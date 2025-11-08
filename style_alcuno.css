@@ -1,0 +1,284 @@
+/*Style_Alcuno.css*/
+
+body
+{
+    background-color: #3f3232;
+    margin: 0;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.plateau 
+{
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 1050px; /* 10 cartes * 100px */
+    margin: 0 auto;
+    justify-content: center;
+    gap: 5px;
+}
+
+.Carte 
+{
+  width: 100px;
+  height: 150px;
+  background-image: url("Cartes/dos.gif");
+  background-size: cover;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.Carte:hover 
+{
+  transform: scale(1.05);
+}
+
+.zero_vert 
+{
+  background-image: url("Cartes/zero_vert.jpg");
+}
+
+.zero_jaune 
+{
+  background-image: url("Cartes/zero_jaune.jpg");
+}
+
+.zero_rouge 
+{
+  background-image: url("Cartes/zero_rouge.jpg");
+}
+
+.zero_bleu
+{
+  background-image: url("Cartes/zero_bleu.jpg");
+}
+
+.un_vert, .un_vert1
+{
+  background-image: url("Cartes/un_vert.jpg");
+}
+
+.un_jaune, .un_jaune1
+{
+  background-image: url("Cartes/un_jaune.jpg");
+}
+
+.un_rouge, .un_rouge1
+{
+  background-image: url("Cartes/un_rouge.jpg");
+}
+
+.un_bleu, .un_bleu1
+{
+  background-image: url("Cartes/un_bleu.jpg");
+}
+
+.deux_vert, .deux_vert1
+{
+  background-image: url("Cartes/deux_vert.jpg");
+}
+
+.deux_jaune, .deux_jaune1
+{
+  background-image: url("Cartes/deux_jaune.jpg");
+}
+
+.deux_rouge, .deux_rouge1
+{
+  background-image: url("Cartes/deux_rouge.jpg");
+}
+
+.deux_bleu, .deux_bleu1
+{
+  background-image: url("Cartes/deux_bleu.jpg");
+}
+
+.trois_vert, .trois_vert1
+{
+  background-image: url("Cartes/trois_vert.jpg");
+}
+
+.trois_jaune, .trois_jaune1
+{
+  background-image: url("Cartes/trois_jaune.jpg");
+}
+
+.trois_rouge, .trois_rouge1
+{
+  background-image: url("Cartes/trois_rouge.jpg");
+}
+
+.trois_bleu, .trois_bleu1
+{
+  background-image: url("Cartes/trois_bleu.jpg");
+}
+
+.quatre_vert, .quatre_vert1
+{
+  background-image: url("Cartes/quatre_vert.jpg");
+}
+
+.quatre_jaune, .quatre_jaune1
+{
+  background-image: url("Cartes/quatre_jaune.jpg");
+}
+
+.quatre_rouge, .quatre_rouge1
+{
+  background-image: url("Cartes/quatre_rouge.jpg");
+}
+
+.quatre_bleu, .quatre_bleu1
+{
+  background-image: url("Cartes/quatre_bleu.jpg");
+}
+
+.cinq_vert, .cinq_vert1
+{
+  background-image: url("Cartes/cinq_vert.jpg");
+}
+
+.cinq_jaune, .cinq_jaune1
+{
+  background-image: url("Cartes/cinq_jaune.jpg");
+}
+
+.cinq_rouge, .cinq_rouge1
+{
+  background-image: url("Cartes/cinq_rouge.jpg");
+}
+
+.cinq_bleu, .cinq_bleu1
+{
+  background-image: url("Cartes/cinq_bleu.jpg");
+}
+
+.six_vert, .six_vert1
+{
+  background-image: url("Cartes/six_vert.jpg");
+}
+
+.six_jaune, .six_jaune1
+{
+  background-image: url("Cartes/six_jaune.jpg");
+}
+
+.six_rouge, .six_rouge1
+{
+  background-image: url("Cartes/six_rouge.jpg");
+}
+
+.six_bleu, .six_bleu1
+{
+  background-image: url("Cartes/six_bleu.jpg");
+}
+
+.sept_vert, .sept_vert1
+{
+  background-image: url("Cartes/sept_vert.jpg");
+}
+
+.sept_jaune, .sept_jaune1
+{
+  background-image: url("Cartes/sept_jaune.jpg");
+}
+
+.sept_rouge, .sept_rouge1
+{
+  background-image: url("Cartes/sept_rouge.jpg");
+}
+
+.sept_bleu, .sept_bleu1
+{
+  background-image: url("Cartes/sept_bleu.jpg");
+}
+
+.huit_vert, .huit_vert1
+{
+  background-image: url("Cartes/huit_vert.jpg");
+}
+
+.huit_jaune, .huit_jaune1
+{
+  background-image: url("Cartes/huit_jaune.jpg");
+}
+
+.huit_rouge, .huit_rouge1
+{
+  background-image: url("Cartes/huit_rouge.jpg");
+}
+
+.huit_bleu, .huit_bleu1
+{
+  background-image: url("Cartes/huit_bleu.jpg");
+}
+
+.neuf_vert, .neuf_vert1
+{
+  background-image: url("Cartes/neuf_vert.jpg");
+}
+
+.neuf_jaune, .neuf_jaune1
+{
+  background-image: url("Cartes/neuf_jaune.jpg");
+}
+
+.neuf_rouge, .neuf_rouge1
+{
+  background-image: url("Cartes/neuf_rouge.jpg");
+}
+
+.neuf_bleu, .neuf_bleu1
+{
+  background-image: url("Cartes/neuf_bleu.jpg");
+}
+
+.interdit_vert
+{
+  background-image: url("Cartes/interdit_vert.jpg");
+}
+
+.interdit_jaune
+{
+  background-image: url("Cartes/interdit_jaune.jpg");
+}
+
+.interdit_rouge
+{
+  background-image: url("Cartes/interdit_rouge.jpg");
+}
+
+.interdit_bleu
+{
+  background-image: url("Cartes/interdit_bleu.jpg");
+}
+
+.couleur, .couleur1, .couleur2, .couleur3
+{
+  background-image: url("Cartes/couleur.jpg");
+}
+
+.plus_2_vert, .plus_2_vert1
+{
+  background-image: url("Cartes/plus_2_vert.jpg");
+}
+
+.plus_2_jaune, .plus_2_jaune1
+{
+  background-image: url("Cartes/plus_2_jaune.jpg");
+}
+
+.plus_2_rouge, .plus_2_rouge1
+{
+  background-image: url("Cartes/plus_2_rouge.jpg");
+}
+
+.plus_2_bleu, .plus_2_bleu1
+{
+  background-image: url("Cartes/plus_2_bleu.jpg");
+}
+
+.plus_4, .plus_4_1, .plus_4_2, .plus_4_3
+{
+  background-image: url("Cartes/plus_4.jpg");
+}
