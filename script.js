@@ -43,6 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
   let nomPigeonOriginal = "";
   let choixPigeonEnCours = false;
   let zeroEnCours = false;
+  let switchEnCours = false;
   let sensHoraire = true; // true = normal, false = inversé
 
   /* ===== OUTILS ===== */
@@ -205,10 +206,12 @@ document.addEventListener("DOMContentLoaded", function () {
   };
 
   function appliquerRegle(carteTiree, joueurActuel){
-    if(zeroEnCours){
+    if(zeroEnCours || switchEnCours){
       regleZero.style.display="none";
       zeroEnCours=false;
+      switchEnCours=false;
     }
+
     effacerMessagePigeon();
 
     // Cartes "boire"
@@ -225,9 +228,15 @@ document.addEventListener("DOMContentLoaded", function () {
     // Cartes "switch"
     if(carteTiree.startsWith("switch")){
       sensHoraire = !sensHoraire;
-      montrerOverlayRegle("Le sens du jeu est inversé ! 🔄", carteTiree);
+
+      regleZero.innerText = "Sens du jeu inversé";
+      regleZero.style.display = "block";
+      switchEnCours = true;
+
+      montrerOverlayRegle("Le sens du jeu est inversé !", carteTiree);
       return;
     }
+
 
     // Cartes "trois/pigeon"
     if(carteTiree.startsWith("trois")){
