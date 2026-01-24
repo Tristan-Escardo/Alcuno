@@ -1,1 +1,33 @@
-"deux_vert", "deux_vert1", "deux_jaune", "deux_jaune1", "deux_rouge", "deux_rouge1", "deux_bleu", "deux_bleu1",
+0 : Social sauf celui qui l'a pioché<br/>        
+Interdit : Social<br/>
+Plus_2 : Bois 2 gorgées<br/>
+            Plus_4 : Distribues 4 gorgées<br/>
+            3 : Pigeon prends 2 gorgées d'office<br/>
+            à chaque nouveau 3 qui sort tu prends une gorgée. Pour en sortir<br/>
+            tu dois repiocher un 3, tu décides alors qui sera le nouveau pigeon<br/>
+Switch : Changement de sens<br/>
+
+1 : Se garde et peut annuler une gorgée<br/>
+            4 : Duel tu dois désigner 2 personnes qui vont s'affronter. Elles<br/>
+            tireront chacune une carte pouvant être 2,5,6,7,8 ou 9. Le perdant<br/>
+            ayant tiré la plus petite carte bois le nombre de gorgées de sa carte.<br/>
+            Couleur : Choisis une couleur (b,v,r,j), le prochain à tirer une carte<br/>
+            de cette couleur voit ses gorgées attribuées doublées. Si il ne doit pas<br/>
+            boire il boit quand même.<br/>
+            
+            
+
+A la fin la dernière carte est réservée de côté et chacun doit parier pour<br/>
+            savoir laquelle c'est. Les paris commencent avec celui qui a tiré l'avant dernière<br/>
+            carte. Le gagnant distribue un cul sec.
+
+
+Tableau de suivi
+
+À droite, les joueurs et gorgées consommées
+
+Option “Réinitialiser les compteurs” entre parties
+
+Fonctionne sur PC, tablette ou téléphone
+
+Mode soirée → gros boutons, textes lisibles à distance
