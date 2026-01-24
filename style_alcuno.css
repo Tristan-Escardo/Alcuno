@@ -1,284 +1,270 @@
-/*Style_Alcuno.css*/
-
-body
-{
+/* ===== GLOBAL ===== */
+body {
     background-color: #3f3232;
     margin: 0;
     padding: 20px;
     font-family: Arial, sans-serif;
+    color: white;
+    overflow-x: hidden;
 }
 
-.plateau 
-{
+header {
+    border-bottom: 2px solid #fff;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.menu, .suppression {
     display: flex;
-    flex-wrap: wrap;
-    max-width: 1050px; /* 10 cartes * 100px */
-    margin: 0 auto;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.suppression {
+    flex-direction: column;
+}
+
+.menu input {
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    width: 250px;
+}
+
+.menu button, .suppression button {
+    padding: 10px 15px;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #8b5a5a;
+    color: white;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.menu button:hover, .suppression button:hover {
+    background-color: #a86f6f;
+    transform: scale(1.05);
+}
+
+/* ===== PLATEAU + MESSAGES ===== */
+.jeu {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.plateau {
+    display: grid;
+    grid-template-columns: repeat(8, 100px);
+    grid-auto-rows: 150px;
+    gap: 10px;
+    padding: 10px;
+    background: transparent;
+}
+
+.messages {
+    border-left: 2px solid #fff;
+    padding: 10px;
+    width: 350px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    /* REND LE MENU TOUJOURS VISIBLE */
+    position: sticky;   /* colle le menu quand on scroll */
+    top: 20px;          /* distance depuis le haut de la fenêtre */
+    align-self: flex-start; /* assure l'alignement avec le plateau */
+}
+
+/* ===== CARTES ===== */
+.Carte {
+    width: 100px;
+    height: 150px;
+    border-radius: 8px;
+    background-image: url("Cartes/dos.gif");
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
+    transition: transform 0.2s, background-image 0.3s;
+}
+
+.Carte:hover {
+    transform: scale(1.05);
+}
+
+.retournee {
+    pointer-events: none;
+}
+
+.joueurActif {
+    margin-top: 20px;
+    font-size: 22px;
+    font-weight: bold;
+    color: yellow;
+    text-align: left;
+}
+
+.listeJoueurs {
+    margin-top: 10px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #ddd;
+    text-align: center;
+}
+
+.titreJoueurs {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.nomsJoueurs {
+    font-size: 16px;
+    color: #40E0D0;
+    text-align: center;
+    line-height: 1.6;
+}
+
+.regleZero,
+.reglePigeon {
+    margin-top: 15px;
+    font-size: 16px;
+    color: #FFD700; /* doré pour toutes les règles */
+    text-align: center;
+    font-weight: bold;
+}
+
+/* ===== MENU PIGEON FULLSCREEN ===== */
+#overlayPigeon {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background-color: rgba(0,0,0,0.9);
+    display: flex;
+    flex-direction: column;
     justify-content: center;
-    gap: 5px;
+    align-items: center;
+    gap: 30px;
+    z-index: 9999;
+    padding: 20px;
+    box-sizing: border-box;
+    animation: fadeIn 0.5s ease forwards;
 }
 
-.Carte 
-{
-  width: 100px;
-  height: 150px;
-  background-image: url("Cartes/dos.gif");
-  background-size: cover;
-  cursor: pointer;
-  transition: transform 0.2s;
+#overlayPigeon .titre-pigeon {
+    font-size: 48px;
+    font-weight: bold;
+    color: #FFD700;
+    text-align: center;
+    text-shadow: 2px 2px 5px #000;
+    animation: pop 0.5s ease forwards;
 }
 
-.Carte:hover 
-{
-  transform: scale(1.05);
+#overlayPigeon .bouton-pigeon {
+    width: 80%;
+    max-width: 400px;
+    padding: 25px;
+    font-size: 32px;
+    font-weight: bold;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    background-color: #FFD700;
+    color: #000;
+    transition: transform 0.2s, background-color 0.2s;
+    animation: slideUp 0.5s ease forwards;
 }
 
-.zero_vert 
-{
-  background-image: url("Cartes/zero_vert.jpg");
+#overlayPigeon .bouton-pigeon:hover {
+    background-color: #ffea70;
+    transform: scale(1.15);
 }
 
-.zero_jaune 
-{
-  background-image: url("Cartes/zero_jaune.jpg");
+/* ===== ANIMATIONS ===== */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
-.zero_rouge 
-{
-  background-image: url("Cartes/zero_rouge.jpg");
+@keyframes pop {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
 }
 
-.zero_bleu
-{
-  background-image: url("Cartes/zero_bleu.jpg");
+@keyframes slideUp {
+    from { transform: translateY(50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
 
-.un_vert, .un_vert1
-{
-  background-image: url("Cartes/un_vert.jpg");
-}
+/* ===== Cartes classes ===== */
+.zero_vert { background-image: url("Cartes/zero_vert.jpg"); }
+.zero_jaune { background-image: url("Cartes/zero_jaune.jpg"); }
+.zero_rouge { background-image: url("Cartes/zero_rouge.jpg"); }
+.zero_bleu { background-image: url("Cartes/zero_bleu.jpg"); }
 
-.un_jaune, .un_jaune1
-{
-  background-image: url("Cartes/un_jaune.jpg");
-}
+.un_vert, .un_vert1 { background-image: url("Cartes/un_vert.jpg"); }
+.un_jaune, .un_jaune1 { background-image: url("Cartes/un_jaune.jpg"); }
+.un_rouge, .un_rouge1 { background-image: url("Cartes/un_rouge.jpg"); }
+.un_bleu, .un_bleu1 { background-image: url("Cartes/un_bleu.jpg"); }
 
-.un_rouge, .un_rouge1
-{
-  background-image: url("Cartes/un_rouge.jpg");
-}
+.deux_vert, .deux_vert1 { background-image: url("Cartes/deux_vert.jpg"); }
+.deux_jaune, .deux_jaune1 { background-image: url("Cartes/deux_jaune.jpg"); }
+.deux_rouge, .deux_rouge1 { background-image: url("Cartes/deux_rouge.jpg"); }
+.deux_bleu, .deux_bleu1 { background-image: url("Cartes/deux_bleu.jpg"); }
 
-.un_bleu, .un_bleu1
-{
-  background-image: url("Cartes/un_bleu.jpg");
-}
+.trois_vert, .trois_vert1 { background-image: url("Cartes/trois_vert.jpg"); }
+.trois_jaune, .trois_jaune1 { background-image: url("Cartes/trois_jaune.jpg"); }
+.trois_rouge, .trois_rouge1 { background-image: url("Cartes/trois_rouge.jpg"); }
+.trois_bleu, .trois_bleu1 { background-image: url("Cartes/trois_bleu.jpg"); }
 
-.deux_vert, .deux_vert1
-{
-  background-image: url("Cartes/deux_vert.jpg");
-}
+.quatre_vert, .quatre_vert1 { background-image: url("Cartes/quatre_vert.jpg"); }
+.quatre_jaune, .quatre_jaune1 { background-image: url("Cartes/quatre_jaune.jpg"); }
+.quatre_rouge, .quatre_rouge1 { background-image: url("Cartes/quatre_rouge.jpg"); }
+.quatre_bleu, .quatre_bleu1 { background-image: url("Cartes/quatre_bleu.jpg"); }
 
-.deux_jaune, .deux_jaune1
-{
-  background-image: url("Cartes/deux_jaune.jpg");
-}
+.cinq_vert, .cinq_vert1 { background-image: url("Cartes/cinq_vert.jpg"); }
+.cinq_jaune, .cinq_jaune1 { background-image: url("Cartes/cinq_jaune.jpg"); }
+.cinq_rouge, .cinq_rouge1 { background-image: url("Cartes/cinq_rouge.jpg"); }
+.cinq_bleu, .cinq_bleu1 { background-image: url("Cartes/cinq_bleu.jpg"); }
 
-.deux_rouge, .deux_rouge1
-{
-  background-image: url("Cartes/deux_rouge.jpg");
-}
+.six_vert, .six_vert1 { background-image: url("Cartes/six_vert.jpg"); }
+.six_jaune, .six_jaune1 { background-image: url("Cartes/six_jaune.jpg"); }
+.six_rouge, .six_rouge1 { background-image: url("Cartes/six_rouge.jpg"); }
+.six_bleu, .six_bleu1 { background-image: url("Cartes/six_bleu.jpg"); }
 
-.deux_bleu, .deux_bleu1
-{
-  background-image: url("Cartes/deux_bleu.jpg");
-}
+.sept_vert, .sept_vert1 { background-image: url("Cartes/sept_vert.jpg"); }
+.sept_jaune, .sept_jaune1 { background-image: url("Cartes/sept_jaune.jpg"); }
+.sept_rouge, .sept_rouge1 { background-image: url("Cartes/sept_rouge.jpg"); }
+.sept_bleu, .sept_bleu1 { background-image: url("Cartes/sept_bleu.jpg"); }
 
-.trois_vert, .trois_vert1
-{
-  background-image: url("Cartes/trois_vert.jpg");
-}
+.huit_vert, .huit_vert1 { background-image: url("Cartes/huit_vert.jpg"); }
+.huit_jaune, .huit_jaune1 { background-image: url("Cartes/huit_jaune.jpg"); }
+.huit_rouge, .huit_rouge1 { background-image: url("Cartes/huit_rouge.jpg"); }
+.huit_bleu, .huit_bleu1 { background-image: url("Cartes/huit_bleu.jpg"); }
 
-.trois_jaune, .trois_jaune1
-{
-  background-image: url("Cartes/trois_jaune.jpg");
-}
+.neuf_vert, .neuf_vert1 { background-image: url("Cartes/neuf_vert.jpg"); }
+.neuf_jaune, .neuf_jaune1 { background-image: url("Cartes/neuf_jaune.jpg"); }
+.neuf_rouge, .neuf_rouge1 { background-image: url("Cartes/neuf_rouge.jpg"); }
+.neuf_bleu, .neuf_bleu1 { background-image: url("Cartes/neuf_bleu.jpg"); }
 
-.trois_rouge, .trois_rouge1
-{
-  background-image: url("Cartes/trois_rouge.jpg");
-}
+.interdit_vert { background-image: url("Cartes/interdit_vert.jpg"); }
+.interdit_jaune { background-image: url("Cartes/interdit_jaune.jpg"); }
+.interdit_rouge { background-image: url("Cartes/interdit_rouge.jpg"); }
+.interdit_bleu { background-image: url("Cartes/interdit_bleu.jpg"); }
 
-.trois_bleu, .trois_bleu1
-{
-  background-image: url("Cartes/trois_bleu.jpg");
-}
+.couleur, .couleur1, .couleur2, .couleur3 { background-image: url("Cartes/couleur.jpg"); }
 
-.quatre_vert, .quatre_vert1
-{
-  background-image: url("Cartes/quatre_vert.jpg");
-}
+.plus_2_vert, .plus_2_vert1 { background-image: url("Cartes/plus_2_vert.jpg"); }
+.plus_2_jaune, .plus_2_jaune1 { background-image: url("Cartes/plus_2_jaune.jpg"); }
+.plus_2_rouge, .plus_2_rouge1 { background-image: url("Cartes/plus_2_rouge.jpg"); }
+.plus_2_bleu, .plus_2_bleu1 { background-image: url("Cartes/plus_2_bleu.jpg"); }
 
-.quatre_jaune, .quatre_jaune1
-{
-  background-image: url("Cartes/quatre_jaune.jpg");
-}
+.plus_4, .plus_4_1, .plus_4_2, .plus_4_3 { background-image: url("Cartes/plus_4.jpg"); }
 
-.quatre_rouge, .quatre_rouge1
-{
-  background-image: url("Cartes/quatre_rouge.jpg");
-}
-
-.quatre_bleu, .quatre_bleu1
-{
-  background-image: url("Cartes/quatre_bleu.jpg");
-}
-
-.cinq_vert, .cinq_vert1
-{
-  background-image: url("Cartes/cinq_vert.jpg");
-}
-
-.cinq_jaune, .cinq_jaune1
-{
-  background-image: url("Cartes/cinq_jaune.jpg");
-}
-
-.cinq_rouge, .cinq_rouge1
-{
-  background-image: url("Cartes/cinq_rouge.jpg");
-}
-
-.cinq_bleu, .cinq_bleu1
-{
-  background-image: url("Cartes/cinq_bleu.jpg");
-}
-
-.six_vert, .six_vert1
-{
-  background-image: url("Cartes/six_vert.jpg");
-}
-
-.six_jaune, .six_jaune1
-{
-  background-image: url("Cartes/six_jaune.jpg");
-}
-
-.six_rouge, .six_rouge1
-{
-  background-image: url("Cartes/six_rouge.jpg");
-}
-
-.six_bleu, .six_bleu1
-{
-  background-image: url("Cartes/six_bleu.jpg");
-}
-
-.sept_vert, .sept_vert1
-{
-  background-image: url("Cartes/sept_vert.jpg");
-}
-
-.sept_jaune, .sept_jaune1
-{
-  background-image: url("Cartes/sept_jaune.jpg");
-}
-
-.sept_rouge, .sept_rouge1
-{
-  background-image: url("Cartes/sept_rouge.jpg");
-}
-
-.sept_bleu, .sept_bleu1
-{
-  background-image: url("Cartes/sept_bleu.jpg");
-}
-
-.huit_vert, .huit_vert1
-{
-  background-image: url("Cartes/huit_vert.jpg");
-}
-
-.huit_jaune, .huit_jaune1
-{
-  background-image: url("Cartes/huit_jaune.jpg");
-}
-
-.huit_rouge, .huit_rouge1
-{
-  background-image: url("Cartes/huit_rouge.jpg");
-}
-
-.huit_bleu, .huit_bleu1
-{
-  background-image: url("Cartes/huit_bleu.jpg");
-}
-
-.neuf_vert, .neuf_vert1
-{
-  background-image: url("Cartes/neuf_vert.jpg");
-}
-
-.neuf_jaune, .neuf_jaune1
-{
-  background-image: url("Cartes/neuf_jaune.jpg");
-}
-
-.neuf_rouge, .neuf_rouge1
-{
-  background-image: url("Cartes/neuf_rouge.jpg");
-}
-
-.neuf_bleu, .neuf_bleu1
-{
-  background-image: url("Cartes/neuf_bleu.jpg");
-}
-
-.interdit_vert
-{
-  background-image: url("Cartes/interdit_vert.jpg");
-}
-
-.interdit_jaune
-{
-  background-image: url("Cartes/interdit_jaune.jpg");
-}
-
-.interdit_rouge
-{
-  background-image: url("Cartes/interdit_rouge.jpg");
-}
-
-.interdit_bleu
-{
-  background-image: url("Cartes/interdit_bleu.jpg");
-}
-
-.couleur, .couleur1, .couleur2, .couleur3
-{
-  background-image: url("Cartes/couleur.jpg");
-}
-
-.plus_2_vert, .plus_2_vert1
-{
-  background-image: url("Cartes/plus_2_vert.jpg");
-}
-
-.plus_2_jaune, .plus_2_jaune1
-{
-  background-image: url("Cartes/plus_2_jaune.jpg");
-}
-
-.plus_2_rouge, .plus_2_rouge1
-{
-  background-image: url("Cartes/plus_2_rouge.jpg");
-}
-
-.plus_2_bleu, .plus_2_bleu1
-{
-  background-image: url("Cartes/plus_2_bleu.jpg");
-}
-
-.plus_4, .plus_4_1, .plus_4_2, .plus_4_3
-{
-  background-image: url("Cartes/plus_4.jpg");
-}
+.switch_vert { background-image: url("Cartes/switch_vert.jpg"); }
+.switch_jaune { background-image: url("Cartes/switch_jaune.jpg"); }
+.switch_rouge { background-image: url("Cartes/switch_rouge.jpg"); }
+.switch_bleu { background-image: url("Cartes/switch_bleu.jpg"); }
