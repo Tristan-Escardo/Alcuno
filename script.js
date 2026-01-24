@@ -1,4 +1,3 @@
-/* ===== SCRIPT COMPLET AVEC RÈGLE COULEUR ===== */
 document.addEventListener("DOMContentLoaded", function () {
   const plateau = document.getElementById("plateau");
   const joueurActif = document.getElementById("joueurActif");
@@ -277,8 +276,9 @@ document.addEventListener("DOMContentLoaded", function () {
       afficherOverlayCouleur();
     }
 
-    // Application de la règle couleur si active
-    if(couleurChoisie && carteTiree.includes(couleurChoisie)){
+    // FIX COULEUR : application correcte
+    if(couleurChoisie){
+      // on ne check plus si carteTiree.includes(couleurChoisie)
       const msgCouleur = "Bois 1 gorgée pour la couleur !";
       if(regleZero.innerText){
         regleZero.innerText += "\n" + msgCouleur;
@@ -286,7 +286,7 @@ document.addEventListener("DOMContentLoaded", function () {
         regleZero.innerText = msgCouleur;
         regleZero.style.display = "block";
       }
-      montrerOverlayRegle(msgCouleur, carteTiree, "couleur_"+couleurChoisie);
+      montrerOverlayRegle(msgCouleur, carteTiree);
       couleurChoisie = null;
     }
   }
@@ -320,6 +320,7 @@ document.addEventListener("DOMContentLoaded", function () {
         couleurChoisie = c.nom;
         overlay.remove();
         choixPigeonEnCours = false;
+        afficherJoueurActif();
       });
       container.appendChild(carre);
     });
@@ -330,6 +331,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
   /* ===== JEU ===== */
   function lancerPartie(){
+    if(joueurs.length < 2){
+      alert("Il faut au moins 2 joueurs");
+      return;
+    }
+
     plateau.innerHTML="";
     paquet=[...classes];
     melangerPaquet(paquet);
