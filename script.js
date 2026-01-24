@@ -1,3 +1,4 @@
+/* ===== SCRIPT COMPLET AVEC RÈGLE COULEUR ===== */
 document.addEventListener("DOMContentLoaded", function () {
   const plateau = document.getElementById("plateau");
   const joueurActif = document.getElementById("joueurActif");
@@ -44,7 +45,8 @@ document.addEventListener("DOMContentLoaded", function () {
   let choixPigeonEnCours = false;
   let zeroEnCours = false;
   let switchEnCours = false;
-  let sensHoraire = true; // true = normal, false = inversé
+  let sensHoraire = true; 
+  let couleurChoisie = null; // couleur choisie pour la règle couleur
 
   /* ===== OUTILS ===== */
   function melangerPaquet(array){
@@ -147,7 +149,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   /* ===== Overlay animé pour toutes les cartes spéciales ===== */
-  function montrerOverlayRegle(message, classeCarte="") {
+  function montrerOverlayRegle(message, classeCarte="", classeCarteSupplementaire="") {
     const overlay = document.createElement("div");
     overlay.style.position = "fixed";
     overlay.style.top = "0";
@@ -169,14 +171,31 @@ document.addEventListener("DOMContentLoaded", function () {
     overlay.style.opacity = "0";
     overlay.style.transition = "opacity 0.3s ease, transform 0.3s ease";
 
+    const imagesContainer = document.createElement("div");
+    imagesContainer.style.display = "flex";
+    imagesContainer.style.gap = "20px";
+    imagesContainer.style.marginBottom = "20px";
+
     if(classeCarte){
       const miniCarte = document.createElement("div");
       miniCarte.classList.add("Carte", classeCarte);
       miniCarte.style.width = "150px";
       miniCarte.style.height = "220px";
-      miniCarte.style.marginBottom = "20px";
       miniCarte.style.boxShadow = "0 0 15px #FFD700";
-      overlay.appendChild(miniCarte);
+      imagesContainer.appendChild(miniCarte);
+    }
+
+    if(classeCarteSupplementaire){
+      const miniCarte2 = document.createElement("div");
+      miniCarte2.classList.add("Carte", classeCarteSupplementaire);
+      miniCarte2.style.width = "150px";
+      miniCarte2.style.height = "220px";
+      miniCarte2.style.boxShadow = "0 0 15px #FFD700";
+      imagesContainer.appendChild(miniCarte2);
+    }
+
+    if(classeCarte || classeCarteSupplementaire){
+      overlay.appendChild(imagesContainer);
     }
 
     const texte = document.createElement("div");
@@ -193,8 +212,8 @@ document.addEventListener("DOMContentLoaded", function () {
     setTimeout(() => {
       overlay.style.opacity = "0";
       overlay.style.transform = "scale(0.8)";
-      overlay.addEventListener("transitionend", () => overlay.remove());
-    }, 1300);
+      overlay.addEventListener("transitionend", () => overlay.remove(), {once: true});
+    }, 1500);
   }
 
   /* ===== Règles centralisées ===== */
@@ -213,45 +232,100 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     effacerMessagePigeon();
+    let messageCarte = "";
 
     // Cartes "boire"
     for(const key in reglesBoire){
       if(carteTiree.startsWith(key)){
-        regleZero.innerText = reglesBoire[key];
+        messageCarte = reglesBoire[key];
+        regleZero.innerText = messageCarte;
         regleZero.style.display = "block";
         zeroEnCours = true;
-        montrerOverlayRegle(reglesBoire[key], carteTiree);
-        return;
+        montrerOverlayRegle(messageCarte, carteTiree);
       }
     }
 
     // Cartes "switch"
     if(carteTiree.startsWith("switch")){
       sensHoraire = !sensHoraire;
-
-      regleZero.innerText = "Sens du jeu inversé";
+      messageCarte = "Sens du jeu inversé";
+      regleZero.innerText = messageCarte;
       regleZero.style.display = "block";
       switchEnCours = true;
-
       montrerOverlayRegle("Le sens du jeu est inversé !", carteTiree);
-      return;
     }
-
 
     // Cartes "trois/pigeon"
     if(carteTiree.startsWith("trois")){
       if(indexPigeon===null){
         indexPigeon=joueurActuel;
         nomPigeonOriginal=joueurs[joueurActuel];
+        montrerOverlayRegle("Tu es pigeon ! Bois 2 gorgées.", carteTiree);
         afficherMessagePigeon(
           "Tu es pigeon ! Bois 2 gorgées. À chaque 3 tiré, tu bois 1 gorgée. Pour sortir, tire un 3."
         );
       } else if(indexPigeon===joueurActuel){
         afficherMenuPigeon();
       } else {
+        montrerOverlayRegle("Le pigeon boit 1 gorgée", carteTiree);
         afficherMessagePigeon("Le pigeon boit 1 gorgée");
       }
     }
+
+    // Cartes "couleur"
+    if(carteTiree.startsWith("couleur")){
+      afficherOverlayCouleur();
+    }
+
+    // Application de la règle couleur si active
+    if(couleurChoisie && carteTiree.includes(couleurChoisie)){
+      const msgCouleur = "Bois 1 gorgée pour la couleur !";
+      if(regleZero.innerText){
+        regleZero.innerText += "\n" + msgCouleur;
+      } else {
+        regleZero.innerText = msgCouleur;
+        regleZero.style.display = "block";
+      }
+      montrerOverlayRegle(msgCouleur, carteTiree, "couleur_"+couleurChoisie);
+      couleurChoisie = null;
+    }
+  }
+
+  function afficherOverlayCouleur(){
+    if(document.getElementById("overlayCouleur")) return;
+    choixPigeonEnCours=true;
+
+    const overlay = document.createElement("div");
+    overlay.id = "overlayCouleur";
+
+    const titre = document.createElement("div");
+    titre.className = "titre-couleur";
+    titre.innerText = "Choisis une couleur";
+    overlay.appendChild(titre);
+
+    const container = document.createElement("div");
+    container.className = "container-couleurs";
+
+    const couleurs = [
+      { nom: "vert", classe: "carre-vert" },
+      { nom: "jaune", classe: "carre-jaune" },
+      { nom: "rouge", classe: "carre-rouge" },
+      { nom: "bleu", classe: "carre-bleu" }
+    ];
+
+    couleurs.forEach(c=>{
+      const carre = document.createElement("div");
+      carre.className = "carre-couleur " + c.classe;
+      carre.addEventListener("click", ()=>{
+        couleurChoisie = c.nom;
+        overlay.remove();
+        choixPigeonEnCours = false;
+      });
+      container.appendChild(carre);
+    });
+
+    overlay.appendChild(container);
+    document.body.appendChild(overlay);
   }
 
   /* ===== JEU ===== */
@@ -263,6 +337,7 @@ document.addEventListener("DOMContentLoaded", function () {
     partieLancee=true;
     zeroEnCours=false;
     sensHoraire = true;
+    couleurChoisie = null;
 
     btnNouvellePartie.style.display="inline-block";
     btnSupprimer.style.display="none";
@@ -286,8 +361,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const joueurActuel = indexJoueur % joueurs.length;
         appliquerRegle(carteTiree, joueurActuel);
 
-        indexJoueur += sensHoraire ? 1 : -1;
-        if(indexJoueur<0) indexJoueur = joueurs.length-1;
+        indexJoueur = (indexJoueur + (sensHoraire?1:-1) + joueurs.length) % joueurs.length;
 
         afficherJoueurActif();
         afficherJoueurs();
@@ -305,7 +379,9 @@ document.addEventListener("DOMContentLoaded", function () {
     nomPigeonOriginal="";
     choixPigeonEnCours=false;
     zeroEnCours=false;
+    switchEnCours=false;
     sensHoraire = true;
+    couleurChoisie = null;
 
     plateau.innerHTML="";
     regleZero.style.display="none";
@@ -314,6 +390,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const overlay=document.getElementById("overlayPigeon");
     if(overlay) overlay.remove();
+    const overlayCouleur = document.getElementById("overlayCouleur");
+    if(overlayCouleur) overlayCouleur.remove();
 
     btnNouvellePartie.style.display="none";
     btnSupprimer.style.display="inline-block";
