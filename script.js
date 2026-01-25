@@ -86,9 +86,59 @@ document.addEventListener("DOMContentLoaded", function () {
 
   let phase = 1;       // 1 = choix J1, 2 = choix J2
   let choixJ1 = null;  // 1 ou 2 (carte de gauche/droite)
-
+  let lastCols = null;
 
   /* ===== OUTILS ===== */
+
+  function refreshPlateauLayout(){
+    const plateau = document.getElementById("plateau");
+    if(!plateau) return;
+
+    const cols = getCols();
+    if(cols === lastCols) return; // évite resize spam iOS
+
+    lastCols = cols;
+
+    // On ne touche PAS aux cartes existantes :
+    // on enlève juste les spacers, puis on les remet
+    const children = Array.from(plateau.children);
+
+    // Retire les spacers existants
+    for(const el of children){
+      if(el.classList && el.classList.contains("carteSpacer")){
+        el.remove();
+      } else {
+        break; // spacers uniquement au début
+      }
+    }
+
+    // Remet les spacers selon la nouvelle largeur
+    ajouterSpacersPourCentrerPremiereLigne(plateau, 52);
+  }
+
+  
+  function getCols(){
+    const w = window.innerWidth;
+    if(w <= 380) return 3;
+    if(w <= 520) return 4;
+    if(w <= 720) return 5;
+    if(w <= 1000) return 6;
+    return 8;
+  }
+
+  function ajouterSpacersPourCentrerPremiereLigne(plateauEl, totalCartes){
+    const cols = getCols();
+    const reste = totalCartes % cols;
+    if(reste === 0) return; // pas besoin
+
+    const offset = Math.floor((cols - reste) / 2);
+    for(let i=0; i<offset; i++){
+      const sp = document.createElement("div");
+      sp.className = "carteSpacer";
+      plateauEl.appendChild(sp);
+    }
+  }
+
   function melangerPaquet(array){
     for(let i=array.length-1;i>0;i--){
       const j=Math.floor(Math.random()*(i+1));
@@ -698,6 +748,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     plateau.innerHTML = "";
+    ajouterSpacersPourCentrerPremiereLigne(plateau, 52);
+    refreshPlateauLayout();
 
     // Plateau principal = toutes les cartes SAUF 2/5/6/7/8/9 (paquet duel)
     const paquetPrincipal = classes.filter(c => !duelCartes.includes(c));
@@ -775,6 +827,9 @@ document.addEventListener("DOMContentLoaded", function () {
     duelMultiplicateur = 1;
 
     plateau.innerHTML = "";
+    ajouterSpacersPourCentrerPremiereLigne(plateau, 52);
+    refreshPlateauLayout();
+
     regleZero.style.display = "none";
     effacerMessagePigeon();
     joueurActif.innerText = "";
@@ -801,4 +856,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
   /* ===== INIT ===== */
   afficherJoueurs();
+  window.addEventListener("resize", () => {
+    // iOS déclenche resize quand on scroll / barres changent,
+    // donc on filtre : on ne fait quelque chose que si le nb de colonnes change réellement.
+    if(typeof refreshPlateauLayout === "function"){
+      refreshPlateauLayout();
+    }
+  });
 });

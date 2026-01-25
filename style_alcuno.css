@@ -86,18 +86,28 @@ header {
     --gap: clamp(6px, 1.2vw, 14px);
 }
 
+:root{
+  --cols: 8; /* desktop */
+}
+
+/* Ajuste le nombre de colonnes selon la largeur */
+@media (max-width: 1000px){ :root{ --cols: 6; } }
+@media (max-width: 720px){  :root{ --cols: 5; } }
+@media (max-width: 520px){  :root{ --cols: 4; } }  /* iPhone */
+@media (max-width: 380px){  :root{ --cols: 3; } }  /* très petit */
+
 .plateau{
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(var(--card-w), 1fr));
-    gap: var(--gap);
-    justify-items: center;
-    align-items: center;
-
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+    gap: var(--gap);                 /* ✅ même espace H/V */
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
     padding: 10px;
+    justify-items: center;           /* centre la carte dans sa case */
+    align-items: center;
 }
+
 
 
 
@@ -150,6 +160,7 @@ header {
 .Carte {
     width: var(--card-w);
     height: var(--card-h);
+    max-width: 100%;
     border-radius: 8px;
     background-image: url("Cartes/dos.gif");
     background-size: cover;
@@ -163,6 +174,13 @@ header {
 }
 
 .retournee {
+    pointer-events: none;
+}
+
+.carteSpacer{
+    width: var(--card-w);
+    height: var(--card-h);
+    visibility: hidden;
     pointer-events: none;
 }
 
