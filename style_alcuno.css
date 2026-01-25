@@ -438,6 +438,36 @@ header {
     height: calc(var(--card-w) * 1.466);
 }
 
+#menu{
+    display: flex;
+    flex-wrap: wrap;     /* ✅ autorise retour ligne */
+    gap: 10px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#menu button{
+    white-space: nowrap;     /* évite le bouton qui “s’étire” en 2 lignes */
+    flex: 0 0 auto;
+}
+
+#controlsGauche,
+#controlsDroite{
+    display: flex;
+    flex-wrap: wrap;     /* ✅ boutons passent à la ligne */
+    gap: 10px;
+    align-items: center;
+}
+
+#controlsGauche button,
+#controlsDroite button{
+    min-width: 170px; /* ajuste si tu veux */
+}
+
+#menu input{
+    min-width: 0;
+}
+
 
 /* ===== Animations (réutilisation) ===== */
 @keyframes fadeIn {
@@ -457,7 +487,8 @@ header {
 
 @media (max-width: 520px){
     :root{
-        --card-w: clamp(52px, 12vw, 86px);
+        --card-w: clamp(74px, 21vw, 98px);
+        --gap: clamp(8px, 2.2vw, 14px);
     }
 }
 
@@ -467,6 +498,25 @@ header {
     }
     .blocActif, .blocJoueurs, .blocRegles{
         flex: 1 1 auto;
+    }
+}
+
+@media (max-width: 520px){
+    #menu{
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    #controlsGauche,
+    #controlsDroite{
+        width: 100%;
+    }
+
+    /* boutons + input => mêmes largeurs */
+    #menu button,
+    #menu input{
+        width: 100%;
+        max-width: 100%;
     }
 }
 
