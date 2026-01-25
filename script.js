@@ -272,16 +272,12 @@ document.addEventListener("DOMContentLoaded", function () {
     if (classeCarte) {
       const carte1 = document.createElement("div");
       carte1.className = "Carte " + classeCarte;
-      carte1.style.width = "150px";
-      carte1.style.height = "220px";
       cartes.appendChild(carte1);
     }
 
     if (classeCarteSupplementaire) {
       const carte2 = document.createElement("div");
       carte2.className = "Carte " + classeCarteSupplementaire;
-      carte2.style.width = "150px";
-      carte2.style.height = "220px";
       cartes.appendChild(carte2);
     }
 
@@ -432,14 +428,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const c1 = document.createElement("div");
     c1.className = "Carte";
-    c1.style.width = "150px";
-    c1.style.height = "220px";
     containerCartes.appendChild(c1);
 
     const c2 = document.createElement("div");
     c2.className = "Carte";
-    c2.style.width = "150px";
-    c2.style.height = "220px";
     containerCartes.appendChild(c2);
 
     // Labels sous les cartes (optionnel mais clair)
