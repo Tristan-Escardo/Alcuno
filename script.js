@@ -95,26 +95,53 @@ document.addEventListener("DOMContentLoaded", function () {
     if(!plateau) return;
 
     const cols = getCols();
-    if(cols === lastCols) return; // évite resize spam iOS
-
+    if(cols === lastCols) return; // évite spam iOS
     lastCols = cols;
 
-    // On ne touche PAS aux cartes existantes :
-    // on enlève juste les spacers, puis on les remet
-    const children = Array.from(plateau.children);
+    // Récupère toutes les cartes/slots (tout sauf les spacers)
+    const nodes = Array.from(plateau.children).filter(el => !el.classList.contains("carteSpacer"));
 
-    // Retire les spacers existants
-    for(const el of children){
-      if(el.classList && el.classList.contains("carteSpacer")){
-        el.remove();
-      } else {
-        break; // spacers uniquement au début
-      }
+    // Reconstruit le plateau en DÉPLAÇANT les nodes (les listeners restent)
+    plateau.innerHTML = "";
+
+    const total = nodes.length;
+    const reste = total % cols;
+
+    if(reste === 0){
+      // Pas de ligne incomplète => on remet juste tout
+      nodes.forEach(n => plateau.appendChild(n));
+      return;
     }
 
-    // Remet les spacers selon la nouvelle largeur
-    ajouterSpacersPourCentrerPremiereLigne(plateau, 52);
+    const vides = cols - reste;
+    const left = Math.floor(vides / 2);
+    const right = vides - left;
+
+    // 1) Spacers gauche
+    for(let i=0; i<left; i++){
+      const sp = document.createElement("div");
+      sp.className = "carteSpacer";
+      plateau.appendChild(sp);
+    }
+
+    // 2) Les "reste" premières cartes (elles seront sur la 1ère ligne)
+    for(let i=0; i<reste; i++){
+      plateau.appendChild(nodes[i]);
+    }
+
+    // 3) Spacers droite (pour centrer)
+    for(let i=0; i<right; i++){
+      const sp = document.createElement("div");
+      sp.className = "carteSpacer";
+      plateau.appendChild(sp);
+    }
+
+    // 4) Le reste des cartes
+    for(let i=reste; i<nodes.length; i++){
+      plateau.appendChild(nodes[i]);
+    }
   }
+
 
   
   function getCols(){
@@ -129,15 +156,20 @@ document.addEventListener("DOMContentLoaded", function () {
   function ajouterSpacersPourCentrerPremiereLigne(plateauEl, totalCartes){
     const cols = getCols();
     const reste = totalCartes % cols;
-    if(reste === 0) return; // pas besoin
+    if(reste === 0) return;
 
-    const offset = Math.floor((cols - reste) / 2);
-    for(let i=0; i<offset; i++){
+    const vides = cols - reste;
+    const left = Math.floor(vides / 2);
+    const right = vides - left;
+
+    // On ajoute left spacers
+    for(let i=0; i<left; i++){
       const sp = document.createElement("div");
       sp.className = "carteSpacer";
       plateauEl.appendChild(sp);
     }
   }
+
 
   function melangerPaquet(array){
     for(let i=array.length-1;i>0;i--){
@@ -857,10 +889,6 @@ document.addEventListener("DOMContentLoaded", function () {
   /* ===== INIT ===== */
   afficherJoueurs();
   window.addEventListener("resize", () => {
-    // iOS déclenche resize quand on scroll / barres changent,
-    // donc on filtre : on ne fait quelque chose que si le nb de colonnes change réellement.
-    if(typeof refreshPlateauLayout === "function"){
-      refreshPlateauLayout();
-    }
+    refreshPlateauLayout();
   });
 });
