@@ -244,10 +244,9 @@ document.addEventListener("DOMContentLoaded", function () {
     overlay = document.createElement("div");
     overlay.id = "overlayRegleUnique";
     overlay.style.position = "fixed";
-    overlay.style.top = "0";
-    overlay.style.left = "0";
-    overlay.style.width = "100vw";
-    overlay.style.height = "100vh";
+    overlay.style.inset = "0";
+    overlay.style.width = "100%";
+    overlay.style.height = "100%";
     overlay.style.backgroundColor = "rgba(0,0,0,0.7)";
     overlay.style.display = "flex";
     overlay.style.flexDirection = "column";

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="style_alcuno.css" />
+    <title>Alcuno</title>
+</head>
+<body>
+    <header>
+        <h1>ALCUUUUUNOOOOOOOO</h1>
+    </header>
+
+    <main>
+        <section class="menu" id="menu">
+            <input type="text" id="nomJoueur" placeholder="Entrez un nom de joueur" />
+            <button type="button" id="ajouterJoueur">Ajouter un joueur</button>
+            <button type="button" id="jouer" style="display:none;">Jouer</button>
+            <button type="button" id="supprimerJoueur">Supprimer un joueur</button>
+            <button type="button" id="nouvellePartie" style="display:none;">Nouvelle partie</button>
+        </section>
+
+        <section class="suppression" id="suppression" style="display:none;">
+            <h2>Supprimer un ou plusieurs joueurs</h2>
+            <div id="listeSuppression"></div>
+            <button type="button" id="termineSuppression">Terminé</button>
+        </section>
+
+        <!-- Barre d’infos (entre menu et plateau) -->
+        <div class="messages" id="messages">
+            <div class="blocMessages blocActif">
+                <div class="titreBloc">Joueur actif</div>
+                <div class="joueurActif" id="joueurActif"></div>
+            </div>
+
+            <div class="blocMessages blocJoueurs">
+                <div class="titreBloc">Joueurs</div>
+                <div class="nomsJoueurs" id="listeJoueurs"></div>
+            </div>
+
+            <div class="blocMessages blocRegles">
+                <div class="titreBloc">Règles</div>
+
+                <div id="messageTexte"></div>
+
+                <div class="regleZero" id="regleZero" style="display:none;">
+                    <strong>Tout le monde boit sauf toi</strong>
+                </div>
+
+                <div class="reglePigeon" id="reglePigeon" style="display:none;"></div>
+            </div>
+        </div>
+
+        <div class="jeu">
+            <div class="plateau" id="plateau"></div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

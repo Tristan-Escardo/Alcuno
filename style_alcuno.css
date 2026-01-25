@@ -1,4 +1,22 @@
 /* ===== GLOBAL ===== */
+/* Anti scroll horizontal (iOS/Android) */
+body{
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+}
+
+html, body{
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+*, *::before, *::after{
+    box-sizing: border-box;
+}
+
 :root{
     /* Taille des cartes sur le plateau */
     --card-w: clamp(58px, 7.2vw, 112px);
@@ -75,14 +93,17 @@ header {
     justify-items: center;
     align-items: center;
 
-    width: min(96vw, 1200px);
+    width: 100%;
+    max-width: 1200px;
     margin: 0 auto;
+    padding: 10px;
 }
 
 
 
 .messages{
-    width: min(96vw, 1200px);
+    width: 100%;
+    max-width: 1200px;
     margin: 0 auto 16px auto;
 
     display: flex;
@@ -96,11 +117,18 @@ header {
     background: rgba(0,0,0,0.15);
 }
 
+.messages,
+.plateau{
+    max-width: 100%;
+    overflow-x: clip; /* évite les débordements visuels */
+}
+
 
 .blocMessages{
     border: 1px solid rgba(255,255,255,0.35);
     border-radius: 12px;
     padding: 10px;
+    min-width: 0;
     min-height: 90px;
 }
 
@@ -192,6 +220,11 @@ header {
 
 #overlayRegleUnique{
   --card-w: clamp(90px, 14vw, 180px);
+}
+
+#overlayDuel,
+#overlayRegleUnique{
+    overflow: hidden;
 }
 
 /* ===== Overlay choix couleur ===== */
