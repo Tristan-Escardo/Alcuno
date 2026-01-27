@@ -156,7 +156,6 @@ header {
     background-size: cover;
     background-position: center;
     cursor: pointer;
-    transition: transform 0.2s, background-image 0.3s;
 }
 
 .Carte:hover {
