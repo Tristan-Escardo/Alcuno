@@ -540,19 +540,27 @@ document.addEventListener("DOMContentLoaded", function () {
       const perdant = (v1 < v2) ? j1 : j2;
       const vPerdant = (v1 < v2) ? v1 : v2;
       const gorg = vPerdant * duelMultiplicateur;
+      const msg = joueurs[perdant] + "boit " + gorg + " gorgées";
 
-      regleZero.innerText = joueurs[perdant] + " boit " + gorg + " gorgées";
-      regleZero.style.display = "block";
-      zeroEnCours = true;
-
-      // on ferme l’overlay après un petit délai pour laisser le reveal lisible
+       // 1) on enlève l’overlay du duel (après un mini délai pour lire le reveal)
       setTimeout(() => {
         overlay.remove();
-        duelEnCours = false;
-        choixPigeonEnCours = false;
-        duelMultiplicateur = 1;
-        afficherJoueurActif();
-      }, 1400);
+
+        // 2) on affiche d’abord l’annonce en overlay plein écran
+        montrerOverlayRegle(msg);
+
+        // 3) puis seulement après, on l’affiche dans .messages
+        setTimeout(() => {
+          regleZero.innerText = msg;
+          regleZero.style.display = "block";
+          zeroEnCours = true;
+
+          duelEnCours = false;
+          choixPigeonEnCours = false;
+          duelMultiplicateur = 1;
+          afficherJoueurActif();
+        }, dureeOverlaySelonNbLignes(1));
+      }, 1000);
     }
 
     function onChoose(which){
