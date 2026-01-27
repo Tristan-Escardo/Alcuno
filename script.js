@@ -65,6 +65,7 @@ document.addEventListener("DOMContentLoaded", function () {
   ];
 
   let joueurs = [];
+  let annulations = {}; // { "Alice": 3, "Bob": 0, ... }
   let paquet = [];
 
   let paquetDuel = [];
@@ -144,14 +145,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function afficherJoueurs(){
     listeJoueurs.innerHTML = joueurs.map((j,i)=>{
-      if(i===indexPigeon) return `<div><strong>PIGEON</strong> (${nomPigeonOriginal})</div>`;
-      return `<div>${j}</div>`;
+      const n = Number(annulations[j] || 0);
+      const bonus = n > 0 ? ` <span class="bonus-annulation">+${n}</span>` : "";
+
+      // label pigeon (mais on garde le bonus)
+      if(i === indexPigeon){
+        return `<div><strong>PIGEON</strong> (${nomPigeonOriginal})${bonus}</div>`;
+      }
+
+      return `<div>${j}${bonus}</div>`;
     }).join("");
 
     if(!partieLancee){
       btnJouer.style.display = joueurs.length>0 ? "inline-block" : "none";
     }
   }
+
 
   function afficherJoueurActif(){
     if(!partieLancee || choixPigeonEnCours || duelEnCours){
@@ -176,6 +185,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const nom = nomJoueurInput.value.trim();
     if(!nom) return;
     joueurs.push(nom);
+    if(annulations[nom] == null) annulations[nom] = 0;
     nomJoueurInput.value = "";
     afficherJoueurs();
   }
@@ -197,7 +207,11 @@ document.addEventListener("DOMContentLoaded", function () {
   btnTermine.addEventListener("click", ()=>{
     const toDelete=[...listeSuppression.querySelectorAll("input:checked")]
       .map(cb=>parseInt(cb.value,10)).sort((a,b)=>b-a);
-    toDelete.forEach(i=>joueurs.splice(i,1));
+    toDelete.forEach(i=>{
+      const name = joueurs[i];
+      joueurs.splice(i,1);
+      if(name != null) delete annulations[name];
+    });
     suppression.style.display="none";
     menu.style.display="flex";
     afficherJoueurs();
@@ -500,7 +514,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function preparerDuel(){
       phase = 1;
       choixJ1 = null;
-      info.innerText = joueurs[j1] + " : choisis une carte (de dos)";
+      info.innerText = joueurs[j1] + " : choisis une carte";
 
       selectionFaite = false;
 
@@ -540,7 +554,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const perdant = (v1 < v2) ? j1 : j2;
       const vPerdant = (v1 < v2) ? v1 : v2;
       const gorg = vPerdant * duelMultiplicateur;
-      const msg = joueurs[perdant] + "boit " + gorg + " gorgées";
+      const msg = joueurs[perdant] + " boit " + gorg + " gorgées";
 
        // 1) on enlève l’overlay du duel (après un mini délai pour lire le reveal)
       setTimeout(() => {
@@ -643,7 +657,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   /* ===== Application des règles ===== */
-  function appliquerRegle(carteTiree, joueurActuel){
+  function appliquerRegle(carteTiree, joueurActuel, carteElement){
     if(zeroEnCours || switchEnCours){
       regleZero.style.display="none";
       zeroEnCours=false;
@@ -663,6 +677,29 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     }
 
+    // Cartes "un" => +1 annulation de gorgée
+    if(carteTiree.startsWith("un")){
+      const msg = "+1 annulation de gorgée !";
+      montrerOverlayRegle(msg, carteTiree);
+      // puis message persistant jusqu'au prochain tirage (géré par zeroEnCours)
+      regleZero.innerText = msg;
+      regleZero.style.display = "block";
+      zeroEnCours = true;
+
+      // +1 permanent à côté du nom du joueur
+      const nom = joueurs[joueurActuel];
+      annulations[nom] = Number(annulations[nom] || 0) + 1;
+      afficherJoueurs();
+
+      // la carte reste visible 6s puis devient "trou"
+      if(carteElement){
+        setTimeout(() => {
+          carteElement.classList.add("carte-disparue");
+        }, 2000);
+      }
+    }
+
+
     // Cartes "switch"
     if(carteTiree.startsWith("switch")){
       sensHoraire = !sensHoraire;
@@ -680,7 +717,7 @@ document.addEventListener("DOMContentLoaded", function () {
         nomPigeonOriginal=joueurs[joueurActuel];
         montrerOverlayRegle("Tu es pigeon ! Bois 2 gorgées.", carteTiree);
         afficherMessagePigeon(
-          "Tu es pigeon ! Bois 2 gorgées. À chaque 3 tiré, tu bois 1 gorgée. Pour sortir, tire un 3."
+          "Tu es pigeon ! Boit 2 gorgées. À chaque 3 tiré, tu bois 1 gorgée. Pour sortir, tire un 3."
         );
       } else if(indexPigeon===joueurActuel){
         afficherMenuPigeon();
@@ -779,7 +816,7 @@ document.addEventListener("DOMContentLoaded", function () {
         carte.classList.add(carteTiree, "retournee");
 
         const joueurActuel = indexJoueur % joueurs.length;
-        appliquerRegle(carteTiree, joueurActuel);
+        appliquerRegle(carteTiree, joueurActuel, carte);
 
         indexJoueur = (indexJoueur + (sensHoraire ? 1 : -1) + joueurs.length) % joueurs.length;
 

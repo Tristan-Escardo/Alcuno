@@ -202,13 +202,25 @@ header {
     text-align: left;
 }
 
+/* Carte invisible mais garde sa place (trou) */
+.Carte.carte-disparue{
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Petit compteur +N à côté du nom */
+.bonus-annulation{
+  margin-left: 8px;
+  font-weight: 800;
+  color: #FFD700;
+}
+
 @media (max-width: 520px){
     .nomsJoueurs{
         grid-auto-flow: row;
         grid-template-rows: none;
     }
 }
-
 
 .regleZero,
 .reglePigeon {
