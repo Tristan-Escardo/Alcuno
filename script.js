@@ -89,85 +89,32 @@ document.addEventListener("DOMContentLoaded", function () {
   let lastCols = null;
 
   /* ===== OUTILS ===== */
-
-  function refreshPlateauLayout(){
-    const plateau = document.getElementById("plateau");
-    if(!plateau) return;
-
+  function centrerDerniereLigne(){
+    const cards = Array.from(plateau.querySelectorAll(".Carte"));
+    const total = cards.length;
     const cols = getCols();
-    if(cols === lastCols) return; // évite spam iOS
-    lastCols = cols;
 
-    // Récupère toutes les cartes/slots (tout sauf les spacers)
-    const nodes = Array.from(plateau.children).filter(el => !el.classList.contains("carteSpacer"));
+    // reset (important sur resize)
+    cards.forEach(c => c.style.gridColumnStart = "");
 
-    // Reconstruit le plateau en DÉPLAÇANT les nodes (les listeners restent)
-    plateau.innerHTML = "";
-
-    const total = nodes.length;
     const reste = total % cols;
+    if(reste === 0) return;
 
-    if(reste === 0){
-      // Pas de ligne incomplète => on remet juste tout
-      nodes.forEach(n => plateau.appendChild(n));
-      return;
-    }
+    const start = Math.floor((cols - reste) / 2) + 1;
+    const first = total - reste;
 
-    const vides = cols - reste;
-    const left = Math.floor(vides / 2);
-    const right = vides - left;
-
-    // 1) Spacers gauche
-    for(let i=0; i<left; i++){
-      const sp = document.createElement("div");
-      sp.className = "carteSpacer";
-      plateau.appendChild(sp);
-    }
-
-    // 2) Les "reste" premières cartes (elles seront sur la 1ère ligne)
-    for(let i=0; i<reste; i++){
-      plateau.appendChild(nodes[i]);
-    }
-
-    // 3) Spacers droite (pour centrer)
-    for(let i=0; i<right; i++){
-      const sp = document.createElement("div");
-      sp.className = "carteSpacer";
-      plateau.appendChild(sp);
-    }
-
-    // 4) Le reste des cartes
-    for(let i=reste; i<nodes.length; i++){
-      plateau.appendChild(nodes[i]);
+    // ⚠️ on décale TOUTES les cartes de la dernière ligne
+    for(let i = 0; i < reste; i++){
+      cards[first + i].style.gridColumnStart = String(start + i);
     }
   }
-
 
   
   function getCols(){
-    const w = window.innerWidth;
-    if(w <= 380) return 3;
-    if(w <= 520) return 4;
-    if(w <= 720) return 5;
-    if(w <= 1000) return 6;
-    return 8;
-  }
-
-  function ajouterSpacersPourCentrerPremiereLigne(plateauEl, totalCartes){
-    const cols = getCols();
-    const reste = totalCartes % cols;
-    if(reste === 0) return;
-
-    const vides = cols - reste;
-    const left = Math.floor(vides / 2);
-    const right = vides - left;
-
-    // On ajoute left spacers
-    for(let i=0; i<left; i++){
-      const sp = document.createElement("div");
-      sp.className = "carteSpacer";
-      plateauEl.appendChild(sp);
-    }
+    const cols = getComputedStyle(document.documentElement)
+      .getPropertyValue("--cols")
+      .trim();
+    return parseInt(cols, 10) || 8;
   }
 
 
@@ -780,8 +727,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     plateau.innerHTML = "";
-    ajouterSpacersPourCentrerPremiereLigne(plateau, 52);
-    refreshPlateauLayout();
 
     // Plateau principal = toutes les cartes SAUF 2/5/6/7/8/9 (paquet duel)
     const paquetPrincipal = classes.filter(c => !duelCartes.includes(c));
@@ -836,6 +781,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
       plateau.appendChild(carte);
     }
+    
+    centrerDerniereLigne();
   }
 
   function retourMenu(){
@@ -859,8 +806,6 @@ document.addEventListener("DOMContentLoaded", function () {
     duelMultiplicateur = 1;
 
     plateau.innerHTML = "";
-    ajouterSpacersPourCentrerPremiereLigne(plateau, 52);
-    refreshPlateauLayout();
 
     regleZero.style.display = "none";
     effacerMessagePigeon();
@@ -889,6 +834,6 @@ document.addEventListener("DOMContentLoaded", function () {
   /* ===== INIT ===== */
   afficherJoueurs();
   window.addEventListener("resize", () => {
-    refreshPlateauLayout();
+    centrerDerniereLigne();
   });
 });

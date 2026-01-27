@@ -1,6 +1,12 @@
 /* ===== GLOBAL ===== */
 /* Anti scroll horizontal (iOS/Android) */
 body{
+    background-color: rgb(43, 0, 29);
+    margin: 0;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    color: white;
+    overflow-x: hidden;
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
 }
@@ -22,16 +28,6 @@ html, body{
     --card-w: clamp(58px, 7.2vw, 112px);
     --card-h: calc(var(--card-w) * 1.466);
     --gap: clamp(6px, 1.2vw, 14px);
-}
-
-
-body {
-    background-color: #3f3232;
-    margin: 0;
-    padding: 20px;
-    font-family: Arial, sans-serif;
-    color: white;
-    overflow-x: hidden;
 }
 
 header {
@@ -86,10 +82,7 @@ header {
     --gap: clamp(6px, 1.2vw, 14px);
 }
 
-:root{
-  --cols: 8; /* desktop */
-}
-
+:root{ --cols: 8; }
 /* Ajuste le nombre de colonnes selon la largeur */
 @media (max-width: 1000px){ :root{ --cols: 6; } }
 @media (max-width: 720px){  :root{ --cols: 5; } }
@@ -107,9 +100,6 @@ header {
     justify-items: center;           /* centre la carte dans sa case */
     align-items: center;
 }
-
-
-
 
 .messages{
     width: 100%;
@@ -177,13 +167,6 @@ header {
     pointer-events: none;
 }
 
-.carteSpacer{
-    width: var(--card-w);
-    height: var(--card-h);
-    visibility: hidden;
-    pointer-events: none;
-}
-
 .joueurActif {
     margin-top: 0;
     font-size: 22px;
@@ -196,13 +179,14 @@ header {
     margin-top: 10px;
     font-size: 22px;
     font-weight: bold;
-    color: #ddd;
+    color: #75f6ff;
     text-align: center;
 }
 
 .titreJoueurs {
     font-size: 22px;
     font-weight: bold;
+    color: #75f6ff;
     margin-bottom: 8px;
 }
 
