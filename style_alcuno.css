@@ -2,7 +2,7 @@
 /* Anti scroll horizontal (iOS/Android) */
 body{
     background-color: rgb(43, 0, 29);
-    margin: 0;
+    margin: 1%;
     padding: 20px;
     font-family: Arial, sans-serif;
     color: white;
