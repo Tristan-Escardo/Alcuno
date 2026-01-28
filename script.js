@@ -257,8 +257,138 @@ document.addEventListener("DOMContentLoaded", function () {
 
   /* ===== Overlay animé pour toutes les cartes spéciales ===== */
   let overlayRegleTimeout = null;
+  // ===== Annulation de gorgées (carte "un") =====
+  let overlayRegleVerrouille = false; // si true => overlayRegleUnique ne s'auto-ferme pas
 
-  function montrerOverlayRegle(message, classeCarte="", classeCarteSupplementaire="") {
+  function fermerOverlayRegleUnique(){
+    const overlay = document.getElementById("overlayRegleUnique");
+    if(!overlay) return;
+
+    overlayRegleVerrouille = false;
+
+    // stop timer éventuel
+    if (overlayRegleTimeout) {
+      clearTimeout(overlayRegleTimeout);
+      overlayRegleTimeout = null;
+    }
+
+    overlay.style.opacity = "0";
+    overlay.style.transform = "scale(0.8)";
+    overlay.addEventListener("transitionend", () => overlay.remove(), { once: true });
+  }
+
+  // Ajoute (ou remplace) l'UI de choix d'annulation dans l'overlay existant.
+  // - joueurIndex : index dans joueurs[]
+  // - nbGorgees : combien il devrait boire au départ
+  // - onDone(annule, reste) : callback une fois le choix fait
+  function injecterChoixAnnulationDansOverlay(joueurIndex, nbGorgees, onDone){
+    const overlay = document.getElementById("overlayRegleUnique");
+    if(!overlay) return false;
+
+    const nom = joueurs[joueurIndex];
+    const dispo = Number(annulations[nom] || 0);
+    const maxAnnulable = Math.min(dispo, nbGorgees);
+
+    if(maxAnnulable <= 0) return false;
+
+    // On verrouille l'overlay => pas d'auto-close tant que pas de choix
+    overlayRegleVerrouille = true;
+
+    // On stoppe le timer de fermeture si déjà lancé
+    if (overlayRegleTimeout) {
+      clearTimeout(overlayRegleTimeout);
+      overlayRegleTimeout = null;
+    }
+
+    // Supprime un ancien bloc d'annulation si présent (au cas où)
+    const old = overlay.querySelector(".bloc-annulation");
+    if(old) old.remove();
+
+    const bloc = document.createElement("div");
+    bloc.className = "bloc-annulation";
+
+    const titre = document.createElement("div");
+    titre.className = "titre-annulation";
+    titre.innerText = `${nom}, tu as +${dispo} annulation(s). Combien tu en utilises ?`;
+    bloc.appendChild(titre);
+
+    const boutons = document.createElement("div");
+    boutons.className = "ligne-boutons-annulation";
+
+    // Boutons: 0..maxAnnulable (pas d'invention : 1 bouton par valeur possible)
+    for(let i=0; i<=maxAnnulable; i++){
+      const btn = document.createElement("button");
+      btn.className = "bouton-annulation";
+      btn.innerText = `Annuler ${i}`;
+
+      btn.addEventListener("click", () => {
+        const utilise = i;
+        const reste = nbGorgees - utilise;
+
+        annulations[nom] = Math.max(0, dispo - utilise);
+        afficherJoueurs();
+
+        // Enlève le bloc boutons (choix fait)
+        bloc.remove();
+
+        // Ajoute une ligne résultat dans l'overlay
+        const boxTexte = overlay.querySelector(".overlay-regle-texte");
+        if(boxTexte){
+          const ligne = document.createElement("div");
+          ligne.style.marginTop = "10px";
+          ligne.innerText =
+            utilise > 0
+              ? `✅ Annulé ${utilise}. Tu bois ${reste} gorgée(s).`
+              : `➡️ Tu n’annules rien. Tu bois ${reste} gorgée(s).`;
+          boxTexte.appendChild(ligne);
+        }
+
+        // Déverrouille et ferme après un court délai (le temps de lire)
+        overlayRegleVerrouille = false;
+
+        // petite pause de lecture, puis fermeture
+        setTimeout(() => {
+          fermerOverlayRegleUnique();
+        }, 900);
+
+        if(typeof onDone === "function") onDone(utilise, reste);
+      });
+
+      boutons.appendChild(btn);
+    }
+
+    bloc.appendChild(boutons);
+    overlay.appendChild(bloc);
+
+    return true;
+  }
+
+  // Helper : annonce "X boit N" + propose annulation si dispo
+  function annoncerBoireAvecAnnulation(joueurIndex, nbGorgees, classeCarte = "", prefixMsg = null){
+    const nom = joueurs[joueurIndex];
+    const msg = prefixMsg ? prefixMsg : `${nom} boit ${nbGorgees} gorgée(s)`;
+
+    // On affiche l'overlay (ou on ajoute une ligne si déjà là)
+    montrerOverlayRegle(msg, classeCarte);
+
+    // On tente d'injecter le choix d'annulation DANS le même overlay
+    const ok = injecterChoixAnnulationDansOverlay(joueurIndex, nbGorgees, (annule, reste) => {
+      // Met à jour le message persistant (bloc règles) avec le résultat final
+      regleZero.innerText = `${nom} boit ${reste} gorgée(s)`;
+      regleZero.style.display = "block";
+      zeroEnCours = true;
+    });
+
+    // Si pas d'annulation possible => message persistant normal
+    if(!ok){
+      regleZero.innerText = msg;
+      regleZero.style.display = "block";
+      zeroEnCours = true;
+    }
+  }
+
+
+  function montrerOverlayRegle(message, classeCarte = "", classeCarteSupplementaire = "") {
     // 1) Si un overlay existe déjà, on ajoute un message dessous
     let overlay = document.getElementById("overlayRegleUnique");
     if (overlay) {
@@ -272,13 +402,15 @@ document.addEventListener("DOMContentLoaded", function () {
         const nbLignes = boxTexteExist.children.length;
         const duree = dureeOverlaySelonNbLignes(nbLignes);
 
-        // On relance le timer de fermeture pour laisser le temps de lire
-        if (overlayRegleTimeout) clearTimeout(overlayRegleTimeout);
-        overlayRegleTimeout = setTimeout(() => {
-          overlay.style.opacity = "0";
-          overlay.style.transform = "scale(0.8)";
-          overlay.addEventListener("transitionend", () => overlay.remove(), { once: true });
-        }, duree);
+        // On relance le timer de fermeture (sauf si overlay verrouillé)
+        if (!overlayRegleVerrouille) {
+          if (overlayRegleTimeout) clearTimeout(overlayRegleTimeout);
+          overlayRegleTimeout = setTimeout(() => {
+            overlay.style.opacity = "0";
+            overlay.style.transform = "scale(0.8)";
+            overlay.addEventListener("transitionend", () => overlay.remove(), { once: true });
+          }, duree);
+        }
       }
       return;
     }
@@ -341,17 +473,21 @@ document.addEventListener("DOMContentLoaded", function () {
       overlay.style.transform = "scale(1.05)";
     });
 
-    // ✅ durée adaptée (pas besoin de querySelector, on a déjà boxTexte)
     const nbLignes = boxTexte.children.length;
     const duree = dureeOverlaySelonNbLignes(nbLignes);
 
-    if (overlayRegleTimeout) clearTimeout(overlayRegleTimeout);
-    overlayRegleTimeout = setTimeout(() => {
-      overlay.style.opacity = "0";
-      overlay.style.transform = "scale(0.8)";
-      overlay.addEventListener("transitionend", () => overlay.remove(), { once: true });
-    }, duree);
+    // Auto-close seulement si pas verrouillé
+    if (!overlayRegleVerrouille) {
+      if (overlayRegleTimeout) clearTimeout(overlayRegleTimeout);
+      overlayRegleTimeout = setTimeout(() => {
+        overlay.style.opacity = "0";
+        overlay.style.transform = "scale(0.8)";
+        overlay.addEventListener("transitionend", () => overlay.remove(), { once: true });
+      }, duree);
+    }
   }
+
+   
 
   /* ===== Règles centralisées ===== */
   const reglesBoire = {
@@ -559,21 +695,15 @@ document.addEventListener("DOMContentLoaded", function () {
        // 1) on enlève l’overlay du duel (après un mini délai pour lire le reveal)
       setTimeout(() => {
         overlay.remove();
+        annoncerBoireAvecAnnulation(perdant, gorg, "", msg);
 
-        // 2) on affiche d’abord l’annonce en overlay plein écran
-        montrerOverlayRegle(msg);
-
-        // 3) puis seulement après, on l’affiche dans .messages
+        // Puis on restaure l'état du jeu (sans attendre la fin d'overlay ici)
         setTimeout(() => {
-          regleZero.innerText = msg;
-          regleZero.style.display = "block";
-          zeroEnCours = true;
-
           duelEnCours = false;
           choixPigeonEnCours = false;
           duelMultiplicateur = 1;
           afficherJoueurActif();
-        }, dureeOverlaySelonNbLignes(1));
+        }, 1000);
       }, 1000);
     }
 
@@ -667,15 +797,29 @@ document.addEventListener("DOMContentLoaded", function () {
     effacerMessagePigeon();
 
     // Cartes "boire"
-    for(const key in reglesBoire){
-      if(carteTiree.startsWith(key)){
+    // Cas spécial: plus_2 => le joueur actuel boit 2 (annulable)
+    if (carteTiree.startsWith("plus_2")) {
+      annoncerBoireAvecAnnulation(
+        joueurActuel,
+        2,
+        carteTiree,
+        `${joueurs[joueurActuel]} boit 2 gorgée(s)`
+      );
+      return; // important : on évite le traitement générique en dessous
+    }
+    // Autres règles génériques de "boire"
+    for (const key in reglesBoire) {
+      if (key === "plus_2") continue; // sécurité (au cas où)
+      if (carteTiree.startsWith(key)) {
         const msg = reglesBoire[key];
         regleZero.innerText = msg;
         regleZero.style.display = "block";
         zeroEnCours = true;
         montrerOverlayRegle(msg, carteTiree);
+        return; // une seule règle "boire" à appliquer
       }
     }
+
 
     // Cartes "un" => +1 annulation de gorgée
     if(carteTiree.startsWith("un")){
@@ -715,7 +859,9 @@ document.addEventListener("DOMContentLoaded", function () {
       if(indexPigeon===null){
         indexPigeon=joueurActuel;
         nomPigeonOriginal=joueurs[joueurActuel];
-        montrerOverlayRegle("Tu es pigeon ! Bois 2 gorgées.", carteTiree);
+        // montrerOverlayRegle("Tu es pigeon ! Bois 2 gorgées.", carteTiree);
+        annoncerBoireAvecAnnulation(joueurActuel, 2, carteTiree, `Tu es pigeon ! ${joueurs[joueurActuel]} boit 2 gorgée(s)`);
+
         afficherMessagePigeon(
           "Tu es pigeon ! Boit 2 gorgées. À chaque 3 tiré, tu bois 1 gorgée. Pour sortir, tire un 3."
         );
@@ -750,11 +896,8 @@ document.addEventListener("DOMContentLoaded", function () {
         if(colCarte && colCarte === couleurChoisie){
           const msgCouleur = "Et boit 1 gorgée pour la couleur (" + couleurChoisie + ") !";
 
-          regleZero.innerText = msgCouleur;
-          regleZero.style.display = "block";
-          zeroEnCours = true;
-
-          montrerOverlayRegle(msgCouleur, carteTiree);
+          // ✅ annulable via les "UN" (même overlay, pas de superposition)
+          annoncerBoireAvecAnnulation(joueurActuel, 1, carteTiree, msgCouleur);
 
           // la couleur "attendue" est tombée => on reset
           couleurChoisie = null;

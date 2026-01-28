@@ -481,6 +481,49 @@ header {
     min-width: 0;
 }
 
+/* ===== Boutons annulation dans overlayRegleUnique ===== */
+#overlayRegleUnique .bloc-annulation{
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: center;
+}
+
+#overlayRegleUnique .titre-annulation{
+  color: #FFD700;
+  font-size: 22px;
+  font-weight: 800;
+  text-align: center;
+  text-shadow: 2px 2px 5px #000;
+}
+
+#overlayRegleUnique .ligne-boutons-annulation{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+}
+
+#overlayRegleUnique .bouton-annulation{
+  width: 200px;
+  max-width: 400px;
+  padding: 18px;
+  font-size: 22px;
+  font-weight: bold;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  background-color: #FFD700;
+  color: #000;
+  transition: transform 0.2s, background-color 0.2s;
+  animation: slideUp 0.5s ease forwards; /* tu l'as déjà défini */
+}
+
+#overlayRegleUnique .bouton-annulation:hover{
+  background-color: #ffea70;
+  transform: scale(1.10);
+}
 
 /* ===== Animations (réutilisation) ===== */
 @keyframes fadeIn {
