@@ -309,7 +309,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const titre = document.createElement("div");
     titre.className = "titre-annulation";
-    titre.innerText = `${nom}, tu as +${dispo} annulation(s). Combien tu en utilises ?`;
+    titre.innerText = `${nom}, tu as +${dispo} annulation(s). Combien de gorgées veux-tu annuler ?`;
     bloc.appendChild(titre);
 
     const boutons = document.createElement("div");
@@ -803,7 +803,7 @@ document.addEventListener("DOMContentLoaded", function () {
         joueurActuel,
         2,
         carteTiree,
-        `${joueurs[joueurActuel]} boit 2 gorgée(s)`
+        `${joueurs[joueurActuel]} boit 2 gorgées`
       );
       return; // important : on évite le traitement générique en dessous
     }
@@ -859,8 +859,8 @@ document.addEventListener("DOMContentLoaded", function () {
       if(indexPigeon===null){
         indexPigeon=joueurActuel;
         nomPigeonOriginal=joueurs[joueurActuel];
-        // montrerOverlayRegle("Tu es pigeon ! Bois 2 gorgées.", carteTiree);
-        annoncerBoireAvecAnnulation(joueurActuel, 2, carteTiree, `Tu es pigeon ! ${joueurs[joueurActuel]} boit 2 gorgée(s)`);
+        // montrerOverlayRegle("Tu es pigeon ! Boit 2 gorgées.", carteTiree);
+        annoncerBoireAvecAnnulation(joueurActuel, 2, carteTiree, `Tu es pigeon ! ${joueurs[joueurActuel]} boit 2 gorgées`);
 
         afficherMessagePigeon(
           "Tu es pigeon ! Boit 2 gorgées. À chaque 3 tiré, tu bois 1 gorgée. Pour sortir, tire un 3."
