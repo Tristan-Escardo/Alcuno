@@ -525,6 +525,14 @@ header {
   transform: scale(1.10);
 }
 
+/* Empêche le scroll quand un overlay est présent */
+body.no-scroll{
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  touch-action: none;
+}
+
 /* ===== Animations (réutilisation) ===== */
 @keyframes fadeIn {
     from { opacity: 0; }

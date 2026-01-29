@@ -88,8 +88,36 @@ document.addEventListener("DOMContentLoaded", function () {
   let phase = 1;       // 1 = choix J1, 2 = choix J2
   let choixJ1 = null;  // 1 ou 2 (carte de gauche/droite)
   let lastCols = null;
+  let scrollLockCount = 0;
+  let scrollYBeforeLock = 0;
 
   /* ===== OUTILS ===== */
+  function lockScroll(){
+    scrollLockCount++;
+    if(scrollLockCount > 1) return;
+
+    // Sauve la position pour iOS
+    scrollYBeforeLock = window.scrollY || document.documentElement.scrollTop || 0;
+
+    document.body.classList.add("no-scroll");
+    // Astuce iOS : fixer la position du body pour empêcher le scroll tactile
+    document.body.style.top = `-${scrollYBeforeLock}px`;
+  }
+
+  function unlockScroll(){
+    if(scrollLockCount <= 0) return;
+    scrollLockCount--;
+    if(scrollLockCount > 0) return;
+
+    document.body.classList.remove("no-scroll");
+    const top = document.body.style.top;
+    document.body.style.top = "";
+
+    // restore position
+    const y = top ? Math.abs(parseInt(top, 10)) : scrollYBeforeLock;
+    window.scrollTo(0, y);
+  }
+
   function centrerDerniereLigne(){
     const cards = Array.from(plateau.querySelectorAll(".Carte"));
     const total = cards.length;
@@ -221,6 +249,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function afficherMenuPigeon(){
     if(document.getElementById("overlayPigeon")) return;
     choixPigeonEnCours=true;
+    lockScroll();
 
     const overlay=document.createElement("div");
     overlay.id="overlayPigeon";
@@ -238,6 +267,7 @@ document.addEventListener("DOMContentLoaded", function () {
         btn.addEventListener("click",()=>{
           indexPigeon=i;
           nomPigeonOriginal=joueurs[i];
+          unlockScroll();
           overlay.remove();
           choixPigeonEnCours=false;
           afficherJoueurs();
@@ -274,7 +304,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     overlay.style.opacity = "0";
     overlay.style.transform = "scale(0.8)";
-    overlay.addEventListener("transitionend", () => overlay.remove(), { once: true });
+    overlay.addEventListener("transitionend", () => {
+      overlay.remove();
+      unlockScroll();
+    }, { once: true });
   }
 
   // Ajoute (ou remplace) l'UI de choix d'annulation dans l'overlay existant.
@@ -466,6 +499,7 @@ document.addEventListener("DOMContentLoaded", function () {
     boxTexte.appendChild(ligne1);
 
     overlay.appendChild(boxTexte);
+    lockScroll();
     document.body.appendChild(overlay);
 
     requestAnimationFrame(() => {
@@ -482,7 +516,10 @@ document.addEventListener("DOMContentLoaded", function () {
       overlayRegleTimeout = setTimeout(() => {
         overlay.style.opacity = "0";
         overlay.style.transform = "scale(0.8)";
-        overlay.addEventListener("transitionend", () => overlay.remove(), { once: true });
+        overlay.addEventListener("transitionend", () => {
+          overlay.remove();
+          unlockScroll();
+        }, { once: true });
       }, duree);
     }
   }
@@ -500,6 +537,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function afficherOverlayCouleur(){
     if(document.getElementById("overlayCouleur")) return;
     choixPigeonEnCours = true;
+    lockScroll();
 
     const overlay = document.createElement("div");
     overlay.id = "overlayCouleur";
@@ -524,6 +562,7 @@ document.addEventListener("DOMContentLoaded", function () {
       carre.className = "carre-couleur " + c.classe;
       carre.addEventListener("click", ()=>{
         couleurChoisie = c.nom;
+        unlockScroll();
         overlay.remove();
         choixPigeonEnCours = false;
         afficherJoueurActif();
@@ -540,6 +579,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if(document.getElementById("overlayDuel")) return;
     duelEnCours = true;
     choixPigeonEnCours = true;
+    lockScroll();
     duelMultiplicateur = 1;
 
     const overlay = document.createElement("div");
@@ -694,6 +734,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
        // 1) on enlève l’overlay du duel (après un mini délai pour lire le reveal)
       setTimeout(() => {
+        unlockScroll();
         overlay.remove();
         annoncerBoireAvecAnnulation(perdant, gorg, "", msg);
 
@@ -1014,6 +1055,10 @@ document.addEventListener("DOMContentLoaded", function () {
     menu.style.display = "flex";
 
     afficherJoueurs();
+    // Sécurité : on réactive le scroll quoi qu'il arrive
+    scrollLockCount = 0;
+    document.body.classList.remove("no-scroll");
+    document.body.style.top = "";
   }
 
   btnJouer.addEventListener("click", lancerPartie);
