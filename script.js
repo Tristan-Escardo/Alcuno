@@ -185,7 +185,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }).join("");
 
     if(!partieLancee){
-      btnJouer.style.display = joueurs.length>0 ? "inline-block" : "none";
+      btnJouer.style.display = joueurs.length >= 2 ? "inline-block" : "none";
     }
   }
 
@@ -282,7 +282,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function dureeOverlaySelonNbLignes(nb){
     // 1 ligne = 1500ms, puis +900ms par ligne supplémentaire
-    return 1500 + Math.max(0, nb - 1) * 900;
+    return 1500 + Math.max(0, nb - 1) * 1000;
   }
 
   /* ===== Overlay animé pour toutes les cartes spéciales ===== */
@@ -609,8 +609,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
       btn.addEventListener("click", ()=>{
         if(picks.length >= 2) return;
+        if(picks.includes(idx)) return; // ✅ empêche 2 fois le même joueur
 
         picks.push(idx);
+        btn.disabled = true;            // ✅ bonus: évite double tap iPhone
+        btn.style.opacity = "0.6";      // (optionnel mais clair)
+        btn.style.cursor = "not-allowed";
+
         btn.style.backgroundColor = "#ffea70";
         btn.style.color = "#000";
 
@@ -619,6 +624,7 @@ document.addEventListener("DOMContentLoaded", function () {
           afficherOverlayTirageDuel(overlay, picks[0], picks[1]);
         }
       });
+
 
       containerBoutons.appendChild(btn);
     });
@@ -934,9 +940,9 @@ document.addEventListener("DOMContentLoaded", function () {
         const colCarte = couleurDeLaCarte(carteTiree);
 
         if(colCarte && colCarte === couleurChoisie){
-          const msgCouleur = "Et boit 1 gorgée pour la couleur (" + couleurChoisie + ") !";
+          const msgCouleur = "Et boit 1 gorgée pour la couleur ( + couleurChoisie + ) !";
 
-          // ✅ annulable via les "UN" (même overlay, pas de superposition)
+          // annulable via les "UN" (même overlay, pas de superposition)
           annoncerBoireAvecAnnulation(joueurActuel, 1, carteTiree, msgCouleur);
 
           // la couleur "attendue" est tombée => on reset
@@ -1050,7 +1056,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     btnNouvellePartie.style.display = "none";
     btnSupprimer.style.display = "inline-block";
-    btnJouer.style.display = joueurs.length>0 ? "inline-block" : "none";
+    btnJouer.style.display = joueurs.length >= 2 ? "inline-block" : "none";
     menu.style.display = "flex";
 
     afficherJoueurs();
