@@ -396,8 +396,8 @@ document.addEventListener("DOMContentLoaded", function () {
     return true;
   }
 
-  // Helper : annonce "X boit N" + propose annulation si dispo
-  function annoncerBoireAvecAnnulation(joueurIndex, nbGorgees, classeCarte = "", prefixMsg = null){
+  // Annonce "X boit N" + propose annulation si dispo
+  function annoncerBoireAvecAnnulation(joueurIndex, nbGorgees, classeCarte = "", prefixMsg = null, onFinish = null){
     const nom = joueurs[joueurIndex];
     const msg = prefixMsg ? prefixMsg : `${nom} boit ${nbGorgees} gorgée(s)`;
 
@@ -406,10 +406,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // On tente d'injecter le choix d'annulation DANS le même overlay
     const ok = injecterChoixAnnulationDansOverlay(joueurIndex, nbGorgees, (annule, reste) => {
-      // Met à jour le message persistant (bloc règles) avec le résultat final
-      regleZero.innerText = `${nom} boit ${reste} gorgée(s)`;
+      regleZero.innerText = (reste <= 0)
+        ? `${nom} annule et ne boit pas`
+        : `${nom} boit ${reste} gorgée(s)`;
       regleZero.style.display = "block";
       zeroEnCours = true;
+
+      // on laisse le temps à l'overlay d'afficher le résultat puis on enchaîne
+      if(typeof onFinish === "function"){
+        setTimeout(() => onFinish(), 950);
+      }
     });
 
     // Si pas d'annulation possible => message persistant normal
@@ -417,8 +423,15 @@ document.addEventListener("DOMContentLoaded", function () {
       regleZero.innerText = msg;
       regleZero.style.display = "block";
       zeroEnCours = true;
+
+      // on attend la fermeture auto de l'overlay avant d'enchaîner
+      if(typeof onFinish === "function"){
+        const wait = dureeOverlaySelonNbLignes(1) + 350;
+        setTimeout(() => onFinish(), wait);
+      }
     }
   }
+
 
 
   function montrerOverlayRegle(message, classeCarte = "", classeCarteSupplementaire = "") {
@@ -830,6 +843,146 @@ document.addEventListener("DOMContentLoaded", function () {
     preparerDuel();
   }
 
+  function afficherOverlayPlus4(joueurActuel, classeCartePlus4){
+    if(document.getElementById("overlayPlus4")) return;
+
+    choixPigeonEnCours = true;
+    lockScroll();
+
+    const overlay = document.createElement("div");
+    overlay.id = "overlayPlus4";
+
+    const titre = document.createElement("div");
+    titre.className = "titre-pigeon";
+    titre.innerText = "PLUS 4 — Distribue 4 gorgées";
+    overlay.appendChild(titre);
+
+    const info = document.createElement("div");
+    info.className = "plus4-info";
+    overlay.appendChild(info);
+
+    const totalBox = document.createElement("div");
+    totalBox.className = "plus4-total";
+    overlay.appendChild(totalBox);
+
+    const container = document.createElement("div");
+    container.className = "plus4-container-joueurs";
+    overlay.appendChild(container);
+
+    const actions = document.createElement("div");
+    actions.className = "plus4-actions";
+    overlay.appendChild(actions);
+
+    // distribution par joueur (index -> nb gorgées)
+    const dist = {};
+    joueurs.forEach((_, i) => dist[i] = 0);
+
+    // historique pour "annuler le dernier"
+    let historique = []; // ex: [2,2,5,1] = on a ajouté +1 à ces joueurs dans cet ordre
+
+    function totalDistribue(){
+      return Object.values(dist).reduce((a,b)=>a+b,0);
+    }
+
+    function refreshUI(){
+      const total = totalDistribue();
+      totalBox.innerText = `Total distribué : ${total} / 4`;
+
+      if(total < 4){
+        info.innerText = "Clique sur un joueur pour lui donner +1 gorgée.";
+      } else {
+        info.innerText = "✅ Total atteint. Tu peux valider.";
+      }
+
+      // update boutons joueurs (badge)
+      [...container.querySelectorAll("button[data-idx]")].forEach(btn=>{
+        const idx = Number(btn.dataset.idx);
+        const n = dist[idx];
+        btn.innerHTML = n > 0
+        ? `${joueurs[idx]} <span class="plus4-badge">• ${n}</span>`
+        : `${joueurs[idx]}`;
+
+
+        // optionnel: griser si total déjà à 4 (plus possible d'ajouter)
+        if(total >= 4){
+          btn.style.opacity = "0.7";
+        } else {
+          btn.style.opacity = "1";
+        }
+      });
+
+      // enable/disable undo
+      btnUndo.disabled = (historique.length === 0);
+      btnUndo.style.opacity = btnUndo.disabled ? "0.6" : "1";
+
+      // validation uniquement si total == 4
+      btnValider.disabled = (total !== 4);
+      btnValider.style.opacity = btnValider.disabled ? "0.6" : "1";
+    }
+
+    // boutons joueurs : UN CLIC = +1 (si total < 4)
+    joueurs.forEach((nom, idx)=>{
+      const btn = document.createElement("button");
+      btn.className = "bouton-pigeon";
+      btn.dataset.idx = String(idx);
+      btn.innerText = nom;
+
+      btn.addEventListener("click", ()=>{
+        const total = totalDistribue();
+        if(total >= 4) return;
+
+        dist[idx] += 1;
+        historique.push(idx);
+        refreshUI();
+      });
+
+      container.appendChild(btn);
+    });
+
+    const btnUndo = document.createElement("button");
+    btnUndo.className = "bouton-pigeon";
+    btnUndo.innerText = "Annuler la dernière";
+    btnUndo.addEventListener("click", ()=>{
+      if(historique.length === 0) return;
+      const idx = historique.pop();
+      if(dist[idx] > 0) dist[idx] -= 1;
+      refreshUI();
+    });
+    actions.appendChild(btnUndo);
+
+    const btnReset = document.createElement("button");
+    btnReset.className = "bouton-pigeon";
+    btnReset.innerText = "Reset";
+    btnReset.addEventListener("click", ()=>{
+      Object.keys(dist).forEach(k => dist[k] = 0);
+      historique = [];
+      refreshUI();
+    });
+    actions.appendChild(btnReset);
+
+    const btnValider = document.createElement("button");
+    btnValider.className = "bouton-pigeon";
+    btnValider.innerText = "Valider";
+    btnValider.addEventListener("click", ()=>{
+      if(totalDistribue() !== 4) return;
+
+      overlay.remove();
+      unlockScroll();
+      choixPigeonEnCours = false;
+      afficherJoueurActif();
+
+      const file = Object.entries(dist)
+        .map(([k,v]) => ({ idx: Number(k), n: Number(v) }))
+        .filter(x => x.n > 0);
+
+      distribuerFilePlus4(file, classeCartePlus4);
+    });
+    actions.appendChild(btnValider);
+
+    document.body.appendChild(overlay);
+    refreshUI();
+  }
+
   function couleurDeLaCarte(classeCarte){
     // Ex: "un_vert1" => "vert", "interdit_rouge" => "rouge"
     const m = classeCarte.match(/_(vert|jaune|rouge|bleu)/);
@@ -845,6 +998,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     effacerMessagePigeon();
+
+    // Cas spécial: plus_4 => overlay de distribution + annulations chez les cibles
+    if (carteTiree.startsWith("plus_4")) {
+      afficherOverlayPlus4(joueurActuel, carteTiree);
+      return;
+    }
 
     // Cartes "boire"
     // Cas spécial: plus_2 => le joueur actuel boit 2 (annulable)
@@ -940,7 +1099,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const colCarte = couleurDeLaCarte(carteTiree);
 
         if(colCarte && colCarte === couleurChoisie){
-          const msgCouleur = "Et boit 1 gorgée pour la couleur ( + couleurChoisie + ) !";
+          const msgCouleur = "Et boit 1 gorgée pour la couleur ("+ couleurChoisie +") !";
 
           // annulable via les "UN" (même overlay, pas de superposition)
           annoncerBoireAvecAnnulation(joueurActuel, 1, carteTiree, msgCouleur);

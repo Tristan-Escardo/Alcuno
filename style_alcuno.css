@@ -2,7 +2,7 @@
 /* Anti scroll horizontal (iOS/Android) */
 body{
     background-color: rgb(43, 0, 29);
-    margin: 1%;
+    margin: 0;
     padding: 20px;
     font-family: Arial, sans-serif;
     color: white;
@@ -282,6 +282,142 @@ header {
 #overlayCouleur .carre-couleur:hover {
     transform: scale(1.1);
     box-shadow: 0 0 25px rgba(0,0,0,0.7);
+}
+
+/* ===== Overlay PLUS 4 ===== */
+#overlayPlus4{
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background-color: rgba(0,0,0,0.85);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  gap: 14px;
+}
+
+#overlayPlus4 .plus4-info{
+  color: #FFD700;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+}
+
+#overlayPlus4 .plus4-total{
+  color: #FFD700;
+  font-size: 22px;
+  font-weight: 900;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+#overlayPlus4 .plus4-container-joueurs{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  max-width: 900px;
+}
+
+#overlayPlus4 .plus4-actions{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+/* Optionnel : un petit badge “• n” plus lisible */
+#overlayPlus4 .plus4-badge{
+  margin-left: 10px;
+  font-weight: 900;
+}
+
+/* ===== Overlay PLUS 4 (look) ===== */
+#overlayPlus4{
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background-color: rgba(0,0,0,0.9); /* comme pigeon/duel */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;               /* comme pigeon */
+  padding: 20px;
+  box-sizing: border-box;
+  animation: fadeIn 0.5s ease forwards;
+}
+
+/* Titre comme pigeon */
+#overlayPlus4 .titre-pigeon{
+  font-size: clamp(28px, 5vw, 56px); /* proche duel, responsive */
+  font-weight: bold;
+  color: #FFD700;
+  text-align: center;
+  text-shadow: 2px 2px 5px #000;
+  animation: pop 0.5s ease forwards;
+}
+
+/* Boutons plus compacts pour le +4 (sinon ça déborde) */
+#overlayPlus4 .bouton-pigeon{
+  width: 46%;
+  max-width: 320px;
+  padding: 16px 14px;
+  font-size: 20px;
+  font-weight: bold;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  background-color: #FFD700;
+  color: #000;
+  transition: transform 0.2s, background-color 0.2s;
+  animation: slideUp 0.5s ease forwards;
+}
+
+
+#overlayPlus4 .bouton-pigeon:hover{
+  background-color: #ffea70;
+  transform: scale(1.10);
+}
+
+/* Tes blocs existants peuvent rester, je les garde compatibles */
+#overlayPlus4 .plus4-info{
+  color: #FFD700;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+}
+
+#overlayPlus4 .plus4-total{
+  color: #FFD700;
+  font-size: 22px;
+  font-weight: 900;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+#overlayPlus4 .plus4-container-joueurs{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  max-width: 900px;
+}
+
+#overlayPlus4 .plus4-actions{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+#overlayPlus4 .plus4-badge{
+  margin-left: 10px;
+  font-weight: 900;
 }
 
 /* Couleurs spécifiques */
