@@ -371,8 +371,8 @@ document.addEventListener("DOMContentLoaded", function () {
           ligne.style.marginTop = "10px";
           ligne.innerText =
             utilise > 0
-              ? `✅ Annulé ${utilise}. Tu bois ${reste} gorgée(s).`
-              : `➡️ Tu n’annules rien. Tu bois ${reste} gorgée(s).`;
+              ? `Annulé ${utilise}. Tu bois ${reste} gorgée(s).`
+              : `Tu n’annules rien. Tu bois ${reste} gorgée(s).`;
           boxTexte.appendChild(ligne);
         }
 
@@ -382,7 +382,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // petite pause de lecture, puis fermeture
         setTimeout(() => {
           fermerOverlayRegleUnique();
-        }, 900);
+        }, 1200);
 
         if(typeof onDone === "function") onDone(utilise, reste);
       });
@@ -747,8 +747,8 @@ document.addEventListener("DOMContentLoaded", function () {
           choixPigeonEnCours = false;
           duelMultiplicateur = 1;
           afficherJoueurActif();
-        }, 1000);
-      }, 1000);
+        }, 1100);
+      }, 1100);
     }
 
     function onChoose(which){
@@ -904,11 +904,7 @@ document.addEventListener("DOMContentLoaded", function () {
         indexPigeon=joueurActuel;
         nomPigeonOriginal=joueurs[joueurActuel];
         // montrerOverlayRegle("Tu es pigeon ! Boit 2 gorgées.", carteTiree);
-        annoncerBoireAvecAnnulation(joueurActuel, 2, carteTiree, `Tu es pigeon ! ${joueurs[joueurActuel]} boit 2 gorgées`);
-
-        afficherMessagePigeon(
-          "Tu es pigeon ! Boit 2 gorgées. À chaque 3 tiré, tu bois 1 gorgée. Pour sortir, tire un 3."
-        );
+        annoncerBoireAvecAnnulation(joueurActuel, 2, carteTiree, `${joueurs[joueurActuel]} est pigeon ! Boit 2 gorgées. À chaque 3 tiré, tu bois 1 gorgée. Pour sortir, tire un 3.`);
       } else if(indexPigeon===joueurActuel){
         afficherMenuPigeon();
       } else {
