@@ -441,7 +441,10 @@ document.addEventListener("DOMContentLoaded", function () {
           overlayRegleTimeout = setTimeout(() => {
             overlay.style.opacity = "0";
             overlay.style.transform = "scale(0.8)";
-            overlay.addEventListener("transitionend", () => overlay.remove(), { once: true });
+            overlay.addEventListener("transitionend", () => {
+              overlay.remove();
+              unlockScroll();
+             }, { once: true });
           }, duree);
         }
       }
