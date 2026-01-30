@@ -584,9 +584,14 @@ document.addEventListener("DOMContentLoaded", function () {
       carre.className = "carre-couleur " + c.classe;
       carre.addEventListener("click", ()=>{
         couleurChoisie = c.nom;
+        const mapCouleurs = {
+          rouge: "#e53935",
+          bleu: "#1e88e5",
+          vert: "#43a047",
+          jaune: "#fdd835"
+        };
         messageTexte.innerText = c.nom.toUpperCase();
-        messageTexte.style.color = c.nom; // marche car "rouge/bleu/vert/jaune" => couleurs CSS valides
-        messageCouleurEnCours = true;
+        messageTexte.style.color = mapCouleurs[c.nom] || "#FFD700";
         messageCouleurEnCours = true;
         unlockScroll();
         overlay.remove();
