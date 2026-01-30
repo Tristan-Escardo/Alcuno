@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const btnSupprimer = document.getElementById("supprimerJoueur");
   const btnNouvellePartie = document.getElementById("nouvellePartie");
   const btnTermine = document.getElementById("termineSuppression");
+  const messageTexte = document.getElementById("messageTexte");
 
   const classes = [
     "zero_vert","zero_jaune","zero_rouge","zero_bleu",
@@ -84,6 +85,7 @@ document.addEventListener("DOMContentLoaded", function () {
   let sensHoraire = true;
 
   let couleurChoisie = null;
+  let messageCouleurEnCours = false;
 
   let phase = 1;       // 1 = choix J1, 2 = choix J2
   let choixJ1 = null;  // 1 ou 2 (carte de gauche/droite)
@@ -290,13 +292,15 @@ document.addEventListener("DOMContentLoaded", function () {
   // ===== Annulation de gorgées (carte "un") =====
   let overlayRegleVerrouille = false; // si true => overlayRegleUnique ne s'auto-ferme pas
 
-  function fermerOverlayRegleUnique(){
+  function fermerOverlayRegleUnique(afterClose = null){
     const overlay = document.getElementById("overlayRegleUnique");
-    if(!overlay) return;
+    if(!overlay) {
+      if(typeof afterClose === "function") afterClose();
+      return;
+    }
 
     overlayRegleVerrouille = false;
 
-    // stop timer éventuel
     if (overlayRegleTimeout) {
       clearTimeout(overlayRegleTimeout);
       overlayRegleTimeout = null;
@@ -307,6 +311,7 @@ document.addEventListener("DOMContentLoaded", function () {
     overlay.addEventListener("transitionend", () => {
       overlay.remove();
       unlockScroll();
+      if(typeof afterClose === "function") afterClose();
     }, { once: true });
   }
 
@@ -314,7 +319,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // - joueurIndex : index dans joueurs[]
   // - nbGorgees : combien il devrait boire au départ
   // - onDone(annule, reste) : callback une fois le choix fait
-  function injecterChoixAnnulationDansOverlay(joueurIndex, nbGorgees, onDone){
+  function injecterChoixAnnulationDansOverlay(joueurIndex, nbGorgees, onDone, afterClose = null){
     const overlay = document.getElementById("overlayRegleUnique");
     if(!overlay) return false;
 
@@ -380,8 +385,9 @@ document.addEventListener("DOMContentLoaded", function () {
         overlayRegleVerrouille = false;
 
         // petite pause de lecture, puis fermeture
+        if(typeof onDone === "function") onDone(utilise, reste);
         setTimeout(() => {
-          fermerOverlayRegleUnique();
+          fermerOverlayRegleUnique(afterClose);
         }, 1200);
 
         if(typeof onDone === "function") onDone(utilise, reste);
@@ -578,6 +584,10 @@ document.addEventListener("DOMContentLoaded", function () {
       carre.className = "carre-couleur " + c.classe;
       carre.addEventListener("click", ()=>{
         couleurChoisie = c.nom;
+        messageTexte.innerText = c.nom.toUpperCase();
+        messageTexte.style.color = c.nom; // marche car "rouge/bleu/vert/jaune" => couleurs CSS valides
+        messageCouleurEnCours = true;
+        messageCouleurEnCours = true;
         unlockScroll();
         overlay.remove();
         choixPigeonEnCours = false;
@@ -891,7 +901,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if(total < 4){
         info.innerText = "Clique sur un joueur pour lui donner +1 gorgée.";
       } else {
-        info.innerText = "✅ Total atteint. Tu peux valider.";
+        info.innerText = "Total atteint. Tu peux valider.";
       }
 
       // update boutons joueurs (badge)
@@ -983,6 +993,53 @@ document.addEventListener("DOMContentLoaded", function () {
     refreshUI();
   }
 
+  function distribuerFilePlus4(file, classeCartePlus4){
+    if(file.length === 0) return;
+
+    const item = file.shift();
+    demanderAnnulationPlus4(item.idx, item.n, classeCartePlus4, () => {
+      distribuerFilePlus4(file, classeCartePlus4);
+    });
+  }
+
+  function demanderAnnulationPlus4(joueurIndex, nbGorgees, classeCartePlus4, onFinish){
+    const nom = joueurs[joueurIndex];
+    const dispo = Number(annulations[nom] || 0);
+
+    // Message +4 (ne dit pas encore "boit", juste "reçoit")
+    const msg = `${nom} reçoit ${nbGorgees} gorgée(s) (+4)`;
+
+    // Affiche l'overlay (et donc bloque scroll grâce à ton lockScroll déjà branché)
+    montrerOverlayRegle(msg, classeCartePlus4);
+
+    // Si le joueur peut annuler -> on injecte les boutons dans CE MÊME overlay
+    const ok = injecterChoixAnnulationDansOverlay(
+      joueurIndex,
+      nbGorgees,
+      (annule, reste) => {
+        regleZero.innerText = (reste <= 0)
+          ? `${nom} annule et ne boit pas`
+          : `${nom} boit ${reste} gorgée(s)`;
+        regleZero.style.display = "block";
+        zeroEnCours = true;
+      },
+      () => { if(typeof onFinish === "function") onFinish(); }
+    );
+
+
+    // Si pas d’annulation dispo, on affiche juste un résultat direct puis on enchaîne
+    if(!ok){
+      regleZero.innerText = `${nom} boit ${nbGorgees} gorgée(s)`;
+      regleZero.style.display = "block";
+      zeroEnCours = true;
+
+      if(typeof onFinish === "function"){
+        const wait = dureeOverlaySelonNbLignes(1) + 350;
+        setTimeout(() => onFinish(), wait);
+      }
+    }
+  }
+
   function couleurDeLaCarte(classeCarte){
     // Ex: "un_vert1" => "vert", "interdit_rouge" => "rouge"
     const m = classeCarte.match(/_(vert|jaune|rouge|bleu)/);
@@ -998,6 +1055,14 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     effacerMessagePigeon();
+    
+    // On enlève l'affichage de la couleur au prochain tirage
+    if(messageCouleurEnCours){
+      messageTexte.innerText = "";
+      messageTexte.style.color = "#FFD700"; // ou "inherit"
+      messageCouleurEnCours = false;
+    }
+
 
     // Cas spécial: plus_4 => overlay de distribution + annulations chez les cibles
     if (carteTiree.startsWith("plus_4")) {
@@ -1069,7 +1134,7 @@ document.addEventListener("DOMContentLoaded", function () {
         indexPigeon=joueurActuel;
         nomPigeonOriginal=joueurs[joueurActuel];
         // montrerOverlayRegle("Tu es pigeon ! Boit 2 gorgées.", carteTiree);
-        annoncerBoireAvecAnnulation(joueurActuel, 2, carteTiree, `${joueurs[joueurActuel]} est pigeon ! Boit 2 gorgées. À chaque 3 tiré, tu bois 1 gorgée. Pour sortir, tire un 3.`);
+        annoncerBoireAvecAnnulation(joueurActuel, 2, carteTiree, `${joueurs[joueurActuel]} est pigeon ! Boit 2 gorgées. À chaque 3 tiré, tu bois 1 gorgée. Pour en sortir, tire un 3.`);
       } else if(indexPigeon===joueurActuel){
         afficherMenuPigeon();
       } else {
@@ -1180,6 +1245,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function retourMenu(){
     partieLancee = false;
+
+    // ✅ reset des annulations (compteurs "un") pour une nouvelle partie
+    joueurs.forEach(nom => {
+      annulations[nom] = 0;
+    });
+
     paquet = [];
     paquetDuel = [];
 
@@ -1227,6 +1298,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
   btnJouer.addEventListener("click", lancerPartie);
   btnNouvellePartie.addEventListener("click", retourMenu);
+
+  // on force l'UI du menu (au cas où)
+  suppression.style.display = "none";
+  menu.style.display = "flex";
+  btnSupprimer.style.display = "inline-block";
 
   /* ===== INIT ===== */
   afficherJoueurs();

@@ -617,6 +617,14 @@ header {
     min-width: 0;
 }
 
+#messageTexte{
+  font-size: 34px;
+  font-weight: 900;
+  text-align: center;
+  margin-top: 10px;
+  text-shadow: 2px 2px 5px #000;
+}
+
 /* ===== Boutons annulation dans overlayRegleUnique ===== */
 #overlayRegleUnique .bloc-annulation{
   margin-top: 18px;
@@ -781,7 +789,7 @@ body.no-scroll{
 .plus_2_vert, .plus_2_vert1 { background-image: url("Cartes/plus_2_vert.jpg"); }
 .plus_2_jaune, .plus_2_jaune1 { background-image: url("Cartes/plus_2_jaune.jpg"); }
 .plus_2_rouge, .plus_2_rouge1 { background-image: url("Cartes/plus_2_rouge.jpg"); }
-.plus_2_bleu, .plus_2_bleu1 { background-image: url("Cartes/plus_2_bleu.jpg"); }
+.plus_2_bleu, .plus_2_bleu1 { background-image: url("Cartes/plus_2_bleu1.jpg"); }
 
 .plus_4, .plus_4_1, .plus_4_2, .plus_4_3 { background-image: url("Cartes/plus_4.jpg"); }
 
