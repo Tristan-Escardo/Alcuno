@@ -670,6 +670,56 @@ header {
   transform: scale(1.10);
 }
 
+/* ===== Overlay FIN "1 restants" ===== */
+#overlayFinUnRestants{
+  animation: fadeIn 0.5s ease forwards;
+}
+
+#overlayFinUnRestants .titre-pigeon{
+  font-size: 48px;
+  font-weight: bold;
+  color: #FFD700;
+  text-align: center;
+  text-shadow: 2px 2px 5px #000;
+  animation: pop 0.5s ease forwards;
+}
+
+#overlayFinUnRestants .bouton-pigeon{
+  width: 80%;
+  max-width: 400px;
+  padding: 25px;
+  font-size: 32px;
+  font-weight: bold;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  background-color: #FFD700;
+  color: #000;
+  transition: transform 0.2s, background-color 0.2s;
+  animation: slideUp 0.5s ease forwards;
+}
+
+#overlayFinUnRestants .bouton-pigeon:hover{
+  background-color: #ffea70;
+  transform: scale(1.10);
+}
+
+#overlayFinUnRestants .fin-un-lignes{
+  width: min(900px, 92vw);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#overlayFinUnRestants .fin-un-ligne{
+  color: #FFD700;
+  font-size: 28px;
+  font-weight: 800;
+  text-align: center;
+  text-shadow: 2px 2px 5px #000;
+  animation: slideUp 0.35s ease forwards;
+}
+
 /* Empêche le scroll quand un overlay est présent */
 body.no-scroll{
   overflow: hidden;

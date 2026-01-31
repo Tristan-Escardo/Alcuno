@@ -93,6 +93,7 @@ document.addEventListener("DOMContentLoaded", function () {
   let lastCols = null;
   let scrollLockCount = 0;
   let scrollYBeforeLock = 0;
+  let finUnOverlayAffiche = false;
 
   /* ===== OUTILS ===== */
   function lockScroll(){
@@ -249,6 +250,70 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   /* ===== PIGEON OVERLAY ===== */
+  function afficherOverlayFinUnRestants(){
+    if(finUnOverlayAffiche) return;
+    finUnOverlayAffiche = true;
+
+    // joueurs qui ont encore des "un" stockés
+    const restants = joueurs
+      .map(nom => ({ nom, n: Number(annulations[nom] || 0) }))
+      .filter(x => x.n > 0);
+
+    if(restants.length === 0) return; // rien à faire
+
+    // on évite de superposer des overlays
+    const overlayRegle = document.getElementById("overlayRegleUnique");
+    if(overlayRegle) overlayRegle.remove(); // fin de partie => on nettoie
+
+    lockScroll();
+
+    const overlay = document.createElement("div");
+    overlay.id = "overlayFinUnRestants";
+    overlay.style.position = "fixed";
+    overlay.style.inset = "0";
+    overlay.style.zIndex = "9999";
+    overlay.style.backgroundColor = "rgba(0,0,0,0.9)";
+    overlay.style.display = "flex";
+    overlay.style.flexDirection = "column";
+    overlay.style.justifyContent = "center";
+    overlay.style.alignItems = "center";
+    overlay.style.padding = "24px";
+    overlay.style.gap = "18px";
+
+    const titre = document.createElement("div");
+    titre.className = "titre-pigeon";
+    titre.innerText = "FIN DU PLATEAU";
+    overlay.appendChild(titre);
+
+    const bloc = document.createElement("div");
+    bloc.className = "fin-un-lignes";
+
+    restants.forEach(x => {
+      const ligne = document.createElement("div");
+      ligne.className = "fin-un-ligne";
+      ligne.innerText = `${x.nom} doit boire ${x.n} gorgée(s) pour les 1 restants`;
+      bloc.appendChild(ligne);
+    });
+
+    overlay.appendChild(bloc);
+
+    const btnTerminer = document.createElement("button");
+    btnTerminer.className = "bouton-pigeon";
+    btnTerminer.innerText = "Terminer";
+
+    btnTerminer.addEventListener("click", () => {
+      // ils boivent leurs "1 restants" => on remet les compteurs à 0
+      restants.forEach(x => { annulations[x.nom] = 0; });
+      afficherJoueurs();
+
+      overlay.remove();
+      unlockScroll();
+    });
+
+    overlay.appendChild(btnTerminer);
+    document.body.appendChild(overlay);
+  }
+
   function afficherMenuPigeon(){
     if(document.getElementById("overlayPigeon")) return;
     choixPigeonEnCours=true;
@@ -1301,6 +1366,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     duelEnCours = false;
     duelMultiplicateur = 1;
+    let finUnOverlayAffiche = false;
 
     btnNouvellePartie.style.display = "inline-block";
     btnSupprimer.style.display = "none";
@@ -1327,6 +1393,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const joueurActuel = indexJoueur % joueurs.length;
         appliquerRegle(carteTiree, joueurActuel, carte);
+        // fin du plateau : on affiche les "1 restants"
+        if(paquet.length === 0){
+          afficherOverlayFinUnRestants();
+        }
 
         indexJoueur = (indexJoueur + (sensHoraire ? 1 : -1) + joueurs.length) % joueurs.length;
 
@@ -1342,6 +1412,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function retourMenu(){
     partieLancee = false;
+    let finUnOverlayAffiche = false;
+
 
     // ✅ reset des annulations (compteurs "un") pour une nouvelle partie
     joueurs.forEach(nom => {
