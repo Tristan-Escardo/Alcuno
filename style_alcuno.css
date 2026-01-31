@@ -1,5 +1,9 @@
 /* ===== GLOBAL ===== */
 /* Anti scroll horizontal (iOS/Android) */
+html{
+  scrollbar-gutter: stable;
+}
+
 body{
     background-color: rgb(43, 0, 29);
     margin: 0;
@@ -377,7 +381,6 @@ header {
   transition: transform 0.2s, background-color 0.2s;
   animation: slideUp 0.5s ease forwards;
 }
-
 
 #overlayPlus4 .bouton-pigeon:hover{
   background-color: #ffea70;
