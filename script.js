@@ -96,6 +96,31 @@ document.addEventListener("DOMContentLoaded", function () {
   let finUnOverlayAffiche = false;
 
   /* ===== OUTILS ===== */
+  function appliquerBonusCouleurSiBesoin(carteTiree){
+    if(!couleurChoisie) return;
+
+    // bonus couleur ne s'applique pas à plus_4 / couleur (comme tu faisais)
+    const estExclue =
+      carteTiree.startsWith("plus_4") ||
+      carteTiree.startsWith("couleur");
+
+    if(estExclue) return;
+
+    const colCarte = couleurDeLaCarte(carteTiree);
+    if(colCarte && colCarte === couleurChoisie){
+      const msgCouleur = "Et boit 1 gorgée pour la couleur (" + couleurChoisie + ") !";
+
+      regleZero.innerText = msgCouleur;
+      regleZero.style.display = "block";
+      zeroEnCours = true;
+
+      montrerOverlayRegle(msgCouleur, carteTiree);
+
+      // la couleur attendue est tombée => reset
+      couleurChoisie = null;
+    }
+  }
+
   function lockScroll(){
     scrollLockCount++;
     if(scrollLockCount > 1) return;
@@ -282,7 +307,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const titre = document.createElement("div");
     titre.className = "titre-pigeon";
-    titre.innerText = "FIN DU PLATEAU";
+    titre.innerText = "FIN DE LA PARTIE";
     overlay.appendChild(titre);
 
     const bloc = document.createElement("div");
@@ -394,6 +419,25 @@ document.addEventListener("DOMContentLoaded", function () {
       unlockScroll();
       if(typeof afterClose === "function") afterClose();
     }, { once: true });
+  }
+
+  function executerApresOverlayRegleUnique(callback){
+    const overlay = document.getElementById("overlayRegleUnique");
+    if(!overlay){
+      callback();
+      return;
+    }
+
+    // on attend qu'il soit réellement retiré
+    const obs = new MutationObserver(() => {
+      const stillThere = document.getElementById("overlayRegleUnique");
+      if(!stillThere){
+        obs.disconnect();
+        callback();
+      }
+    });
+
+    obs.observe(document.body, { childList: true, subtree: true });
   }
 
   // Ajoute (ou remplace) l'UI de choix d'annulation dans l'overlay existant.
@@ -1211,6 +1255,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const victimes = joueurs.map((_, i) => i); // tout le monde
       demarrerAnnulationsMulti(victimes, carteTiree, entete);
+      appliquerBonusCouleurSiBesoin(carteTiree);
       return;
     }
 
@@ -1224,6 +1269,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const victimes = joueurs.map((_, i) => i).filter(i => i !== joueurActuel);
       demarrerAnnulationsMulti(victimes, carteTiree, entete);
+      appliquerBonusCouleurSiBesoin(carteTiree);
       return;
     }
 
@@ -1234,8 +1280,10 @@ document.addEventListener("DOMContentLoaded", function () {
         carteTiree,
         `${joueurs[joueurActuel]} boit 2 gorgées`
       );
+      appliquerBonusCouleurSiBesoin(carteTiree);
       return; // important : on évite le traitement générique en dessous
     }
+
     // Autres règles génériques de "boire"
     for (const key in reglesBoire) {
       if (key === "plus_2") continue; // sécurité (au cas où)
@@ -1245,6 +1293,7 @@ document.addEventListener("DOMContentLoaded", function () {
         regleZero.style.display = "block";
         zeroEnCours = true;
         montrerOverlayRegle(msg, carteTiree);
+        appliquerBonusCouleurSiBesoin(carteTiree);
         return; // une seule règle "boire" à appliquer
       }
     }
@@ -1395,7 +1444,9 @@ document.addEventListener("DOMContentLoaded", function () {
         appliquerRegle(carteTiree, joueurActuel, carte);
         // fin du plateau : on affiche les "1 restants"
         if(paquet.length === 0){
-          afficherOverlayFinUnRestants();
+          executerApresOverlayRegleUnique(() => {
+            afficherOverlayFinUnRestants();
+          });
         }
 
         indexJoueur = (indexJoueur + (sensHoraire ? 1 : -1) + joueurs.length) % joueurs.length;
