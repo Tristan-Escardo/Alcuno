@@ -1416,7 +1416,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     duelEnCours = false;
     duelMultiplicateur = 1;
-    let finUnOverlayAffiche = false;
+    finUnOverlayAffiche = false;
 
     btnNouvellePartie.style.display = "inline-block";
     btnSupprimer.style.display = "none";
@@ -1464,7 +1464,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function retourMenu(){
     partieLancee = false;
-    let finUnOverlayAffiche = false;
+    finUnOverlayAffiche = false;
 
 
     // ✅ reset des annulations (compteurs "un") pour une nouvelle partie
