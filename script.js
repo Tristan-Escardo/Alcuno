@@ -85,6 +85,7 @@ document.addEventListener("DOMContentLoaded", function () {
   let sensHoraire = true;
 
   let couleurChoisie = null;
+  let carteTroisPourTransfertPigeon = "";
   let messageCouleurEnCours = false;
 
   let phase = 1;       // 1 = choix J1, 2 = choix J2
@@ -267,14 +268,29 @@ document.addEventListener("DOMContentLoaded", function () {
         btn.className="bouton-pigeon";
         btn.innerText=j;
         btn.addEventListener("click",()=>{
-          indexPigeon=i;
-          nomPigeonOriginal=joueurs[i];
-          unlockScroll();
-          overlay.remove();
-          choixPigeonEnCours=false;
-          afficherJoueurs();
-          afficherJoueurActif();
-        });
+        indexPigeon = i;
+        nomPigeonOriginal = joueurs[i];
+        // 1) on ferme l'overlay de choix
+        unlockScroll();
+        overlay.remove();
+        choixPigeonEnCours = false;
+        afficherJoueurs();
+        afficherJoueurActif();
+        // 2) message demandé (overlay + .messages)
+        const msg = `${joueurs[i]} est le nouveau PIGEON, il boit 2 gorgées pour fêter ça`;
+        // .messages : on l'affiche dans reglePigeon (et il disparaît au prochain tirage)
+        afficherMessagePigeon(msg);
+        // 3) overlay + annulation si compteur (utilise la carte "trois" qui a déclenché le transfert)
+        annoncerBoireAvecAnnulation(
+          i,
+          2,
+          carteTroisPourTransfertPigeon || "trois_vert",
+          msg
+        );
+        // optionnel : on nettoie
+        carteTroisPourTransfertPigeon = "";
+      });
+
         overlay.appendChild(btn);
       }
     });
@@ -543,8 +559,6 @@ document.addEventListener("DOMContentLoaded", function () {
       }, duree);
     }
   }
-
-   
 
   /* ===== Règles centralisées ===== */
   const reglesBoire = {
@@ -1212,6 +1226,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // montrerOverlayRegle("Tu es pigeon ! Boit 2 gorgées.", carteTiree);
         annoncerBoireAvecAnnulation(joueurActuel, 2, carteTiree, `${joueurs[joueurActuel]} est pigeon ! Boit 2 gorgées. À chaque 3 tiré, tu bois 1 gorgée. Pour en sortir, tire un 3.`);
       } else if(indexPigeon===joueurActuel){
+        carteTroisPourTransfertPigeon = "";
         afficherMenuPigeon();
       } else {
         montrerOverlayRegle("Le pigeon boit 1 gorgée", carteTiree);
