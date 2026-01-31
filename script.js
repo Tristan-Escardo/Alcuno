@@ -1184,7 +1184,6 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     }
 
-
     // Cartes "un" => +1 annulation de gorgée
     if(carteTiree.startsWith("un")){
       const msg = "+1 annulation de gorgée !";
@@ -1220,18 +1219,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Cartes "trois/pigeon"
     if(carteTiree.startsWith("trois")){
+      
       if(indexPigeon===null){
         indexPigeon=joueurActuel;
         nomPigeonOriginal=joueurs[joueurActuel];
         // montrerOverlayRegle("Tu es pigeon ! Boit 2 gorgées.", carteTiree);
         annoncerBoireAvecAnnulation(joueurActuel, 2, carteTiree, `${joueurs[joueurActuel]} est PIGEON ! Il boit 2 gorgées. À chaque 3 tiré, tu bois 1 gorgée. Pour en sortir, tire un 3.`);
+      
       } else if(indexPigeon===joueurActuel){
-        carteTroisPourTransfertPigeon = "";
         carteTroisPourTransfertPigeon = carteTiree;
         afficherMenuPigeon();
+      
       } else {
-        montrerOverlayRegle("Le pigeon boit 1 gorgée", carteTiree);
-        afficherMessagePigeon("Le pigeon boit 1 gorgée");
+        // si quelqu'un d'autre tire un 3 : le pigeon boit 1 (annulable si compteur)
+        const msg = "Le pigeon boit 1 gorgée";
+        // message dans .messages (disparaît au prochain tirage grâce à effacerMessagePigeon() au début)
+        afficherMessagePigeon(msg);
+        // overlay + choix d'annulation si le pigeon a des "UN"
+        annoncerBoireAvecAnnulation(indexPigeon, 1, carteTiree, msg);
       }
     }
 
