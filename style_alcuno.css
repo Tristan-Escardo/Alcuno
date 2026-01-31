@@ -1,13 +1,8 @@
 /* ===== GLOBAL ===== */
 /* Anti scroll horizontal (iOS/Android) */
-html{
-  scrollbar-gutter: stable;
-}
 
 body{
     background-color: rgb(43, 0, 29);
-    margin: 0;
-    padding: 20px;
     font-family: Arial, sans-serif;
     color: white;
     overflow-x: hidden;
@@ -18,8 +13,8 @@ body{
 html, body{
     width: 100%;
     max-width: 100%;
+    padding: 8px;
     margin: 0;
-    padding: 0;
     overflow-x: hidden;
     overscroll-behavior: none;
 }

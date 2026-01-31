@@ -267,6 +267,18 @@ document.addEventListener("DOMContentLoaded", function () {
     toDelete.forEach(i=>{
       const name = joueurs[i];
       joueurs.splice(i,1);
+      // si pigeon supprimé ou liste vide
+      if (joueurs.length === 0) {
+        indexPigeon = null;
+      } else if (indexPigeon != null) {
+        // si on a supprimé quelqu’un avant l’index pigeon, il faut le décaler
+        // (le plus safe : retrouver par nom si tu gardes nomPigeonOriginal)
+        const newIdx = joueurs.indexOf(nomPigeonOriginal);
+        indexPigeon = newIdx >= 0 ? newIdx : null;
+      }
+      // sécurise indexJoueur
+      if (joueurs.length > 0) indexJoueur = ((indexJoueur % joueurs.length) + joueurs.length) % joueurs.length;
+
       if(name != null) delete annulations[name];
     });
     suppression.style.display="none";
