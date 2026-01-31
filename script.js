@@ -389,8 +389,6 @@ document.addEventListener("DOMContentLoaded", function () {
         setTimeout(() => {
           fermerOverlayRegleUnique(afterClose);
         }, 1200);
-
-        if(typeof onDone === "function") onDone(utilise, reste);
       });
 
       boutons.appendChild(btn);
