@@ -614,6 +614,7 @@ document.addEventListener("DOMContentLoaded", function () {
     overlay.style.borderRadius = "20px";
     overlay.style.opacity = "0";
     overlay.style.transition = "opacity 0.3s ease, transform 0.3s ease";
+    overlay.style.transform = "scale(1)";
 
     // Cartes (si tu utilises cette partie)
     const cartes = document.createElement("div");
@@ -649,7 +650,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     requestAnimationFrame(() => {
       overlay.style.opacity = "1";
-      overlay.style.transform = "scale(1.05)";
+      overlay.style.transform = "scale(1)";
     });
 
     const nbLignes = boxTexte.children.length;
