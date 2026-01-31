@@ -1031,6 +1031,55 @@ document.addEventListener("DOMContentLoaded", function () {
       () => { if(typeof onFinish === "function") onFinish(); }
     );
 
+    // ===== Annulations pour pénalités multi-joueurs (SOCIAL / ZERO) =====
+    function demanderAnnulationSimple(joueurIndex, nbGorgees, classeCarte, message, onFinish){
+      const nom = joueurs[joueurIndex];
+
+      // Affiche/ajoute la ligne dans l'overlay
+      montrerOverlayRegle(message, classeCarte);
+
+      // Injecte les boutons d'annulation si dispo, puis enchaîne seulement après fermeture
+      const ok = injecterChoixAnnulationDansOverlay(
+        joueurIndex,
+        nbGorgees,
+        (annule, reste) => {
+          regleZero.innerText = (reste <= 0)
+            ? `${nom} annule et ne boit pas`
+            : `${nom} boit ${reste} gorgée(s)`;
+          regleZero.style.display = "block";
+          zeroEnCours = true;
+        },
+        () => { if(typeof onFinish === "function") onFinish(); }
+      );
+
+      // Si pas d'annulation dispo : pas de choix, on enchaîne vite
+      if(!ok){
+        regleZero.innerText = message;
+        regleZero.style.display = "block";
+        zeroEnCours = true;
+
+        if(typeof onFinish === "function"){
+          setTimeout(() => onFinish(), 650);
+        }
+      }
+    }
+
+    function demarrerAnnulationsMulti(victimes, classeCarte, messageEntete){
+      // Message global (social/zero)
+      montrerOverlayRegle(messageEntete, classeCarte);
+
+      // On ne demande un choix qu'aux joueurs qui ont au moins 1 annulation
+      const file = victimes.filter(idx => Number(annulations[joueurs[idx]] || 0) > 0);
+
+      function next(){
+        if(file.length === 0) return;
+        const idx = file.shift();
+        const msg = `${joueurs[idx]} boit 1 gorgée`;
+        demanderAnnulationSimple(idx, 1, classeCarte, msg, next);
+      }
+
+      next();
+    }
 
     // Si pas d’annulation dispo, on affiche juste un résultat direct puis on enchaîne
     if(!ok){
@@ -1076,7 +1125,31 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Cartes "boire"
-    // Cas spécial: plus_2 => le joueur actuel boit 2 (annulable)
+    if(carteTiree.startsWith("interdit")){
+      const entete = "SOCIAAALE ! Tout le monde boit 1 gorgée";
+
+      regleZero.innerText = entete;
+      regleZero.style.display = "block";
+      zeroEnCours = true;
+
+      const victimes = joueurs.map((_, i) => i); // tout le monde
+      demarrerAnnulationsMulti(victimes, carteTiree, entete);
+      return;
+    }
+
+    // ZERO : tout le monde boit 1 sauf celui qui a tiré le 0
+    if(carteTiree.startsWith("zero")){
+      const entete = "Tout le monde boit 1 gorgée sauf toi";
+
+      regleZero.innerText = entete;
+      regleZero.style.display = "block";
+      zeroEnCours = true;
+
+      const victimes = joueurs.map((_, i) => i).filter(i => i !== joueurActuel);
+      demarrerAnnulationsMulti(victimes, carteTiree, entete);
+      return;
+    }
+
     if (carteTiree.startsWith("plus_2")) {
       annoncerBoireAvecAnnulation(
         joueurActuel,

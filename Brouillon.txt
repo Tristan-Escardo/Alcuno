@@ -20,14 +20,3 @@ Switch : Changement de sens<br/>
 A la fin la dernière carte est réservée de côté et chacun doit parier pour<br/>
             savoir laquelle c'est. Les paris commencent avec celui qui a tiré l'avant dernière<br/>
             carte. Le gagnant distribue un cul sec.
-
-
-Tableau de suivi
-
-À droite, les joueurs et gorgées consommées
-
-Option “Réinitialiser les compteurs” entre parties
-
-Fonctionne sur PC, tablette ou téléphone
-
-Mode soirée → gros boutons, textes lisibles à distance
