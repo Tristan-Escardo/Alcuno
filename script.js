@@ -1043,56 +1043,6 @@ document.addEventListener("DOMContentLoaded", function () {
       () => { if(typeof onFinish === "function") onFinish(); }
     );
 
-    // ===== Annulations pour pénalités multi-joueurs (SOCIAL / ZERO) =====
-    function demanderAnnulationSimple(joueurIndex, nbGorgees, classeCarte, message, onFinish){
-      const nom = joueurs[joueurIndex];
-
-      // Affiche/ajoute la ligne dans l'overlay
-      montrerOverlayRegle(message, classeCarte);
-
-      // Injecte les boutons d'annulation si dispo, puis enchaîne seulement après fermeture
-      const ok = injecterChoixAnnulationDansOverlay(
-        joueurIndex,
-        nbGorgees,
-        (annule, reste) => {
-          regleZero.innerText = (reste <= 0)
-            ? `${nom} annule et ne boit pas`
-            : `${nom} boit ${reste} gorgée(s)`;
-          regleZero.style.display = "block";
-          zeroEnCours = true;
-        },
-        () => { if(typeof onFinish === "function") onFinish(); }
-      );
-
-      // Si pas d'annulation dispo : pas de choix, on enchaîne vite
-      if(!ok){
-        regleZero.innerText = message;
-        regleZero.style.display = "block";
-        zeroEnCours = true;
-
-        if(typeof onFinish === "function"){
-          setTimeout(() => onFinish(), 650);
-        }
-      }
-    }
-
-    function demarrerAnnulationsMulti(victimes, classeCarte, messageEntete){
-      // Message global (social/zero)
-      montrerOverlayRegle(messageEntete, classeCarte);
-
-      // On ne demande un choix qu'aux joueurs qui ont au moins 1 annulation
-      const file = victimes.filter(idx => Number(annulations[joueurs[idx]] || 0) > 0);
-
-      function next(){
-        if(file.length === 0) return;
-        const idx = file.shift();
-        const msg = `${joueurs[idx]} boit 1 gorgée`;
-        demanderAnnulationSimple(idx, 1, classeCarte, msg, next);
-      }
-
-      next();
-    }
-
     // Si pas d’annulation dispo, on affiche juste un résultat direct puis on enchaîne
     if(!ok){
       regleZero.innerText = `${nom} boit ${nbGorgees} gorgée(s)`;
@@ -1104,6 +1054,56 @@ document.addEventListener("DOMContentLoaded", function () {
         setTimeout(() => onFinish(), wait);
       }
     }
+  }
+
+  // ===== Annulations pour pénalités multi-joueurs (SOCIAL / ZERO) =====
+  function demanderAnnulationSimple(joueurIndex, nbGorgees, classeCarte, message, onFinish){
+    const nom = joueurs[joueurIndex];
+
+    // Affiche/ajoute la ligne dans l'overlay
+    montrerOverlayRegle(message, classeCarte);
+
+    // Injecte les boutons d'annulation si dispo, puis enchaîne seulement après fermeture
+    const ok = injecterChoixAnnulationDansOverlay(
+      joueurIndex,
+      nbGorgees,
+      (annule, reste) => {
+        regleZero.innerText = (reste <= 0)
+          ? `${nom} annule et ne boit pas`
+          : `${nom} boit ${reste} gorgée(s)`;
+        regleZero.style.display = "block";
+        zeroEnCours = true;
+      },
+      () => { if(typeof onFinish === "function") onFinish(); }
+    );
+
+    // Si pas d'annulation dispo : pas de choix, on enchaîne vite
+    if(!ok){
+      regleZero.innerText = message;
+      regleZero.style.display = "block";
+      zeroEnCours = true;
+
+      if(typeof onFinish === "function"){
+        setTimeout(() => onFinish(), 650);
+      }
+    }
+  }
+
+  function demarrerAnnulationsMulti(victimes, classeCarte, messageEntete){
+    // Message global (social/zero)
+    montrerOverlayRegle(messageEntete, classeCarte);
+
+    // On ne demande un choix qu'aux joueurs qui ont au moins 1 annulation
+    const file = victimes.filter(idx => Number(annulations[joueurs[idx]] || 0) > 0);
+
+    function next(){
+      if(file.length === 0) return;
+      const idx = file.shift();
+      const msg = `${joueurs[idx]} boit 1 gorgée`;
+      demanderAnnulationSimple(idx, 1, classeCarte, msg, next);
+    }
+
+    next();
   }
 
   function couleurDeLaCarte(classeCarte){
@@ -1227,6 +1227,7 @@ document.addEventListener("DOMContentLoaded", function () {
         annoncerBoireAvecAnnulation(joueurActuel, 2, carteTiree, `${joueurs[joueurActuel]} est pigeon ! Boit 2 gorgées. À chaque 3 tiré, tu bois 1 gorgée. Pour en sortir, tire un 3.`);
       } else if(indexPigeon===joueurActuel){
         carteTroisPourTransfertPigeon = "";
+        carteTroisPourTransfertPigeon = carteTiree;
         afficherMenuPigeon();
       } else {
         montrerOverlayRegle("Le pigeon boit 1 gorgée", carteTiree);
