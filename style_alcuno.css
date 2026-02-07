@@ -237,10 +237,10 @@ header {
 
 #overlayDuel,
 #overlayRegleUnique{
-  overflow-y: auto;                 /* ✅ scroll dans l’overlay */
+  overflow-y: auto;                 /* scroll dans l’overlay */
   overflow-x: hidden;
-  -webkit-overflow-scrolling: touch; /* ✅ scroll fluide iOS */
-  overscroll-behavior: contain;     /* ✅ évite de "tirer" la page derrière */
+  -webkit-overflow-scrolling: touch; /* scroll fluide iOS */
+  overscroll-behavior: contain;     /* évite de "tirer" la page derrière */
 }
 
 
@@ -347,22 +347,6 @@ header {
 #overlayPlus4 .plus4-badge{
   margin-left: 10px;
   font-weight: 900;
-}
-
-/* ===== Overlay PLUS 4 (look) ===== */
-#overlayPlus4{
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  background-color: rgba(0,0,0,0.9); /* comme pigeon/duel */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 30px;               /* comme pigeon */
-  padding: 20px;
-  box-sizing: border-box;
-  animation: fadeIn 0.5s ease forwards;
 }
 
 /* Titre comme pigeon */
@@ -607,7 +591,6 @@ header {
 
 #overlayDuel,
 #overlayRegleUnique{
-    padding: 16px;
     box-sizing: border-box;
 }
 
@@ -768,7 +751,7 @@ body.no-scroll{
 #overlayCouleur,
 #overlayFinUnRestants,
 #overlayRegleUnique{
-  padding: clamp(12px, 3vw, 24px);
+  padding: clamp(12px, 3vw, 30px);
   gap: clamp(10px, 2.5vw, 30px);
 }
 
