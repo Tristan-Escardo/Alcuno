@@ -1059,9 +1059,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const idx = Number(btn.dataset.idx);
         const n = dist[idx];
         btn.innerHTML = n > 0
-        ? `${joueurs[idx]} <span class="plus4-badge">• ${n}</span>`
+        ? `${joueurs[idx]} <span class="plus4-badge">+ ${n}</span>`
         : `${joueurs[idx]}`;
-
 
         // optionnel: griser si total déjà à 4 (plus possible d'ajouter)
         if(total >= 4){
