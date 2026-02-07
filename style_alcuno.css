@@ -600,16 +600,6 @@ header {
     justify-content: center;
 }
 
-#overlayDuel .Carte {
-    width: 150px;
-    height: 220px;
-    border-radius: 8px;
-    background-size: cover;
-    background-position: center;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.3s;
-}
-
 #overlayDuel .Carte:hover {
     transform: scale(1.05);
     box-shadow: 0 0 20px #FFD700;
@@ -771,6 +761,40 @@ body.no-scroll{
   touch-action: auto;
 }
 
+/* ===== Base responsive pour tous les overlays ===== */
+#overlayPlus4,
+#overlayDuel,
+#overlayPigeon,
+#overlayCouleur,
+#overlayFinUnRestants,
+#overlayRegleUnique{
+  padding: clamp(12px, 3vw, 24px);
+  gap: clamp(10px, 2.5vw, 30px);
+}
+
+#overlayPlus4 .titre-pigeon,
+#overlayDuel .titre-pigeon,
+#overlayPigeon .titre-pigeon,
+#overlayFinUnRestants .titre-pigeon{
+  font-size: clamp(24px, 5vw, 52px);
+  line-height: 1.05;
+}
+
+#overlayRegleUnique{
+  font-size: clamp(18px, 4.5vw, 36px);
+}
+
+/* Boutons overlays: taille flexible */
+#overlayPlus4 .bouton-pigeon,
+#overlayDuel .bouton-pigeon,
+#overlayPigeon .bouton-pigeon,
+#overlayFinUnRestants .bouton-pigeon,
+#overlayRegleUnique .bouton-annulation{
+  width: min(420px, 92vw);
+  padding: clamp(12px, 3.2vw, 22px);
+  font-size: clamp(16px, 4vw, 28px);
+}
+
 /* ===== Animations (réutilisation) ===== */
 @keyframes fadeIn {
     from { opacity: 0; }
@@ -820,6 +844,20 @@ body.no-scroll{
         width: 100%;
         max-width: 100%;
     }
+}
+@media (max-width: 520px){
+  /* moins d’espace, boutons en pleine largeur */
+  #overlayPlus4 .bouton-pigeon,
+  #overlayDuel .bouton-pigeon,
+  #overlayPigeon .bouton-pigeon,
+  #overlayFinUnRestants .bouton-pigeon{
+    width: 100%;
+  }
+
+  /* Duel: réduire l’écart entre cartes */
+  #overlayDuel div:nth-child(3){
+    gap: 16px !important;
+  }
 }
 
 /* ===== Cartes classes ===== */
