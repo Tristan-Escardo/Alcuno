@@ -239,13 +239,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
   /* ===== JOUEURS ===== */
   function ajouterJoueur(){
-    const nom = nomJoueurInput.value.trim();
+      let nom = nomJoueurInput.value;
+
+    // Normalisation robuste : trim + espaces multiples -> 1 + lower
+    nom = nom.replace(/\s+/g, " ").trim();
     if(!nom) return;
+
+    const key = nom.toLocaleLowerCase("fr-FR");
+
+    if (joueurs.some(j => (j || "").replace(/\s+/g, " ").trim().toLocaleLowerCase("fr-FR") === key)) {
+        nomJoueurInput.value = "";
+        return;
+    }
+
     joueurs.push(nom);
-    if(annulations[nom] == null) annulations[nom] = 0;
     nomJoueurInput.value = "";
     afficherJoueurs();
-  }
+}
+
 
   btnAjouter.addEventListener("click", ajouterJoueur);
   nomJoueurInput.addEventListener("keydown", e=>{ if(e.key==="Enter") ajouterJoueur(); });
