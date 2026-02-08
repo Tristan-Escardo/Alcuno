@@ -2,22 +2,22 @@
 /* Anti scroll horizontal (iOS/Android) */
 
 body{
-    background-color: rgb(43, 0, 29);
-    font-family: Arial, sans-serif;
-    color: white;
-    overflow-x: hidden;
-    padding-left: calc(20px + env(safe-area-inset-left));
-    padding-right: calc(20px + env(safe-area-inset-right) + var(--sbw, 0px));
+  background-color: rgb(43, 0, 29);
+  font-family: Arial, sans-serif;
+  color: white;
+  overflow-x: hidden;
+  padding-left: calc(20px + env(safe-area-inset-left));
+  padding-right: calc(20px + env(safe-area-inset-right));
 }
 
 html{
-    width: 100%;
-    max-width: 100%;
-    padding: 0;
-    margin: 0;
-    overflow-x: hidden;
-    overscroll-behavior: none;
-    scrollbar-gutter: stable;
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+  margin: 0;
+  overflow-x: hidden;
+  overscroll-behavior: none;
+  scrollbar-gutter: stable;
 }
 
 *, *::before, *::after{
@@ -744,6 +744,7 @@ body.no-scroll{
   position: fixed;
   width: 100%;
   touch-action: auto;
+  padding-right: calc(20px + env(safe-area-inset-right) + var(--sbw, 0px));
 }
 
 /* ===== Base responsive pour tous les overlays ===== */
@@ -755,6 +756,8 @@ body.no-scroll{
 #overlayRegleUnique{
   padding: clamp(12px, 3vw, 30px);
   gap: clamp(10px, 2.5vw, 30px);
+  padding-left:  calc(20px + env(safe-area-inset-left));
+  padding-right: calc(20px + env(safe-area-inset-right) + var(--sbw, 0px));
 }
 
 #overlayPlus4 .titre-pigeon,
