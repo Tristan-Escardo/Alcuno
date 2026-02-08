@@ -127,6 +127,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Sauve la position pour iOS
     scrollYBeforeLock = window.scrollY || document.documentElement.scrollTop || 0;
+    const sbw = window.innerWidth - document.documentElement.clientWidth;
+    document.documentElement.style.setProperty("--sbw", (sbw > 0 ? sbw : 0) + "px");
 
     document.body.classList.add("no-scroll");
     // Astuce iOS : fixer la position du body pour empêcher le scroll tactile
@@ -139,6 +141,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if(scrollLockCount > 0) return;
 
     document.body.classList.remove("no-scroll");
+    document.documentElement.style.removeProperty("--sbw");
     const top = document.body.style.top;
     document.body.style.top = "";
 
@@ -372,7 +375,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const titre=document.createElement("div");
     titre.className="titre-pigeon";
-    titre.innerText="Choisis le nouveau pigeon";
+    titre.innerText="Choisis le nouveau PIGEON";
     overlay.appendChild(titre);
 
     joueurs.forEach((j,i)=>{
@@ -1360,7 +1363,6 @@ document.addEventListener("DOMContentLoaded", function () {
       if(indexPigeon===null){
         indexPigeon=joueurActuel;
         nomPigeonOriginal=joueurs[joueurActuel];
-        // montrerOverlayRegle("Tu es pigeon ! Boit 2 gorgées.", carteTiree);
         annoncerBoireAvecAnnulation(joueurActuel, 2, carteTiree, `${joueurs[joueurActuel]} est PIGEON ! Il boit 2 gorgées. À chaque 3 tiré, tu bois 1 gorgée. Pour en sortir, tire un 3.`);
       
       } else if(indexPigeon===joueurActuel){
@@ -1369,7 +1371,7 @@ document.addEventListener("DOMContentLoaded", function () {
       
       } else {
         // si quelqu'un d'autre tire un 3 : le pigeon boit 1 (annulable si compteur)
-        const msg = "Le pigeon boit 1 gorgée";
+        const msg = "Le PIGEON boit 1 gorgée";
         // message dans .messages (disparaît au prochain tirage grâce à effacerMessagePigeon() au début)
         afficherMessagePigeon(msg);
         // overlay + choix d'annulation si le pigeon a des "UN"
