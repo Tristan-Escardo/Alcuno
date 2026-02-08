@@ -232,6 +232,142 @@ header {
     white-space: pre-line;
 }
 
+/* ===== MENU – STYLE COHÉRENT AVEC LES OVERLAYS ===== */
+.menu button,
+.suppression button{
+  background-color: #ffcc00;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+
+  padding: clamp(12px, 2.5vw, 18px) clamp(16px, 3vw, 22px);
+  font-size: clamp(16px, 3.5vw, 20px);
+  font-weight: bold;
+
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+/* Hover */
+.menu button:hover,
+.suppression button:hover{
+  background-color: #ffea70;
+  transform: scale(1.05);
+}
+
+/* Click */
+.menu button:active,
+.suppression button:active{
+  transform: scale(0.98);
+}
+
+.menu button,
+.suppression button{
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+}
+/* ===== Overlay suppression joueurs (même style que les overlays) ===== */
+#suppression{
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgb(43, 0, 29);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding: 20px;
+  box-sizing: border-box;
+  gap: 14px;
+
+  animation: fadeIn 0.25s ease forwards;
+}
+
+#suppression h2{
+  margin: 0;
+  color: #FFD700;
+  text-align: center;
+  font-size: clamp(20px, 4.5vw, 34px);
+  font-weight: 900;
+  text-shadow: 2px 2px 5px #000;
+}
+
+/* Conteneur liste : scroll SI besoin */
+#listeSuppression{
+  width: min(620px, 92vw);
+  flex: 1;
+  min-height: 0;              /* important pour overflow dans flex */
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.06);
+  box-shadow: 0 0 0 1px rgba(255,215,0,0.18) inset;
+}
+
+/* Une ligne joueur (toute la ligne cliquable) */
+#listeSuppression .supp-item{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.35);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.08) inset;
+
+  cursor: pointer;
+  user-select: none;
+}
+
+#listeSuppression .supp-item:hover{
+  background: rgba(255,215,0,0.10);
+  box-shadow: 0 0 0 1px rgba(255,215,0,0.22) inset;
+}
+
+/* Checkbox simple mais clean (support moderne) */
+#listeSuppression .supp-check{
+  width: 20px;
+  height: 20px;
+  accent-color: #FFD700;
+  flex: 0 0 auto;
+}
+
+#listeSuppression .supp-name{
+  font-size: clamp(16px, 4vw, 22px);
+  font-weight: 800;
+}
+
+/* Bouton "Terminé" en bas, sticky */
+#termineSuppression{
+  width: min(420px, 92vw);
+  padding: clamp(12px, 3.2vw, 18px);
+  font-size: clamp(16px, 4vw, 22px);
+  font-weight: 900;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  background-color: #FFD700;
+  color: #ffffff;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+#termineSuppression:hover{
+  background-color: #ffea70;
+  transform: scale(1.05);
+}
+
+#termineSuppression:active{
+  transform: scale(0.98);
+}
+
 #overlayRegleUnique{
   --card-w: clamp(90px, 14vw, 180px);
 }

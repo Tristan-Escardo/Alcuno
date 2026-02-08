@@ -219,6 +219,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if(!partieLancee){
       btnJouer.style.display = joueurs.length >= 2 ? "inline-block" : "none";
     }
+    btnSupprimer.style.display = joueurs.length > 0 ? "inline-block" : "none";
   }
 
 
@@ -267,10 +268,18 @@ document.addEventListener("DOMContentLoaded", function () {
   btnSupprimer.addEventListener("click", ()=>{
     menu.style.display="none";
     suppression.style.display="flex";
+    lockScroll();
     listeSuppression.innerHTML="";
     joueurs.forEach((j,i)=>{
-      const ligne=document.createElement("div");
-      ligne.innerHTML=`<input type="checkbox" value="${i}"> <label>${j}</label>`;
+      const ligne = document.createElement("div");
+
+      ligne.innerHTML = `
+        <label class="supp-item">
+          <input class="supp-check" type="checkbox" value="${i}">
+          <span class="supp-name">${j}</span>
+        </label>
+      `;
+
       listeSuppression.appendChild(ligne);
     });
   });
@@ -297,6 +306,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     suppression.style.display="none";
     menu.style.display="flex";
+    unlockScroll();
     afficherJoueurs();
   });
 
