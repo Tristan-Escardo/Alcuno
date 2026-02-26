@@ -780,52 +780,35 @@ header {
   text-shadow: 2px 2px 5px #000;
 }
 
-/* ===== Overlay annulation séparé ===== */
-#overlayAnnulation{
-  position: fixed;
-  inset: 0;
-  z-index: 10000;
-  background-color: rgba(0,0,0,0.85);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  opacity: 0;
-  transform: scale(0.96);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-#overlayAnnulation .overlay-annulation-box{
-  width: min(900px, 92vw);
+/* ===== Boutons annulation dans overlayRegleUnique ===== */
+#overlayRegleUnique .bloc-annulation{
+  margin-top: 18px;
   display: flex;
   flex-direction: column;
+  gap: 14px;
   align-items: center;
-  gap: 18px;
-  color: #FFD700;
-  text-align: center;
-  font-weight: 800;
 }
 
-#overlayAnnulation .titre-annulation{
+#overlayRegleUnique .titre-annulation{
   color: #FFD700;
-  font-size: clamp(22px, 4.2vw, 40px);
+  font-size: 22px;
   font-weight: 800;
   text-align: center;
   text-shadow: 2px 2px 5px #000;
 }
 
-#overlayAnnulation .ligne-boutons-annulation{
+#overlayRegleUnique .ligne-boutons-annulation{
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 14px;
-  width: 100%;
 }
 
-#overlayAnnulation .bouton-annulation{
-  width: min(420px, 92vw);
-  padding: clamp(12px, 3.2vw, 22px);
-  font-size: clamp(16px, 4vw, 28px);
+#overlayRegleUnique .bouton-annulation{
+  width: 200px;
+  max-width: 400px;
+  padding: 18px;
+  font-size: 22px;
   font-weight: bold;
   border-radius: 12px;
   border: none;
@@ -833,19 +816,12 @@ header {
   background-color: #FFD700;
   color: #000;
   transition: transform 0.2s, background-color 0.2s;
-  animation: slideUp 0.5s ease forwards;
+  animation: slideUp 0.5s ease forwards; /* tu l'as déjà défini */
 }
 
-#overlayAnnulation .bouton-annulation:hover{
+#overlayRegleUnique .bouton-annulation:hover{
   background-color: #ffea70;
   transform: scale(1.10);
-}
-
-#overlayAnnulation .resultat-annulation{
-  font-size: clamp(24px, 5vw, 52px);
-  line-height: 1.08;
-  text-shadow: 2px 2px 5px #000;
-  animation: pop 0.35s ease forwards;
 }
 
 /* ===== Overlay FIN "1 restants" ===== */
@@ -913,8 +889,7 @@ body.no-scroll{
 #overlayPigeon,
 #overlayCouleur,
 #overlayFinUnRestants,
-#overlayRegleUnique,
-#overlayAnnulation{
+#overlayRegleUnique{
   padding: clamp(12px, 3vw, 30px);
   gap: clamp(10px, 2.5vw, 30px);
   padding-left:  calc(20px + env(safe-area-inset-left));
@@ -938,8 +913,7 @@ body.no-scroll{
 #overlayDuel .bouton-pigeon,
 #overlayPigeon .bouton-pigeon,
 #overlayFinUnRestants .bouton-pigeon,
-#overlayRegleUnique .bouton-annulation,
-#overlayAnnulation .bouton-annulation{
+#overlayRegleUnique .bouton-annulation{
   width: min(420px, 92vw);
   padding: clamp(12px, 3.2vw, 22px);
   font-size: clamp(16px, 4vw, 28px);
@@ -1079,3 +1053,99 @@ body.no-scroll{
 .switch_jaune { background-image: url("Cartes/switch_jaune.jpg"); }
 .switch_rouge { background-image: url("Cartes/switch_rouge.jpg"); }
 .switch_bleu { background-image: url("Cartes/switch_bleu.jpg"); }
+
+/* ===== OPTION B : sticky joueur actif discret ===== */
+#stickyJoueurActif{
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  z-index: 1200;
+  width: auto;
+  max-width: calc(100% - 28px);
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 215, 0, 0.22);
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(62, 0, 43, 0.72), rgba(22, 0, 16, 0.68));
+  backdrop-filter: blur(10px) saturate(115%);
+  -webkit-backdrop-filter: blur(10px) saturate(115%);
+  box-shadow:
+    0 8px 22px rgba(0,0,0,0.18),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease, transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+}
+
+#stickyJoueurActif::before{
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  background: radial-gradient(circle at 35% 35%, #fff6bf 0%, #FFD700 45%, #d6a900 100%);
+  box-shadow: 0 0 10px rgba(255,215,0,0.28);
+}
+
+#stickyJoueurActif.visible{
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+#stickyJoueurActif .sticky-label{
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.62);
+  white-space: nowrap;
+}
+
+#stickyJoueurActif .sticky-nom{
+  font-size: clamp(16px, 3.8vw, 20px);
+  font-weight: 900;
+  color: #FFE36B;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: min(52vw, 260px);
+}
+
+#stickyJoueurActif.is-pigeon{
+  border-color: rgba(64, 224, 208, 0.22);
+}
+
+#stickyJoueurActif.is-pigeon::before{
+  background: radial-gradient(circle at 35% 35%, #dffffc 0%, #40E0D0 52%, #1ba5a0 100%);
+  box-shadow: 0 0 10px rgba(64,224,208,0.22);
+}
+
+#stickyJoueurActif.is-pigeon .sticky-nom{
+  color: #8EF5EE;
+}
+
+@media (max-width: 520px){
+  #stickyJoueurActif{
+    top: calc(env(safe-area-inset-top, 0px) + 8px);
+    padding: 7px 10px;
+    gap: 8px;
+  }
+
+  #stickyJoueurActif::before{
+    width: 7px;
+    height: 7px;
+  }
+
+  #stickyJoueurActif .sticky-label{
+    font-size: 10px;
+  }
+
+  #stickyJoueurActif .sticky-nom{
+    font-size: 17px;
+    max-width: 48vw;
+  }
+}
