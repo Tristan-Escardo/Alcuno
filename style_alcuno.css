@@ -404,16 +404,16 @@ header {
 }
 
 #overlayCouleur .container-couleurs {
-    display: flex;
-    gap: 30px;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(72px, 120px));
     justify-content: center;
+    gap: 18px;
 }
 
 #overlayCouleur .carre-couleur {
-    width: 120px;
-    height: 120px;
-    border-radius: 15px;
+    width: clamp(82px, 18vw, 120px);
+    aspect-ratio: 1 / 1;
+    border-radius: 18px;
     cursor: pointer;
     box-shadow: 0 0 20px rgba(0,0,0,0.5);
     transition: transform 0.2s, box-shadow 0.2s;
@@ -464,11 +464,12 @@ header {
 }
 
 #overlayPlus4 .plus4-container-joueurs{
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 220px));
   justify-content: center;
-  gap: 12px;
-  max-width: 900px;
+  gap: 14px;
+  width: min(760px, 100%);
+  max-width: 760px;
 }
 
 #overlayPlus4 .plus4-actions{
@@ -477,6 +478,7 @@ header {
   justify-content: center;
   gap: 12px;
   margin-top: 10px;
+  width: min(760px, 100%);
 }
 
 /* Optionnel : un petit badge “• n” plus lisible */
@@ -516,6 +518,27 @@ header {
   transform: scale(1.10);
 }
 
+#overlayPlus4 .plus4-joueur-btn{
+  width: 100% !important;
+  max-width: none;
+  min-height: 84px;
+  padding: 14px 12px;
+  border-radius: 18px;
+  font-size: clamp(16px, 3.8vw, 22px);
+  line-height: 1.15;
+  background: rgba(255, 215, 0, 0.92);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.22);
+}
+
+#overlayPlus4 .plus4-joueur-btn:hover{
+  transform: translateY(-1px) scale(1.03);
+}
+
+#overlayPlus4 .plus4-action-btn{
+  width: min(420px, 92vw);
+}
+
+
 /* Tes blocs existants peuvent rester, je les garde compatibles */
 #overlayPlus4 .plus4-info{
   color: #FFD700;
@@ -550,11 +573,12 @@ header {
 }
 
 #overlayPlus4 .plus4-container-joueurs{
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 220px));
   justify-content: center;
-  gap: 12px;
-  max-width: 900px;
+  gap: 14px;
+  width: min(760px, 100%);
+  max-width: 760px;
 }
 
 #overlayPlus4 .plus4-actions{
@@ -563,6 +587,7 @@ header {
   justify-content: center;
   gap: 12px;
   margin-top: 10px;
+  width: min(760px, 100%);
 }
 
 #overlayPlus4 .plus4-badge{
@@ -579,14 +604,23 @@ header {
 /* Ajustement mobile */
 @media (max-width: 600px) {
     #overlayCouleur .carre-couleur {
-        width: 80px;
-        height: 80px;
+        width: 100%;
     }
     #overlayCouleur div.titre-couleur {
         font-size: 28px;
     }
     #overlayCouleur .container-couleurs {
-        gap: 15px;
+        grid-template-columns: repeat(2, minmax(88px, 120px));
+        gap: 16px;
+    }
+    #overlayPlus4 .plus4-container-joueurs{
+      grid-template-columns: repeat(2, minmax(120px, 1fr));
+      width: min(520px, 100%);
+    }
+    #overlayPlus4 .plus4-joueur-btn{
+      min-height: 72px;
+      padding: 12px 10px;
+      border-radius: 16px;
     }
 }
 
@@ -1054,27 +1088,24 @@ body.no-scroll{
 .switch_rouge { background-image: url("Cartes/switch_rouge.jpg"); }
 .switch_bleu { background-image: url("Cartes/switch_bleu.jpg"); }
 
-/* ===== OPTION B : sticky joueur actif discret ===== */
+/* ===== Sticky joueur actif discret ===== */
 #stickyJoueurActif{
   position: fixed;
   top: calc(env(safe-area-inset-top, 0px) + 10px);
   left: 50%;
   transform: translateX(-50%) translateY(-8px);
   z-index: 1200;
-  width: auto;
-  max-width: calc(100% - 28px);
+  width: min(560px, calc(100% - 24px));
   padding: 8px 12px;
   border: 1px solid rgba(255, 215, 0, 0.22);
   border-radius: 999px;
-  background:
-    linear-gradient(180deg, rgba(62, 0, 43, 0.72), rgba(22, 0, 16, 0.68));
+  background: linear-gradient(180deg, rgba(62, 0, 43, 0.72), rgba(22, 0, 16, 0.68));
   backdrop-filter: blur(10px) saturate(115%);
   -webkit-backdrop-filter: blur(10px) saturate(115%);
-  box-shadow:
-    0 8px 22px rgba(0,0,0,0.18),
-    inset 0 1px 0 rgba(255,255,255,0.08);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.08);
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 10px;
   opacity: 0;
   pointer-events: none;
@@ -1105,6 +1136,14 @@ body.no-scroll{
   white-space: nowrap;
 }
 
+#stickyJoueurActif .sticky-valeur{
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 #stickyJoueurActif .sticky-nom{
   font-size: clamp(16px, 3.8vw, 20px);
   font-weight: 900;
@@ -1112,7 +1151,26 @@ body.no-scroll{
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: min(52vw, 260px);
+  max-width: min(54vw, 290px);
+}
+
+#stickyJoueurActif .sticky-bonus{
+  display: none;
+  flex: 0 0 auto;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(255,215,0,0.16);
+  border: 1px solid rgba(255,215,0,0.18);
+  color: #ffe88b;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+#stickyJoueurActif.has-bonus .sticky-bonus{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 #stickyJoueurActif.is-pigeon{
@@ -1128,9 +1186,16 @@ body.no-scroll{
   color: #8EF5EE;
 }
 
+#stickyJoueurActif.is-pigeon .sticky-bonus{
+  background: rgba(64,224,208,0.12);
+  border-color: rgba(64,224,208,0.18);
+  color: #b8fffa;
+}
+
 @media (max-width: 520px){
   #stickyJoueurActif{
     top: calc(env(safe-area-inset-top, 0px) + 8px);
+    width: calc(100% - 18px);
     padding: 7px 10px;
     gap: 8px;
   }
@@ -1145,7 +1210,147 @@ body.no-scroll{
   }
 
   #stickyJoueurActif .sticky-nom{
-    font-size: 17px;
-    max-width: 48vw;
+    font-size: 16px;
+    max-width: 46vw;
+  }
+
+  #stickyJoueurActif .sticky-bonus{
+    font-size: 11px;
+    padding: 2px 7px;
+  }
+}
+
+
+/* ===== Override final : +4 compact et hiérarchisé ===== */
+#overlayPlus4 .plus4-container-joueurs{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(104px, 148px));
+  gap: 8px;
+  width: min(300px, 84vw);
+  max-width: 300px;
+  margin: 4px auto 0 auto;
+}
+
+#overlayPlus4 .plus4-container-joueurs .bouton-pigeon{
+  width: 100%;
+  max-width: none;
+  min-height: 78px;
+  padding: 8px 6px;
+  font-size: clamp(12px, 3vw, 15px);
+  line-height: 1.08;
+  border-radius: 16px;
+}
+
+#overlayPlus4 .plus4-actions{
+  width: min(360px, 92vw);
+  margin-top: 12px;
+}
+
+#overlayPlus4 .plus4-actions .bouton-pigeon{
+  width: 100%;
+  max-width: none;
+  padding: 14px 16px;
+  font-size: clamp(16px, 3.9vw, 22px);
+  border-radius: 14px;
+}
+
+@media (min-width: 700px){
+  #overlayPlus4 .plus4-container-joueurs{
+    width: min(320px, 76vw);
+    max-width: 320px;
+  }
+
+  #overlayPlus4 .plus4-container-joueurs .bouton-pigeon{
+    min-height: 88px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 520px){
+  #overlayPlus4 .plus4-container-joueurs{
+    width: min(248px, 76vw);
+    max-width: 248px;
+    grid-template-columns: repeat(2, minmax(96px, 120px));
+    gap: 7px;
+  }
+
+  #overlayPlus4 .plus4-container-joueurs .bouton-pigeon{
+    min-height: 68px;
+    padding: 7px 5px;
+    font-size: 12px;
+    border-radius: 14px;
+  }
+
+  #overlayPlus4 .plus4-actions{
+    width: min(320px, 92vw);
+  }
+}
+
+
+/* ===== Override final : +4 ultra compact ===== */
+#overlayPlus4 .plus4-container-joueurs{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(88px, 118px));
+  justify-content: center;
+  gap: 8px;
+  width: min(250px, 74vw);
+  max-width: 250px;
+  margin: 2px auto 0 auto;
+}
+
+#overlayPlus4 .plus4-container-joueurs .bouton-pigeon,
+#overlayPlus4 .plus4-joueur-btn{
+  width: 100%;
+  max-width: none;
+  min-height: 68px;
+  padding: 7px 6px;
+  font-size: 12px;
+  line-height: 1.05;
+  border-radius: 12px;
+}
+
+#overlayPlus4 .plus4-actions{
+  width: min(300px, 88vw);
+  margin-top: 10px;
+}
+
+#overlayPlus4 .plus4-actions .bouton-pigeon{
+  padding: 11px 14px;
+  font-size: clamp(15px, 3.8vw, 19px);
+  border-radius: 13px;
+}
+
+@media (max-width: 520px){
+  #overlayPlus4 .plus4-container-joueurs{
+    grid-template-columns: repeat(2, minmax(84px, 108px));
+    width: min(232px, 72vw);
+    max-width: 232px;
+    gap: 7px;
+  }
+
+  #overlayPlus4 .plus4-container-joueurs .bouton-pigeon,
+  #overlayPlus4 .plus4-joueur-btn{
+    min-height: 62px;
+    padding: 6px 5px;
+    font-size: 11px;
+    border-radius: 11px;
+  }
+
+  #overlayPlus4 .plus4-actions{
+    width: min(290px, 88vw);
+  }
+}
+
+@media (min-width: 700px){
+  #overlayPlus4 .plus4-container-joueurs{
+    grid-template-columns: repeat(2, minmax(96px, 126px));
+    width: min(268px, 40vw);
+    max-width: 268px;
+  }
+
+  #overlayPlus4 .plus4-container-joueurs .bouton-pigeon,
+  #overlayPlus4 .plus4-joueur-btn{
+    min-height: 74px;
+    font-size: 13px;
   }
 }
