@@ -464,12 +464,12 @@ header {
 }
 
 #overlayPlus4 .plus4-container-joueurs{
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 220px));
-  justify-content: center;
-  gap: 14px;
-  width: min(760px, 100%);
-  max-width: 760px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: min(420px, 92vw);
+  max-width: 420px;
 }
 
 #overlayPlus4 .plus4-actions{
@@ -519,19 +519,19 @@ header {
 }
 
 #overlayPlus4 .plus4-joueur-btn{
-  width: 100% !important;
-  max-width: none;
-  min-height: 84px;
-  padding: 14px 12px;
-  border-radius: 18px;
-  font-size: clamp(16px, 3.8vw, 22px);
-  line-height: 1.15;
-  background: rgba(255, 215, 0, 0.92);
-  box-shadow: 0 10px 26px rgba(0,0,0,0.22);
+  width: min(420px, 92vw) !important;
+  max-width: 420px;
+  min-height: 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-size: clamp(15px, 3.2vw, 19px);
+  line-height: 1.1;
+  background: rgba(255, 215, 0, 0.94);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.18);
 }
 
 #overlayPlus4 .plus4-joueur-btn:hover{
-  transform: translateY(-1px) scale(1.03);
+  transform: translateY(-1px) scale(1.02);
 }
 
 #overlayPlus4 .plus4-action-btn{
@@ -573,12 +573,12 @@ header {
 }
 
 #overlayPlus4 .plus4-container-joueurs{
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 220px));
-  justify-content: center;
-  gap: 14px;
-  width: min(760px, 100%);
-  max-width: 760px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: min(420px, 92vw);
+  max-width: 420px;
 }
 
 #overlayPlus4 .plus4-actions{
@@ -614,13 +614,17 @@ header {
         gap: 16px;
     }
     #overlayPlus4 .plus4-container-joueurs{
-      grid-template-columns: repeat(2, minmax(120px, 1fr));
-      width: min(520px, 100%);
+      width: min(420px, 92vw);
+      max-width: min(420px, 92vw);
+      gap: 10px;
     }
     #overlayPlus4 .plus4-joueur-btn{
-      min-height: 72px;
-      padding: 12px 10px;
-      border-radius: 16px;
+      width: 100% !important;
+      max-width: none;
+      min-height: 0;
+      padding: 11px 12px;
+      border-radius: 13px;
+      font-size: 16px;
     }
 }
 
@@ -780,7 +784,7 @@ header {
     display: flex;
     flex-wrap: wrap;     /* ✅ autorise retour ligne */
     gap: 10px;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
 }
 
@@ -1095,7 +1099,8 @@ body.no-scroll{
   left: 50%;
   transform: translateX(-50%) translateY(-8px);
   z-index: 1200;
-  width: min(560px, calc(100% - 24px));
+  width: max-content;
+  max-width: calc(100% - 24px);
   padding: 8px 12px;
   border: 1px solid rgba(255, 215, 0, 0.22);
   border-radius: 999px;
@@ -1105,7 +1110,7 @@ body.no-scroll{
   box-shadow: 0 8px 22px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.08);
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 10px;
   opacity: 0;
   pointer-events: none;
@@ -1195,7 +1200,7 @@ body.no-scroll{
 @media (max-width: 520px){
   #stickyJoueurActif{
     top: calc(env(safe-area-inset-top, 0px) + 8px);
-    width: calc(100% - 18px);
+    max-width: calc(100% - 18px);
     padding: 7px 10px;
     gap: 8px;
   }
