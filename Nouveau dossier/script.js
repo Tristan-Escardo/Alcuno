@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const listeJoueurs = document.getElementById("listeJoueurs");
   const regleZero = document.getElementById("regleZero");
   const reglePigeon = document.getElementById("reglePigeon");
-  const messagesBar = document.getElementById("messages");
 
   const menu = document.getElementById("menu");
   const suppression = document.getElementById("suppression");
@@ -216,16 +215,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
 
-  function repositionnerStickyJoueurActif(){
-    if(!stickyJoueurActif || !messagesBar) return;
-
-    const rect = messagesBar.getBoundingClientRect();
-    const gap = window.innerWidth <= 520 ? 8 : 10;
-    const topSouhaite = Math.max(Math.round(rect.bottom + gap), 0);
-
-    stickyJoueurActif.style.setProperty("--sticky-anchor-bottom", `${topSouhaite}px`);
-  }
-
   function creerUIJoueurActifSticky(){
     if(document.getElementById("stickyJoueurActif")) return;
 
@@ -241,13 +230,10 @@ document.addEventListener("DOMContentLoaded", function () {
     `;
 
     document.body.appendChild(stickyJoueurActif);
-    repositionnerStickyJoueurActif();
   }
 
   function majStickyJoueurActif(){
     if(!stickyJoueurActif) return;
-
-    repositionnerStickyJoueurActif();
 
     const nomEl = stickyJoueurActif.querySelector(".sticky-nom");
     const bonusEl = stickyJoueurActif.querySelector(".sticky-bonus");
@@ -502,39 +488,8 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function dureeOverlaySelonNbLignes(nb){
-    // Base légèrement augmentée pour laisser le temps de lire sans ralentir le jeu.
-    return 1700 + Math.max(0, nb - 1) * 850;
-  }
-
-  function estimerNbLignesOverlay(message){
-    const texte = String(message || "").trim();
-    if(!texte) return 1;
-
-    const largeur = window.innerWidth || 390;
-    const caracteresParLigne =
-      largeur <= 380 ? 16 :
-      largeur <= 520 ? 20 :
-      largeur <= 720 ? 26 : 34;
-
-    return texte
-      .split(/\n+/)
-      .reduce((total, ligne) => {
-        const propre = ligne.trim();
-        if(!propre) return total + 1;
-        return total + Math.max(1, Math.ceil(propre.length / caracteresParLigne));
-      }, 0);
-  }
-
-  function dureeOverlayPourMessage(message){
-    const texte = String(message || "").trim();
-    const nbLignes = estimerNbLignesOverlay(texte);
-    const nbMots = texte ? texte.split(/\s+/).filter(Boolean).length : 0;
-
-    const duree =
-      dureeOverlaySelonNbLignes(nbLignes) +
-      Math.max(0, nbMots - 5) * 45;
-
-    return Math.min(4300, Math.max(1800, duree));
+    // 1 ligne = 1500ms, puis +900ms par ligne supplémentaire
+    return 1500 + Math.max(0, nb - 1) * 1000;
   }
 
   /* ===== Overlay animé pour toutes les cartes spéciales ===== */
@@ -761,7 +716,7 @@ document.addEventListener("DOMContentLoaded", function () {
       overlay.style.transform = "scale(1)";
     });
 
-    setTimeout(fermer, dureeOverlayPourMessage(message));
+    setTimeout(fermer, 1200);
     return true;
   }
 
@@ -953,9 +908,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if(typeof onDone === "function") onDone(utilise, reste);
         setTimeout(() => {
           fermerOverlayRegleUnique(afterClose);
-        }, dureeOverlayPourMessage(utilise > 0
-          ? `Annulé ${utilise}. Tu bois ${reste} gorgée(s).`
-          : `Tu n’annules rien. Tu bois ${reste} gorgée(s).`));
+        }, 1200);
       });
 
       boutons.appendChild(btn);
@@ -1030,7 +983,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       if (!overlayRegleVerrouille) {
-        overlayRegleTimeout = setTimeout(() => fermerOverlayRegleUnique(), dureeOverlayPourMessage(message));
+        overlayRegleTimeout = setTimeout(() => fermerOverlayRegleUnique(), dureeOverlaySelonNbLignes(1));
       }
       return;
     }
@@ -1096,7 +1049,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!overlayRegleVerrouille) {
       if (overlayRegleTimeout) clearTimeout(overlayRegleTimeout);
-      overlayRegleTimeout = setTimeout(() => fermerOverlayRegleUnique(), dureeOverlayPourMessage(message));
+      overlayRegleTimeout = setTimeout(() => fermerOverlayRegleUnique(), dureeOverlaySelonNbLignes(1));
     }
   }
 
@@ -1934,14 +1887,6 @@ document.addEventListener("DOMContentLoaded", function () {
   btnSupprimer.style.display = "inline-block";
 
   /* ===== INIT ===== */
-  window.addEventListener("scroll", repositionnerStickyJoueurActif, { passive: true });
-  window.addEventListener("resize", repositionnerStickyJoueurActif);
-
-  if(window.visualViewport){
-    window.visualViewport.addEventListener("resize", repositionnerStickyJoueurActif);
-    window.visualViewport.addEventListener("scroll", repositionnerStickyJoueurActif);
-  }
-
   creerUIJoueurActifSticky();
   afficherJoueurs();
   majStickyJoueurActif();
