@@ -96,6 +96,18 @@ document.addEventListener("DOMContentLoaded", function () {
   let scrollLockCount = 0;
   let scrollYBeforeLock = 0;
   let finUnOverlayAffiche = false;
+  let predictionFinEnCours = false;
+  const typesPredictionFin = [
+    { key: "zero", label: "0", labelLong: "0", classe: "zero_vert" },
+    { key: "un", label: "1", labelLong: "1", classe: "un_vert" },
+    { key: "trois", label: "3", labelLong: "3", classe: "trois_vert" },
+    { key: "quatre", label: "4", labelLong: "4", classe: "quatre_vert" },
+    { key: "interdit", label: "Interdit", labelLong: "Interdit", classe: "interdit_vert" },
+    { key: "couleur", label: "Couleur", labelLong: "Couleur", classe: "couleur" },
+    { key: "plus_2", label: "+2", labelLong: "+2", classe: "plus_2_vert" },
+    { key: "plus_4", label: "+4", labelLong: "+4", classe: "plus_4" },
+    { key: "switch", label: "Switch", labelLong: "Switch", classe: "switch_vert" }
+  ];
 
   /* ===== OUTILS ===== */
   function appliquerBonusCouleurSiBesoin(carteTiree, options = {}){
@@ -188,6 +200,276 @@ document.addEventListener("DOMContentLoaded", function () {
       .getPropertyValue("--cols")
       .trim();
     return parseInt(cols, 10) || 8;
+  }
+
+  function centrerDerniereLigneDansGrille(container, itemSelector, cols){
+    if(!container) return;
+
+    const items = Array.from(container.querySelectorAll(itemSelector));
+    const total = items.length;
+
+    items.forEach(item => {
+      item.style.gridColumnStart = "";
+    });
+
+    if(!cols || cols < 2 || total === 0) return;
+
+    const reste = total % cols;
+    if(reste === 0) return;
+
+    const start = Math.floor((cols - reste) / 2) + 1;
+    const first = total - reste;
+
+    for(let i = 0; i < reste; i++){
+      items[first + i].style.gridColumnStart = String(start + i);
+    }
+  }
+
+  function getPredictionCols(){
+    const largeur = window.innerWidth || document.documentElement.clientWidth || 390;
+    if(largeur <= 520) return 3;
+    if(largeur <= 760) return 4;
+    if(largeur <= 980) return 5;
+    return 6;
+  }
+
+  function typePredictionDeCarte(classeCarte){
+    if(!classeCarte) return null;
+    if(classeCarte.startsWith("plus_4")) return "plus_4";
+    if(classeCarte.startsWith("plus_2")) return "plus_2";
+    if(classeCarte.startsWith("interdit")) return "interdit";
+    if(classeCarte.startsWith("couleur")) return "couleur";
+    if(classeCarte.startsWith("switch")) return "switch";
+    if(classeCarte.startsWith("zero")) return "zero";
+    if(classeCarte.startsWith("un")) return "un";
+    if(classeCarte.startsWith("trois")) return "trois";
+    if(classeCarte.startsWith("quatre")) return "quatre";
+    return null;
+  }
+
+  function mettreAJourDispositionPrediction(){
+    const grille = document.querySelector("#overlayPredictionFin .prediction-types-grid");
+    if(!grille) return;
+
+    const cols = getPredictionCols();
+    grille.style.setProperty("--prediction-cols", String(cols));
+    centrerDerniereLigneDansGrille(grille, ".prediction-card-button", cols);
+  }
+
+  function overlayBloquantActif(){
+    const ids = [
+      "overlayRegleUnique",
+      "overlayAnnulation",
+      "overlayResultatAnnulation",
+      "overlayPlus4",
+      "overlayCouleur",
+      "overlayPigeon",
+      "overlayDuel"
+    ];
+
+    return ids.some(id => document.getElementById(id));
+  }
+
+  function attendreFermetureOverlaysBloquants(callback){
+    if(!overlayBloquantActif()){
+      callback();
+      return;
+    }
+
+    const obs = new MutationObserver(() => {
+      if(!overlayBloquantActif()){
+        obs.disconnect();
+        callback();
+      }
+    });
+
+    obs.observe(document.body, { childList: true, subtree: true });
+  }
+
+  function demarrerPredictionFin(joueurDepartIndex){
+    if(predictionFinEnCours || joueurs.length === 0 || paquet.length !== 1) return;
+
+    predictionFinEnCours = true;
+    afficherJoueurActif();
+
+    attendreFermetureOverlaysBloquants(() => {
+      if(document.getElementById("overlayPredictionFin")) return;
+
+      lockScroll();
+
+      const ordreChoix = [];
+      for(let offset = 0; offset < joueurs.length; offset++){
+        const delta = sensHoraire ? offset : -offset;
+        const idx = (joueurDepartIndex + delta + joueurs.length * 10) % joueurs.length;
+        ordreChoix.push(idx);
+      }
+
+      const choix = {};
+      let etape = 0;
+
+      const overlay = document.createElement("div");
+      overlay.id = "overlayPredictionFin";
+      overlay.className = "overlay-prediction-fin";
+
+      const titre = document.createElement("div");
+      titre.className = "titre-pigeon prediction-title";
+      titre.innerText = "Devinez la dernière carte";
+      overlay.appendChild(titre);
+
+      const sousTitre = document.createElement("div");
+      sousTitre.className = "prediction-subtitle";
+      overlay.appendChild(sousTitre);
+
+      const recap = document.createElement("div");
+      recap.className = "prediction-recap";
+      overlay.appendChild(recap);
+
+      const grille = document.createElement("div");
+      grille.className = "prediction-types-grid";
+      overlay.appendChild(grille);
+
+      const info = document.createElement("div");
+      info.className = "prediction-footer-note";
+      info.innerText = "Plusieurs joueurs peuvent choisir le même type.";
+      overlay.appendChild(info);
+
+      const actions = document.createElement("div");
+      actions.className = "prediction-actions";
+      overlay.appendChild(actions);
+
+      function renduRecap(){
+        recap.innerHTML = "";
+        ordreChoix.forEach((idx, position) => {
+          const nom = joueurs[idx];
+          const item = document.createElement("div");
+          item.className = "prediction-player-item";
+
+          if(position === etape){
+            item.classList.add("is-current");
+          }
+          if(choix[nom]){
+            item.classList.add("is-done");
+          }
+
+          const nomEl = document.createElement("div");
+          nomEl.className = "prediction-player-name";
+          nomEl.innerText = nom;
+          item.appendChild(nomEl);
+
+          const choixEl = document.createElement("div");
+          choixEl.className = "prediction-player-choice";
+          choixEl.innerText = choix[nom] ? "Choix : " + (typesPredictionFin.find(t => t.key === choix[nom])?.labelLong || choix[nom]) : "En attente";
+          item.appendChild(choixEl);
+
+          recap.appendChild(item);
+        });
+      }
+
+      function renduChoix(){
+        const idxCourant = ordreChoix[etape];
+        const nomCourant = joueurs[idxCourant];
+        sousTitre.innerText = `${nomCourant}, choisis le type de la dernière carte.`;
+
+        grille.innerHTML = "";
+        actions.innerHTML = "";
+
+        typesPredictionFin.forEach(type => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "prediction-card-button";
+          btn.setAttribute("aria-label", `Choisir ${type.labelLong}`);
+
+          const carte = document.createElement("div");
+          carte.className = `Carte retournee prediction-face-card ${type.classe}`;
+          btn.appendChild(carte);
+
+          const etiquette = document.createElement("div");
+          etiquette.className = "prediction-card-label";
+          etiquette.innerText = type.label;
+          btn.appendChild(etiquette);
+
+          btn.addEventListener("click", () => {
+            choix[nomCourant] = type.key;
+            etape += 1;
+
+            if(etape >= ordreChoix.length){
+              revelerDerniereCarte();
+            } else {
+              renduRecap();
+              renduChoix();
+            }
+          });
+
+          grille.appendChild(btn);
+        });
+
+        renduRecap();
+        requestAnimationFrame(mettreAJourDispositionPrediction);
+      }
+
+      function revelerDerniereCarte(){
+        grille.innerHTML = "";
+        actions.innerHTML = "";
+
+        const carteFinale = paquet.shift();
+        const typeFinal = typePredictionDeCarte(carteFinale);
+        const metaFinale = typesPredictionFin.find(t => t.key === typeFinal);
+
+        const cartePlateau = plateau.querySelector(".Carte:not(.retournee)");
+        if(cartePlateau && carteFinale){
+          cartePlateau.classList.add(carteFinale, "retournee");
+        }
+
+        sousTitre.innerText = "Révélation de la dernière carte";
+
+        const revealWrap = document.createElement("div");
+        revealWrap.className = "prediction-reveal-wrap";
+
+        const revealCard = document.createElement("div");
+        revealCard.className = `Carte retournee prediction-reveal-card ${carteFinale || ""}`;
+        revealWrap.appendChild(revealCard);
+
+        const revealLabel = document.createElement("div");
+        revealLabel.className = "prediction-reveal-label";
+        revealLabel.innerText = metaFinale ? `C’était : ${metaFinale.labelLong}` : "Carte finale révélée";
+        revealWrap.appendChild(revealLabel);
+
+        grille.appendChild(revealWrap);
+
+        const gagnants = ordreChoix
+          .filter(idx => choix[joueurs[idx]] === typeFinal)
+          .map(idx => joueurs[idx]);
+
+        recap.innerHTML = "";
+
+        const resultat = document.createElement("div");
+        resultat.className = "prediction-result-text";
+        if(gagnants.length > 0){
+          resultat.innerText = gagnants.length === 1
+            ? `${gagnants[0]} a vu juste et distribue un cul sec.`
+            : `${gagnants.join(", ")} ont vu juste et distribuent chacun un cul sec.`;
+        } else {
+          resultat.innerText = "Personne n’a trouvé. Aucun cul sec distribué.";
+        }
+        recap.appendChild(resultat);
+
+        const btnContinuer = document.createElement("button");
+        btnContinuer.type = "button";
+        btnContinuer.className = "bouton-pigeon";
+        btnContinuer.innerText = "Continuer";
+        btnContinuer.addEventListener("click", () => {
+          overlay.remove();
+          unlockScroll();
+          predictionFinEnCours = false;
+          afficherOverlayFinUnRestants();
+        });
+        actions.appendChild(btnContinuer);
+      }
+
+      document.body.appendChild(overlay);
+      renduRecap();
+      renduChoix();
+    });
   }
 
 
@@ -293,7 +575,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
   function afficherJoueurActif(){
-    if(!partieLancee || choixPigeonEnCours || duelEnCours || joueurs.length === 0){
+    if(!partieLancee || choixPigeonEnCours || duelEnCours || predictionFinEnCours || joueurs.length === 0){
       joueurActif.innerText = "";
       majStickyJoueurActif();
       return;
@@ -393,16 +675,12 @@ document.addEventListener("DOMContentLoaded", function () {
     if(finUnOverlayAffiche) return;
     finUnOverlayAffiche = true;
 
-    // joueurs qui ont encore des "un" stockés
     const restants = joueurs
       .map(nom => ({ nom, n: Number(annulations[nom] || 0) }))
       .filter(x => x.n > 0);
 
-    if(restants.length === 0) return; // rien à faire
-
-    // on évite de superposer des overlays
     const overlayRegle = document.getElementById("overlayRegleUnique");
-    if(overlayRegle) overlayRegle.remove(); // fin de partie => on nettoie
+    if(overlayRegle) overlayRegle.remove();
 
     lockScroll();
 
@@ -427,12 +705,19 @@ document.addEventListener("DOMContentLoaded", function () {
     const bloc = document.createElement("div");
     bloc.className = "fin-un-lignes";
 
-    restants.forEach(x => {
+    if(restants.length === 0){
       const ligne = document.createElement("div");
       ligne.className = "fin-un-ligne";
-      ligne.innerText = `${x.nom} doit boire ${x.n} gorgée(s) pour les 1 restants`;
+      ligne.innerText = "Partie terminée. Aucun 1 restant à boire.";
       bloc.appendChild(ligne);
-    });
+    } else {
+      restants.forEach(x => {
+        const ligne = document.createElement("div");
+        ligne.className = "fin-un-ligne";
+        ligne.innerText = `${x.nom} doit boire ${x.n} gorgée(s) pour les 1 restants`;
+        bloc.appendChild(ligne);
+      });
+    }
 
     overlay.appendChild(bloc);
 
@@ -441,7 +726,6 @@ document.addEventListener("DOMContentLoaded", function () {
     btnTerminer.innerText = "Terminer";
 
     btnTerminer.addEventListener("click", () => {
-      // ils boivent leurs "1 restants" => on remet les compteurs à 0
       restants.forEach(x => { annulations[x.nom] = 0; });
       afficherJoueurs();
 
@@ -1825,6 +2109,7 @@ document.addEventListener("DOMContentLoaded", function () {
     duelEnCours = false;
     duelMultiplicateur = 1;
     finUnOverlayAffiche = false;
+    predictionFinEnCours = false;
 
     btnNouvellePartie.style.display = "inline-block";
     btnSupprimer.style.display = "none";
@@ -1851,9 +2136,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const joueurActuel = indexJoueur % joueurs.length;
         appliquerRegle(carteTiree, joueurActuel, carte);
-        // fin du plateau : on affiche les "1 restants"
-        if(paquet.length === 0){
-          executerApresOverlayRegleUnique(() => {
+
+        if(paquet.length === 1){
+          demarrerPredictionFin(joueurActuel);
+        } else if(paquet.length === 0){
+          attendreFermetureOverlaysBloquants(() => {
             afficherOverlayFinUnRestants();
           });
         }
@@ -1897,6 +2184,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     duelEnCours = false;
     duelMultiplicateur = 1;
+    predictionFinEnCours = false;
 
     plateau.innerHTML = "";
 
@@ -1912,6 +2200,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const overlayDuel = document.getElementById("overlayDuel");
     if(overlayDuel) overlayDuel.remove();
+
+    const overlayPredictionFin = document.getElementById("overlayPredictionFin");
+    if(overlayPredictionFin) overlayPredictionFin.remove();
+
+    const overlayFinUnRestants = document.getElementById("overlayFinUnRestants");
+    if(overlayFinUnRestants) overlayFinUnRestants.remove();
 
     btnNouvellePartie.style.display = "none";
     btnSupprimer.style.display = "inline-block";
@@ -1947,5 +2241,6 @@ document.addEventListener("DOMContentLoaded", function () {
   majStickyJoueurActif();
   window.addEventListener("resize", () => {
     centrerDerniereLigne();
+    mettreAJourDispositionPrediction();
   });
 });

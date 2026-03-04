@@ -1095,7 +1095,9 @@ body.no-scroll{
 /* ===== Sticky joueur actif discret ===== */
 #stickyJoueurActif{
   position: fixed;
-  top: calc(env(safe-area-inset-top, 0px) + 10px);
+  --sticky-min-top: calc(env(safe-area-inset-top, 0px) + 10px);
+  --sticky-anchor-bottom: var(--sticky-min-top);
+  top: max(var(--sticky-min-top), var(--sticky-anchor-bottom));
   left: 50%;
   transform: translateX(-50%) translateY(-8px);
   z-index: 1200;
@@ -1199,7 +1201,7 @@ body.no-scroll{
 
 @media (max-width: 520px){
   #stickyJoueurActif{
-    top: calc(env(safe-area-inset-top, 0px) + 8px);
+    --sticky-min-top: calc(env(safe-area-inset-top, 0px) + 8px);
     max-width: calc(100% - 18px);
     padding: 7px 10px;
     gap: 8px;
