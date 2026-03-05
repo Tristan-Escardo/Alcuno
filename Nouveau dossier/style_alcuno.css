@@ -1361,3 +1361,204 @@ body.no-scroll{
     font-size: 13px;
   }
 }
+
+
+/* ===== Overlay prédiction fin de partie ===== */
+#overlayPredictionFin{
+  position: fixed;
+  inset: 0;
+  z-index: 10002;
+  background: rgba(8, 4, 12, 0.98);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(10px, 2.6vw, 24px);
+  padding: clamp(16px, 3vw, 30px);
+  animation: fadeIn 0.28s ease forwards;
+}
+
+#overlayPredictionFin .prediction-title{
+  max-width: min(960px, 94vw);
+  text-align: center;
+}
+
+#overlayPredictionFin .prediction-subtitle,
+#overlayPredictionFin .prediction-footer-note,
+#overlayPredictionFin .prediction-result-text,
+#overlayPredictionFin .prediction-reveal-label{
+  width: min(960px, 94vw);
+  text-align: center;
+  color: #ffffff;
+  text-shadow: 2px 2px 5px #000;
+}
+
+#overlayPredictionFin .prediction-subtitle{
+  font-size: clamp(18px, 3.5vw, 30px);
+  font-weight: 800;
+}
+
+#overlayPredictionFin .prediction-footer-note{
+  font-size: clamp(14px, 2.5vw, 18px);
+  color: #e8dfff;
+}
+
+#overlayPredictionFin .prediction-types-grid{
+  --prediction-cols: 6;
+  width: min(980px, 94vw);
+  display: grid;
+  grid-template-columns: repeat(var(--prediction-cols), minmax(0, 1fr));
+  gap: clamp(10px, 2vw, 18px);
+  justify-items: center;
+  align-items: start;
+}
+
+#overlayPredictionFin .prediction-card-button{
+  width: 100%;
+  max-width: 150px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transition: transform 0.16s ease;
+}
+
+#overlayPredictionFin .prediction-card-button:hover{
+  transform: translateY(-3px) scale(1.03);
+}
+
+#overlayPredictionFin .prediction-face-card,
+#overlayPredictionFin .prediction-reveal-card{
+  width: min(100%, 120px);
+  aspect-ratio: 150 / 220;
+  height: auto;
+  background-size: cover;
+  background-position: center;
+  border-radius: 10px;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+  pointer-events: none;
+}
+
+#overlayPredictionFin .prediction-card-label{
+  font-size: clamp(14px, 2.5vw, 18px);
+  font-weight: 800;
+  color: #FFD700;
+  text-shadow: 2px 2px 5px #000;
+  text-align: center;
+}
+
+#overlayPredictionFin .prediction-recap{
+  width: min(980px, 94vw);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+#overlayPredictionFin .prediction-player-item{
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 10px 12px;
+  min-height: 72px;
+}
+
+#overlayPredictionFin .prediction-player-item.is-current{
+  border-color: #FFD700;
+  box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.22);
+}
+
+#overlayPredictionFin .prediction-player-item.is-done{
+  background: rgba(255,215,0,0.10);
+}
+
+#overlayPredictionFin .prediction-player-name{
+  font-weight: 900;
+  font-size: clamp(15px, 2.5vw, 18px);
+  color: #ffffff;
+}
+
+#overlayPredictionFin .prediction-player-choice{
+  margin-top: 6px;
+  font-size: clamp(13px, 2.2vw, 15px);
+  color: #d8d8d8;
+}
+
+#overlayPredictionFin .prediction-reveal-wrap{
+  width: min(420px, 94vw);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  justify-self: center;
+  grid-column: 1 / -1;
+}
+
+#overlayPredictionFin .prediction-reveal-card{
+  width: min(170px, 42vw);
+}
+
+#overlayPredictionFin .prediction-reveal-label{
+  font-size: clamp(18px, 4vw, 28px);
+  font-weight: 900;
+  color: #FFD700;
+}
+
+#overlayPredictionFin .prediction-result-text{
+  font-size: clamp(18px, 4vw, 28px);
+  font-weight: 900;
+  color: #FFD700;
+}
+
+#overlayPredictionFin .prediction-actions{
+  width: min(420px, 92vw);
+  display: flex;
+  justify-content: center;
+}
+
+#overlayPredictionFin .bouton-pigeon{
+  width: min(420px, 92vw);
+  padding: clamp(12px, 3.2vw, 22px);
+  font-size: clamp(16px, 4vw, 28px);
+  font-weight: bold;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  background-color: #FFD700;
+  color: #000;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+#overlayPredictionFin .bouton-pigeon:hover{
+  background-color: #ffea70;
+  transform: scale(1.04);
+}
+
+@media (max-width: 520px){
+  #overlayPredictionFin .prediction-types-grid{
+    --prediction-cols: 3;
+  }
+
+  #overlayPredictionFin .prediction-card-button{
+    max-width: none;
+  }
+
+  #overlayPredictionFin .prediction-recap{
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 521px) and (max-width: 760px){
+  #overlayPredictionFin .prediction-types-grid{
+    --prediction-cols: 4;
+  }
+}
+
+@media (min-width: 761px) and (max-width: 980px){
+  #overlayPredictionFin .prediction-types-grid{
+    --prediction-cols: 5;
+  }
+}

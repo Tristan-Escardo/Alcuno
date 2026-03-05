@@ -96,18 +96,10 @@ document.addEventListener("DOMContentLoaded", function () {
   let scrollLockCount = 0;
   let scrollYBeforeLock = 0;
   let finUnOverlayAffiche = false;
-  let predictionFinEnCours = false;
-  const typesPredictionFin = [
-    { key: "zero", label: "0", labelLong: "0", classe: "zero_vert" },
-    { key: "un", label: "1", labelLong: "1", classe: "un_vert" },
-    { key: "trois", label: "3", labelLong: "3", classe: "trois_vert" },
-    { key: "quatre", label: "4", labelLong: "4", classe: "quatre_vert" },
-    { key: "interdit", label: "Interdit", labelLong: "Interdit", classe: "interdit_vert" },
-    { key: "couleur", label: "Couleur", labelLong: "Couleur", classe: "couleur" },
-    { key: "plus_2", label: "+2", labelLong: "+2", classe: "plus_2_vert" },
-    { key: "plus_4", label: "+4", labelLong: "+4", classe: "plus_4" },
-    { key: "switch", label: "Switch", labelLong: "Switch", classe: "switch_vert" }
-  ];
+
+  // ===== Règle de fin: pari sur la dernière carte =====
+  let predictionEnCours = false;
+  let predictions = null; // Array<{ joueurIndex:number, typeId:string|null }>
 
   /* ===== OUTILS ===== */
   function appliquerBonusCouleurSiBesoin(carteTiree, options = {}){
@@ -202,274 +194,197 @@ document.addEventListener("DOMContentLoaded", function () {
     return parseInt(cols, 10) || 8;
   }
 
-  function centrerDerniereLigneDansGrille(container, itemSelector, cols){
-    if(!container) return;
+  // ===== Helpers: type de carte (pour la règle de fin) =====
+  function typeFromCardClass(carte){
+    if(!carte) return "autre";
+    if(carte.startsWith("zero")) return "zero";
+    if(carte.startsWith("un_")) return "un";
+    if(carte.startsWith("trois")) return "trois";
+    if(carte.startsWith("quatre")) return "quatre";
+    if(carte.startsWith("interdit")) return "interdit";
+    if(carte.startsWith("couleur")) return "couleur";
+    if(carte.startsWith("plus_2")) return "plus2";
+    if(carte.startsWith("plus_4")) return "plus4";
+    if(carte.startsWith("switch")) return "switch";
+    return "autre";
+  }
 
-    const items = Array.from(container.querySelectorAll(itemSelector));
-    const total = items.length;
+  const TYPES_PARIS = [
+    { id: "zero",   label: "0",        rep: "zero_vert" },
+    { id: "un",     label: "1",        rep: "un_vert" },
+    { id: "trois",  label: "3",        rep: "trois_vert" },
+    { id: "quatre", label: "4",        rep: "quatre_vert" },
+    { id: "interdit", label: "Interdit", rep: "interdit_vert" },
+    { id: "couleur", label: "Couleur", rep: "couleur" },
+    { id: "plus2",  label: "+2",       rep: "plus_2_vert" },
+    { id: "plus4",  label: "+4",       rep: "plus_4" },
+    { id: "switch", label: "Switch",  rep: "switch_vert" },
+  ];
 
-    items.forEach(item => {
-      item.style.gridColumnStart = "";
+  function nomType(typeId){
+    const t = TYPES_PARIS.find(x => x.id === typeId);
+    return t ? t.label : typeId;
+  }
+
+  function nextPlayerIndex(fromIdx){
+    if(joueurs.length === 0) return 0;
+    return (fromIdx + (sensHoraire ? 1 : -1) + joueurs.length) % joueurs.length;
+  }
+
+  function creerCartePreview(className){
+    const wrap = document.createElement("div");
+    wrap.className = "Carte retournee " + className;
+    return wrap;
+  }
+
+  function lancerOverlayPrediction(startIndex){
+    if(predictionEnCours) return;
+    if(joueurs.length < 2) return;
+    if(paquet.length !== 1) return; // on doit être à l'avant-dernière carte tirée
+
+    predictionEnCours = true;
+    predictions = joueurs.map((_, idx) => ({ joueurIndex: idx, typeId: null }));
+
+    // Nettoie un overlay règle s'il traîne (sécurité)
+    const overlayRegle = document.getElementById("overlayRegleUnique");
+    if(overlayRegle) overlayRegle.remove();
+
+    lockScroll();
+
+    const overlay = document.createElement("div");
+    overlay.id = "overlayPredictionFin";
+    overlay.className = "overlay-opaque";
+
+    const panel = document.createElement("div");
+    panel.className = "overlay-panel";
+
+    const titre = document.createElement("div");
+    titre.className = "titre-pigeon";
+    titre.innerText = "Pari sur la dernière carte";
+
+    const subtitle = document.createElement("div");
+    subtitle.className = "overlay-subtitle";
+    subtitle.innerText = "Chacun choisit un type de carte. Tous ceux qui trouvent distribuent un cul sec.";
+
+    const turn = document.createElement("div");
+    turn.className = "fin-choix-turn";
+
+    const recap = document.createElement("div");
+    recap.className = "fin-choix-recap";
+
+    const grid = document.createElement("div");
+    grid.className = "fin-choix-grid";
+
+    // Crée les cartes de choix (face découverte)
+    TYPES_PARIS.forEach(t => {
+      const cardWrap = document.createElement("div");
+      cardWrap.className = "fin-choix-card";
+      cardWrap.dataset.typeId = t.id;
+
+      const preview = creerCartePreview(t.rep);
+      cardWrap.appendChild(preview);
+
+      cardWrap.addEventListener("click", () => {
+        if(cardWrap.classList.contains("disabled")) return;
+        const typeId = cardWrap.dataset.typeId;
+        const cur = ordre[curPos];
+        predictions[cur].typeId = typeId;
+        curPos++;
+        rafraichirUI();
+      });
+
+      grid.appendChild(cardWrap);
     });
 
-    if(!cols || cols < 2 || total === 0) return;
-
-    const reste = total % cols;
-    if(reste === 0) return;
-
-    const start = Math.floor((cols - reste) / 2) + 1;
-    const first = total - reste;
-
-    for(let i = 0; i < reste; i++){
-      items[first + i].style.gridColumnStart = String(start + i);
+    // Ordre de jeu pour la sélection
+    const ordre = [];
+    for(let k = 0; k < joueurs.length; k++){
+      ordre.push((startIndex + (sensHoraire ? k : -k) + joueurs.length) % joueurs.length);
     }
-  }
+    let curPos = 0;
 
-  function getPredictionCols(){
-    const largeur = window.innerWidth || document.documentElement.clientWidth || 390;
-    if(largeur <= 520) return 3;
-    if(largeur <= 760) return 4;
-    if(largeur <= 980) return 5;
-    return 6;
-  }
+    function rafraichirUI(){
+      // recap
+      recap.innerHTML = "";
+      ordre.forEach((jIdx, i) => {
+        const p = predictions[jIdx];
+        const ligne = document.createElement("div");
+        ligne.className = "ligne";
+        const who = document.createElement("strong");
+        who.innerText = joueurs[jIdx] + (i === curPos ? " ←" : "");
+        const what = document.createElement("span");
+        what.innerText = p.typeId ? nomType(p.typeId) : "—";
+        ligne.appendChild(who);
+        ligne.appendChild(what);
+        recap.appendChild(ligne);
+      });
 
-  function typePredictionDeCarte(classeCarte){
-    if(!classeCarte) return null;
-    if(classeCarte.startsWith("plus_4")) return "plus_4";
-    if(classeCarte.startsWith("plus_2")) return "plus_2";
-    if(classeCarte.startsWith("interdit")) return "interdit";
-    if(classeCarte.startsWith("couleur")) return "couleur";
-    if(classeCarte.startsWith("switch")) return "switch";
-    if(classeCarte.startsWith("zero")) return "zero";
-    if(classeCarte.startsWith("un")) return "un";
-    if(classeCarte.startsWith("trois")) return "trois";
-    if(classeCarte.startsWith("quatre")) return "quatre";
-    return null;
-  }
+      if(curPos < ordre.length){
+        const jIdx = ordre[curPos];
+        turn.innerText = `Au tour de ${joueurs[jIdx]} : choisis un type`;
+      } else {
+        // Révélation
+        const lastCard = paquet[0];
+        const vraiType = typeFromCardClass(lastCard);
+        const gagnants = ordre
+          .map(jIdx => predictions[jIdx])
+          .filter(p => p.typeId === vraiType)
+          .map(p => joueurs[p.joueurIndex]);
 
-  function mettreAJourDispositionPrediction(){
-    const grille = document.querySelector("#overlayPredictionFin .prediction-types-grid");
-    if(!grille) return;
+        turn.innerText = "Révélation de la dernière carte";
 
-    const cols = getPredictionCols();
-    grille.style.setProperty("--prediction-cols", String(cols));
-    centrerDerniereLigneDansGrille(grille, ".prediction-card-button", cols);
-  }
+        // Désactive les cartes
+        Array.from(grid.querySelectorAll('.fin-choix-card')).forEach(el => el.classList.add('disabled'));
 
-  function overlayBloquantActif(){
-    const ids = [
-      "overlayRegleUnique",
-      "overlayAnnulation",
-      "overlayResultatAnnulation",
-      "overlayPlus4",
-      "overlayCouleur",
-      "overlayPigeon",
-      "overlayDuel"
-    ];
+        const reveal = document.createElement('div');
+        reveal.style.display = 'flex';
+        reveal.style.flexDirection = 'column';
+        reveal.style.alignItems = 'center';
+        reveal.style.gap = '10px';
+        reveal.style.paddingTop = '6px';
 
-    return ids.some(id => document.getElementById(id));
-  }
+        const prev = creerCartePreview(TYPES_PARIS.find(t=>t.id===vraiType)?.rep || lastCard);
+        prev.style.width = 'min(180px, 58vw)';
+        prev.style.height = 'auto';
+        reveal.appendChild(prev);
 
-  function attendreFermetureOverlaysBloquants(callback){
-    if(!overlayBloquantActif()){
-      callback();
-      return;
-    }
+        const txt = document.createElement('div');
+        txt.style.textAlign = 'center';
+        txt.style.fontWeight = '800';
 
-    const obs = new MutationObserver(() => {
-      if(!overlayBloquantActif()){
-        obs.disconnect();
-        callback();
-      }
-    });
-
-    obs.observe(document.body, { childList: true, subtree: true });
-  }
-
-  function demarrerPredictionFin(joueurDepartIndex){
-    if(predictionFinEnCours || joueurs.length === 0 || paquet.length !== 1) return;
-
-    predictionFinEnCours = true;
-    afficherJoueurActif();
-
-    attendreFermetureOverlaysBloquants(() => {
-      if(document.getElementById("overlayPredictionFin")) return;
-
-      lockScroll();
-
-      const ordreChoix = [];
-      for(let offset = 0; offset < joueurs.length; offset++){
-        const delta = sensHoraire ? offset : -offset;
-        const idx = (joueurDepartIndex + delta + joueurs.length * 10) % joueurs.length;
-        ordreChoix.push(idx);
-      }
-
-      const choix = {};
-      let etape = 0;
-
-      const overlay = document.createElement("div");
-      overlay.id = "overlayPredictionFin";
-      overlay.className = "overlay-prediction-fin";
-
-      const titre = document.createElement("div");
-      titre.className = "titre-pigeon prediction-title";
-      titre.innerText = "Devinez la dernière carte";
-      overlay.appendChild(titre);
-
-      const sousTitre = document.createElement("div");
-      sousTitre.className = "prediction-subtitle";
-      overlay.appendChild(sousTitre);
-
-      const recap = document.createElement("div");
-      recap.className = "prediction-recap";
-      overlay.appendChild(recap);
-
-      const grille = document.createElement("div");
-      grille.className = "prediction-types-grid";
-      overlay.appendChild(grille);
-
-      const info = document.createElement("div");
-      info.className = "prediction-footer-note";
-      info.innerText = "Plusieurs joueurs peuvent choisir le même type.";
-      overlay.appendChild(info);
-
-      const actions = document.createElement("div");
-      actions.className = "prediction-actions";
-      overlay.appendChild(actions);
-
-      function renduRecap(){
-        recap.innerHTML = "";
-        ordreChoix.forEach((idx, position) => {
-          const nom = joueurs[idx];
-          const item = document.createElement("div");
-          item.className = "prediction-player-item";
-
-          if(position === etape){
-            item.classList.add("is-current");
-          }
-          if(choix[nom]){
-            item.classList.add("is-done");
-          }
-
-          const nomEl = document.createElement("div");
-          nomEl.className = "prediction-player-name";
-          nomEl.innerText = nom;
-          item.appendChild(nomEl);
-
-          const choixEl = document.createElement("div");
-          choixEl.className = "prediction-player-choice";
-          choixEl.innerText = choix[nom] ? "Choix : " + (typesPredictionFin.find(t => t.key === choix[nom])?.labelLong || choix[nom]) : "En attente";
-          item.appendChild(choixEl);
-
-          recap.appendChild(item);
-        });
-      }
-
-      function renduChoix(){
-        const idxCourant = ordreChoix[etape];
-        const nomCourant = joueurs[idxCourant];
-        sousTitre.innerText = `${nomCourant}, choisis le type de la dernière carte.`;
-
-        grille.innerHTML = "";
-        actions.innerHTML = "";
-
-        typesPredictionFin.forEach(type => {
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.className = "prediction-card-button";
-          btn.setAttribute("aria-label", `Choisir ${type.labelLong}`);
-
-          const carte = document.createElement("div");
-          carte.className = `Carte retournee prediction-face-card ${type.classe}`;
-          btn.appendChild(carte);
-
-          const etiquette = document.createElement("div");
-          etiquette.className = "prediction-card-label";
-          etiquette.innerText = type.label;
-          btn.appendChild(etiquette);
-
-          btn.addEventListener("click", () => {
-            choix[nomCourant] = type.key;
-            etape += 1;
-
-            if(etape >= ordreChoix.length){
-              revelerDerniereCarte();
-            } else {
-              renduRecap();
-              renduChoix();
-            }
-          });
-
-          grille.appendChild(btn);
-        });
-
-        renduRecap();
-        requestAnimationFrame(mettreAJourDispositionPrediction);
-      }
-
-      function revelerDerniereCarte(){
-        grille.innerHTML = "";
-        actions.innerHTML = "";
-
-        const carteFinale = paquet.shift();
-        const typeFinal = typePredictionDeCarte(carteFinale);
-        const metaFinale = typesPredictionFin.find(t => t.key === typeFinal);
-
-        const cartePlateau = plateau.querySelector(".Carte:not(.retournee)");
-        if(cartePlateau && carteFinale){
-          cartePlateau.classList.add(carteFinale, "retournee");
-        }
-
-        sousTitre.innerText = "Révélation de la dernière carte";
-
-        const revealWrap = document.createElement("div");
-        revealWrap.className = "prediction-reveal-wrap";
-
-        const revealCard = document.createElement("div");
-        revealCard.className = `Carte retournee prediction-reveal-card ${carteFinale || ""}`;
-        revealWrap.appendChild(revealCard);
-
-        const revealLabel = document.createElement("div");
-        revealLabel.className = "prediction-reveal-label";
-        revealLabel.innerText = metaFinale ? `C’était : ${metaFinale.labelLong}` : "Carte finale révélée";
-        revealWrap.appendChild(revealLabel);
-
-        grille.appendChild(revealWrap);
-
-        const gagnants = ordreChoix
-          .filter(idx => choix[joueurs[idx]] === typeFinal)
-          .map(idx => joueurs[idx]);
-
-        recap.innerHTML = "";
-
-        const resultat = document.createElement("div");
-        resultat.className = "prediction-result-text";
-        if(gagnants.length > 0){
-          resultat.innerText = gagnants.length === 1
-            ? `${gagnants[0]} a vu juste et distribue un cul sec.`
-            : `${gagnants.join(", ")} ont vu juste et distribuent chacun un cul sec.`;
+        if(gagnants.length === 0){
+          txt.innerText = `Personne n'a trouvé (${nomType(vraiType)}).`;
+        } else if(gagnants.length === 1){
+          txt.innerText = `${gagnants[0]} a trouvé ! Il/elle distribue un cul sec.`;
         } else {
-          resultat.innerText = "Personne n’a trouvé. Aucun cul sec distribué.";
+          txt.innerText = `${gagnants.join(', ')} ont trouvé ! Chacun distribue un cul sec.`;
         }
-        recap.appendChild(resultat);
+        reveal.appendChild(txt);
 
-        const btnContinuer = document.createElement("button");
-        btnContinuer.type = "button";
-        btnContinuer.className = "bouton-pigeon";
-        btnContinuer.innerText = "Continuer";
-        btnContinuer.addEventListener("click", () => {
+        const btn = document.createElement('button');
+        btn.className = 'bouton-pigeon';
+        btn.innerText = 'Continuer';
+        btn.addEventListener('click', () => {
           overlay.remove();
           unlockScroll();
-          predictionFinEnCours = false;
-          afficherOverlayFinUnRestants();
+          predictionEnCours = false;
         });
-        actions.appendChild(btnContinuer);
-      }
+        reveal.appendChild(btn);
 
-      document.body.appendChild(overlay);
-      renduRecap();
-      renduChoix();
-    });
+        // remplace la grille par la révélation (garde recap au dessus)
+        grid.replaceWith(reveal);
+      }
+    }
+
+    panel.appendChild(titre);
+    panel.appendChild(subtitle);
+    panel.appendChild(turn);
+    panel.appendChild(recap);
+    panel.appendChild(grid);
+    overlay.appendChild(panel);
+    document.body.appendChild(overlay);
+
+    rafraichirUI();
   }
 
 
@@ -575,7 +490,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
   function afficherJoueurActif(){
-    if(!partieLancee || choixPigeonEnCours || duelEnCours || predictionFinEnCours || joueurs.length === 0){
+    if(!partieLancee || choixPigeonEnCours || duelEnCours || joueurs.length === 0){
       joueurActif.innerText = "";
       majStickyJoueurActif();
       return;
@@ -675,12 +590,16 @@ document.addEventListener("DOMContentLoaded", function () {
     if(finUnOverlayAffiche) return;
     finUnOverlayAffiche = true;
 
+    // joueurs qui ont encore des "un" stockés
     const restants = joueurs
       .map(nom => ({ nom, n: Number(annulations[nom] || 0) }))
       .filter(x => x.n > 0);
 
+    // Même s'il n'y a aucun "1" restant, on affiche quand même l'écran de fin.
+
+    // on évite de superposer des overlays
     const overlayRegle = document.getElementById("overlayRegleUnique");
-    if(overlayRegle) overlayRegle.remove();
+    if(overlayRegle) overlayRegle.remove(); // fin de partie => on nettoie
 
     lockScroll();
 
@@ -708,7 +627,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if(restants.length === 0){
       const ligne = document.createElement("div");
       ligne.className = "fin-un-ligne";
-      ligne.innerText = "Partie terminée. Aucun 1 restant à boire.";
+      ligne.innerText = "Aucun 1 restant à boire.";
       bloc.appendChild(ligne);
     } else {
       restants.forEach(x => {
@@ -726,6 +645,7 @@ document.addEventListener("DOMContentLoaded", function () {
     btnTerminer.innerText = "Terminer";
 
     btnTerminer.addEventListener("click", () => {
+      // ils boivent leurs "1 restants" => on remet les compteurs à 0
       restants.forEach(x => { annulations[x.nom] = 0; });
       afficherJoueurs();
 
@@ -2109,7 +2029,6 @@ document.addEventListener("DOMContentLoaded", function () {
     duelEnCours = false;
     duelMultiplicateur = 1;
     finUnOverlayAffiche = false;
-    predictionFinEnCours = false;
 
     btnNouvellePartie.style.display = "inline-block";
     btnSupprimer.style.display = "none";
@@ -2137,10 +2056,24 @@ document.addEventListener("DOMContentLoaded", function () {
         const joueurActuel = indexJoueur % joueurs.length;
         appliquerRegle(carteTiree, joueurActuel, carte);
 
-        if(paquet.length === 1){
-          demarrerPredictionFin(joueurActuel);
-        } else if(paquet.length === 0){
-          attendreFermetureOverlaysBloquants(() => {
+        // Avant-dernière carte tirée => on lance le pari sur la dernière (après les overlays éventuels)
+        if(paquet.length === 1 && !predictionEnCours){
+          const startIdx = nextPlayerIndex(joueurActuel);
+          executerApresOverlayRegleUnique(() => {
+            // Si un duel/pigeon est en cours, on attend que ça finisse avant d'afficher
+            const attendre = () => {
+              if(choixPigeonEnCours || duelEnCours){
+                requestAnimationFrame(attendre);
+                return;
+              }
+              lancerOverlayPrediction(startIdx);
+            };
+            attendre();
+          });
+        }
+        // fin du plateau : on affiche les "1 restants"
+        if(paquet.length === 0){
+          executerApresOverlayRegleUnique(() => {
             afficherOverlayFinUnRestants();
           });
         }
@@ -2184,7 +2117,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     duelEnCours = false;
     duelMultiplicateur = 1;
-    predictionFinEnCours = false;
 
     plateau.innerHTML = "";
 
@@ -2200,12 +2132,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const overlayDuel = document.getElementById("overlayDuel");
     if(overlayDuel) overlayDuel.remove();
-
-    const overlayPredictionFin = document.getElementById("overlayPredictionFin");
-    if(overlayPredictionFin) overlayPredictionFin.remove();
-
-    const overlayFinUnRestants = document.getElementById("overlayFinUnRestants");
-    if(overlayFinUnRestants) overlayFinUnRestants.remove();
 
     btnNouvellePartie.style.display = "none";
     btnSupprimer.style.display = "inline-block";
@@ -2241,6 +2167,5 @@ document.addEventListener("DOMContentLoaded", function () {
   majStickyJoueurActif();
   window.addEventListener("resize", () => {
     centrerDerniereLigne();
-    mettreAJourDispositionPrediction();
   });
 });
