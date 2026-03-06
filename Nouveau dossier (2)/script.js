@@ -283,13 +283,19 @@ document.addEventListener("DOMContentLoaded", function () {
     const panel = document.createElement("div");
     panel.className = "overlay-panel";
 
+    const header = document.createElement("div");
+    header.className = "prediction-header";
+
     const titre = document.createElement("div");
-    titre.className = "titre-pigeon";
+    titre.className = "titre-pigeon prediction-title";
     titre.innerText = "Pari sur la dernière carte";
 
     const subtitle = document.createElement("div");
-    subtitle.className = "overlay-subtitle";
+    subtitle.className = "overlay-subtitle prediction-subtitle";
     subtitle.innerText = "Chacun choisit un type de carte. Tous ceux qui trouvent distribuent un cul sec.";
+
+    header.appendChild(titre);
+    header.appendChild(subtitle);
 
     const turn = document.createElement("div");
     turn.className = "fin-choix-turn";
@@ -357,32 +363,27 @@ document.addEventListener("DOMContentLoaded", function () {
           .map(p => joueurs[p.joueurIndex]);
 
         turn.innerText = "Révélation de la dernière carte";
+        header.style.display = 'none';
+        panel.classList.add('prediction-reveal-mode');
 
         // Désactive les cartes
         Array.from(grid.querySelectorAll('.fin-choix-card')).forEach(el => el.classList.add('disabled'));
 
         const reveal = document.createElement('div');
-        reveal.style.display = 'flex';
-        reveal.style.flexDirection = 'column';
-        reveal.style.alignItems = 'center';
-        reveal.style.gap = '10px';
-        reveal.style.paddingTop = '6px';
+        reveal.className = 'fin-choix-reveal';
 
         const prev = creerCartePreview(TYPES_PARIS.find(t=>t.id===vraiType)?.rep || lastCard);
-        prev.style.width = 'min(180px, 58vw)';
-        prev.style.height = 'auto';
         reveal.appendChild(prev);
 
         const txt = document.createElement('div');
-        txt.style.textAlign = 'center';
-        txt.style.fontWeight = '800';
+        txt.className = 'fin-choix-resultat';
 
         if(gagnants.length === 0){
-          txt.innerText = `Personne n'a trouvé.`;
+          txt.innerText = `Personne n'a trouvé (${nomType(vraiType)}).`;
         } else if(gagnants.length === 1){
-          txt.innerText = `${gagnants[0]} a trouvé ! \nTu distribues un cul sec.`;
+          txt.innerText = `${gagnants[0]} a trouvé ! Tu distribues un cul sec.`;
         } else {
-          txt.innerText = `${gagnants.join(', ')} ont trouvé ! \nChacun distribue un cul sec.`;
+          txt.innerText = `${gagnants.join(', ')} ont trouvé ! Chacun distribue un cul sec.`;
         }
         reveal.appendChild(txt);
 
@@ -410,8 +411,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     }
 
-    panel.appendChild(titre);
-    panel.appendChild(subtitle);
+    panel.appendChild(header);
     panel.appendChild(turn);
     panel.appendChild(recap);
     panel.appendChild(grid);
@@ -1998,7 +1998,7 @@ document.addEventListener("DOMContentLoaded", function () {
           joueurActuel,
           2,
           carteTiree,
-          `${joueurs[joueurActuel]} est PIGEON ! \nIl boit 2 gorgées. \nÀ chaque 3 tiré, tu bois 1 gorgée. \nPour en sortir, tire un 3.`,
+          `${joueurs[joueurActuel]} est PIGEON ! Il boit 2 gorgées. À chaque 3 tiré, tu bois 1 gorgée. Pour en sortir, tire un 3.`,
           () => {
             appliquerBonusCouleurSiBesoin(carteTiree, { preserveRuleMessage: true });
           }
