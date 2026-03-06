@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const btnJouer = document.getElementById("jouer");
   const btnSupprimer = document.getElementById("supprimerJoueur");
   const btnNouvellePartie = document.getElementById("nouvellePartie");
+  const btnTestPari = document.getElementById("testPari");
   const btnTermine = document.getElementById("termineSuppression");
   const messageTexte = document.getElementById("messageTexte");
   let stickyJoueurActif = null;
@@ -221,6 +222,30 @@ document.addEventListener("DOMContentLoaded", function () {
     { id: "switch", label: "Switch",  rep: "switch_vert" },
   ];
 
+  // ===== Helpers UI: centrage de la dernière ligne (grilles) =====
+  function getFinCols(gridEl){
+    if(!gridEl) return 3;
+    const v = getComputedStyle(gridEl).getPropertyValue('--fin-cols').trim();
+    return parseInt(v, 10) || 3;
+  }
+
+  function centrerDerniereLigneGrid(gridEl){
+    if(!gridEl) return;
+    const items = Array.from(gridEl.children);
+    const total = items.length;
+    const cols = getFinCols(gridEl);
+
+    items.forEach(el => el.style.gridColumnStart = "");
+    const reste = total % cols;
+    if(reste === 0) return;
+
+    const start = Math.floor((cols - reste) / 2) + 1;
+    const first = total - reste;
+    for(let i=0;i<reste;i++){
+      items[first + i].style.gridColumnStart = String(start + i);
+    }
+  }
+
   function nomType(typeId){
     const t = TYPES_PARIS.find(x => x.id === typeId);
     return t ? t.label : typeId;
@@ -353,21 +378,30 @@ document.addEventListener("DOMContentLoaded", function () {
         txt.style.fontWeight = '800';
 
         if(gagnants.length === 0){
-          txt.innerText = `Personne n'a trouvé (${nomType(vraiType)}).`;
+          txt.innerText = `Personne n'a trouvé.`;
         } else if(gagnants.length === 1){
-          txt.innerText = `${gagnants[0]} a trouvé ! Il/elle distribue un cul sec.`;
+          txt.innerText = `${gagnants[0]} a trouvé ! \nTu distribues un cul sec.`;
         } else {
-          txt.innerText = `${gagnants.join(', ')} ont trouvé ! Chacun distribue un cul sec.`;
+          txt.innerText = `${gagnants.join(', ')} ont trouvé ! \nChacun distribue un cul sec.`;
         }
         reveal.appendChild(txt);
 
         const btn = document.createElement('button');
         btn.className = 'bouton-pigeon';
-        btn.innerText = 'Continuer';
+        btn.innerText = 'Terminer';
         btn.addEventListener('click', () => {
+          if(overlay._cleanup) overlay._cleanup();
           overlay.remove();
           unlockScroll();
           predictionEnCours = false;
+
+          // On considère la dernière carte comme "résolue" par le pari :
+          // on la retire du paquet et on enchaîne directement sur l'écran de fin.
+          if(paquet.length === 1){
+            paquet.pop();
+          }
+          // Affiche systématiquement l'écran de fin (même si 0 "1 restant")
+          afficherOverlayFinUnRestants();
         });
         reveal.appendChild(btn);
 
@@ -383,6 +417,23 @@ document.addEventListener("DOMContentLoaded", function () {
     panel.appendChild(grid);
     overlay.appendChild(panel);
     document.body.appendChild(overlay);
+
+    // Centre la dernière ligne (surtout utile quand la grille est en 3 colonnes sur mobile)
+    const onResize = () => centrerDerniereLigneGrid(grid);
+    window.addEventListener('resize', onResize);
+    if(window.visualViewport){
+      window.visualViewport.addEventListener('resize', onResize);
+    }
+
+    // Quand on quitte l'overlay, on nettoie le listener
+    overlay._cleanup = () => {
+      window.removeEventListener('resize', onResize);
+      if(window.visualViewport){
+        window.visualViewport.removeEventListener('resize', onResize);
+      }
+    };
+
+    centrerDerniereLigneGrid(grid);
 
     rafraichirUI();
   }
@@ -483,6 +534,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if(!partieLancee){
       btnJouer.style.display = joueurs.length >= 2 ? "inline-block" : "none";
+      if(btnTestPari) btnTestPari.style.display = joueurs.length >= 2 ? "inline-block" : "none";
     }
     btnSupprimer.style.display = joueurs.length > 0 ? "inline-block" : "none";
     majStickyJoueurActif();
@@ -1946,7 +1998,7 @@ document.addEventListener("DOMContentLoaded", function () {
           joueurActuel,
           2,
           carteTiree,
-          `${joueurs[joueurActuel]} est PIGEON ! Il boit 2 gorgées. À chaque 3 tiré, tu bois 1 gorgée. Pour en sortir, tire un 3.`,
+          `${joueurs[joueurActuel]} est PIGEON ! \nIl boit 2 gorgées. \nÀ chaque 3 tiré, tu bois 1 gorgée. \nPour en sortir, tire un 3.`,
           () => {
             appliquerBonusCouleurSiBesoin(carteTiree, { preserveRuleMessage: true });
           }
@@ -2146,6 +2198,38 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   btnJouer.addEventListener("click", lancerPartie);
+
+  if(btnTestPari){
+    btnTestPari.addEventListener("click", () => {
+      // Bouton de test: se placer à 1 carte AVANT l'overlay de pari.
+      // Objectif: il reste 2 cartes dans le paquet -> tu tires UNE carte -> overlay de pari s'affiche.
+      if(!partieLancee){
+        lancerPartie();
+      }
+
+      // Force l'état "il reste 2 cartes"
+      if(paquet.length > 2){
+        paquet = paquet.slice(-2);
+      }else if(paquet.length === 1){
+        // cas extrême: on duplique une carte factice devant pour rester à 2
+        paquet = [paquet[0], paquet[0]];
+      }
+
+      // Sécurité: pas d'autre mini-jeu en cours / pas de prédiction en cours
+      duelEnCours = false;
+      choixPigeonEnCours = false;
+      predictionEnCours = false;
+
+      // Petit feedback
+      if(messageTexte){
+        messageTexte.innerText = "Mode test : tire 1 carte pour lancer le pari de fin.";
+      }
+
+      // Assure l'affichage du plateau côté jeu
+      afficherJoueurActif();
+      afficherJoueurs();
+    });
+  }
   btnNouvellePartie.addEventListener("click", retourMenu);
 
   // on force l'UI du menu (au cas où)

@@ -1,4 +1,6 @@
 0 : Social sauf celui qui l'a pioché<br/>        
+cd ./OneDrive/Video/Programmation/Jeux/Alcuno_HTML5
+
 Interdit : Social<br/>
 Plus_2 : Bois 2 gorgées<br/>
             Plus_4 : Distribues 4 gorgées<br/>

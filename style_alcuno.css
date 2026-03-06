@@ -921,6 +921,111 @@ body.no-scroll{
   padding-right: calc(20px + env(safe-area-inset-right) + var(--sbw, 0px));
 }
 
+/* =============================
+   Overlay PARI FIN (scrollable)
+   ============================= */
+
+/* Overlay plein écran opaque qui reste utilisable sur iOS (scroll interne) */
+.overlay-opaque{
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0,0,0,0.92);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: clamp(14px, 3.2vw, 30px);
+  padding-left:  calc(20px + env(safe-area-inset-left));
+  padding-right: calc(20px + env(safe-area-inset-right) + var(--sbw, 0px));
+}
+
+.overlay-panel{
+  width: min(900px, 92vw);
+  margin: auto; /* centre verticalement si ça tient, sinon scroll */
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Texte explicatif */
+.overlay-subtitle{
+  color: #fff;
+  font-size: clamp(14px, 3.6vw, 20px);
+  line-height: 1.3;
+  text-align: center;
+  opacity: 0.95;
+}
+
+.fin-choix-turn{
+  color: #FFD700;
+  font-size: clamp(16px, 4.2vw, 26px);
+  font-weight: 900;
+  text-align: center;
+  text-shadow: 2px 2px 5px #000;
+}
+
+.fin-choix-recap{
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px;
+  padding: 10px 12px;
+}
+
+.fin-choix-recap .ligne{
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  color: #fff;
+  font-size: clamp(13px, 3.5vw, 18px);
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.fin-choix-recap .ligne:last-child{ border-bottom: 0; }
+
+/* Grille responsive: 3 colonnes téléphone, + sur grand écran */
+.fin-choix-grid{
+  --fin-cols: 6;
+  display: grid;
+  grid-template-columns: repeat(var(--fin-cols), minmax(0, 1fr));
+  gap: clamp(10px, 2.2vw, 16px);
+  justify-items: center;
+}
+
+.fin-choix-card{
+  width: 100%;
+  max-width: 160px;
+  cursor: pointer;
+  border-radius: 14px;
+  padding: 6px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  touch-action: manipulation;
+}
+
+.fin-choix-card:active{ transform: scale(0.98); }
+
+.fin-choix-card.disabled{
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+@media (max-width: 520px){
+  .fin-choix-grid{ --fin-cols: 3; }
+  .fin-choix-card{ max-width: 140px; }
+}
+
+@media (min-width: 521px) and (max-width: 860px){
+  .fin-choix-grid{ --fin-cols: 4; }
+}
+
+@media (min-width: 861px){
+  .fin-choix-grid{ --fin-cols: 6; }
+}
+
 /* ===== Base responsive pour tous les overlays ===== */
 #overlayPlus4,
 #overlayDuel,
