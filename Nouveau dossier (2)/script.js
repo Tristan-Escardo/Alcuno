@@ -15,7 +15,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const btnJouer = document.getElementById("jouer");
   const btnSupprimer = document.getElementById("supprimerJoueur");
   const btnNouvellePartie = document.getElementById("nouvellePartie");
-  const btnTestPari = document.getElementById("testPari");
   const btnTermine = document.getElementById("termineSuppression");
   const messageTexte = document.getElementById("messageTexte");
   let stickyJoueurActif = null;
@@ -381,7 +380,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if(gagnants.length === 0){
           txt.innerText = `Personne n'a trouvé (${nomType(vraiType)}).`;
         } else if(gagnants.length === 1){
-          txt.innerText = `${gagnants[0]} a trouvé ! Tu distribues un cul sec.`;
+          txt.innerText = `${gagnants[0]} a trouvé ! Il/elle distribue un cul sec.`;
         } else {
           txt.innerText = `${gagnants.join(', ')} ont trouvé ! Chacun distribue un cul sec.`;
         }
@@ -534,7 +533,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if(!partieLancee){
       btnJouer.style.display = joueurs.length >= 2 ? "inline-block" : "none";
-      if(btnTestPari) btnTestPari.style.display = joueurs.length >= 2 ? "inline-block" : "none";
     }
     btnSupprimer.style.display = joueurs.length > 0 ? "inline-block" : "none";
     majStickyJoueurActif();
@@ -2199,37 +2197,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   btnJouer.addEventListener("click", lancerPartie);
 
-  if(btnTestPari){
-    btnTestPari.addEventListener("click", () => {
-      // Bouton de test: se placer à 1 carte AVANT l'overlay de pari.
-      // Objectif: il reste 2 cartes dans le paquet -> tu tires UNE carte -> overlay de pari s'affiche.
-      if(!partieLancee){
-        lancerPartie();
-      }
-
-      // Force l'état "il reste 2 cartes"
-      if(paquet.length > 2){
-        paquet = paquet.slice(-2);
-      }else if(paquet.length === 1){
-        // cas extrême: on duplique une carte factice devant pour rester à 2
-        paquet = [paquet[0], paquet[0]];
-      }
-
-      // Sécurité: pas d'autre mini-jeu en cours / pas de prédiction en cours
-      duelEnCours = false;
-      choixPigeonEnCours = false;
-      predictionEnCours = false;
-
-      // Petit feedback
-      if(messageTexte){
-        messageTexte.innerText = "Mode test : tire 1 carte pour lancer le pari de fin.";
-      }
-
-      // Assure l'affichage du plateau côté jeu
-      afficherJoueurActif();
-      afficherJoueurs();
-    });
-  }
   btnNouvellePartie.addEventListener("click", retourMenu);
 
   // on force l'UI du menu (au cas où)

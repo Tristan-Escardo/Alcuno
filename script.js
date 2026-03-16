@@ -735,7 +735,7 @@ document.addEventListener("DOMContentLoaded", function () {
         afficherJoueurs();
         afficherJoueurActif();
         // 2) message demandé (overlay + .messages)
-        const msg = `${joueurs[i]} est le nouveau PIGEON, il boit 2 gorgées pour fêter ça`;
+        const msg = `${joueurs[i]} est le nouveau PIGEON,/n il boit 2 gorgées pour fêter ça`;
         // .messages : on l'affiche dans reglePigeon (et il disparaît au prochain tirage)
         // 3) overlay + annulation si compteur (utilise la carte "trois" qui a déclenché le transfert)
         annoncerBoireAvecAnnulation(
@@ -1359,7 +1359,7 @@ document.addEventListener("DOMContentLoaded", function () {
     "zero": "Tout le monde boit 1 gorgée sauf toi",
     "plus_2": "Bois 2 gorgées",
     "plus_4": "Distribue 4 gorgées (tu peux les partager)",
-    "interdit": "SOCIAAALE ! Tout le monde boit 1 gorgée"
+    "interdit": "SOCIAAALE !/n Tout le monde boit 1 gorgée"
   };
 
   function afficherOverlayCouleur(){
@@ -1422,17 +1422,18 @@ document.addEventListener("DOMContentLoaded", function () {
     const overlay = document.createElement("div");
     overlay.id = "overlayDuel";
 
+    const content = document.createElement("div");
+    content.className = "duel-content duel-choix-content";
+    overlay.appendChild(content);
+
     const titre = document.createElement("div");
-    titre.className = "titre-pigeon";
+    titre.className = "titre-pigeon duel-main-title";
     titre.innerText = "DUEL ! Choisis 2 joueurs";
-    overlay.appendChild(titre);
+    content.appendChild(titre);
 
     const containerBoutons = document.createElement("div");
-    containerBoutons.style.display = "flex";
-    containerBoutons.style.flexWrap = "wrap";
-    containerBoutons.style.justifyContent = "center";
-    containerBoutons.style.gap = "20px";
-    overlay.appendChild(containerBoutons);
+    containerBoutons.className = "duel-boutons";
+    content.appendChild(containerBoutons);
 
     let picks = [];
 
@@ -1443,13 +1444,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
       btn.addEventListener("click", ()=>{
         if(picks.length >= 2) return;
-        if(picks.includes(idx)) return; // ✅ empêche 2 fois le même joueur
+        if(picks.includes(idx)) return;
 
         picks.push(idx);
-        btn.disabled = true;            // ✅ bonus: évite double tap iPhone
-        btn.style.opacity = "0.6";      // (optionnel mais clair)
+        btn.disabled = true;
+        btn.style.opacity = "0.6";
         btn.style.cursor = "not-allowed";
-
         btn.style.backgroundColor = "#ffea70";
         btn.style.color = "#000";
 
@@ -1459,7 +1459,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       });
 
-
       containerBoutons.appendChild(btn);
     });
 
@@ -1467,25 +1466,26 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function afficherOverlayTirageDuel(overlay, j1, j2){
+    const content = document.createElement("div");
+    content.className = "duel-content duel-tirage-content";
+    overlay.appendChild(content);
+
     const titre = document.createElement("div");
-    titre.className = "titre-pigeon";
+    titre.className = "titre-pigeon duel-main-title";
     titre.innerText = "DUEL";
-    overlay.appendChild(titre);
+    content.appendChild(titre);
 
     const info = document.createElement("div");
-    info.style.color = "#FFD700";
-    info.style.fontSize = "28px";
-    info.style.fontWeight = "bold";
-    info.style.textAlign = "center";
-    info.style.marginBottom = "16px";
-    overlay.appendChild(info);
+    info.className = "duel-info";
+    content.appendChild(info);
+
+    const revealWrap = document.createElement("div");
+    revealWrap.className = "duel-reveal-wrap";
+    content.appendChild(revealWrap);
 
     const containerCartes = document.createElement("div");
-    containerCartes.style.display = "flex";
-    containerCartes.style.gap = "40px";
-    containerCartes.style.justifyContent = "center";
-    containerCartes.style.alignItems = "center";
-    overlay.appendChild(containerCartes);
+    containerCartes.className = "duel-cartes";
+    revealWrap.appendChild(containerCartes);
 
     const c1 = document.createElement("div");
     c1.className = "Carte";
@@ -1495,29 +1495,16 @@ document.addEventListener("DOMContentLoaded", function () {
     c2.className = "Carte";
     containerCartes.appendChild(c2);
 
-    // Labels sous les cartes (optionnel mais clair)
     const labels = document.createElement("div");
-    labels.style.display = "flex";
-    labels.style.gap = "40px";
-    labels.style.justifyContent = "center";
-    labels.style.alignItems = "center";
-    labels.style.marginTop = "12px";
-    overlay.appendChild(labels);
+    labels.className = "duel-labels";
+    revealWrap.appendChild(labels);
 
     const label1 = document.createElement("div");
-    label1.style.width = "150px";
-    label1.style.textAlign = "center";
-    label1.style.color = "#FFD700";
-    label1.style.fontSize = "18px";
-    label1.style.fontWeight = "700";
+    label1.className = "duel-label";
     labels.appendChild(label1);
 
     const label2 = document.createElement("div");
-    label2.style.width = "150px";
-    label2.style.textAlign = "center";
-    label2.style.color = "#FFD700";
-    label2.style.fontSize = "18px";
-    label2.style.fontWeight = "700";
+    label2.className = "duel-label";
     labels.appendChild(label2);
 
     let carteA = null;
@@ -1996,7 +1983,7 @@ document.addEventListener("DOMContentLoaded", function () {
           joueurActuel,
           2,
           carteTiree,
-          `${joueurs[joueurActuel]} est PIGEON ! Il boit 2 gorgées. À chaque 3 tiré, tu bois 1 gorgée. Pour en sortir, tire un 3.`,
+          `${joueurs[joueurActuel]} est PIGEON ! /nIl boit 2 gorgées. /nÀ chaque 3 tiré, tu bois 1 gorgée. /nPour en sortir, tire un 3.`,
           () => {
             appliquerBonusCouleurSiBesoin(carteTiree, { preserveRuleMessage: true });
           }

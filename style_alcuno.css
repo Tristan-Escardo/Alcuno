@@ -1545,3 +1545,98 @@ body.no-scroll{
     border-radius: 14px;
   }
 }
+
+
+/* ===== Correctifs overlay DUEL (centrage + labels sous cartes) ===== */
+#overlayDuel{
+  justify-content: center;
+  align-items: center;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+#overlayDuel .duel-content{
+  width: min(920px, 92vw);
+  min-height: 100%;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(14px, 3vw, 28px);
+  text-align: center;
+}
+
+#overlayDuel .duel-main-title{
+  max-width: min(900px, 92vw);
+  line-height: 1.05;
+  margin: 0;
+}
+
+#overlayDuel .duel-boutons{
+  width: min(760px, 92vw);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(14px, 3vw, 24px);
+}
+
+#overlayDuel .duel-info{
+  color: #FFD700;
+  font-size: clamp(22px, 4.2vw, 34px);
+  font-weight: 800;
+  text-align: center;
+  text-shadow: 2px 2px 5px #000;
+  max-width: min(760px, 92vw);
+}
+
+#overlayDuel .duel-reveal-wrap{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+#overlayDuel .duel-cartes{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(18px, 5vw, 40px);
+}
+
+#overlayDuel .duel-labels{
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: clamp(18px, 5vw, 40px);
+}
+
+#overlayDuel .duel-label{
+  width: var(--card-w);
+  max-width: var(--card-w);
+  text-align: center;
+  color: #FFD700;
+  font-size: clamp(16px, 3.4vw, 22px);
+  font-weight: 800;
+  line-height: 1.15;
+  text-shadow: 2px 2px 5px #000;
+}
+
+@media (max-width: 520px){
+  #overlayDuel .duel-content{
+    width: min(96vw, 520px);
+    gap: 14px;
+  }
+
+  #overlayDuel .duel-boutons{
+    width: min(96vw, 420px);
+    gap: 14px;
+  }
+
+  #overlayDuel .duel-label{
+    font-size: 15px;
+  }
+}
