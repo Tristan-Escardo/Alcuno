@@ -735,7 +735,7 @@ document.addEventListener("DOMContentLoaded", function () {
         afficherJoueurs();
         afficherJoueurActif();
         // 2) message demandé (overlay + .messages)
-        const msg = `${joueurs[i]} est le nouveau PIGEON,/n il boit 2 gorgées pour fêter ça`;
+        const msg = `${joueurs[i]} est le nouveau PIGEON,\n il boit 2 gorgées pour fêter ça`;
         // .messages : on l'affiche dans reglePigeon (et il disparaît au prochain tirage)
         // 3) overlay + annulation si compteur (utilise la carte "trois" qui a déclenché le transfert)
         annoncerBoireAvecAnnulation(
@@ -936,8 +936,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const resultat = document.createElement("div");
         resultat.innerText = utilise > 0
-          ? `Annulé ${utilise}. Tu bois ${reste} gorgée(s).`
-          : `Tu n’annules rien. Tu bois ${reste} gorgée(s).`;
+          ? `${utilise} gorgée(s) annulée(s).\nTu bois ${reste} gorgée(s).`
+          : `Tu n’annules rien.\nTu bois ${reste} gorgée(s).`;
         resultat.style.fontSize = "clamp(22px, 5vw, 42px)";
         resultat.style.fontWeight = "900";
         resultat.style.textShadow = "2px 2px 5px #000";
@@ -1108,8 +1108,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const utilise = i;
         const reste = nbGorgees - utilise;
         const messageResultat = utilise > 0
-          ? `Annulé ${utilise}. Tu bois ${reste} gorgée(s).`
-          : `Tu n’annules rien. Tu bois ${reste} gorgée(s).`;
+          ? `${utilise} gorgée(s) annulée(s). \nTu bois ${reste} gorgée(s).`
+          : `Tu n’annules rien. \nTu bois ${reste} gorgée(s).`;
 
         annulations[nom] = Math.max(0, dispo - utilise);
         afficherJoueurs();
@@ -1195,7 +1195,7 @@ document.addEventListener("DOMContentLoaded", function () {
           ligne.style.marginTop = "10px";
           ligne.innerText =
             utilise > 0
-              ? `Annulé ${utilise}. Tu bois ${reste} gorgée(s).`
+              ? `${utilise} gorgée(s) annulée(s). \nTu bois ${reste} gorgée(s).`
               : `Tu n’annules rien. Tu bois ${reste} gorgée(s).`;
           boxTexte.appendChild(ligne);
         }
@@ -1208,7 +1208,7 @@ document.addEventListener("DOMContentLoaded", function () {
         setTimeout(() => {
           fermerOverlayRegleUnique(afterClose);
         }, dureeOverlayPourMessage(utilise > 0
-          ? `Annulé ${utilise}. Tu bois ${reste} gorgée(s).`
+          ? `${utilise} gorgée(s) annulée(s). \nTu bois ${reste} gorgée(s).`
           : `Tu n’annules rien. Tu bois ${reste} gorgée(s).`));
       });
 
@@ -1359,7 +1359,7 @@ document.addEventListener("DOMContentLoaded", function () {
     "zero": "Tout le monde boit 1 gorgée sauf toi",
     "plus_2": "Bois 2 gorgées",
     "plus_4": "Distribue 4 gorgées (tu peux les partager)",
-    "interdit": "SOCIAAALE !/n Tout le monde boit 1 gorgée"
+    "interdit": "SOCIAAALE ! \nTout le monde boit 1 gorgée"
   };
 
   function afficherOverlayCouleur(){
@@ -1983,7 +1983,7 @@ document.addEventListener("DOMContentLoaded", function () {
           joueurActuel,
           2,
           carteTiree,
-          `${joueurs[joueurActuel]} est PIGEON ! /nIl boit 2 gorgées. /nÀ chaque 3 tiré, tu bois 1 gorgée. /nPour en sortir, tire un 3.`,
+          `${joueurs[joueurActuel]} est PIGEON ! \nIl boit 2 gorgées. \nÀ chaque 3 tiré, tu bois 1 gorgée. \nPour en sortir, tire un 3.`,
           () => {
             appliquerBonusCouleurSiBesoin(carteTiree, { preserveRuleMessage: true });
           }
