@@ -146,6 +146,32 @@ header {
 .blocJoueurs{ flex: 1 1 320px; }
 .blocRegles{ flex: 2 1 420px; } /* prend plus de place */
 
+/* Empêche le zoom au double tap sur toutes les zones cliquables du jeu */
+button,
+.Carte,
+.fin-choix-card,
+#overlayCouleur .carre-couleur,
+#listeSuppression .supp-item,
+#listeSuppression .supp-check,
+#overlayPlus4 .plus4-joueur-btn,
+#overlayPlus4 .plus4-action-btn,
+#overlayPigeon .bouton-pigeon,
+#overlayFinUnRestants .bouton-pigeon,
+#overlayPredictionFin .bouton-pigeon,
+#overlayRegleUnique .bouton-annulation {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Optionnel mais utile pour éviter les sélections bizarres au tap rapide */
+button,
+.Carte,
+.fin-choix-card,
+#overlayCouleur .carre-couleur,
+#listeSuppression .supp-item {
+  -webkit-user-select: none;
+  user-select: none;
+}
 
 /* ===== CARTES ===== */
 .Carte {
