@@ -112,27 +112,10 @@ header {
     gap: 12px;
     align-items: stretch;
 
-    position: relative;
-    border: none;
+    border: 2px solid #fff;
     border-radius: 12px;
     padding: 12px;
     background: rgba(0,0,0,0.15);
-    isolation: isolate;
-}
-
-.messages::before{
-    content: "";
-    position: absolute;
-    inset: 0;
-    padding: 2px;
-    border-radius: inherit;
-    background: linear-gradient(90deg, #ff5b5b 0%, #ffcc00 25%, #6eff72 50%, #58d4ff 75%, #8b7dff 100%);
-    pointer-events: none;
-    -webkit-mask:
-        linear-gradient(#000 0 0) content-box,
-        linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-            mask-composite: exclude;
 }
 
 .messages,
@@ -1681,129 +1664,5 @@ body.no-scroll{
 
   #overlayDuel .duel-label{
     font-size: 15px;
-  }
-}
-
-
-/* ===== HEADER / TOP BAR – intégré au design du jeu ===== */
-body{
-  background:
-    radial-gradient(circle at top center, rgba(255, 215, 0, 0.08) 0%, rgba(255, 215, 0, 0) 26%),
-    rgb(43, 0, 29);
-}
-
-header{
-  width: min(1200px, 100%);
-  margin: 12px auto 14px auto;
-  padding: 16px 20px 18px;
-  border: none;
-  border-radius: 18px;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)),
-    linear-gradient(135deg, rgba(255, 215, 0, 0.08), rgba(255,255,255,0) 45%),
-    rgba(0,0,0,0.22);
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,0.08),
-    inset 0 0 0 2px rgba(255,215,0,0.10),
-    0 14px 30px rgba(0,0,0,0.20);
-  position: relative;
-  overflow: hidden;
-  text-align: center;
-}
-
-header::before{
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 70, 70, 0.14) 0%,
-    rgba(255, 215, 0, 0.10) 35%,
-    rgba(70, 210, 110, 0.10) 68%,
-    rgba(70, 170, 255, 0.14) 100%
-  );
-  opacity: 0.85;
-  mask-image: linear-gradient(180deg, rgba(255,255,255,0.65), transparent 72%);
-  -webkit-mask-image: linear-gradient(180deg, rgba(255,255,255,0.65), transparent 72%);
-  pointer-events: none;
-}
-
-header::after{
-  content: "";
-  position: absolute;
-  left: 18px;
-  right: 18px;
-  bottom: 0;
-  height: 4px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #ff4d4d 0%, #ffd700 34%, #42d86b 67%, #42b7ff 100%);
-  opacity: 0.95;
-}
-
-header h1{
-  margin: 0;
-  position: relative;
-  z-index: 1;
-  display: inline-block;
-  font-family: Impact, Haettenschweiler, "Arial Black", sans-serif;
-  font-size: clamp(34px, 7vw, 62px);
-  font-weight: 900;
-  line-height: 1;
-  letter-spacing: 0.10em;
-  color: #FFD700;
-  text-transform: uppercase;
-  text-shadow:
-    0 2px 0 rgba(120, 70, 0, 0.95),
-    0 4px 10px rgba(0,0,0,0.45),
-    0 0 18px rgba(255, 215, 0, 0.18);
-}
-
-#menu{
-  width: min(1200px, 100%);
-  margin: 0 auto 18px auto;
-  padding: 12px;
-  border-radius: 16px;
-  background: rgba(0,0,0,0.16);
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,0.06),
-    inset 0 0 0 2px rgba(255,215,0,0.08);
-}
-
-#menu input{
-  background: rgba(0,0,0,0.34);
-  color: #fff;
-  border: 1px solid rgba(255,215,0,0.18);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
-}
-
-#menu input::placeholder{
-  color: rgba(255,255,255,0.72);
-}
-
-#menu button{
-  box-shadow:
-    inset 0 -2px 0 rgba(0,0,0,0.18),
-    0 6px 14px rgba(0,0,0,0.16);
-}
-
-@media (max-width: 520px){
-  header{
-    margin-top: 8px;
-    padding: 14px 14px 16px;
-    border-radius: 16px;
-  }
-
-  header::after{
-    left: 14px;
-    right: 14px;
-  }
-
-  header h1{
-    letter-spacing: 0.07em;
-  }
-
-  #menu{
-    padding: 10px;
-    border-radius: 14px;
   }
 }

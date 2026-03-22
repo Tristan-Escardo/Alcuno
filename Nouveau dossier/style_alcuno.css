@@ -112,27 +112,10 @@ header {
     gap: 12px;
     align-items: stretch;
 
-    position: relative;
-    border: none;
+    border: 2px solid #fff;
     border-radius: 12px;
     padding: 12px;
     background: rgba(0,0,0,0.15);
-    isolation: isolate;
-}
-
-.messages::before{
-    content: "";
-    position: absolute;
-    inset: 0;
-    padding: 2px;
-    border-radius: inherit;
-    background: linear-gradient(90deg, #ff5b5b 0%, #ffcc00 25%, #6eff72 50%, #58d4ff 75%, #8b7dff 100%);
-    pointer-events: none;
-    -webkit-mask:
-        linear-gradient(#000 0 0) content-box,
-        linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-            mask-composite: exclude;
 }
 
 .messages,
