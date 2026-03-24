@@ -534,7 +534,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if(!partieLancee){
       btnJouer.style.display = joueurs.length >= 2 ? "inline-block" : "none";
     }
-    btnSupprimer.style.display = joueurs.length > 0 ? "inline-block" : "none";
+    btnSupprimer.style.display = (!partieLancee && joueurs.length > 0) ? "inline-block" : "none";
     majStickyJoueurActif();
   }
 
