@@ -20,11 +20,6 @@ html{
   scrollbar-gutter: stable;
 }
 
-html,
-body {
-  touch-action: manipulation;
-}
-
 *, *::before, *::after{
     box-sizing: border-box;
 }
@@ -1791,10 +1786,37 @@ header h1{
     0 6px 14px rgba(0,0,0,0.16);
 }
 
-body.overlay-open .plateau,
-body.overlay-open .messages,
-body.overlay-open #stickyJoueurActif {
-  visibility: hidden;
+/* ===== DUEL : boutons choix joueurs plus compacts et mieux centrés ===== */
+#overlayDuel .duel-boutons{
+  width: min(340px, 82vw);
+  max-width: 100%;
+  gap: 10px;
+}
+
+#overlayDuel .duel-boutons .bouton-pigeon{
+  width: 100%;
+  max-width: 100%;
+  min-height: 54px;
+  padding: 10px 14px;
+  font-size: clamp(16px, 4.6vw, 21px);
+  line-height: 1.15;
+  border-radius: 16px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+@media (min-width: 521px){
+  #overlayDuel .duel-boutons{
+    width: min(420px, 70vw);
+    gap: 12px;
+  }
+
+  #overlayDuel .duel-boutons .bouton-pigeon{
+    min-height: 58px;
+    padding: 12px 16px;
+    font-size: clamp(18px, 2.4vw, 24px);
+  }
 }
 
 @media (max-width: 520px){
