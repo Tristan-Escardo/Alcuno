@@ -1295,7 +1295,7 @@ document.addEventListener("DOMContentLoaded", function () {
     overlay.style.inset = "0";
     overlay.style.width = "100%";
     overlay.style.height = "100%";
-    overlay.style.backgroundColor = "rgba(0,0,0,0.7)";
+    overlay.style.backgroundColor = "rgb(0,0,0)";
     overlay.style.display = "flex";
     overlay.style.flexDirection = "column";
     overlay.style.justifyContent = "center";
