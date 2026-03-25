@@ -1786,6 +1786,12 @@ header h1{
     0 6px 14px rgba(0,0,0,0.16);
 }
 
+body.overlay-open .plateau,
+body.overlay-open .messages,
+body.overlay-open #stickyJoueurActif {
+  visibility: hidden;
+}
+
 @media (max-width: 520px){
   header{
     margin-top: 8px;

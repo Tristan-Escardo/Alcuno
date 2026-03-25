@@ -136,10 +136,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     return true;
   }
-
+  
   function lockScroll(){
     scrollLockCount++;
     if(scrollLockCount > 1) return;
+
+    document.body.classList.add("overlay-open");
 
     // Sauve la position pour iOS
     scrollYBeforeLock = window.scrollY || document.documentElement.scrollTop || 0;
@@ -147,7 +149,6 @@ document.addEventListener("DOMContentLoaded", function () {
     document.documentElement.style.setProperty("--sbw", (sbw > 0 ? sbw : 0) + "px");
 
     document.body.classList.add("no-scroll");
-    // Astuce iOS : fixer la position du body pour empêcher le scroll tactile
     document.body.style.top = `-${scrollYBeforeLock}px`;
   }
 
@@ -156,16 +157,16 @@ document.addEventListener("DOMContentLoaded", function () {
     scrollLockCount--;
     if(scrollLockCount > 0) return;
 
+    document.body.classList.remove("overlay-open");
     document.body.classList.remove("no-scroll");
     document.documentElement.style.removeProperty("--sbw");
     const top = document.body.style.top;
     document.body.style.top = "";
 
-    // restore position
     const y = top ? Math.abs(parseInt(top, 10)) : scrollYBeforeLock;
     window.scrollTo(0, y);
   }
-
+  
   function centrerDerniereLigne(){
     const cards = Array.from(plateau.querySelectorAll(".Carte"));
     const total = cards.length;
