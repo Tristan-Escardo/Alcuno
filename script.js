@@ -101,6 +101,28 @@ document.addEventListener("DOMContentLoaded", function () {
   let predictionEnCours = false;
   let predictions = null; // Array<{ joueurIndex:number, typeId:string|null }>
 
+  let dernierTap = 0;
+  let dernierTouchCount = 0;
+
+  document.addEventListener("touchstart", (e) => {
+    dernierTouchCount = e.touches.length;
+  }, { passive: true });
+
+  document.addEventListener("touchend", (e) => {
+    if (dernierTouchCount > 1) return; // laisse le pinch zoom tranquille
+
+    const maintenant = Date.now();
+    const ecart = maintenant - dernierTap;
+
+    if (ecart > 0 && ecart < 300) {
+      if (!e.target.closest("input, textarea, select, label")) {
+        e.preventDefault();
+      }
+    }
+
+    dernierTap = maintenant;
+  }, { passive: false });
+
   /* ===== OUTILS ===== */
   function appliquerBonusCouleurSiBesoin(carteTiree, options = {}){
     if(!couleurChoisie) return false;
@@ -136,7 +158,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     return true;
   }
-  
+
   function lockScroll(){
     scrollLockCount++;
     if(scrollLockCount > 1) return;

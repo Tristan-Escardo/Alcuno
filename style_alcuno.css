@@ -20,6 +20,11 @@ html{
   scrollbar-gutter: stable;
 }
 
+html,
+body {
+  touch-action: manipulation;
+}
+
 *, *::before, *::after{
     box-sizing: border-box;
 }
