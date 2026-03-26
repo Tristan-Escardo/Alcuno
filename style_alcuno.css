@@ -807,9 +807,13 @@ button,
     justify-content: center;
 }
 
-#overlayDuel .Carte:hover {
+#overlayDuel .Carte:not(.retournee):not(.duel-selected):hover {
     transform: scale(1.05);
     box-shadow: 0 0 20px #FFD700;
+}
+
+#overlayDuel .Carte.duel-selected{
+    box-shadow: 0 0 25px #FFD700;
 }
 
 #overlayDuel,

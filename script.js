@@ -681,7 +681,7 @@ document.addEventListener("DOMContentLoaded", function () {
     overlay.style.position = "fixed";
     overlay.style.inset = "0";
     overlay.style.zIndex = "9999";
-    overlay.style.backgroundColor = "rgba(0,0,0,0.9)";
+    overlay.style.backgroundColor = "rgb(0,0,0)";
     overlay.style.display = "flex";
     overlay.style.flexDirection = "column";
     overlay.style.justifyContent = "center";
@@ -885,7 +885,7 @@ document.addEventListener("DOMContentLoaded", function () {
     overlay.style.position = "fixed";
     overlay.style.inset = "0";
     overlay.style.zIndex = "10000";
-    overlay.style.backgroundColor = "rgba(0,0,0,0.82)";
+    overlay.style.backgroundColor = "rgb(0,0,0)";
     overlay.style.display = "flex";
     overlay.style.flexDirection = "column";
     overlay.style.justifyContent = "center";
@@ -999,7 +999,7 @@ document.addEventListener("DOMContentLoaded", function () {
     overlay.style.position = "fixed";
     overlay.style.inset = "0";
     overlay.style.zIndex = "10001";
-    overlay.style.backgroundColor = "rgba(0,0,0,0.82)";
+    overlay.style.backgroundColor = "rgb(0,0,0)";
     overlay.style.display = "flex";
     overlay.style.flexDirection = "column";
     overlay.style.justifyContent = "center";
@@ -1061,7 +1061,7 @@ document.addEventListener("DOMContentLoaded", function () {
     overlay.style.position = "fixed";
     overlay.style.inset = "0";
     overlay.style.zIndex = "10000";
-    overlay.style.backgroundColor = "rgba(0,0,0,0.82)";
+    overlay.style.backgroundColor = "rgb(0,0,0)";
     overlay.style.display = "flex";
     overlay.style.flexDirection = "column";
     overlay.style.justifyContent = "center";
@@ -1607,13 +1607,12 @@ document.addEventListener("DOMContentLoaded", function () {
         choixJ1 = which;
         phase = 2;
 
-        // feedback visuel : on "marque" le choix de J1
         if(which === 1){
-          c1.style.boxShadow = "0 0 25px #FFD700";
+          c1.classList.add("duel-selected");
           c1.style.pointerEvents = "none";
           c2.style.pointerEvents = "auto";
         } else {
-          c2.style.boxShadow = "0 0 25px #FFD700";
+          c2.classList.add("duel-selected");
           c2.style.pointerEvents = "none";
           c1.style.pointerEvents = "auto";
         }
@@ -1639,14 +1638,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
         info.innerText = "On retourne les cartes…";
 
+        c1.classList.remove("duel-selected");
+        c2.classList.remove("duel-selected");
+        c1.style.boxShadow = "";
+        c2.style.boxShadow = "";
+
         // Reveal des 2 cartes (on ajoute les classes maintenant)
         setTimeout(() => {
           // enlever le halo dès qu'on retourne les cartes
           c1.style.boxShadow = "";
           c2.style.boxShadow = "";
 
-          c1.className = "Carte";
-          c2.className = "Carte";
+          c1.className = "Carte retournee";
+          c2.className = "Carte retournee";
 
           // La gauche montre carteA, la droite montre carteB (positions fixes)
           c1.classList.add(carteA);
