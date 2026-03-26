@@ -3,6 +3,7 @@
 
 body{
   background-color: rgb(43, 0, 29);
+  margin: 0;
   font-family: Arial, sans-serif;
   color: white;
   overflow-x: hidden;
@@ -128,6 +129,9 @@ header {
     border-radius: inherit;
     background: linear-gradient(90deg, #ff5b5b 0%, #ffcc00 25%, #6eff72 50%, #58d4ff 75%, #8b7dff 100%);
     pointer-events: none;
+    mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
     -webkit-mask:
         linear-gradient(#000 0 0) content-box,
         linear-gradient(#000 0 0);
@@ -960,6 +964,9 @@ button,
 
 /* Empêche le scroll quand un overlay est présent */
 body.no-scroll{
+  left: 0;
+  right: 0;
+  top: 0;
   overflow: hidden;
   position: fixed;
   width: 100%;
@@ -1133,6 +1140,32 @@ body.no-scroll{
 
 #overlayRegleUnique{
   font-size: clamp(18px, 4.5vw, 36px);
+}
+
+#overlayPlus4,
+#overlayDuel,
+#overlayPigeon,
+#overlayCouleur,
+#overlayFinUnRestants,
+#overlayPredictionFin,
+#overlayRegleUnique,
+#overlayAnnulation,
+#overlayResultatAnnulation,
+.overlay-opaque{
+  position: fixed;
+  inset: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 100vw !important;
+  min-width: 100vw !important;
+  height: 100dvh;
+  min-height: 100dvh;
+  max-width: none !important;
+  border-radius: 0 !important;
+  box-sizing: border-box;
+  margin: 0 !important;
 }
 
 /* Boutons overlays: taille flexible */
