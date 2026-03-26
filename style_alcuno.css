@@ -1843,6 +1843,12 @@ header h1{
   word-break: break-word;
 }
 
+#overlayDuel.reveal .Carte,
+#overlayDuel.reveal .Carte:hover {
+  box-shadow: none !important;
+  transform: none !important;
+}
+
 @media (min-width: 521px){
   #overlayDuel .duel-boutons{
     width: min(420px, 70vw);

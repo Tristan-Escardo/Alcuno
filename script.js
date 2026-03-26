@@ -1637,6 +1637,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const carteJ2 = (choixJ1 === 1) ? carteB : carteA;
 
         info.innerText = "On retourne les cartes…";
+        overlay.classList.add("reveal");
 
         c1.classList.remove("duel-selected");
         c2.classList.remove("duel-selected");
@@ -1645,7 +1646,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Reveal des 2 cartes (on ajoute les classes maintenant)
         setTimeout(() => {
-          // enlever le halo dès qu'on retourne les cartes
+
+          overlay.classList.remove("reveal");
+          
           c1.style.boxShadow = "";
           c2.style.boxShadow = "";
 
