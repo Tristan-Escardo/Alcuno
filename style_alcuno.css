@@ -1047,7 +1047,7 @@ body.no-scroll{
 
 /* Texte explicatif */
 .overlay-subtitle{
-  color: #fff;
+  color: #FFD700;
   font-size: clamp(14px, 3.6vw, 20px);
   line-height: 1.4;
   text-align: center;
@@ -1073,7 +1073,7 @@ body.no-scroll{
   display: flex;
   justify-content: space-between;
   gap: 10px;
-  color: #fff;
+  color: #FFD700;
   font-size: clamp(13px, 3.5vw, 18px);
   padding: 6px 0;
   border-bottom: 1px solid rgba(255,255,255,0.08);
