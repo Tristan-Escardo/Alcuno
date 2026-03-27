@@ -1380,7 +1380,7 @@ document.addEventListener("DOMContentLoaded", function () {
   /* ===== Règles centralisées ===== */
   const reglesBoire = {
     "zero": "Tout le monde boit 1 gorgée sauf toi",
-    "plus_2": "Bois 2 gorgées",
+    "plus_2": "Boit 2 gorgées",
     "plus_4": "Distribue 4 gorgées (tu peux les partager)",
     "interdit": "SOCIAAALE ! \nTout le monde boit 1 gorgée"
   };
@@ -1724,10 +1724,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function refreshUI(){
       const total = totalDistribue();
-      totalBox.innerText = `Total distribué : ${total} / 4`;
+      totalBox.innerText = `Gorgées distribuées : ${total} / 4`;
 
       if(total < 4){
-        info.innerText = "Clique sur un joueur pour lui donner +1 gorgée.";
+        info.innerText = "Choisis à qui tu veux distribuer tes 4 gorgées.";
       } else {
         info.innerText = "Total atteint. Tu peux valider.";
       }
@@ -1831,7 +1831,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function demanderAnnulationPlus4(joueurIndex, nbGorgees, classeCartePlus4, onFinish){
     const nom = joueurs[joueurIndex];
-    const msg = `${nom} reçoit ${nbGorgees} gorgée(s) (+4)`;
+    const msg = `${nom} boit ${nbGorgees} gorgée(s) (+4)`;
 
     montrerOverlayRegle(msg, classeCartePlus4);
 
@@ -1914,7 +1914,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Cartes "boire"
     if(carteTiree.startsWith("interdit")){
-      const entete = "SOCIAAALE ! Tout le monde boit 1 gorgée";
+      const entete = "SOCIAAALE ! \nTout le monde boit 1 gorgée";
 
       regleZero.innerText = entete;
       regleZero.style.display = "block";
