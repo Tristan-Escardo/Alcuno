@@ -1032,6 +1032,7 @@ body.no-scroll{
 
 .prediction-subtitle{
   width: min(720px, 100%);
+  color: #FFD700;
   margin: 0;
   padding: clamp(12px, 3vw, 16px) clamp(14px, 3.5vw, 18px);
   border-radius: 18px;

@@ -137,7 +137,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if(!(colCarte && colCarte === couleurChoisie)) return false;
 
     const preserveRuleMessage = !!options.preserveRuleMessage;
-    const msgCouleur = "Et boit 1 gorgée pour la couleur (" + couleurChoisie + ") !";
+    const msgCouleur = "Et boit 1 gorgée pour la couleur (" + couleurChoisie + ")";
 
     const afficher = () => {
       if(!preserveRuleMessage){
@@ -314,7 +314,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const subtitle = document.createElement("div");
     subtitle.className = "overlay-subtitle prediction-subtitle";
-    subtitle.innerText = "Chacun choisit un type de carte. Tous ceux qui trouvent distribuent un cul sec.";
+    subtitle.innerText = "Chacun choisit un type de carte. Tous ceux qui trouvent distribuent un CUL SEC !.";
 
     header.appendChild(titre);
     header.appendChild(subtitle);
@@ -401,11 +401,11 @@ document.addEventListener("DOMContentLoaded", function () {
         txt.className = 'fin-choix-resultat';
 
         if(gagnants.length === 0){
-          txt.innerText = `Personne n'a trouvé (${nomType(vraiType)}).`;
+          txt.innerText = `Personne n'a trouvé \nLa dernière carte était ${nomType(vraiType)}`;
         } else if(gagnants.length === 1){
-          txt.innerText = `${gagnants[0]} a trouvé ! Il/elle distribue un cul sec.`;
+          txt.innerText = `${gagnants[0]} a trouvé ! Il/elle distribue un CUL SEC !`;
         } else {
-          txt.innerText = `${gagnants.join(', ')} ont trouvé ! Chacun distribue un cul sec.`;
+          txt.innerText = `${gagnants.join(', ')} ont trouvé ! Chacun distribue un CUL SEC !`;
         }
         reveal.appendChild(txt);
 
@@ -2055,7 +2055,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const colCarte = couleurDeLaCarte(carteTiree);
 
         if(colCarte && colCarte === couleurChoisie){
-          const msgCouleur = "Et boit 1 gorgée pour la couleur ("+ couleurChoisie +") !";
+          const msgCouleur = "Et boit 1 gorgée pour la couleur ("+ couleurChoisie +")";
 
           // annulable via les "UN" (même overlay, pas de superposition)
           annoncerBoireAvecAnnulation(joueurActuel, 1, carteTiree, msgCouleur);
