@@ -337,7 +337,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const preview = creerCartePreview(t.rep);
       cardWrap.appendChild(preview);
 
-      cardWrap.addEventListener("click", () => {
+      cardWrap.addEventListener("pointerdown", () => {
         if(cardWrap.classList.contains("disabled")) return;
         const typeId = cardWrap.dataset.typeId;
         const cur = ordre[curPos];
@@ -412,7 +412,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const btn = document.createElement('button');
         btn.className = 'bouton-pigeon';
         btn.innerText = 'Terminer';
-        btn.addEventListener('click', () => {
+        btn.addEventListener('pointerdown', () => {
           if(overlay._cleanup) overlay._cleanup();
           overlay.remove();
           unlockScroll();
@@ -610,10 +610,10 @@ document.addEventListener("DOMContentLoaded", function () {
 }
 
 
-  btnAjouter.addEventListener("click", ajouterJoueur);
+  btnAjouter.addEventListener("pointerdown", ajouterJoueur);
   nomJoueurInput.addEventListener("keydown", e=>{ if(e.key==="Enter") ajouterJoueur(); });
 
-  btnSupprimer.addEventListener("click", ()=>{
+  btnSupprimer.addEventListener("pointerdown", ()=>{
     menu.style.display="none";
     suppression.style.display="flex";
     lockScroll();
@@ -632,7 +632,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  btnTermine.addEventListener("click", ()=>{
+  btnTermine.addEventListener("pointerdown", ()=>{
     const toDelete=[...listeSuppression.querySelectorAll("input:checked")]
       .map(cb=>parseInt(cb.value,10)).sort((a,b)=>b-a);
     toDelete.forEach(i=>{
@@ -717,7 +717,7 @@ document.addEventListener("DOMContentLoaded", function () {
     btnTerminer.className = "bouton-pigeon";
     btnTerminer.innerText = "Terminer";
 
-    btnTerminer.addEventListener("click", () => {
+    btnTerminer.addEventListener("pointerdown", () => {
       // ils boivent leurs "1 restants" => on remet les compteurs à 0
       restants.forEach(x => { annulations[x.nom] = 0; });
       afficherJoueurs();
@@ -748,7 +748,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const btn=document.createElement("button");
         btn.className="bouton-pigeon";
         btn.innerText=j;
-        btn.addEventListener("click",()=>{
+        btn.addEventListener("pointerdown",()=>{
         indexPigeon = i;
         nomPigeonOriginal = joueurs[i];
         // 1) on ferme l'overlay de choix
@@ -947,7 +947,7 @@ document.addEventListener("DOMContentLoaded", function () {
       btn.style.cursor = "pointer";
       btn.style.boxShadow = "0 10px 24px rgba(0,0,0,0.28)";
 
-      btn.addEventListener("click", () => {
+      btn.addEventListener("pointerdown", () => {
         const utilise = i;
         const reste = nbGorgees - utilise;
 
@@ -1127,7 +1127,7 @@ document.addEventListener("DOMContentLoaded", function () {
       btn.style.cursor = "pointer";
       btn.style.boxShadow = "0 10px 24px rgba(0,0,0,0.28)";
 
-      btn.addEventListener("click", () => {
+      btn.addEventListener("pointerdown", () => {
         const utilise = i;
         const reste = nbGorgees - utilise;
         const messageResultat = utilise > 0
@@ -1201,7 +1201,7 @@ document.addEventListener("DOMContentLoaded", function () {
       btn.className = "bouton-annulation";
       btn.innerText = `Annuler ${i}`;
 
-      btn.addEventListener("click", () => {
+      btn.addEventListener("pointerdown", () => {
         const utilise = i;
         const reste = nbGorgees - utilise;
 
@@ -1411,7 +1411,7 @@ document.addEventListener("DOMContentLoaded", function () {
     couleurs.forEach(c=>{
       const carre = document.createElement("div");
       carre.className = "carre-couleur " + c.classe;
-      carre.addEventListener("click", ()=>{
+      carre.addEventListener("pointerdown", ()=>{
         couleurChoisie = c.nom;
         const mapCouleurs = {
           rouge: "#e53935",
@@ -1465,7 +1465,7 @@ document.addEventListener("DOMContentLoaded", function () {
       btn.className = "bouton-pigeon";
       btn.innerText = nom;
 
-      btn.addEventListener("click", ()=>{
+      btn.addEventListener("pointerdown", ()=>{
         if(picks.length >= 2) return;
         if(picks.includes(idx)) return;
 
@@ -1675,8 +1675,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    c1.addEventListener("click", () => onChoose(1));
-    c2.addEventListener("click", () => onChoose(2));
+    c1.addEventListener("pointerdown", () => onChoose(1));
+    c2.addEventListener("pointerdown", () => onChoose(2));
 
     preparerDuel();
   }
@@ -1764,7 +1764,7 @@ document.addEventListener("DOMContentLoaded", function () {
       btn.dataset.idx = String(idx);
       btn.innerText = nom;
 
-      btn.addEventListener("click", ()=>{
+      btn.addEventListener("pointerdown", ()=>{
         const total = totalDistribue();
         if(total >= 4) return;
 
@@ -1779,7 +1779,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const btnUndo = document.createElement("button");
     btnUndo.className = "bouton-pigeon plus4-action-btn";
     btnUndo.innerText = "Annuler la dernière";
-    btnUndo.addEventListener("click", ()=>{
+    btnUndo.addEventListener("pointerdown", ()=>{
       if(historique.length === 0) return;
       const idx = historique.pop();
       if(dist[idx] > 0) dist[idx] -= 1;
@@ -1790,7 +1790,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const btnReset = document.createElement("button");
     btnReset.className = "bouton-pigeon plus4-action-btn";
     btnReset.innerText = "Reset";
-    btnReset.addEventListener("click", ()=>{
+    btnReset.addEventListener("pointerdown", ()=>{
       Object.keys(dist).forEach(k => dist[k] = 0);
       historique = [];
       refreshUI();
@@ -1800,7 +1800,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const btnValider = document.createElement("button");
     btnValider.className = "bouton-pigeon plus4-action-btn";
     btnValider.innerText = "Valider";
-    btnValider.addEventListener("click", ()=>{
+    btnValider.addEventListener("pointerdown", ()=>{
       if(totalDistribue() !== 4) return;
 
       overlay.remove();
@@ -2109,7 +2109,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const carte = document.createElement("div");
       carte.classList.add("Carte");
 
-      carte.addEventListener("click", ()=>{
+      carte.addEventListener("pointerdown", ()=>{
         // Plateau bloqué pendant overlays pigeon/couleur/duel
         if(choixPigeonEnCours || duelEnCours) return;
         if(carte.classList.contains("retournee")) return;
@@ -2212,9 +2212,9 @@ document.addEventListener("DOMContentLoaded", function () {
     document.body.style.top = "";
   }
 
-  btnJouer.addEventListener("click", lancerPartie);
+  btnJouer.addEventListener("pointerdown", lancerPartie);
 
-  btnNouvellePartie.addEventListener("click", retourMenu);
+  btnNouvellePartie.addEventListener("pointerdown", retourMenu);
 
   // on force l'UI du menu (au cas où)
   suppression.style.display = "none";
