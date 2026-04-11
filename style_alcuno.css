@@ -180,7 +180,7 @@ button,
 #overlayFinUnRestants .bouton-pigeon,
 #overlayPredictionFin .bouton-pigeon,
 #overlayRegleUnique .bouton-annulation {
-  touch-action: manipulation;
+  touch-action: none;
   -webkit-tap-highlight-color: transparent;
 }
 
