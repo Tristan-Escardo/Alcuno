@@ -2109,7 +2109,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const carte = document.createElement("div");
       carte.classList.add("Carte");
 
-      carte.addEventListener("pointerdown", ()=>{
+      carte.addEventListener("click", ()=>{
         // Plateau bloqué pendant overlays pigeon/couleur/duel
         if(choixPigeonEnCours || duelEnCours) return;
         if(carte.classList.contains("retournee")) return;
