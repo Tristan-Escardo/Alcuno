@@ -1621,7 +1621,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // petite pause puis on relance un duel (toujours dos au départ)
         setTimeout(() => {
           preparerDuel();
-        }, 1400);
+        }, 1500);
         return;
       }
 
@@ -1642,7 +1642,7 @@ document.addEventListener("DOMContentLoaded", function () {
           choixPigeonEnCours = false;
           duelMultiplicateur = 1;
           afficherJoueurActif();
-        }, 1100);
+        }, 1800);
       }, 1100);
     }
 
