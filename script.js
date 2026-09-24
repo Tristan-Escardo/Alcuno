@@ -1036,7 +1036,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     overlay.style.cursor = "pointer";
     overlay.addEventListener("pointerdown", fermer);
-    
+
     document.body.appendChild(overlay);
     requestAnimationFrame(() => {
       overlay.style.opacity = "1";
@@ -1257,7 +1257,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (nbGorgees > 15) {
       const message17 =
         "Et interdit de vomir, c'est pas fini !\n" +
-        "Signé Célien, un des créateurs du jeu.";
+        "Célien Cosme (un des créateurs du jeu).";
 
       montrerOverlayRegle(`${msg}\n\n${message17}`, classeCarte);
 
