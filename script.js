@@ -19,6 +19,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const messageTexte = document.getElementById("messageTexte");
   let stickyJoueurActif = null;
 
+
+  /* ====== Cartes du plateau principal ====== */
   const classes = [
     "zero_vert","zero_jaune","zero_rouge","zero_bleu",
 
@@ -1032,6 +1034,9 @@ document.addEventListener("DOMContentLoaded", function () {
       }, { once: true });
     };
 
+    overlay.style.cursor = "pointer";
+    overlay.addEventListener("pointerdown", fermer);
+    
     document.body.appendChild(overlay);
     requestAnimationFrame(() => {
       overlay.style.opacity = "1";
@@ -1249,6 +1254,39 @@ document.addEventListener("DOMContentLoaded", function () {
     const nom = joueurs[joueurIndex];
     const msg = prefixMsg ? prefixMsg : `${nom} boit ${nbGorgees} gorgée(s)`;
 
+    if (nbGorgees > 15) {
+      const message17 =
+        "Et interdit de vomir, c'est pas fini !\n" +
+        "Signé Célien, un des créateurs du jeu.";
+
+      montrerOverlayRegle(`${msg}\n\n${message17}`, classeCarte);
+
+      // Ce message contient l'avertissement "interdit de vomir" => +2s d'affichage
+      if (overlayRegleTimeout) {
+        clearTimeout(overlayRegleTimeout);
+      }
+      if (!overlayRegleVerrouille) {
+        overlayRegleTimeout = setTimeout(
+          () => fermerOverlayRegleUnique(),
+          dureeOverlayPourMessage(`${msg}\n\n${message17}`) + 2000
+        );
+      }
+        const ensuite = () => {
+          if(joueurPeutAnnuler(joueurIndex, nbGorgees)){
+            afficherOverlayAnnulation(
+              joueurIndex,
+              nbGorgees,
+              null,
+              () => { if(typeof onFinish === "function") onFinish(); }
+            );
+          } else if(typeof onFinish === "function"){
+            onFinish();
+          }
+        };
+        executerApresOverlayRegleUnique(ensuite);
+      return;
+    }
+
     regleZero.innerText = msg;
     regleZero.style.display = "block";
     zeroEnCours = true;
@@ -1363,6 +1401,13 @@ document.addEventListener("DOMContentLoaded", function () {
     boxTexte.appendChild(ligne1);
 
     overlay.appendChild(boxTexte);
+    overlay.style.cursor = "pointer";
+    overlay.addEventListener("pointerdown", () => {
+      if (!overlayRegleVerrouille) {
+        fermerOverlayRegleUnique();
+      }
+    });
+
     lockScroll();
     document.body.appendChild(overlay);
 
