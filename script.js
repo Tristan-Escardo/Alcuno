@@ -1015,16 +1015,27 @@ document.addEventListener("DOMContentLoaded", function () {
     stickyJoueurActif.classList.add("visible");
   }
 
+  // Un nom de joueur inséré dans du HTML doit passer par ici : sinon un pseudo comme
+  // <img src=x onerror=...> exécuterait du code chez tous les joueurs (mode en ligne)
+  function echapperHtml(texte){
+    return String(texte)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
   function afficherJoueurs(){
     listeJoueurs.innerHTML = joueurs.map((j,i)=>{
       const n = Number(annulations[j] || 0);
       const bonus = n > 0 ? ` <span class="bonus-annulation">+${n}</span>` : "";
 
       if(i === indexPigeon){
-        return `<div class="joueur-ligne joueur-ligne-pigeon"><strong>PIGEON</strong> (${nomPigeonOriginal})${bonus}</div>`;
+        return `<div class="joueur-ligne joueur-ligne-pigeon"><strong>PIGEON</strong> (${echapperHtml(nomPigeonOriginal)})${bonus}</div>`;
       }
 
-      return `<div class="joueur-ligne">${j}${bonus}</div>`;
+      return `<div class="joueur-ligne">${echapperHtml(j)}${bonus}</div>`;
     }).join("");
 
     if(!partieLancee){
@@ -1099,7 +1110,7 @@ document.addEventListener("DOMContentLoaded", function () {
       ligne.innerHTML = `
         <label class="supp-item">
           <input class="supp-check" type="checkbox" value="${i}">
-          <span class="supp-name">${j}</span>
+          <span class="supp-name">${echapperHtml(j)}</span>
         </label>
       `;
 
@@ -2266,8 +2277,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const idx = Number(btn.dataset.idx);
         const n = dist[idx];
         btn.innerHTML = n > 0
-        ? `${joueurs[idx]} <span class="plus4-badge">+ ${n}</span>`
-        : `${joueurs[idx]}`;
+        ? `${echapperHtml(joueurs[idx])} <span class="plus4-badge">+ ${n}</span>`
+        : echapperHtml(joueurs[idx]);
 
         // optionnel: griser si total déjà à 4 (plus possible d'ajouter)
         if(total >= 4){
