@@ -34,13 +34,42 @@ document.addEventListener("DOMContentLoaded", function () {
   const VERSION_JEU = 8.2;
   document.getElementById("versionJeu").innerText = "version " + VERSION_JEU;
 
+  // Easter egg : de temps en temps, le code de la partie est un de ces noms,
+  // complété par des chiffres AVANT ou APRÈS (jamais au milieu) pour faire 5 caractères
+  const CODES_EASTER_EGG = ["YLA", "CELIEN", "ROSA", "TRIS"];
+  const CHANCE_EASTER_EGG = 0.1; // 1 partie sur 10
+  const LONGUEUR_CODE = 5;
+  const CHIFFRES_CODE = "23456789"; // pas de 0/1 (confusion avec O/I)
+
+  function tirer(chaine){
+    return chaine[Math.floor(Math.random() * chaine.length)];
+  }
+
   function genererCodePartie(){
-    const caracteres = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    if (Math.random() < CHANCE_EASTER_EGG) {
+      const nom = tirer(CODES_EASTER_EGG);
+      let chiffres = "";
+      for (let i = nom.length; i < LONGUEUR_CODE; i++) chiffres += tirer(CHIFFRES_CODE);
+      return Math.random() < 0.5 ? chiffres + nom : nom + chiffres;
+    }
+
+    const caracteres = "ABCDEFGHJKLMNPQRSTUVWXYZ" + CHIFFRES_CODE;
     let code = "";
-    for (let i = 0; i < 5; i++){
-      code += caracteres[Math.floor(Math.random() * caracteres.length)];
+    for (let i = 0; i < LONGUEUR_CODE; i++){
+      code += tirer(caracteres);
     }
     return code;
+  }
+
+  // Tire un code qui n'est pas déjà utilisé par une autre partie
+  // (indispensable pour les codes easter egg, peu nombreux : CELIEN est unique)
+  function trouverCodeLibre(essaisRestants = 10){
+    const code = genererCodePartie();
+    return window.fbGet(window.fbRef(window.firebaseDB, `parties/${code}`)).then((snapshot) => {
+      if (!snapshot.exists()) return code;
+      if (essaisRestants <= 1) throw new Error("Aucun code de partie libre trouvé");
+      return trouverCodeLibre(essaisRestants - 1);
+    });
   }
 
   function erreurFirebase(err){
@@ -92,17 +121,18 @@ document.addEventListener("DOMContentLoaded", function () {
     if (PSEUDO_INVALIDE.test(pseudo)) { alert("Pseudo invalide (pas de . # $ [ ] /)."); return; }
 
     attendreFirebase(() => {
-      const code = genererCodePartie();
-      const db = window.firebaseDB;
-      const refPartie = window.fbRef(db, `parties/${code}`);
+      let code = null;
 
-      window.fbSet(refPartie, {
-        version: VERSION_JEU,
-        hote: pseudo,
-        joueurs: {
-          [pseudo]: { nom: pseudo, host: true, rejoint: Date.now() }
-        },
-        etatJeu: { demarree: false, hote: pseudo }
+      trouverCodeLibre().then((codeLibre) => {
+        code = codeLibre;
+        return window.fbSet(window.fbRef(window.firebaseDB, `parties/${code}`), {
+          version: VERSION_JEU,
+          hote: pseudo,
+          joueurs: {
+            [pseudo]: { nom: pseudo, host: true, rejoint: Date.now() }
+          },
+          etatJeu: { demarree: false, hote: pseudo }
+        });
       }).then(() => {
         codePartieActuel = code;
         pseudoActuel = pseudo;
