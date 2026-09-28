@@ -1854,7 +1854,8 @@ header h1{
 /* ===== ÉCRANS DE CHOIX DU MODE DE JEU (classique / en ligne) ===== */
 #choixMode,
 #enLigne,
-#ecranNouvellePartie{
+#ecranNouvellePartie,
+#ecranConfirmerHote{
   position: fixed;
   inset: 0;
   z-index: 9999;
@@ -1874,12 +1875,14 @@ header h1{
 /* Fondu sur le contenu seulement : le fond reste opaque, le plateau ne transparaît pas */
 #choixMode > *,
 #enLigne > div,
-#ecranNouvellePartie > *{
+#ecranNouvellePartie > *,
+#ecranConfirmerHote > *{
   animation: fadeIn 0.25s ease forwards;
 }
 
 #choixMode h2,
 #ecranNouvellePartie h2,
+#ecranConfirmerHote h2,
 #enLigne h2,
 #enLigne h3{
   margin: 0;
@@ -1891,6 +1894,7 @@ header h1{
 
 #choixMode button,
 #ecranNouvellePartie button,
+#ecranConfirmerHote button,
 #enLigne button{
   background-color: #ffcc00;
   color: #ffffff;
@@ -1913,6 +1917,7 @@ header h1{
 
 #choixMode button:hover,
 #ecranNouvellePartie button:hover,
+#ecranConfirmerHote button:hover,
 #enLigne button:hover{
   background-color: #ffea70;
   transform: scale(1.05);
@@ -1920,6 +1925,7 @@ header h1{
 
 #choixMode button:active,
 #ecranNouvellePartie button:active,
+#ecranConfirmerHote button:active,
 #enLigne button:active{
   transform: scale(0.98);
 }
@@ -1993,11 +1999,15 @@ header h1{
   background-color: rgba(255,255,255,0.22) !important;
 }
 
-#ecranNouvellePartie .infoEcran{
-  margin: -8px 0 0;
-  max-width: min(420px, 86vw);
-  color: rgba(255,255,255,0.75);
-  font-weight: 700;
+/* Écran « Retirer l'hôte ? » */
+#ecranConfirmerHote .texteConfirmation{
+  margin: 0;
+  max-width: min(460px, 88vw);
+  color: #ffffff;
+  font-size: clamp(17px, 4vw, 22px);
+  font-weight: 800;
+  line-height: 1.4;
+  text-shadow: 1px 1px 3px #000;
 }
 
 #choixMode .versionJeu{
@@ -2010,11 +2020,7 @@ header h1{
   color: rgba(255,255,255,0.35);
 }
 
-#ecranNouvellePartie .infoEcran:empty{
-  display: none;
-}
-
-/* Salle d'attente : nom à gauche, bouton ✕ (hôte uniquement) à droite */
+/* Salle d'attente : nom à gauche, bouton ✕ à droite */
 #listeJoueursEnLigne div{
   display: flex;
   justify-content: space-between;

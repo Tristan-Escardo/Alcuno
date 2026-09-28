@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // À augmenter (+1) à chaque mise en ligne qui touche au mode en ligne : un téléphone qui a
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
-  const VERSION_JEU = 6;
+  const VERSION_JEU = 7;
   document.getElementById("versionJeu").innerText = "version " + VERSION_JEU;
 
   function genererCodePartie(){
@@ -242,15 +242,11 @@ document.addEventListener("DOMContentLoaded", function () {
           btn.innerText = "✕";
           btn.title = "Retirer " + j.nom;
           btn.addEventListener("click", () => {
-            // Retirer l'hôte : on prévient d'abord (le rôle passe au joueur suivant)
+            // Retirer l'hôte : écran de confirmation d'abord (le rôle passe au joueur suivant)
             if (j.host) {
               const suivant = tries.find(x => x.nom !== j.nom);
-              const ok = confirm(
-                `${j.nom} est l'hôte de la partie.\n` +
-                `Si tu le retires, il est éjecté et c'est ${suivant ? suivant.nom : "le joueur suivant"} ` +
-                `qui devient l'hôte.\n\nRetirer quand même ${j.nom} ?`
-              );
-              if (!ok) return;
+              demanderRetraitHote(code, j.nom, suivant ? suivant.nom : "le joueur suivant");
+              return;
             }
             retirerJoueur(code, j.nom).catch(erreurFirebase);
           });
@@ -264,6 +260,31 @@ document.addEventListener("DOMContentLoaded", function () {
         (estHote && tries.length >= 2) ? "" : "none";
     });
   }
+
+  // ===== Écran de confirmation « Retirer l'hôte ? » =====
+  const ecranConfirmerHote = document.getElementById("ecranConfirmerHote");
+  let retraitHoteEnAttente = null; // { code, nom }
+
+  function demanderRetraitHote(code, nomHote, nomSuivant){
+    document.getElementById("texteConfirmerHote").innerText =
+      `${nomHote} est l'hôte de la partie.\n` +
+      `Si tu le retires, il est éjecté et c'est ${nomSuivant} qui devient l'hôte.`;
+    retraitHoteEnAttente = { code, nom: nomHote };
+    ecranConfirmerHote.style.display = "";
+  }
+
+  function fermerConfirmationHote(){
+    retraitHoteEnAttente = null;
+    ecranConfirmerHote.style.display = "none";
+  }
+
+  document.getElementById("btnConfirmerHoteOui").addEventListener("click", () => {
+    const retrait = retraitHoteEnAttente;
+    fermerConfirmationHote();
+    if (retrait) retirerJoueur(retrait.code, retrait.nom).catch(erreurFirebase);
+  });
+
+  document.getElementById("btnConfirmerHoteNon").addEventListener("click", fermerConfirmationHote);
 
   function ecouterEtatPartie(code){
     if (desabonnerEtat) desabonnerEtat();
@@ -391,6 +412,7 @@ document.addEventListener("DOMContentLoaded", function () {
     mancheCourante = null;
     reinitialiserFileActions();
     reinitialiserEcransJeu();
+    fermerConfirmationHote();
 
     document.getElementById("enLigne").style.display = "";
     document.getElementById("salleAttente").style.display = "none";
@@ -2694,9 +2716,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // "click" (et pas pointerdown) : évite que le relâchement du doigt active un bouton du nouvel écran
   btnNouvellePartie.addEventListener("click", () => {
-    document.getElementById("infoNouvellePartie").innerText = enLigneActif
-      ? "Le choix s'applique à tous les joueurs de la partie."
-      : "";
     ecranNouvellePartie.style.display = "";
   });
 
@@ -2946,6 +2965,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.body.classList.add("mode-en-ligne");
     fermerEcranNouvellePartie();
+    fermerConfirmationHote();
     document.getElementById("enLigne").style.display = "none";
     messagesBar.style.display = "";
     document.getElementById("jeu").style.display = "";
