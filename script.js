@@ -27,6 +27,11 @@ document.addEventListener("DOMContentLoaded", function () {
   let traitementEnCours = false;
   let timerTrou = null;
 
+  // Reconnexion en pleine manche : on rejoue toutes les actions déjà faites, en accéléré
+  let repriseEnCours = false;     // la prochaine manche démarrée est une reprise
+  let rattrapageEnCours = false;  // délais du jeu quasi nuls (voir delai())
+  let seqFinRattrapage = 0;       // numéro de la dernière action à rattraper
+
   const PSEUDO_INVALIDE = /[.#$\[\]\/]/;
 
   // À augmenter (+1) à chaque mise en ligne qui touche au mode en ligne : un téléphone qui a
@@ -359,12 +364,11 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
       }
 
-      // En pleine manche : reprise pas encore possible (il faudra rejouer les actions)
-      if (partie.etatJeu && partie.etatJeu.demarree) return;
-
-      repriseEnAttente = sauvegarde;
+      const enJeu = !!(partie.etatJeu && partie.etatJeu.demarree);
+      repriseEnAttente = Object.assign({}, sauvegarde, { enJeu });
       document.getElementById("texteReprendre").innerText =
-        `Tu étais dans la partie ${sauvegarde.code} sous le pseudo ${sauvegarde.pseudo}.`;
+        `Tu étais dans la partie ${sauvegarde.code} sous le pseudo ${sauvegarde.pseudo}.` +
+        (enJeu ? "\nLa partie est en cours : tu vas la retrouver là où elle en est." : "");
       ecranReprendre.style.display = "";
     }).catch(() => {});
   }
@@ -378,6 +382,8 @@ document.addEventListener("DOMContentLoaded", function () {
     codePartieActuel = reprise.code;
     pseudoActuel = reprise.pseudo;
     estHote = false; // mis à jour par l'écoute de la liste des joueurs
+    // En pleine manche : la manche démarrera en mode rattrapage (actions rejouées en accéléré)
+    repriseEnCours = !!reprise.enJeu;
 
     document.getElementById("choixMode").style.display = "none";
     ["enLigneChoix", "enLigneCreer", "enLigneRejoindre"].forEach((id) => {
@@ -1384,7 +1390,28 @@ document.addEventListener("DOMContentLoaded", function () {
       }, 0);
   }
 
+  // Délai du jeu (overlays, duel…) : quasi nul pendant le rattrapage d'une reconnexion.
+  // Minimum 60 ms : laisse le temps à l'overlay d'apparaître (requestAnimationFrame) avant de se fermer.
+  function delai(ms){
+    return rattrapageEnCours ? Math.min(ms, 60) : ms;
+  }
+
+  // Appelle callback UNE fois : à la fin de la transition de l'élément, ou au plus tard après `ms`.
+  // Sécurité : si la transition n'a pas lieu (ex. fermeture juste avant la fin de l'apparition),
+  // "transitionend" n'arrive jamais et l'overlay resterait bloqué à l'écran.
+  function apresTransition(el, ms, callback){
+    let fait = false;
+    const fin = () => {
+      if (fait) return;
+      fait = true;
+      callback();
+    };
+    el.addEventListener("transitionend", fin, { once: true });
+    setTimeout(fin, delai(ms) + 80);
+  }
+
   function dureeOverlayPourMessage(message){
+    if (rattrapageEnCours) return delai(0);
     const texte = String(message || "").trim();
     const nbLignes = estimerNbLignesOverlay(texte);
     const nbMots = texte ? texte.split(/\s+/).filter(Boolean).length : 0;
@@ -1415,13 +1442,17 @@ document.addEventListener("DOMContentLoaded", function () {
       overlayRegleTimeout = null;
     }
 
+    // Déjà en train de se fermer (tap + minuteur) : une seule fermeture
+    if (overlay.dataset.enFermeture) return;
+    overlay.dataset.enFermeture = "1";
+
     overlay.style.opacity = "0";
     overlay.style.transform = "scale(0.8)";
-    overlay.addEventListener("transitionend", () => {
+    apresTransition(overlay, 300, () => {
       overlay.remove();
       unlockScroll();
       if(typeof afterClose === "function") afterClose();
-    }, { once: true });
+    });
   }
 
   function executerApresOverlayRegleUnique(callback){
@@ -1605,14 +1636,17 @@ document.addEventListener("DOMContentLoaded", function () {
     texte.style.maxWidth = "min(820px, 92vw)";
     overlay.appendChild(texte);
 
+    let enFermeture = false;
     const fermer = () => {
+      if(enFermeture) return; // tap + minuteur : une seule fermeture
+      enFermeture = true;
       overlay.style.opacity = "0";
       overlay.style.transform = "scale(0.96)";
-      overlay.addEventListener("transitionend", () => {
+      apresTransition(overlay, 250, () => {
         overlay.remove();
         unlockScroll();
         if(typeof afterClose === "function") afterClose();
-      }, { once: true });
+      });
     };
 
     overlay.style.cursor = "pointer";
@@ -1684,10 +1718,13 @@ document.addEventListener("DOMContentLoaded", function () {
     boutons.style.width = "min(760px, 92vw)";
     overlay.appendChild(boutons);
 
+    let enFermeture = false;
     const fermer = (callback = null) => {
+      if(enFermeture) return;
+      enFermeture = true;
       overlay.style.opacity = "0";
       overlay.style.transform = "scale(0.96)";
-      overlay.addEventListener("transitionend", () => {
+      apresTransition(overlay, 250, () => {
         overlay.remove();
         unlockScroll();
         if(typeof callback === "function"){
@@ -1695,7 +1732,7 @@ document.addEventListener("DOMContentLoaded", function () {
         } else if(typeof afterClose === "function"){
           afterClose();
         }
-      }, { once: true });
+      });
     };
 
     for(let i=0; i<=maxAnnulable; i++){
@@ -1851,7 +1888,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (!overlayRegleVerrouille) {
         overlayRegleTimeout = setTimeout(
           () => fermerOverlayRegleUnique(),
-          dureeOverlayPourMessage(`${msg}\n\n${message17}`) + 2000
+          delai(dureeOverlayPourMessage(`${msg}\n\n${message17}`) + 2000)
         );
       }
         const ensuite = () => {
@@ -2206,7 +2243,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // petite pause puis on relance un duel (toujours dos au départ)
         setTimeout(() => {
           preparerDuel();
-        }, 1500);
+        }, delai(1500));
         return;
       }
 
@@ -2227,8 +2264,8 @@ document.addEventListener("DOMContentLoaded", function () {
           choixPigeonEnCours = false;
           duelMultiplicateur = 1;
           afficherJoueurActif();
-        }, 1800);
-      }, 1100);
+        }, delai(1800));
+      }, delai(1100));
     }
 
     function onChoose(which){
@@ -2300,7 +2337,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
           info.innerText = "Résultat…";
           resoudreDuel(carteJ1, carteJ2);
-        }, 1400);
+        }, delai(1400));
       }
     }
 
@@ -2620,7 +2657,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if(carteElement){
         setTimeout(() => {
           carteElement.classList.add("carte-disparue");
-        }, 2000);
+        }, delai(2000));
       }
     }
 
@@ -3044,14 +3081,21 @@ document.addEventListener("DOMContentLoaded", function () {
       const resultat = tenterAction(action);
       // On attend que l'overlay concerné soit affiché chez nous (max 30 s d'écran allumé)
       if(resultat === "attendre" && attente < 30000){
-        if(document.visibilityState === "visible") attente += 120;
-        setTimeout(essayer, 120);
+        const pas = rattrapageEnCours ? 20 : 120;
+        if(document.visibilityState === "visible") attente += pas;
+        setTimeout(essayer, pas);
         return;
       }
 
       fileActions.delete(prochainSeq);
       prochainSeq++;
       traitementEnCours = false;
+
+      if(rattrapageEnCours){
+        if(prochainSeq > seqFinRattrapage) finirRattrapage();
+        else majRattrapage();
+      }
+
       traiterFile();
     };
 
@@ -3063,6 +3107,38 @@ document.addEventListener("DOMContentLoaded", function () {
     prochainSeq = 1;
     traitementEnCours = false;
     if(timerTrou){ clearTimeout(timerTrou); timerTrou = null; }
+    finirRattrapage();
+  }
+
+  // ===== Rattrapage (reconnexion en pleine manche) =====
+  // Un écran « Retour dans la partie… » cache les overlays qui défilent en accéléré
+  function commencerRattrapage(cible){
+    rattrapageEnCours = true;
+    seqFinRattrapage = cible;
+    document.body.classList.add("rattrapage");
+
+    let ecran = document.getElementById("ecranRattrapage");
+    if(!ecran){
+      ecran = document.createElement("div");
+      ecran.id = "ecranRattrapage";
+      document.body.appendChild(ecran);
+    }
+    majRattrapage();
+  }
+
+  function majRattrapage(){
+    const ecran = document.getElementById("ecranRattrapage");
+    if(!ecran) return;
+    const fait = Math.min(prochainSeq - 1, seqFinRattrapage);
+    ecran.innerText = `Retour dans la partie…\n${fait} / ${seqFinRattrapage}`;
+  }
+
+  function finirRattrapage(){
+    rattrapageEnCours = false;
+    seqFinRattrapage = 0;
+    document.body.classList.remove("rattrapage");
+    const ecran = document.getElementById("ecranRattrapage");
+    if(ecran) ecran.remove();
   }
 
   function ecouterActions(){
@@ -3123,7 +3199,26 @@ document.addEventListener("DOMContentLoaded", function () {
     messagesBar.style.display = "";
     document.getElementById("jeu").style.display = "";
 
-    ecouterActions();
+    if(!repriseEnCours){
+      ecouterActions();
+      return;
+    }
+
+    // Reconnexion en pleine manche : on regarde combien d'actions ont déjà été jouées,
+    // puis on les rejoue toutes en accéléré avant de reprendre normalement
+    repriseEnCours = false;
+    const code = codePartieActuel;
+    const manche = etat.manche;
+    window.fbGet(window.fbRef(window.firebaseDB, `parties/${code}/manches/${manche}/seq`))
+      .then((snapshot) => {
+        if(manche !== mancheCourante) return;
+        const cible = Number(snapshot.val() || 0);
+        if(cible > 0) commencerRattrapage(cible);
+        ecouterActions();
+      })
+      .catch(() => {
+        if(manche === mancheCourante) ecouterActions();
+      });
   }
 
   function afficherToast(message, duree = 1800){
