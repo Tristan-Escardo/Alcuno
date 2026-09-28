@@ -79,19 +79,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("enLigneRejoindre").style.display = "";
   });
 
-  document.getElementById("btnQuitterSalle").addEventListener("click", () => {
-    const code = codePartieActuel;
-    const pseudo = pseudoActuel;
-    const hote = estHote;
-
-    quitterPartieEnLigne();
-
-    // L'hôte ferme la partie, un invité se retire juste de la liste
-    if (code) {
-      const chemin = hote ? `parties/${code}` : `parties/${code}/joueurs/${pseudo}`;
-      window.fbRemove(window.fbRef(window.firebaseDB, chemin));
-    }
-  });
+  document.getElementById("btnQuitterSalle").addEventListener("click", quitterPartie);
 
   document.getElementById("validerCreation").addEventListener("click", () => {
     const pseudo = document.getElementById("pseudoCreateur").value.replace(/\s+/g, " ").trim();
@@ -108,7 +96,7 @@ document.addEventListener("DOMContentLoaded", function () {
         joueurs: {
           [pseudo]: { nom: pseudo, host: true, rejoint: Date.now() }
         },
-        etatJeu: { demarree: false }
+        etatJeu: { demarree: false, hote: pseudo }
       }).then(() => {
         codePartieActuel = code;
         pseudoActuel = pseudo;
@@ -176,7 +164,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .map(j => j.nom);
 
       if (liste.length < 2) { alert("Il faut au moins 2 joueurs."); return; }
-      lancerMancheEnLigne(liste);
+      lancerMancheEnLigne(liste, true);
     }).catch(erreurFirebase);
   });
 
@@ -205,13 +193,40 @@ document.addEventListener("DOMContentLoaded", function () {
     if (desabonnerJoueurs) desabonnerJoueurs();
     desabonnerJoueurs = window.fbOnValue(refJoueurs, (snapshot) => {
       const data = snapshot.val() || {};
+
+      // On n'est plus dans la liste : l'hôte nous a retiré
+      if (!data[pseudoActuel]) {
+        quitterPartieEnLigne();
+        alert("Tu as été retiré de la partie.");
+        return;
+      }
+
+      // Le rôle d'hôte peut changer (l'hôte précédent est parti)
+      estHote = !!data[pseudoActuel].host;
+
       const liste = document.getElementById("listeJoueursEnLigne");
       liste.innerHTML = "";
 
       const tries = Object.values(data).sort((a, b) => (a.rejoint || 0) - (b.rejoint || 0));
       tries.forEach((j) => {
         const div = document.createElement("div");
-        div.innerText = j.nom + (j.host ? " (hôte)" : "");
+        const nom = document.createElement("span");
+        nom.innerText = j.nom + (j.host ? " (hôte)" : "") + (j.nom === pseudoActuel ? " — toi" : "");
+        div.appendChild(nom);
+
+        // L'hôte peut retirer les autres joueurs
+        if (estHote && j.nom !== pseudoActuel) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "btnExclure";
+          btn.innerText = "✕";
+          btn.title = "Retirer " + j.nom;
+          btn.addEventListener("click", () => {
+            window.fbRemove(window.fbRef(db, `parties/${code}/joueurs/${j.nom}`)).catch(erreurFirebase);
+          });
+          div.appendChild(btn);
+        }
+
         liste.appendChild(div);
       });
 
@@ -225,37 +240,114 @@ document.addEventListener("DOMContentLoaded", function () {
     desabonnerEtat = window.fbOnValue(window.fbRef(window.firebaseDB, `parties/${code}/etatJeu`), (snapshot) => {
       const etat = snapshot.val();
 
-      // Partie supprimée par l'hôte
+      // Partie supprimée (plus aucun joueur)
       if (!etat) {
-        if (codePartieActuel === code && !estHote) {
+        if (codePartieActuel === code) {
           quitterPartieEnLigne();
-          alert("L'hôte a fermé la partie.");
+          alert("La partie a été fermée.");
         }
         return;
       }
 
       if (etat.demarree && etat.manche !== mancheCourante) {
         demarrerMancheEnLigne(etat);
+      } else if (!etat.demarree && enLigneActif) {
+        retourSalleEnLigne(etat);
       }
     });
   }
 
   // Écrit une nouvelle manche (transaction : si deux joueurs relancent en même temps, une seule passe)
-  function lancerMancheEnLigne(listeJoueurs){
+  // depuisSalle : lancement depuis la salle d'attente ; sinon « Rejouer » pendant une manche
+  function lancerMancheEnLigne(listeJoueurs, depuisSalle){
     const mancheAttendue = mancheCourante;
     const refEtat = window.fbRef(window.firebaseDB, `parties/${codePartieActuel}/etatJeu`);
 
     window.fbRunTransaction(refEtat, (etat) => {
-      const mancheActuelle = (etat && etat.manche) || null;
-      if (mancheActuelle !== mancheAttendue) return; // quelqu'un a déjà relancé => abandon
+      const e = etat || {};
+      const possible = depuisSalle ? !e.demarree : (e.demarree && e.manche === mancheAttendue);
+      if (!possible) return; // quelqu'un a déjà relancé => abandon
 
       return {
         demarree: true,
-        manche: (mancheActuelle || 0) + 1,
+        manche: (e.manche || 0) + 1,
         seed: Math.floor(Math.random() * 4294967296),
         joueurs: listeJoueurs,
-        hote: (etat && etat.hote) || pseudoActuel
+        hote: e.hote || pseudoActuel
       };
+    }).catch(erreurFirebase);
+  }
+
+  // « Modifier les joueurs » : tout le monde repasse en salle d'attente, même code
+  function renvoyerEnSalleEnLigne(){
+    const mancheAttendue = mancheCourante;
+    const refEtat = window.fbRef(window.firebaseDB, `parties/${codePartieActuel}/etatJeu`);
+
+    window.fbRunTransaction(refEtat, (etat) => {
+      const e = etat || {};
+      if (!e.demarree || e.manche !== mancheAttendue) return;
+      return { demarree: false, manche: e.manche, hote: e.hote || pseudoActuel };
+    }).catch(erreurFirebase);
+  }
+
+  function retourSalleEnLigne(etat){
+    enLigneActif = false;
+    if (desabonnerActions) { desabonnerActions(); desabonnerActions = null; }
+    reinitialiserFileActions();
+    reinitialiserEcransJeu();
+
+    ["enLigneChoix", "enLigneCreer", "enLigneRejoindre"].forEach((id) => {
+      document.getElementById(id).style.display = "none";
+    });
+    document.getElementById("salleAttente").style.display = "";
+    document.getElementById("enLigne").style.display = "";
+
+    if (etat.message) afficherToast(etat.message, 4000);
+  }
+
+  // Quitte la partie : retire le joueur, passe le rôle d'hôte au suivant si besoin,
+  // et renvoie les autres en salle d'attente si une manche était en cours
+  function quitterPartie(){
+    const code = codePartieActuel;
+    const pseudo = pseudoActuel;
+    quitterPartieEnLigne();
+    if (!code) return;
+
+    const db = window.firebaseDB;
+    window.fbGet(window.fbRef(db, `parties/${code}`)).then((snapshot) => {
+      const partie = snapshot.val();
+      if (!partie) return;
+
+      const restants = Object.values(partie.joueurs || {})
+        .filter(j => j.nom !== pseudo)
+        .sort((a, b) => (a.rejoint || 0) - (b.rejoint || 0));
+
+      if (restants.length === 0) {
+        return window.fbRemove(window.fbRef(db, `parties/${code}`));
+      }
+
+      const etat = partie.etatJeu || {};
+      const nouvelHote = partie.hote === pseudo ? restants[0].nom : partie.hote;
+
+      const maj = {
+        [`joueurs/${pseudo}`]: null,
+        [`joueurs/${nouvelHote}/host`]: true,
+        hote: nouvelHote
+      };
+
+      if (etat.demarree) {
+        // La manche ne peut pas continuer sans lui : retour en salle pour tout le monde
+        maj.etatJeu = {
+          demarree: false,
+          manche: etat.manche,
+          hote: nouvelHote,
+          message: `${pseudo} a quitté la partie`
+        };
+      } else {
+        maj["etatJeu/hote"] = nouvelHote;
+      }
+
+      return window.fbUpdate(window.fbRef(db, `parties/${code}`), maj);
     }).catch(erreurFirebase);
   }
 
@@ -271,7 +363,9 @@ document.addEventListener("DOMContentLoaded", function () {
     enLigneActif = false;
     mancheCourante = null;
     reinitialiserFileActions();
+    reinitialiserEcransJeu();
 
+    document.getElementById("enLigne").style.display = "";
     document.getElementById("salleAttente").style.display = "none";
     document.getElementById("lancerPartieEnLigne").style.display = "none";
     document.getElementById("enLigneChoix").style.display = "";
@@ -2564,15 +2658,66 @@ document.addEventListener("DOMContentLoaded", function () {
 
   btnJouer.addEventListener("pointerdown", lancerPartie);
 
-  btnNouvellePartie.addEventListener("pointerdown", () => {
-    if(!enLigneActif){
-      retourMenu();
+  /* ===== ÉCRAN « NOUVELLE PARTIE » (classique et en ligne) ===== */
+  const ecranNouvellePartie = document.getElementById("ecranNouvellePartie");
+
+  function fermerEcranNouvellePartie(){
+    ecranNouvellePartie.style.display = "none";
+  }
+
+  // "click" (et pas pointerdown) : évite que le relâchement du doigt active un bouton du nouvel écran
+  btnNouvellePartie.addEventListener("click", () => {
+    document.getElementById("infoNouvellePartie").innerText = enLigneActif
+      ? "Le choix s'applique à tous les joueurs de la partie."
+      : "";
+    ecranNouvellePartie.style.display = "";
+  });
+
+  document.getElementById("btnRetourNouvellePartie").addEventListener("click", fermerEcranNouvellePartie);
+
+  document.getElementById("btnRejouerMemes").addEventListener("click", () => {
+    fermerEcranNouvellePartie();
+    if(enLigneActif){
+      lancerMancheEnLigne(joueurs.slice(), false);
       return;
     }
-    if(confirm("Relancer une nouvelle partie pour tout le monde ?")){
-      lancerMancheEnLigne(joueurs.slice());
-    }
+    nettoyerOverlays();
+    retourMenu();
+    lancerPartie();
   });
+
+  document.getElementById("btnModifierJoueurs").addEventListener("click", () => {
+    fermerEcranNouvellePartie();
+    if(enLigneActif){
+      renvoyerEnSalleEnLigne();
+      return;
+    }
+    nettoyerOverlays();
+    retourMenu();
+  });
+
+  document.getElementById("btnAccueil").addEventListener("click", () => {
+    if(codePartieActuel) quitterPartie();
+    reinitialiserEcransJeu();
+    document.getElementById("enLigne").style.display = "none";
+    document.getElementById("choixMode").style.display = "";
+  });
+
+  // Remet l'interface de jeu à zéro et la masque (plateau, menu, overlays, liste de joueurs)
+  function reinitialiserEcransJeu(){
+    nettoyerOverlays();
+    retourMenu();
+    joueurs = [];
+    annulations = {};
+    aleatoire = Math.random;
+    afficherJoueurs();
+
+    document.body.classList.remove("mode-en-ligne");
+    fermerEcranNouvellePartie();
+    menu.style.display = "none";
+    messagesBar.style.display = "none";
+    document.getElementById("jeu").style.display = "none";
+  }
 
   // on force l'UI du menu (au cas où)
   suppression.style.display = "none";
@@ -2773,6 +2918,7 @@ document.addEventListener("DOMContentLoaded", function () {
     lancerPartie();
 
     document.body.classList.add("mode-en-ligne");
+    fermerEcranNouvellePartie();
     document.getElementById("enLigne").style.display = "none";
     messagesBar.style.display = "";
     document.getElementById("jeu").style.display = "";
@@ -2780,7 +2926,7 @@ document.addEventListener("DOMContentLoaded", function () {
     ecouterActions();
   }
 
-  function afficherToast(message){
+  function afficherToast(message, duree = 1800){
     let toast = document.getElementById("toastEnLigne");
     if(!toast){
       toast = document.createElement("div");
@@ -2790,7 +2936,7 @@ document.addEventListener("DOMContentLoaded", function () {
     toast.innerText = message;
     toast.classList.add("visible");
     clearTimeout(toast._timer);
-    toast._timer = setTimeout(() => toast.classList.remove("visible"), 1800);
+    toast._timer = setTimeout(() => toast.classList.remove("visible"), duree);
   }
 
   /* ===== INIT ===== */

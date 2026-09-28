@@ -1853,7 +1853,8 @@ header h1{
 
 /* ===== ÉCRANS DE CHOIX DU MODE DE JEU (classique / en ligne) ===== */
 #choixMode,
-#enLigne{
+#enLigne,
+#ecranNouvellePartie{
   position: fixed;
   inset: 0;
   z-index: 9999;
@@ -1872,11 +1873,13 @@ header h1{
 
 /* Fondu sur le contenu seulement : le fond reste opaque, le plateau ne transparaît pas */
 #choixMode > *,
-#enLigne > div{
+#enLigne > div,
+#ecranNouvellePartie > *{
   animation: fadeIn 0.25s ease forwards;
 }
 
 #choixMode h2,
+#ecranNouvellePartie h2,
 #enLigne h2,
 #enLigne h3{
   margin: 0;
@@ -1887,6 +1890,7 @@ header h1{
 }
 
 #choixMode button,
+#ecranNouvellePartie button,
 #enLigne button{
   background-color: #ffcc00;
   color: #ffffff;
@@ -1908,12 +1912,14 @@ header h1{
 }
 
 #choixMode button:hover,
+#ecranNouvellePartie button:hover,
 #enLigne button:hover{
   background-color: #ffea70;
   transform: scale(1.05);
 }
 
 #choixMode button:active,
+#ecranNouvellePartie button:active,
 #enLigne button:active{
   transform: scale(0.98);
 }
@@ -1965,6 +1971,8 @@ header h1{
 }
 
 #choixMode .btnRetour,
+#ecranNouvellePartie .btnRetour,
+#ecranNouvellePartie .btnAccueil,
 #enLigne .btnRetour{
   position: absolute;
   top: 20px;
@@ -1974,6 +1982,47 @@ header h1{
   padding: 10px 18px;
   font-size: 15px;
   z-index: 2;
+}
+
+#ecranNouvellePartie .btnAccueil{
+  left: auto;
+  right: 20px;
+}
+
+.btnAccueil:hover{
+  background-color: rgba(255,255,255,0.22) !important;
+}
+
+#ecranNouvellePartie .infoEcran{
+  margin: -8px 0 0;
+  max-width: min(420px, 86vw);
+  color: rgba(255,255,255,0.75);
+  font-weight: 700;
+}
+
+#ecranNouvellePartie .infoEcran:empty{
+  display: none;
+}
+
+/* Salle d'attente : nom à gauche, bouton ✕ (hôte uniquement) à droite */
+#listeJoueursEnLigne div{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+#enLigne .btnExclure{
+  width: auto;
+  padding: 4px 12px;
+  font-size: 16px;
+  border-radius: 8px;
+  background-color: rgba(255,255,255,0.12);
+  box-shadow: none;
+}
+
+#enLigne .btnExclure:hover{
+  background-color: rgba(255,80,80,0.55);
 }
 
 .btnRetour:hover{
