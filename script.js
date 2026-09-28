@@ -29,6 +29,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const PSEUDO_INVALIDE = /[.#$\[\]\/]/;
 
+  // Easter egg : couronne 👑 à côté du nom des créateurs du jeu
+  // (majuscules/minuscules ignorées : « TrIs », « ROSA »… comptent aussi)
+  const PSEUDOS_CREATEURS = [
+    "tris", "tristanus", "origamy",
+    "yla", "nana", "ylana",
+    "celien", "célien", "chouchou",
+    "ro", "rosa", "rosy", "roseanna"
+  ];
+
+  function estCreateur(nom){
+    return PSEUDOS_CREATEURS.includes(String(nom || "").trim().toLocaleLowerCase("fr-FR"));
+  }
+
+  function avecCouronne(nom){
+    return estCreateur(nom) ? `${nom} 👑` : nom;
+  }
+
   // À augmenter (+1) à chaque mise en ligne qui touche au mode en ligne : un téléphone qui a
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   const VERSION_JEU = 8.3;
@@ -271,7 +288,7 @@ document.addEventListener("DOMContentLoaded", function () {
       tries.forEach((j) => {
         const div = document.createElement("div");
         const nom = document.createElement("span");
-        nom.innerText = j.nom + (j.host ? " (hôte)" : "");
+        nom.innerText = avecCouronne(j.nom) + (j.host ? " (hôte)" : "");
         div.appendChild(nom);
 
         // Tout le monde peut retirer les autres joueurs (pour partir soi-même : « Retour »)
@@ -1018,7 +1035,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const n = Number(annulations[nom] || 0);
     const estPigeon = idx === indexPigeon;
 
-    nomEl.innerText = estPigeon ? `PIGEON (${nom})` : nom;
+    nomEl.innerText = estPigeon ? `PIGEON (${avecCouronne(nom)})` : avecCouronne(nom);
     bonusEl.innerText = n > 0 ? `+${n}` : "";
     if(enLigneActif && nom === pseudoActuel) labelEl.innerText = "À toi !";
 
@@ -1044,10 +1061,10 @@ document.addEventListener("DOMContentLoaded", function () {
       const bonus = n > 0 ? ` <span class="bonus-annulation">+${n}</span>` : "";
 
       if(i === indexPigeon){
-        return `<div class="joueur-ligne joueur-ligne-pigeon"><strong>PIGEON</strong> (${echapperHtml(nomPigeonOriginal)})${bonus}</div>`;
+        return `<div class="joueur-ligne joueur-ligne-pigeon"><strong>PIGEON</strong> (${echapperHtml(avecCouronne(nomPigeonOriginal))})${bonus}</div>`;
       }
 
-      return `<div class="joueur-ligne">${echapperHtml(j)}${bonus}</div>`;
+      return `<div class="joueur-ligne">${echapperHtml(avecCouronne(j))}${bonus}</div>`;
     }).join("");
 
     if(!partieLancee){
@@ -1070,7 +1087,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const idx = indexJoueur % joueurs.length;
     const nom = joueurs[idx];
     const n = Number(annulations[nom] || 0);
-    const libelle = idx === indexPigeon ? `PIGEON (${nom})` : nom;
+    const libelle = idx === indexPigeon ? `PIGEON (${avecCouronne(nom)})` : avecCouronne(nom);
     const bonus = n > 0 ? ` +${n}` : "";
     joueurActif.innerText = "Joueur actif : " + libelle + bonus;
 
