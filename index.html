@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <link rel="stylesheet" href="style_alcuno.css" />
+    <!-- Anti-cache : GitHub Pages fait garder les fichiers 10 min par les navigateurs.
+         Un paramètre différent à chaque chargement force toujours la dernière version. -->
+    <script>
+        window.ANTI_CACHE = Date.now();
+        document.write('<link rel="stylesheet" href="style_alcuno.css?t=' + window.ANTI_CACHE + '" />');
+    </script>
     <title>Alcuno</title>
 </head>
 <body>
@@ -135,6 +140,8 @@
         window.dispatchEvent(new Event("firebase-ready"));
     </script>
     
-    <script src="script.js"></script>
+    <script>
+        document.write('<script src="script.js?t=' + window.ANTI_CACHE + '"><\/script>');
+    </script>
 </body>
 </html>

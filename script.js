@@ -29,9 +29,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const PSEUDO_INVALIDE = /[.#$\[\]\/]/;
 
-  // À changer à chaque mise en ligne qui touche au mode en ligne : un téléphone qui a gardé
-  // l'ancienne version en cache ne pourra pas rejoindre (sinon les parties se désynchronisent)
-  const VERSION_JEU = "2026-09-28-5";
+  // À augmenter (+1) à chaque mise en ligne qui touche au mode en ligne : un téléphone qui a
+  // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
+  const VERSION_JEU = 6;
   document.getElementById("versionJeu").innerText = "version " + VERSION_JEU;
 
   function genererCodePartie(){
@@ -136,9 +136,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const partie = snapshot.val();
         if (partie.version !== VERSION_JEU) {
-          alert("Ta version du jeu n'est pas la même que celle de l'hôte.\n" +
-                "Rechargez la page sur les deux téléphones (ou ouvrez-la en navigation privée), " +
-                "puis recréez la partie.");
+          // Anciennes parties : version en texte => considérée comme plus ancienne
+          const versionPartie = typeof partie.version === "number" ? partie.version : 0;
+
+          if (versionPartie > VERSION_JEU) {
+            // C'est nous qui sommes en retard : rechargement sur une adresse neuve (contourne le cache)
+            alert("Ton jeu n'est pas à jour : la page va se recharger.\nEntre ensuite à nouveau le code.");
+            location.replace(location.pathname + "?v=" + versionPartie);
+          } else {
+            alert("Le téléphone qui a créé la partie a une ancienne version du jeu.\n" +
+                  "Il doit recharger la page (ou l'ouvrir en navigation privée), puis recréer la partie.");
+          }
           return;
         }
         if (partie.etatJeu && partie.etatJeu.demarree) {
