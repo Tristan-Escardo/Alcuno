@@ -1857,7 +1857,7 @@ header h1{
 #choixMode,
 #enLigne,
 #ecranNouvellePartie,
-.ecranConfirmation{
+#ecranConfirmerHote{
   position: fixed;
   inset: 0;
   z-index: 9999;
@@ -1878,13 +1878,13 @@ header h1{
 #choixMode > *,
 #enLigne > div,
 #ecranNouvellePartie > *,
-.ecranConfirmation > *{
+#ecranConfirmerHote > *{
   animation: fadeIn 0.25s ease forwards;
 }
 
 #choixMode h2,
 #ecranNouvellePartie h2,
-.ecranConfirmation h2,
+#ecranConfirmerHote h2,
 #enLigne h2,
 #enLigne h3{
   margin: 0;
@@ -1896,7 +1896,7 @@ header h1{
 
 #choixMode button,
 #ecranNouvellePartie button,
-.ecranConfirmation button,
+#ecranConfirmerHote button,
 #enLigne button{
   background-color: #ffcc00;
   color: #ffffff;
@@ -1919,7 +1919,7 @@ header h1{
 
 #choixMode button:hover,
 #ecranNouvellePartie button:hover,
-.ecranConfirmation button:hover,
+#ecranConfirmerHote button:hover,
 #enLigne button:hover{
   background-color: #ffea70;
   transform: scale(1.05);
@@ -1927,7 +1927,7 @@ header h1{
 
 #choixMode button:active,
 #ecranNouvellePartie button:active,
-.ecranConfirmation button:active,
+#ecranConfirmerHote button:active,
 #enLigne button:active{
   transform: scale(0.98);
 }
@@ -2001,8 +2001,8 @@ header h1{
   background-color: rgba(255,255,255,0.22) !important;
 }
 
-/* Écrans de confirmation (« Retirer l'hôte ? », « Reprendre la partie ? ») */
-.ecranConfirmation .texteConfirmation{
+/* Écran « Retirer l'hôte ? » */
+#ecranConfirmerHote .texteConfirmation{
   margin: 0;
   max-width: min(460px, 88vw);
   color: #ffffff;
@@ -2177,33 +2177,4 @@ body.mode-en-ligne #jouer{
 #toastEnLigne.visible{
   opacity: 1;
   transform: translate(-50%, 0);
-}
-
-/* ===== RECONNEXION EN PLEINE MANCHE : rattrapage accéléré ===== */
-/* Animations des overlays quasi instantanées (1 ms et pas 0 : "transitionend" doit quand même arriver) */
-body.rattrapage [id^="overlay"],
-body.rattrapage [id^="overlay"] *{
-  transition-duration: 1ms !important;
-  animation-duration: 1ms !important;
-}
-
-/* Écran qui cache les overlays qui défilent pendant le rattrapage */
-#ecranRattrapage{
-  position: fixed;
-  inset: 0;
-  z-index: 30000;
-  background: rgb(43, 0, 29);
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 24px;
-  box-sizing: border-box;
-
-  color: #FFD700;
-  font-size: clamp(22px, 5vw, 36px);
-  font-weight: 900;
-  text-align: center;
-  white-space: pre-line;
-  text-shadow: 2px 2px 5px #000;
 }
