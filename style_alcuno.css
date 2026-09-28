@@ -2091,7 +2091,7 @@ body.mode-en-ligne #jouer{
   display: none !important;
 }
 
-/* Boutons « Accueil » texte, même écriture que le titre ALCUNO (sans cadre) :
+/* Boutons « Accueil » : symbole ⌂ doré comme le titre ALCUNO (sans cadre) :
    - mode classique : coin droit du bandeau, avant de lancer la partie
    - mode en ligne : coin droit des écrans Créer / Rejoindre / salle d'attente */
 #btnAccueilClassique,
@@ -2107,9 +2107,9 @@ body.mode-en-ligne #jouer{
   box-shadow: none;
 
   font-family: Impact, Haettenschweiler, "Arial Black", sans-serif;
-  font-size: 17px;
+  font-size: 26px;
   font-weight: 400;
-  letter-spacing: 0.08em;
+  line-height: 1;
   text-transform: uppercase;
   color: #FFD700;
   text-shadow:
@@ -2145,7 +2145,7 @@ body.mode-en-ligne #jouer{
 @media (max-width: 520px){
   #btnAccueilClassique,
   #enLigne #btnAccueilEnLigne{
-    font-size: 14px;
+    font-size: 22px;
   }
 
   #btnAccueilClassique{
