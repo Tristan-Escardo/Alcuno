@@ -1,10 +1,9 @@
 document.addEventListener("DOMContentLoaded", function () {
   // ================== MODE DE JEU (classique / en ligne) ==================
-  let firebaseReady = false;
-  window.addEventListener("firebase-ready", () => { firebaseReady = true; });
-
+  // Le module Firebase s'exécute souvent AVANT ce code : l'événement "firebase-ready"
+  // est alors déjà passé, on se fie donc à la présence de window.firebaseDB
   function attendreFirebase(callback){
-    if (firebaseReady && window.firebaseDB) {
+    if (window.firebaseDB) {
       callback();
     } else {
       window.addEventListener("firebase-ready", () => callback(), { once: true });
@@ -38,6 +37,25 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     return code;
   }
+
+  function erreurFirebase(err){
+    console.error(err);
+    const refus = err && String(err.code || err.message || "").toLowerCase().includes("permission");
+    alert(refus
+      ? "Accès refusé par la base Firebase (règles de sécurité)."
+      : "Impossible de joindre le serveur. Vérifie ta connexion.");
+  }
+
+  // Entrée dans un champ = clic sur le bouton de validation
+  function validerAvecEntree(idsChamps, idBouton){
+    idsChamps.forEach((id) => {
+      document.getElementById(id).addEventListener("keydown", (e) => {
+        if (e.key === "Enter") document.getElementById(idBouton).click();
+      });
+    });
+  }
+  validerAvecEntree(["pseudoCreateur"], "validerCreation");
+  validerAvecEntree(["codeRejoindre", "pseudoRejoindre"], "validerRejoindre");
 
   document.getElementById("btnModeClassique").addEventListener("click", () => {
     document.getElementById("choixMode").style.display = "none";
@@ -102,7 +120,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         ecouterSalleAttente(code);
         ecouterEtatPartie(code);
-      });
+      }).catch(erreurFirebase);
     });
   });
 
@@ -144,8 +162,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
           ecouterSalleAttente(code);
           ecouterEtatPartie(code);
-        });
-      });
+        }).catch(erreurFirebase);
+      }).catch(erreurFirebase);
     });
   });
 
@@ -159,7 +177,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (liste.length < 2) { alert("Il faut au moins 2 joueurs."); return; }
       lancerMancheEnLigne(liste);
-    });
+    }).catch(erreurFirebase);
   });
 
   
@@ -238,7 +256,7 @@ document.addEventListener("DOMContentLoaded", function () {
         joueurs: listeJoueurs,
         hote: (etat && etat.hote) || pseudoActuel
       };
-    });
+    }).catch(erreurFirebase);
   }
 
   function quitterPartieEnLigne(){
