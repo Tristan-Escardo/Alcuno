@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // À augmenter (+1) à chaque mise en ligne qui touche au mode en ligne : un téléphone qui a
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
-  const VERSION_JEU = 8;
+  const VERSION_JEU = 8.2;
   document.getElementById("versionJeu").innerText = "version " + VERSION_JEU;
 
   function genererCodePartie(){
@@ -445,6 +445,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const btnSupprimer = document.getElementById("supprimerJoueur");
   const btnNouvellePartie = document.getElementById("nouvellePartie");
   const btnTermine = document.getElementById("termineSuppression");
+  const btnAccueilClassique = document.getElementById("btnAccueilClassique");
   const messageTexte = document.getElementById("messageTexte");
   let stickyJoueurActif = null;
 
@@ -1000,6 +1001,8 @@ document.addEventListener("DOMContentLoaded", function () {
       btnJouer.style.display = joueurs.length >= 2 ? "inline-block" : "none";
     }
     btnSupprimer.style.display = (!partieLancee && joueurs.length > 0) ? "inline-block" : "none";
+    // Avant la partie seulement : pendant la partie, l'accueil passe par « Nouvelle partie »
+    btnAccueilClassique.style.display = partieLancee ? "none" : "inline-block";
     majStickyJoueurActif();
   }
 
@@ -2596,6 +2599,7 @@ document.addEventListener("DOMContentLoaded", function () {
     btnNouvellePartie.style.display = "inline-block";
     btnSupprimer.style.display = "none";
     btnJouer.style.display = "none";
+    btnAccueilClassique.style.display = "none";
 
     regleZero.style.display = "none";
     effacerMessagePigeon();
@@ -2750,12 +2754,15 @@ document.addEventListener("DOMContentLoaded", function () {
     retourMenu();
   });
 
-  document.getElementById("btnAccueil").addEventListener("click", () => {
+  function allerAccueil(){
     if(codePartieActuel) quitterPartie();
     reinitialiserEcransJeu();
     document.getElementById("enLigne").style.display = "none";
     document.getElementById("choixMode").style.display = "";
-  });
+  }
+
+  document.getElementById("btnAccueil").addEventListener("click", allerAccueil);
+  btnAccueilClassique.addEventListener("click", allerAccueil);
 
   // Remet l'interface de jeu à zéro et la masque (plateau, menu, overlays, liste de joueurs)
   function reinitialiserEcransJeu(){

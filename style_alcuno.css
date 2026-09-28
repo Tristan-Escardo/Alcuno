@@ -2083,6 +2083,7 @@ header h1{
 }
 /* ===== MODE EN LIGNE ===== */
 /* Les joueurs viennent de la salle d'attente : pas de saisie, juste « Nouvelle partie » */
+body.mode-en-ligne #btnAccueilClassique,
 body.mode-en-ligne #nomJoueur,
 body.mode-en-ligne #ajouterJoueur,
 body.mode-en-ligne #supprimerJoueur,
