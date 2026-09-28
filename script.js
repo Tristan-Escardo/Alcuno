@@ -140,6 +140,7 @@ document.addEventListener("DOMContentLoaded", function () {
         codePartieActuel = code;
         pseudoActuel = pseudo;
         estHote = true;
+        memoriserPartieLocale(code, pseudo);
 
         document.getElementById("enLigneCreer").style.display = "none";
         document.getElementById("codePartieAffiche").innerText = "Code de la partie : " + code;
@@ -197,6 +198,7 @@ document.addEventListener("DOMContentLoaded", function () {
           codePartieActuel = code;
           pseudoActuel = pseudo;
           estHote = false;
+          memoriserPartieLocale(code, pseudo);
 
           document.getElementById("enLigneRejoindre").style.display = "none";
           document.getElementById("codePartieAffiche").innerText = "Code de la partie : " + code;
@@ -324,6 +326,82 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   document.getElementById("btnConfirmerHoteNon").addEventListener("click", fermerConfirmationHote);
+
+  // ===== Reconnexion : le téléphone retient la partie en ligne en cours =====
+  // (stockage local du navigateur, rien n'est envoyé ailleurs)
+  const CLE_PARTIE_LOCALE = "alcuno_partie_en_ligne";
+
+  function memoriserPartieLocale(code, pseudo){
+    try { localStorage.setItem(CLE_PARTIE_LOCALE, JSON.stringify({ code, pseudo })); } catch (e) {}
+  }
+
+  function oublierPartieLocale(){
+    try { localStorage.removeItem(CLE_PARTIE_LOCALE); } catch (e) {}
+  }
+
+  function lirePartieLocale(){
+    try { return JSON.parse(localStorage.getItem(CLE_PARTIE_LOCALE)); } catch (e) { return null; }
+  }
+
+  const ecranReprendre = document.getElementById("ecranReprendre");
+  let repriseEnAttente = null; // { code, pseudo }
+
+  // À l'ouverture de la page : si on était dans une partie qui existe encore, on propose de la reprendre
+  function proposerReprise(){
+    const sauvegarde = lirePartieLocale();
+    if (!sauvegarde || !sauvegarde.code || !sauvegarde.pseudo) return;
+
+    window.fbGet(window.fbRef(window.firebaseDB, `parties/${sauvegarde.code}`)).then((snapshot) => {
+      const partie = snapshot.val();
+      const toujoursDedans = partie && partie.joueurs && partie.joueurs[sauvegarde.pseudo];
+      if (!toujoursDedans || partie.version !== VERSION_JEU) {
+        oublierPartieLocale();
+        return;
+      }
+
+      // En pleine manche : reprise pas encore possible (il faudra rejouer les actions)
+      if (partie.etatJeu && partie.etatJeu.demarree) return;
+
+      repriseEnAttente = sauvegarde;
+      document.getElementById("texteReprendre").innerText =
+        `Tu étais dans la partie ${sauvegarde.code} sous le pseudo ${sauvegarde.pseudo}.`;
+      ecranReprendre.style.display = "";
+    }).catch(() => {});
+  }
+
+  document.getElementById("btnReprendreOui").addEventListener("click", () => {
+    const reprise = repriseEnAttente;
+    repriseEnAttente = null;
+    ecranReprendre.style.display = "none";
+    if (!reprise) return;
+
+    codePartieActuel = reprise.code;
+    pseudoActuel = reprise.pseudo;
+    estHote = false; // mis à jour par l'écoute de la liste des joueurs
+
+    document.getElementById("choixMode").style.display = "none";
+    ["enLigneChoix", "enLigneCreer", "enLigneRejoindre"].forEach((id) => {
+      document.getElementById(id).style.display = "none";
+    });
+    document.getElementById("codePartieAffiche").innerText = "Code de la partie : " + reprise.code;
+    document.getElementById("salleAttente").style.display = "";
+    document.getElementById("enLigne").style.display = "";
+
+    ecouterSalleAttente(reprise.code);
+    ecouterEtatPartie(reprise.code);
+    marquerActivite(reprise.code);
+  });
+
+  // « Non » : on quitte vraiment la partie, pour ne pas laisser un joueur fantôme dans la liste
+  document.getElementById("btnReprendreNon").addEventListener("click", () => {
+    const reprise = repriseEnAttente;
+    repriseEnAttente = null;
+    ecranReprendre.style.display = "none";
+    oublierPartieLocale();
+    if (reprise) retirerJoueur(reprise.code, reprise.pseudo).catch(() => {});
+  });
+
+  attendreFirebase(proposerReprise);
 
   function ecouterEtatPartie(code){
     if (desabonnerEtat) desabonnerEtat();
@@ -453,6 +531,9 @@ document.addEventListener("DOMContentLoaded", function () {
     if (desabonnerJoueurs) { desabonnerJoueurs(); desabonnerJoueurs = null; }
     if (desabonnerEtat) { desabonnerEtat(); desabonnerEtat = null; }
     if (desabonnerActions) { desabonnerActions(); desabonnerActions = null; }
+
+    // On a quitté / été retiré / la partie est fermée : plus rien à reprendre
+    oublierPartieLocale();
 
     codePartieActuel = null;
     pseudoActuel = null;

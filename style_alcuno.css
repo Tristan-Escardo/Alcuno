@@ -1857,7 +1857,7 @@ header h1{
 #choixMode,
 #enLigne,
 #ecranNouvellePartie,
-#ecranConfirmerHote{
+.ecranConfirmation{
   position: fixed;
   inset: 0;
   z-index: 9999;
@@ -1878,13 +1878,13 @@ header h1{
 #choixMode > *,
 #enLigne > div,
 #ecranNouvellePartie > *,
-#ecranConfirmerHote > *{
+.ecranConfirmation > *{
   animation: fadeIn 0.25s ease forwards;
 }
 
 #choixMode h2,
 #ecranNouvellePartie h2,
-#ecranConfirmerHote h2,
+.ecranConfirmation h2,
 #enLigne h2,
 #enLigne h3{
   margin: 0;
@@ -1896,7 +1896,7 @@ header h1{
 
 #choixMode button,
 #ecranNouvellePartie button,
-#ecranConfirmerHote button,
+.ecranConfirmation button,
 #enLigne button{
   background-color: #ffcc00;
   color: #ffffff;
@@ -1919,7 +1919,7 @@ header h1{
 
 #choixMode button:hover,
 #ecranNouvellePartie button:hover,
-#ecranConfirmerHote button:hover,
+.ecranConfirmation button:hover,
 #enLigne button:hover{
   background-color: #ffea70;
   transform: scale(1.05);
@@ -1927,7 +1927,7 @@ header h1{
 
 #choixMode button:active,
 #ecranNouvellePartie button:active,
-#ecranConfirmerHote button:active,
+.ecranConfirmation button:active,
 #enLigne button:active{
   transform: scale(0.98);
 }
@@ -2001,8 +2001,8 @@ header h1{
   background-color: rgba(255,255,255,0.22) !important;
 }
 
-/* Écran « Retirer l'hôte ? » */
-#ecranConfirmerHote .texteConfirmation{
+/* Écrans de confirmation (« Retirer l'hôte ? », « Reprendre la partie ? ») */
+.ecranConfirmation .texteConfirmation{
   margin: 0;
   max-width: min(460px, 88vw);
   color: #ffffff;
