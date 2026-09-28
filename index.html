@@ -12,7 +12,41 @@
     </header>
 
     <main>
-        <section class="menu" id="menu">
+        <section class="choixMode" id="choixMode">
+            <h2>Comment voulez-vous jouer ?</h2>
+            <button type="button" id="btnModeClassique">Mode classique</button>
+            <button type="button" id="btnModeEnLigne">Mode en ligne</button>
+        </section>
+
+        <section class="enLigne" id="enLigne" style="display:none;">
+            <div id="enLigneChoix">
+                <button type="button" id="btnRetourChoixMode" class="btnRetour">← Retour</button>
+                <button type="button" id="btnCreerPartie">Créer une partie</button>
+                <button type="button" id="btnRejoindrePartie">Rejoindre une partie</button>
+            </div>
+
+            <div id="enLigneCreer" style="display:none;">
+                <button type="button" id="btnRetourCreer" class="btnRetour">← Retour</button>
+                <input type="text" id="pseudoCreateur" placeholder="Ton pseudo" />
+                <button type="button" id="validerCreation">Créer</button>
+            </div>
+
+            <div id="enLigneRejoindre" style="display:none;">
+                <button type="button" id="btnRetourRejoindre" class="btnRetour">← Retour</button>
+                <input type="text" id="codeRejoindre" placeholder="Code de la partie" />
+                <input type="text" id="pseudoRejoindre" placeholder="Ton pseudo" />
+                <button type="button" id="validerRejoindre">Rejoindre</button>
+            </div>
+
+            <div id="salleAttente" style="display:none;">
+                <button type="button" id="btnQuitterSalle" class="btnRetour">← Retour</button>
+                <h3 id="codePartieAffiche"></h3>
+                <div id="listeJoueursEnLigne"></div>
+                <button type="button" id="lancerPartieEnLigne" style="display:none;">Lancer la partie</button>
+            </div>
+        </section>
+
+        <section class="menu" id="menu" style="display:none;">
             <input type="text" id="nomJoueur" placeholder="Entrez un nom de joueur" />
             <button type="button" id="ajouterJoueur">Ajouter un joueur</button>
             <button type="button" id="jouer" style="display:none;">Jouer</button>
@@ -27,7 +61,7 @@
         </section>
 
         <!-- Barre d’infos (entre menu et plateau) -->
-        <div class="messages" id="messages">
+        <div class="messages" id="messages" style="display:none;">
             <div class="blocMessages blocActif">
                 <div class="titreBloc">Joueur actif</div>
                 <div class="joueurActif" id="joueurActif"></div>
@@ -51,11 +85,46 @@
             </div>
         </div>
 
-        <div class="jeu">
+        <div class="jeu" id="jeu" style="display:none;">
             <div class="plateau" id="plateau"></div>
         </div>
     </main>
 
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+        import {
+            getDatabase, ref, set, get, update, onValue, onChildAdded, push, remove, onDisconnect, runTransaction
+        } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyApZL1dCQLGdrZFjsGJC0y4DxLUzorum4M",
+            authDomain: "alcuno.firebaseapp.com",
+            databaseURL: "https://alcuno-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "alcuno",
+            storageBucket: "alcuno.firebasestorage.app",
+            messagingSenderId: "481896309098",
+            appId: "1:481896309098:web:c84fe2d2ded1df80810513"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // On rend tout accessible depuis script.js
+        window.firebaseDB = db;
+        window.fbRef = ref;
+        window.fbSet = set;
+        window.fbGet = get;
+        window.fbUpdate = update;
+        window.fbOnValue = onValue;
+        window.fbPush = push;
+        window.fbRemove = remove;
+        window.fbOnDisconnect = onDisconnect;
+        window.fbOnChildAdded = onChildAdded;
+        window.fbRunTransaction = runTransaction;
+
+        window.dispatchEvent(new Event("firebase-ready"));
+    </script>
+    
     <script src="script.js"></script>
 </body>
 </html>

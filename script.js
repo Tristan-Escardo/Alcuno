@@ -1,4 +1,264 @@
 document.addEventListener("DOMContentLoaded", function () {
+  // ================== MODE DE JEU (classique / en ligne) ==================
+  let firebaseReady = false;
+  window.addEventListener("firebase-ready", () => { firebaseReady = true; });
+
+  function attendreFirebase(callback){
+    if (firebaseReady && window.firebaseDB) {
+      callback();
+    } else {
+      window.addEventListener("firebase-ready", () => callback(), { once: true });
+    }
+  }
+
+  let codePartieActuel = null;
+  let pseudoActuel = null;
+  let estHote = false;
+  let hotePartie = null;
+
+  // Synchro en ligne : chaque tap de jeu est une action numérotée dans Firebase,
+  // rejouée dans le même ordre sur tous les téléphones (y compris l'émetteur).
+  let enLigneActif = false;
+  let mancheCourante = null;
+  let desabonnerJoueurs = null;
+  let desabonnerEtat = null;
+  let desabonnerActions = null;
+  let fileActions = new Map(); // seq -> { id, par }
+  let prochainSeq = 1;
+  let traitementEnCours = false;
+  let timerTrou = null;
+
+  const PSEUDO_INVALIDE = /[.#$\[\]\/]/;
+
+  function genererCodePartie(){
+    const caracteres = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let code = "";
+    for (let i = 0; i < 5; i++){
+      code += caracteres[Math.floor(Math.random() * caracteres.length)];
+    }
+    return code;
+  }
+
+  document.getElementById("btnModeClassique").addEventListener("click", () => {
+    document.getElementById("choixMode").style.display = "none";
+    document.getElementById("menu").style.display = "";
+    document.getElementById("messages").style.display = "";
+    document.getElementById("jeu").style.display = "";
+  });
+
+  document.getElementById("btnModeEnLigne").addEventListener("click", () => {
+    document.getElementById("choixMode").style.display = "none";
+    document.getElementById("enLigne").style.display = "";
+  });
+
+  document.getElementById("btnCreerPartie").addEventListener("click", () => {
+    document.getElementById("enLigneChoix").style.display = "none";
+    document.getElementById("enLigneCreer").style.display = "";
+  });
+
+  document.getElementById("btnRejoindrePartie").addEventListener("click", () => {
+    document.getElementById("enLigneChoix").style.display = "none";
+    document.getElementById("enLigneRejoindre").style.display = "";
+  });
+
+  document.getElementById("btnQuitterSalle").addEventListener("click", () => {
+    const code = codePartieActuel;
+    const pseudo = pseudoActuel;
+    const hote = estHote;
+
+    quitterPartieEnLigne();
+
+    // L'hôte ferme la partie, un invité se retire juste de la liste
+    if (code) {
+      const chemin = hote ? `parties/${code}` : `parties/${code}/joueurs/${pseudo}`;
+      window.fbRemove(window.fbRef(window.firebaseDB, chemin));
+    }
+  });
+
+  document.getElementById("validerCreation").addEventListener("click", () => {
+    const pseudo = document.getElementById("pseudoCreateur").value.replace(/\s+/g, " ").trim();
+    if (!pseudo) { alert("Entre un pseudo."); return; }
+    if (PSEUDO_INVALIDE.test(pseudo)) { alert("Pseudo invalide (pas de . # $ [ ] /)."); return; }
+
+    attendreFirebase(() => {
+      const code = genererCodePartie();
+      const db = window.firebaseDB;
+      const refPartie = window.fbRef(db, `parties/${code}`);
+
+      window.fbSet(refPartie, {
+        hote: pseudo,
+        joueurs: {
+          [pseudo]: { nom: pseudo, host: true, rejoint: Date.now() }
+        },
+        etatJeu: { demarree: false }
+      }).then(() => {
+        codePartieActuel = code;
+        pseudoActuel = pseudo;
+        estHote = true;
+
+        document.getElementById("enLigneCreer").style.display = "none";
+        document.getElementById("codePartieAffiche").innerText = "Code de la partie : " + code;
+        document.getElementById("salleAttente").style.display = "";
+
+        ecouterSalleAttente(code);
+        ecouterEtatPartie(code);
+      });
+    });
+  });
+
+  document.getElementById("validerRejoindre").addEventListener("click", () => {
+    const code = document.getElementById("codeRejoindre").value.trim().toUpperCase();
+    const pseudo = document.getElementById("pseudoRejoindre").value.replace(/\s+/g, " ").trim();
+    if (!code || !pseudo) { alert("Entre le code et ton pseudo."); return; }
+    if (PSEUDO_INVALIDE.test(pseudo)) { alert("Pseudo invalide (pas de . # $ [ ] /)."); return; }
+
+    attendreFirebase(() => {
+      const db = window.firebaseDB;
+      const refPartie = window.fbRef(db, `parties/${code}`);
+
+      window.fbGet(refPartie).then((snapshot) => {
+        if (!snapshot.exists()) {
+          alert("Aucune partie trouvée avec ce code.");
+          return;
+        }
+
+        const partie = snapshot.val();
+        if (partie.etatJeu && partie.etatJeu.demarree) {
+          alert("La partie a déjà commencé.");
+          return;
+        }
+        if (partie.joueurs && partie.joueurs[pseudo]) {
+          alert("Ce pseudo est déjà pris dans cette partie.");
+          return;
+        }
+
+        const refJoueur = window.fbRef(db, `parties/${code}/joueurs/${pseudo}`);
+        window.fbSet(refJoueur, { nom: pseudo, host: false, rejoint: Date.now() }).then(() => {
+          codePartieActuel = code;
+          pseudoActuel = pseudo;
+          estHote = false;
+
+          document.getElementById("enLigneRejoindre").style.display = "none";
+          document.getElementById("codePartieAffiche").innerText = "Code de la partie : " + code;
+          document.getElementById("salleAttente").style.display = "";
+
+          ecouterSalleAttente(code);
+          ecouterEtatPartie(code);
+        });
+      });
+    });
+  });
+
+  document.getElementById("lancerPartieEnLigne").addEventListener("click", () => {
+    if (!estHote || !codePartieActuel) return;
+
+    window.fbGet(window.fbRef(window.firebaseDB, `parties/${codePartieActuel}/joueurs`)).then((snapshot) => {
+      const liste = Object.values(snapshot.val() || {})
+        .sort((a, b) => (a.rejoint || 0) - (b.rejoint || 0))
+        .map(j => j.nom);
+
+      if (liste.length < 2) { alert("Il faut au moins 2 joueurs."); return; }
+      lancerMancheEnLigne(liste);
+    });
+  });
+
+  
+  // ===== BOUTONS RETOUR =====
+  document.getElementById("btnRetourChoixMode").addEventListener("click", () => {
+    document.getElementById("enLigne").style.display = "none";
+    document.getElementById("choixMode").style.display = "";
+  });
+
+  document.getElementById("btnRetourCreer").addEventListener("click", () => {
+    document.getElementById("enLigneCreer").style.display = "none";
+    document.getElementById("enLigneChoix").style.display = "";
+  });
+
+  document.getElementById("btnRetourRejoindre").addEventListener("click", () => {
+    document.getElementById("enLigneRejoindre").style.display = "none";
+    document.getElementById("enLigneChoix").style.display = "";
+  });
+
+
+  function ecouterSalleAttente(code){
+    const db = window.firebaseDB;
+    const refJoueurs = window.fbRef(db, `parties/${code}/joueurs`);
+
+    if (desabonnerJoueurs) desabonnerJoueurs();
+    desabonnerJoueurs = window.fbOnValue(refJoueurs, (snapshot) => {
+      const data = snapshot.val() || {};
+      const liste = document.getElementById("listeJoueursEnLigne");
+      liste.innerHTML = "";
+
+      const tries = Object.values(data).sort((a, b) => (a.rejoint || 0) - (b.rejoint || 0));
+      tries.forEach((j) => {
+        const div = document.createElement("div");
+        div.innerText = j.nom + (j.host ? " (hôte)" : "");
+        liste.appendChild(div);
+      });
+
+      document.getElementById("lancerPartieEnLigne").style.display =
+        (estHote && tries.length >= 2) ? "" : "none";
+    });
+  }
+
+  function ecouterEtatPartie(code){
+    if (desabonnerEtat) desabonnerEtat();
+    desabonnerEtat = window.fbOnValue(window.fbRef(window.firebaseDB, `parties/${code}/etatJeu`), (snapshot) => {
+      const etat = snapshot.val();
+
+      // Partie supprimée par l'hôte
+      if (!etat) {
+        if (codePartieActuel === code && !estHote) {
+          quitterPartieEnLigne();
+          alert("L'hôte a fermé la partie.");
+        }
+        return;
+      }
+
+      if (etat.demarree && etat.manche !== mancheCourante) {
+        demarrerMancheEnLigne(etat);
+      }
+    });
+  }
+
+  // Écrit une nouvelle manche (transaction : si deux joueurs relancent en même temps, une seule passe)
+  function lancerMancheEnLigne(listeJoueurs){
+    const mancheAttendue = mancheCourante;
+    const refEtat = window.fbRef(window.firebaseDB, `parties/${codePartieActuel}/etatJeu`);
+
+    window.fbRunTransaction(refEtat, (etat) => {
+      const mancheActuelle = (etat && etat.manche) || null;
+      if (mancheActuelle !== mancheAttendue) return; // quelqu'un a déjà relancé => abandon
+
+      return {
+        demarree: true,
+        manche: (mancheActuelle || 0) + 1,
+        seed: Math.floor(Math.random() * 4294967296),
+        joueurs: listeJoueurs,
+        hote: (etat && etat.hote) || pseudoActuel
+      };
+    });
+  }
+
+  function quitterPartieEnLigne(){
+    if (desabonnerJoueurs) { desabonnerJoueurs(); desabonnerJoueurs = null; }
+    if (desabonnerEtat) { desabonnerEtat(); desabonnerEtat = null; }
+    if (desabonnerActions) { desabonnerActions(); desabonnerActions = null; }
+
+    codePartieActuel = null;
+    pseudoActuel = null;
+    estHote = false;
+    hotePartie = null;
+    enLigneActif = false;
+    mancheCourante = null;
+    reinitialiserFileActions();
+
+    document.getElementById("salleAttente").style.display = "none";
+    document.getElementById("lancerPartieEnLigne").style.display = "none";
+    document.getElementById("enLigneChoix").style.display = "";
+  }
+
   const plateau = document.getElementById("plateau");
   const joueurActif = document.getElementById("joueurActif");
   const listeJoueurs = document.getElementById("listeJoueurs");
@@ -102,6 +362,11 @@ document.addEventListener("DOMContentLoaded", function () {
   // ===== Règle de fin: pari sur la dernière carte =====
   let predictionEnCours = false;
   let predictions = null; // Array<{ joueurIndex:number, typeId:string|null }>
+
+  // Hasard utilisé pour mélanger : Math.random en classique, générateur à graine commune en ligne
+  let aleatoire = Math.random;
+  // Incrémenté à chaque relance : les callbacks d'overlays de l'ancienne partie sont ignorés
+  let generationPartie = 0;
 
   let dernierTap = 0;
   let dernierTouchCount = 0;
@@ -339,7 +604,10 @@ document.addEventListener("DOMContentLoaded", function () {
       const preview = creerCartePreview(t.rep);
       cardWrap.appendChild(preview);
 
-      cardWrap.addEventListener("pointerdown", () => {
+      surAction(cardWrap, "pred:" + t.id, {
+        owner: () => curPos < ordre.length ? joueurs[ordre[curPos]] : null,
+        pret: () => !cardWrap.classList.contains("disabled")
+      }, () => {
         if(cardWrap.classList.contains("disabled")) return;
         const typeId = cardWrap.dataset.typeId;
         const cur = ordre[curPos];
@@ -414,7 +682,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const btn = document.createElement('button');
         btn.className = 'bouton-pigeon';
         btn.innerText = 'Terminer';
-        btn.addEventListener('pointerdown', () => {
+        surAction(btn, "pred:terminer", { owner: () => hotePartie, once: true }, () => {
           if(overlay._cleanup) overlay._cleanup();
           overlay.remove();
           unlockScroll();
@@ -465,7 +733,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function melangerPaquet(array){
     for(let i=array.length-1;i>0;i--){
-      const j=Math.floor(Math.random()*(i+1));
+      const j=Math.floor(aleatoire()*(i+1));
       [array[i],array[j]]=[array[j],array[i]];
     }
   }
@@ -521,8 +789,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     repositionnerStickyJoueurActif();
 
+    const labelEl = stickyJoueurActif.querySelector(".sticky-label");
     const nomEl = stickyJoueurActif.querySelector(".sticky-nom");
     const bonusEl = stickyJoueurActif.querySelector(".sticky-bonus");
+    labelEl.innerText = "Tour de";
 
     if(!partieLancee || joueurs.length === 0 || choixPigeonEnCours || duelEnCours){
       stickyJoueurActif.classList.remove("visible", "is-pigeon", "has-bonus");
@@ -538,6 +808,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     nomEl.innerText = estPigeon ? `PIGEON (${nom})` : nom;
     bonusEl.innerText = n > 0 ? `+${n}` : "";
+    if(enLigneActif && nom === pseudoActuel) labelEl.innerText = "À toi !";
 
     stickyJoueurActif.classList.toggle("is-pigeon", estPigeon);
     stickyJoueurActif.classList.toggle("has-bonus", n > 0);
@@ -719,7 +990,7 @@ document.addEventListener("DOMContentLoaded", function () {
     btnTerminer.className = "bouton-pigeon";
     btnTerminer.innerText = "Terminer";
 
-    btnTerminer.addEventListener("pointerdown", () => {
+    surAction(btnTerminer, "fin:terminer", { owner: () => hotePartie, once: true }, () => {
       // ils boivent leurs "1 restants" => on remet les compteurs à 0
       restants.forEach(x => { annulations[x.nom] = 0; });
       afficherJoueurs();
@@ -745,12 +1016,15 @@ document.addEventListener("DOMContentLoaded", function () {
     titre.innerText="Choisis le nouveau PIGEON";
     overlay.appendChild(titre);
 
+    // C'est le pigeon actuel (celui qui vient de tirer le 3) qui choisit
+    const choisisseur = joueurs[indexPigeon];
+
     joueurs.forEach((j,i)=>{
       if(i!==indexPigeon){
         const btn=document.createElement("button");
         btn.className="bouton-pigeon";
         btn.innerText=j;
-        btn.addEventListener("pointerdown",()=>{
+        surAction(btn, "pigeon:" + i, { owner: choisisseur, once: true }, ()=>{
         indexPigeon = i;
         nomPigeonOriginal = joueurs[i];
         // 1) on ferme l'overlay de choix
@@ -851,11 +1125,12 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
+    const generation = generationPartie;
     const obs = new MutationObserver(() => {
       const stillThere = document.getElementById("overlayRegleUnique");
       if(!stillThere){
         obs.disconnect();
-        callback();
+        if(generation === generationPartie) callback();
       }
     });
 
@@ -1132,7 +1407,9 @@ document.addEventListener("DOMContentLoaded", function () {
       btn.style.cursor = "pointer";
       btn.style.boxShadow = "0 10px 24px rgba(0,0,0,0.28)";
 
-      btn.addEventListener("pointerdown", () => {
+      surAction(btn, `annul:${nom}:${i}`, { owner: nom, once: true }, () => {
+        // Overlay en train de se fermer : ses autres boutons ne doivent plus recevoir d'action
+        overlay.dataset.netFerme = "1";
         const utilise = i;
         const reste = nbGorgees - utilise;
         const messageResultat = utilise > 0
@@ -1430,8 +1707,9 @@ document.addEventListener("DOMContentLoaded", function () {
     "interdit": "SOCIAAALE ! \nTout le monde boit 1 gorgée"
   };
 
-  function afficherOverlayCouleur(){
+  function afficherOverlayCouleur(joueurActuel){
     if(document.getElementById("overlayCouleur")) return;
+    const choisisseur = joueurs[joueurActuel];
     choixPigeonEnCours = true;
     lockScroll();
 
@@ -1456,7 +1734,7 @@ document.addEventListener("DOMContentLoaded", function () {
     couleurs.forEach(c=>{
       const carre = document.createElement("div");
       carre.className = "carre-couleur " + c.classe;
-      carre.addEventListener("pointerdown", ()=>{
+      surAction(carre, "couleur:" + c.nom, { owner: choisisseur, once: true }, ()=>{
         couleurChoisie = c.nom;
         const mapCouleurs = {
           rouge: "#e53935",
@@ -1480,8 +1758,9 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   /* ===== DUEL : Choix joueurs puis tirage ===== */
-  function lancerOverlayChoixDuel(){
+  function lancerOverlayChoixDuel(joueurActuel){
     if(document.getElementById("overlayDuel")) return;
+    const choisisseur = joueurs[joueurActuel];
     duelEnCours = true;
     choixPigeonEnCours = true;
     lockScroll();
@@ -1510,7 +1789,7 @@ document.addEventListener("DOMContentLoaded", function () {
       btn.className = "bouton-pigeon";
       btn.innerText = nom;
 
-      btn.addEventListener("pointerdown", ()=>{
+      surAction(btn, "duel:choix:" + idx, { owner: choisisseur, once: true }, ()=>{
         if(picks.length >= 2) return;
         if(picks.includes(idx)) return;
 
@@ -1720,8 +1999,10 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    c1.addEventListener("pointerdown", () => onChoose(1));
-    c2.addEventListener("pointerdown", () => onChoose(2));
+    // J1 choisit sa carte, puis J2 prend la restante
+    const choisisseurDuel = () => phase === 1 ? joueurs[j1] : joueurs[j2];
+    surAction(c1, "duel:carte:1", { owner: choisisseurDuel }, () => onChoose(1));
+    surAction(c2, "duel:carte:2", { owner: choisisseurDuel }, () => onChoose(2));
 
     preparerDuel();
   }
@@ -1731,6 +2012,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     choixPigeonEnCours = true;
     lockScroll();
+    const choisisseur = joueurs[joueurActuel];
 
     const overlay = document.createElement("div");
     overlay.id = "overlayPlus4";
@@ -1809,7 +2091,7 @@ document.addEventListener("DOMContentLoaded", function () {
       btn.dataset.idx = String(idx);
       btn.innerText = nom;
 
-      btn.addEventListener("pointerdown", ()=>{
+      surAction(btn, "plus4:joueur:" + idx, { owner: choisisseur }, ()=>{
         const total = totalDistribue();
         if(total >= 4) return;
 
@@ -1824,7 +2106,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const btnUndo = document.createElement("button");
     btnUndo.className = "bouton-pigeon plus4-action-btn";
     btnUndo.innerText = "Annuler la dernière";
-    btnUndo.addEventListener("pointerdown", ()=>{
+    surAction(btnUndo, "plus4:annuler", { owner: choisisseur }, ()=>{
       if(historique.length === 0) return;
       const idx = historique.pop();
       if(dist[idx] > 0) dist[idx] -= 1;
@@ -1835,7 +2117,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const btnReset = document.createElement("button");
     btnReset.className = "bouton-pigeon plus4-action-btn";
     btnReset.innerText = "Reset";
-    btnReset.addEventListener("pointerdown", ()=>{
+    surAction(btnReset, "plus4:reset", { owner: choisisseur }, ()=>{
       Object.keys(dist).forEach(k => dist[k] = 0);
       historique = [];
       refreshUI();
@@ -1845,7 +2127,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const btnValider = document.createElement("button");
     btnValider.className = "bouton-pigeon plus4-action-btn";
     btnValider.innerText = "Valider";
-    btnValider.addEventListener("pointerdown", ()=>{
+    surAction(btnValider, "plus4:valider", { owner: choisisseur, once: true }, ()=>{
       if(totalDistribue() !== 4) return;
 
       overlay.remove();
@@ -2081,12 +2363,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Cartes "couleur"
     if(carteTiree.startsWith("couleur")){
-      afficherOverlayCouleur();
+      afficherOverlayCouleur(joueurActuel);
     }
 
     // Cartes "quatre" => duel
     if(carteTiree.startsWith("quatre")){
-      lancerOverlayChoixDuel();
+      lancerOverlayChoixDuel(joueurActuel);
     }
 
     // - ne s'applique PAS à plus_2 / plus_4 / couleur
@@ -2154,7 +2436,12 @@ document.addEventListener("DOMContentLoaded", function () {
       const carte = document.createElement("div");
       carte.classList.add("Carte");
 
-      carte.addEventListener("click", ()=>{
+      surAction(carte, "carte:" + i, {
+        evenement: "click",
+        owner: () => joueurs[indexJoueur % joueurs.length],
+        pret: () => !choixPigeonEnCours && !duelEnCours && !predictionEnCours,
+        valide: () => !carte.classList.contains("retournee")
+      }, ()=>{
         // Plateau bloqué pendant overlays pigeon/couleur/duel
         if(choixPigeonEnCours || duelEnCours) return;
         if(carte.classList.contains("retournee")) return;
@@ -2259,12 +2546,234 @@ document.addEventListener("DOMContentLoaded", function () {
 
   btnJouer.addEventListener("pointerdown", lancerPartie);
 
-  btnNouvellePartie.addEventListener("pointerdown", retourMenu);
+  btnNouvellePartie.addEventListener("pointerdown", () => {
+    if(!enLigneActif){
+      retourMenu();
+      return;
+    }
+    if(confirm("Relancer une nouvelle partie pour tout le monde ?")){
+      lancerMancheEnLigne(joueurs.slice());
+    }
+  });
 
   // on force l'UI du menu (au cas où)
   suppression.style.display = "none";
-  menu.style.display = "flex";
+
   btnSupprimer.style.display = "inline-block";
+
+  /* ===== MODE EN LIGNE : synchronisation des actions ===== */
+  // Un élément « de jeu » (carte, bouton d'overlay…) est déclaré via surAction :
+  // - en classique, le tap exécute directement le handler ;
+  // - en ligne, le tap est envoyé à Firebase, et chaque téléphone exécute le handler
+  //   quand l'action lui revient, dans l'ordre des numéros (seq).
+  // options : owner (nom ou fonction -> nom autorisé, null = tout le monde),
+  //           pret() (l'élément peut recevoir l'action maintenant),
+  //           valide() (false => action sans objet, ignorée),
+  //           once (un seul usage), evenement ("pointerdown" par défaut)
+  function surAction(el, id, options, handler){
+    el.dataset.netId = id;
+    el._net = Object.assign({ owner: null, pret: null, valide: null, once: false }, options, { handler });
+
+    el.addEventListener(options.evenement || "pointerdown", (e) => {
+      if(!enLigneActif){
+        handler(e);
+        return;
+      }
+      envoyerAction(el);
+    });
+  }
+
+  function actionPrete(el){
+    if(!el._net || !el.isConnected) return false;
+    if(el.disabled || el.dataset.netUtilise) return false;
+    if(el.closest("[data-net-ferme]")) return false;
+    if(getComputedStyle(el).pointerEvents === "none") return false;
+    return el._net.pret ? el._net.pret() : true;
+  }
+
+  function proprietaireAction(el){
+    const owner = el._net.owner;
+    return typeof owner === "function" ? owner() : owner;
+  }
+
+  function envoyerAction(el){
+    const net = el._net;
+    if(net.valide && !net.valide()) return;
+    if(!actionPrete(el)) return;
+
+    const owner = proprietaireAction(el);
+    if(owner && owner !== pseudoActuel){
+      afficherToast(`En attente de ${owner}`);
+      return;
+    }
+
+    if(net.once){
+      if(el.dataset.netEnvoye) return;
+      el.dataset.netEnvoye = "1";
+    }
+
+    const db = window.firebaseDB;
+    const base = `parties/${codePartieActuel}/manches/${mancheCourante}`;
+
+    window.fbRunTransaction(window.fbRef(db, `${base}/seq`), n => (n || 0) + 1)
+      .then((res) => {
+        const seq = res.snapshot.val();
+        return window.fbSet(window.fbRef(db, `${base}/actions/${seq}`), {
+          id: el.dataset.netId,
+          par: pseudoActuel
+        });
+      })
+      .catch(() => {
+        delete el.dataset.netEnvoye;
+        afficherToast("Connexion perdue, réessaie");
+      });
+  }
+
+  // "ok" | "attendre" (élément pas encore là / pas prêt) | "ignorer" (action devenue sans objet)
+  function tenterAction(action){
+    const candidats = Array.from(document.querySelectorAll("[data-net-id]"))
+      .filter(el => el.dataset.netId === action.id);
+
+    const el = candidats.find(actionPrete);
+    if(!el){
+      if(candidats.some(c => c._net && c._net.valide && !c._net.valide())) return "ignorer";
+      return "attendre";
+    }
+
+    if(el._net.valide && !el._net.valide()) return "ignorer";
+
+    // Vérifié au moment du rejeu (état identique partout) : bloque par ex. un double tap
+    // qui aurait envoyé une 2e carte alors que ce n'était déjà plus son tour
+    const owner = proprietaireAction(el);
+    if(owner && owner !== action.par) return "ignorer";
+
+    if(el._net.once) el.dataset.netUtilise = "1";
+    el._net.handler();
+    return "ok";
+  }
+
+  function traiterFile(){
+    if(traitementEnCours || !enLigneActif) return;
+
+    const action = fileActions.get(prochainSeq);
+    if(!action){
+      // Trou dans la numérotation (envoi interrompu) : on le saute au bout de 5 s
+      const plusLoin = Array.from(fileActions.keys()).some(k => k > prochainSeq);
+      if(plusLoin && !timerTrou){
+        const attendu = prochainSeq;
+        timerTrou = setTimeout(() => {
+          timerTrou = null;
+          if(prochainSeq === attendu && !fileActions.has(attendu)){
+            prochainSeq++;
+            traiterFile();
+          }
+        }, 5000);
+      }
+      return;
+    }
+
+    traitementEnCours = true;
+    const manche = mancheCourante;
+    let attente = 0;
+
+    const essayer = () => {
+      if(manche !== mancheCourante) return;
+
+      const resultat = tenterAction(action);
+      // On attend que l'overlay concerné soit affiché chez nous (max 30 s d'écran allumé)
+      if(resultat === "attendre" && attente < 30000){
+        if(document.visibilityState === "visible") attente += 120;
+        setTimeout(essayer, 120);
+        return;
+      }
+
+      fileActions.delete(prochainSeq);
+      prochainSeq++;
+      traitementEnCours = false;
+      traiterFile();
+    };
+
+    essayer();
+  }
+
+  function reinitialiserFileActions(){
+    fileActions = new Map();
+    prochainSeq = 1;
+    traitementEnCours = false;
+    if(timerTrou){ clearTimeout(timerTrou); timerTrou = null; }
+  }
+
+  function ecouterActions(){
+    if(desabonnerActions) desabonnerActions();
+    const refActions = window.fbRef(
+      window.firebaseDB,
+      `parties/${codePartieActuel}/manches/${mancheCourante}/actions`
+    );
+
+    desabonnerActions = window.fbOnChildAdded(refActions, (snapshot) => {
+      fileActions.set(Number(snapshot.key), snapshot.val());
+      traiterFile();
+    });
+  }
+
+  // Générateur pseudo-aléatoire à graine (mulberry32) : même graine => même mélange sur tous les téléphones
+  function generateurAleatoire(seed){
+    let a = seed >>> 0;
+    return function(){
+      a = (a + 0x6D2B79F5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function nettoyerOverlays(){
+    generationPartie++;
+    document.querySelectorAll('[id^="overlay"]').forEach(el => el.remove());
+    if(overlayRegleTimeout){
+      clearTimeout(overlayRegleTimeout);
+      overlayRegleTimeout = null;
+    }
+    overlayRegleVerrouille = false;
+    predictionEnCours = false;
+    predictions = null;
+  }
+
+  function demarrerMancheEnLigne(etat){
+    enLigneActif = true;
+    mancheCourante = etat.manche;
+    hotePartie = etat.hote;
+    reinitialiserFileActions();
+
+    nettoyerOverlays();
+    joueurs = Object.values(etat.joueurs || {});
+    annulations = {};
+    retourMenu();
+
+    aleatoire = generateurAleatoire(etat.seed);
+    lancerPartie();
+
+    document.body.classList.add("mode-en-ligne");
+    document.getElementById("enLigne").style.display = "none";
+    messagesBar.style.display = "";
+    document.getElementById("jeu").style.display = "";
+
+    ecouterActions();
+  }
+
+  function afficherToast(message){
+    let toast = document.getElementById("toastEnLigne");
+    if(!toast){
+      toast = document.createElement("div");
+      toast.id = "toastEnLigne";
+      document.body.appendChild(toast);
+    }
+    toast.innerText = message;
+    toast.classList.add("visible");
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => toast.classList.remove("visible"), 1800);
+  }
 
   /* ===== INIT ===== */
   window.addEventListener("scroll", repositionnerStickyJoueurActif, { passive: true });
