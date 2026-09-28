@@ -1,0 +1,57 @@
+# Nettoyage automatique des parties en ligne dans Firebase.
+# Une partie est supprimée si :
+#   - aucune activité (aucun tap, personne qui rejoint) depuis 3 h, OU
+#   - elle a été créée il y a plus de 10 h, quelle que soit l'activité.
+# Tourne toutes les heures ; peut aussi être lancé à la main depuis l'onglet « Actions » de GitHub.
+# Nécessite le secret de dépôt FIREBASE_SECRET (code secret de la base Firebase).
+
+name: Nettoyage des parties
+
+on:
+  schedule:
+    - cron: "17 * * * *"   # toutes les heures, à la 17e minute
+  workflow_dispatch:        # bouton « Run workflow » dans GitHub
+
+jobs:
+  nettoyer:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Supprimer les parties inactives ou trop vieilles
+        env:
+          FIREBASE_SECRET: ${{ secrets.FIREBASE_SECRET }}
+          DB_URL: https://alcuno-default-rtdb.europe-west1.firebasedatabase.app
+          HEURES_INACTIVITE: 3
+          HEURES_MAX: 10
+        run: |
+          set -euo pipefail
+
+          if [ -z "$FIREBASE_SECRET" ]; then
+            echo "Secret FIREBASE_SECRET manquant dans les réglages du dépôt."
+            exit 1
+          fi
+
+          maintenant=$(( $(date +%s) * 1000 ))
+          limite_inactivite=$(( maintenant - HEURES_INACTIVITE * 3600 * 1000 ))
+          limite_age=$(( maintenant - HEURES_MAX * 3600 * 1000 ))
+
+          # -s : pas d'affichage de l'URL (qui contient le secret)
+          curl -sf "$DB_URL/parties.json?auth=$FIREBASE_SECRET" > parties.json
+
+          # Parties sans date (créées avant le nettoyage) : considérées comme vieilles
+          jq -c --argjson inactif "$limite_inactivite" --argjson age "$limite_age" '
+            (. // {})
+            | with_entries(select(
+                ((.value.activite // 0) < $inactif) or ((.value.creee // 0) < $age)
+              ))
+            | map_values(null)
+          ' parties.json > suppressions.json
+
+          nombre=$(jq 'length' suppressions.json)
+          total=$(jq '(. // {}) | length' parties.json)
+          echo "Parties en base : $total — à supprimer : $nombre"
+
+          if [ "$nombre" -gt 0 ]; then
+            jq -r 'keys[]' suppressions.json | sed 's/^/  - /'
+            curl -sf -X PATCH -d @suppressions.json "$DB_URL/parties.json?auth=$FIREBASE_SECRET" > /dev/null
+            echo "Suppression effectuée."
+          fi

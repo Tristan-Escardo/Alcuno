@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // À augmenter (+1) à chaque mise en ligne qui touche au mode en ligne : un téléphone qui a
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
-  const VERSION_JEU = 8.2;
+  const VERSION_JEU = 8.3;
   document.getElementById("versionJeu").innerText = "version " + VERSION_JEU;
 
   // Easter egg : de temps en temps, le code de la partie est un de ces noms,
@@ -131,7 +131,10 @@ document.addEventListener("DOMContentLoaded", function () {
           joueurs: {
             [pseudo]: { nom: pseudo, host: true, rejoint: Date.now() }
           },
-          etatJeu: { demarree: false, hote: pseudo }
+          etatJeu: { demarree: false, hote: pseudo },
+          // Pour le nettoyage automatique (.github/workflows/nettoyage.yml)
+          creee: window.fbServerTimestamp(),
+          activite: window.fbServerTimestamp()
         });
       }).then(() => {
         codePartieActuel = code;
@@ -190,6 +193,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const refJoueur = window.fbRef(db, `parties/${code}/joueurs/${pseudo}`);
         window.fbSet(refJoueur, { nom: pseudo, host: false, rejoint: Date.now() }).then(() => {
+          marquerActivite(code);
           codePartieActuel = code;
           pseudoActuel = pseudo;
           estHote = false;
@@ -358,7 +362,15 @@ document.addEventListener("DOMContentLoaded", function () {
         joueurs: listeJoueurs,
         hote: e.hote || pseudoActuel
       };
-    }).catch(erreurFirebase);
+    }).then(() => marquerActivite(codePartieActuel)).catch(erreurFirebase);
+  }
+
+  // Date de dernière activité (heure du serveur) : une partie sans activité depuis 3 h
+  // est supprimée par le nettoyage automatique (.github/workflows/nettoyage.yml)
+  function marquerActivite(code){
+    if (!code) return;
+    window.fbSet(window.fbRef(window.firebaseDB, `parties/${code}/activite`), window.fbServerTimestamp())
+      .catch(() => {}); // pas bloquant pour le jeu
   }
 
   // « Modifier les joueurs » : tout le monde repasse en salle d'attente, même code
@@ -370,7 +382,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const e = etat || {};
       if (!e.demarree || e.manche !== mancheAttendue) return;
       return { demarree: false, manche: e.manche, hote: e.hote || pseudoActuel };
-    }).catch(erreurFirebase);
+    }).then(() => marquerActivite(codePartieActuel)).catch(erreurFirebase);
   }
 
   function retourSalleEnLigne(etat){
@@ -2880,14 +2892,16 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     const db = window.firebaseDB;
-    const base = `parties/${codePartieActuel}/manches/${mancheCourante}`;
+    const code = codePartieActuel;
+    const manche = mancheCourante;
 
-    window.fbRunTransaction(window.fbRef(db, `${base}/seq`), n => (n || 0) + 1)
+    window.fbRunTransaction(window.fbRef(db, `parties/${code}/manches/${manche}/seq`), n => (n || 0) + 1)
       .then((res) => {
         const seq = res.snapshot.val();
-        return window.fbSet(window.fbRef(db, `${base}/actions/${seq}`), {
-          id: el.dataset.netId,
-          par: pseudoActuel
+        // Une seule écriture : l'action + la date de dernière activité
+        return window.fbUpdate(window.fbRef(db, `parties/${code}`), {
+          [`manches/${manche}/actions/${seq}`]: { id: el.dataset.netId, par: pseudoActuel },
+          activite: window.fbServerTimestamp()
         });
       })
       .catch(() => {
