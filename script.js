@@ -29,6 +29,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const PSEUDO_INVALIDE = /[.#$\[\]\/]/;
 
+  // À changer à chaque mise en ligne qui touche au mode en ligne : un téléphone qui a gardé
+  // l'ancienne version en cache ne pourra pas rejoindre (sinon les parties se désynchronisent)
+  const VERSION_JEU = "2026-09-28-4";
+  document.getElementById("versionJeu").innerText = "version " + VERSION_JEU;
+
   function genererCodePartie(){
     const caracteres = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     let code = "";
@@ -92,6 +97,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const refPartie = window.fbRef(db, `parties/${code}`);
 
       window.fbSet(refPartie, {
+        version: VERSION_JEU,
         hote: pseudo,
         joueurs: {
           [pseudo]: { nom: pseudo, host: true, rejoint: Date.now() }
@@ -129,6 +135,12 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         const partie = snapshot.val();
+        if (partie.version !== VERSION_JEU) {
+          alert("Ta version du jeu n'est pas la même que celle de l'hôte.\n" +
+                "Rechargez la page sur les deux téléphones (ou ouvrez-la en navigation privée), " +
+                "puis recréez la partie.");
+          return;
+        }
         if (partie.etatJeu && partie.etatJeu.demarree) {
           alert("La partie a déjà commencé.");
           return;
@@ -194,7 +206,7 @@ document.addEventListener("DOMContentLoaded", function () {
     desabonnerJoueurs = window.fbOnValue(refJoueurs, (snapshot) => {
       const data = snapshot.val() || {};
 
-      // On n'est plus dans la liste : l'hôte nous a retiré
+      // On n'est plus dans la liste : un autre joueur nous a retiré
       if (!data[pseudoActuel]) {
         quitterPartieEnLigne();
         alert("Tu as été retiré de la partie.");
@@ -214,15 +226,15 @@ document.addEventListener("DOMContentLoaded", function () {
         nom.innerText = j.nom + (j.host ? " (hôte)" : "") + (j.nom === pseudoActuel ? " — toi" : "");
         div.appendChild(nom);
 
-        // L'hôte peut retirer les autres joueurs
-        if (estHote && j.nom !== pseudoActuel) {
+        // Tout le monde peut retirer les autres joueurs (pour partir soi-même : « Retour »)
+        if (j.nom !== pseudoActuel) {
           const btn = document.createElement("button");
           btn.type = "button";
           btn.className = "btnExclure";
           btn.innerText = "✕";
           btn.title = "Retirer " + j.nom;
           btn.addEventListener("click", () => {
-            window.fbRemove(window.fbRef(db, `parties/${code}/joueurs/${j.nom}`)).catch(erreurFirebase);
+            retirerJoueur(code, j.nom).catch(erreurFirebase);
           });
           div.appendChild(btn);
         }
@@ -305,50 +317,47 @@ document.addEventListener("DOMContentLoaded", function () {
     if (etat.message) afficherToast(etat.message, 4000);
   }
 
-  // Quitte la partie : retire le joueur, passe le rôle d'hôte au suivant si besoin,
-  // et renvoie les autres en salle d'attente si une manche était en cours
+  // Quitte la partie (Accueil, ou Retour dans la salle d'attente)
   function quitterPartie(){
     const code = codePartieActuel;
     const pseudo = pseudoActuel;
     quitterPartieEnLigne();
     if (!code) return;
 
-    const db = window.firebaseDB;
-    window.fbGet(window.fbRef(db, `parties/${code}`)).then((snapshot) => {
-      const partie = snapshot.val();
-      if (!partie) return;
+    retirerJoueur(code, pseudo, `${pseudo} a quitté la partie`).catch(erreurFirebase);
+  }
 
-      const restants = Object.values(partie.joueurs || {})
-        .filter(j => j.nom !== pseudo)
+  // Retire un joueur (soi-même ou un autre), passe le rôle d'hôte au suivant si besoin,
+  // et renvoie tout le monde en salle d'attente si une manche était en cours.
+  // Transaction : si deux joueurs retirent quelqu'un en même temps, Firebase rejoue
+  // la 2e sur l'état déjà mis à jour => pas de doublon ni d'hôte incohérent.
+  function retirerJoueur(code, nom, message){
+    const refPartie = window.fbRef(window.firebaseDB, `parties/${code}`);
+
+    return window.fbRunTransaction(refPartie, (partie) => {
+      // null = pas encore en cache : Firebase relance la fonction avec la vraie valeur
+      if (!partie) return partie;
+      if (!partie.joueurs || !partie.joueurs[nom]) return; // déjà retiré => abandon
+
+      delete partie.joueurs[nom];
+
+      const restants = Object.values(partie.joueurs)
         .sort((a, b) => (a.rejoint || 0) - (b.rejoint || 0));
 
-      if (restants.length === 0) {
-        return window.fbRemove(window.fbRef(db, `parties/${code}`));
-      }
+      // Plus personne : on supprime la partie
+      if (restants.length === 0) return null;
+
+      if (!partie.joueurs[partie.hote]) partie.hote = restants[0].nom;
+      restants.forEach((j) => { j.host = (j.nom === partie.hote); });
 
       const etat = partie.etatJeu || {};
-      const nouvelHote = partie.hote === pseudo ? restants[0].nom : partie.hote;
-
-      const maj = {
-        [`joueurs/${pseudo}`]: null,
-        [`joueurs/${nouvelHote}/host`]: true,
-        hote: nouvelHote
-      };
-
-      if (etat.demarree) {
+      partie.etatJeu = etat.demarree
         // La manche ne peut pas continuer sans lui : retour en salle pour tout le monde
-        maj.etatJeu = {
-          demarree: false,
-          manche: etat.manche,
-          hote: nouvelHote,
-          message: `${pseudo} a quitté la partie`
-        };
-      } else {
-        maj["etatJeu/hote"] = nouvelHote;
-      }
+        ? { demarree: false, manche: etat.manche, hote: partie.hote, message: message || "" }
+        : Object.assign({}, etat, { hote: partie.hote });
 
-      return window.fbUpdate(window.fbRef(db, `parties/${code}`), maj);
-    }).catch(erreurFirebase);
+      return partie;
+    });
   }
 
   function quitterPartieEnLigne(){
