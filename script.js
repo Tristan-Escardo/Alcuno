@@ -2763,6 +2763,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document.getElementById("btnAccueil").addEventListener("click", allerAccueil);
   btnAccueilClassique.addEventListener("click", allerAccueil);
+  // Écrans en ligne (Créer / Rejoindre / salle d'attente) : quitte la partie éventuelle
+  document.getElementById("btnAccueilEnLigne").addEventListener("click", allerAccueil);
 
   // Remet l'interface de jeu à zéro et la masque (plateau, menu, overlays, liste de joueurs)
   function reinitialiserEcransJeu(){
