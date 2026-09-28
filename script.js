@@ -48,8 +48,34 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // À augmenter (+1) à chaque mise en ligne qui touche au mode en ligne : un téléphone qui a
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
-  const VERSION_JEU = 8.3;
-  document.getElementById("versionJeu").innerText = "version " + VERSION_JEU;
+  // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
+  // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
+  const VERSION_AFFICHEE = "8.3.2";
+  const VERSION_JEU = VERSION_AFFICHEE.split(".")
+    .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
+  document.getElementById("versionJeu").innerText = "version " + VERSION_AFFICHEE;
+
+  // ===== Easter egg : 4 taps rapides sur le titre ALCUNO => écran des créateurs =====
+  const ecranCredits = document.getElementById("ecranCredits");
+  let tapsTitre = 0;
+  let dernierTapTitre = 0;
+
+  // pointerdown (et pas click) : les taps rapprochés ne génèrent pas tous un "click" sur mobile
+  document.querySelector("header h1").addEventListener("pointerdown", () => {
+    const maintenant = Date.now();
+    tapsTitre = (maintenant - dernierTapTitre < 600) ? tapsTitre + 1 : 1;
+    dernierTapTitre = maintenant;
+
+    if (tapsTitre >= 4) {
+      tapsTitre = 0;
+      ecranCredits.scrollTop = 0;
+      ecranCredits.style.display = "";
+    }
+  });
+
+  document.getElementById("btnFermerCredits").addEventListener("click", () => {
+    ecranCredits.style.display = "none";
+  });
 
   // Easter egg : de temps en temps, le code de la partie est un de ces noms,
   // complété par des chiffres AVANT ou APRÈS (jamais au milieu) pour faire 5 caractères

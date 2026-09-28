@@ -112,6 +112,33 @@
         <div class="jeu" id="jeu" style="display:none;">
             <div class="plateau" id="plateau"></div>
         </div>
+        <!-- Easter egg : 4 taps rapides sur le titre ALCUNO -->
+        <section class="ecranCredits" id="ecranCredits" style="display:none;">
+            <button type="button" id="btnFermerCredits" class="btnRetour">← Retour</button>
+            <div class="credits-contenu">
+                <div class="credits-titre">ALCUNO</div>
+                <p class="credits-phrase">
+                    Un jeu imaginé par<br>
+                    <strong>Tristan, Ylana, Célien &amp; Roseanna</strong>
+                </p>
+
+                <!-- Photo : mettre le fichier photo_createurs.jpg à côté de index.html -->
+                <div class="cadrePhoto">
+                    <img id="photoCreateurs" src="photo_createurs.jpg" alt="Tristan, Ylana, Célien et Roseanna"
+                         onerror="this.parentNode.classList.add('sansPhoto')">
+                    <div class="photoVide">📸<br>La photo des créateurs<br>arrive bientôt</div>
+                </div>
+
+                <div class="credits-noms">
+                    <div class="credits-nom">👑 Tristan</div>
+                    <div class="credits-nom">👑 Ylana</div>
+                    <div class="credits-nom">👑 Célien</div>
+                    <div class="credits-nom">👑 Roseanna</div>
+                </div>
+
+                <p class="credits-pied">À consommer avec modération 🍻</p>
+            </div>
+        </section>
     </main>
 
     <script type="module">
