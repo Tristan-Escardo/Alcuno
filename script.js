@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // À changer à chaque mise en ligne qui touche au mode en ligne : un téléphone qui a gardé
   // l'ancienne version en cache ne pourra pas rejoindre (sinon les parties se désynchronisent)
-  const VERSION_JEU = "2026-09-28-4";
+  const VERSION_JEU = "2026-09-28-5";
   document.getElementById("versionJeu").innerText = "version " + VERSION_JEU;
 
   function genererCodePartie(){
@@ -234,6 +234,16 @@ document.addEventListener("DOMContentLoaded", function () {
           btn.innerText = "✕";
           btn.title = "Retirer " + j.nom;
           btn.addEventListener("click", () => {
+            // Retirer l'hôte : on prévient d'abord (le rôle passe au joueur suivant)
+            if (j.host) {
+              const suivant = tries.find(x => x.nom !== j.nom);
+              const ok = confirm(
+                `${j.nom} est l'hôte de la partie.\n` +
+                `Si tu le retires, il est éjecté et c'est ${suivant ? suivant.nom : "le joueur suivant"} ` +
+                `qui devient l'hôte.\n\nRetirer quand même ${j.nom} ?`
+              );
+              if (!ok) return;
+            }
             retirerJoueur(code, j.nom).catch(erreurFirebase);
           });
           div.appendChild(btn);
