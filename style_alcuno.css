@@ -2091,6 +2091,21 @@ body.mode-en-ligne #jouer{
   display: none !important;
 }
 
+/* Bouton Accueil du menu classique : discret (contour fin, texte atténué) */
+.menu #btnAccueilClassique{
+  background-color: transparent;
+  border: 1px solid rgba(255,255,255,0.22);
+  color: rgba(255,255,255,0.6);
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.menu #btnAccueilClassique:hover{
+  background-color: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.85);
+  transform: none;
+}
+
 /* Petit message « En attente de X » quand on tape hors de son tour */
 #toastEnLigne{
   position: fixed;
