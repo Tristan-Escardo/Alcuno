@@ -237,7 +237,7 @@ document.addEventListener("DOMContentLoaded", function () {
       tries.forEach((j) => {
         const div = document.createElement("div");
         const nom = document.createElement("span");
-        nom.innerText = j.nom + (j.host ? " (hôte)" : "") + (j.nom === pseudoActuel ? " — toi" : "");
+        nom.innerText = j.nom + (j.host ? " (hôte)" : "");
         div.appendChild(nom);
 
         // Tout le monde peut retirer les autres joueurs (pour partir soi-même : « Retour »)
