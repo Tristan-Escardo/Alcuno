@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // À augmenter (+1) à chaque mise en ligne qui touche au mode en ligne : un téléphone qui a
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
-  const VERSION_JEU = 7;
+  const VERSION_JEU = 8;
   document.getElementById("versionJeu").innerText = "version " + VERSION_JEU;
 
   function genererCodePartie(){
@@ -212,7 +212,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (desabonnerJoueurs) desabonnerJoueurs();
     desabonnerJoueurs = window.fbOnValue(refJoueurs, (snapshot) => {
-      const data = snapshot.val() || {};
+      // Plus aucun joueur : la partie a été supprimée
+      if (!snapshot.exists()) {
+        partieFermee();
+        return;
+      }
+
+      const data = snapshot.val();
 
       // On n'est plus dans la liste : un autre joueur nous a retiré
       if (!data[pseudoActuel]) {
@@ -242,10 +248,9 @@ document.addEventListener("DOMContentLoaded", function () {
           btn.innerText = "✕";
           btn.title = "Retirer " + j.nom;
           btn.addEventListener("click", () => {
-            // Retirer l'hôte : écran de confirmation d'abord (le rôle passe au joueur suivant)
+            // Retirer l'hôte arrête la partie : écran de confirmation d'abord
             if (j.host) {
-              const suivant = tries.find(x => x.nom !== j.nom);
-              demanderRetraitHote(code, j.nom, suivant ? suivant.nom : "le joueur suivant");
+              demanderRetraitHote(code, j.nom);
               return;
             }
             retirerJoueur(code, j.nom).catch(erreurFirebase);
@@ -265,10 +270,10 @@ document.addEventListener("DOMContentLoaded", function () {
   const ecranConfirmerHote = document.getElementById("ecranConfirmerHote");
   let retraitHoteEnAttente = null; // { code, nom }
 
-  function demanderRetraitHote(code, nomHote, nomSuivant){
+  function demanderRetraitHote(code, nomHote){
     document.getElementById("texteConfirmerHote").innerText =
       `${nomHote} est l'hôte de la partie.\n` +
-      `Si tu le retires, il est éjecté et c'est ${nomSuivant} qui devient l'hôte.`;
+      `Si tu le retires, la partie s'arrête pour tout le monde.`;
     retraitHoteEnAttente = { code, nom: nomHote };
     ecranConfirmerHote.style.display = "";
   }
@@ -291,12 +296,9 @@ document.addEventListener("DOMContentLoaded", function () {
     desabonnerEtat = window.fbOnValue(window.fbRef(window.firebaseDB, `parties/${code}/etatJeu`), (snapshot) => {
       const etat = snapshot.val();
 
-      // Partie supprimée (plus aucun joueur)
+      // Partie supprimée (l'hôte est parti ou a été retiré)
       if (!etat) {
-        if (codePartieActuel === code) {
-          quitterPartieEnLigne();
-          alert("La partie a été fermée.");
-        }
+        if (codePartieActuel === code) partieFermee();
         return;
       }
 
@@ -366,37 +368,43 @@ document.addEventListener("DOMContentLoaded", function () {
     retirerJoueur(code, pseudo, `${pseudo} a quitté la partie`).catch(erreurFirebase);
   }
 
-  // Retire un joueur (soi-même ou un autre), passe le rôle d'hôte au suivant si besoin,
-  // et renvoie tout le monde en salle d'attente si une manche était en cours.
-  // Transaction : si deux joueurs retirent quelqu'un en même temps, Firebase rejoue
-  // la 2e sur l'état déjà mis à jour => pas de doublon ni d'hôte incohérent.
+  // Retire un joueur (soi-même ou un autre).
+  // - Si c'est l'hôte (ou le dernier joueur) : la partie est supprimée => elle s'arrête pour tout le monde
+  // - Sinon : il est retiré de la liste, et si une manche était en cours, tout le monde
+  //   repasse en salle d'attente (la manche ne peut pas continuer sans lui)
+  // Si deux joueurs retirent la même personne en même temps, la 2e suppression ne change rien.
   function retirerJoueur(code, nom, message){
     const refPartie = window.fbRef(window.firebaseDB, `parties/${code}`);
 
-    return window.fbRunTransaction(refPartie, (partie) => {
-      // null = pas encore en cache : Firebase relance la fonction avec la vraie valeur
-      if (!partie) return partie;
-      if (!partie.joueurs || !partie.joueurs[nom]) return; // déjà retiré => abandon
+    return window.fbGet(refPartie).then((snapshot) => {
+      const partie = snapshot.val();
+      if (!partie || !partie.joueurs || !partie.joueurs[nom]) return; // déjà retiré
 
-      delete partie.joueurs[nom];
+      const restants = Object.keys(partie.joueurs).filter(n => n !== nom);
+      if (partie.hote === nom || restants.length === 0) {
+        return window.fbRemove(refPartie);
+      }
 
-      const restants = Object.values(partie.joueurs)
-        .sort((a, b) => (a.rejoint || 0) - (b.rejoint || 0));
-
-      // Plus personne : on supprime la partie
-      if (restants.length === 0) return null;
-
-      if (!partie.joueurs[partie.hote]) partie.hote = restants[0].nom;
-      restants.forEach((j) => { j.host = (j.nom === partie.hote); });
-
-      const etat = partie.etatJeu || {};
-      partie.etatJeu = etat.demarree
-        // La manche ne peut pas continuer sans lui : retour en salle pour tout le monde
-        ? { demarree: false, manche: etat.manche, hote: partie.hote, message: message || "" }
-        : Object.assign({}, etat, { hote: partie.hote });
-
-      return partie;
+      const maj = { [`joueurs/${nom}`]: null };
+      if (partie.etatJeu && partie.etatJeu.demarree) {
+        maj.etatJeu = {
+          demarree: false,
+          manche: partie.etatJeu.manche,
+          hote: partie.hote,
+          message: message || `${nom} a été retiré de la partie`
+        };
+      }
+      return window.fbUpdate(refPartie, maj);
     });
+  }
+
+  // La partie n'existe plus (l'hôte est parti ou a été retiré)
+  function partieFermee(){
+    const etaisHote = estHote;
+    quitterPartieEnLigne();
+    alert(etaisHote
+      ? "Tu as été retiré de la partie.\nComme tu étais l'hôte, la partie est terminée."
+      : "La partie est terminée : l'hôte l'a quittée ou a été retiré.");
   }
 
   function quitterPartieEnLigne(){
