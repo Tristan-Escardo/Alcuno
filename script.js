@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Easter egg : de temps en temps, le code de la partie est un de ces noms,
   // complété par des chiffres AVANT ou APRÈS (jamais au milieu) pour faire 5 caractères
   const CODES_EASTER_EGG = ["YLA", "CELIEN", "ROSA", "TRIS"];
-  const CHANCE_EASTER_EGG = 0.1; // 1 partie sur 10
+  const CHANCE_EASTER_EGG = 0.2; // 1 partie sur 5
   const LONGUEUR_CODE = 5;
   const CHIFFRES_CODE = "23456789"; // pas de 0/1 (confusion avec O/I)
 
