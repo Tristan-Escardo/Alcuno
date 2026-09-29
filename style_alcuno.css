@@ -2533,3 +2533,36 @@ header h1{
   #overlayCarteDoree .doree-carte-vedette,
   #overlayRegleUnique.overlay-doree .Carte{ animation: none; }
 }
+
+/* Pari de fin : la dernière carte était la carte dorée (révélation remplacée par le cul sec collectif) */
+#overlayPredictionFin .reveal-doree .Carte{
+  animation: lueurDoree 3.2s ease-in-out infinite;
+}
+
+#overlayPredictionFin .reveal-doree .doree-titre{
+  margin-bottom: 10px;
+  font-family: Impact, Haettenschweiler, "Arial Black", sans-serif;
+  font-weight: 400;
+  font-size: clamp(26px, 7vw, 42px);
+  letter-spacing: 0.06em;
+  line-height: 1.1;
+  color: #FFD700;
+  text-shadow:
+    0 2px 0 #6b4200,
+    0 0 24px rgba(255, 215, 0, 0.45);
+}
+
+#overlayPredictionFin .reveal-doree .doree-etincelle{ color: #FFD700; }
+
+#overlayPredictionFin .reveal-doree .doree-texte{
+  max-width: 26ch;
+  margin: 0 auto;
+  font-size: clamp(18px, 4.6vw, 24px);
+  font-weight: 900;
+  line-height: 1.3;
+  color: #FFF1A8;
+}
+
+@media (prefers-reduced-motion: reduce){
+  #overlayPredictionFin .reveal-doree .Carte{ animation: none; }
+}

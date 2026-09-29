@@ -817,10 +817,18 @@ document.addEventListener("DOMContentLoaded", function () {
     return wrap;
   }
 
+  // Cartes encore cachées sur le plateau (carte dorée comprise)
+  function cartesRestantes(){
+    return paquet.length + (carteDoreeEnJeu ? 1 : 0);
+  }
+
   function lancerOverlayPrediction(startIndex){
     if(predictionEnCours) return;
     if(joueurs.length < 2) return;
-    if(paquet.length !== 1) return; // on doit être à l'avant-dernière carte tirée
+    if(cartesRestantes() !== 1) return; // on doit être à l'avant-dernière carte tirée
+
+    // La dernière carte cachée est la carte dorée : personne ne l'a trouvée
+    const derniereEstDoree = carteDoreeEnJeu && paquet.length === 0;
 
     predictionEnCours = true;
     predictions = joueurs.map((_, idx) => ({ joueurIndex: idx, typeId: null }));
@@ -913,9 +921,9 @@ document.addEventListener("DOMContentLoaded", function () {
         turn.innerText = `Au tour de ${joueurs[jIdx]} : choisis un type`;
       } else {
         // Révélation
-        const lastCard = paquet[0];
+        const lastCard = derniereEstDoree ? "carte_doree" : paquet[0];
         const vraiType = typeFromCardClass(lastCard);
-        const gagnants = ordre
+        const gagnants = derniereEstDoree ? [] : ordre
           .map(jIdx => predictions[jIdx])
           .filter(p => p.typeId === vraiType)
           .map(p => joueurs[p.joueurIndex]);
@@ -930,13 +938,22 @@ document.addEventListener("DOMContentLoaded", function () {
         const reveal = document.createElement('div');
         reveal.className = 'fin-choix-reveal';
 
-        const prev = creerCartePreview(TYPES_PARIS.find(t=>t.id===vraiType)?.rep || lastCard);
+        const prev = creerCartePreview(
+          derniereEstDoree ? "carte_doree" : (TYPES_PARIS.find(t=>t.id===vraiType)?.rep || lastCard)
+        );
         reveal.appendChild(prev);
 
         const txt = document.createElement('div');
         txt.className = 'fin-choix-resultat';
 
-        if(gagnants.length === 0){
+        if(derniereEstDoree){
+          // La dernière carte était la carte dorée : le pari est perdu pour tout le monde
+          prev.classList.add("doree-carte-vedette");
+          reveal.classList.add("reveal-doree");
+          txt.innerHTML =
+            '<div class="doree-titre"><span class="doree-etincelle">✦</span> PERSONNE N\'A TROUVÉ LA CARTE DORÉE !! <span class="doree-etincelle">✦</span></div>' +
+            '<div class="doree-texte">Tout le monde prend un CUL SEC de la part du développeur 😘</div>';
+        } else if(gagnants.length === 0){
           txt.innerText = `Personne n'a trouvé \nLa dernière carte était ${nomType(vraiType)}`;
         } else if(gagnants.length === 1){
           txt.innerText = `${gagnants[0]} a trouvé ! Il/elle distribue un CUL SEC !`;
@@ -954,9 +971,17 @@ document.addEventListener("DOMContentLoaded", function () {
           unlockScroll();
           predictionEnCours = false;
 
-          // On considère la dernière carte comme "résolue" par le pari :
-          // on la retire du paquet et on enchaîne directement sur l'écran de fin.
-          if(paquet.length === 1){
+          // On considère la dernière carte comme "résolue" par le pari (sa règle ne s'applique pas) :
+          // on la retire et on enchaîne directement sur l'écran de fin.
+          if(derniereEstDoree){
+            // Le cul sec collectif vient d'être annoncé : on retourne la carte dorée sur le plateau
+            carteDoreeEnJeu = false;
+            const caseDoree = plateau.children[indexCaseDoree];
+            if(caseDoree){
+              caseDoree.classList.remove("dos_dore");
+              caseDoree.classList.add("carte_doree", "retournee");
+            }
+          } else if(paquet.length === 1){
             paquet.pop();
           }
           // Affiche systématiquement l'écran de fin (même si 0 "1 restant")
@@ -2902,12 +2927,14 @@ document.addEventListener("DOMContentLoaded", function () {
       surAction(carte, "carte:" + i, {
         evenement: "click",
         owner: () => joueurs[indexJoueur % joueurs.length],
-        pret: () => !choixPigeonEnCours && !duelEnCours && !predictionEnCours,
+        pret: () => !choixPigeonEnCours && !duelEnCours && !predictionEnCours && cartesRestantes() > 1,
         valide: () => !carte.classList.contains("retournee")
       }, ()=>{
         // Plateau bloqué pendant overlays pigeon/couleur/duel
         if(choixPigeonEnCours || duelEnCours) return;
         if(carte.classList.contains("retournee")) return;
+        // La dernière carte cachée ne se retourne pas : elle est réservée au pari de fin
+        if(cartesRestantes() <= 1) return;
         if(joueurs.length === 0) return;
 
         const carteTiree = estCaseDoree ? "carte_doree" : paquet.shift();
@@ -2922,10 +2949,9 @@ document.addEventListener("DOMContentLoaded", function () {
         const joueurActuel = indexJoueur % joueurs.length;
         appliquerRegle(carteTiree, joueurActuel, carte);
 
-        // Avant-dernière carte tirée => on lance le pari sur la dernière (après les overlays éventuels).
-        // Carte dorée encore cachée : pas de pari, il reste 2 cartes. Si la carte dorée est retournée,
-        // le pari se lance à ce moment-là ; si elle reste la dernière, cul sec collectif (finDePartie).
-        if(paquet.length === 1 && !predictionEnCours && !carteDoreeEnJeu){
+        // Avant-dernière carte tirée (carte dorée comprise) => on lance le pari sur la dernière,
+        // après les overlays éventuels. La dernière carte n'est jamais jouée : elle sert au pari.
+        if(cartesRestantes() === 1 && !predictionEnCours){
           const startIdx = nextPlayerIndex(joueurActuel);
           executerApresOverlayRegleUnique(() => {
             // Si un duel/pigeon est en cours, on attend que ça finisse avant d'afficher
@@ -2940,7 +2966,7 @@ document.addEventListener("DOMContentLoaded", function () {
           });
         }
         // fin du plateau : on affiche les "1 restants"
-        if(paquet.length === 0){
+        if(cartesRestantes() === 0){
           executerApresOverlayRegleUnique(() => {
             finDePartie();
           });
