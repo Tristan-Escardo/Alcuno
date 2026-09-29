@@ -954,7 +954,7 @@ document.addEventListener("DOMContentLoaded", function () {
             paquet.pop();
           }
           // Affiche systématiquement l'écran de fin (même si 0 "1 restant")
-          afficherOverlayFinUnRestants();
+          finDePartie();
         });
         reveal.appendChild(btn);
 
@@ -1203,6 +1203,28 @@ document.addEventListener("DOMContentLoaded", function () {
     unlockScroll();
     afficherJoueurs();
   });
+
+  // Carte dorée jamais retournée : elle se révèle et tout le monde prend un cul sec avant l'écran de fin
+  function finDePartie(){
+    if(!carteDoreeEnJeu){
+      afficherOverlayFinUnRestants();
+      return;
+    }
+
+    carteDoreeEnJeu = false;
+    const caseDoree = plateau.children[indexCaseDoree];
+    if(caseDoree){
+      caseDoree.classList.remove("dos_dore");
+      caseDoree.classList.add("carte_doree", "retournee");
+    }
+
+    montrerOverlayRegle(
+      "Personne n'a trouvé la CARTE DORÉE !!\n" +
+      "Tout le monde prend un CUL SEC de la part du développeur 😘",
+      "carte_doree"
+    );
+    executerApresOverlayRegleUnique(afficherOverlayFinUnRestants);
+  }
 
   /* ===== PIGEON OVERLAY ===== */
   function afficherOverlayFinUnRestants(){
@@ -2814,12 +2836,6 @@ document.addEventListener("DOMContentLoaded", function () {
         if(carte.classList.contains("retournee")) return;
         if(joueurs.length === 0) return;
 
-        // La dernière carte du paquet est réservée au pari de fin : la carte dorée doit sortir avant
-        if(!estCaseDoree && carteDoreeEnJeu && paquet.length === 1){
-          afficherToast("Tire d'abord la carte dorée ✨");
-          return;
-        }
-
         const carteTiree = estCaseDoree ? "carte_doree" : paquet.shift();
         if(!carteTiree) return;
 
@@ -2833,7 +2849,7 @@ document.addEventListener("DOMContentLoaded", function () {
         appliquerRegle(carteTiree, joueurActuel, carte);
 
         // Avant-dernière carte tirée => on lance le pari sur la dernière (après les overlays éventuels)
-        if(paquet.length === 1 && !predictionEnCours && !carteDoreeEnJeu){
+        if(paquet.length === 1 && !predictionEnCours){
           const startIdx = nextPlayerIndex(joueurActuel);
           executerApresOverlayRegleUnique(() => {
             // Si un duel/pigeon est en cours, on attend que ça finisse avant d'afficher
@@ -2850,7 +2866,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // fin du plateau : on affiche les "1 restants"
         if(paquet.length === 0){
           executerApresOverlayRegleUnique(() => {
-            afficherOverlayFinUnRestants();
+            finDePartie();
           });
         }
 
