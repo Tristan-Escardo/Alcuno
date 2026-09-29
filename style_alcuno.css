@@ -1337,6 +1337,32 @@ body.no-scroll{
 /* ===== Easter egg : carte dorée ===== */
 .carte_doree { background-image: url("Cartes/carte_doree.svg"); }
 
+/* Overlay d'annonce : grand titre « ✦ CARTE DORÉE ✦ » puis le texte */
+#overlayRegleUnique .doree-titre{
+  margin-bottom: 14px;
+  font-family: Impact, Haettenschweiler, "Arial Black", sans-serif;
+  font-weight: 400;
+  font-size: clamp(30px, 8vw, 46px);
+  letter-spacing: 0.08em;
+  color: #FFD700;
+  text-shadow:
+    0 2px 0 #6b4200,
+    0 0 24px rgba(255, 215, 0, 0.45);
+}
+
+#overlayRegleUnique .doree-etincelle{
+  color: #FFD700;
+}
+
+#overlayRegleUnique .doree-texte{
+  max-width: 26ch;
+  margin: 0 auto;
+  font-size: clamp(20px, 5vw, 28px);
+  font-weight: 900;
+  line-height: 1.3;
+  color: #FFF1A8;
+}
+
 /* Dos normal, avec un reflet doré qui passe de temps en temps */
 .Carte.dos_dore {
   position: relative;

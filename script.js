@@ -2076,6 +2076,26 @@ document.addEventListener("DOMContentLoaded", function () {
     document.body.appendChild(overlay);
   }
 
+  /* ===== CARTE DORÉE : mise en forme de l'overlay d'annonce =====
+     Grand titre « ✦ CARTE DORÉE ✦ » doré, puis le texte en dessous */
+  function habillerOverlayCarteDoree(texte){
+    const boxTexte = document.querySelector("#overlayRegleUnique .overlay-regle-texte");
+    if(!boxTexte) return;
+
+    boxTexte.innerHTML = "";
+
+    const titre = document.createElement("div");
+    titre.className = "doree-titre";
+    titre.innerHTML = '<span class="doree-etincelle">✦</span> CARTE DORÉE <span class="doree-etincelle">✦</span>';
+
+    const ligne = document.createElement("div");
+    ligne.className = "doree-texte";
+    ligne.innerText = texte;
+
+    boxTexte.appendChild(titre);
+    boxTexte.appendChild(ligne);
+  }
+
   /* ===== CARTE DORÉE : choix de celui qui prend le cul sec ===== */
   function afficherOverlayCarteDoree(joueurActuel){
     if(document.getElementById("overlayCarteDoree")) return;
@@ -2604,11 +2624,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Plateau bloqué (et pari de fin en attente) jusqu'au choix de la victime
       choixPigeonEnCours = true;
-      montrerOverlayRegle(
-        "Tu as trouvé la CARTE DORÉE !!\n" +
-        "Distribue un cul sec de la part du développeur, et obligation de se servir un vrai verre avant 😘",
-        carteTiree
-      );
+      const texteCarteDoree =
+        "Distribue un cul sec de la part du développeur, et obligation de se servir un vrai verre avant 😘";
+      // Le texte complet sert à calculer la durée d'affichage de l'overlay
+      montrerOverlayRegle(`CARTE DORÉE\n${texteCarteDoree}`, carteTiree);
+      habillerOverlayCarteDoree(texteCarteDoree);
       executerApresOverlayRegleUnique(() => afficherOverlayCarteDoree(joueurActuel));
       return;
     }
