@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.3.2";
+  const VERSION_AFFICHEE = "8.3.3";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "version " + VERSION_AFFICHEE;
@@ -588,6 +588,11 @@ document.addEventListener("DOMContentLoaded", function () {
   let annulations = {}; // { "Alice": 3, "Bob": 0, ... }
   let paquet = [];
 
+  // Easter egg : environ 1 partie sur 50, une case en plus sur le plateau cache la carte dorée
+  const CHANCE_CARTE_DOREE = 1 / 50;
+  let indexCaseDoree = -1; // -1 = pas de carte dorée dans cette partie
+  let carteDoreeEnJeu = false; // présente et pas encore retournée
+
   let paquetDuel = [];
   let duelEnCours = false;
   let duelMultiplicateur = 1;
@@ -949,7 +954,7 @@ document.addEventListener("DOMContentLoaded", function () {
             paquet.pop();
           }
           // Affiche systématiquement l'écran de fin (même si 0 "1 restant")
-          afficherOverlayFinUnRestants();
+          finDePartie();
         });
         reveal.appendChild(btn);
 
@@ -1198,6 +1203,28 @@ document.addEventListener("DOMContentLoaded", function () {
     unlockScroll();
     afficherJoueurs();
   });
+
+  // Carte dorée jamais retournée : elle se révèle et tout le monde prend un cul sec avant l'écran de fin
+  function finDePartie(){
+    if(!carteDoreeEnJeu){
+      afficherOverlayFinUnRestants();
+      return;
+    }
+
+    carteDoreeEnJeu = false;
+    const caseDoree = plateau.children[indexCaseDoree];
+    if(caseDoree){
+      caseDoree.classList.remove("dos_dore");
+      caseDoree.classList.add("carte_doree", "retournee");
+    }
+
+    montrerOverlayRegle(
+      "Personne n'a trouvé la CARTE DORÉE !!\n" +
+      "Tout le monde prend un CUL SEC de la part du développeur 😘",
+      "carte_doree"
+    );
+    executerApresOverlayRegleUnique(afficherOverlayFinUnRestants);
+  }
 
   /* ===== PIGEON OVERLAY ===== */
   function afficherOverlayFinUnRestants(){
@@ -2049,6 +2076,51 @@ document.addEventListener("DOMContentLoaded", function () {
     document.body.appendChild(overlay);
   }
 
+  /* ===== CARTE DORÉE : choix de celui qui prend le cul sec ===== */
+  function afficherOverlayCarteDoree(joueurActuel){
+    if(document.getElementById("overlayCarteDoree")) return;
+    const choisisseur = joueurs[joueurActuel];
+    choixPigeonEnCours = true;
+    lockScroll();
+
+    const overlay = document.createElement("div");
+    overlay.id = "overlayCarteDoree";
+
+    const titre = document.createElement("div");
+    titre.className = "titre-pigeon";
+    titre.innerText = "Choisis à qui tu vas distribuer ton cul sec";
+    overlay.appendChild(titre);
+
+    // Tout le monde, y compris celui qui a tiré la carte
+    joueurs.forEach((nom, i) => {
+      const btn = document.createElement("button");
+      btn.className = "bouton-pigeon";
+      btn.innerText = nom;
+      surAction(btn, "doree:" + i, { owner: choisisseur, once: true }, () => {
+        overlay.remove();
+        unlockScroll();
+        afficherOverlayTiensGueule(nom);
+        // Plateau (et pari de fin) débloqués seulement une fois le message lu
+        executerApresOverlayRegleUnique(() => {
+          choixPigeonEnCours = false;
+          afficherJoueurActif();
+        });
+      });
+      overlay.appendChild(btn);
+    });
+
+    document.body.appendChild(overlay);
+  }
+
+  // En ligne : seul le téléphone de la victime affiche « TIENS DANS TA GUEULE. »
+  function afficherOverlayTiensGueule(victime){
+    if(enLigneActif && victime !== pseudoActuel){
+      montrerOverlayRegle(`${victime} prend le CUL SEC de la carte dorée !`, "carte_doree");
+      return;
+    }
+    montrerOverlayRegle("TIENS DANS TA GUEULE.");
+  }
+
   /* ===== DUEL : Choix joueurs puis tirage ===== */
   function lancerOverlayChoixDuel(joueurActuel){
     if(document.getElementById("overlayDuel")) return;
@@ -2525,6 +2597,22 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
+    if (carteTiree === "carte_doree") {
+      regleZero.innerText = "CARTE DORÉE : distribue un cul sec";
+      regleZero.style.display = "block";
+      zeroEnCours = true;
+
+      // Plateau bloqué (et pari de fin en attente) jusqu'au choix de la victime
+      choixPigeonEnCours = true;
+      montrerOverlayRegle(
+        "Tu as trouvé la CARTE DORÉE !!\n" +
+        "Distribue un cul sec de la part du développeur, et obligation de se servir un vrai verre avant 😘",
+        carteTiree
+      );
+      executerApresOverlayRegleUnique(() => afficherOverlayCarteDoree(joueurActuel));
+      return;
+    }
+
     // Cas spécial: plus_4 => overlay de distribution + annulations chez les cibles
     if (carteTiree.startsWith("plus_4")) {
       afficherOverlayPlus4(joueurActuel, carteTiree);
@@ -2705,6 +2793,12 @@ document.addEventListener("DOMContentLoaded", function () {
     paquetDuel = [...duelCartes];
     melangerPaquet(paquetDuel);
 
+    // Tirée avec « aleatoire » : en ligne, tous les téléphones ont la même carte dorée au même endroit
+    const avecCarteDoree = aleatoire() < CHANCE_CARTE_DOREE;
+    const nbCases = paquet.length + (avecCarteDoree ? 1 : 0);
+    indexCaseDoree = avecCarteDoree ? Math.floor(aleatoire() * nbCases) : -1;
+    carteDoreeEnJeu = avecCarteDoree;
+
     indexJoueur = 0;
     partieLancee = true;
     zeroEnCours = false;
@@ -2725,9 +2819,11 @@ document.addEventListener("DOMContentLoaded", function () {
     effacerMessagePigeon();
     afficherJoueurActif();
 
-    for(let i=0;i<paquet.length;i++){
+    for(let i=0;i<nbCases;i++){
       const carte = document.createElement("div");
       carte.classList.add("Carte");
+      const estCaseDoree = i === indexCaseDoree;
+      if(estCaseDoree) carte.classList.add("dos_dore");
 
       surAction(carte, "carte:" + i, {
         evenement: "click",
@@ -2740,9 +2836,13 @@ document.addEventListener("DOMContentLoaded", function () {
         if(carte.classList.contains("retournee")) return;
         if(joueurs.length === 0) return;
 
-        const carteTiree = paquet.shift();
+        const carteTiree = estCaseDoree ? "carte_doree" : paquet.shift();
         if(!carteTiree) return;
 
+        if(estCaseDoree){
+          carteDoreeEnJeu = false;
+          carte.classList.remove("dos_dore");
+        }
         carte.classList.add(carteTiree, "retournee");
 
         const joueurActuel = indexJoueur % joueurs.length;
@@ -2766,7 +2866,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // fin du plateau : on affiche les "1 restants"
         if(paquet.length === 0){
           executerApresOverlayRegleUnique(() => {
-            afficherOverlayFinUnRestants();
+            finDePartie();
           });
         }
 
@@ -2794,6 +2894,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     paquet = [];
     paquetDuel = [];
+    indexCaseDoree = -1;
+    carteDoreeEnJeu = false;
 
     indexJoueur = 0;
 

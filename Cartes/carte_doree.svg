@@ -1,0 +1,225 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 220" width="150" height="220">
+  <defs>
+    <linearGradient id="cadre" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5c3d00"/>
+      <stop offset="0.12" stop-color="#ffe9a1"/>
+      <stop offset="0.25" stop-color="#b8860b"/>
+      <stop offset="0.4" stop-color="#fff7d1"/>
+      <stop offset="0.52" stop-color="#d4a017"/>
+      <stop offset="0.7" stop-color="#fff3b8"/>
+      <stop offset="0.85" stop-color="#9c6b00"/>
+      <stop offset="1" stop-color="#ffe08a"/>
+    </linearGradient>
+    <linearGradient id="fond" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#a87200"/>
+      <stop offset="0.3" stop-color="#ffd84d"/>
+      <stop offset="0.5" stop-color="#e6a800"/>
+      <stop offset="0.7" stop-color="#ffe27a"/>
+      <stop offset="1" stop-color="#8f5f00"/>
+    </linearGradient>
+    <linearGradient id="reflet" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0.3" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="0.45" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="0.5" stop-color="#ffffff" stop-opacity="0.8"/>
+      <stop offset="0.55" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="0.7" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="ovale" cx="0.35" cy="0.3" r="0.8">
+      <stop offset="0" stop-color="#2b2410"/>
+      <stop offset="0.6" stop-color="#0a0802"/>
+      <stop offset="1" stop-color="#000000"/>
+    </radialGradient>
+    <linearGradient id="orMetal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fffbe6"/>
+      <stop offset="0.3" stop-color="#ffd84d"/>
+      <stop offset="0.55" stop-color="#c88a00"/>
+      <stop offset="0.75" stop-color="#ffe89a"/>
+      <stop offset="1" stop-color="#8f5f00"/>
+    </linearGradient>
+    <linearGradient id="verre" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.35"/>
+      <stop offset="0.2" stop-color="#ffffff" stop-opacity="0.12"/>
+      <stop offset="0.8" stop-color="#ffffff" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.3"/>
+    </linearGradient>
+    <linearGradient id="rhum" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffb52e"/>
+      <stop offset="0.5" stop-color="#d9730b"/>
+      <stop offset="1" stop-color="#7a3300"/>
+    </linearGradient>
+    <linearGradient id="orContour" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffd84d"/>
+      <stop offset="0.5" stop-color="#e0ad25"/>
+      <stop offset="0.8" stop-color="#ffe089"/>
+      <stop offset="1" stop-color="#c88a00"/>
+    </linearGradient>
+    <linearGradient id="acier" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8c96a0"/>
+      <stop offset="0.45" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#6b7580"/>
+    </linearGradient>
+    <radialGradient id="rubis" cx="0.35" cy="0.35" r="0.7">
+      <stop offset="0" stop-color="#ffb3b3"/>
+      <stop offset="0.4" stop-color="#e0102a"/>
+      <stop offset="1" stop-color="#5c0010"/>
+    </radialGradient>
+    <radialGradient id="saphir" cx="0.35" cy="0.35" r="0.7">
+      <stop offset="0" stop-color="#cfe3ff"/>
+      <stop offset="0.4" stop-color="#1f5fe0"/>
+      <stop offset="1" stop-color="#0a1f5c"/>
+    </radialGradient>
+    <filter id="lueur" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="1.6" result="flou"/>
+      <feMerge><feMergeNode in="flou"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <clipPath id="clipFond"><rect x="9" y="9" width="132" height="202" rx="8"/></clipPath>
+    <clipPath id="clipOvale"><ellipse cx="75" cy="110" rx="57" ry="92" transform="rotate(15 75 110)"/></clipPath>
+    <path id="eclat" d="M0,-7 C0.8,-1 1,-0.8 7,0 C1,0.8 0.8,1 0,7 C-0.8,1 -1,0.8 -7,0 C-1,-0.8 -0.8,-1 0,-7 Z" fill="#ffffff"/>
+    <g id="capitaine" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4,14 Q10,12 17,14 L17,27 Q10,29 4,27 Z" fill="#8a5220" stroke="#3b2210" stroke-width="1"/>
+      <path d="M4.3,17.5 Q10,16 16.8,17.5 M4.3,24 Q10,25.5 16.8,24" fill="none" stroke="#3b2210" stroke-width="1.2"/>
+      <ellipse cx="10.5" cy="14" rx="6.5" ry="1.8" fill="#a8672b" stroke="#3b2210" stroke-width="0.8"/>
+      <path d="M-3,6 L-4.5,16" stroke="#f3ead8" stroke-width="4"/>
+      <path d="M-4.5,15 L-5,26.5" stroke="#141414" stroke-width="4.2"/>
+      <path d="M-5.5,27 L-1.5,27" stroke="#141414" stroke-width="2.4"/>
+      <path d="M1.5,6 L9,4.5" stroke="#f3ead8" stroke-width="4"/>
+      <path d="M9,4.5 L10.5,12.5" stroke="#141414" stroke-width="4.2"/>
+      <path d="M9.5,13 L14,13" stroke="#141414" stroke-width="2.4"/>
+      <path d="M-7.5,-12 Q-1,-14 5.5,-12 L6,6 Q3,9 -1,7 L-9,13 Q-9.5,0 -7.5,-12 Z" fill="#c41414" stroke="#5e0606" stroke-width="0.9"/>
+      <path d="M-3,-12 L1,-12 L0.5,3 L-2.5,3 Z" fill="#f3ead8"/>
+      <path d="M-7.2,4.2 L5.8,4.2" stroke="#141414" stroke-width="1.8"/>
+      <circle cx="-4" cy="-5" r="0.8" fill="#ffd84d"/>
+      <circle cx="-4" cy="-1" r="0.8" fill="#ffd84d"/>
+      <circle cx="3" cy="-5" r="0.8" fill="#ffd84d"/>
+      <circle cx="3" cy="-1" r="0.8" fill="#ffd84d"/>
+      <path d="M-12,7 L-9.2,7 L-11.4,24.2 L-12.4,26.4 L-12.9,24 Z" fill="url(#acier)" stroke="#3a3f45" stroke-width="0.6"/>
+      <path d="M-10.8,8.5 L-12,24" stroke="#ffffff" stroke-width="0.5" opacity="0.9"/>
+      <path d="M-10.6,6.8 L-10.9,0.8" stroke="#3b2210" stroke-width="2"/>
+      <path d="M-7.5,-11 L-12,-3.5 L-10.8,2.6" fill="none" stroke="#c41414" stroke-width="3.2"/>
+      <circle cx="-10.7" cy="3.4" r="1.7" fill="#f0c38e"/>
+      <path d="M-13.2,6.8 L-8,6.8" stroke="#5c3d00" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M-13.2,6.8 L-8,6.8" stroke="url(#orMetal)" stroke-width="1.3" stroke-linecap="round"/>
+      <path d="M-13,6.8 Q-15.6,2.6 -11.2,0.4" fill="none" stroke="#5c3d00" stroke-width="2.2"/>
+      <path d="M-13,6.8 Q-15.6,2.6 -11.2,0.4" fill="none" stroke="url(#orMetal)" stroke-width="1.3"/>
+      <circle cx="-10.9" cy="0.4" r="1.2" fill="url(#orMetal)" stroke="#5c3d00" stroke-width="0.4"/>
+      <path d="M5.5,-11 L10,-3.5 L9.5,3" fill="none" stroke="#c41414" stroke-width="3.2"/>
+      <circle cx="9.5" cy="3.8" r="1.5" fill="#f0c38e"/>
+      <circle cx="-1" cy="-17" r="4.3" fill="#f0c38e"/>
+      <path d="M-5.3,-17 Q-6.5,-12 -4.5,-11 M3.3,-17 Q4.5,-12 2.5,-11" fill="none" stroke="#2a1a0c" stroke-width="2"/>
+      <path d="M-4.6,-16 Q-4.8,-11.5 -1,-11.3 Q2.8,-11.5 2.6,-16 Q1,-14.2 -1,-14.4 Q-3,-14.2 -4.6,-16 Z" fill="#2a1a0c"/>
+      <path d="M-3,-15.4 Q-1,-16.6 1,-15.4" fill="none" stroke="#2a1a0c" stroke-width="0.9"/>
+      <path d="M-10,-19.5 Q-9,-24 -4.5,-23 Q-1,-28.5 2.5,-23 Q7,-24 8,-19.5 Q-1,-22.3 -10,-19.5 Z" fill="#141414"/>
+      <path d="M-10,-19.5 Q-1,-22.3 8,-19.5" fill="none" stroke="#ffd84d" stroke-width="1"/>
+      <path d="M-2,-24.5 Q-8,-31 -14,-25.5 Q-9,-27 -4.5,-22.5 Z" fill="#ffffff" stroke="#a0a0a0" stroke-width="0.4"/>
+    </g>
+    <g id="couronne">
+      <path d="M-20,6 L-23,-9 L-12,-1 L0,-14 L12,-1 L23,-9 L20,6 Z" fill="url(#orMetal)" stroke="#5c3d00" stroke-width="1" stroke-linejoin="round"/>
+      <rect x="-21" y="5" width="42" height="7" rx="1.5" fill="url(#orMetal)" stroke="#5c3d00" stroke-width="1"/>
+      <circle cx="-23" cy="-9" r="2.6" fill="url(#orMetal)" stroke="#5c3d00" stroke-width="0.7"/>
+      <circle cx="0" cy="-14" r="3" fill="url(#orMetal)" stroke="#5c3d00" stroke-width="0.7"/>
+      <circle cx="23" cy="-9" r="2.6" fill="url(#orMetal)" stroke="#5c3d00" stroke-width="0.7"/>
+      <ellipse cx="0" cy="8.5" rx="3.6" ry="2.6" fill="url(#rubis)"/>
+      <circle cx="-12" cy="8.5" r="2" fill="url(#saphir)"/>
+      <circle cx="12" cy="8.5" r="2" fill="url(#saphir)"/>
+      <path d="M0,-4 L2.5,0 L0,3 L-2.5,0 Z" fill="url(#rubis)"/>
+    </g>
+  </defs>
+
+  <rect x="0" y="0" width="150" height="220" rx="12" fill="url(#cadre)"/>
+  <rect x="4.5" y="4.5" width="141" height="211" rx="9.5" fill="none" stroke="#4a3000" stroke-width="1"/>
+
+  <g clip-path="url(#clipFond)">
+    <rect x="9" y="9" width="132" height="202" fill="url(#fond)"/>
+    <g fill="#fff6c2" opacity="0.22">
+      <path d="M75,110 L275.0,110.0 L274.2,127.4 Z"/>
+      <path d="M75,110 L272.0,144.7 L268.2,161.8 Z"/>
+      <path d="M75,110 L262.9,178.4 L256.3,194.5 Z"/>
+      <path d="M75,110 L248.2,210.0 L238.8,224.7 Z"/>
+      <path d="M75,110 L228.2,238.6 L216.4,251.4 Z"/>
+      <path d="M75,110 L203.6,263.2 L189.7,273.8 Z"/>
+      <path d="M75,110 L175.0,283.2 L159.5,291.3 Z"/>
+      <path d="M75,110 L143.4,297.9 L126.8,303.2 Z"/>
+      <path d="M75,110 L109.7,307.0 L92.4,309.2 Z"/>
+      <path d="M75,110 L75.0,310.0 L57.6,309.2 Z"/>
+      <path d="M75,110 L40.3,307.0 L23.2,303.2 Z"/>
+      <path d="M75,110 L6.6,297.9 L-9.5,291.3 Z"/>
+      <path d="M75,110 L-25.0,283.2 L-39.7,273.8 Z"/>
+      <path d="M75,110 L-53.6,263.2 L-66.4,251.4 Z"/>
+      <path d="M75,110 L-78.2,238.6 L-88.8,224.7 Z"/>
+      <path d="M75,110 L-98.2,210.0 L-106.3,194.5 Z"/>
+      <path d="M75,110 L-112.9,178.4 L-118.2,161.8 Z"/>
+      <path d="M75,110 L-122.0,144.7 L-124.2,127.4 Z"/>
+      <path d="M75,110 L-125.0,110.0 L-124.2,92.6 Z"/>
+      <path d="M75,110 L-122.0,75.3 L-118.2,58.2 Z"/>
+      <path d="M75,110 L-112.9,41.6 L-106.3,25.5 Z"/>
+      <path d="M75,110 L-98.2,10.0 L-88.8,-4.7 Z"/>
+      <path d="M75,110 L-78.2,-18.6 L-66.4,-31.4 Z"/>
+      <path d="M75,110 L-53.6,-43.2 L-39.7,-53.8 Z"/>
+      <path d="M75,110 L-25.0,-63.2 L-9.5,-71.3 Z"/>
+      <path d="M75,110 L6.6,-77.9 L23.2,-83.2 Z"/>
+      <path d="M75,110 L40.3,-87.0 L57.6,-89.2 Z"/>
+      <path d="M75,110 L75.0,-90.0 L92.4,-89.2 Z"/>
+      <path d="M75,110 L109.7,-87.0 L126.8,-83.2 Z"/>
+      <path d="M75,110 L143.4,-77.9 L159.5,-71.3 Z"/>
+      <path d="M75,110 L175.0,-63.2 L189.7,-53.8 Z"/>
+      <path d="M75,110 L203.6,-43.2 L216.4,-31.4 Z"/>
+      <path d="M75,110 L228.2,-18.6 L238.8,-4.7 Z"/>
+      <path d="M75,110 L248.2,10.0 L256.3,25.5 Z"/>
+      <path d="M75,110 L262.9,41.6 L268.2,58.2 Z"/>
+      <path d="M75,110 L272.0,75.3 L274.2,92.6 Z"/>
+    </g>
+    <polygon points="-40,30 30,-40 90,-40 -40,90" fill="url(#reflet)" opacity="0.55"/>
+    <polygon points="60,260 190,130 190,175 105,260" fill="url(#reflet)" opacity="0.35"/>
+  </g>
+  <rect x="9" y="9" width="132" height="202" rx="8" fill="none" stroke="#5c3d00" stroke-width="1.2"/>
+  <rect x="12" y="12" width="126" height="196" rx="6" fill="none" stroke="#fff3b8" stroke-width="0.8" opacity="0.9"/>
+
+  <ellipse cx="75" cy="110" rx="60" ry="95" transform="rotate(15 75 110)" fill="none" stroke="url(#orMetal)" stroke-width="4"/>
+  <ellipse cx="75" cy="110" rx="57" ry="92" transform="rotate(15 75 110)" fill="url(#ovale)" stroke="#5c3d00" stroke-width="1"/>
+  <g clip-path="url(#clipOvale)">
+    <ellipse cx="58" cy="52" rx="34" ry="46" transform="rotate(15 58 52)" fill="#ffffff" opacity="0.07"/>
+  </g>
+
+  <use href="#couronne" transform="translate(78 54)"/>
+
+  <g transform="translate(78 95)">
+    <path d="M-22,-24 L22,-24 L16.5,20 L-16.5,20 Z" fill="#1a1405"/>
+    <path d="M-19.5,-10 L19.5,-10 L15.5,18 L-15.5,18 Z" fill="url(#rhum)"/>
+    <ellipse cx="0" cy="-10" rx="19.5" ry="2.2" fill="#ffcf6b"/>
+    <path d="M-22,-24 L22,-24 L16.5,20 L-16.5,20 Z" fill="url(#verre)" stroke="url(#orContour)" stroke-width="1.8" stroke-linejoin="round"/>
+    <rect x="-18" y="18" width="36" height="7" rx="2" fill="url(#orMetal)" stroke="#5c3d00" stroke-width="0.8"/>
+    <path d="M-17,-20 L-13,15" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round" opacity="0.75"/>
+    <path d="M14,-20 L12,-2" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/>
+
+    <g transform="translate(0 1)">
+      <ellipse rx="14" ry="17.5" fill="url(#orMetal)" stroke="#5c3d00" stroke-width="0.8"/>
+      <ellipse rx="12.3" ry="15.8" fill="#f6e9c8" stroke="#9e0b0f" stroke-width="1.3"/>
+      <use href="#capitaine" transform="translate(0.5 0.5) scale(0.5)"/>
+    </g>
+  </g>
+
+  <g font-family="Georgia, 'Times New Roman', serif" font-weight="bold" font-size="25" text-anchor="middle" letter-spacing="1.5">
+    <g stroke="#3d2800" stroke-width="3" stroke-linejoin="round" fill="#3d2800">
+      <text x="72" y="150">CUL</text>
+      <text x="68" y="176">SEC</text>
+    </g>
+    <g fill="url(#orMetal)">
+      <text x="72" y="150">CUL</text>
+      <text x="68" y="176">SEC</text>
+    </g>
+  </g>
+
+  <use href="#couronne" transform="translate(26 26) scale(0.42)"/>
+  <use href="#couronne" transform="rotate(180 75 110) translate(26 26) scale(0.42)"/>
+
+  <g filter="url(#lueur)">
+    <use href="#eclat" transform="translate(112 34) scale(1.1)"/>
+    <use href="#eclat" transform="translate(107 40) scale(0.45)"/>
+    <use href="#eclat" transform="translate(97 62) scale(0.8)"/>
+    <use href="#eclat" transform="translate(58 76) scale(0.6)"/>
+    <use href="#eclat" transform="translate(28 150) scale(0.9)"/>
+    <use href="#eclat" transform="translate(124 128) scale(0.7)"/>
+    <use href="#eclat" transform="translate(40 198) scale(0.5)"/>
+    <use href="#eclat" transform="translate(96 168) scale(0.55)"/>
+  </g>
+</svg>

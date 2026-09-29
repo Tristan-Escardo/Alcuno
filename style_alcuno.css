@@ -179,6 +179,7 @@ button,
 #overlayPlus4 .plus4-joueur-btn,
 #overlayPlus4 .plus4-action-btn,
 #overlayPigeon .bouton-pigeon,
+#overlayCarteDoree .bouton-pigeon,
 #overlayFinUnRestants .bouton-pigeon,
 #overlayPredictionFin .bouton-pigeon,
 #overlayRegleUnique .bouton-annulation {
@@ -491,6 +492,7 @@ button,
 }
 
 #overlayPigeon,
+#overlayCarteDoree,
 #overlayFinUnRestants{
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
@@ -678,7 +680,8 @@ button,
 }
 
 /* ===== MENU PIGEON FULLSCREEN ===== */
-#overlayPigeon {
+#overlayPigeon,
+#overlayCarteDoree {
     position: fixed;
     inset: 0;
     width: auto;
@@ -695,7 +698,8 @@ button,
     animation: fadeIn 0.5s ease forwards;
 }
 
-#overlayPigeon .titre-pigeon {
+#overlayPigeon .titre-pigeon,
+#overlayCarteDoree .titre-pigeon {
     font-size: 48px;
     font-weight: bold;
     color: #FFD700;
@@ -704,7 +708,8 @@ button,
     animation: pop 0.5s ease forwards;
 }
 
-#overlayPigeon .bouton-pigeon {
+#overlayPigeon .bouton-pigeon,
+#overlayCarteDoree .bouton-pigeon {
     width: 80%;
     max-width: 400px;
     padding: 25px;
@@ -719,7 +724,8 @@ button,
     animation: slideUp 0.5s ease forwards;
 }
 
-#overlayPigeon .bouton-pigeon:hover {
+#overlayPigeon .bouton-pigeon:hover,
+#overlayCarteDoree .bouton-pigeon:hover {
     background-color: #ffea70;
     transform: scale(1.15);
 }
@@ -1127,6 +1133,7 @@ body.no-scroll{
 #overlayPlus4,
 #overlayDuel,
 #overlayPigeon,
+#overlayCarteDoree,
 #overlayCouleur,
 #overlayFinUnRestants,
 #overlayPredictionFin,
@@ -1140,6 +1147,7 @@ body.no-scroll{
 #overlayPlus4 .titre-pigeon,
 #overlayDuel .titre-pigeon,
 #overlayPigeon .titre-pigeon,
+#overlayCarteDoree .titre-pigeon,
 #overlayFinUnRestants .titre-pigeon{
   font-size: clamp(24px, 5vw, 52px);
   line-height: 1.05;
@@ -1152,6 +1160,7 @@ body.no-scroll{
 #overlayPlus4,
 #overlayDuel,
 #overlayPigeon,
+#overlayCarteDoree,
 #overlayCouleur,
 #overlayFinUnRestants,
 #overlayPredictionFin,
@@ -1179,6 +1188,7 @@ body.no-scroll{
 #overlayPlus4 .bouton-pigeon,
 #overlayDuel .bouton-pigeon,
 #overlayPigeon .bouton-pigeon,
+#overlayCarteDoree .bouton-pigeon,
 #overlayFinUnRestants .bouton-pigeon,
 #overlayPredictionFin .bouton-pigeon,
 #overlayRegleUnique .bouton-annulation{
@@ -1242,6 +1252,7 @@ body.no-scroll{
   #overlayPlus4 .bouton-pigeon,
   #overlayDuel .bouton-pigeon,
   #overlayPigeon .bouton-pigeon,
+  #overlayCarteDoree .bouton-pigeon,
   #overlayFinUnRestants .bouton-pigeon,
   #overlayPredictionFin .bouton-pigeon{
     width: 100%;
@@ -1322,6 +1333,36 @@ body.no-scroll{
 .switch_jaune { background-image: url("Cartes/switch_jaune.jpg"); }
 .switch_rouge { background-image: url("Cartes/switch_rouge.jpg"); }
 .switch_bleu { background-image: url("Cartes/switch_bleu.jpg"); }
+
+/* ===== Easter egg : carte dorée ===== */
+.carte_doree { background-image: url("Cartes/carte_doree.svg"); }
+
+/* Dos normal, avec un reflet doré qui passe de temps en temps */
+.Carte.dos_dore {
+  position: relative;
+  overflow: hidden;
+}
+
+.Carte.dos_dore::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(115deg,
+    transparent 32%,
+    rgba(255, 200, 40, 0.55) 44%,
+    rgba(255, 246, 200, 0.95) 50%,
+    rgba(255, 200, 40, 0.55) 56%,
+    transparent 68%);
+  transform: translateX(-170%);
+  animation: refletDore 5.5s ease-in-out infinite;
+}
+
+@keyframes refletDore {
+  0%, 72% { transform: translateX(-170%); }
+  100%    { transform: translateX(170%); }
+}
 
 /* ===== Sticky joueur actif discret ===== */
 #stickyJoueurActif{
