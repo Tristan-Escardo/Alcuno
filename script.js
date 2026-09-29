@@ -2077,9 +2077,12 @@ document.addEventListener("DOMContentLoaded", function () {
       surAction(btn, "doree:" + i, { owner: choisisseur, once: true }, () => {
         overlay.remove();
         unlockScroll();
-        choixPigeonEnCours = false;
-        afficherJoueurActif();
-        afficherOverlayTiensGueule(nom, choisisseur);
+        afficherOverlayTiensGueule(nom);
+        // Plateau (et pari de fin) débloqués seulement une fois le message lu
+        executerApresOverlayRegleUnique(() => {
+          choixPigeonEnCours = false;
+          afficherJoueurActif();
+        });
       });
       overlay.appendChild(btn);
     });
@@ -2087,51 +2090,13 @@ document.addEventListener("DOMContentLoaded", function () {
     document.body.appendChild(overlay);
   }
 
-  // En ligne : seul le téléphone de la victime affiche l'écran violent, les autres un message normal
-  function afficherOverlayTiensGueule(victime, donneur){
+  // En ligne : seul le téléphone de la victime affiche « TIENS DANS TA GUEULE. »
+  function afficherOverlayTiensGueule(victime){
     if(enLigneActif && victime !== pseudoActuel){
       montrerOverlayRegle(`${victime} prend le CUL SEC de la carte dorée !`, "carte_doree");
       return;
     }
-
-    const overlay = document.createElement("div");
-    overlay.id = "overlayTiensGueule";
-
-    const boum = document.createElement("div");
-    boum.className = "gueule-boum";
-    boum.innerText = "💥";
-
-    const titre = document.createElement("div");
-    titre.className = "gueule-titre";
-    titre.innerText = "TIENS DANS TA GUEULE";
-
-    const sousTitre = document.createElement("div");
-    sousTitre.className = "gueule-sous-titre";
-    const offert = victime === donneur ? "tu te l'es offert toi-même" : `offert par ${donneur}`;
-    sousTitre.innerText = enLigneActif
-      ? `CUL SEC 🥃 ${offert}`
-      : `${victime} : CUL SEC 🥃 ${offert}`;
-
-    overlay.appendChild(boum);
-    overlay.appendChild(titre);
-    overlay.appendChild(sousTitre);
-
-    lockScroll();
-    document.body.appendChild(overlay);
-    if(navigator.vibrate) navigator.vibrate([300, 80, 300, 80, 600]);
-
-    let ferme = false;
-    const fermer = () => {
-      if(ferme) return;
-      ferme = true;
-      // Déjà retiré par nettoyerOverlays (nouvelle partie) : le scroll a été remis à zéro
-      if(!overlay.isConnected) return;
-      overlay.remove();
-      unlockScroll();
-    };
-    // Petit délai avant d'accepter le tap : le doigt qui vient de choisir ne ferme pas tout de suite
-    setTimeout(() => overlay.addEventListener("pointerdown", fermer), 600);
-    setTimeout(fermer, 4500);
+    montrerOverlayRegle("TIENS DANS TA GUEULE.");
   }
 
   /* ===== DUEL : Choix joueurs puis tirage ===== */
