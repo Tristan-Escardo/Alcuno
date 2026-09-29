@@ -2680,3 +2680,36 @@ header h1{
   flex: 0 1 auto;
   align-content: start;
 }
+
+/* ===== Duel : halo qui suit les cartes qu'on peut toucher ===== */
+/* Cartes encore à choisir : elles pulsent en doré (visible aussi sur téléphone, sans survol) */
+#overlayDuel .Carte.duel-a-choisir{
+  animation: duelPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes duelPulse{
+  0%, 100% { box-shadow: 0 0 0 2px rgba(255,215,0,0.55), 0 0 10px rgba(255,215,0,0.25); }
+  50%      { box-shadow: 0 0 0 2px rgba(255,215,0,0.95), 0 0 28px rgba(255,215,0,0.60); }
+}
+
+/* Carte déjà choisie par J1 : en retrait (plus de halo, assombrie, un peu surélevée) */
+#overlayDuel .Carte.duel-selected{
+  box-shadow: none;
+  filter: brightness(0.55) saturate(0.8);
+  transform: translateY(-6px);
+  transition: filter 0.2s ease, transform 0.2s ease;
+}
+
+/* Effet de survol réservé aux appareils avec souris (sinon il reste « collé » après un tap sur téléphone) */
+@media (hover: none){
+  #overlayDuel .Carte:not(.retournee):not(.duel-selected):hover{
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce){
+  #overlayDuel .Carte.duel-a-choisir{
+    animation: none;
+    box-shadow: 0 0 0 2px rgba(255,215,0,0.85), 0 0 18px rgba(255,215,0,0.45);
+  }
+}

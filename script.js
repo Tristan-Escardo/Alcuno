@@ -2374,9 +2374,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
       selectionFaite = false;
 
-      // Reset visuel : cartes de dos (classe Carte uniquement)
-      c1.className = "Carte";
-      c2.className = "Carte";
+      // Reset visuel : cartes de dos, qui pulsent (= à choisir)
+      c1.className = "Carte duel-a-choisir";
+      c2.className = "Carte duel-a-choisir";
       c1.style.boxShadow = "";
       c2.style.boxShadow = "";
       c1.style.opacity = "1";
@@ -2442,18 +2442,17 @@ document.addEventListener("DOMContentLoaded", function () {
         choixJ1 = which;
         phase = 2;
 
-        if(which === 1){
-          c1.classList.add("duel-selected");
-          c1.style.pointerEvents = "none";
-          c2.style.pointerEvents = "auto";
-        } else {
-          c2.classList.add("duel-selected");
-          c2.style.pointerEvents = "none";
-          c1.style.pointerEvents = "auto";
-        }
+        // La carte de J1 se met en retrait (plus de halo) ; seule la carte restante pulse
+        const choisie = (which === 1) ? c1 : c2;
+        const restante = (which === 1) ? c2 : c1;
+        choisie.classList.remove("duel-a-choisir");
+        choisie.classList.add("duel-selected");
+        choisie.style.pointerEvents = "none";
+        restante.style.pointerEvents = "auto";
 
-        label1.innerText = "";
-        label2.innerText = "";
+        // On sait tout de suite à qui est la carte choisie
+        label1.innerText = (which === 1) ? "Carte de " + joueurs[j1] : "";
+        label2.innerText = (which === 2) ? "Carte de " + joueurs[j1] : "";
         info.innerText = joueurs[j2] + " : clique sur la carte restante";
         return;
       }
@@ -2466,6 +2465,8 @@ document.addEventListener("DOMContentLoaded", function () {
         phase = 3; // terminé
         c1.style.pointerEvents = "none";
         c2.style.pointerEvents = "none";
+        c1.classList.remove("duel-a-choisir");
+        c2.classList.remove("duel-a-choisir");
 
         // Attribution réelle des cartes
         const carteJ1 = (choixJ1 === 1) ? carteA : carteB;
