@@ -626,9 +626,18 @@ document.addEventListener("DOMContentLoaded", function () {
     messageTexte.style.color = hex || "#FFD700";
 
     if(!stickyJoueurActif) return;
+    // Bannière : bleu plus foncé, pour ne pas le confondre avec le turquoise du pigeon
+    // (texte du nom plus clair, pour rester lisible sur le fond sombre)
+    const hexBanniere = couleurChoisie === "bleu" ? "#1d4ed8" : hex;
+    const hexTexte = couleurChoisie === "bleu" ? "#9db9ff" : hex;
     stickyJoueurActif.classList.toggle("has-couleur", !!hex);
-    if(hex) stickyJoueurActif.style.setProperty("--couleur-jeu", hex);
-    else stickyJoueurActif.style.removeProperty("--couleur-jeu");
+    if(hex){
+      stickyJoueurActif.style.setProperty("--couleur-jeu", hexBanniere);
+      stickyJoueurActif.style.setProperty("--couleur-jeu-texte", hexTexte);
+    } else {
+      stickyJoueurActif.style.removeProperty("--couleur-jeu");
+      stickyJoueurActif.style.removeProperty("--couleur-jeu-texte");
+    }
 
     const pastille = stickyJoueurActif.querySelector(".sticky-couleur");
     if(pastille) pastille.innerText = nomCouleur;
@@ -2403,8 +2412,14 @@ document.addEventListener("DOMContentLoaded", function () {
       const gorg = vPerdant * duelMultiplicateur;
       const msg = joueurs[perdant] + " boit " + gorg + " gorgées";
 
-       // 1) on enlève l’overlay du duel (après un mini délai pour lire le reveal)
-      setTimeout(() => {
+      // 1) on enlève l’overlay du duel après le temps de lire le reveal (2,2 s),
+      //    ou dès qu'on tape sur l'écran
+      let suiteFaite = false;
+      const suite = () => {
+        if(suiteFaite) return;
+        suiteFaite = true;
+        overlay.removeEventListener("pointerdown", suite);
+
         unlockScroll();
         overlay.remove();
         annoncerBoireAvecAnnulation(perdant, gorg, "", msg);
@@ -2416,7 +2431,9 @@ document.addEventListener("DOMContentLoaded", function () {
           duelMultiplicateur = 1;
           afficherJoueurActif();
         }, 1800);
-      }, 1100);
+      };
+      setTimeout(suite, 2200);
+      overlay.addEventListener("pointerdown", suite);
     }
 
     function onChoose(which){
