@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.3.6";
+  const VERSION_AFFICHEE = "8.3.7";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "version " + VERSION_AFFICHEE;
@@ -611,6 +611,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   let couleurChoisie = null;
   let carteTroisPourTransfertPigeon = "";
+  let joueurTroisPourTransfertPigeon = null; // celui qui a tiré ce 3 (pour la gorgée couleur)
+  let couleurTroisPourTransfertPigeon = null; // couleur à boire pour ce 3 (ou null)
   let messageCouleurEnCours = false;
 
   let phase = 1;       // 1 = choix J1, 2 = choix J2
@@ -652,20 +654,30 @@ document.addEventListener("DOMContentLoaded", function () {
   }, { passive: false });
 
   /* ===== OUTILS ===== */
-  function appliquerBonusCouleurSiBesoin(carteTiree, options = {}){
-    if(!couleurChoisie) return false;
-
-    const estExclue =
-      carteTiree.startsWith("plus_4") ||
-      carteTiree.startsWith("couleur");
-
-    if(estExclue) return false;
+  // Décidé AU TIRAGE (même résultat sur tous les téléphones en ligne) : si la carte est de la
+  // couleur choisie, renvoie cette couleur et l'efface (elle ne compte qu'une fois). Sinon null.
+  // Pas pour le +4 ni la carte couleur.
+  function prendreCouleurSiBesoin(carteTiree){
+    if(!couleurChoisie) return null;
+    if(carteTiree.startsWith("plus_4") || carteTiree.startsWith("couleur")) return null;
 
     const colCarte = couleurDeLaCarte(carteTiree);
-    if(!(colCarte && colCarte === couleurChoisie)) return false;
+    if(!(colCarte && colCarte === couleurChoisie)) return null;
+
+    couleurChoisie = null;
+    return colCarte;
+  }
+
+  // Affiche la gorgée pour la couleur (options.couleur = résultat de prendreCouleurSiBesoin)
+  function appliquerBonusCouleurSiBesoin(carteTiree, options = {}){
+    const couleur = options.couleur;
+    if(!couleur) return false;
 
     const preserveRuleMessage = !!options.preserveRuleMessage;
-    const msgCouleur = "Et boit 1 gorgée pour la couleur (" + couleurChoisie + ")";
+    // C'est toujours celui qui a tiré la carte qui boit pour la couleur : on le nomme
+    // (sinon, après « Le PIGEON boit 1 gorgée », on croyait que c'était le pigeon)
+    const nom = joueurs[options.joueur];
+    const msgCouleur = (nom ? `${nom} boit` : "Et boit") + " 1 gorgée pour la couleur (" + couleur + ")";
 
     const afficher = () => {
       if(!preserveRuleMessage){
@@ -675,8 +687,6 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       montrerOverlayRegle(msgCouleur, carteTiree);
     };
-
-    couleurChoisie = null;
 
     if(options.afterRuleOverlay){
       executerApresOverlayRegleUnique(afficher);
@@ -1357,14 +1367,21 @@ document.addEventListener("DOMContentLoaded", function () {
         const msg = `${joueurs[i]} est le nouveau PIGEON,\n il boit 2 gorgées pour fêter ça`;
         // .messages : on l'affiche dans reglePigeon (et il disparaît au prochain tirage)
         // 3) overlay + annulation si compteur (utilise la carte "trois" qui a déclenché le transfert)
+        const carteTrois = carteTroisPourTransfertPigeon || "trois_vert";
+        const joueurTrois = joueurTroisPourTransfertPigeon;
+        const couleurTrois = couleurTroisPourTransfertPigeon;
         annoncerBoireAvecAnnulation(
           i,
           2,
-          carteTroisPourTransfertPigeon || "trois_vert",
-          msg
+          carteTrois,
+          msg,
+          // puis la gorgée couleur éventuelle de celui qui a tiré le 3
+          () => appliquerBonusCouleurSiBesoin(carteTrois, { couleur: couleurTrois, joueur: joueurTrois, preserveRuleMessage: true })
         );
         // optionnel : on nettoie
         carteTroisPourTransfertPigeon = "";
+        joueurTroisPourTransfertPigeon = null;
+        couleurTroisPourTransfertPigeon = null;
       });
 
         overlay.appendChild(btn);
@@ -2681,6 +2698,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
   /* ===== Application des règles ===== */
   function appliquerRegle(carteTiree, joueurActuel, carteElement){
+    // Gorgée pour la couleur choisie : décidée maintenant (et la couleur effacée),
+    // affichée plus tard par chaque règle, après son propre message
+    const couleurBue = prendreCouleurSiBesoin(carteTiree);
+
     if(zeroEnCours || switchEnCours){
       regleZero.style.display="none";
       zeroEnCours=false;
@@ -2730,7 +2751,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const victimes = joueurs.map((_, i) => i); // tout le monde
       demarrerAnnulationsMulti(victimes, carteTiree, entete, () => {
-        appliquerBonusCouleurSiBesoin(carteTiree, { preserveRuleMessage: true });
+        appliquerBonusCouleurSiBesoin(carteTiree, { couleur: couleurBue, joueur: joueurActuel, preserveRuleMessage: true });
       });
       return;
     }
@@ -2745,7 +2766,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const victimes = joueurs.map((_, i) => i).filter(i => i !== joueurActuel);
       demarrerAnnulationsMulti(victimes, carteTiree, entete, () => {
-        appliquerBonusCouleurSiBesoin(carteTiree, { preserveRuleMessage: true });
+        appliquerBonusCouleurSiBesoin(carteTiree, { couleur: couleurBue, joueur: joueurActuel, preserveRuleMessage: true });
       });
       return;
     }
@@ -2757,7 +2778,7 @@ document.addEventListener("DOMContentLoaded", function () {
         carteTiree,
         `${joueurs[joueurActuel]} boit 2 gorgées`,
         () => {
-          appliquerBonusCouleurSiBesoin(carteTiree, { preserveRuleMessage: true });
+          appliquerBonusCouleurSiBesoin(carteTiree, { couleur: couleurBue, joueur: joueurActuel, preserveRuleMessage: true });
         }
       );
       return; // important : on évite le traitement générique en dessous
@@ -2772,7 +2793,7 @@ document.addEventListener("DOMContentLoaded", function () {
         regleZero.style.display = "block";
         zeroEnCours = true;
         montrerOverlayRegle(msg, carteTiree);
-        appliquerBonusCouleurSiBesoin(carteTiree, { preserveRuleMessage: true, afterRuleOverlay: true });
+        appliquerBonusCouleurSiBesoin(carteTiree, { couleur: couleurBue, joueur: joueurActuel, preserveRuleMessage: true, afterRuleOverlay: true });
         return; // une seule règle "boire" à appliquer
       }
     }
@@ -2797,6 +2818,9 @@ document.addEventListener("DOMContentLoaded", function () {
           carteElement.classList.add("carte-disparue");
         }, 2000);
       }
+
+      // Couleur choisie : la gorgée s'affiche APRÈS « +1 annulation » (sinon elle l'effaçait)
+      appliquerBonusCouleurSiBesoin(carteTiree, { couleur: couleurBue, joueur: joueurActuel, preserveRuleMessage: true, afterRuleOverlay: true });
     }
 
 
@@ -2808,7 +2832,7 @@ document.addEventListener("DOMContentLoaded", function () {
       regleZero.style.display = "block";
       switchEnCours = true;
       montrerOverlayRegle("Le sens du jeu est inversé !", carteTiree);
-      appliquerBonusCouleurSiBesoin(carteTiree, { preserveRuleMessage: true, afterRuleOverlay: true });
+      appliquerBonusCouleurSiBesoin(carteTiree, { couleur: couleurBue, joueur: joueurActuel, preserveRuleMessage: true, afterRuleOverlay: true });
     }
 
     // Cartes "trois/pigeon"
@@ -2823,12 +2847,15 @@ document.addEventListener("DOMContentLoaded", function () {
           carteTiree,
           `${joueurs[joueurActuel]} est PIGEON ! \nIl boit 2 gorgées. \nÀ chaque 3 tiré, tu bois 1 gorgée. \nPour en sortir, tire un 3.`,
           () => {
-            appliquerBonusCouleurSiBesoin(carteTiree, { preserveRuleMessage: true });
+            appliquerBonusCouleurSiBesoin(carteTiree, { couleur: couleurBue, joueur: joueurActuel, preserveRuleMessage: true });
           }
         );
       
       } else if(indexPigeon===joueurActuel){
         carteTroisPourTransfertPigeon = carteTiree;
+        // La gorgée couleur éventuelle viendra après l'annonce du nouveau pigeon
+        joueurTroisPourTransfertPigeon = joueurActuel;
+        couleurTroisPourTransfertPigeon = couleurBue;
         afficherMenuPigeon();
       
       } else {
@@ -2837,7 +2864,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // message dans .messages (disparaît au prochain tirage grâce à effacerMessagePigeon() au début)
         // overlay + choix d'annulation si le pigeon a des "UN"
         annoncerBoireAvecAnnulation(indexPigeon, 1, carteTiree, msg, () => {
-          appliquerBonusCouleurSiBesoin(carteTiree, { preserveRuleMessage: true });
+          appliquerBonusCouleurSiBesoin(carteTiree, { couleur: couleurBue, joueur: joueurActuel, preserveRuleMessage: true });
         });
       }
     }
@@ -2852,28 +2879,12 @@ document.addEventListener("DOMContentLoaded", function () {
       lancerOverlayChoixDuel(joueurActuel);
     }
 
-    // - ne s'applique PAS à plus_2 / plus_4 / couleur
-    // - ne se déclenche QUE quand la carte tirée est de la couleur choisie
-    if(couleurChoisie){
-      const estExclue =
-        carteTiree.startsWith("plus_4") ||
-        carteTiree.startsWith("couleur");
-
-      if(!estExclue){
-        const colCarte = couleurDeLaCarte(carteTiree);
-
-        if(colCarte && colCarte === couleurChoisie){
-          const msgCouleur = "Et boit 1 gorgée pour la couleur ("+ couleurChoisie +")";
-
-          // annulable via les "UN" (même overlay, pas de superposition)
-          annoncerBoireAvecAnnulation(joueurActuel, 1, carteTiree, msgCouleur);
-
-          // la couleur "attendue" est tombée => on reset
-          couleurChoisie = null;
-        }
-      }
+    // Duel de la couleur choisie : la gorgée couleur s'affiche avant le duel
+    // (annulable via les "UN"). Les autres cartes l'affichent elles-mêmes après leur règle.
+    if(couleurBue && carteTiree.startsWith("quatre")){
+      const msgCouleur = `${joueurs[joueurActuel]} boit 1 gorgée pour la couleur (${couleurBue})`;
+      annoncerBoireAvecAnnulation(joueurActuel, 1, carteTiree, msgCouleur);
     }
-    
   }
 
   /* ===== JEU ===== */
