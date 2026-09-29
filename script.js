@@ -50,11 +50,11 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.3.4";
+  const VERSION_AFFICHEE = "8.3.5";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "version " + VERSION_AFFICHEE +
-    (new URLSearchParams(location.search).has("test") ? " · MODE TEST (classique : 4 cartes + carte dorée)" : "");
+    (new URLSearchParams(location.search).has("test") ? " · MODE TEST (en ligne : 4 cartes + carte dorée)" : "");
 
   // ===== Easter egg : 4 taps rapides sur le titre ALCUNO => écran des créateurs =====
   const ecranCredits = document.getElementById("ecranCredits");
@@ -404,7 +404,9 @@ document.addEventListener("DOMContentLoaded", function () {
         manche: (e.manche || 0) + 1,
         seed: Math.floor(Math.random() * 4294967296),
         joueurs: listeJoueurs,
-        hote: e.hote || pseudoActuel
+        hote: e.hote || pseudoActuel,
+        // Mode test : si celui qui lance a « ?test », ou si la manche précédente était déjà en test
+        ...((MODE_TEST || mancheDeTest) ? { test: true } : {})
       };
     }).then(() => marquerActivite(codePartieActuel)).catch(erreurFirebase);
   }
@@ -504,6 +506,7 @@ document.addEventListener("DOMContentLoaded", function () {
     hotePartie = null;
     enLigneActif = false;
     mancheCourante = null;
+    mancheDeTest = false;
     reinitialiserFileActions();
     reinitialiserEcransJeu();
     fermerConfirmationHote();
@@ -592,10 +595,12 @@ document.addEventListener("DOMContentLoaded", function () {
   // Easter egg : environ 1 partie sur 50, une case en plus sur le plateau cache la carte dorée
   const CHANCE_CARTE_DOREE = 1 / 50;
 
-  // Mode test : ajouter « ?test » à la fin de l'adresse du jeu. En mode classique seulement,
-  // le plateau n'a que 4 cartes + la carte dorée (toujours présente) : on arrive vite à la fin.
+  // Mode test EN LIGNE : celui qui lance la manche ouvre le jeu avec « ?test » à la fin de l'adresse.
+  // L'info est enregistrée dans la partie (etatJeu.test) pour que tous les téléphones aient le même
+  // plateau : 4 cartes + la carte dorée (toujours présente), pour arriver vite à la fin.
   const MODE_TEST = new URLSearchParams(location.search).has("test");
   const NB_CARTES_MODE_TEST = 4;
+  let mancheDeTest = false; // manche en ligne actuelle lancée en mode test
   let indexCaseDoree = -1; // -1 = pas de carte dorée dans cette partie
   let carteDoreeEnJeu = false; // présente et pas encore retournée
 
@@ -2899,8 +2904,8 @@ document.addEventListener("DOMContentLoaded", function () {
     paquetDuel = [...duelCartes];
     melangerPaquet(paquetDuel);
 
-    // Mode test (classique uniquement : en ligne, les téléphones doivent avoir le même plateau)
-    const testFin = MODE_TEST && !enLigneActif;
+    // Mode test (en ligne uniquement : décidé par celui qui a lancé la manche, voir etatJeu.test)
+    const testFin = enLigneActif && mancheDeTest;
     if(testFin) paquet = paquet.slice(0, NB_CARTES_MODE_TEST);
 
     // Tirée avec « aleatoire » : en ligne, tous les téléphones ont la même carte dorée au même endroit
@@ -3313,6 +3318,7 @@ document.addEventListener("DOMContentLoaded", function () {
     annulations = {};
     retourMenu();
 
+    mancheDeTest = !!etat.test;
     aleatoire = generateurAleatoire(etat.seed);
     lancerPartie();
 
