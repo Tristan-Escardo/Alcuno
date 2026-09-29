@@ -26,6 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
   let prochainSeq = 1;
   let traitementEnCours = false;
   let timerTrou = null;
+  let idsUniquesUtilises = new Set(); // boutons « unique » déjà appliqués dans la manche (voir surAction)
 
   const PSEUDO_INVALIDE = /[.#$\[\]\/]/;
 
@@ -50,7 +51,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.3.7";
+  const VERSION_AFFICHEE = "8.3.8";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "version " + VERSION_AFFICHEE;
@@ -229,7 +230,11 @@ document.addEventListener("DOMContentLoaded", function () {
           alert("La partie a déjà commencé.");
           return;
         }
-        if (partie.joueurs && partie.joueurs[pseudo]) {
+        // Majuscules ignorées : « Tris » et « tris » ne peuvent pas être tous les deux dans la partie
+        const pseudoMin = pseudo.toLocaleLowerCase("fr-FR");
+        const dejaPris = Object.keys(partie.joueurs || {})
+          .some(nom => nom.toLocaleLowerCase("fr-FR") === pseudoMin);
+        if (dejaPris) {
           alert("Ce pseudo est déjà pris dans cette partie.");
           return;
         }
@@ -999,7 +1004,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const btn = document.createElement('button');
         btn.className = 'bouton-pigeon';
         btn.innerText = 'Terminer';
-        surAction(btn, "pred:terminer", { owner: () => hotePartie, once: true }, () => {
+        surAction(btn, "pred:terminer", { once: true, unique: true }, () => {
           if(overlay._cleanup) overlay._cleanup();
           overlay.remove();
           unlockScroll();
@@ -1350,7 +1355,7 @@ document.addEventListener("DOMContentLoaded", function () {
     btnTerminer.className = "bouton-pigeon";
     btnTerminer.innerText = "Terminer";
 
-    surAction(btnTerminer, "fin:terminer", { owner: () => hotePartie, once: true }, () => {
+    surAction(btnTerminer, "fin:terminer", { once: true, unique: true }, () => {
       // ils boivent leurs "1 restants" => on remet les compteurs à 0
       restants.forEach(x => { annulations[x.nom] = 0; });
       afficherJoueurs();
@@ -1453,6 +1458,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const fin = () => {
       if (fait) return;
       fait = true;
+      // Overlay déjà retiré par une nouvelle partie : on n'enchaîne pas sur la suite de l'ancienne
+      if (!el.isConnected) return;
       callback();
     };
     el.addEventListener("transitionend", fin, { once: true });
@@ -2318,6 +2325,8 @@ document.addEventListener("DOMContentLoaded", function () {
   function afficherOverlayTirageDuel(overlay, j1, j2){
     const content = document.createElement("div");
     content.className = "duel-content duel-tirage-content";
+    // Si une nouvelle partie démarre pendant le duel, ses minuteurs ne doivent plus rien faire
+    const generation = generationPartie;
     overlay.appendChild(content);
 
     const titre = document.createElement("div");
@@ -2402,6 +2411,7 @@ document.addEventListener("DOMContentLoaded", function () {
         duelMultiplicateur *= 2;
         // petite pause puis on relance un duel (toujours dos au départ)
         setTimeout(() => {
+          if(generation !== generationPartie) return;
           preparerDuel();
         }, 1500);
         return;
@@ -2416,7 +2426,7 @@ document.addEventListener("DOMContentLoaded", function () {
       //    ou dès qu'on tape sur l'écran
       let suiteFaite = false;
       const suite = () => {
-        if(suiteFaite) return;
+        if(suiteFaite || generation !== generationPartie) return;
         suiteFaite = true;
         overlay.removeEventListener("pointerdown", suite);
 
@@ -2426,6 +2436,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Puis on restaure l'état du jeu (sans attendre la fin d'overlay ici)
         setTimeout(() => {
+          if(generation !== generationPartie) return;
           duelEnCours = false;
           choixPigeonEnCours = false;
           duelMultiplicateur = 1;
@@ -2482,6 +2493,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Reveal des 2 cartes (on ajoute les classes maintenant)
         setTimeout(() => {
+          if(generation !== generationPartie) return; // partie relancée entre-temps
 
           overlay.classList.remove("reveal");
           
@@ -3147,7 +3159,22 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   document.getElementById("btnAccueil").addEventListener("click", allerAccueil);
-  btnAccueilClassique.addEventListener("click", allerAccueil);
+  // ⌂ du bandeau (mode classique) : pendant une partie, on demande confirmation
+  const ecranConfirmerAccueil = document.getElementById("ecranConfirmerAccueil");
+  btnAccueilClassique.addEventListener("click", () => {
+    if(!partieLancee){
+      allerAccueil();
+      return;
+    }
+    ecranConfirmerAccueil.style.display = "";
+  });
+  document.getElementById("btnConfirmerAccueilOui").addEventListener("click", () => {
+    ecranConfirmerAccueil.style.display = "none";
+    allerAccueil();
+  });
+  document.getElementById("btnConfirmerAccueilNon").addEventListener("click", () => {
+    ecranConfirmerAccueil.style.display = "none";
+  });
   // Écrans en ligne (Créer / Rejoindre / salle d'attente) : quitte la partie éventuelle
   document.getElementById("btnAccueilEnLigne").addEventListener("click", allerAccueil);
 
@@ -3180,10 +3207,11 @@ document.addEventListener("DOMContentLoaded", function () {
   // options : owner (nom ou fonction -> nom autorisé, null = tout le monde),
   //           pret() (l'élément peut recevoir l'action maintenant),
   //           valide() (false => action sans objet, ignorée),
-  //           once (un seul usage), evenement ("pointerdown" par défaut)
+  //           once (un seul usage), unique (une seule fois par manche : un 2e envoi est ignoré),
+  //           evenement ("pointerdown" par défaut)
   function surAction(el, id, options, handler){
     el.dataset.netId = id;
-    el._net = Object.assign({ owner: null, pret: null, valide: null, once: false }, options, { handler });
+    el._net = Object.assign({ owner: null, pret: null, valide: null, once: false, unique: false }, options, { handler });
 
     el.addEventListener(options.evenement || "pointerdown", (e) => {
       if(!enLigneActif){
@@ -3244,6 +3272,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // "ok" | "attendre" (élément pas encore là / pas prêt) | "ignorer" (action devenue sans objet)
   function tenterAction(action){
+    // Bouton à usage unique dans la manche (ex. « Terminer ») déjà appliqué : si deux joueurs
+    // ont appuyé en même temps, le 2e appui est ignoré au lieu d'attendre un bouton disparu
+    if(idsUniquesUtilises.has(action.id)) return "ignorer";
+
     const candidats = Array.from(document.querySelectorAll("[data-net-id]"))
       .filter(el => el.dataset.netId === action.id);
 
@@ -3261,6 +3293,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if(owner && owner !== action.par) return "ignorer";
 
     if(el._net.once) el.dataset.netUtilise = "1";
+    if(el._net.unique) idsUniquesUtilises.add(action.id);
     el._net.handler();
     return "ok";
   }
@@ -3314,6 +3347,7 @@ document.addEventListener("DOMContentLoaded", function () {
     prochainSeq = 1;
     traitementEnCours = false;
     if(timerTrou){ clearTimeout(timerTrou); timerTrou = null; }
+    idsUniquesUtilises = new Set();
   }
 
   function ecouterActions(){
