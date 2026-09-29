@@ -1103,8 +1103,6 @@ document.addEventListener("DOMContentLoaded", function () {
       btnJouer.style.display = joueurs.length >= 2 ? "inline-block" : "none";
     }
     btnSupprimer.style.display = (!partieLancee && joueurs.length > 0) ? "inline-block" : "none";
-    // Avant la partie seulement : pendant la partie, l'accueil passe par « Nouvelle partie »
-    btnAccueilClassique.style.display = partieLancee ? "none" : "inline-block";
     majStickyJoueurActif();
   }
 
@@ -2083,6 +2081,20 @@ document.addEventListener("DOMContentLoaded", function () {
      Fond doré + grand titre (par défaut « ✦ CARTE DORÉE ✦ ») + texte en dessous (facultatif) */
   const TITRE_CARTE_DOREE = '<span class="doree-etincelle">✦</span> CARTE DORÉE <span class="doree-etincelle">✦</span>';
 
+  // Change la durée d'affichage de l'overlay de règle qui vient d'être montré.
+  // facteur = null : il reste affiché jusqu'à ce qu'on tape dessus.
+  function reglerDureeOverlayRegle(message, facteur){
+    if(overlayRegleTimeout){
+      clearTimeout(overlayRegleTimeout);
+      overlayRegleTimeout = null;
+    }
+    if(facteur === null || overlayRegleVerrouille) return;
+    overlayRegleTimeout = setTimeout(
+      () => fermerOverlayRegleUnique(),
+      Math.round(dureeOverlayPourMessage(message) * facteur)
+    );
+  }
+
   function habillerOverlayCarteDoree(texte, titreHtml = TITRE_CARTE_DOREE){
     const overlay = document.getElementById("overlayRegleUnique");
     const boxTexte = overlay && overlay.querySelector(".overlay-regle-texte");
@@ -2160,10 +2172,17 @@ document.addEventListener("DOMContentLoaded", function () {
       const message = `${victime} prend le CUL SEC de la carte dorée !`;
       montrerOverlayRegle(message, "carte_doree");
       habillerOverlayCarteDoree(message);
+      reglerDureeOverlayRegle(message, null); // reste jusqu'au tap
       return;
     }
+
+    // En classique, un seul téléphone pour tous : on précise qui prend le cul sec
+    const titre = enLigneActif
+      ? "TIENS DANS<br>TA GUEULE."
+      : `TIENS DANS<br>TA GUEULE<br>${echapperHtml(avecCouronne(victime))}.`;
     montrerOverlayRegle("TIENS DANS TA GUEULE.", "carte_doree");
-    habillerOverlayCarteDoree("", "TIENS DANS<br>TA GUEULE.");
+    habillerOverlayCarteDoree("", titre);
+    reglerDureeOverlayRegle("", null); // reste jusqu'au tap
   }
 
   /* ===== DUEL : Choix joueurs puis tirage ===== */
@@ -2654,6 +2673,7 @@ document.addEventListener("DOMContentLoaded", function () {
       // Le texte complet sert à calculer la durée d'affichage de l'overlay
       montrerOverlayRegle(`CARTE DORÉE\n${texteCarteDoree}`, carteTiree);
       habillerOverlayCarteDoree(texteCarteDoree);
+      reglerDureeOverlayRegle(`CARTE DORÉE\n${texteCarteDoree}`, 1.65); // +65 % de temps de lecture
       executerApresOverlayRegleUnique(() => afficherOverlayCarteDoree(joueurActuel));
       return;
     }
@@ -2858,7 +2878,6 @@ document.addEventListener("DOMContentLoaded", function () {
     btnNouvellePartie.style.display = "inline-block";
     btnSupprimer.style.display = "none";
     btnJouer.style.display = "none";
-    btnAccueilClassique.style.display = "none";
 
     regleZero.style.display = "none";
     effacerMessagePigeon();
