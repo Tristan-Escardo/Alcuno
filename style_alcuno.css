@@ -2667,3 +2667,16 @@ header h1{
   letter-spacing: 0.08em;
   line-height: 1;
 }
+
+/* ===== +4 : correctif final (chevauchement au-dessus de 600 px + rangées trop espacées) ===== */
+/* Une vieille règle imposait width: min(420px, 92vw) !important aux boutons joueurs :
+   dans la grille de 2 colonnes (~120 px), ils se chevauchaient dès 600 px de large. */
+#overlayPlus4 .plus4-container-joueurs .plus4-joueur-btn{
+  width: 100% !important;
+}
+
+/* Les rangées de joueurs restent serrées au lieu de s'étirer sur toute la hauteur */
+#overlayPlus4 .plus4-container-joueurs{
+  flex: 0 1 auto;
+  align-content: start;
+}
