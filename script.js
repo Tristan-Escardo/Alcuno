@@ -3058,6 +3058,28 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document.getElementById("btnRetourNouvellePartie").addEventListener("click", fermerEcranNouvellePartie);
 
+  // Courte annonce après « Rejouer (avec les mêmes joueurs) » : disparaît toute seule (~1,5 s)
+  // ou au tap. Hors des overlays du jeu : ne bloque rien, même en ligne.
+  function annoncerNouvellePartie(){
+    const ancienne = document.getElementById("annonceNouvellePartie");
+    if(ancienne) ancienne.remove();
+
+    const annonce = document.createElement("div");
+    annonce.id = "annonceNouvellePartie";
+    annonce.innerHTML =
+      '<div class="annonce-titre">NOUVELLE PARTIE</div>' +
+      '<div class="annonce-texte">avec les mêmes joueurs</div>';
+
+    const retirer = () => annonce.remove();
+    annonce.addEventListener("pointerdown", retirer);
+    annonce.addEventListener("animationend", (e) => {
+      if(e.animationName === "annonceApparaitDisparait") retirer();
+    });
+    setTimeout(retirer, 2000); // sécurité (ex. animations désactivées)
+
+    document.body.appendChild(annonce);
+  }
+
   document.getElementById("btnRejouerMemes").addEventListener("click", () => {
     fermerEcranNouvellePartie();
     if(enLigneActif){
@@ -3067,6 +3089,7 @@ document.addEventListener("DOMContentLoaded", function () {
     nettoyerOverlays();
     retourMenu();
     lancerPartie();
+    annoncerNouvellePartie();
   });
 
   document.getElementById("btnModifierJoueurs").addEventListener("click", () => {
@@ -3294,6 +3317,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function demarrerMancheEnLigne(etat){
+    const etaitEnJeu = enLigneActif;
     enLigneActif = true;
     mancheCourante = etat.manche;
     hotePartie = etat.hote;
@@ -3306,6 +3330,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     aleatoire = generateurAleatoire(etat.seed);
     lancerPartie();
+
+    // Manche relancée pendant une partie (« Rejouer ») et pas depuis la salle d'attente
+    if(etaitEnJeu) annoncerNouvellePartie();
 
     document.body.classList.add("mode-en-ligne");
     fermerEcranNouvellePartie();
