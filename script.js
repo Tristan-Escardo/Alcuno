@@ -589,7 +589,8 @@ document.addEventListener("DOMContentLoaded", function () {
   let paquet = [];
 
   // Easter egg : environ 1 partie sur 50, une case en plus sur le plateau cache la carte dorée
-  const CHANCE_CARTE_DOREE = 1 / 50;
+  // ⚠️ TEST : 1 = carte dorée à chaque partie. Remettre 1 / 50 une fois les tests finis.
+  const CHANCE_CARTE_DOREE = 1;
   let indexCaseDoree = -1; // -1 = pas de carte dorée dans cette partie
   let carteDoreeEnJeu = false; // présente et pas encore retournée
 
@@ -1910,6 +1911,8 @@ document.addEventListener("DOMContentLoaded", function () {
   function montrerOverlayRegle(message, classeCarte = "", classeCarteSupplementaire = "") {
     let overlay = document.getElementById("overlayRegleUnique");
     if (overlay) {
+      // Overlay réutilisé : on retire l'habillage doré d'un message carte dorée précédent
+      overlay.classList.remove("overlay-doree");
       const cartes = overlay.querySelector(".overlay-regle-cartes");
       const boxTexte = overlay.querySelector(".overlay-regle-texte");
 
@@ -2076,24 +2079,29 @@ document.addEventListener("DOMContentLoaded", function () {
     document.body.appendChild(overlay);
   }
 
-  /* ===== CARTE DORÉE : mise en forme de l'overlay d'annonce =====
-     Grand titre « ✦ CARTE DORÉE ✦ » doré, puis le texte en dessous */
-  function habillerOverlayCarteDoree(texte){
-    const boxTexte = document.querySelector("#overlayRegleUnique .overlay-regle-texte");
+  /* ===== CARTE DORÉE : habillage premium de l'overlay de règle =====
+     Fond doré + grand titre (par défaut « ✦ CARTE DORÉE ✦ ») + texte en dessous (facultatif) */
+  const TITRE_CARTE_DOREE = '<span class="doree-etincelle">✦</span> CARTE DORÉE <span class="doree-etincelle">✦</span>';
+
+  function habillerOverlayCarteDoree(texte, titreHtml = TITRE_CARTE_DOREE){
+    const overlay = document.getElementById("overlayRegleUnique");
+    const boxTexte = overlay && overlay.querySelector(".overlay-regle-texte");
     if(!boxTexte) return;
 
+    overlay.classList.add("overlay-doree");
     boxTexte.innerHTML = "";
 
     const titre = document.createElement("div");
     titre.className = "doree-titre";
-    titre.innerHTML = '<span class="doree-etincelle">✦</span> CARTE DORÉE <span class="doree-etincelle">✦</span>';
-
-    const ligne = document.createElement("div");
-    ligne.className = "doree-texte";
-    ligne.innerText = texte;
-
+    titre.innerHTML = titreHtml;
     boxTexte.appendChild(titre);
-    boxTexte.appendChild(ligne);
+
+    if(texte){
+      const ligne = document.createElement("div");
+      ligne.className = "doree-texte";
+      ligne.innerText = texte;
+      boxTexte.appendChild(ligne);
+    }
   }
 
   /* ===== CARTE DORÉE : choix de celui qui prend le cul sec ===== */
@@ -2106,16 +2114,30 @@ document.addEventListener("DOMContentLoaded", function () {
     const overlay = document.createElement("div");
     overlay.id = "overlayCarteDoree";
 
+    // En-tête : la carte dorée qui brille, le titre, puis la consigne
+    const carte = document.createElement("div");
+    carte.className = "Carte carte_doree doree-carte-vedette";
+    overlay.appendChild(carte);
+
     const titre = document.createElement("div");
-    titre.className = "titre-pigeon";
-    titre.innerText = "Choisis à qui tu vas distribuer ton cul sec";
+    titre.className = "doree-titre";
+    titre.innerHTML = TITRE_CARTE_DOREE;
     overlay.appendChild(titre);
+
+    const consigne = document.createElement("div");
+    consigne.className = "doree-texte";
+    consigne.innerText = "Choisis à qui tu distribues ton cul sec";
+    overlay.appendChild(consigne);
+
+    const liste = document.createElement("div");
+    liste.className = "doree-boutons";
+    overlay.appendChild(liste);
 
     // Tout le monde, y compris celui qui a tiré la carte
     joueurs.forEach((nom, i) => {
       const btn = document.createElement("button");
-      btn.className = "bouton-pigeon";
-      btn.innerText = nom;
+      btn.className = "bouton-doree";
+      btn.innerText = avecCouronne(nom);
       surAction(btn, "doree:" + i, { owner: choisisseur, once: true }, () => {
         overlay.remove();
         unlockScroll();
@@ -2126,7 +2148,7 @@ document.addEventListener("DOMContentLoaded", function () {
           afficherJoueurActif();
         });
       });
-      overlay.appendChild(btn);
+      liste.appendChild(btn);
     });
 
     document.body.appendChild(overlay);
@@ -2135,10 +2157,13 @@ document.addEventListener("DOMContentLoaded", function () {
   // En ligne : seul le téléphone de la victime affiche « TIENS DANS TA GUEULE. »
   function afficherOverlayTiensGueule(victime){
     if(enLigneActif && victime !== pseudoActuel){
-      montrerOverlayRegle(`${victime} prend le CUL SEC de la carte dorée !`, "carte_doree");
+      const message = `${victime} prend le CUL SEC de la carte dorée !`;
+      montrerOverlayRegle(message, "carte_doree");
+      habillerOverlayCarteDoree(message);
       return;
     }
-    montrerOverlayRegle("TIENS DANS TA GUEULE.");
+    montrerOverlayRegle("TIENS DANS TA GUEULE.", "carte_doree");
+    habillerOverlayCarteDoree("", "TIENS DANS<br>TA GUEULE.");
   }
 
   /* ===== DUEL : Choix joueurs puis tirage ===== */
