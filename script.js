@@ -53,7 +53,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const VERSION_AFFICHEE = "8.3.3";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
-  document.getElementById("versionJeu").innerText = "version " + VERSION_AFFICHEE;
+  document.getElementById("versionJeu").innerText = "version " + VERSION_AFFICHEE +
+    (new URLSearchParams(location.search).has("test") ? " · MODE TEST (classique : 4 cartes + carte dorée)" : "");
 
   // ===== Easter egg : 4 taps rapides sur le titre ALCUNO => écran des créateurs =====
   const ecranCredits = document.getElementById("ecranCredits");
@@ -589,8 +590,12 @@ document.addEventListener("DOMContentLoaded", function () {
   let paquet = [];
 
   // Easter egg : environ 1 partie sur 50, une case en plus sur le plateau cache la carte dorée
-  // ⚠️ TEST : 1 = carte dorée à chaque partie. Remettre 1 / 50 une fois les tests finis.
-  const CHANCE_CARTE_DOREE = 1;
+  const CHANCE_CARTE_DOREE = 1 / 50;
+
+  // Mode test : ajouter « ?test » à la fin de l'adresse du jeu. En mode classique seulement,
+  // le plateau n'a que 4 cartes + la carte dorée (toujours présente) : on arrive vite à la fin.
+  const MODE_TEST = new URLSearchParams(location.search).has("test");
+  const NB_CARTES_MODE_TEST = 4;
   let indexCaseDoree = -1; // -1 = pas de carte dorée dans cette partie
   let carteDoreeEnJeu = false; // présente et pas encore retournée
 
@@ -2858,8 +2863,12 @@ document.addEventListener("DOMContentLoaded", function () {
     paquetDuel = [...duelCartes];
     melangerPaquet(paquetDuel);
 
+    // Mode test (classique uniquement : en ligne, les téléphones doivent avoir le même plateau)
+    const testFin = MODE_TEST && !enLigneActif;
+    if(testFin) paquet = paquet.slice(0, NB_CARTES_MODE_TEST);
+
     // Tirée avec « aleatoire » : en ligne, tous les téléphones ont la même carte dorée au même endroit
-    const avecCarteDoree = aleatoire() < CHANCE_CARTE_DOREE;
+    const avecCarteDoree = testFin || aleatoire() < CHANCE_CARTE_DOREE;
     const nbCases = paquet.length + (avecCarteDoree ? 1 : 0);
     indexCaseDoree = avecCarteDoree ? Math.floor(aleatoire() * nbCases) : -1;
     carteDoreeEnJeu = avecCarteDoree;
