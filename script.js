@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.3.3";
+  const VERSION_AFFICHEE = "8.3.4";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "version " + VERSION_AFFICHEE +
@@ -2185,7 +2185,17 @@ document.addEventListener("DOMContentLoaded", function () {
         overlay.remove();
         unlockScroll();
         afficherOverlayTiensGueule(nom);
-        // Plateau (et pari de fin) débloqués seulement une fois le message lu
+
+        // En ligne : on débloque tout de suite. L'overlay reste affiché jusqu'au tap, mais ne doit
+        // pas bloquer ce téléphone (sinon, s'il n'est pas tapé, il raterait les actions des autres
+        // et se désynchroniserait). Si la partie avance, le message suivant le remplace.
+        if(enLigneActif){
+          choixPigeonEnCours = false;
+          afficherJoueurActif();
+          return;
+        }
+
+        // Classique : plateau (et pari de fin) débloqués seulement une fois le message lu
         executerApresOverlayRegleUnique(() => {
           choixPigeonEnCours = false;
           afficherJoueurActif();
