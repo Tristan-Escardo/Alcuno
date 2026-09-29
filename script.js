@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.3.2";
+  const VERSION_AFFICHEE = "8.3.3";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "version " + VERSION_AFFICHEE;
@@ -587,6 +587,11 @@ document.addEventListener("DOMContentLoaded", function () {
   let joueurs = [];
   let annulations = {}; // { "Alice": 3, "Bob": 0, ... }
   let paquet = [];
+
+  // Easter egg : environ 1 partie sur 50, une case en plus sur le plateau cache la carte dorée
+  const CHANCE_CARTE_DOREE = 1 / 50;
+  let indexCaseDoree = -1; // -1 = pas de carte dorée dans cette partie
+  let carteDoreeEnJeu = false; // présente et pas encore retournée
 
   let paquetDuel = [];
   let duelEnCours = false;
@@ -2049,6 +2054,86 @@ document.addEventListener("DOMContentLoaded", function () {
     document.body.appendChild(overlay);
   }
 
+  /* ===== CARTE DORÉE : choix de celui qui prend le cul sec ===== */
+  function afficherOverlayCarteDoree(joueurActuel){
+    if(document.getElementById("overlayCarteDoree")) return;
+    const choisisseur = joueurs[joueurActuel];
+    choixPigeonEnCours = true;
+    lockScroll();
+
+    const overlay = document.createElement("div");
+    overlay.id = "overlayCarteDoree";
+
+    const titre = document.createElement("div");
+    titre.className = "titre-pigeon";
+    titre.innerText = "Choisis à qui tu vas distribuer ton cul sec";
+    overlay.appendChild(titre);
+
+    // Tout le monde, y compris celui qui a tiré la carte
+    joueurs.forEach((nom, i) => {
+      const btn = document.createElement("button");
+      btn.className = "bouton-pigeon";
+      btn.innerText = nom;
+      surAction(btn, "doree:" + i, { owner: choisisseur, once: true }, () => {
+        overlay.remove();
+        unlockScroll();
+        choixPigeonEnCours = false;
+        afficherJoueurActif();
+        afficherOverlayTiensGueule(nom, choisisseur);
+      });
+      overlay.appendChild(btn);
+    });
+
+    document.body.appendChild(overlay);
+  }
+
+  // En ligne : seul le téléphone de la victime affiche l'écran violent, les autres un message normal
+  function afficherOverlayTiensGueule(victime, donneur){
+    if(enLigneActif && victime !== pseudoActuel){
+      montrerOverlayRegle(`${victime} prend le CUL SEC de la carte dorée !`, "carte_doree");
+      return;
+    }
+
+    const overlay = document.createElement("div");
+    overlay.id = "overlayTiensGueule";
+
+    const boum = document.createElement("div");
+    boum.className = "gueule-boum";
+    boum.innerText = "💥";
+
+    const titre = document.createElement("div");
+    titre.className = "gueule-titre";
+    titre.innerText = "TIENS DANS TA GUEULE";
+
+    const sousTitre = document.createElement("div");
+    sousTitre.className = "gueule-sous-titre";
+    const offert = victime === donneur ? "tu te l'es offert toi-même" : `offert par ${donneur}`;
+    sousTitre.innerText = enLigneActif
+      ? `CUL SEC 🥃 ${offert}`
+      : `${victime} : CUL SEC 🥃 ${offert}`;
+
+    overlay.appendChild(boum);
+    overlay.appendChild(titre);
+    overlay.appendChild(sousTitre);
+
+    lockScroll();
+    document.body.appendChild(overlay);
+    if(navigator.vibrate) navigator.vibrate([300, 80, 300, 80, 600]);
+
+    let ferme = false;
+    const fermer = () => {
+      if(ferme) return;
+      ferme = true;
+      // Déjà retiré par nettoyerOverlays (nouvelle partie) : le scroll a été remis à zéro
+      if(!overlay.isConnected) return;
+      overlay.remove();
+      unlockScroll();
+    };
+    // Petit délai avant d'accepter le tap : le doigt qui vient de choisir ne ferme pas tout de suite
+    setTimeout(() => overlay.addEventListener("pointerdown", fermer), 600);
+    setTimeout(fermer, 4500);
+  }
+
   /* ===== DUEL : Choix joueurs puis tirage ===== */
   function lancerOverlayChoixDuel(joueurActuel){
     if(document.getElementById("overlayDuel")) return;
@@ -2525,6 +2610,22 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
+    if (carteTiree === "carte_doree") {
+      regleZero.innerText = "CARTE DORÉE : distribue un cul sec";
+      regleZero.style.display = "block";
+      zeroEnCours = true;
+
+      // Plateau bloqué (et pari de fin en attente) jusqu'au choix de la victime
+      choixPigeonEnCours = true;
+      montrerOverlayRegle(
+        "Tu as trouvé la CARTE DORÉE !!\n" +
+        "Distribue un cul sec de la part du développeur, et obligation de se servir un vrai verre avant 😘",
+        carteTiree
+      );
+      executerApresOverlayRegleUnique(() => afficherOverlayCarteDoree(joueurActuel));
+      return;
+    }
+
     // Cas spécial: plus_4 => overlay de distribution + annulations chez les cibles
     if (carteTiree.startsWith("plus_4")) {
       afficherOverlayPlus4(joueurActuel, carteTiree);
@@ -2705,6 +2806,12 @@ document.addEventListener("DOMContentLoaded", function () {
     paquetDuel = [...duelCartes];
     melangerPaquet(paquetDuel);
 
+    // Tirée avec « aleatoire » : en ligne, tous les téléphones ont la même carte dorée au même endroit
+    const avecCarteDoree = aleatoire() < CHANCE_CARTE_DOREE;
+    const nbCases = paquet.length + (avecCarteDoree ? 1 : 0);
+    indexCaseDoree = avecCarteDoree ? Math.floor(aleatoire() * nbCases) : -1;
+    carteDoreeEnJeu = avecCarteDoree;
+
     indexJoueur = 0;
     partieLancee = true;
     zeroEnCours = false;
@@ -2725,9 +2832,11 @@ document.addEventListener("DOMContentLoaded", function () {
     effacerMessagePigeon();
     afficherJoueurActif();
 
-    for(let i=0;i<paquet.length;i++){
+    for(let i=0;i<nbCases;i++){
       const carte = document.createElement("div");
       carte.classList.add("Carte");
+      const estCaseDoree = i === indexCaseDoree;
+      if(estCaseDoree) carte.classList.add("dos_dore");
 
       surAction(carte, "carte:" + i, {
         evenement: "click",
@@ -2740,16 +2849,26 @@ document.addEventListener("DOMContentLoaded", function () {
         if(carte.classList.contains("retournee")) return;
         if(joueurs.length === 0) return;
 
-        const carteTiree = paquet.shift();
+        // La dernière carte du paquet est réservée au pari de fin : la carte dorée doit sortir avant
+        if(!estCaseDoree && carteDoreeEnJeu && paquet.length === 1){
+          afficherToast("Tire d'abord la carte dorée ✨");
+          return;
+        }
+
+        const carteTiree = estCaseDoree ? "carte_doree" : paquet.shift();
         if(!carteTiree) return;
 
+        if(estCaseDoree){
+          carteDoreeEnJeu = false;
+          carte.classList.remove("dos_dore");
+        }
         carte.classList.add(carteTiree, "retournee");
 
         const joueurActuel = indexJoueur % joueurs.length;
         appliquerRegle(carteTiree, joueurActuel, carte);
 
         // Avant-dernière carte tirée => on lance le pari sur la dernière (après les overlays éventuels)
-        if(paquet.length === 1 && !predictionEnCours){
+        if(paquet.length === 1 && !predictionEnCours && !carteDoreeEnJeu){
           const startIdx = nextPlayerIndex(joueurActuel);
           executerApresOverlayRegleUnique(() => {
             // Si un duel/pigeon est en cours, on attend que ça finisse avant d'afficher
@@ -2794,6 +2913,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     paquet = [];
     paquetDuel = [];
+    indexCaseDoree = -1;
+    carteDoreeEnJeu = false;
 
     indexJoueur = 0;
 

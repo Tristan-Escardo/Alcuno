@@ -179,6 +179,7 @@ button,
 #overlayPlus4 .plus4-joueur-btn,
 #overlayPlus4 .plus4-action-btn,
 #overlayPigeon .bouton-pigeon,
+#overlayCarteDoree .bouton-pigeon,
 #overlayFinUnRestants .bouton-pigeon,
 #overlayPredictionFin .bouton-pigeon,
 #overlayRegleUnique .bouton-annulation {
@@ -491,6 +492,7 @@ button,
 }
 
 #overlayPigeon,
+#overlayCarteDoree,
 #overlayFinUnRestants{
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
@@ -678,7 +680,8 @@ button,
 }
 
 /* ===== MENU PIGEON FULLSCREEN ===== */
-#overlayPigeon {
+#overlayPigeon,
+#overlayCarteDoree {
     position: fixed;
     inset: 0;
     width: auto;
@@ -695,7 +698,8 @@ button,
     animation: fadeIn 0.5s ease forwards;
 }
 
-#overlayPigeon .titre-pigeon {
+#overlayPigeon .titre-pigeon,
+#overlayCarteDoree .titre-pigeon {
     font-size: 48px;
     font-weight: bold;
     color: #FFD700;
@@ -704,7 +708,8 @@ button,
     animation: pop 0.5s ease forwards;
 }
 
-#overlayPigeon .bouton-pigeon {
+#overlayPigeon .bouton-pigeon,
+#overlayCarteDoree .bouton-pigeon {
     width: 80%;
     max-width: 400px;
     padding: 25px;
@@ -719,7 +724,8 @@ button,
     animation: slideUp 0.5s ease forwards;
 }
 
-#overlayPigeon .bouton-pigeon:hover {
+#overlayPigeon .bouton-pigeon:hover,
+#overlayCarteDoree .bouton-pigeon:hover {
     background-color: #ffea70;
     transform: scale(1.15);
 }
@@ -1127,6 +1133,7 @@ body.no-scroll{
 #overlayPlus4,
 #overlayDuel,
 #overlayPigeon,
+#overlayCarteDoree,
 #overlayCouleur,
 #overlayFinUnRestants,
 #overlayPredictionFin,
@@ -1140,6 +1147,7 @@ body.no-scroll{
 #overlayPlus4 .titre-pigeon,
 #overlayDuel .titre-pigeon,
 #overlayPigeon .titre-pigeon,
+#overlayCarteDoree .titre-pigeon,
 #overlayFinUnRestants .titre-pigeon{
   font-size: clamp(24px, 5vw, 52px);
   line-height: 1.05;
@@ -1152,6 +1160,8 @@ body.no-scroll{
 #overlayPlus4,
 #overlayDuel,
 #overlayPigeon,
+#overlayCarteDoree,
+#overlayTiensGueule,
 #overlayCouleur,
 #overlayFinUnRestants,
 #overlayPredictionFin,
@@ -1179,6 +1189,7 @@ body.no-scroll{
 #overlayPlus4 .bouton-pigeon,
 #overlayDuel .bouton-pigeon,
 #overlayPigeon .bouton-pigeon,
+#overlayCarteDoree .bouton-pigeon,
 #overlayFinUnRestants .bouton-pigeon,
 #overlayPredictionFin .bouton-pigeon,
 #overlayRegleUnique .bouton-annulation{
@@ -1242,6 +1253,7 @@ body.no-scroll{
   #overlayPlus4 .bouton-pigeon,
   #overlayDuel .bouton-pigeon,
   #overlayPigeon .bouton-pigeon,
+  #overlayCarteDoree .bouton-pigeon,
   #overlayFinUnRestants .bouton-pigeon,
   #overlayPredictionFin .bouton-pigeon{
     width: 100%;
@@ -1322,6 +1334,100 @@ body.no-scroll{
 .switch_jaune { background-image: url("Cartes/switch_jaune.jpg"); }
 .switch_rouge { background-image: url("Cartes/switch_rouge.jpg"); }
 .switch_bleu { background-image: url("Cartes/switch_bleu.jpg"); }
+
+/* ===== Easter egg : carte dorée ===== */
+.carte_doree { background-image: url("Cartes/carte_doree.svg"); }
+
+/* Dos normal, avec un reflet doré qui passe de temps en temps */
+.Carte.dos_dore {
+  position: relative;
+  overflow: hidden;
+}
+
+.Carte.dos_dore::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(115deg,
+    transparent 32%,
+    rgba(255, 200, 40, 0.55) 44%,
+    rgba(255, 246, 200, 0.95) 50%,
+    rgba(255, 200, 40, 0.55) 56%,
+    transparent 68%);
+  transform: translateX(-170%);
+  animation: refletDore 5.5s ease-in-out infinite;
+}
+
+@keyframes refletDore {
+  0%, 72% { transform: translateX(-170%); }
+  100%    { transform: translateX(170%); }
+}
+
+/* ===== Overlay « TIENS DANS TA GUEULE » ===== */
+#overlayTiensGueule {
+  z-index: 10050;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(10px, 3vw, 24px);
+  padding: 20px;
+  text-align: center;
+  color: #fff;
+  background: #7a0000;
+  cursor: pointer;
+  animation: gueuleFlash 0.16s steps(1) 8, gueuleFond 0.4s ease 1.3s forwards;
+}
+
+#overlayTiensGueule .gueule-boum {
+  font-size: clamp(64px, 20vw, 140px);
+  line-height: 1;
+  animation: gueuleSlam 0.35s cubic-bezier(.2, 1.6, .4, 1) both, gueuleTremble 0.12s linear 0.35s 10;
+}
+
+#overlayTiensGueule .gueule-titre {
+  font-size: clamp(40px, 13vw, 110px);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #fff;
+  -webkit-text-stroke: 2px #000;
+  text-shadow: 0 0 18px #ff0000, 5px 5px 0 #000;
+  animation: gueuleSlam 0.35s cubic-bezier(.2, 1.6, .4, 1) 0.08s both, gueuleTremble 0.1s linear 0.45s 14;
+}
+
+#overlayTiensGueule .gueule-sous-titre {
+  font-size: clamp(18px, 5vw, 34px);
+  font-weight: 800;
+  color: #FFD700;
+  text-shadow: 2px 2px 0 #000;
+  animation: fadeIn 0.4s ease 0.6s both;
+}
+
+@keyframes gueuleFlash {
+  0%   { background: #ff0000; }
+  50%  { background: #000000; }
+}
+
+@keyframes gueuleFond {
+  to { background: radial-gradient(circle at center, #b30000 0%, #3d0000 70%, #000 100%); }
+}
+
+@keyframes gueuleSlam {
+  from { transform: scale(3.5) rotate(-8deg); opacity: 0; }
+  to   { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+@keyframes gueuleTremble {
+  0%   { transform: translate(0, 0) rotate(0deg); }
+  25%  { transform: translate(-6px, 3px) rotate(-2deg); }
+  50%  { transform: translate(5px, -4px) rotate(2deg); }
+  75%  { transform: translate(-4px, -2px) rotate(-1deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
 
 /* ===== Sticky joueur actif discret ===== */
 #stickyJoueurActif{
