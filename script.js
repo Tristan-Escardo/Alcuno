@@ -613,7 +613,26 @@ document.addEventListener("DOMContentLoaded", function () {
   let carteTroisPourTransfertPigeon = "";
   let joueurTroisPourTransfertPigeon = null; // celui qui a tiré ce 3 (pour la gorgée couleur)
   let couleurTroisPourTransfertPigeon = null; // couleur à boire pour ce 3 (ou null)
-  let messageCouleurEnCours = false;
+  // Couleurs des cartes (affichage de la couleur choisie : bannière « Tour de » + bloc Règles)
+  const COULEURS_JEU = { rouge: "#e53935", bleu: "#1e88e5", vert: "#43a047", jaune: "#fdd835" };
+
+  // Affiche la couleur choisie TANT QU'ELLE EST ACTIVE (jusqu'à ce qu'une carte de cette couleur tombe) :
+  // bannière « Tour de » teintée + petit rond + nom de la couleur, et nom dans le bloc Règles
+  function majAffichageCouleur(){
+    const hex = couleurChoisie ? (COULEURS_JEU[couleurChoisie] || "#FFD700") : null;
+    const nomCouleur = couleurChoisie ? couleurChoisie.toUpperCase() : "";
+
+    messageTexte.innerText = nomCouleur;
+    messageTexte.style.color = hex || "#FFD700";
+
+    if(!stickyJoueurActif) return;
+    stickyJoueurActif.classList.toggle("has-couleur", !!hex);
+    if(hex) stickyJoueurActif.style.setProperty("--couleur-jeu", hex);
+    else stickyJoueurActif.style.removeProperty("--couleur-jeu");
+
+    const pastille = stickyJoueurActif.querySelector(".sticky-couleur");
+    if(pastille) pastille.innerText = nomCouleur;
+  }
 
   let phase = 1;       // 1 = choix J1, 2 = choix J2
   let choixJ1 = null;  // 1 ou 2 (carte de gauche/droite)
@@ -665,6 +684,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if(!(colCarte && colCarte === couleurChoisie)) return null;
 
     couleurChoisie = null;
+    majAffichageCouleur();
     return colCarte;
   }
 
@@ -1074,6 +1094,7 @@ document.addEventListener("DOMContentLoaded", function () {
         <span class="sticky-nom">—</span>
         <span class="sticky-bonus"></span>
       </span>
+      <span class="sticky-couleur"></span>
     `;
 
     document.body.appendChild(stickyJoueurActif);
@@ -2099,15 +2120,7 @@ document.addEventListener("DOMContentLoaded", function () {
       carre.className = "carre-couleur " + c.classe;
       surAction(carre, "couleur:" + c.nom, { owner: choisisseur, once: true }, ()=>{
         couleurChoisie = c.nom;
-        const mapCouleurs = {
-          rouge: "#e53935",
-          bleu: "#1e88e5",
-          vert: "#43a047",
-          jaune: "#fdd835"
-        };
-        messageTexte.innerText = c.nom.toUpperCase();
-        messageTexte.style.color = mapCouleurs[c.nom] || "#FFD700";
-        messageCouleurEnCours = true;
+        majAffichageCouleur();
         unlockScroll();
         overlay.remove();
         choixPigeonEnCours = false;
@@ -2709,13 +2722,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     effacerMessagePigeon();
-    
-    // On enlève l'affichage de la couleur au prochain tirage
-    if(messageCouleurEnCours){
-      messageTexte.innerText = "";
-      messageTexte.style.color = "#FFD700"; // ou "inherit"
-      messageCouleurEnCours = false;
-    }
 
 
     if (carteTiree === "carte_doree") {
@@ -2917,6 +2923,7 @@ document.addEventListener("DOMContentLoaded", function () {
     switchEnCours = false;
     sensHoraire = true;
     couleurChoisie = null;
+    majAffichageCouleur();
 
     duelEnCours = false;
     duelMultiplicateur = 1;
@@ -3022,6 +3029,7 @@ document.addEventListener("DOMContentLoaded", function () {
     sensHoraire = true;
 
     couleurChoisie = null;
+    majAffichageCouleur();
 
     duelEnCours = false;
     duelMultiplicateur = 1;

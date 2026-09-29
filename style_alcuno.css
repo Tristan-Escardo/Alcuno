@@ -2619,3 +2619,51 @@ header h1{
   #annonceNouvellePartie,
   #annonceNouvellePartie .annonce-titre{ animation: none; }
 }
+
+/* ===== Couleur choisie dans la bannière « Tour de » (tant qu'elle est active) ===== */
+/* Petit rond : seulement quand une couleur est active */
+#stickyJoueurActif::before{
+  display: none;
+}
+
+#stickyJoueurActif.has-couleur{
+  border-color: var(--couleur-jeu);
+  border-color: color-mix(in srgb, var(--couleur-jeu) 75%, transparent);
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--couleur-jeu) 32%, rgba(62, 0, 43, 0.78)),
+    rgba(22, 0, 16, 0.72));
+  box-shadow:
+    0 8px 22px rgba(0,0,0,0.18),
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    0 0 16px color-mix(in srgb, var(--couleur-jeu) 40%, transparent);
+}
+
+#stickyJoueurActif.has-couleur::before{
+  display: block;
+  width: 10px;
+  height: 10px;
+  background: var(--couleur-jeu);
+  box-shadow:
+    0 0 0 2px rgba(255,255,255,0.25),
+    0 0 12px var(--couleur-jeu);
+}
+
+/* Nom de la couleur, en petit à droite */
+#stickyJoueurActif .sticky-couleur{
+  display: none;
+}
+
+#stickyJoueurActif.has-couleur .sticky-couleur{
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--couleur-jeu);
+  background: rgba(0,0,0,0.35);
+  color: var(--couleur-jeu);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
