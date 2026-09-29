@@ -1222,10 +1222,11 @@ document.addEventListener("DOMContentLoaded", function () {
       caseDoree.classList.add("carte_doree", "retournee");
     }
 
-    montrerOverlayRegle(
-      "Personne n'a trouvé la CARTE DORÉE !!\n" +
-      "Tout le monde prend un CUL SEC de la part du développeur 😘",
-      "carte_doree"
+    const texte = "Tout le monde prend un CUL SEC de la part du développeur 😘";
+    montrerOverlayRegle(`Personne n'a trouvé la CARTE DORÉE !!\n${texte}`, "carte_doree");
+    habillerOverlayCarteDoree(
+      texte,
+      '<span class="doree-etincelle">✦</span> PERSONNE N\'A TROUVÉ LA CARTE DORÉE !! <span class="doree-etincelle">✦</span>'
     );
     executerApresOverlayRegleUnique(afficherOverlayFinUnRestants);
   }
@@ -2921,8 +2922,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const joueurActuel = indexJoueur % joueurs.length;
         appliquerRegle(carteTiree, joueurActuel, carte);
 
-        // Avant-dernière carte tirée => on lance le pari sur la dernière (après les overlays éventuels)
-        if(paquet.length === 1 && !predictionEnCours){
+        // Avant-dernière carte tirée => on lance le pari sur la dernière (après les overlays éventuels).
+        // Carte dorée encore cachée : pas de pari, il reste 2 cartes. Si la carte dorée est retournée,
+        // le pari se lance à ce moment-là ; si elle reste la dernière, cul sec collectif (finDePartie).
+        if(paquet.length === 1 && !predictionEnCours && !carteDoreeEnJeu){
           const startIdx = nextPlayerIndex(joueurActuel);
           executerApresOverlayRegleUnique(() => {
             // Si un duel/pigeon est en cours, on attend que ça finisse avant d'afficher
