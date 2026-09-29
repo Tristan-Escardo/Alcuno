@@ -1323,34 +1323,6 @@ body.no-scroll{
 .switch_rouge { background-image: url("Cartes/switch_rouge.jpg"); }
 .switch_bleu { background-image: url("Cartes/switch_bleu.jpg"); }
 
-/* Easter egg : carte dorée */
-.carte_doree {
-  background-image: url("Cartes/carte_doree.svg");
-  position: relative;
-  overflow: hidden;
-  animation: carteDoreeLueur 1.6s ease-in-out infinite alternate;
-}
-
-.carte_doree::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.7) 50%, transparent 65%);
-  transform: translateX(-130%);
-  animation: carteDoreeReflet 2.8s ease-in-out infinite;
-  pointer-events: none;
-}
-
-@keyframes carteDoreeLueur {
-  from { box-shadow: 0 0 6px 1px rgba(255, 215, 0, 0.55); }
-  to   { box-shadow: 0 0 18px 5px rgba(255, 215, 0, 0.95); }
-}
-
-@keyframes carteDoreeReflet {
-  0%, 55% { transform: translateX(-130%); }
-  100%    { transform: translateX(130%); }
-}
-
 /* ===== Sticky joueur actif discret ===== */
 #stickyJoueurActif{
   position: fixed;
