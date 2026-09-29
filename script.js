@@ -50,11 +50,10 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.3.5";
+  const VERSION_AFFICHEE = "8.3.6";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
-  document.getElementById("versionJeu").innerText = "version " + VERSION_AFFICHEE +
-    (new URLSearchParams(location.search).has("test") ? " · MODE TEST (en ligne : 4 cartes + carte dorée)" : "");
+  document.getElementById("versionJeu").innerText = "version " + VERSION_AFFICHEE;
 
   // ===== Easter egg : 4 taps rapides sur le titre ALCUNO => écran des créateurs =====
   const ecranCredits = document.getElementById("ecranCredits");
@@ -404,9 +403,7 @@ document.addEventListener("DOMContentLoaded", function () {
         manche: (e.manche || 0) + 1,
         seed: Math.floor(Math.random() * 4294967296),
         joueurs: listeJoueurs,
-        hote: e.hote || pseudoActuel,
-        // Mode test : si celui qui lance a « ?test », ou si la manche précédente était déjà en test
-        ...((MODE_TEST || mancheDeTest) ? { test: true } : {})
+        hote: e.hote || pseudoActuel
       };
     }).then(() => marquerActivite(codePartieActuel)).catch(erreurFirebase);
   }
@@ -506,7 +503,6 @@ document.addEventListener("DOMContentLoaded", function () {
     hotePartie = null;
     enLigneActif = false;
     mancheCourante = null;
-    mancheDeTest = false;
     reinitialiserFileActions();
     reinitialiserEcransJeu();
     fermerConfirmationHote();
@@ -595,12 +591,6 @@ document.addEventListener("DOMContentLoaded", function () {
   // Easter egg : environ 1 partie sur 50, une case en plus sur le plateau cache la carte dorée
   const CHANCE_CARTE_DOREE = 1 / 50;
 
-  // Mode test EN LIGNE : celui qui lance la manche ouvre le jeu avec « ?test » à la fin de l'adresse.
-  // L'info est enregistrée dans la partie (etatJeu.test) pour que tous les téléphones aient le même
-  // plateau : 4 cartes + la carte dorée (toujours présente), pour arriver vite à la fin.
-  const MODE_TEST = new URLSearchParams(location.search).has("test");
-  const NB_CARTES_MODE_TEST = 4;
-  let mancheDeTest = false; // manche en ligne actuelle lancée en mode test
   let indexCaseDoree = -1; // -1 = pas de carte dorée dans cette partie
   let carteDoreeEnJeu = false; // présente et pas encore retournée
 
@@ -2174,7 +2164,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const consigne = document.createElement("div");
     consigne.className = "doree-texte";
-    consigne.innerText = "Choisis à qui tu distribues ton cul sec";
+    consigne.innerText = "Choisis à qui tu distribues ton CUL SEC";
     overlay.appendChild(consigne);
 
     const liste = document.createElement("div");
@@ -2708,14 +2698,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     if (carteTiree === "carte_doree") {
-      regleZero.innerText = "CARTE DORÉE : distribue un cul sec";
+      regleZero.innerText = "CARTE DORÉE : distribue un CUL SEC";
       regleZero.style.display = "block";
       zeroEnCours = true;
 
       // Plateau bloqué (et pari de fin en attente) jusqu'au choix de la victime
       choixPigeonEnCours = true;
       const texteCarteDoree =
-        "Distribue un cul sec de la part du développeur, et obligation de se servir un vrai verre avant 😘";
+        "Distribue un CUL SEC de la part du développeur, et obligation de se servir un vrai verre avant 😘";
       // Le texte complet sert à calculer la durée d'affichage de l'overlay
       montrerOverlayRegle(`CARTE DORÉE\n${texteCarteDoree}`, carteTiree);
       habillerOverlayCarteDoree(texteCarteDoree);
@@ -2904,12 +2894,8 @@ document.addEventListener("DOMContentLoaded", function () {
     paquetDuel = [...duelCartes];
     melangerPaquet(paquetDuel);
 
-    // Mode test (en ligne uniquement : décidé par celui qui a lancé la manche, voir etatJeu.test)
-    const testFin = enLigneActif && mancheDeTest;
-    if(testFin) paquet = paquet.slice(0, NB_CARTES_MODE_TEST);
-
     // Tirée avec « aleatoire » : en ligne, tous les téléphones ont la même carte dorée au même endroit
-    const avecCarteDoree = testFin || aleatoire() < CHANCE_CARTE_DOREE;
+    const avecCarteDoree = aleatoire() < CHANCE_CARTE_DOREE;
     const nbCases = paquet.length + (avecCarteDoree ? 1 : 0);
     indexCaseDoree = avecCarteDoree ? Math.floor(aleatoire() * nbCases) : -1;
     carteDoreeEnJeu = avecCarteDoree;
@@ -3318,7 +3304,6 @@ document.addEventListener("DOMContentLoaded", function () {
     annulations = {};
     retourMenu();
 
-    mancheDeTest = !!etat.test;
     aleatoire = generateurAleatoire(etat.seed);
     lancerPartie();
 
