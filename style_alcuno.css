@@ -2720,3 +2720,75 @@ header h1{
     box-shadow: 0 0 0 2px rgba(255,215,0,0.85), 0 0 18px rgba(255,215,0,0.45);
   }
 }
+
+/* ===== Interrupteur « Vibrations » (écran de départ, en petit en bas) ===== */
+#choixMode .optionVibrations{
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(38px + env(safe-area-inset-bottom, 0px));
+  width: max-content;
+  max-width: calc(100% - 32px);
+  margin: 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.72);
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* la vraie case à cocher reste accessible mais invisible */
+#choixMode .optionVibrations input{
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+#choixMode .interrupteur{
+  position: relative;
+  flex: 0 0 auto;
+  width: 34px;
+  height: 20px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.18);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
+  transition: background-color 0.2s ease;
+}
+
+#choixMode .interrupteur::after{
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+#choixMode .optionVibrations input:checked + .interrupteur{
+  background: #FFD700;
+}
+
+#choixMode .optionVibrations input:checked + .interrupteur::after{
+  transform: translateX(14px);
+  background: rgb(43, 0, 29);
+}
+
+#choixMode .optionVibrations input:focus-visible + .interrupteur{
+  outline: 2px solid #FFD700;
+  outline-offset: 2px;
+}
+
+#choixMode .optionNote{
+  font-weight: 600;
+  color: rgba(255,255,255,0.42);
+}

@@ -78,6 +78,57 @@ document.addEventListener("DOMContentLoaded", function () {
     ecranCredits.style.display = "none";
   });
 
+  // ===== Vibrations (Android : un iPhone ne peut pas vibrer depuis une page web) =====
+  // Interrupteur en bas de l'écran de départ, activé par défaut, choix retenu sur le téléphone
+  const CLE_VIBRATIONS = "alcuno_vibrations";
+  const caseVibrations = document.getElementById("optionVibrations");
+  let vibrationsActives = true;
+  try { vibrationsActives = localStorage.getItem(CLE_VIBRATIONS) !== "0"; } catch (e) {}
+  caseVibrations.checked = vibrationsActives;
+
+  caseVibrations.addEventListener("change", () => {
+    vibrationsActives = caseVibrations.checked;
+    try { localStorage.setItem(CLE_VIBRATIONS, vibrationsActives ? "1" : "0"); } catch (e) {}
+    if (vibrationsActives) vibrer(60); // petit retour pour montrer que ça marche
+  });
+
+  function vibrer(motif){
+    if (!vibrationsActives || typeof navigator.vibrate !== "function") return;
+    try { navigator.vibrate(motif); } catch (e) {}
+  }
+
+  let dernierTourVibre = null; // en ligne : on vibre une seule fois par tour (voir majStickyJoueurActif)
+
+  // ===== Écran toujours allumé pendant une partie (Wake Lock) =====
+  // Un téléphone en veille ne reçoit plus les actions en ligne et prend du retard.
+  // Le navigateur relâche le verrou quand on change d'appli : on le redemande au retour.
+  let verrouEcran = null;
+  let demandeVerrouEnCours = false;
+
+  function garderEcranAllume(){
+    if (verrouEcran || demandeVerrouEnCours) return;
+    if (!("wakeLock" in navigator) || document.visibilityState !== "visible") return;
+
+    demandeVerrouEnCours = true;
+    navigator.wakeLock.request("screen").then((verrou) => {
+      verrouEcran = verrou;
+      verrou.addEventListener("release", () => {
+        if (verrouEcran === verrou) verrouEcran = null;
+      });
+    }).catch(() => {}).finally(() => { demandeVerrouEnCours = false; });
+  }
+
+  function libererEcran(){
+    if (!verrouEcran) return;
+    const verrou = verrouEcran;
+    verrouEcran = null;
+    verrou.release().catch(() => {});
+  }
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && (partieLancee || codePartieActuel)) garderEcranAllume();
+  });
+
   // Easter egg : de temps en temps, le code de la partie est un de ces noms,
   // complété par des chiffres AVANT ou APRÈS (jamais au milieu) pour faire 5 caractères
   const CODES_EASTER_EGG = ["YLA", "CELIEN", "ROSA", "TRIS"];
@@ -291,6 +342,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function ecouterSalleAttente(code){
     const db = window.firebaseDB;
     const refJoueurs = window.fbRef(db, `parties/${code}/joueurs`);
+    garderEcranAllume(); // en ligne : pas de mise en veille dès la salle d'attente
 
     if (desabonnerJoueurs) desabonnerJoueurs();
     desabonnerJoueurs = window.fbOnValue(refJoueurs, (snapshot) => {
@@ -500,6 +552,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function quitterPartieEnLigne(){
     if (desabonnerJoueurs) { desabonnerJoueurs(); desabonnerJoueurs = null; }
     if (desabonnerEtat) { desabonnerEtat(); desabonnerEtat = null; }
+    libererEcran();
     if (desabonnerActions) { desabonnerActions(); desabonnerActions = null; }
 
     codePartieActuel = null;
@@ -1139,7 +1192,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
     nomEl.innerText = estPigeon ? `PIGEON (${avecCouronne(nom)})` : avecCouronne(nom);
     bonusEl.innerText = n > 0 ? `+${n}` : "";
-    if(enLigneActif && nom === pseudoActuel) labelEl.innerText = "À toi !";
+    if(enLigneActif && nom === pseudoActuel){
+      labelEl.innerText = "À toi !";
+      // Vibre une seule fois par tour (un tour = un nombre de cartes restantes dans la manche)
+      const tour = `${mancheCourante}:${cartesRestantes()}`;
+      if(tour !== dernierTourVibre){
+        dernierTourVibre = tour;
+        vibrer([70, 60, 70]);
+      }
+    }
 
     stickyJoueurActif.classList.toggle("is-pigeon", estPigeon);
     stickyJoueurActif.classList.toggle("has-bonus", n > 0);
@@ -2258,6 +2319,8 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
+    vibrer([400, 100, 400]); // c'est lui (ou, en classique, le téléphone de la table) qui prend
+
     // En classique, un seul téléphone pour tous : on précise qui prend le cul sec
     const titre = enLigneActif
       ? "TIENS DANS<br>TA GUEULE."
@@ -2765,6 +2828,7 @@ document.addEventListener("DOMContentLoaded", function () {
         "Distribue un CUL SEC de la part du développeur, et obligation de se servir un vrai verre avant 😘";
       // Le texte complet sert à calculer la durée d'affichage de l'overlay
       montrerOverlayRegle(`CARTE DORÉE\n${texteCarteDoree}`, carteTiree);
+      vibrer([150, 70, 150, 70, 300]);
       habillerOverlayCarteDoree(texteCarteDoree);
       reglerDureeOverlayRegle(`CARTE DORÉE\n${texteCarteDoree}`, 1.65); // +65 % de temps de lecture
       executerApresOverlayRegleUnique(() => afficherOverlayCarteDoree(joueurActuel));
@@ -2931,6 +2995,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     plateau.innerHTML = "";
+    garderEcranAllume(); // pas de mise en veille pendant la partie
 
     // Plateau principal = toutes les cartes SAUF 2/5/6/7/8/9 (paquet duel)
     const paquetPrincipal = classes.filter(c => !duelCartes.includes(c));
@@ -3154,6 +3219,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function allerAccueil(){
     if(codePartieActuel) quitterPartie();
     reinitialiserEcransJeu();
+    libererEcran();
     document.getElementById("enLigne").style.display = "none";
     document.getElementById("choixMode").style.display = "";
   }
