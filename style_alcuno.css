@@ -73,7 +73,7 @@ header {
 
 :root{
     --card-w: clamp(62px, 7vw, 110px); /* largeur carte responsive */
-    --card-h: calc(var(--card-w) * 1.466); /* ratio ~ 150x220 */
+    --card-h: calc(var(--card-w) * 1.56); /* ratio des images de cartes (50 x 78) */
     --gap: clamp(6px, 1.2vw, 14px);
 }
 
@@ -193,11 +193,14 @@ button,
 /* ===== CARTES ===== */
 .Carte {
     width: var(--card-w);
-    height: var(--card-h);
+    /* Forme exacte des images de cartes (50 x 78) : plus rien n'est rogné.
+       La hauteur suit la largeur, même si la carte rétrécit dans une colonne étroite. */
+    height: auto;
+    aspect-ratio: 50 / 78;
     max-width: 100%;
     border-radius: 8px;
     background-image: url("Cartes/dos.gif");
-    background-size: cover;
+    background-size: 100% 100%; /* image entière (avant : cover, qui zoomait et coupait) */
     background-position: center;
     cursor: pointer;
 }
@@ -829,7 +832,8 @@ button,
 #overlayDuel .Carte,
 #overlayRegleUnique .Carte{
     width: var(--card-w);
-    height: calc(var(--card-w) * 1.466);
+    height: auto;
+    aspect-ratio: 50 / 78;
 }
 
 #menu{
@@ -1584,7 +1588,8 @@ body.no-scroll{
 
 .fin-choix-reveal .Carte{
   width: min(180px, 58vw);
-  height: calc(min(180px, 58vw) * 1.466);
+  height: auto;
+  aspect-ratio: 50 / 78;
 }
 
 .fin-choix-resultat{
@@ -2334,7 +2339,7 @@ header h1{
 #overlayRegleUnique.overlay-doree .Carte{
   width: clamp(84px, 22vw, 120px);
   height: auto;
-  aspect-ratio: 188 / 319;
+  aspect-ratio: 50 / 78;
   flex: 0 0 auto;
   border-radius: 8px;
   animation: lueurDoree 3.2s ease-in-out infinite;

@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.3.8";
+  const VERSION_AFFICHEE = "8.3.9";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "version " + VERSION_AFFICHEE;
@@ -695,7 +695,7 @@ document.addEventListener("DOMContentLoaded", function () {
   let annulations = {}; // { "Alice": 3, "Bob": 0, ... }
   let paquet = [];
 
-  // Easter egg : environ 1 partie sur 50, une case en plus sur le plateau cache la carte dorée
+  // Easter egg : environ 1 partie sur 50, une des cases du plateau cache la carte dorée (à la place d'une carte normale)
   const CHANCE_CARTE_DOREE = 1 / 50;
 
   let indexCaseDoree = -1; // -1 = pas de carte dorée dans cette partie
@@ -2876,6 +2876,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Tirée avec « aleatoire » : en ligne, tous les téléphones ont la même carte dorée au même endroit
     const avecCarteDoree = aleatoire() < CHANCE_CARTE_DOREE;
+    // La carte dorée REMPLACE une carte normale (n'importe laquelle : la dernière du paquet mélangé),
+    // pour garder 52 cases : sinon une carte se retrouvait seule sur la dernière rangée
+    if(avecCarteDoree) paquet.pop();
     const nbCases = paquet.length + (avecCarteDoree ? 1 : 0);
     indexCaseDoree = avecCarteDoree ? Math.floor(aleatoire() * nbCases) : -1;
     carteDoreeEnJeu = avecCarteDoree;
