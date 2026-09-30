@@ -1503,7 +1503,7 @@ document.addEventListener("DOMContentLoaded", function () {
         afficherJoueurs();
         afficherJoueurActif();
         // 2) message demandé (overlay + .messages)
-        const msg = `${joueurs[i]} est le nouveau PIGEON,\n il boit 2 gorgées pour fêter ça`;
+        const msg = `${joueurs[i]} est le nouveau PIGEON !\nIl boit 2 gorgées pour fêter ça.`;
         // .messages : on l'affiche dans reglePigeon (et il disparaît au prochain tirage)
         // 3) overlay + annulation si compteur (utilise la carte "trois" qui a déclenché le transfert)
         const carteTrois = carteTroisPourTransfertPigeon || "trois_vert";
@@ -1824,11 +1824,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const msg = prefixMsg ? prefixMsg : `${nom} boit ${nbGorgees} gorgée(s)`;
 
     if (nbGorgees > 15) {
-      const message17 =
-        "Et interdit de vomir, c'est pas fini !\n" +
-        "Célien Cosme (un des créateurs du jeu).";
+      // Easter egg : message signé Célien, mise en forme premium
+      const citationCelien = "Et interdit de vomir, c'est pas fini !";
+      const signatureCelien = "Signé Célien, un des créateurs du jeu";
+      const message17 = `${citationCelien}\n${signatureCelien}`;
 
       montrerOverlayRegle(`${msg}\n\n${message17}`, classeCarte);
+      habillerOverlayCelien(msg, citationCelien, signatureCelien);
 
       // Ce message contient l'avertissement "interdit de vomir" => +2s d'affichage
       if (overlayRegleTimeout) {
@@ -1880,6 +1882,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
+  // Texte des overlays de règle : la 1re ligne en titre, les suivantes en détails plus petits
+  // (avant, tout s'affichait d'un bloc dans la même grosse taille : illisible dès 3-4 lignes)
+  function remplirTexteRegle(boxTexte, message){
+    boxTexte.innerHTML = "";
+    String(message || "")
+      .split("\n")
+      .map(l => l.trim())
+      .filter(Boolean)
+      .forEach((texte, i) => {
+        const el = document.createElement("div");
+        el.className = i === 0 ? "regle-titre" : "regle-detail";
+        el.innerText = texte;
+        boxTexte.appendChild(el);
+      });
+  }
+
   function montrerOverlayRegle(message, classeCarte = "", classeCarteSupplementaire = "") {
     let overlay = document.getElementById("overlayRegleUnique");
     if (overlay) {
@@ -1908,12 +1926,7 @@ document.addEventListener("DOMContentLoaded", function () {
         cartes.style.display = cartes.children.length > 0 ? "flex" : "none";
       }
 
-      if (boxTexte) {
-        boxTexte.innerHTML = "";
-        const ligne = document.createElement("div");
-        ligne.innerText = message;
-        boxTexte.appendChild(ligne);
-      }
+      if (boxTexte) remplirTexteRegle(boxTexte, message);
 
       if (!overlayRegleVerrouille) {
         overlayRegleTimeout = setTimeout(() => fermerOverlayRegleUnique(), dureeOverlayPourMessage(message));
@@ -1967,9 +1980,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const boxTexte = document.createElement("div");
     boxTexte.className = "overlay-regle-texte";
 
-    const ligne1 = document.createElement("div");
-    ligne1.innerText = message;
-    boxTexte.appendChild(ligne1);
+    remplirTexteRegle(boxTexte, message);
 
     overlay.appendChild(boxTexte);
     overlay.style.cursor = "pointer";
@@ -2051,6 +2062,33 @@ document.addEventListener("DOMContentLoaded", function () {
       () => fermerOverlayRegleUnique(),
       Math.round(dureeOverlayPourMessage(message) * facteur)
     );
+  }
+
+  // Easter egg Célien (plus de 15 gorgées) : fond doré, le message, puis la citation
+  // en italique dorée et la signature ornée
+  function habillerOverlayCelien(message, citation, signature){
+    const overlay = document.getElementById("overlayRegleUnique");
+    const boxTexte = overlay && overlay.querySelector(".overlay-regle-texte");
+    if(!boxTexte) return;
+
+    overlay.classList.add("overlay-doree");
+    remplirTexteRegle(boxTexte, message);
+
+    const bloc = document.createElement("div");
+    bloc.className = "celien-bloc";
+
+    const ligneCitation = document.createElement("div");
+    ligneCitation.className = "celien-citation";
+    ligneCitation.innerText = `« ${citation} »`;
+
+    const ligneSignature = document.createElement("div");
+    ligneSignature.className = "celien-signature";
+    ligneSignature.innerHTML =
+      `<span class="doree-etincelle">✦</span> ${echapperHtml(signature)} 👑 <span class="doree-etincelle">✦</span>`;
+
+    bloc.appendChild(ligneCitation);
+    bloc.appendChild(ligneSignature);
+    boxTexte.appendChild(bloc);
   }
 
   function habillerOverlayCarteDoree(texte, titreHtml = TITRE_CARTE_DOREE){
@@ -2294,6 +2332,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if(v1 === v2){
         duelMultiplicateur *= 2;
+        // Le multiplicateur reste affiché dans le titre pendant tout le duel
+        titre.innerText = "DUEL ×" + duelMultiplicateur;
+        info.innerText = "Égalité ! Les gorgées sont multipliées : ×" + duelMultiplicateur;
         // petite pause puis on relance un duel (toujours dos au départ)
         setTimeout(() => {
           if(generation !== generationPartie) return;
@@ -2305,7 +2346,9 @@ document.addEventListener("DOMContentLoaded", function () {
       const perdant = (v1 < v2) ? j1 : j2;
       const vPerdant = (v1 < v2) ? v1 : v2;
       const gorg = vPerdant * duelMultiplicateur;
-      const msg = joueurs[perdant] + " boit " + gorg + " gorgées";
+      // Égalités avant : on rappelle le multiplicateur sous le résultat
+      const msg = joueurs[perdant] + " boit " + gorg + " gorgées" +
+        (duelMultiplicateur > 1 ? "\nDuel ×" + duelMultiplicateur + " après égalité" : "");
 
       // 1) on enlève l’overlay du duel après le temps de lire le reveal (2,2 s),
       //    ou dès qu'on tape sur l'écran
@@ -2757,7 +2800,7 @@ document.addEventListener("DOMContentLoaded", function () {
           joueurActuel,
           2,
           carteTiree,
-          `${joueurs[joueurActuel]} est PIGEON ! \nIl boit 2 gorgées. \nÀ chaque 3 tiré, tu bois 1 gorgée. \nPour en sortir, tire un 3.`,
+          `${joueurs[joueurActuel]} est le PIGEON !\nIl boit 2 gorgées.\nÀ chaque 3 tiré par un autre, le pigeon boit 1 gorgée.\nPour s'en débarrasser : tirer un 3 et choisir le prochain pigeon.`,
           () => {
             appliquerBonusCouleurSiBesoin(carteTiree, { couleur: couleurBue, joueur: joueurActuel, preserveRuleMessage: true });
           }
@@ -2772,7 +2815,7 @@ document.addEventListener("DOMContentLoaded", function () {
       
       } else {
         // si quelqu'un d'autre tire un 3 : le pigeon boit 1 (annulable si compteur)
-        const msg = "Le PIGEON boit 1 gorgée";
+        const msg = `Le PIGEON (${joueurs[indexPigeon]}) boit 1 gorgée`;
         // message dans .messages (disparaît au prochain tirage grâce à effacerMessagePigeon() au début)
         // overlay + choix d'annulation si le pigeon a des "UN"
         annoncerBoireAvecAnnulation(indexPigeon, 1, carteTiree, msg, () => {

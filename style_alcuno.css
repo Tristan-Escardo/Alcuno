@@ -2751,3 +2751,48 @@ header h1{
 #choixMode .astuceIphone strong{
   color: #FFD700;
 }
+
+/* ===== Overlays de règle : 1re ligne en titre, suite en détails plus petits ===== */
+#overlayRegleUnique .regle-titre{
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+#overlayRegleUnique .regle-detail{
+  max-width: 30ch;
+  margin: 0.45em auto 0;
+  font-size: 0.6em;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #FFF1A8;
+  text-wrap: balance;
+}
+
+/* ===== Easter egg Célien (plus de 15 gorgées) : citation + signature premium ===== */
+#overlayRegleUnique .celien-bloc{
+  max-width: 24ch;
+  margin: 0.9em auto 0;
+  padding-top: 0.7em;
+  border-top: 1px solid rgba(255, 215, 0, 0.35);
+}
+
+#overlayRegleUnique .celien-citation{
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 0.8em;
+  line-height: 1.25;
+  color: #FFE27A;
+  text-shadow: 0 0 18px rgba(255, 215, 0, 0.35);
+}
+
+#overlayRegleUnique .celien-signature{
+  margin-top: 0.55em;
+  font-family: Impact, Haettenschweiler, "Arial Black", sans-serif;
+  font-weight: 400;
+  font-size: 0.52em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #FFD700;
+  text-shadow: 0 2px 0 #6b4200, 0 0 16px rgba(255, 215, 0, 0.35);
+}
