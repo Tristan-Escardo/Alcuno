@@ -840,7 +840,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Sauve la position pour iOS
     scrollYBeforeLock = window.scrollY || document.documentElement.scrollTop || 0;
-    const sbw = window.innerWidth - document.documentElement.clientWidth;
+    // La place de la barre de défilement est déjà réservée en permanence (scrollbar-gutter: stable
+    // sur html) : la compenser en plus décalait tout le contenu sur PC à chaque overlay.
+    // On ne compense que sur les navigateurs qui ne gèrent pas scrollbar-gutter.
+    const gutterStable = !!(window.CSS && CSS.supports && CSS.supports("scrollbar-gutter", "stable"));
+    const sbw = gutterStable ? 0 : window.innerWidth - document.documentElement.clientWidth;
     document.documentElement.style.setProperty("--sbw", (sbw > 0 ? sbw : 0) + "px");
 
     document.body.classList.add("no-scroll");
