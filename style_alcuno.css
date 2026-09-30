@@ -2816,3 +2816,58 @@ header h1{
 html.overlay-ouvert{
   background: #000;
 }
+
+/* ===== MODE EN LIGNE : code de la partie toujours visible ===== */
+/* Par-dessus tout (overlays compris) : si un joueur est déconnecté, même en plein duel,
+   les autres peuvent lui redonner le code pour revenir sous son pseudo */
+#badgeCodePartie{
+  display: none;
+  position: fixed;
+  top: calc(8px + env(safe-area-inset-top, 0px));
+  left: calc(8px + env(safe-area-inset-left, 0px));
+  z-index: 30001;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,215,0,0.35);
+  background: rgba(20, 0, 14, 0.82);
+  color: #FFD700;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  pointer-events: none;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+body.mode-en-ligne #badgeCodePartie{
+  display: block;
+}
+
+/* ===== RECONNEXION EN PLEINE MANCHE : rattrapage accéléré ===== */
+/* Animations des overlays quasi instantanées (1 ms et pas 0 : "transitionend" doit quand même arriver) */
+body.rattrapage [id^="overlay"],
+body.rattrapage [id^="overlay"] *{
+  transition-duration: 1ms !important;
+  animation-duration: 1ms !important;
+}
+
+/* Écran qui cache les overlays qui défilent pendant le rattrapage */
+#ecranRattrapage{
+  position: fixed;
+  inset: 0;
+  z-index: 30000;
+  background: rgb(43, 0, 29);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  box-sizing: border-box;
+
+  color: #FFD700;
+  font-size: clamp(22px, 5vw, 36px);
+  font-weight: 900;
+  text-align: center;
+  white-space: pre-line;
+  text-shadow: 2px 2px 5px #000;
+}

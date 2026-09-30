@@ -28,6 +28,11 @@ document.addEventListener("DOMContentLoaded", function () {
   let timerTrou = null;
   let idsUniquesUtilises = new Set(); // boutons « unique » déjà appliqués dans la manche (voir surAction)
 
+  // Reconnexion en pleine manche : on rejoue toutes les actions déjà faites, en accéléré
+  let repriseEnCours = false;     // la prochaine manche démarrée est une reprise (reprendrePlaceEnLigne)
+  let rattrapageEnCours = false;  // délais du jeu quasi nuls pendant le rattrapage (voir delai())
+  let seqFinRattrapage = 0;       // numéro de la dernière action à rattraper
+
   const PSEUDO_INVALIDE = /[.#$\[\]\/]/;
 
   // Easter egg : couronne 👑 à côté du nom des créateurs du jeu
@@ -51,7 +56,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.3.9";
+  const VERSION_AFFICHEE = "8.4.0";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "version " + VERSION_AFFICHEE;
@@ -94,6 +99,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function vibrer(motif){
     if (!vibrationsActives || typeof navigator.vibrate !== "function") return;
+    if (rattrapageEnCours) return; // reconnexion : pas de vibrations pour les actions déjà passées
     try { navigator.vibrate(motif); } catch (e) {}
   }
 
@@ -326,16 +332,28 @@ document.addEventListener("DOMContentLoaded", function () {
           }
           return;
         }
-        if (partie.etatJeu && partie.etatJeu.demarree) {
-          alert("La partie a déjà commencé.");
+        const enJeu = !!(partie.etatJeu && partie.etatJeu.demarree);
+
+        // Pseudo déjà dans la partie (majuscules ignorées) : c'est sans doute un joueur qui s'est
+        // déconnecté (page rechargée, téléphone éteint...) => il reprend sa place, sous son pseudo exact
+        const pseudoMin = pseudo.toLocaleLowerCase("fr-FR");
+        const nomExistant = Object.keys(partie.joueurs || {})
+          .find(nom => nom.toLocaleLowerCase("fr-FR") === pseudoMin);
+
+        if (nomExistant) {
+          const ok = confirm(
+            `« ${nomExistant} » est déjà dans cette partie.\n\n` +
+            `C'est toi ? Appuie sur OK pour reprendre ta place` +
+            (enJeu ? " : tu retrouveras la partie là où elle en est." : ".") +
+            `\n\n(Sinon, annule et choisis un autre pseudo.)`
+          );
+          if (ok) reprendrePlaceEnLigne(code, nomExistant, partie);
           return;
         }
-        // Majuscules ignorées : « Tris » et « tris » ne peuvent pas être tous les deux dans la partie
-        const pseudoMin = pseudo.toLocaleLowerCase("fr-FR");
-        const dejaPris = Object.keys(partie.joueurs || {})
-          .some(nom => nom.toLocaleLowerCase("fr-FR") === pseudoMin);
-        if (dejaPris) {
-          alert("Ce pseudo est déjà pris dans cette partie.");
+
+        if (enJeu) {
+          alert("La partie a déjà commencé.\n\nSi tu en faisais partie et que tu as été déconnecté, " +
+                "reprends exactement le même pseudo qu'avant pour revenir à ta place.");
           return;
         }
 
@@ -547,6 +565,23 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("enLigne").style.display = "";
 
     if (etat.message) afficherToast(etat.message, 4000);
+  }
+
+  // Reconnexion : le joueur reprend sa place sous son pseudo exact. En pleine manche, son téléphone
+  // rejoue toutes les actions déjà faites (rattrapage accéléré) avant de reprendre en direct.
+  function reprendrePlaceEnLigne(code, nom, partie){
+    codePartieActuel = code;
+    pseudoActuel = nom;
+    estHote = !!(partie.joueurs[nom] && partie.joueurs[nom].host);
+    repriseEnCours = !!(partie.etatJeu && partie.etatJeu.demarree);
+
+    document.getElementById("enLigneRejoindre").style.display = "none";
+    document.getElementById("codePartieAffiche").innerText = "Code de la partie : " + code;
+    document.getElementById("salleAttente").style.display = "";
+
+    marquerActivite(code);
+    ecouterSalleAttente(code);
+    ecouterEtatPartie(code); // manche en cours => démarrée en mode rattrapage (demarrerMancheEnLigne)
   }
 
   // Quitte la partie (Accueil, ou Retour dans la salle d'attente)
@@ -1584,10 +1619,17 @@ document.addEventListener("DOMContentLoaded", function () {
       callback();
     };
     el.addEventListener("transitionend", fin, { once: true });
-    setTimeout(fin, ms + 80);
+    setTimeout(fin, delai(ms) + 80);
+  }
+
+  // Délai du jeu (overlays, duel...) : quasi nul pendant le rattrapage d'une reconnexion.
+  // Minimum 60 ms : laisse le temps à l'overlay d'apparaître (requestAnimationFrame) avant de se fermer.
+  function delai(ms){
+    return rattrapageEnCours ? Math.min(ms, 60) : ms;
   }
 
   function dureeOverlayPourMessage(message){
+    if(rattrapageEnCours) return delai(0);
     const texte = String(message || "").trim();
     const nbLignes = estimerNbLignesOverlay(texte);
     const nbMots = texte ? texte.split(/\s+/).filter(Boolean).length : 0;
@@ -1853,7 +1895,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (!overlayRegleVerrouille) {
         overlayRegleTimeout = setTimeout(
           () => fermerOverlayRegleUnique(),
-          dureeOverlayPourMessage(`${msg}\n\n${message17}`) + 2000
+          delai(dureeOverlayPourMessage(`${msg}\n\n${message17}`) + 2000)
         );
       }
         const ensuite = () => {
@@ -2353,7 +2395,7 @@ document.addEventListener("DOMContentLoaded", function () {
         setTimeout(() => {
           if(generation !== generationPartie) return;
           preparerDuel();
-        }, 1500);
+        }, delai(1500));
         return;
       }
 
@@ -2383,9 +2425,9 @@ document.addEventListener("DOMContentLoaded", function () {
           choixPigeonEnCours = false;
           duelMultiplicateur = 1;
           afficherJoueurActif();
-        }, 1800);
+        }, delai(1800));
       };
-      setTimeout(suite, 2200);
+      setTimeout(suite, delai(2200));
       overlay.addEventListener("pointerdown", suite);
     }
 
@@ -2464,7 +2506,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
           info.innerText = "Résultat…";
           resoudreDuel(carteJ1, carteJ2);
-        }, 1400);
+        }, delai(1400));
       }
     }
 
@@ -2784,7 +2826,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if(carteElement){
         setTimeout(() => {
           carteElement.classList.add("carte-disparue");
-        }, 2000);
+        }, delai(2000));
       }
 
       // Couleur choisie : la gorgée s'affiche APRÈS « +1 annulation » (sinon elle l'effaçait)
@@ -3266,14 +3308,21 @@ document.addEventListener("DOMContentLoaded", function () {
       const resultat = tenterAction(action);
       // On attend que l'overlay concerné soit affiché chez nous (max 30 s d'écran allumé)
       if(resultat === "attendre" && attente < 30000){
-        if(document.visibilityState === "visible") attente += 120;
-        setTimeout(essayer, 120);
+        const pas = rattrapageEnCours ? 20 : 120;
+        if(document.visibilityState === "visible") attente += pas;
+        setTimeout(essayer, pas);
         return;
       }
 
       fileActions.delete(prochainSeq);
       prochainSeq++;
       traitementEnCours = false;
+
+      if(rattrapageEnCours){
+        if(prochainSeq > seqFinRattrapage) finirRattrapage();
+        else majRattrapage();
+      }
+
       traiterFile();
     };
 
@@ -3286,6 +3335,39 @@ document.addEventListener("DOMContentLoaded", function () {
     traitementEnCours = false;
     if(timerTrou){ clearTimeout(timerTrou); timerTrou = null; }
     idsUniquesUtilises = new Set();
+    finirRattrapage();
+  }
+
+  // ===== Rattrapage (reconnexion en pleine manche) =====
+  // Le téléphone rejoue toutes les actions déjà faites, délais quasi nuls (delai()) ;
+  // un écran « Retour dans la partie… » cache les overlays qui défilent en accéléré.
+  function commencerRattrapage(cible){
+    rattrapageEnCours = true;
+    seqFinRattrapage = cible;
+    document.body.classList.add("rattrapage");
+
+    let ecran = document.getElementById("ecranRattrapage");
+    if(!ecran){
+      ecran = document.createElement("div");
+      ecran.id = "ecranRattrapage";
+      document.body.appendChild(ecran);
+    }
+    majRattrapage();
+  }
+
+  function majRattrapage(){
+    const ecran = document.getElementById("ecranRattrapage");
+    if(!ecran) return;
+    const fait = Math.min(prochainSeq - 1, seqFinRattrapage);
+    ecran.innerText = `Retour dans la partie…\n${fait} / ${seqFinRattrapage}`;
+  }
+
+  function finirRattrapage(){
+    rattrapageEnCours = false;
+    seqFinRattrapage = 0;
+    document.body.classList.remove("rattrapage");
+    const ecran = document.getElementById("ecranRattrapage");
+    if(ecran) ecran.remove();
   }
 
   function ecouterActions(){
@@ -3349,8 +3431,40 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("enLigne").style.display = "none";
     messagesBar.style.display = "";
     document.getElementById("jeu").style.display = "";
+    afficherBadgeCode();
 
-    ecouterActions();
+    if(!repriseEnCours){
+      ecouterActions();
+      return;
+    }
+
+    // Reconnexion en pleine manche : on regarde combien d'actions ont déjà été jouées,
+    // puis on les rejoue toutes en accéléré avant de reprendre normalement
+    repriseEnCours = false;
+    const code = codePartieActuel;
+    const manche = etat.manche;
+    window.fbGet(window.fbRef(window.firebaseDB, `parties/${code}/manches/${manche}/seq`))
+      .then((snapshot) => {
+        if(manche !== mancheCourante) return;
+        const cible = Number(snapshot.val() || 0);
+        if(cible > 0) commencerRattrapage(cible);
+        ecouterActions();
+      })
+      .catch(() => {
+        if(manche === mancheCourante) ecouterActions();
+      });
+  }
+
+  // Code de la partie toujours visible en ligne, par-dessus tous les overlays : si quelqu'un
+  // est déconnecté (même en plein duel), les autres peuvent lui redonner le code pour revenir
+  function afficherBadgeCode(){
+    let badge = document.getElementById("badgeCodePartie");
+    if(!badge){
+      badge = document.createElement("div");
+      badge.id = "badgeCodePartie";
+      document.body.appendChild(badge);
+    }
+    badge.innerText = "Partie " + codePartieActuel;
   }
 
   function afficherToast(message, duree = 1800){
