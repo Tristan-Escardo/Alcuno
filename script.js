@@ -2582,7 +2582,6 @@ document.addEventListener("DOMContentLoaded", function () {
       if(dist[idx] > 0) dist[idx] -= 1;
       refreshUI();
     });
-    actions.appendChild(btnUndo);
 
     const btnReset = document.createElement("button");
     btnReset.className = "bouton-pigeon plus4-action-btn";
@@ -2592,7 +2591,6 @@ document.addEventListener("DOMContentLoaded", function () {
       historique = [];
       refreshUI();
     });
-    actions.appendChild(btnReset);
 
     const btnValider = document.createElement("button");
     btnValider.className = "bouton-pigeon plus4-action-btn";
@@ -2611,7 +2609,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
       distribuerFilePlus4(file, classeCartePlus4);
     });
-    actions.appendChild(btnValider);
+    // Ordre d'affichage : Valider, puis Retour, puis Annuler
+    actions.append(btnValider, btnUndo, btnReset);
 
     document.body.appendChild(overlay);
     refreshUI();
