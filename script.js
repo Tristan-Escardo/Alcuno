@@ -1503,7 +1503,7 @@ document.addEventListener("DOMContentLoaded", function () {
         afficherJoueurs();
         afficherJoueurActif();
         // 2) message demandé (overlay + .messages)
-        const msg = `${joueurs[i]} est le nouveau PIGEON !\nIl boit 2 gorgées pour fêter ça.`;
+        const msg = `${joueurs[i]} est le nouveau PIGEON !\nIl/elle boit 2 gorgées pour fêter ça.`;
         // .messages : on l'affiche dans reglePigeon (et il disparaît au prochain tirage)
         // 3) overlay + annulation si compteur (utilise la carte "trois" qui a déclenché le transfert)
         const carteTrois = carteTroisPourTransfertPigeon || "trois_vert";
@@ -2800,7 +2800,7 @@ document.addEventListener("DOMContentLoaded", function () {
           joueurActuel,
           2,
           carteTiree,
-          `${joueurs[joueurActuel]} est le PIGEON !\nIl boit 2 gorgées.\nÀ chaque 3 tiré par un autre, le pigeon boit 1 gorgée.\nPour s'en débarrasser : tirer un 3 et choisir le prochain pigeon.`,
+          `${joueurs[joueurActuel]} est le PIGEON !\nIl/elle boit 2 gorgées.\nÀ chaque 3 tiré par un autre, le pigeon boit 1 gorgée.\nPour s'en débarrasser : tirer un 3 et choisir le prochain pigeon.`,
           () => {
             appliquerBonusCouleurSiBesoin(carteTiree, { couleur: couleurBue, joueur: joueurActuel, preserveRuleMessage: true });
           }
