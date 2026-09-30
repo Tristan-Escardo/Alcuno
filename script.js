@@ -2368,6 +2368,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const carteJ1 = (choixJ1 === 1) ? carteA : carteB;
         const carteJ2 = (choixJ1 === 1) ? carteB : carteA;
 
+        // Le nom de J2 s'affiche tout de suite sous sa carte (comme pour J1), avant le retournement
+        if(which === 1) label1.innerText = "Carte de " + joueurs[j2];
+        else label2.innerText = "Carte de " + joueurs[j2];
+
         info.innerText = "On retourne les cartes…";
         overlay.classList.add("reveal");
 
@@ -2514,7 +2518,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const btnUndo = document.createElement("button");
     btnUndo.className = "bouton-pigeon plus4-action-btn";
-    btnUndo.innerText = "Annuler la dernière";
+    btnUndo.innerText = "Retour";
     surAction(btnUndo, "plus4:annuler", { owner: choisisseur }, ()=>{
       if(historique.length === 0) return;
       const idx = historique.pop();
@@ -2525,7 +2529,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const btnReset = document.createElement("button");
     btnReset.className = "bouton-pigeon plus4-action-btn";
-    btnReset.innerText = "Reset";
+    btnReset.innerText = "Annuler";
     surAction(btnReset, "plus4:reset", { owner: choisisseur }, ()=>{
       Object.keys(dist).forEach(k => dist[k] = 0);
       historique = [];
