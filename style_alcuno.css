@@ -2792,3 +2792,49 @@ header h1{
   font-weight: 600;
   color: rgba(255,255,255,0.42);
 }
+
+/* ===== Installer l'appli (écran de départ, au-dessus de l'interrupteur Vibrations) ===== */
+#choixMode [hidden]{
+  display: none !important;
+}
+
+#choixMode .installerAppli{
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  justify-content: center;
+  padding-inline: 16px;
+}
+
+#choixMode .btnInstaller{
+  width: auto;
+  padding: 9px 16px;
+  font-size: 14px;
+  font-weight: 900;
+  color: #FFD700;
+  background: rgba(255,215,0,0.10);
+  border: 1px solid rgba(255,215,0,0.45);
+  border-radius: 999px;
+  box-shadow: none;
+  text-shadow: none;
+}
+
+#choixMode .btnInstaller:hover{
+  background: rgba(255,215,0,0.18);
+  transform: none;
+}
+
+#choixMode .astuceIphone{
+  margin: 0;
+  max-width: 34ch;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: rgba(255,255,255,0.72);
+}
+
+#choixMode .astuceIphone strong{
+  color: #FFD700;
+}

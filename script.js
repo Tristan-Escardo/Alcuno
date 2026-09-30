@@ -129,6 +129,55 @@ document.addEventListener("DOMContentLoaded", function () {
     if (document.visibilityState === "visible" && (partieLancee || codePartieActuel)) garderEcranAllume();
   });
 
+  // ===== Appli installable (PWA) =====
+  // Service worker « réseau d'abord » (sw.js) : dernière version avec internet, copie locale sans.
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("sw.js").catch(() => {});
+    });
+  }
+
+  // Déjà ouvert en appli (depuis l'icône) : on ne propose rien
+  const estEnAppli =
+    window.matchMedia("(display-mode: standalone)").matches ||
+    window.navigator.standalone === true;
+
+  const blocInstaller = document.getElementById("installerAppli");
+  const btnInstallerAppli = document.getElementById("btnInstallerAppli");
+  let demandeInstallation = null;
+
+  // Android (Chrome) : le navigateur signale qu'on peut installer => on montre le bouton
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    if (estEnAppli) return;
+    demandeInstallation = e;
+    blocInstaller.hidden = false;
+    btnInstallerAppli.hidden = false;
+  });
+
+  btnInstallerAppli.addEventListener("click", () => {
+    if (!demandeInstallation) return;
+    demandeInstallation.prompt();
+    demandeInstallation.userChoice.finally(() => {
+      demandeInstallation = null;
+      btnInstallerAppli.hidden = true;
+      blocInstaller.hidden = true;
+    });
+  });
+
+  window.addEventListener("appinstalled", () => {
+    demandeInstallation = null;
+    blocInstaller.hidden = true;
+  });
+
+  // iPhone / iPad : pas de bouton possible (Apple ne le permet pas), on affiche l'astuce Safari
+  const estIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  if (estIOS && !estEnAppli) {
+    blocInstaller.hidden = false;
+    document.getElementById("astuceIphone").hidden = false;
+  }
+
   // Easter egg : de temps en temps, le code de la partie est un de ces noms,
   // complété par des chiffres AVANT ou APRÈS (jamais au milieu) pour faire 5 caractères
   const CODES_EASTER_EGG = ["YLA", "CELIEN", "ROSA", "TRIS"];

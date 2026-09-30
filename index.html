@@ -10,6 +10,17 @@
         document.write('<link rel="stylesheet" href="style_alcuno.css?t=' + window.ANTI_CACHE + '" />');
     </script>
     <title>Alcuno</title>
+
+    <!-- Appli installable (PWA) : manifest.json + sw.js -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2B001D">
+    <link rel="icon" type="image/png" href="icones/icone-192.png">
+    <!-- iPhone : icône, plein écran et nom sur l'écran d'accueil -->
+    <link rel="apple-touch-icon" href="icones/icone-180.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Alcuno">
 </head>
 <body>
     <header>
@@ -22,6 +33,12 @@
             <h2>Comment voulez-vous jouer ?</h2>
             <button type="button" id="btnModeClassique">Mode classique</button>
             <button type="button" id="btnModeEnLigne">Mode en ligne</button>
+            <!-- Installer l'appli : bouton sur Android (quand Chrome le permet), astuce sur iPhone.
+                 Rien ne s'affiche quand le jeu est déjà ouvert en appli. -->
+            <div class="installerAppli" id="installerAppli" hidden>
+                <button type="button" id="btnInstallerAppli" class="btnInstaller" hidden>📲 Installer l'appli</button>
+                <p id="astuceIphone" class="astuceIphone" hidden>📲 Pour installer l'appli : bouton <strong>Partager</strong> → <strong>Sur l'écran d'accueil</strong></p>
+            </div>
             <label class="optionVibrations" for="optionVibrations">
                 <input type="checkbox" id="optionVibrations" checked>
                 <span class="interrupteur" aria-hidden="true"></span>

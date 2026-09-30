@@ -1,0 +1,17 @@
+{
+  "name": "Alcuno",
+  "short_name": "Alcuno",
+  "description": "Le jeu de cartes à boire, en classique sur un téléphone ou en ligne avec tout le monde.",
+  "lang": "fr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#2B001D",
+  "theme_color": "#2B001D",
+  "icons": [
+    { "src": "icones/icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icones/icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icones/icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
