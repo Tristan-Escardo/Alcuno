@@ -240,6 +240,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
   validerAvecEntree(["pseudoCreateur"], "validerCreation");
   validerAvecEntree(["codeRejoindre", "pseudoRejoindre"], "validerRejoindre");
+  validerAvecEntree(["codeRevenir"], "validerRevenir");
 
   document.getElementById("btnModeClassique").addEventListener("click", () => {
     document.getElementById("choixMode").style.display = "none";
@@ -262,6 +263,68 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("enLigneChoix").style.display = "none";
     document.getElementById("enLigneRejoindre").style.display = "";
   });
+
+  // ===== « Revenir dans une partie » : reconnexion avec le code seulement =====
+  const btnRevenirPartie = document.getElementById("btnRevenirPartie");
+
+  // Si ce téléphone se souvient d'une partie en cours, le bouton la propose directement
+  function majBoutonRevenir(){
+    const memoire = lirePartieLocale();
+    btnRevenirPartie.innerText = (memoire && memoire.code)
+      ? "Revenir dans la partie " + memoire.code
+      : "Revenir dans une partie";
+  }
+  // (mis à jour quand on entre dans le mode en ligne, pas au chargement : la mémoire locale
+  // est définie plus bas dans ce fichier)
+  document.getElementById("btnModeEnLigne").addEventListener("click", majBoutonRevenir);
+
+  btnRevenirPartie.addEventListener("click", () => {
+    const memoire = lirePartieLocale();
+    document.getElementById("codeRevenir").value = (memoire && memoire.code) || "";
+    document.getElementById("enLigneChoix").style.display = "none";
+    document.getElementById("enLigneRevenir").style.display = "";
+  });
+
+  document.getElementById("btnRetourRevenir").addEventListener("click", () => {
+    document.getElementById("enLigneRevenir").style.display = "none";
+    document.getElementById("enLigneChoix").style.display = "";
+  });
+
+  document.getElementById("validerRevenir").addEventListener("click", () => {
+    const code = document.getElementById("codeRevenir").value.trim().toUpperCase();
+    if (!code) { alert("Entre le code de la partie."); return; }
+
+    attendreFirebase(() => {
+      window.fbGet(window.fbRef(window.firebaseDB, `parties/${code}`)).then((snapshot) => {
+        if (!snapshot.exists()) {
+          oublierPartieLocale();
+          majBoutonRevenir();
+          alert("Aucune partie trouvée avec ce code (elle est peut-être terminée).");
+          return;
+        }
+        const partie = snapshot.val();
+        if (!versionCompatible(partie)) return;
+        revenirAvecLeCode(code, partie, !!(partie.etatJeu && partie.etatJeu.demarree));
+      }).catch(erreurFirebase);
+    });
+  });
+
+  // Même version du jeu que la partie ? Sinon message (et rechargement si c'est nous qui sommes en retard)
+  function versionCompatible(partie){
+    if (partie.version === VERSION_JEU) return true;
+
+    // Anciennes parties : version en texte => considérée comme plus ancienne
+    const versionPartie = typeof partie.version === "number" ? partie.version : 0;
+    if (versionPartie > VERSION_JEU) {
+      // C'est nous qui sommes en retard : rechargement sur une adresse neuve (contourne le cache)
+      alert("Ton jeu n'est pas à jour : la page va se recharger.\nEntre ensuite à nouveau le code.");
+      location.replace(location.pathname + "?v=" + versionPartie);
+    } else {
+      alert("Le téléphone qui a créé la partie a une ancienne version du jeu.\n" +
+            "Il doit recharger la page (ou l'ouvrir en navigation privée), puis recréer la partie.");
+    }
+    return false;
+  }
 
   document.getElementById("btnQuitterSalle").addEventListener("click", quitterPartie);
 
@@ -306,9 +369,12 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("validerRejoindre").addEventListener("click", () => {
     const code = document.getElementById("codeRejoindre").value.trim().toUpperCase();
     const pseudo = document.getElementById("pseudoRejoindre").value.replace(/\s+/g, " ").trim();
-    // Le pseudo n'est obligatoire que pour une NOUVELLE place : pour revenir, le code suffit
-    if (!code) { alert("Entre le code de la partie."); return; }
-    if (pseudo && PSEUDO_INVALIDE.test(pseudo)) { alert("Pseudo invalide (pas de . # $ [ ] /)."); return; }
+    if (!code || !pseudo) {
+      alert("Entre le code et ton pseudo.\n\n" +
+            "Tu as été déconnecté d'une partie ? Utilise « Revenir dans une partie » : le code suffit.");
+      return;
+    }
+    if (PSEUDO_INVALIDE.test(pseudo)) { alert("Pseudo invalide (pas de . # $ [ ] /)."); return; }
 
     attendreFirebase(() => {
       const db = window.firebaseDB;
@@ -321,27 +387,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         const partie = snapshot.val();
-        if (partie.version !== VERSION_JEU) {
-          // Anciennes parties : version en texte => considérée comme plus ancienne
-          const versionPartie = typeof partie.version === "number" ? partie.version : 0;
-
-          if (versionPartie > VERSION_JEU) {
-            // C'est nous qui sommes en retard : rechargement sur une adresse neuve (contourne le cache)
-            alert("Ton jeu n'est pas à jour : la page va se recharger.\nEntre ensuite à nouveau le code.");
-            location.replace(location.pathname + "?v=" + versionPartie);
-          } else {
-            alert("Le téléphone qui a créé la partie a une ancienne version du jeu.\n" +
-                  "Il doit recharger la page (ou l'ouvrir en navigation privée), puis recréer la partie.");
-          }
-          return;
-        }
+        if (!versionCompatible(partie)) return;
         const enJeu = !!(partie.etatJeu && partie.etatJeu.demarree);
-
-        // Code seul (pas de pseudo) : c'est un joueur qui revient après une déconnexion
-        if (!pseudo) {
-          revenirAvecLeCode(code, partie, enJeu);
-          return;
-        }
 
         // Pseudo déjà dans la partie (majuscules ignorées) : c'est sans doute un joueur qui s'est
         // déconnecté (page rechargée, téléphone éteint...) => il reprend sa place, sous son pseudo exact
@@ -362,8 +409,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (enJeu) {
           alert("La partie a déjà commencé : on ne peut plus y ajouter de joueur.\n\n" +
-                "Si tu en faisais partie et que tu as été déconnecté, efface le pseudo : " +
-                "le code suffit pour revenir à ta place.");
+                "Si tu en faisais partie et que tu as été déconnecté, utilise « Revenir dans une partie » : " +
+                "le code suffit pour reprendre ta place.");
           return;
         }
 
@@ -695,6 +742,7 @@ document.addEventListener("DOMContentLoaded", function () {
     repriseEnCours = !!(partie.etatJeu && partie.etatJeu.demarree);
 
     document.getElementById("enLigneRejoindre").style.display = "none";
+    document.getElementById("enLigneRevenir").style.display = "none";
     document.getElementById("codePartieAffiche").innerText = "Code de la partie : " + code;
     document.getElementById("salleAttente").style.display = "";
 

@@ -31,7 +31,7 @@
     <main>
         <section class="choixMode" id="choixMode">
             <h2>Comment voulez-vous jouer ?</h2>
-            <button type="button" id="btnModeClassique">Mode classique</button>
+            <button type="button" id="btnModeClassique">Mode classique (Hors connexion)</button>
             <button type="button" id="btnModeEnLigne">Mode en ligne</button>
             <!-- Installer l'appli : bouton sur Android (quand Chrome le permet), astuce sur iPhone.
                  Rien ne s'affiche quand le jeu est déjà ouvert en appli. -->
@@ -53,6 +53,15 @@
                 <button type="button" id="btnRetourChoixMode" class="btnRetour">← Retour</button>
                 <button type="button" id="btnCreerPartie">Créer une partie</button>
                 <button type="button" id="btnRejoindrePartie">Rejoindre une partie</button>
+                <button type="button" id="btnRevenirPartie">Revenir dans une partie</button>
+            </div>
+
+            <!-- Reconnexion : le code suffit pour reprendre sa place -->
+            <div id="enLigneRevenir" style="display:none;">
+                <button type="button" id="btnRetourRevenir" class="btnRetour">← Retour</button>
+                <p class="aideEnLigne">Tu as été déconnecté ?<br>Entre le code de la partie : tu reprendras ta place.</p>
+                <input type="text" id="codeRevenir" placeholder="Code de la partie" maxlength="6" />
+                <button type="button" id="validerRevenir">Revenir</button>
             </div>
 
             <div id="enLigneCreer" style="display:none;">
@@ -64,7 +73,7 @@
             <div id="enLigneRejoindre" style="display:none;">
                 <button type="button" id="btnRetourRejoindre" class="btnRetour">← Retour</button>
                 <input type="text" id="codeRejoindre" placeholder="Code de la partie" maxlength="6" />
-                <input type="text" id="pseudoRejoindre" placeholder="Ton pseudo (inutile pour revenir)" maxlength="20" />
+                <input type="text" id="pseudoRejoindre" placeholder="Ton pseudo" maxlength="20" />
                 <button type="button" id="validerRejoindre">Rejoindre</button>
             </div>
 
@@ -78,7 +87,7 @@
 
         <section class="ecranNouvellePartie" id="ecranNouvellePartie" style="display:none;">
             <button type="button" id="btnRetourNouvellePartie" class="btnRetour">← Retour</button>
-            <button type="button" id="btnAccueil" class="btnAccueil">⌂ Accueil</button>
+            <button type="button" id="btnAccueil" class="btnAccueilTexte" title="Accueil" aria-label="Accueil">⌂</button>
             <h2>Nouvelle partie</h2>
             <button type="button" id="btnRejouerMemes">Rejouer<br>(avec les mêmes joueurs)</button>
             <button type="button" id="btnModifierJoueurs">Modifier les joueurs</button>
@@ -96,8 +105,8 @@
         <section class="ecranConfirmerAccueil" id="ecranConfirmerAccueil" style="display:none;">
             <h2>Retourner à l'accueil ?</h2>
             <p class="texteConfirmation">La partie en cours sera perdue.</p>
-            <button type="button" id="btnConfirmerAccueilOui">Oui, retour à l'accueil</button>
-            <button type="button" id="btnConfirmerAccueilNon">Non, continuer la partie</button>
+            <button type="button" id="btnConfirmerAccueilOui">Oui</button>
+            <button type="button" id="btnConfirmerAccueilNon">Non</button>
         </section>
 
         <section class="ecranConfirmerHote" id="ecranConfirmerHote" style="display:none;">

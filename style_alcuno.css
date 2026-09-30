@@ -1954,6 +1954,7 @@ header h1{
 #enLigneChoix,
 #enLigneCreer,
 #enLigneRejoindre,
+#enLigneRevenir,
 #salleAttente{
   display: flex;
   flex-direction: column;
@@ -2099,9 +2100,11 @@ body.mode-en-ligne #jouer{
 
 /* Boutons « Accueil » : symbole ⌂ doré comme le titre ALCUNO (sans cadre) :
    - mode classique : coin droit du bandeau, avant de lancer la partie
-   - mode en ligne : coin droit des écrans Créer / Rejoindre / salle d'attente */
+   - mode en ligne : coin droit des écrans Créer / Rejoindre / Revenir / salle d'attente
+   - écran « Nouvelle partie » (classique et en ligne) : coin droit */
 #btnAccueilClassique,
-#enLigne #btnAccueilEnLigne{
+#enLigne #btnAccueilEnLigne,
+#ecranNouvellePartie #btnAccueil{
   position: absolute;
   z-index: 2;
   width: auto;
@@ -2138,12 +2141,14 @@ body.mode-en-ligne #jouer{
   transform: translateY(-50%) scale(1.06);
 }
 
-#enLigne #btnAccueilEnLigne{
+#enLigne #btnAccueilEnLigne,
+#ecranNouvellePartie #btnAccueil{
   top: 26px;
   right: 20px;
 }
 
-#enLigne #btnAccueilEnLigne:hover{
+#enLigne #btnAccueilEnLigne:hover,
+#ecranNouvellePartie #btnAccueil:hover{
   opacity: 1;
   background: none;
   transform: scale(1.06);
@@ -2151,7 +2156,8 @@ body.mode-en-ligne #jouer{
 
 @media (max-width: 520px){
   #btnAccueilClassique,
-  #enLigne #btnAccueilEnLigne{
+  #enLigne #btnAccueilEnLigne,
+  #ecranNouvellePartie #btnAccueil{
     font-size: 26px;
   }
 
@@ -2911,4 +2917,15 @@ body.rattrapage [id^="overlay"] *{
   gap: 12px;
   max-height: 50vh;
   overflow-y: auto;
+}
+
+/* Écran « Revenir dans une partie » : petite phrase d'explication */
+#enLigne .aideEnLigne{
+  margin: 0;
+  max-width: 30ch;
+  font-size: clamp(15px, 3.8vw, 18px);
+  font-weight: 700;
+  line-height: 1.4;
+  color: rgba(255,255,255,0.8);
+  text-align: center;
 }
