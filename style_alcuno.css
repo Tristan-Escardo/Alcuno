@@ -1850,7 +1850,8 @@ header h1{
 #enLigne,
 #ecranNouvellePartie,
 #ecranConfirmerHote,
-#ecranConfirmerAccueil{
+#ecranConfirmerAccueil,
+#ecranChoixPseudo{
   position: fixed;
   inset: 0;
   z-index: 9999;
@@ -1872,7 +1873,8 @@ header h1{
 #enLigne > div,
 #ecranNouvellePartie > *,
 #ecranConfirmerHote > *,
-#ecranConfirmerAccueil > *{
+#ecranConfirmerAccueil > *,
+#ecranChoixPseudo > *{
   animation: fadeIn 0.25s ease forwards;
 }
 
@@ -1880,6 +1882,7 @@ header h1{
 #ecranNouvellePartie h2,
 #ecranConfirmerHote h2,
 #ecranConfirmerAccueil h2,
+#ecranChoixPseudo h2,
 #enLigne h2,
 #enLigne h3{
   margin: 0;
@@ -1893,6 +1896,7 @@ header h1{
 #ecranNouvellePartie button,
 #ecranConfirmerHote button,
 #ecranConfirmerAccueil button,
+#ecranChoixPseudo button,
 #enLigne button{
   background-color: #ffcc00;
   color: #ffffff;
@@ -1917,6 +1921,7 @@ header h1{
 #ecranNouvellePartie button:hover,
 #ecranConfirmerHote button:hover,
 #ecranConfirmerAccueil button:hover,
+#ecranChoixPseudo button:hover,
 #enLigne button:hover{
   background-color: #ffea70;
   transform: scale(1.05);
@@ -1926,6 +1931,7 @@ header h1{
 #ecranNouvellePartie button:active,
 #ecranConfirmerHote button:active,
 #ecranConfirmerAccueil button:active,
+#ecranChoixPseudo button:active,
 #enLigne button:active{
   transform: scale(0.98);
 }
@@ -2001,7 +2007,8 @@ header h1{
 
 /* Écran « Retirer l'hôte ? » */
 #ecranConfirmerHote .texteConfirmation,
-#ecranConfirmerAccueil .texteConfirmation{
+#ecranConfirmerAccueil .texteConfirmation,
+#ecranChoixPseudo .texteConfirmation{
   margin: 0;
   max-width: min(460px, 88vw);
   color: #ffffff;
@@ -2817,30 +2824,54 @@ html.overlay-ouvert{
   background: #000;
 }
 
-/* ===== MODE EN LIGNE : code de la partie toujours visible ===== */
-/* Par-dessus tout (overlays compris) : si un joueur est déconnecté, même en plein duel,
-   les autres peuvent lui redonner le code pour revenir sous son pseudo */
-#badgeCodePartie{
+/* ===== MODE EN LIGNE : code de la partie (bouton discret 🔑) ===== */
+/* Petit bouton en bas à gauche, par-dessus tout (overlays compris) : un tap affiche le code
+   quelques secondes, pour le redonner à un joueur déconnecté */
+#btnCodePartie{
   display: none;
   position: fixed;
-  top: calc(8px + env(safe-area-inset-top, 0px));
-  left: calc(8px + env(safe-area-inset-left, 0px));
+  left: calc(10px + env(safe-area-inset-left, 0px));
+  bottom: calc(10px + env(safe-area-inset-bottom, 0px));
   z-index: 30001;
-  padding: 5px 10px;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  min-width: 34px;
+  padding: 0 9px;
   border-radius: 999px;
-  border: 1px solid rgba(255,215,0,0.35);
-  background: rgba(20, 0, 14, 0.82);
+  border: 1px solid rgba(255,215,0,0.25);
+  background: rgba(20, 0, 14, 0.6);
   color: #FFD700;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 900;
-  letter-spacing: 0.08em;
-  pointer-events: none;
-  -webkit-user-select: text;
-  user-select: text;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  opacity: 0.55;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
 }
 
-body.mode-en-ligne #badgeCodePartie{
-  display: block;
+body.mode-en-ligne #btnCodePartie{
+  display: inline-flex;
+}
+
+#btnCodePartie .cle{
+  font-size: 15px;
+  line-height: 1;
+}
+
+#btnCodePartie .texte{
+  display: none;
+  white-space: nowrap;
+}
+
+#btnCodePartie.ouvert{
+  opacity: 1;
+  background: rgba(20, 0, 14, 0.92);
+  border-color: rgba(255,215,0,0.6);
+}
+
+#btnCodePartie.ouvert .texte{
+  display: inline;
 }
 
 /* ===== RECONNEXION EN PLEINE MANCHE : rattrapage accéléré ===== */
@@ -2870,4 +2901,14 @@ body.rattrapage [id^="overlay"] *{
   text-align: center;
   white-space: pre-line;
   text-shadow: 2px 2px 5px #000;
+}
+
+/* Écran « Qui es-tu ? » : liste des joueurs déconnectés */
+#ecranChoixPseudo .listeChoixPseudo{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-height: 50vh;
+  overflow-y: auto;
 }

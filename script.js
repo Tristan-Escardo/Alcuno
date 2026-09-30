@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.4.0";
+  const VERSION_AFFICHEE = "8.4.1";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "version " + VERSION_AFFICHEE;
@@ -290,6 +290,8 @@ document.addEventListener("DOMContentLoaded", function () {
         codePartieActuel = code;
         pseudoActuel = pseudo;
         estHote = true;
+        memoriserPartieLocale(code, pseudo);
+        suivrePresence(code, pseudo);
 
         document.getElementById("enLigneCreer").style.display = "none";
         document.getElementById("codePartieAffiche").innerText = "Code de la partie : " + code;
@@ -304,8 +306,9 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("validerRejoindre").addEventListener("click", () => {
     const code = document.getElementById("codeRejoindre").value.trim().toUpperCase();
     const pseudo = document.getElementById("pseudoRejoindre").value.replace(/\s+/g, " ").trim();
-    if (!code || !pseudo) { alert("Entre le code et ton pseudo."); return; }
-    if (PSEUDO_INVALIDE.test(pseudo)) { alert("Pseudo invalide (pas de . # $ [ ] /)."); return; }
+    // Le pseudo n'est obligatoire que pour une NOUVELLE place : pour revenir, le code suffit
+    if (!code) { alert("Entre le code de la partie."); return; }
+    if (pseudo && PSEUDO_INVALIDE.test(pseudo)) { alert("Pseudo invalide (pas de . # $ [ ] /)."); return; }
 
     attendreFirebase(() => {
       const db = window.firebaseDB;
@@ -334,6 +337,12 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         const enJeu = !!(partie.etatJeu && partie.etatJeu.demarree);
 
+        // Code seul (pas de pseudo) : c'est un joueur qui revient après une déconnexion
+        if (!pseudo) {
+          revenirAvecLeCode(code, partie, enJeu);
+          return;
+        }
+
         // Pseudo déjà dans la partie (majuscules ignorées) : c'est sans doute un joueur qui s'est
         // déconnecté (page rechargée, téléphone éteint...) => il reprend sa place, sous son pseudo exact
         const pseudoMin = pseudo.toLocaleLowerCase("fr-FR");
@@ -352,8 +361,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         if (enJeu) {
-          alert("La partie a déjà commencé.\n\nSi tu en faisais partie et que tu as été déconnecté, " +
-                "reprends exactement le même pseudo qu'avant pour revenir à ta place.");
+          alert("La partie a déjà commencé : on ne peut plus y ajouter de joueur.\n\n" +
+                "Si tu en faisais partie et que tu as été déconnecté, efface le pseudo : " +
+                "le code suffit pour revenir à ta place.");
           return;
         }
 
@@ -363,6 +373,8 @@ document.addEventListener("DOMContentLoaded", function () {
           codePartieActuel = code;
           pseudoActuel = pseudo;
           estHote = false;
+          memoriserPartieLocale(code, pseudo);
+          suivrePresence(code, pseudo);
 
           document.getElementById("enLigneRejoindre").style.display = "none";
           document.getElementById("codePartieAffiche").innerText = "Code de la partie : " + code;
@@ -567,6 +579,113 @@ document.addEventListener("DOMContentLoaded", function () {
     if (etat.message) afficherToast(etat.message, 4000);
   }
 
+  // ===== Présence : qui est connecté ? =====
+  // joueurs/<pseudo>/connecte vaut true tant que le téléphone est connecté à la partie. Firebase le
+  // passe tout seul à false quand la connexion est perdue (page fermée, téléphone éteint, réseau coupé).
+  // Sert à proposer les bons pseudos quand quelqu'un revient avec le code seulement.
+  let desabonnerPresence = null;
+  let refPresence = null;
+
+  function suivrePresence(code, nom){
+    arreterPresence();
+    refPresence = window.fbRef(window.firebaseDB, `parties/${code}/joueurs/${nom}/connecte`);
+    const refConnecte = refPresence;
+    desabonnerPresence = window.fbOnValue(window.fbRef(window.firebaseDB, ".info/connected"), (snapshot) => {
+      if (snapshot.val() !== true) return;
+      // (re)connecté au serveur : on prépare le « false » automatique, puis on passe à true
+      window.fbOnDisconnect(refConnecte).set(false)
+        .then(() => window.fbSet(refConnecte, true))
+        .catch(() => {}); // sans la règle Firebase "connecte", on continue sans présence
+    });
+  }
+
+  function arreterPresence(){
+    if (desabonnerPresence) { desabonnerPresence(); desabonnerPresence = null; }
+    if (refPresence) {
+      window.fbOnDisconnect(refPresence).cancel().catch(() => {});
+      refPresence = null;
+    }
+  }
+
+  // ===== Mémoire : ce téléphone se souvient de son pseudo dans la partie en cours =====
+  // (stockage local du navigateur) : pour revenir, le code suffit, sans retaper son pseudo
+  const CLE_PARTIE_LOCALE = "alcuno_partie_en_ligne";
+
+  function memoriserPartieLocale(code, pseudo){
+    try { localStorage.setItem(CLE_PARTIE_LOCALE, JSON.stringify({ code, pseudo })); } catch (e) {}
+  }
+
+  function oublierPartieLocale(){
+    try { localStorage.removeItem(CLE_PARTIE_LOCALE); } catch (e) {}
+  }
+
+  function lirePartieLocale(){
+    try { return JSON.parse(localStorage.getItem(CLE_PARTIE_LOCALE)); } catch (e) { return null; }
+  }
+
+  // Revenir avec le code seulement (champ pseudo vide) :
+  // 1) ce téléphone se souvient de son pseudo dans cette partie => il reprend sa place directement ;
+  // 2) sinon (autre téléphone...), on propose les joueurs déconnectés : un seul => confirmation,
+  //    plusieurs => écran « Qui es-tu ? ».
+  function revenirAvecLeCode(code, partie, enJeu){
+    const joueursPartie = partie.joueurs || {};
+
+    const memoire = lirePartieLocale();
+    if (memoire && memoire.code === code && joueursPartie[memoire.pseudo]) {
+      reprendrePlaceEnLigne(code, memoire.pseudo, partie);
+      return;
+    }
+
+    // Déconnectés = connecte à false. Sans info de présence (règle Firebase absente),
+    // on propose tous ceux qui ne sont pas marqués connectés.
+    const candidats = Object.keys(joueursPartie)
+      .filter(nom => joueursPartie[nom].connecte !== true)
+      .sort((a, b) => (joueursPartie[a].rejoint || 0) - (joueursPartie[b].rejoint || 0));
+
+    if (candidats.length === 0) {
+      alert(enJeu
+        ? "Tous les joueurs de cette partie sont connectés : il n'y a pas de place à reprendre."
+        : "Entre ton pseudo pour rejoindre la partie.");
+      return;
+    }
+
+    if (candidats.length === 1) {
+      if (confirm(`Reprendre la place de « ${candidats[0]} » dans la partie ${code} ?`)) {
+        reprendrePlaceEnLigne(code, candidats[0], partie);
+      }
+      return;
+    }
+
+    afficherChoixPseudo(code, candidats, partie);
+  }
+
+  // Écran « Qui es-tu ? » : plusieurs joueurs déconnectés, on choisit sa place
+  const ecranChoixPseudo = document.getElementById("ecranChoixPseudo");
+
+  function afficherChoixPseudo(code, noms, partie){
+    document.getElementById("texteChoixPseudo").innerText =
+      `Plusieurs joueurs se sont déconnectés de la partie ${code}.\nChoisis ton pseudo pour reprendre ta place.`;
+
+    const liste = document.getElementById("listeChoixPseudo");
+    liste.innerHTML = "";
+    noms.forEach((nom) => {
+      const bouton = document.createElement("button");
+      bouton.type = "button";
+      bouton.innerText = avecCouronne(nom);
+      bouton.addEventListener("click", () => {
+        ecranChoixPseudo.style.display = "none";
+        reprendrePlaceEnLigne(code, nom, partie);
+      });
+      liste.appendChild(bouton);
+    });
+
+    ecranChoixPseudo.style.display = "";
+  }
+
+  document.getElementById("btnChoixPseudoAnnuler").addEventListener("click", () => {
+    ecranChoixPseudo.style.display = "none";
+  });
+
   // Reconnexion : le joueur reprend sa place sous son pseudo exact. En pleine manche, son téléphone
   // rejoue toutes les actions déjà faites (rattrapage accéléré) avant de reprendre en direct.
   function reprendrePlaceEnLigne(code, nom, partie){
@@ -581,6 +700,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     marquerActivite(code);
     ecouterSalleAttente(code);
+    memoriserPartieLocale(code, nom);
+    suivrePresence(code, nom);
     ecouterEtatPartie(code); // manche en cours => démarrée en mode rattrapage (demarrerMancheEnLigne)
   }
 
@@ -638,6 +759,10 @@ document.addEventListener("DOMContentLoaded", function () {
     if (desabonnerEtat) { desabonnerEtat(); desabonnerEtat = null; }
     libererEcran();
     if (desabonnerActions) { desabonnerActions(); desabonnerActions = null; }
+
+    // Parti volontairement / retiré / partie fermée : plus de présence, plus rien à reprendre
+    arreterPresence();
+    oublierPartieLocale();
 
     codePartieActuel = null;
     pseudoActuel = null;
@@ -3455,16 +3580,28 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   }
 
-  // Code de la partie toujours visible en ligne, par-dessus tous les overlays : si quelqu'un
-  // est déconnecté (même en plein duel), les autres peuvent lui redonner le code pour revenir
+  // Code de la partie, discret : petit bouton 🔑 en bas à gauche, accessible par-dessus les overlays
+  // (même en plein duel). Un tap affiche « Code : XXXXX » quelques secondes, pour le redonner
+  // à un joueur déconnecté.
   function afficherBadgeCode(){
-    let badge = document.getElementById("badgeCodePartie");
-    if(!badge){
-      badge = document.createElement("div");
-      badge.id = "badgeCodePartie";
-      document.body.appendChild(badge);
+    let bouton = document.getElementById("btnCodePartie");
+    if(!bouton){
+      bouton = document.createElement("button");
+      bouton.type = "button";
+      bouton.id = "btnCodePartie";
+      bouton.setAttribute("aria-label", "Voir le code de la partie");
+      bouton.innerHTML = '<span class="cle" aria-hidden="true">🔑</span><span class="texte"></span>';
+      bouton.addEventListener("click", () => {
+        bouton.classList.toggle("ouvert");
+        clearTimeout(bouton._minuteur);
+        if(bouton.classList.contains("ouvert")){
+          bouton._minuteur = setTimeout(() => bouton.classList.remove("ouvert"), 6000);
+        }
+      });
+      document.body.appendChild(bouton);
     }
-    badge.innerText = "Partie " + codePartieActuel;
+    bouton.querySelector(".texte").innerText = "Code : " + codePartieActuel;
+    bouton.classList.remove("ouvert");
   }
 
   function afficherToast(message, duree = 1800){

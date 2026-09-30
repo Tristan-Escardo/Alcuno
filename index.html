@@ -64,7 +64,7 @@
             <div id="enLigneRejoindre" style="display:none;">
                 <button type="button" id="btnRetourRejoindre" class="btnRetour">← Retour</button>
                 <input type="text" id="codeRejoindre" placeholder="Code de la partie" maxlength="6" />
-                <input type="text" id="pseudoRejoindre" placeholder="Ton pseudo" maxlength="20" />
+                <input type="text" id="pseudoRejoindre" placeholder="Ton pseudo (inutile pour revenir)" maxlength="20" />
                 <button type="button" id="validerRejoindre">Rejoindre</button>
             </div>
 
@@ -85,6 +85,14 @@
         </section>
 
         <!-- Mode classique : ⌂ pendant une partie en cours -->
+        <!-- Mode en ligne : revenir avec le code seulement, quand plusieurs joueurs sont déconnectés -->
+        <section class="ecranChoixPseudo" id="ecranChoixPseudo" style="display:none;">
+            <h2>Qui es-tu ?</h2>
+            <p id="texteChoixPseudo" class="texteConfirmation"></p>
+            <div id="listeChoixPseudo" class="listeChoixPseudo"></div>
+            <button type="button" id="btnChoixPseudoAnnuler">Annuler</button>
+        </section>
+
         <section class="ecranConfirmerAccueil" id="ecranConfirmerAccueil" style="display:none;">
             <h2>Retourner à l'accueil ?</h2>
             <p class="texteConfirmation">La partie en cours sera perdue.</p>
@@ -174,7 +182,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
         import {
-            getDatabase, ref, set, get, update, onValue, onChildAdded, remove, runTransaction, serverTimestamp
+            getDatabase, ref, set, get, update, onValue, onChildAdded, remove, onDisconnect, runTransaction, serverTimestamp
         } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
 
         const firebaseConfig = {
@@ -201,6 +209,7 @@
         window.fbOnChildAdded = onChildAdded;
         window.fbRunTransaction = runTransaction;
         window.fbServerTimestamp = serverTimestamp;
+        window.fbOnDisconnect = onDisconnect;
 
         window.dispatchEvent(new Event("firebase-ready"));
     </script>
