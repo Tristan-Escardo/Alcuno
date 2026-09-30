@@ -837,6 +837,8 @@ document.addEventListener("DOMContentLoaded", function () {
     if(scrollLockCount > 1) return;
 
     document.body.classList.add("overlay-open");
+    // Fond de la page en noir le temps de l'overlay : couvre la bande réservée à la barre de défilement (PC)
+    document.documentElement.classList.add("overlay-ouvert");
 
     // Sauve la position pour iOS
     scrollYBeforeLock = window.scrollY || document.documentElement.scrollTop || 0;
@@ -857,6 +859,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if(scrollLockCount > 0) return;
 
     document.body.classList.remove("overlay-open");
+    document.documentElement.classList.remove("overlay-ouvert");
     document.body.classList.remove("no-scroll");
     document.documentElement.style.removeProperty("--sbw");
     const top = document.body.style.top;
@@ -1558,6 +1561,16 @@ document.addEventListener("DOMContentLoaded", function () {
       }, 0);
   }
 
+  // Disparition des overlays : fondu doux (avant : rétrécissement à 80 % en même temps, trop brutal).
+  // Il bloque les taps jusqu'au bout : certaines règles enchaînent un écran juste après (annulations).
+  // Même durée qu'avant (0,3 s) : l'ordre d'enchaînement des écrans ne change pas.
+  const DUREE_SORTIE_OVERLAY = 300;
+  function animerSortieOverlay(overlay){
+    overlay.style.transition = `opacity ${DUREE_SORTIE_OVERLAY}ms ease-out, transform ${DUREE_SORTIE_OVERLAY}ms ease-out`;
+    overlay.style.opacity = "0";
+    overlay.style.transform = "scale(0.98)";
+  }
+
   // Appelle callback UNE fois : à la fin de la transition de l'élément, ou au plus tard après `ms`.
   // Sécurité : si la transition n'a pas lieu (ex. fermeture juste avant la fin de l'apparition),
   // "transitionend" n'arrive jamais et l'overlay resterait bloqué à l'écran.
@@ -1609,9 +1622,8 @@ document.addEventListener("DOMContentLoaded", function () {
     if (overlay.dataset.enFermeture) return;
     overlay.dataset.enFermeture = "1";
 
-    overlay.style.opacity = "0";
-    overlay.style.transform = "scale(0.8)";
-    apresTransition(overlay, 300, () => {
+    animerSortieOverlay(overlay);
+    apresTransition(overlay, DUREE_SORTIE_OVERLAY, () => {
       overlay.remove();
       unlockScroll();
       if(typeof afterClose === "function") afterClose();
@@ -1680,9 +1692,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const fermer = () => {
       if(enFermeture) return; // tap + minuteur : une seule fermeture
       enFermeture = true;
-      overlay.style.opacity = "0";
-      overlay.style.transform = "scale(0.96)";
-      apresTransition(overlay, 250, () => {
+      animerSortieOverlay(overlay);
+      apresTransition(overlay, DUREE_SORTIE_OVERLAY, () => {
         overlay.remove();
         unlockScroll();
         if(typeof afterClose === "function") afterClose();
@@ -1762,9 +1773,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const fermer = (callback = null) => {
       if(enFermeture) return;
       enFermeture = true;
-      overlay.style.opacity = "0";
-      overlay.style.transform = "scale(0.96)";
-      apresTransition(overlay, 250, () => {
+      animerSortieOverlay(overlay);
+      apresTransition(overlay, DUREE_SORTIE_OVERLAY, () => {
         overlay.remove();
         unlockScroll();
         if(typeof callback === "function"){
@@ -3011,7 +3021,8 @@ document.addEventListener("DOMContentLoaded", function () {
     afficherJoueurs();
     // Sécurité : on réactive le scroll quoi qu'il arrive
     scrollLockCount = 0;
-    document.body.classList.remove("no-scroll");
+    document.body.classList.remove("no-scroll", "overlay-open");
+    document.documentElement.classList.remove("overlay-ouvert");
     document.body.style.top = "";
   }
 

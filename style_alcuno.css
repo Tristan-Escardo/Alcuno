@@ -2796,3 +2796,11 @@ header h1{
   color: #FFD700;
   text-shadow: 0 2px 0 #6b4200, 0 0 16px rgba(255, 215, 0, 0.35);
 }
+
+/* ===== PC : bande de la barre de défilement pendant un overlay ===== */
+/* La place de la barre est réservée en permanence (scrollbar-gutter) ; pendant un overlay la barre
+   disparaît et on voyait une bande bordeaux à droite. On passe le fond de la page en noir,
+   comme les overlays, le temps qu'ils sont ouverts. */
+html.overlay-ouvert{
+  background: #000;
+}
