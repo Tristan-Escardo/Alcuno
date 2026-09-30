@@ -77,12 +77,14 @@ header {
     --gap: clamp(6px, 1.2vw, 14px);
 }
 
-:root{ --cols: 8; }
-/* Ajuste le nombre de colonnes selon la largeur */
-@media (max-width: 1000px){ :root{ --cols: 6; } }
-@media (max-width: 720px){  :root{ --cols: 5; } }
-@media (max-width: 520px){  :root{ --cols: 4; } }  /* iPhone */
-@media (max-width: 380px){  :root{ --cols: 3; } }  /* très petit */
+/* Cartes par rangée : 52 cartes ne font des rangées toutes pleines qu'avec 4 ou 13 par rangée.
+   - téléphones : 4 (13 rangées pleines)
+   - tablettes : 6 (8 rangées pleines + une de 4, centrée) : 4 ferait un plateau très étroit,
+     13 des cartes minuscules
+   - PC : 13 (4 rangées pleines) ; les cartes rétrécissent si besoin en gardant leur forme */
+:root{ --cols: 13; }
+@media (max-width: 1100px){ :root{ --cols: 6; } }  /* tablettes */
+@media (max-width: 600px){  :root{ --cols: 4; } }  /* téléphones, même très petits */
 
 .plateau{
     display: grid;
@@ -1194,7 +1196,12 @@ body.no-scroll{
   font-size: clamp(16px, 4vw, 28px);
 }
 
-@media (max-width: 520px){
+/* Taille des cartes : téléphones (4 par rangée) puis tablettes (6 par rangée) */
+@media (min-width: 601px) and (max-width: 1100px){
+    :root{ --card-w: clamp(62px, 10vw, 110px); }
+}
+
+@media (max-width: 600px){
     :root{
         --card-w: clamp(74px, 21vw, 98px);
         --gap: clamp(8px, 2.2vw, 14px);
