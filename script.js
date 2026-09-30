@@ -752,7 +752,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   let phase = 1;       // 1 = choix J1, 2 = choix J2
   let choixJ1 = null;  // 1 ou 2 (carte de gauche/droite)
-  let lastCols = null;
   let scrollLockCount = 0;
   let scrollYBeforeLock = 0;
   let finUnOverlayAffiche = false;
@@ -1304,11 +1303,6 @@ document.addEventListener("DOMContentLoaded", function () {
     majStickyJoueurActif();
   }
 
-  function afficherMessagePigeon(msg){
-    reglePigeon.innerText = msg;
-    reglePigeon.style.display = "block";
-  }
-
   function effacerMessagePigeon(){
     reglePigeon.innerText = "";
     reglePigeon.style.display = "none";
@@ -1645,129 +1639,6 @@ document.addEventListener("DOMContentLoaded", function () {
     return Math.min(dispo, nbGorgees) > 0;
   }
 
-  function afficherOverlayAnnulation(joueurIndex, nbGorgees, onDone = null, afterClose = null){
-    const nom = joueurs[joueurIndex];
-    const dispo = Number(annulations[nom] || 0);
-    const maxAnnulable = Math.min(dispo, nbGorgees);
-
-    if(maxAnnulable <= 0){
-      if(typeof afterClose === "function") afterClose();
-      return false;
-    }
-
-    if(document.getElementById("overlayAnnulation")) return true;
-
-    lockScroll();
-
-    const overlay = document.createElement("div");
-    overlay.id = "overlayAnnulation";
-    overlay.style.position = "fixed";
-    overlay.style.inset = "0";
-    overlay.style.zIndex = "10000";
-    overlay.style.backgroundColor = "rgb(0,0,0)";
-    overlay.style.display = "flex";
-    overlay.style.flexDirection = "column";
-    overlay.style.justifyContent = "center";
-    overlay.style.alignItems = "center";
-    overlay.style.padding = "20px";
-    overlay.style.textAlign = "center";
-    overlay.style.color = "#FFD700";
-    overlay.style.opacity = "0";
-    overlay.style.transition = "opacity 0.25s ease, transform 0.25s ease";
-    overlay.style.transform = "scale(0.96)";
-    overlay.style.gap = "16px";
-    overlay.style.overflowY = "auto";
-    overlay.style.webkitOverflowScrolling = "touch";
-
-    const titre = document.createElement("div");
-    titre.innerText = `${nom}, tu as +${dispo} annulation(s).`;
-    titre.style.fontSize = "clamp(24px, 5vw, 46px)";
-    titre.style.fontWeight = "900";
-    titre.style.textShadow = "2px 2px 5px #000";
-    overlay.appendChild(titre);
-
-    const sousTitre = document.createElement("div");
-    sousTitre.innerText = "Combien de gorgées veux-tu annuler ?";
-    sousTitre.style.fontSize = "clamp(18px, 4vw, 28px)";
-    sousTitre.style.fontWeight = "800";
-    sousTitre.style.maxWidth = "min(780px, 92vw)";
-    overlay.appendChild(sousTitre);
-
-    const boutons = document.createElement("div");
-    boutons.style.display = "flex";
-    boutons.style.flexWrap = "wrap";
-    boutons.style.justifyContent = "center";
-    boutons.style.gap = "14px";
-    boutons.style.width = "min(760px, 92vw)";
-    overlay.appendChild(boutons);
-
-    const fermer = () => {
-      overlay.style.opacity = "0";
-      overlay.style.transform = "scale(0.96)";
-      overlay.addEventListener("transitionend", () => {
-        overlay.remove();
-        unlockScroll();
-        if(typeof afterClose === "function") afterClose();
-      }, { once: true });
-    };
-
-    for(let i=0; i<=maxAnnulable; i++){
-      const btn = document.createElement("button");
-      btn.className = "bouton-annulation";
-      btn.innerText = `Annuler ${i}`;
-      btn.style.width = "min(420px, 92vw)";
-      btn.style.padding = "clamp(12px, 3.2vw, 22px)";
-      btn.style.fontSize = "clamp(16px, 4vw, 28px)";
-      btn.style.fontWeight = "800";
-      btn.style.border = "none";
-      btn.style.borderRadius = "12px";
-      btn.style.backgroundColor = "#FFD700";
-      btn.style.color = "#000";
-      btn.style.cursor = "pointer";
-      btn.style.boxShadow = "0 10px 24px rgba(0,0,0,0.28)";
-
-      btn.addEventListener("pointerdown", () => {
-        const utilise = i;
-        const reste = nbGorgees - utilise;
-
-        annulations[nom] = Math.max(0, dispo - utilise);
-        afficherJoueurs();
-        afficherJoueurActif();
-
-        boutons.remove();
-
-        const resultat = document.createElement("div");
-        resultat.innerText = utilise > 0
-          ? `${utilise} gorgée(s) annulée(s).\nTu bois ${reste} gorgée(s).`
-          : `Tu n’annules rien.\nTu bois ${reste} gorgée(s).`;
-        resultat.style.fontSize = "clamp(22px, 5vw, 42px)";
-        resultat.style.fontWeight = "900";
-        resultat.style.textShadow = "2px 2px 5px #000";
-        resultat.style.maxWidth = "min(820px, 92vw)";
-        overlay.appendChild(resultat);
-
-        if(typeof onDone === "function") onDone(utilise, reste);
-        setTimeout(fermer, 1200);
-      });
-
-      boutons.appendChild(btn);
-    }
-
-    document.body.appendChild(overlay);
-    requestAnimationFrame(() => {
-      overlay.style.opacity = "1";
-      overlay.style.transform = "scale(1)";
-    });
-
-    return true;
-  }
-
-  function joueurPeutAnnuler(joueurIndex, nbGorgees){
-    const nom = joueurs[joueurIndex];
-    const dispo = Number(annulations[nom] || 0);
-    return Math.min(dispo, nbGorgees) > 0;
-  }
-
   function afficherOverlayResultatAnnulation(message, afterClose = null){
     if(document.getElementById("overlayResultatAnnulation")) return false;
 
@@ -1947,93 +1818,6 @@ document.addEventListener("DOMContentLoaded", function () {
     return true;
   }
 
-  // Ajoute (ou remplace) l'UI de choix d'annulation dans l'overlay existant.
-  // - joueurIndex : index dans joueurs[]
-  // - nbGorgees : combien il devrait boire au départ
-  // - onDone(annule, reste) : callback une fois le choix fait
-  function injecterChoixAnnulationDansOverlay(joueurIndex, nbGorgees, onDone, afterClose = null){
-    const overlay = document.getElementById("overlayRegleUnique");
-    if(!overlay) return false;
-
-    const nom = joueurs[joueurIndex];
-    const dispo = Number(annulations[nom] || 0);
-    const maxAnnulable = Math.min(dispo, nbGorgees);
-
-    if(maxAnnulable <= 0) return false;
-
-    // On verrouille l'overlay => pas d'auto-close tant que pas de choix
-    overlayRegleVerrouille = true;
-
-    // On stoppe le timer de fermeture si déjà lancé
-    if (overlayRegleTimeout) {
-      clearTimeout(overlayRegleTimeout);
-      overlayRegleTimeout = null;
-    }
-
-    // Supprime un ancien bloc d'annulation si présent (au cas où)
-    const old = overlay.querySelector(".bloc-annulation");
-    if(old) old.remove();
-
-    const bloc = document.createElement("div");
-    bloc.className = "bloc-annulation";
-
-    const titre = document.createElement("div");
-    titre.className = "titre-annulation";
-    titre.innerText = `${nom}, tu as +${dispo} annulation(s). Combien de gorgées veux-tu annuler ?`;
-    bloc.appendChild(titre);
-
-    const boutons = document.createElement("div");
-    boutons.className = "ligne-boutons-annulation";
-
-    // Boutons: 0..maxAnnulable (pas d'invention : 1 bouton par valeur possible)
-    for(let i=0; i<=maxAnnulable; i++){
-      const btn = document.createElement("button");
-      btn.className = "bouton-annulation";
-      btn.innerText = `Annuler ${i}`;
-
-      btn.addEventListener("pointerdown", () => {
-        const utilise = i;
-        const reste = nbGorgees - utilise;
-
-        annulations[nom] = Math.max(0, dispo - utilise);
-        afficherJoueurs();
-
-        // Enlève le bloc boutons (choix fait)
-        bloc.remove();
-
-        // Ajoute une ligne résultat dans l'overlay
-        const boxTexte = overlay.querySelector(".overlay-regle-texte");
-        if(boxTexte){
-          const ligne = document.createElement("div");
-          ligne.style.marginTop = "10px";
-          ligne.innerText =
-            utilise > 0
-              ? `${utilise} gorgée(s) annulée(s). \nTu bois ${reste} gorgée(s).`
-              : `Tu n’annules rien. Tu bois ${reste} gorgée(s).`;
-          boxTexte.appendChild(ligne);
-        }
-
-        // Déverrouille et ferme après un court délai (le temps de lire)
-        overlayRegleVerrouille = false;
-
-        // petite pause de lecture, puis fermeture
-        if(typeof onDone === "function") onDone(utilise, reste);
-        setTimeout(() => {
-          fermerOverlayRegleUnique(afterClose);
-        }, dureeOverlayPourMessage(utilise > 0
-          ? `${utilise} gorgée(s) annulée(s). \nTu bois ${reste} gorgée(s).`
-          : `Tu n’annules rien. Tu bois ${reste} gorgée(s).`));
-      });
-
-      boutons.appendChild(btn);
-    }
-
-    bloc.appendChild(boutons);
-    overlay.appendChild(bloc);
-
-    return true;
-  }
-
   // Annonce "X boit N" + propose annulation si dispo
   function annoncerBoireAvecAnnulation(joueurIndex, nbGorgees, classeCarte = "", prefixMsg = null, onFinish = null){
     const nom = joueurs[joueurIndex];
@@ -2208,14 +1992,6 @@ document.addEventListener("DOMContentLoaded", function () {
       overlayRegleTimeout = setTimeout(() => fermerOverlayRegleUnique(), dureeOverlayPourMessage(message));
     }
   }
-
-  /* ===== Règles centralisées ===== */
-  const reglesBoire = {
-    "zero": "Tout le monde boit 1 gorgée sauf toi",
-    "plus_2": "Boit 2 gorgées",
-    "plus_4": "Distribue 4 gorgées (tu peux les partager)",
-    "interdit": "SOCIAAALE ! \nTout le monde boit 1 gorgée"
-  };
 
   function afficherOverlayCouleur(joueurActuel){
     if(document.getElementById("overlayCouleur")) return;
@@ -2480,7 +2256,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let carteA = null;
     let carteB = null;
-    let selectionFaite = false;
 
     function tirerUneCarte(){
       resetPaquetDuelSiBesoin();
@@ -2492,8 +2267,6 @@ document.addEventListener("DOMContentLoaded", function () {
       phase = 1;
       choixJ1 = null;
       info.innerText = joueurs[j1] + " : choisis une carte";
-
-      selectionFaite = false;
 
       // Reset visuel : cartes de dos, qui pulsent (= à choisir)
       c1.className = "Carte duel-a-choisir";
@@ -2931,20 +2704,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       );
       return; // important : on évite le traitement générique en dessous
-    }
-
-    // Autres règles génériques de "boire"
-    for (const key in reglesBoire) {
-      if (key === "plus_2") continue; // sécurité (au cas où)
-      if (carteTiree.startsWith(key)) {
-        const msg = reglesBoire[key];
-        regleZero.innerText = msg;
-        regleZero.style.display = "block";
-        zeroEnCours = true;
-        montrerOverlayRegle(msg, carteTiree);
-        appliquerBonusCouleurSiBesoin(carteTiree, { couleur: couleurBue, joueur: joueurActuel, preserveRuleMessage: true, afterRuleOverlay: true });
-        return; // une seule règle "boire" à appliquer
-      }
     }
 
     // Cartes "un" => +1 annulation de gorgée

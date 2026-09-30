@@ -174,7 +174,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
         import {
-            getDatabase, ref, set, get, update, onValue, onChildAdded, push, remove, onDisconnect, runTransaction, serverTimestamp
+            getDatabase, ref, set, get, update, onValue, onChildAdded, remove, runTransaction, serverTimestamp
         } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
 
         const firebaseConfig = {
@@ -197,9 +197,7 @@
         window.fbGet = get;
         window.fbUpdate = update;
         window.fbOnValue = onValue;
-        window.fbPush = push;
         window.fbRemove = remove;
-        window.fbOnDisconnect = onDisconnect;
         window.fbOnChildAdded = onChildAdded;
         window.fbRunTransaction = runTransaction;
         window.fbServerTimestamp = serverTimestamp;

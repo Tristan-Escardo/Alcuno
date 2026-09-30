@@ -25,13 +25,6 @@ html{
     box-sizing: border-box;
 }
 
-:root{
-    /* Taille des cartes sur le plateau */
-    --card-w: clamp(58px, 7.2vw, 112px);
-    --card-h: calc(var(--card-w) * 1.466);
-    --gap: clamp(6px, 1.2vw, 14px);
-}
-
 header {
     border-bottom: 2px solid #fff;
     padding-bottom: 10px;
@@ -1197,22 +1190,6 @@ body.no-scroll{
   font-size: clamp(16px, 4vw, 28px);
 }
 
-/* ===== Animations (réutilisation) ===== */
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes pop {
-    from { transform: scale(0.5); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-}
-
-@keyframes slideUp {
-    from { transform: translateY(50px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-}
-
 @media (max-width: 520px){
     :root{
         --card-w: clamp(74px, 21vw, 98px);
@@ -1526,72 +1503,6 @@ body.no-scroll{
 }
 
 
-/* ===== Override final : +4 compact et hiérarchisé ===== */
-#overlayPlus4 .plus4-container-joueurs{
-  display: grid;
-  grid-template-columns: repeat(2, minmax(104px, 148px));
-  gap: 8px;
-  width: min(300px, 84vw);
-  max-width: 300px;
-  margin: 4px auto 0 auto;
-}
-
-#overlayPlus4 .plus4-container-joueurs .bouton-pigeon{
-  width: 100%;
-  max-width: none;
-  min-height: 78px;
-  padding: 8px 6px;
-  font-size: clamp(12px, 3vw, 15px);
-  line-height: 1.08;
-  border-radius: 16px;
-}
-
-#overlayPlus4 .plus4-actions{
-  width: min(360px, 92vw);
-  margin-top: 12px;
-}
-
-#overlayPlus4 .plus4-actions .bouton-pigeon{
-  width: 100%;
-  max-width: none;
-  padding: 14px 16px;
-  font-size: clamp(16px, 3.9vw, 22px);
-  border-radius: 14px;
-}
-
-@media (min-width: 700px){
-  #overlayPlus4 .plus4-container-joueurs{
-    width: min(320px, 76vw);
-    max-width: 320px;
-  }
-
-  #overlayPlus4 .plus4-container-joueurs .bouton-pigeon{
-    min-height: 88px;
-    font-size: 14px;
-  }
-}
-
-@media (max-width: 520px){
-  #overlayPlus4 .plus4-container-joueurs{
-    width: min(248px, 76vw);
-    max-width: 248px;
-    grid-template-columns: repeat(2, minmax(96px, 120px));
-    gap: 7px;
-  }
-
-  #overlayPlus4 .plus4-container-joueurs .bouton-pigeon{
-    min-height: 68px;
-    padding: 7px 5px;
-    font-size: 12px;
-    border-radius: 14px;
-  }
-
-  #overlayPlus4 .plus4-actions{
-    width: min(320px, 92vw);
-  }
-}
-
-
 /* ===== Override final : +4 ultra compact ===== */
 #overlayPlus4 .plus4-container-joueurs{
   display: grid;
@@ -1620,6 +1531,8 @@ body.no-scroll{
 }
 
 #overlayPlus4 .plus4-actions .bouton-pigeon{
+  width: 100%;
+  max-width: none;
   padding: 11px 14px;
   font-size: clamp(15px, 3.8vw, 19px);
   border-radius: 13px;
