@@ -35,6 +35,14 @@ document.addEventListener("DOMContentLoaded", function () {
   let rattrapageEnCours = false;  // délais du jeu quasi nuls pendant le rattrapage (voir delai())
   let seqFinRattrapage = 0;       // numéro de la dernière action à rattraper
 
+  // Joueur retiré qui revient : il est remis dans la manche par une action « retour »
+  // (voir verifierRetourDansManche), appliquée au même moment sur tous les téléphones
+  let ordreManche = [];           // joueurs au début de la manche : on revient à sa place d'origine
+  let retourEnCours = false;      // ce téléphone attend d'être remis dans la manche
+  let retourEnvoye = false;       // notre demande de retour est dans la file, pas encore traitée
+  let retourAnnonce = false;      // message « Tu reviens dans la partie… » déjà affiché
+  let timerRetour = null;
+
   const PSEUDO_INVALIDE = /[.#$\[\]\/]/;
 
   // Easter egg : couronne 👑 à côté du nom des créateurs du jeu
@@ -58,7 +66,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.5.1";
+  const VERSION_AFFICHEE = "8.5.2";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "version " + VERSION_AFFICHEE;
@@ -475,6 +483,17 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         if (enJeu) {
+          // Joueur retiré (ou parti) pendant la partie : il peut y revenir sous le même pseudo
+          const nomRetire = joueurRetire(partie, pseudo);
+          if (nomRetire) {
+            const ok = confirm(
+              `« ${nomRetire} » a été retiré de cette partie.\n\n` +
+              `C'est toi ? Appuie sur OK pour y revenir : tu retrouveras la partie là où elle en est.`
+            );
+            if (ok) revenirApresRetrait(code, nomRetire, partie);
+            return;
+          }
+
           alert("La partie a déjà commencé : on ne peut plus y ajouter de joueur.\n\n" +
                 "Si tu en faisais partie et que tu as été déconnecté, entre exactement le même pseudo " +
                 "qu'avant pour reprendre ta place.");
@@ -549,8 +568,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // On n'est plus dans la liste : un autre joueur nous a retiré
       if (!data[pseudoActuel]) {
+        // Joueur retiré qui revient : sa fiche a pu être effacée en retard (nettoyage du retrait) => on la remet
+        if (retourEnCours) {
+          remettreFicheJoueur();
+          return;
+        }
+        const code = codePartieActuel;
+        const nom = pseudoActuel;
         quitterPartieEnLigne();
-        alert("Tu as été retiré de la partie.");
+        alerteRetire(code, nom);
         return;
       }
 
@@ -690,6 +716,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function retourSalleEnLigne(etat){
     enLigneActif = false;
+    arreterRetour(); // en salle d'attente, plus de manche où revenir
     if (desabonnerActions) { desabonnerActions(); desabonnerActions = null; }
     reinitialiserFileActions();
     reinitialiserEcransJeu();
@@ -757,6 +784,18 @@ document.addEventListener("DOMContentLoaded", function () {
     const memoire = lirePartieLocale();
     if (memoire && memoire.code === code && joueursPartie[memoire.pseudo]) {
       reprendrePlaceEnLigne(code, memoire.pseudo, partie);
+      return;
+    }
+
+    // Ce téléphone a été retiré de la partie : il peut y revenir (en salle d'attente : si personne
+    // n'a pris son pseudo entre-temps)
+    const pseudoLibre = () => !Object.keys(joueursPartie).some(n =>
+      n.toLocaleLowerCase("fr-FR") === String(memoire.pseudo).toLocaleLowerCase("fr-FR"));
+    if (memoire && memoire.code === code && memoire.pseudo &&
+        (enJeu ? joueurRetire(partie, memoire.pseudo) : pseudoLibre())) {
+      if (confirm(`Tu as été retiré de la partie ${code}.\n\nY revenir en tant que « ${memoire.pseudo} » ?`)) {
+        revenirApresRetrait(code, memoire.pseudo, partie);
+      }
       return;
     }
 
@@ -830,10 +869,81 @@ document.addEventListener("DOMContentLoaded", function () {
     ecouterEtatPartie(code); // manche en cours => démarrée en mode rattrapage (demarrerMancheEnLigne)
   }
 
+  // ===== Joueur retiré qui revient =====
+  // Pseudo exact d'un joueur retiré de la partie (majuscules ignorées), ou null : il était dans la
+  // manche en cours au départ, ou a été retiré pendant une manche (actions « retrait »)
+  function joueurRetire(partie, pseudo){
+    const cherche = String(pseudo).toLocaleLowerCase("fr-FR");
+    const memeNom = n => String(n).toLocaleLowerCase("fr-FR") === cherche;
+    if (Object.keys(partie.joueurs || {}).some(memeNom)) return null; // toujours dans la partie
+
+    const anciens = Object.values((partie.etatJeu && partie.etatJeu.joueurs) || {});
+    Object.values(partie.manches || {}).forEach((manche) => {
+      Object.values((manche && manche.actions) || {}).forEach((action) => {
+        if (action && typeof action.id === "string" && action.id.startsWith("retrait:")) {
+          anciens.push(action.id.split(":").slice(2).join(":"));
+        }
+      });
+    });
+    return anciens.find(memeNom) || null;
+  }
+
+  // Le joueur se remet une fiche dans la partie, puis rattrape la manche en cours en spectateur ;
+  // à la fin du rattrapage, il demande à être remis dans le jeu (verifierRetourDansManche)
+  function revenirApresRetrait(code, nom, partie){
+    const enJeu = !!(partie.etatJeu && partie.etatJeu.demarree);
+    const fiche = { nom, host: false, rejoint: Date.now() };
+
+    window.fbSet(window.fbRef(window.firebaseDB, `parties/${code}/joueurs/${nom}`), fiche).then(() => {
+      retourEnCours = enJeu;
+      const joueursPartie = Object.assign({}, partie.joueurs, { [nom]: fiche });
+      reprendrePlaceEnLigne(code, nom, Object.assign({}, partie, { joueurs: joueursPartie }));
+    }).catch(erreurFirebase);
+  }
+
+  // Fiche effacée par le nettoyage d'un retrait arrivé en retard : on la remet
+  function remettreFicheJoueur(){
+    const code = codePartieActuel;
+    const nom = pseudoActuel;
+    if (!code || !nom) return;
+    window.fbSet(window.fbRef(window.firebaseDB, `parties/${code}/joueurs/${nom}`),
+      { nom, host: false, rejoint: Date.now() })
+      .then(() => { if (codePartieActuel === code) suivrePresence(code, nom); })
+      .catch(() => {});
+  }
+
+  // Retiré par un autre joueur : ce téléphone garde la partie en mémoire pour pouvoir y revenir
+  function alerteRetire(code, nom){
+    if (code && nom) {
+      memoriserPartieLocale(code, nom);
+      majBoutonRevenir();
+    }
+    alert("Tu as été retiré de la partie.\n\nPour y revenir : « Revenir dans une partie en cours ».");
+  }
+
+  function arreterRetour(){
+    retourEnCours = false;
+    retourEnvoye = false;
+    retourAnnonce = false;
+    clearTimeout(timerRetour);
+    timerRetour = null;
+  }
+
   // Quitte la partie (Accueil, ou Retour dans la salle d'attente)
   function quitterPartie(){
     const code = codePartieActuel;
     const pseudo = pseudoActuel;
+
+    // Joueur retiré qui revenait, pas encore remis dans la manche : il repart sans arrêter la partie
+    // (sa demande de retour déjà envoyée est annulée par un retrait juste derrière, si possible)
+    if (enLigneActif && partieLancee && code && !joueurs.includes(pseudo)) {
+      const annulation = retourEnvoye ? ecrireAction(idRetrait(pseudo)).catch(() => {}) : Promise.resolve();
+      quitterPartieEnLigne();
+      annulation.then(() => {
+        window.fbSet(window.fbRef(window.firebaseDB, `parties/${code}/joueurs/${pseudo}`), null).catch(() => {});
+      });
+      return;
+    }
 
     // En pleine partie à plus de 2 : on se retire seulement, la partie continue sans nous
     // (à 2, il ne resterait qu'un joueur : tout le monde repasse en salle d'attente)
@@ -898,6 +1008,7 @@ document.addEventListener("DOMContentLoaded", function () {
     arreterPresence();
     oublierPartieLocale();
     majBoutonRevenir();
+    arreterRetour();
 
     codePartieActuel = null;
     pseudoActuel = null;
@@ -3724,12 +3835,15 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     if(nom === pseudoActuel){
+      // Pendant le rattrapage, c'est un joueur retiré qui revient : il reste, et demandera
+      // à être remis dans la manche à la fin du rattrapage (verifierRetourDansManche)
+      if(rattrapageEnCours) return "ok";
       const code = codePartieActuel;
       setTimeout(() => {
         if(codePartieActuel !== code) return; // déjà parti
         quitterPartieEnLigne();
         if(action.par === nom) allerAccueil();
-        else alert("Tu as été retiré de la partie.");
+        else alerteRetire(code, nom);
       }, 0);
     } else if(!rattrapageEnCours){
       afficherToast(action.par === nom ? `${nom} a quitté la partie` : `${nom} a été retiré de la partie`, 3000);
@@ -3757,9 +3871,115 @@ document.addEventListener("DOMContentLoaded", function () {
     }).catch(() => {});
   }
 
+  // Joueur retiré qui revient : tant qu'il n'est pas dans la manche, il la regarde et demande à y
+  // être remis (action « retour:<cartes restantes>:<nom> », ou « retour:fin:<nom> » une fois la
+  // manche finie). La demande part plateau au repos, sinon on réessaie un peu plus tard.
+  function verifierRetourDansManche(){
+    clearTimeout(timerRetour);
+    timerRetour = null;
+    if(!enLigneActif || !pseudoActuel || rattrapageEnCours || retourEnvoye) return;
+    if(joueurs.includes(pseudoActuel)){
+      retourEnCours = false;
+      retourAnnonce = false;
+      return;
+    }
+    retourEnCours = true;
+
+    // Toutes les actions reçues doivent être appliquées ici avant de demander (état à jour)
+    const id = (traitementEnCours || fileActions.size > 0) ? null
+      : finUnOverlayAffiche ? `retour:fin:${pseudoActuel}`
+      : plateauLibre() ? `retour:${cartesRestantes()}:${pseudoActuel}`
+      : null;
+    if(!id){
+      if(!retourAnnonce){
+        retourAnnonce = true;
+        afficherToast("Tu reviens dans la partie à la fin de l'action en cours…", 3000);
+      }
+      timerRetour = setTimeout(verifierRetourDansManche, 500);
+      return;
+    }
+
+    retourEnvoye = true;
+    const manche = mancheCourante;
+    ecrireAction(id).then(() => {
+      // Sécurité : demande jamais traitée (envoi interrompu) => on la refait
+      timerRetour = setTimeout(() => {
+        if(manche !== mancheCourante) return;
+        retourEnvoye = false;
+        verifierRetourDansManche();
+      }, 20000);
+    }).catch(() => {
+      retourEnvoye = false;
+      if(manche === mancheCourante) timerRetour = setTimeout(verifierRetourDansManche, 2000);
+    });
+  }
+
+  // Comme le retrait : ignoré si une carte a été tirée depuis la demande (le joueur redemande
+  // tout seul), appliqué plateau au repos. Seul le joueur lui-même peut demander son retour.
+  function appliquerRetourEnLigne(action){
+    const [, restantes, ...reste] = action.id.split(":");
+    const nom = reste.join(":");
+
+    let resultat;
+    if(action.par !== nom || joueurs.includes(nom)) resultat = "ignorer";
+    else if(restantes === "fin") resultat = finUnOverlayAffiche ? "ok" : "attendre";
+    else if(finUnOverlayAffiche || cartesRestantes() !== Number(restantes)) resultat = "ignorer";
+    else resultat = plateauLibre() ? "ok" : "attendre";
+    if(resultat === "attendre") return resultat;
+
+    if(resultat === "ok") ajouterJoueurEnJeu(nom);
+
+    if(nom === pseudoActuel){
+      if(!rattrapageEnCours){
+        retourEnvoye = false;
+        if(resultat === "ok"){
+          retourEnCours = false;
+          retourAnnonce = false;
+          clearTimeout(timerRetour);
+          timerRetour = null;
+          afficherToast("Te revoilà dans la partie !", 3000);
+          // Fiche effacée entre-temps par le nettoyage du retrait : on la remet
+          const code = codePartieActuel;
+          window.fbGet(window.fbRef(window.firebaseDB, `parties/${code}/joueurs/${nom}`)).then((snapshot) => {
+            if(!snapshot.exists() && codePartieActuel === code) remettreFicheJoueur();
+          }).catch(() => {});
+        } else {
+          setTimeout(verifierRetourDansManche, 0); // redemande (ou déjà revenu)
+        }
+      }
+    } else if(resultat === "ok" && !rattrapageEnCours){
+      afficherToast(`${nom} est revenu(e) dans la partie`, 3000);
+    }
+    return resultat;
+  }
+
+  // Remet un joueur retiré dans la partie (en ligne, identique sur tous les téléphones) : à sa place
+  // d'origine dans l'ordre de la manche (sinon à la fin), sans changer à qui c'est le tour
+  function ajouterJoueurEnJeu(nom){
+    if(joueurs.includes(nom)) return false;
+
+    const rang = ordreManche.indexOf(nom);
+    let idx = rang < 0 ? -1 : joueurs.findIndex((j) => {
+      const r = ordreManche.indexOf(j);
+      return r < 0 || r > rang;
+    });
+    if(idx < 0) idx = joueurs.length;
+
+    const courant = joueurs.length > 0 ? indexJoueur % joueurs.length : 0;
+    joueurs.splice(idx, 0, nom);
+    annulations[nom] = 0;
+    indexJoueur = idx <= courant ? courant + 1 : courant;
+    if(indexPigeon !== null && indexPigeon >= idx) indexPigeon++;
+
+    afficherJoueurs();
+    afficherJoueurActif();
+    return true;
+  }
+
   // "ok" | "attendre" (élément pas encore là / pas prêt) | "ignorer" (action devenue sans objet)
   function tenterAction(action){
     if(action.id.startsWith("retrait:")) return appliquerRetraitEnLigne(action);
+    if(action.id.startsWith("retour:")) return appliquerRetourEnLigne(action);
 
     // Bouton à usage unique dans la manche (ex. « Terminer ») déjà appliqué : si deux joueurs
     // ont appuyé en même temps, le 2e appui est ignoré au lieu d'attendre un bouton disparu
@@ -3828,7 +4048,10 @@ document.addEventListener("DOMContentLoaded", function () {
       traitementEnCours = false;
 
       if(rattrapageEnCours){
-        if(prochainSeq > seqFinRattrapage) finirRattrapage();
+        if(prochainSeq > seqFinRattrapage){
+          finirRattrapage();
+          setTimeout(verifierRetourDansManche, 0); // joueur retiré qui revient : il demande sa place
+        }
         else majRattrapage();
       }
 
@@ -3925,8 +4148,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     nettoyerOverlays();
     joueurs = Object.values(etat.joueurs || {});
+    ordreManche = joueurs.slice();
     annulations = {};
     retourMenu();
+
+    // Demande de retour faite dans la manche précédente : elle n'y sera jamais traitée
+    retourEnvoye = false;
+    clearTimeout(timerRetour);
+    timerRetour = null;
 
     aleatoire = generateurAleatoire(etat.seed);
     lancerPartie();
@@ -3944,6 +4173,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if(!repriseEnCours){
       ecouterActions();
+      verifierRetourDansManche(); // pas dans la nouvelle manche (joueur qui revenait) : il demande sa place
       return;
     }
 
@@ -3958,9 +4188,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const cible = Number(snapshot.val() || 0);
         if(cible > 0) commencerRattrapage(cible);
         ecouterActions();
+        if(cible === 0) verifierRetourDansManche();
       })
       .catch(() => {
-        if(manche === mancheCourante) ecouterActions();
+        if(manche !== mancheCourante) return;
+        ecouterActions();
+        verifierRetourDansManche();
       });
   }
 
