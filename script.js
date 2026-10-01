@@ -66,10 +66,10 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.5.6";
+  const VERSION_AFFICHEE = "8.5.7";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
-  document.getElementById("versionJeu").innerText = "version " + VERSION_AFFICHEE;
+  document.getElementById("versionJeu").innerText = "Alcuno — version " + VERSION_AFFICHEE;
 
   // ===== Easter egg : 4 taps rapides sur le titre ALCUNO => écran des créateurs =====
   const ecranCredits = document.getElementById("ecranCredits");
@@ -93,8 +93,43 @@ document.addEventListener("DOMContentLoaded", function () {
     ecranCredits.style.display = "none";
   });
 
+  // ===== Réglages (bouton en haut à droite de l'écran d'accueil, seulement là) =====
+  // Chaque réglage est retenu sur le téléphone (stockage local du navigateur)
+  const ecranReglages = document.getElementById("ecranReglages");
+
+  document.getElementById("btnReglages").addEventListener("click", () => {
+    ecranReglages.scrollTop = 0;
+    ecranReglages.style.display = "";
+  });
+
+  document.getElementById("btnFermerReglages").addEventListener("click", () => {
+    ecranReglages.style.display = "none";
+  });
+
+  function lireReglage(cle, parDefaut){
+    try {
+      const valeur = localStorage.getItem(cle);
+      return valeur === null ? parDefaut : valeur === "1";
+    } catch (e) { return parDefaut; }
+  }
+
+  function ecrireReglage(cle, actif){
+    try { localStorage.setItem(cle, actif ? "1" : "0"); } catch (e) {}
+  }
+
+  // Accessibilité pour les gens bourrés : textes et boutons plus gros (classe sur <html>)
+  const CLE_ACCESSIBILITE = "alcuno_accessibilite";
+  const caseAccessibilite = document.getElementById("optionAccessibilite");
+  caseAccessibilite.checked = lireReglage(CLE_ACCESSIBILITE, false);
+  document.documentElement.classList.toggle("accessibilite", caseAccessibilite.checked);
+
+  caseAccessibilite.addEventListener("change", () => {
+    ecrireReglage(CLE_ACCESSIBILITE, caseAccessibilite.checked);
+    document.documentElement.classList.toggle("accessibilite", caseAccessibilite.checked);
+  });
+
   // ===== Vibrations (Android : un iPhone ne peut pas vibrer depuis une page web) =====
-  // Interrupteur en bas de l'écran de départ, activé par défaut, choix retenu sur le téléphone
+  // Activées par défaut
   const CLE_VIBRATIONS = "alcuno_vibrations";
   const caseVibrations = document.getElementById("optionVibrations");
   let vibrationsActives = true;
@@ -118,10 +153,20 @@ document.addEventListener("DOMContentLoaded", function () {
   // ===== Écran toujours allumé pendant une partie (Wake Lock) =====
   // Un téléphone en veille ne reçoit plus les actions en ligne et prend du retard.
   // Le navigateur relâche le verrou quand on change d'appli : on le redemande au retour.
+  // Réglage « Écran toujours allumé » (activé par défaut)
   let verrouEcran = null;
   let demandeVerrouEnCours = false;
+  const CLE_ECRAN_ALLUME = "alcuno_ecran_allume";
+  const caseEcranAllume = document.getElementById("optionEcranAllume");
+  caseEcranAllume.checked = lireReglage(CLE_ECRAN_ALLUME, true);
+
+  caseEcranAllume.addEventListener("change", () => {
+    ecrireReglage(CLE_ECRAN_ALLUME, caseEcranAllume.checked);
+    if (!caseEcranAllume.checked) libererEcran();
+  });
 
   function garderEcranAllume(){
+    if (!caseEcranAllume.checked) return;
     if (verrouEcran || demandeVerrouEnCours) return;
     if (!("wakeLock" in navigator) || document.visibilityState !== "visible") return;
 
@@ -4367,6 +4412,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if(annonce){ taper(annonce); return true; }
 
     if(estVisible(ecranCredits)){ activer("btnFermerCredits"); return true; }
+    if(estVisible(ecranReglages)){ activer("btnFermerReglages"); return true; }
 
     // Overlays du jeu : le plus récent se ferme comme au tap (ceux où il faut choisir ne bougent pas),
     // sauf le +4 où « Retour » enlève la dernière gorgée distribuée

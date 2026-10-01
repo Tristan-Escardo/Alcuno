@@ -30,6 +30,15 @@
 
     <main>
         <section class="choixMode" id="choixMode">
+            <!-- Réglages : seulement sur l'écran d'accueil -->
+            <button type="button" id="btnReglages" title="Réglages" aria-label="Réglages">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M3 6h18M3 12h18M3 18h18" />
+                    <circle cx="8" cy="6" r="2.4" />
+                    <circle cx="16" cy="12" r="2.4" />
+                    <circle cx="10" cy="18" r="2.4" />
+                </svg>
+            </button>
             <h2>Comment voulez-vous jouer ?</h2>
             <button type="button" id="btnModeEnLigne">Mode en ligne</button>
             <button type="button" id="btnModeClassique">Mode classique (Hors connexion)</button>
@@ -39,12 +48,45 @@
                 <button type="button" id="btnInstallerAppli" class="btnInstaller" hidden>📲 Installer l'appli</button>
                 <p id="astuceIphone" class="astuceIphone" hidden>📲 Pour installer l'appli : bouton <strong>Partager</strong> → <strong>Sur l'écran d'accueil</strong></p>
             </div>
-            <label class="optionVibrations" for="optionVibrations">
-                <input type="checkbox" id="optionVibrations" checked>
-                <span class="interrupteur" aria-hidden="true"></span>
-                Vibrations <span class="optionNote">(Android uniquement)</span>
-            </label>
-            <p id="versionJeu" class="versionJeu"></p>
+        </section>
+
+        <section class="ecranReglages" id="ecranReglages" style="display:none;">
+            <button type="button" id="btnFermerReglages" class="btnRetour">← Retour</button>
+            <div class="reglages-contenu">
+                <h2>Réglages</h2>
+
+                <label class="optionReglage" for="optionVibrations">
+                    <span class="optionTexte">
+                        <span class="optionTitre">Vibrations</span>
+                        <span class="optionNote">Android uniquement : un iPhone ne peut pas vibrer depuis une page web.</span>
+                    </span>
+                    <input type="checkbox" id="optionVibrations" checked>
+                    <span class="interrupteur" aria-hidden="true"></span>
+                </label>
+
+                <label class="optionReglage" for="optionEcranAllume">
+                    <span class="optionTexte">
+                        <span class="optionTitre">Écran toujours allumé</span>
+                        <span class="optionNote">Pendant les parties, le téléphone ne se met pas en veille. Conseillé en ligne : un téléphone en veille prend du retard.</span>
+                    </span>
+                    <input type="checkbox" id="optionEcranAllume" checked>
+                    <span class="interrupteur" aria-hidden="true"></span>
+                </label>
+
+                <label class="optionReglage" for="optionAccessibilite">
+                    <span class="optionTexte">
+                        <span class="optionTitre">Accessibilité pour les gens bourrés 🍻</span>
+                        <span class="optionNote">Textes et boutons plus gros.</span>
+                    </span>
+                    <input type="checkbox" id="optionAccessibilite">
+                    <span class="interrupteur" aria-hidden="true"></span>
+                </label>
+
+                <div class="aPropos">
+                    <div class="aProposTitre">À propos</div>
+                    <p id="versionJeu" class="versionJeu"></p>
+                </div>
+            </div>
         </section>
 
         <section class="enLigne" id="enLigne" style="display:none;">

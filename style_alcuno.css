@@ -2048,16 +2048,6 @@ header h1{
   text-shadow: 1px 1px 3px #000;
 }
 
-#choixMode .versionJeu{
-  position: absolute;
-  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-  left: 0;
-  right: 0;
-  margin: 0;
-  font-size: 12px;
-  color: rgba(255,255,255,0.35);
-}
-
 /* Salle d'attente : nom à gauche, bouton ✕ à droite */
 #listeJoueursEnLigne div{
   display: flex;
@@ -2687,21 +2677,119 @@ header h1{
   }
 }
 
-/* ===== Interrupteur « Vibrations » (écran de départ, en petit en bas) ===== */
-#choixMode .optionVibrations{
+/* ===== Bouton Réglages : curseurs dorés, coin droit de l'écran d'accueil (seulement là) ===== */
+#choixMode #btnReglages{
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: calc(38px + env(safe-area-inset-bottom, 0px));
-  width: max-content;
-  max-width: calc(100% - 32px);
+  top: 24px;
+  right: 18px;
+  z-index: 2;
+  width: auto;
+  min-width: 0;
+  padding: 6px;
+  border: none;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  line-height: 0;
+  opacity: 0.9;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+#choixMode #btnReglages svg{
+  width: 32px;
+  height: 32px;
+  overflow: visible;
+  filter:
+    drop-shadow(0 2px 0 rgba(120, 70, 0, 0.95))
+    drop-shadow(0 3px 6px rgba(0,0,0,0.45));
+}
+
+#choixMode #btnReglages path{
+  fill: none;
+  stroke: #FFD700;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+#choixMode #btnReglages circle{
+  fill: rgb(43, 0, 29);
+  stroke: #FFD700;
+  stroke-width: 2.4;
+}
+
+#choixMode #btnReglages:hover{
+  opacity: 1;
+  background: none;
+  transform: scale(1.06);
+}
+
+@media (max-width: 520px){
+  #choixMode #btnReglages svg{
+    width: 28px;
+    height: 28px;
+  }
+}
+
+/* ===== Écran Réglages ===== */
+#ecranReglages{
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 76px 16px calc(28px + env(safe-area-inset-bottom, 0px));
+  box-sizing: border-box;
+  color: #fff;
+  background: rgb(43, 0, 29);
+}
+
+#ecranReglages .reglages-contenu{
+  max-width: 520px;
   margin: 0 auto;
-  display: inline-flex;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: fadeIn 0.25s ease forwards;
+}
+
+#ecranReglages h2{
+  margin: 0 0 6px;
+  text-align: center;
+  color: #FFD700;
+  font-size: clamp(22px, 5vw, 36px);
+  font-weight: 900;
+  text-shadow: 2px 2px 5px #000;
+}
+
+#ecranReglages .btnRetour{
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  padding: 10px 18px;
+  font-size: 15px;
+  font-weight: 900;
+  color: #fff;
+  background-color: #ffcc00;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+  box-shadow:
+    inset 0 -2px 0 rgba(0,0,0,0.18),
+    0 8px 18px rgba(0,0,0,0.25);
+}
+
+/* Une ligne par réglage : texte à gauche, interrupteur à droite */
+#ecranReglages .optionReglage{
+  display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  font-weight: 800;
-  color: rgba(255,255,255,0.72);
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,215,0,0.18);
   cursor: pointer;
   -webkit-user-select: none;
   user-select: none;
@@ -2709,57 +2797,92 @@ header h1{
   -webkit-tap-highlight-color: transparent;
 }
 
+#ecranReglages .optionTexte{
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+}
+
+#ecranReglages .optionTitre{
+  font-size: clamp(16px, 4vw, 19px);
+  font-weight: 900;
+  color: #FFD700;
+}
+
+#ecranReglages .optionNote{
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: rgba(255,255,255,0.62);
+}
+
 /* la vraie case à cocher reste accessible mais invisible */
-#choixMode .optionVibrations input{
+#ecranReglages .optionReglage input{
   position: absolute;
   opacity: 0;
   width: 1px;
   height: 1px;
 }
 
-#choixMode .interrupteur{
+#ecranReglages .interrupteur{
   position: relative;
   flex: 0 0 auto;
-  width: 34px;
-  height: 20px;
+  width: 46px;
+  height: 26px;
   border-radius: 999px;
   background: rgba(255,255,255,0.18);
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
   transition: background-color 0.2s ease;
 }
 
-#choixMode .interrupteur::after{
+#ecranReglages .interrupteur::after{
   content: "";
   position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 14px;
-  height: 14px;
+  top: 4px;
+  left: 4px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background: #fff;
   transition: transform 0.2s ease, background-color 0.2s ease;
 }
 
-#choixMode .optionVibrations input:checked + .interrupteur{
+#ecranReglages .optionReglage input:checked + .interrupteur{
   background: #FFD700;
 }
 
-#choixMode .optionVibrations input:checked + .interrupteur::after{
-  transform: translateX(14px);
+#ecranReglages .optionReglage input:checked + .interrupteur::after{
+  transform: translateX(20px);
   background: rgb(43, 0, 29);
 }
 
-#choixMode .optionVibrations input:focus-visible + .interrupteur{
+#ecranReglages .optionReglage input:focus-visible + .interrupteur{
   outline: 2px solid #FFD700;
   outline-offset: 2px;
 }
 
-#choixMode .optionNote{
-  font-weight: 600;
-  color: rgba(255,255,255,0.42);
+#ecranReglages .aPropos{
+  margin-top: 10px;
+  text-align: center;
 }
 
-/* ===== Installer l'appli (écran de départ, au-dessus de l'interrupteur Vibrations) ===== */
+#ecranReglages .aProposTitre{
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,215,0,0.7);
+}
+
+#ecranReglages .versionJeu{
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: rgba(255,255,255,0.55);
+}
+
+/* ===== Installer l'appli (écran de départ, en bas) ===== */
 #choixMode [hidden]{
   display: none !important;
 }
@@ -2768,7 +2891,7 @@ header h1{
   position: absolute;
   left: 0;
   right: 0;
-  bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(22px + env(safe-area-inset-bottom, 0px));
   display: flex;
   justify-content: center;
   padding-inline: 16px;
@@ -3031,4 +3154,38 @@ body.rattrapage [id^="overlay"] *{
 @keyframes clignoteCoupure{
   0%, 100% { opacity: 1; }
   50%      { opacity: 0.15; }
+}
+
+/* ===== Réglage « Accessibilité pour les gens bourrés » : textes et boutons plus gros =====
+   (zoom sur les éléments de texte seulement : la mise en page et le plateau ne bougent pas) */
+html.accessibilite .overlay-regle-texte,
+html.accessibilite .titre-pigeon,
+html.accessibilite .overlay-subtitle,
+html.accessibilite #overlayCouleur div.titre-couleur,
+html.accessibilite .duel-info,
+html.accessibilite .duel-label,
+html.accessibilite .plus4-info,
+html.accessibilite .plus4-total,
+html.accessibilite .fin-un-ligne,
+html.accessibilite .fin-choix-turn,
+html.accessibilite .fin-choix-recap,
+html.accessibilite .fin-choix-resultat,
+html.accessibilite .doree-titre,
+html.accessibilite .doree-texte,
+html.accessibilite .joueurActif,
+html.accessibilite .nomsJoueurs,
+html.accessibilite #messageTexte,
+html.accessibilite .regleZero,
+html.accessibilite .reglePigeon,
+html.accessibilite #stickyJoueurActif .sticky-label,
+html.accessibilite #stickyJoueurActif .sticky-nom{
+  zoom: 1.25;
+}
+
+html.accessibilite .bouton-pigeon,
+html.accessibilite .bouton-doree,
+html.accessibilite .bouton-annulation,
+html.accessibilite .titreBloc,
+html.accessibilite #toastEnLigne{
+  zoom: 1.15;
 }
