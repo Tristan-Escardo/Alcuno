@@ -263,6 +263,19 @@ button,
   color: #FFD700;
 }
 
+/* En ligne : joueur dont le téléphone est déconnecté */
+.joueur-deconnecte{
+  margin-left: 8px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 0.75em;
+  font-style: italic;
+  font-weight: 700;
+  color: #d0d0d0;
+  background: rgba(255,255,255,0.12);
+  white-space: nowrap;
+}
+
 @media (max-width: 520px){
     .nomsJoueurs{
         grid-auto-flow: row;
