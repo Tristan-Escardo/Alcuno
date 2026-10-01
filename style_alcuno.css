@@ -388,6 +388,15 @@ button,
   flex: 0 0 auto;
 }
 
+/* Pendant une partie : un bouton par joueur (pas de case à cocher) */
+#listeSuppression .supp-retrait{
+  width: 100%;
+  border: none;
+  color: #ffffff;
+  font: inherit;
+  text-align: left;
+}
+
 #listeSuppression .supp-name{
   font-size: clamp(16px, 4vw, 22px);
   font-weight: 800;
@@ -1850,6 +1859,7 @@ header h1{
 #enLigne,
 #ecranNouvellePartie,
 #ecranConfirmerHote,
+#ecranConfirmerRetrait,
 #ecranConfirmerAccueil,
 #ecranChoixPseudo{
   position: fixed;
@@ -1873,6 +1883,7 @@ header h1{
 #enLigne > div,
 #ecranNouvellePartie > *,
 #ecranConfirmerHote > *,
+#ecranConfirmerRetrait > *,
 #ecranConfirmerAccueil > *,
 #ecranChoixPseudo > *{
   animation: fadeIn 0.25s ease forwards;
@@ -1881,6 +1892,7 @@ header h1{
 #choixMode h2,
 #ecranNouvellePartie h2,
 #ecranConfirmerHote h2,
+#ecranConfirmerRetrait h2,
 #ecranConfirmerAccueil h2,
 #ecranChoixPseudo h2,
 #enLigne h2,
@@ -1895,6 +1907,7 @@ header h1{
 #choixMode button,
 #ecranNouvellePartie button,
 #ecranConfirmerHote button,
+#ecranConfirmerRetrait button,
 #ecranConfirmerAccueil button,
 #ecranChoixPseudo button,
 #enLigne button{
@@ -1920,6 +1933,7 @@ header h1{
 #choixMode button:hover,
 #ecranNouvellePartie button:hover,
 #ecranConfirmerHote button:hover,
+#ecranConfirmerRetrait button:hover,
 #ecranConfirmerAccueil button:hover,
 #ecranChoixPseudo button:hover,
 #enLigne button:hover{
@@ -1930,6 +1944,7 @@ header h1{
 #choixMode button:active,
 #ecranNouvellePartie button:active,
 #ecranConfirmerHote button:active,
+#ecranConfirmerRetrait button:active,
 #ecranConfirmerAccueil button:active,
 #ecranChoixPseudo button:active,
 #enLigne button:active{
@@ -2008,6 +2023,7 @@ header h1{
 
 /* Écran « Retirer l'hôte ? » */
 #ecranConfirmerHote .texteConfirmation,
+#ecranConfirmerRetrait .texteConfirmation,
 #ecranConfirmerAccueil .texteConfirmation,
 #ecranChoixPseudo .texteConfirmation{
   margin: 0;
@@ -2093,7 +2109,6 @@ header h1{
 body.mode-en-ligne #btnAccueilClassique,
 body.mode-en-ligne #nomJoueur,
 body.mode-en-ligne #ajouterJoueur,
-body.mode-en-ligne #supprimerJoueur,
 body.mode-en-ligne #jouer{
   display: none !important;
 }

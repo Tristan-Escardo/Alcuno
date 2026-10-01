@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.4.1";
+  const VERSION_AFFICHEE = "8.5.0";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "version " + VERSION_AFFICHEE;
@@ -757,6 +757,15 @@ document.addEventListener("DOMContentLoaded", function () {
   function quitterPartie(){
     const code = codePartieActuel;
     const pseudo = pseudoActuel;
+
+    // En pleine partie à plus de 2 : on se retire seulement, la partie continue sans nous
+    // (à 2, il ne resterait qu'un joueur : tout le monde repasse en salle d'attente)
+    if (enLigneActif && partieLancee && joueurs.length > 2 && joueurs.includes(pseudo)) {
+      ecrireAction(idRetrait(pseudo)).catch(() => {});
+      quitterPartieEnLigne();
+      return;
+    }
+
     quitterPartieEnLigne();
     if (!code) return;
 
@@ -1497,8 +1506,14 @@ document.addEventListener("DOMContentLoaded", function () {
     if(!partieLancee){
       btnJouer.style.display = joueurs.length >= 2 ? "inline-block" : "none";
     }
-    btnSupprimer.style.display = (!partieLancee && joueurs.length > 0) ? "inline-block" : "none";
+    majBoutonSupprimer();
     majStickyJoueurActif();
+  }
+
+  // Avant la partie (classique) : dès qu'il y a un joueur. Pendant la partie : s'il en reste plus de 2.
+  function majBoutonSupprimer(){
+    const visible = partieLancee ? joueurs.length > 2 : (!enLigneActif && joueurs.length > 0);
+    btnSupprimer.style.display = visible ? "inline-block" : "none";
   }
 
 
@@ -1548,7 +1563,16 @@ document.addEventListener("DOMContentLoaded", function () {
   btnAjouter.addEventListener("pointerdown", ajouterJoueur);
   nomJoueurInput.addEventListener("keydown", e=>{ if(e.key==="Enter") ajouterJoueur(); });
 
-  btnSupprimer.addEventListener("pointerdown", ()=>{
+  const titreSuppression = suppression.querySelector("h2");
+
+  // "click" (et pas pointerdown) : sinon le doigt relevé coche/choisit tout de suite le joueur placé dessous
+  btnSupprimer.addEventListener("click", ()=>{
+    if(partieLancee){
+      ouvrirRetraitEnJeu();
+      return;
+    }
+    titreSuppression.innerText = "Supprimer un ou plusieurs joueurs";
+    btnTermine.innerText = "Terminé";
     menu.style.display="none";
     suppression.style.display="flex";
     lockScroll();
@@ -1567,7 +1591,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  btnTermine.addEventListener("pointerdown", ()=>{
+  btnTermine.addEventListener("click", ()=>{
     const toDelete=[...listeSuppression.querySelectorAll("input:checked")]
       .map(cb=>parseInt(cb.value,10)).sort((a,b)=>b-a);
     toDelete.forEach(i=>{
@@ -1592,6 +1616,138 @@ document.addEventListener("DOMContentLoaded", function () {
     unlockScroll();
     afficherJoueurs();
   });
+
+  /* ===== RETIRER UN JOUEUR PENDANT LA PARTIE ===== */
+  // Seulement plateau au repos : aucun overlay, aucun choix en cours, pas pendant le pari de fin
+  // (il reste alors 1 carte). En ligne, c'est vérifié à nouveau sur chaque téléphone au moment du retrait.
+  function plateauLibre(){
+    return partieLancee && !choixPigeonEnCours && !duelEnCours && !predictionEnCours &&
+      cartesRestantes() !== 1 && !document.querySelector('[id^="overlay"]');
+  }
+
+  function ouvrirRetraitEnJeu(){
+    if(joueurs.length <= 2){
+      afficherToast("Il faut au moins 3 joueurs pour en retirer un");
+      return;
+    }
+    if(!plateauLibre()){
+      afficherToast("Attends la fin de l'action en cours");
+      return;
+    }
+
+    titreSuppression.innerText = "Retirer un joueur de la partie";
+    btnTermine.innerText = "Annuler";
+    listeSuppression.innerHTML = "";
+    joueurs.forEach((nom) => {
+      const bouton = document.createElement("button");
+      bouton.type = "button";
+      bouton.className = "supp-item supp-retrait";
+      bouton.innerHTML = `<span class="supp-name">${echapperHtml(avecCouronne(nom))}</span>`;
+      bouton.addEventListener("click", () => demanderConfirmationRetrait(nom));
+      listeSuppression.appendChild(bouton);
+    });
+
+    menu.style.display = "none";
+    suppression.style.display = "flex";
+    lockScroll();
+  }
+
+  const ecranConfirmerRetrait = document.getElementById("ecranConfirmerRetrait");
+  let retraitEnAttente = null;
+
+  function demanderConfirmationRetrait(nom){
+    retraitEnAttente = nom;
+    document.getElementById("titreConfirmerRetrait").innerText = `Retirer ${nom} de la partie ?`;
+
+    let texte = "La partie continue sans lui/elle.";
+    if(enLigneActif && nom === pseudoActuel){
+      texte = "Tu vas quitter la partie. Elle continuera sans toi.";
+    } else if(enLigneActif && nom === hotePartie){
+      const i = joueurs.indexOf(nom);
+      texte = `C'est l'hôte : le rôle d'hôte passera à ${joueurs[(i + 1) % joueurs.length]}.\nLa partie continue sans lui/elle.`;
+    }
+    document.getElementById("texteConfirmerRetrait").innerText = texte;
+    ecranConfirmerRetrait.style.display = "";
+  }
+
+  function fermerRetraitEnJeu(){
+    retraitEnAttente = null;
+    ecranConfirmerRetrait.style.display = "none";
+    if(suppression.style.display !== "none"){
+      suppression.style.display = "none";
+      menu.style.display = "flex";
+      unlockScroll();
+    }
+  }
+
+  document.getElementById("btnConfirmerRetraitNon").addEventListener("click", () => {
+    retraitEnAttente = null;
+    ecranConfirmerRetrait.style.display = "none";
+  });
+
+  document.getElementById("btnConfirmerRetraitOui").addEventListener("click", () => {
+    const nom = retraitEnAttente;
+    fermerRetraitEnJeu();
+    if(!nom || !joueurs.includes(nom)) return;
+    if(joueurs.length <= 2){
+      afficherToast("Il faut au moins 3 joueurs pour en retirer un");
+      return;
+    }
+    if(!plateauLibre()){
+      afficherToast("Une action vient de commencer : réessaie juste après");
+      return;
+    }
+
+    if(!enLigneActif){
+      retirerJoueurEnJeu(nom);
+      afficherToast(`${nom} a été retiré de la partie`);
+      return;
+    }
+
+    const moiMeme = nom === pseudoActuel;
+    ecrireAction(idRetrait(nom))
+      .then(() => {
+        // Retrait de soi-même : on part tout de suite (si le retrait n'a pas déjà été appliqué ici)
+        if(!moiMeme || !codePartieActuel) return;
+        quitterPartieEnLigne();
+        allerAccueil();
+      })
+      .catch(() => afficherToast("Connexion perdue, réessaie"));
+  });
+
+  // Applique le retrait (identique sur tous les téléphones en ligne). Le tour, le pigeon, ses « 1 » et
+  // l'hôte sont mis à jour ; les overlays sont fermés à ce moment-là, rien d'autre ne dépend de lui.
+  function retirerJoueurEnJeu(nom){
+    const idx = joueurs.indexOf(nom);
+    if(idx < 0 || joueurs.length <= 2) return false;
+
+    const courant = indexJoueur % joueurs.length;
+    joueurs.splice(idx, 1);
+    delete annulations[nom];
+    const n = joueurs.length;
+
+    if(indexPigeon !== null){
+      if(indexPigeon === idx){
+        // Plus de pigeon : le prochain qui tire un 3 le devient, comme en début de partie
+        indexPigeon = null;
+        nomPigeonOriginal = "";
+        effacerMessagePigeon();
+      } else if(indexPigeon > idx){
+        indexPigeon--;
+      }
+    }
+
+    // C'était son tour : il passe au suivant, dans le sens du jeu
+    if(idx < courant) indexJoueur = courant - 1;
+    else if(idx > courant) indexJoueur = courant;
+    else indexJoueur = sensHoraire ? idx % n : (idx - 1 + n) % n;
+
+    if(enLigneActif && nom === hotePartie) hotePartie = joueurs[idx % n];
+
+    afficherJoueurs();
+    afficherJoueurActif();
+    return true;
+  }
 
   // Carte dorée jamais retournée : elle se révèle et tout le monde prend un cul sec avant l'écran de fin
   function finDePartie(){
@@ -3113,7 +3269,7 @@ document.addEventListener("DOMContentLoaded", function () {
     finUnOverlayAffiche = false;
 
     btnNouvellePartie.style.display = "inline-block";
-    btnSupprimer.style.display = "none";
+    majBoutonSupprimer();
     btnJouer.style.display = "none";
 
     regleZero.style.display = "none";
@@ -3189,6 +3345,11 @@ document.addEventListener("DOMContentLoaded", function () {
   function retourMenu(){
     partieLancee = false;
     finUnOverlayAffiche = false;
+
+    // Écrans du retrait en cours de partie (nouvelle manche, départ, partie fermée...)
+    retraitEnAttente = null;
+    ecranConfirmerRetrait.style.display = "none";
+    suppression.style.display = "none";
 
 
     // ✅ reset des annulations (compteurs "un") pour une nouvelle partie
@@ -3409,27 +3570,100 @@ document.addEventListener("DOMContentLoaded", function () {
       el.dataset.netEnvoye = "1";
     }
 
+    ecrireAction(el.dataset.netId).catch(() => {
+      delete el.dataset.netEnvoye;
+      afficherToast("Connexion perdue, réessaie");
+    });
+  }
+
+  // Ajoute une action numérotée à la manche (partie, manche et pseudo lus tout de suite :
+  // on peut quitter la partie juste après l'appel)
+  function ecrireAction(id){
     const db = window.firebaseDB;
     const code = codePartieActuel;
     const manche = mancheCourante;
+    const par = pseudoActuel;
 
-    window.fbRunTransaction(window.fbRef(db, `parties/${code}/manches/${manche}/seq`), n => (n || 0) + 1)
+    return window.fbRunTransaction(window.fbRef(db, `parties/${code}/manches/${manche}/seq`), n => (n || 0) + 1)
       .then((res) => {
         const seq = res.snapshot.val();
         // Une seule écriture : l'action + la date de dernière activité
         return window.fbUpdate(window.fbRef(db, `parties/${code}`), {
-          [`manches/${manche}/actions/${seq}`]: { id: el.dataset.netId, par: pseudoActuel },
+          [`manches/${manche}/actions/${seq}`]: { id, par },
           activite: window.fbServerTimestamp()
         });
-      })
-      .catch(() => {
-        delete el.dataset.netEnvoye;
-        afficherToast("Connexion perdue, réessaie");
       });
+  }
+
+  // Retrait en ligne : l'action garde le nombre de cartes restantes au moment de la demande.
+  // Si une carte a été tirée entre-temps, le retrait est ignoré partout (même résultat sur
+  // tous les téléphones) : le demandeur n'a plus qu'à réessayer.
+  function idRetrait(nom){
+    return `retrait:${cartesRestantes()}:${nom}`;
+  }
+
+  function appliquerRetraitEnLigne(action){
+    const [, restantes, ...reste] = action.id.split(":");
+    const nom = reste.join(":");
+
+    if(!joueurs.includes(nom) || joueurs.length <= 2) return "ignorer";
+    if(cartesRestantes() !== Number(restantes)){
+      if(action.par === pseudoActuel && !rattrapageEnCours){
+        afficherToast("Retrait annulé : une carte venait d'être tirée, réessaie");
+      }
+      return "ignorer";
+    }
+    // Overlay qui se ferme tout seul encore affiché ici : on attend qu'il disparaisse
+    if(!plateauLibre()) return "attendre";
+
+    const etaitHote = nom === hotePartie;
+    retirerJoueurEnJeu(nom);
+
+    // Firebase : fait une seule fois, par celui qui a demandé le retrait
+    // (ou le premier joueur restant s'il s'est retiré lui-même)
+    const nettoyeur = joueurs.includes(action.par) ? action.par : joueurs[0];
+    if(!rattrapageEnCours && pseudoActuel === nettoyeur){
+      nettoyerRetraitFirebase(nom, etaitHote ? hotePartie : null);
+    }
+
+    if(nom === pseudoActuel){
+      const code = codePartieActuel;
+      setTimeout(() => {
+        if(codePartieActuel !== code) return; // déjà parti
+        quitterPartieEnLigne();
+        if(action.par === nom) allerAccueil();
+        else alert("Tu as été retiré de la partie.");
+      }, 0);
+    } else if(!rattrapageEnCours){
+      afficherToast(action.par === nom ? `${nom} a quitté la partie` : `${nom} a été retiré de la partie`, 3000);
+    }
+    return "ok";
+  }
+
+  function nettoyerRetraitFirebase(nom, nouvelHote){
+    const db = window.firebaseDB;
+    const code = codePartieActuel;
+    const manche = mancheCourante;
+
+    window.fbSet(window.fbRef(db, `parties/${code}/joueurs/${nom}`), null).catch(() => {});
+    if(!nouvelHote) return;
+
+    // Nouvel hôte : même forme d'écriture que le reste du jeu (joueur entier, etatJeu par transaction)
+    window.fbGet(window.fbRef(db, `parties/${code}/joueurs/${nouvelHote}`)).then((snapshot) => {
+      const joueur = snapshot.val();
+      if(joueur) window.fbSet(snapshot.ref, Object.assign({}, joueur, { host: true })).catch(() => {});
+    }).catch(() => {});
+    window.fbSet(window.fbRef(db, `parties/${code}/hote`), nouvelHote).catch(() => {});
+    window.fbRunTransaction(window.fbRef(db, `parties/${code}/etatJeu`), (etat) => {
+      if(!etat || etat.manche !== manche) return;
+      return Object.assign({}, etat, { hote: nouvelHote });
+    }).catch(() => {});
   }
 
   // "ok" | "attendre" (élément pas encore là / pas prêt) | "ignorer" (action devenue sans objet)
   function tenterAction(action){
+    if(action.id.startsWith("retrait:")) return appliquerRetraitEnLigne(action);
+
     // Bouton à usage unique dans la manche (ex. « Terminer ») déjà appliqué : si deux joueurs
     // ont appuyé en même temps, le 2e appui est ignoré au lieu d'attendre un bouton disparu
     if(idsUniquesUtilises.has(action.id)) return "ignorer";
@@ -3715,6 +3949,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const ecrans = [
       ["ecranConfirmerHote", "btnConfirmerHoteNon"],
+      ["ecranConfirmerRetrait", "btnConfirmerRetraitNon"],
       ["ecranConfirmerAccueil", "btnConfirmerAccueilNon"],
       ["ecranChoixPseudo", "btnChoixPseudoAnnuler"],
       ["ecranNouvellePartie", "btnRetourNouvellePartie"],
