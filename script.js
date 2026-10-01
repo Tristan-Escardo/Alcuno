@@ -509,7 +509,7 @@ document.addEventListener("DOMContentLoaded", function () {
       tries.forEach((j) => {
         const div = document.createElement("div");
         const nom = document.createElement("span");
-        nom.innerText = avecCouronne(j.nom) + (j.host ? " (hôte)" : "") + (deconnectes.has(j.nom) ? " (déconnecté)" : "");
+        nom.innerText = avecCouronne(j.nom) + (j.host ? " (hôte)" : "") + (deconnectes.has(j.nom) ? " (déconnecté(e))" : "");
         div.appendChild(nom);
 
         // Tout le monde peut retirer les autres joueurs (pour partir soi-même : « Retour »)
@@ -1510,11 +1510,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // En ligne : mention ajoutée au nom d'un joueur déconnecté (vide sinon)
   function texteDeconnecte(nom){
-    return enLigneActif && deconnectes.has(nom) ? " (déconnecté)" : "";
+    return enLigneActif && deconnectes.has(nom) ? " (déconnecté(e))" : "";
   }
 
   function badgeDeconnecte(nom){
-    return texteDeconnecte(nom) ? ` <span class="joueur-deconnecte">déconnecté</span>` : "";
+    return texteDeconnecte(nom) ? ` <span class="joueur-deconnecte">déconnecté(e)</span>` : "";
   }
 
   function afficherJoueurs(){
