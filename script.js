@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.5.0";
+  const VERSION_AFFICHEE = "8.5.1";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "version " + VERSION_AFFICHEE;
@@ -135,7 +135,56 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible" && (partieLancee || codePartieActuel)) garderEcranAllume();
+    if (document.visibilityState === "visible") verifierNouvelleVersion();
   });
+
+  // ===== Nouvelle version disponible =====
+  // Une appli installée qu'on rouvre depuis les applis récentes reprend l'ancienne page sans la
+  // recharger. On regarde donc si une version plus récente est en ligne (au retour dans l'appli,
+  // et toutes les 5 min) ; si oui, un bandeau propose de mettre à jour en un tap.
+  // Jamais en pleine partie ni dans une partie en ligne : on ne coupe personne.
+  let versionEnLigne = null;
+
+  // "8.5.1" => 80501 (même calcul que VERSION_JEU), pour comparer les versions
+  function versionEnNombre(texte){
+    return String(texte).split(".").reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
+  }
+
+  function verifierNouvelleVersion(){
+    if (document.visibilityState !== "visible" || navigator.onLine === false) return;
+    fetch("script.js?verif=" + Date.now(), { cache: "no-store" })
+      .then((reponse) => reponse.ok ? reponse.text() : "")
+      .then((texte) => {
+        const trouve = texte.match(/VERSION_AFFICHEE = "([^"]+)"/);
+        // Seulement si la version en ligne est PLUS RÉCENTE que celle de ce téléphone
+        if (trouve && versionEnNombre(trouve[1]) > VERSION_JEU) {
+          versionEnLigne = trouve[1];
+          afficherBandeauMiseAJour();
+        }
+      })
+      .catch(() => {}); // pas de réseau : on réessaiera plus tard
+  }
+
+  function afficherBandeauMiseAJour(){
+    if (!versionEnLigne) return;
+    if (partieLancee || codePartieActuel) return; // pas en pleine partie (affiché au retour à l'accueil)
+    if (document.getElementById("bandeauMiseAJour")) return;
+
+    const bandeau = document.createElement("div");
+    bandeau.id = "bandeauMiseAJour";
+    bandeau.innerHTML =
+      `<span class="texte">Nouvelle version disponible (${echapperHtml(versionEnLigne)})</span>` +
+      `<button type="button" class="maj">Mettre à jour</button>` +
+      `<button type="button" class="plusTard" aria-label="Plus tard">✕</button>`;
+    // Adresse neuve (?v=...) : contourne le cache et recharge toute l'appli
+    bandeau.querySelector(".maj").addEventListener("click", () => {
+      location.replace(location.pathname + "?v=" + encodeURIComponent(versionEnLigne));
+    });
+    bandeau.querySelector(".plusTard").addEventListener("click", () => bandeau.remove());
+    document.body.appendChild(bandeau);
+  }
+
+  setInterval(verifierNouvelleVersion, 5 * 60 * 1000);
 
   // ===== Appli installable (PWA) =====
   // Service worker « réseau d'abord » (sw.js) : dernière version avec internet, copie locale sans.
@@ -3517,6 +3566,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   function allerAccueil(){
+    setTimeout(afficherBandeauMiseAJour, 0); // nouvelle version repérée pendant la partie : proposée maintenant
     if(codePartieActuel) quitterPartie();
     reinitialiserEcransJeu();
     libererEcran();
