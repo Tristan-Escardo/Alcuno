@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.5.3";
+  const VERSION_AFFICHEE = "8.5.4";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "version " + VERSION_AFFICHEE;
@@ -327,16 +327,47 @@ document.addEventListener("DOMContentLoaded", function () {
   const btnRevenirPartie = document.getElementById("btnRevenirPartie");
 
   // Si ce téléphone se souvient d'une partie en cours, le bouton la propose directement
+  // (le code n'est pas affiché sur le bouton, le champ est pré-rempli au tap). Depuis un autre
+  // téléphone : « Rejoindre une partie » avec le même pseudo qu'avant remet aussi le joueur à sa place.
+  // Le bouton n'apparaît que si la partie peut vraiment être reprise, vérifié dans Firebase :
+  // - partie supprimée ou créée avec une ancienne version => oubliée, plus de bouton ;
+  // - plus aucun autre joueur connecté dedans => pas de bouton (il revient si quelqu'un se reconnecte).
+  let verificationRevenir = 0;
+
   function majBoutonRevenir(){
     const memoire = lirePartieLocale();
-    // Seulement si ce téléphone se souvient d'une partie en cours (le code n'est pas affiché sur
-    // le bouton, le champ est pré-rempli au tap). Depuis un autre téléphone : « Rejoindre une partie »
-    // avec le même pseudo qu'avant remet aussi le joueur à sa place.
-    btnRevenirPartie.style.display = (memoire && memoire.code) ? "" : "none";
+    const numero = ++verificationRevenir;
+    if (!memoire || !memoire.code) {
+      btnRevenirPartie.style.display = "none";
+      return;
+    }
+
+    attendreFirebase(() => {
+      window.fbGet(window.fbRef(window.firebaseDB, `parties/${memoire.code}`)).then((snapshot) => {
+        if (numero !== verificationRevenir) return; // une vérification plus récente a été lancée
+        const partie = snapshot.val();
+        const versionPartie = partie && typeof partie.version === "number" ? partie.version : 0;
+
+        if (!partie || versionPartie < VERSION_JEU) {
+          oublierPartieLocale();
+          btnRevenirPartie.style.display = "none";
+          return;
+        }
+
+        // Connecté = pas marqué « false » (sans info de présence, on considère le joueur là)
+        const joueursPartie = partie.joueurs || {};
+        const quelquUn = Object.keys(joueursPartie)
+          .some(nom => nom !== memoire.pseudo && joueursPartie[nom].connecte !== false);
+        btnRevenirPartie.style.display = quelquUn ? "" : "none";
+      }).catch(() => {}); // hors connexion : on laisse le bouton tel quel
+    });
   }
-  // (mis à jour quand on entre dans le mode en ligne, pas au chargement : la mémoire locale
-  // est définie plus bas dans ce fichier)
   document.getElementById("btnModeEnLigne").addEventListener("click", majBoutonRevenir);
+
+  // Retour sur l'appli (téléphone déverrouillé...) hors partie : le bouton est revérifié
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && !codePartieActuel) majBoutonRevenir();
+  });
 
   btnRevenirPartie.addEventListener("click", () => {
     const memoire = lirePartieLocale();
@@ -774,6 +805,9 @@ document.addEventListener("DOMContentLoaded", function () {
   function lirePartieLocale(){
     try { return JSON.parse(localStorage.getItem(CLE_PARTIE_LOCALE)); } catch (e) { return null; }
   }
+
+  // Au chargement (ici : après la mémoire locale) : bouton « Revenir » déjà juste à l'ouverture du mode en ligne
+  majBoutonRevenir();
 
   // Revenir avec le code seulement (champ pseudo vide) :
   // 1) ce téléphone se souvient de son pseudo dans cette partie => il reprend sa place directement ;
