@@ -274,7 +274,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const memoire = lirePartieLocale();
     // Pas de code dans le bouton : il reste discret sur l'écran (le champ est pré-rempli au tap)
     btnRevenirPartie.innerText = (memoire && memoire.code)
-      ? "Revenir dans la partie en cours"
+      ? "Revenir dans une partie en cours"
       : "Revenir dans une partie";
   }
   // (mis à jour quand on entre dans le mode en ligne, pas au chargement : la mémoire locale
