@@ -3001,3 +3001,27 @@ body.rattrapage [id^="overlay"] *{
   font-size: 15px;
   cursor: pointer;
 }
+
+/* Mode en ligne : coupure de réseau => grand logo wifi rouge barré qui clignote au milieu
+   de l'écran, par-dessus tout (y compris les overlays), sans bloquer les taps */
+#coupureReseau{
+  position: fixed;
+  inset: 0;
+  z-index: 40000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+#coupureReseau svg{
+  width: min(48vw, 240px);
+  height: auto;
+  filter: drop-shadow(0 0 14px rgba(255, 30, 30, 0.75));
+  animation: clignoteCoupure 1s ease-in-out infinite;
+}
+
+@keyframes clignoteCoupure{
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.15; }
+}

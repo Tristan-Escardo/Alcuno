@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.5.4";
+  const VERSION_AFFICHEE = "8.5.5";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "version " + VERSION_AFFICHEE;
@@ -774,6 +774,7 @@ document.addEventListener("DOMContentLoaded", function () {
     refPresence = window.fbRef(window.firebaseDB, `parties/${code}/joueurs/${nom}/connecte`);
     const refConnecte = refPresence;
     desabonnerPresence = window.fbOnValue(window.fbRef(window.firebaseDB, ".info/connected"), (snapshot) => {
+      majCoupureReseau(snapshot.val() === true);
       if (snapshot.val() !== true) return;
       // (re)connecté au serveur : on prépare le « false » automatique, puis on passe à true
       window.fbOnDisconnect(refConnecte).set(false)
@@ -782,8 +783,55 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  // ===== Coupure de réseau : grand logo wifi rouge barré qui clignote au milieu de l'écran =====
+  // (mode en ligne seulement : tant que la présence est suivie). Affiché après 1,5 s de coupure
+  // (pas pour un simple raté de connexion), retiré dès que Firebase est reconnecté.
+  let firebaseConnecte = true;
+  let timerCoupure = null;
+
+  function majCoupureReseau(connecte){
+    if (connecte !== undefined) firebaseConnecte = connecte;
+    const coupe = !!desabonnerPresence && (!firebaseConnecte || navigator.onLine === false);
+    let logo = document.getElementById("coupureReseau");
+
+    if (!coupe) {
+      clearTimeout(timerCoupure);
+      timerCoupure = null;
+      if (logo) logo.remove();
+      return;
+    }
+    if (logo || timerCoupure) return;
+
+    timerCoupure = setTimeout(() => {
+      timerCoupure = null;
+      if (!desabonnerPresence || (firebaseConnecte && navigator.onLine !== false)) return;
+      if (document.getElementById("coupureReseau")) return;
+      logo = document.createElement("div");
+      logo.id = "coupureReseau";
+      logo.setAttribute("role", "alert");
+      logo.setAttribute("aria-label", "Connexion perdue");
+      logo.innerHTML =
+        '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" aria-hidden="true">' +
+          '<g stroke="#ff2a2a" stroke-width="2.2">' +
+            '<path d="M2 8.8a15 15 0 0 1 20 0"/>' +
+            '<path d="M5.2 12.2a10.5 10.5 0 0 1 13.6 0"/>' +
+            '<path d="M8.6 15.6a5.5 5.5 0 0 1 6.8 0"/>' +
+          '</g>' +
+          '<circle cx="12" cy="19.4" r="1.4" fill="#ff2a2a"/>' +
+          '<path d="M3.5 3.5l17 17" stroke="#2B001D" stroke-width="4.6"/>' +
+          '<path d="M3.5 3.5l17 17" stroke="#ff2a2a" stroke-width="2.4"/>' +
+        '</svg>';
+      document.body.appendChild(logo);
+    }, 1500);
+  }
+
+  // Le téléphone signale aussi la perte du réseau tout de suite (wifi coupé, mode avion)
+  window.addEventListener("offline", () => majCoupureReseau());
+  window.addEventListener("online", () => majCoupureReseau());
+
   function arreterPresence(){
     if (desabonnerPresence) { desabonnerPresence(); desabonnerPresence = null; }
+    majCoupureReseau(true); // plus en ligne : plus de logo
     if (refPresence) {
       window.fbOnDisconnect(refPresence).cancel().catch(() => {});
       refPresence = null;
