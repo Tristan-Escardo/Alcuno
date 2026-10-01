@@ -1506,14 +1506,17 @@ document.addEventListener("DOMContentLoaded", function () {
     if(!partieLancee){
       btnJouer.style.display = joueurs.length >= 2 ? "inline-block" : "none";
     }
-    majBoutonSupprimer();
+    majBoutonsJoueurs();
     majStickyJoueurActif();
   }
 
-  // Avant la partie (classique) : dès qu'il y a un joueur. Pendant la partie : s'il en reste plus de 2.
-  function majBoutonSupprimer(){
-    const visible = partieLancee ? joueurs.length > 2 : (!enLigneActif && joueurs.length > 0);
-    btnSupprimer.style.display = visible ? "inline-block" : "none";
+  // Supprimer : avant la partie (classique) dès qu'il y a un joueur, pendant la partie s'il en reste plus de 2.
+  // Ajouter : seulement avant la partie (en ligne, les joueurs viennent de la salle d'attente).
+  function majBoutonsJoueurs(){
+    const supprimer = partieLancee ? joueurs.length > 2 : (!enLigneActif && joueurs.length > 0);
+    btnSupprimer.style.display = supprimer ? "inline-block" : "none";
+    nomJoueurInput.style.display = partieLancee ? "none" : "";
+    btnAjouter.style.display = partieLancee ? "none" : "";
   }
 
 
@@ -1541,6 +1544,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   /* ===== JOUEURS ===== */
   function ajouterJoueur(){
+    if(partieLancee) return; // pas de nouveau joueur en pleine partie
       let nom = nomJoueurInput.value;
 
     // Normalisation robuste : trim + espaces multiples -> 1 + lower
@@ -3269,7 +3273,7 @@ document.addEventListener("DOMContentLoaded", function () {
     finUnOverlayAffiche = false;
 
     btnNouvellePartie.style.display = "inline-block";
-    majBoutonSupprimer();
+    majBoutonsJoueurs();
     btnJouer.style.display = "none";
 
     regleZero.style.display = "none";
