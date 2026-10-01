@@ -14,6 +14,8 @@ document.addEventListener("DOMContentLoaded", function () {
   let pseudoActuel = null;
   let estHote = false;
   let hotePartie = null;
+  // En ligne : pseudos marqués déconnectés dans Firebase (affichés « déconnecté » à côté du nom)
+  let deconnectes = new Set();
 
   // Synchro en ligne : chaque tap de jeu est une action numérotée dans Firebase,
   // rejouée dans le même ordre sur tous les téléphones (y compris l'émetteur).
@@ -490,6 +492,16 @@ document.addEventListener("DOMContentLoaded", function () {
       // Le rôle d'hôte peut changer (l'hôte précédent est parti)
       estHote = !!data[pseudoActuel].host;
 
+      // Seulement « false » : sans info de présence (champ absent), on ne marque personne
+      const absents = Object.keys(data).filter(n => data[n].connecte === false && n !== pseudoActuel);
+      if (absents.sort().join("|") !== Array.from(deconnectes).sort().join("|")) {
+        deconnectes = new Set(absents);
+        if (partieLancee) {
+          afficherJoueurs();
+          afficherJoueurActif();
+        }
+      }
+
       const liste = document.getElementById("listeJoueursEnLigne");
       liste.innerHTML = "";
 
@@ -497,7 +509,7 @@ document.addEventListener("DOMContentLoaded", function () {
       tries.forEach((j) => {
         const div = document.createElement("div");
         const nom = document.createElement("span");
-        nom.innerText = avecCouronne(j.nom) + (j.host ? " (hôte)" : "");
+        nom.innerText = avecCouronne(j.nom) + (j.host ? " (hôte)" : "") + (deconnectes.has(j.nom) ? " (déconnecté(e))" : "");
         div.appendChild(nom);
 
         // Tout le monde peut retirer les autres joueurs (pour partir soi-même : « Retour »)
@@ -825,6 +837,7 @@ document.addEventListener("DOMContentLoaded", function () {
     pseudoActuel = null;
     estHote = false;
     hotePartie = null;
+    deconnectes = new Set();
     enLigneActif = false;
     mancheCourante = null;
     reinitialiserFileActions();
@@ -996,8 +1009,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const maintenant = Date.now();
     const ecart = maintenant - dernierTap;
 
+    // Deux taps rapprochés : on bloque le zoom, sauf sur ce qui se touche (champs, boutons, cartes...).
+    // Ces éléments sont déjà protégés du zoom par le CSS (touch-action: manipulation) ; les bloquer ici
+    // annulait leur clic (ex. une carte touchée juste après avoir fermé un overlay ne se retournait pas)
+    const TOUCHABLES = "input, textarea, select, label, button, .Carte, .fin-choix-card, .carre-couleur, .supp-item";
     if (ecart > 0 && ecart < 300) {
-      if (!e.target.closest("input, textarea, select, label")) {
+      if (!e.target.closest(TOUCHABLES)) {
         e.preventDefault();
       }
     }
@@ -1463,7 +1480,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const n = Number(annulations[nom] || 0);
     const estPigeon = idx === indexPigeon;
 
-    nomEl.innerText = estPigeon ? `PIGEON (${avecCouronne(nom)})` : avecCouronne(nom);
+    nomEl.innerText = (estPigeon ? `PIGEON (${avecCouronne(nom)})` : avecCouronne(nom)) + texteDeconnecte(nom);
     bonusEl.innerText = n > 0 ? `+${n}` : "";
     if(enLigneActif && nom === pseudoActuel){
       labelEl.innerText = "À toi !";
@@ -1491,29 +1508,41 @@ document.addEventListener("DOMContentLoaded", function () {
       .replace(/'/g, "&#39;");
   }
 
+  // En ligne : mention ajoutée au nom d'un joueur déconnecté (vide sinon)
+  function texteDeconnecte(nom){
+    return enLigneActif && deconnectes.has(nom) ? " (déconnecté(e))" : "";
+  }
+
+  function badgeDeconnecte(nom){
+    return texteDeconnecte(nom) ? ` <span class="joueur-deconnecte">déconnecté(e)</span>` : "";
+  }
+
   function afficherJoueurs(){
     listeJoueurs.innerHTML = joueurs.map((j,i)=>{
       const n = Number(annulations[j] || 0);
       const bonus = n > 0 ? ` <span class="bonus-annulation">+${n}</span>` : "";
 
       if(i === indexPigeon){
-        return `<div class="joueur-ligne joueur-ligne-pigeon"><strong>PIGEON</strong> (${echapperHtml(avecCouronne(nomPigeonOriginal))})${bonus}</div>`;
+        return `<div class="joueur-ligne joueur-ligne-pigeon"><strong>PIGEON</strong> (${echapperHtml(avecCouronne(nomPigeonOriginal))})${bonus}${badgeDeconnecte(j)}</div>`;
       }
 
-      return `<div class="joueur-ligne">${echapperHtml(avecCouronne(j))}${bonus}</div>`;
+      return `<div class="joueur-ligne">${echapperHtml(avecCouronne(j))}${bonus}${badgeDeconnecte(j)}</div>`;
     }).join("");
 
     if(!partieLancee){
       btnJouer.style.display = joueurs.length >= 2 ? "inline-block" : "none";
     }
-    majBoutonSupprimer();
+    majBoutonsJoueurs();
     majStickyJoueurActif();
   }
 
-  // Avant la partie (classique) : dès qu'il y a un joueur. Pendant la partie : s'il en reste plus de 2.
-  function majBoutonSupprimer(){
-    const visible = partieLancee ? joueurs.length > 2 : (!enLigneActif && joueurs.length > 0);
-    btnSupprimer.style.display = visible ? "inline-block" : "none";
+  // Supprimer : avant la partie (classique) dès qu'il y a un joueur, pendant la partie s'il en reste plus de 2.
+  // Ajouter : seulement avant la partie (en ligne, les joueurs viennent de la salle d'attente).
+  function majBoutonsJoueurs(){
+    const supprimer = partieLancee ? joueurs.length > 2 : (!enLigneActif && joueurs.length > 0);
+    btnSupprimer.style.display = supprimer ? "inline-block" : "none";
+    nomJoueurInput.style.display = partieLancee ? "none" : "";
+    btnAjouter.style.display = partieLancee ? "none" : "";
   }
 
 
@@ -1529,7 +1558,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const n = Number(annulations[nom] || 0);
     const libelle = idx === indexPigeon ? `PIGEON (${avecCouronne(nom)})` : avecCouronne(nom);
     const bonus = n > 0 ? ` +${n}` : "";
-    joueurActif.innerText = "Joueur actif : " + libelle + bonus;
+    joueurActif.innerText = "Joueur actif : " + libelle + bonus + texteDeconnecte(nom);
 
     majStickyJoueurActif();
   }
@@ -1541,6 +1570,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   /* ===== JOUEURS ===== */
   function ajouterJoueur(){
+    if(partieLancee) return; // pas de nouveau joueur en pleine partie
       let nom = nomJoueurInput.value;
 
     // Normalisation robuste : trim + espaces multiples -> 1 + lower
@@ -1642,7 +1672,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const bouton = document.createElement("button");
       bouton.type = "button";
       bouton.className = "supp-item supp-retrait";
-      bouton.innerHTML = `<span class="supp-name">${echapperHtml(avecCouronne(nom))}</span>`;
+      bouton.innerHTML = `<span class="supp-name">${echapperHtml(avecCouronne(nom))}</span>${badgeDeconnecte(nom)}`;
       bouton.addEventListener("click", () => demanderConfirmationRetrait(nom));
       listeSuppression.appendChild(bouton);
     });
@@ -3269,7 +3299,7 @@ document.addEventListener("DOMContentLoaded", function () {
     finUnOverlayAffiche = false;
 
     btnNouvellePartie.style.display = "inline-block";
-    majBoutonSupprimer();
+    majBoutonsJoueurs();
     btnJouer.style.display = "none";
 
     regleZero.style.display = "none";
