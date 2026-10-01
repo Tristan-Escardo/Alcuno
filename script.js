@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.5.9";
+  const VERSION_AFFICHEE = "8.5.10";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "Alcuno — version " + VERSION_AFFICHEE;
@@ -2245,6 +2245,7 @@ document.addEventListener("DOMContentLoaded", function () {
           // puis la gorgée couleur éventuelle de celui qui a tiré le 3
           () => appliquerBonusCouleurSiBesoin(carteTrois, { couleur: couleurTrois, joueur: joueurTrois, preserveRuleMessage: true })
         );
+        reglerDureeOverlayRegle(msg, DUREE_ANNONCE_PIGEON); // annonce du pigeon : affichée 2 fois plus longtemps
         // optionnel : on nettoie
         carteTroisPourTransfertPigeon = "";
         joueurTroisPourTransfertPigeon = null;
@@ -2794,6 +2795,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Change la durée d'affichage de l'overlay de règle qui vient d'être montré.
   // facteur = null : il reste affiché jusqu'à ce qu'on tape dessus.
+  // Annonce d'un pigeon (premier pigeon ou nouveau pigeon choisi) : 2 fois le temps de lecture normal
+  const DUREE_ANNONCE_PIGEON = 2;
+
   function reglerDureeOverlayRegle(message, facteur){
     if(overlayRegleTimeout){
       clearTimeout(overlayRegleTimeout);
@@ -3537,15 +3541,17 @@ document.addEventListener("DOMContentLoaded", function () {
       if(indexPigeon===null){
         indexPigeon=joueurActuel;
         nomPigeonOriginal=joueurs[joueurActuel];
+        const msgPigeon = `${joueurs[joueurActuel]} est le PIGEON !\nIl/elle boit 2 gorgées.\nÀ chaque 3 tiré par un autre, le pigeon boit 1 gorgée.\nPour s'en débarrasser : tirer un 3 et choisir le prochain pigeon.`;
         annoncerBoireAvecAnnulation(
           joueurActuel,
           2,
           carteTiree,
-          `${joueurs[joueurActuel]} est le PIGEON !\nIl/elle boit 2 gorgées.\nÀ chaque 3 tiré par un autre, le pigeon boit 1 gorgée.\nPour s'en débarrasser : tirer un 3 et choisir le prochain pigeon.`,
+          msgPigeon,
           () => {
             appliquerBonusCouleurSiBesoin(carteTiree, { couleur: couleurBue, joueur: joueurActuel, preserveRuleMessage: true });
           }
         );
+        reglerDureeOverlayRegle(msgPigeon, DUREE_ANNONCE_PIGEON); // annonce du pigeon : affichée 2 fois plus longtemps
       
       } else if(indexPigeon===joueurActuel){
         carteTroisPourTransfertPigeon = carteTiree;

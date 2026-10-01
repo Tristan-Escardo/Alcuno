@@ -3250,3 +3250,60 @@ html.accessibilite #toastEnLigne{
 #ecranReglages .optionNote + .optionNote{
   margin-top: 4px;
 }
+
+/* Mode bourré : boutons des menus et des écrans (taille du texte +20 %, largeurs inchangées :
+   un zoom les ferait dépasser de l'écran) */
+html.accessibilite #choixMode button:not(#btnReglages):not(.btnInstaller),
+html.accessibilite #enLigne button:not(.btnAccueilTexte):not(.btnRetour):not(.btnExclure),
+html.accessibilite #ecranNouvellePartie button:not(.btnAccueilTexte):not(.btnRetour),
+html.accessibilite #ecranConfirmerHote button,
+html.accessibilite #ecranConfirmerRetrait button,
+html.accessibilite #ecranConfirmerAccueil button,
+html.accessibilite #ecranChoixPseudo button{
+  font-size: clamp(22px, 4.8vw, 29px);
+}
+
+html.accessibilite .btnRetour{
+  font-size: 18px !important;
+}
+
+html.accessibilite #choixMode .btnInstaller{
+  font-size: 17px;
+}
+
+html.accessibilite #enLigne input{
+  font-size: 20px;
+}
+
+html.accessibilite #listeJoueursEnLigne div{
+  font-size: 1.2em;
+}
+
+html.accessibilite #enLigne .btnExclure{
+  font-size: 19px;
+}
+
+/* En partie : « Supprimer un joueur », « Nouvelle partie », liste et « Terminé » du retrait */
+html.accessibilite #menu button,
+html.accessibilite .suppression button{
+  font-size: clamp(19px, 4.2vw, 24px);
+}
+
+html.accessibilite #listeSuppression .supp-name,
+html.accessibilite #termineSuppression{
+  font-size: clamp(19px, 4.8vw, 26px);
+}
+
+/* +4 : boutons des joueurs (grille de 2) plus gros, sans zoom (sinon ils se chevauchent) */
+html.accessibilite #overlayPlus4 .plus4-container-joueurs{
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: min(300px, 84vw);
+  max-width: 300px;
+}
+
+html.accessibilite #overlayPlus4 .plus4-container-joueurs .bouton-pigeon,
+html.accessibilite #overlayPlus4 .plus4-joueur-btn{
+  zoom: 1;
+  min-height: 74px;
+  font-size: 17px;
+}
