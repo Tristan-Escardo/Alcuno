@@ -16,10 +16,6 @@ document.addEventListener("DOMContentLoaded", function () {
   let hotePartie = null;
   // En ligne : pseudos marqués déconnectés dans Firebase (affichés « déconnecté » à côté du nom)
   let deconnectes = new Set();
-  // En ligne : joueurs au lancement de la manche (un joueur retiré peut y revenir, pas un inconnu)
-  let joueursManche = [];
-  const MESSAGE_RETIRE_EN_JEU = "Tu as été retiré(e) de la partie.\n\n" +
-    "Tu peux y revenir avec « Revenir dans une partie en cours » : tu joueras en dernier.";
 
   // Synchro en ligne : chaque tap de jeu est une action numérotée dans Firebase,
   // rejouée dans le même ordre sur tous les téléphones (y compris l'émetteur).
@@ -62,7 +58,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.6.0";
+  const VERSION_AFFICHEE = "8.5.0";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "version " + VERSION_AFFICHEE;
@@ -429,14 +425,6 @@ document.addEventListener("DOMContentLoaded", function () {
           return;
         }
 
-        // Joueur retiré (ou parti) de la manche en cours, avec le même pseudo qu'avant : il peut revenir
-        const nomRetire = enJeu && joueursDeLaManche(partie)
-          .find(nom => nom.toLocaleLowerCase("fr-FR") === pseudoMin);
-        if (nomRetire) {
-          proposerRetour(code, nomRetire, partie);
-          return;
-        }
-
         if (enJeu) {
           alert("La partie a déjà commencé : on ne peut plus y ajouter de joueur.\n\n" +
                 "Si tu en faisais partie et que tu as été déconnecté, entre exactement le même pseudo " +
@@ -512,10 +500,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // On n'est plus dans la liste : un autre joueur nous a retiré
       if (!data[pseudoActuel]) {
-        // En pleine partie, on garde la partie en mémoire : le joueur peut y revenir
-        const enJeu = enLigneActif && partieLancee;
-        quitterPartieEnLigne({ garderMemoire: enJeu });
-        alert(enJeu ? MESSAGE_RETIRE_EN_JEU : "Tu as été retiré de la partie.");
+        quitterPartieEnLigne();
+        alert("Tu as été retiré de la partie.");
         return;
       }
 
@@ -724,10 +710,6 @@ document.addEventListener("DOMContentLoaded", function () {
       reprendrePlaceEnLigne(code, memoire.pseudo, partie);
       return;
     }
-    if (memoire && memoire.code === code && etaitDansLaManche(partie, memoire.pseudo)) {
-      proposerRetour(code, memoire.pseudo, partie);
-      return;
-    }
 
     // Déconnectés = connecte à false. Sans info de présence (règle Firebase absente),
     // on propose tous ceux qui ne sont pas marqués connectés.
@@ -778,44 +760,6 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("btnChoixPseudoAnnuler").addEventListener("click", () => {
     ecranChoixPseudo.style.display = "none";
   });
-
-  // Joueurs au lancement de la manche en cours (enregistrés dans etatJeu, jamais modifiés ensuite)
-  function joueursDeLaManche(partie){
-    const etat = partie.etatJeu;
-    return (etat && etat.demarree && etat.joueurs) ? Object.values(etat.joueurs) : [];
-  }
-
-  // Retiré (ou parti) de la manche en cours : il n'est plus dans la liste mais faisait partie du lancement
-  function etaitDansLaManche(partie, nom){
-    return !(partie.joueurs || {})[nom] && joueursDeLaManche(partie).includes(nom);
-  }
-
-  function proposerRetour(code, nom, partie){
-    const ok = confirm(
-      `« ${nom} » a été retiré(e) de la partie ${code}.\n\n` +
-      `C'est toi ? Appuie sur OK pour revenir dans la partie : tu joueras en dernier.`
-    );
-    if (ok) revenirApresRetrait(code, nom, partie);
-  }
-
-  // Retour d'un joueur retiré : il retrouve une place dans Firebase, puis l'action « retour »
-  // le remet dans la partie sur tous les téléphones. Son téléphone rejoue ensuite toute la manche
-  // (rattrapage), retrait et retour compris : il arrive dans le même état que les autres.
-  function revenirApresRetrait(code, nom, partie){
-    const db = window.firebaseDB;
-    const manche = partie.etatJeu.manche;
-    const joueur = { nom, host: false, rejoint: Date.now() };
-
-    window.fbSet(window.fbRef(db, `parties/${code}/joueurs/${nom}`), joueur)
-      .then(() => ecrireActionVers(code, manche, nom, "retour:" + nom))
-      .then(() => {
-        const partieAJour = Object.assign({}, partie, {
-          joueurs: Object.assign({}, partie.joueurs, { [nom]: joueur })
-        });
-        reprendrePlaceEnLigne(code, nom, partieAJour);
-      })
-      .catch(erreurFirebase);
-  }
 
   // Reconnexion : le joueur reprend sa place sous son pseudo exact. En pleine manche, son téléphone
   // rejoue toutes les actions déjà faites (rattrapage accéléré) avant de reprendre en direct.
@@ -895,7 +839,7 @@ document.addEventListener("DOMContentLoaded", function () {
       : "La partie est terminée : l'hôte l'a quittée ou a été retiré.");
   }
 
-  function quitterPartieEnLigne(options = {}){
+  function quitterPartieEnLigne(){
     if (desabonnerJoueurs) { desabonnerJoueurs(); desabonnerJoueurs = null; }
     if (desabonnerEtat) { desabonnerEtat(); desabonnerEtat = null; }
     libererEcran();
@@ -903,7 +847,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Parti volontairement / retiré / partie fermée : plus de présence, plus rien à reprendre
     arreterPresence();
-    if (!options.garderMemoire) oublierPartieLocale();
+    oublierPartieLocale();
     majBoutonRevenir();
 
     codePartieActuel = null;
@@ -3682,11 +3626,11 @@ document.addEventListener("DOMContentLoaded", function () {
   // Ajoute une action numérotée à la manche (partie, manche et pseudo lus tout de suite :
   // on peut quitter la partie juste après l'appel)
   function ecrireAction(id){
-    return ecrireActionVers(codePartieActuel, mancheCourante, pseudoActuel, id);
-  }
-
-  function ecrireActionVers(code, manche, par, id){
     const db = window.firebaseDB;
+    const code = codePartieActuel;
+    const manche = mancheCourante;
+    const par = pseudoActuel;
+
     return window.fbRunTransaction(window.fbRef(db, `parties/${code}/manches/${manche}/seq`), n => (n || 0) + 1)
       .then((res) => {
         const seq = res.snapshot.val();
@@ -3730,21 +3674,13 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     if(nom === pseudoActuel){
-      // Pendant le rattrapage (retour dans la partie), on ne part pas : un « retour » peut suivre.
-      // On vérifie seulement à la fin du rattrapage (verifierPlaceApresRattrapage).
-      if(!rattrapageEnCours){
-        const code = codePartieActuel;
-        setTimeout(() => {
-          if(codePartieActuel !== code) return; // déjà parti
-          if(action.par === nom){
-            quitterPartieEnLigne();
-            allerAccueil();
-          } else {
-            quitterPartieEnLigne({ garderMemoire: true });
-            alert(MESSAGE_RETIRE_EN_JEU);
-          }
-        }, 0);
-      }
+      const code = codePartieActuel;
+      setTimeout(() => {
+        if(codePartieActuel !== code) return; // déjà parti
+        quitterPartieEnLigne();
+        if(action.par === nom) allerAccueil();
+        else alert("Tu as été retiré de la partie.");
+      }, 0);
     } else if(!rattrapageEnCours){
       afficherToast(action.par === nom ? `${nom} a quitté la partie` : `${nom} a été retiré de la partie`, 3000);
     }
@@ -3771,38 +3707,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }).catch(() => {});
   }
 
-  // Un joueur retiré (ou parti) revient : il est ajouté EN DERNIER dans l'ordre des tours.
-  // Personne ne change de place : tour en cours, pigeon et overlays ouverts ne sont pas touchés,
-  // le retour peut donc s'appliquer à tout moment, au même endroit de la file sur tous les téléphones.
-  function appliquerRetourEnLigne(action){
-    const nom = action.id.slice("retour:".length);
-    if(!joueursManche.includes(nom) || joueurs.includes(nom)) return "ignorer";
-
-    joueurs.push(nom);
-    annulations[nom] = 0;
-    afficherJoueurs();
-    afficherJoueurActif();
-    if(!rattrapageEnCours && nom !== pseudoActuel){
-      afficherToast(`${nom} est revenu(e) dans la partie`, 3000);
-    }
-    return "ok";
-  }
-
-  // Fin du rattrapage : si on n'est plus dans la partie (retiré sans être revenu), on part
-  function verifierPlaceApresRattrapage(){
-    if(!enLigneActif || !pseudoActuel || joueurs.includes(pseudoActuel)) return;
-    const code = codePartieActuel;
-    setTimeout(() => {
-      if(codePartieActuel !== code) return;
-      quitterPartieEnLigne({ garderMemoire: true });
-      alert(MESSAGE_RETIRE_EN_JEU);
-    }, 0);
-  }
-
   // "ok" | "attendre" (élément pas encore là / pas prêt) | "ignorer" (action devenue sans objet)
   function tenterAction(action){
     if(action.id.startsWith("retrait:")) return appliquerRetraitEnLigne(action);
-    if(action.id.startsWith("retour:")) return appliquerRetourEnLigne(action);
 
     // Bouton à usage unique dans la manche (ex. « Terminer ») déjà appliqué : si deux joueurs
     // ont appuyé en même temps, le 2e appui est ignoré au lieu d'attendre un bouton disparu
@@ -3871,12 +3778,8 @@ document.addEventListener("DOMContentLoaded", function () {
       traitementEnCours = false;
 
       if(rattrapageEnCours){
-        if(prochainSeq > seqFinRattrapage){
-          finirRattrapage();
-          verifierPlaceApresRattrapage();
-        } else {
-          majRattrapage();
-        }
+        if(prochainSeq > seqFinRattrapage) finirRattrapage();
+        else majRattrapage();
       }
 
       traiterFile();
@@ -3972,7 +3875,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     nettoyerOverlays();
     joueurs = Object.values(etat.joueurs || {});
-    joueursManche = joueurs.slice();
     annulations = {};
     retourMenu();
 
