@@ -306,6 +306,21 @@ document.addEventListener("DOMContentLoaded", function () {
           return;
         }
         const partie = snapshot.val();
+
+        // Partie créée avec une ANCIENNE version du jeu : elle ne peut plus être reprise (les
+        // téléphones ne joueraient pas pareil). On l'oublie : le bouton « Revenir » disparaît,
+        // au lieu de reproposer sans fin une partie impossible à reprendre.
+        const versionPartie = typeof partie.version === "number" ? partie.version : 0;
+        if (versionPartie < VERSION_JEU) {
+          oublierPartieLocale();
+          majBoutonRevenir();
+          document.getElementById("enLigneRevenir").style.display = "none";
+          document.getElementById("enLigneChoix").style.display = "";
+          alert("Cette partie a été créée avec une ancienne version du jeu : elle ne peut plus être reprise.\n\n" +
+                "Créez une nouvelle partie.");
+          return;
+        }
+
         if (!versionCompatible(partie)) return;
         revenirAvecLeCode(code, partie, !!(partie.etatJeu && partie.etatJeu.demarree));
       }).catch(erreurFirebase);
