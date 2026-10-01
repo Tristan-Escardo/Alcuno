@@ -3157,7 +3157,8 @@ body.rattrapage [id^="overlay"] *{
 }
 
 /* ===== Réglage « Accessibilité pour les gens bourrés » : textes et boutons plus gros =====
-   (zoom sur les éléments de texte seulement : la mise en page et le plateau ne bougent pas) */
+   (+30 % pour les textes, +20 % pour les boutons ; aussi dans la page Réglages.
+   Zoom sur les éléments de texte seulement : la mise en page et le plateau ne bougent pas) */
 html.accessibilite .overlay-regle-texte,
 html.accessibilite .titre-pigeon,
 html.accessibilite .overlay-subtitle,
@@ -3178,16 +3179,19 @@ html.accessibilite #messageTexte,
 html.accessibilite .regleZero,
 html.accessibilite .reglePigeon,
 html.accessibilite #stickyJoueurActif .sticky-label,
+html.accessibilite #ecranReglages .optionTexte,
+html.accessibilite #ecranReglages .aPropos,
 html.accessibilite #stickyJoueurActif .sticky-nom{
-  zoom: 1.25;
+  zoom: 1.3;
 }
 
 html.accessibilite .bouton-pigeon,
 html.accessibilite .bouton-doree,
 html.accessibilite .bouton-annulation,
 html.accessibilite .titreBloc,
+html.accessibilite #ecranReglages .interrupteur,
 html.accessibilite #toastEnLigne{
-  zoom: 1.15;
+  zoom: 1.2;
 }
 
 /* ===== Grand titre ALCUNO de l'écran d'accueil (comme le bandeau, en plus grand) ===== */
