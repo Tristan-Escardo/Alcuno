@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.5.2";
+  const VERSION_AFFICHEE = "8.5.3";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "version " + VERSION_AFFICHEE;
@@ -600,7 +600,8 @@ document.addEventListener("DOMContentLoaded", function () {
       tries.forEach((j) => {
         const div = document.createElement("div");
         const nom = document.createElement("span");
-        nom.innerText = avecCouronne(j.nom) + (j.host ? " (hôte)" : "") + (deconnectes.has(j.nom) ? " (déconnecté(e))" : "");
+        nom.innerText = avecCouronne(j.nom) + (j.host ? " (hôte)" : "");
+        ajouterBadgeDeconnecte(nom, deconnectes.has(j.nom));
         div.appendChild(nom);
 
         // Tout le monde peut retirer les autres joueurs (pour partir soi-même : « Retour »)
@@ -1657,7 +1658,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const n = Number(annulations[nom] || 0);
     const estPigeon = idx === indexPigeon;
 
-    nomEl.innerText = (estPigeon ? `PIGEON (${avecCouronne(nom)})` : avecCouronne(nom)) + texteDeconnecte(nom);
+    nomEl.innerText = estPigeon ? `PIGEON (${avecCouronne(nom)})` : avecCouronne(nom);
+    ajouterBadgeDeconnecte(nomEl, !!texteDeconnecte(nom));
     bonusEl.innerText = n > 0 ? `+${n}` : "";
     if(enLigneActif && nom === pseudoActuel){
       labelEl.innerText = "À toi !";
@@ -1692,6 +1694,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function badgeDeconnecte(nom){
     return texteDeconnecte(nom) ? ` <span class="joueur-deconnecte">déconnecté(e)</span>` : "";
+  }
+
+  // Même mention (rouge, en italique, plus petite), ajoutée à un élément affiché en texte
+  function ajouterBadgeDeconnecte(el, deconnecte){
+    if(!deconnecte) return;
+    const badge = document.createElement("span");
+    badge.className = "joueur-deconnecte";
+    badge.innerText = "déconnecté(e)";
+    el.appendChild(badge);
   }
 
   function afficherJoueurs(){
@@ -1735,7 +1746,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const n = Number(annulations[nom] || 0);
     const libelle = idx === indexPigeon ? `PIGEON (${avecCouronne(nom)})` : avecCouronne(nom);
     const bonus = n > 0 ? ` +${n}` : "";
-    joueurActif.innerText = "Joueur actif : " + libelle + bonus + texteDeconnecte(nom);
+    joueurActif.innerText = "Joueur actif : " + libelle + bonus;
+    ajouterBadgeDeconnecte(joueurActif, !!texteDeconnecte(nom));
 
     majStickyJoueurActif();
   }
