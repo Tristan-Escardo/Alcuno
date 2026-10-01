@@ -915,6 +915,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   let indexJoueur = 0;
   let partieLancee = false;
+  let lancementPartieA = 0;
 
   let indexPigeon = null;
   let nomPigeonOriginal = "";
@@ -3078,6 +3079,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     plateau.innerHTML = "";
+    lancementPartieA = Date.now();
     garderEcranAllume(); // pas de mise en veille pendant la partie
 
     // Plateau principal = toutes les cartes SAUF 2/5/6/7/8/9 (paquet duel)
@@ -3254,6 +3256,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // "click" (et pas pointerdown) : évite que le relâchement du doigt active un bouton du nouvel écran
   btnNouvellePartie.addEventListener("click", () => {
+    // « Jouer » (au toucher) laisse sa place à « Nouvelle partie » sous le doigt : Android et PC
+    // y envoient le clic du doigt relevé, qui ouvrirait cet écran juste après le lancement
+    if(Date.now() - lancementPartieA < 700) return;
     ecranNouvellePartie.style.display = "";
   });
 
@@ -3665,7 +3670,7 @@ document.addEventListener("DOMContentLoaded", function () {
     toast._timer = setTimeout(() => toast.classList.remove("visible"), duree);
   }
 
-  /* ===== BOUTON RETOUR DU TÉLÉPHONE (Android) ===== */
+  /* ===== BOUTON RETOUR DU TÉLÉPHONE (Android) ET DU NAVIGATEUR (Safari, PC) ===== */
   // Le téléphone ne prévient la page que si elle a ajouté des entrées dans l'historique.
   // On en garde quelques-unes d'avance, ajoutées pendant un tap (sinon Chrome les saute),
   // et chaque retour fait la même chose que le bouton « Retour » de l'écran affiché.
@@ -3745,28 +3750,25 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // iPhone : pas de bouton retour (et on ne touche pas au geste de retour de Safari)
-  if(!estIOS){
-    document.addEventListener("pointerdown", preparerRetour, { capture: true, passive: true });
+  document.addEventListener("pointerdown", preparerRetour, { capture: true, passive: true });
 
-    window.addEventListener("popstate", () => {
-      if(entreesRetour === 0) return;
-      entreesRetour--;
+  window.addEventListener("popstate", () => {
+    if(entreesRetour === 0) return;
+    entreesRetour--;
 
-      if(retourDansLAppli()){
-        if(navigator.userActivation && navigator.userActivation.isActive) preparerRetour();
-        return;
-      }
+    if(retourDansLAppli()){
+      if(navigator.userActivation && navigator.userActivation.isActive) preparerRetour();
+      return;
+    }
 
-      // Écran d'accueil : on retire nos entrées, le prochain retour quitte l'appli
-      if(entreesRetour > 0){
-        const n = entreesRetour;
-        entreesRetour = 0;
-        history.go(-n);
-      }
-      afficherToast("Appuie encore une fois sur retour pour quitter");
-    });
-  }
+    // Écran d'accueil : on retire nos entrées, le prochain retour quitte l'appli
+    if(entreesRetour > 0){
+      const n = entreesRetour;
+      entreesRetour = 0;
+      history.go(-n);
+    }
+    afficherToast("Appuie encore une fois sur retour pour quitter");
+  });
 
   /* ===== INIT ===== */
   window.addEventListener("scroll", repositionnerStickyJoueurActif, { passive: true });
