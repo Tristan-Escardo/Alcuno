@@ -3307,3 +3307,17 @@ html.accessibilite #overlayPlus4 .plus4-joueur-btn{
   min-height: 74px;
   font-size: 17px;
 }
+
+/* Mode en ligne : bouton qui attend la réponse de Firebase (« Création… », « Connexion… »…) */
+#enLigne button.enAttente,
+#enLigne button.enAttente:hover{
+  opacity: 0.75;
+  transform: none;
+  cursor: wait;
+  animation: boutonEnAttente 0.9s ease-in-out infinite;
+}
+
+@keyframes boutonEnAttente{
+  0%, 100% { opacity: 0.75; }
+  50%      { opacity: 0.5; }
+}

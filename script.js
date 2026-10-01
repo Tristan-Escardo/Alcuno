@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.5.10";
+  const VERSION_AFFICHEE = "8.5.11";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "Alcuno — version " + VERSION_AFFICHEE;
@@ -354,7 +354,35 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("jeu").style.display = "";
   });
 
+  // Connexion à Firebase ouverte à l'avance (dès « Mode en ligne », ou au chargement si une partie
+  // est en mémoire) : sinon le 1er tap « Créer » / « Rejoindre » attend aussi la connexion
+  let firebasePrechauffe = false;
+
+  function prechaufferFirebase(){
+    if (firebasePrechauffe) return;
+    firebasePrechauffe = true;
+    attendreFirebase(() => {
+      window.fbOnValue(window.fbRef(window.firebaseDB, ".info/connected"), () => {});
+    });
+  }
+
+  // Bouton qui attend Firebase : il réagit tout de suite (texte « … », grisé) et ne peut pas
+  // être tapé deux fois. Renvoie la fonction qui le remet comme avant.
+  function boutonEnAttente(id, texte){
+    const bouton = document.getElementById(id);
+    const texteAvant = bouton.innerText;
+    bouton.disabled = true;
+    bouton.classList.add("enAttente");
+    bouton.innerText = texte;
+    return () => {
+      bouton.disabled = false;
+      bouton.classList.remove("enAttente");
+      bouton.innerText = texteAvant;
+    };
+  }
+
   document.getElementById("btnModeEnLigne").addEventListener("click", () => {
+    prechaufferFirebase();
     document.getElementById("choixMode").style.display = "none";
     document.getElementById("enLigne").style.display = "";
   });
@@ -388,6 +416,7 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
+    prechaufferFirebase(); // partie en mémoire : le joueur va sans doute revenir en ligne
     attendreFirebase(() => {
       window.fbGet(window.fbRef(window.firebaseDB, `parties/${memoire.code}`)).then((snapshot) => {
         if (numero !== verificationRevenir) return; // une vérification plus récente a été lancée
@@ -431,8 +460,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const code = document.getElementById("codeRevenir").value.trim().toUpperCase();
     if (!code) { alert("Entre le code de la partie."); return; }
 
+    const finAttente = boutonEnAttente("validerRevenir", "Connexion…");
     attendreFirebase(() => {
       window.fbGet(window.fbRef(window.firebaseDB, `parties/${code}`)).then((snapshot) => {
+        finAttente();
         if (!snapshot.exists()) {
           oublierPartieLocale();
           majBoutonRevenir();
@@ -457,7 +488,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (!versionCompatible(partie)) return;
         revenirAvecLeCode(code, partie, !!(partie.etatJeu && partie.etatJeu.demarree));
-      }).catch(erreurFirebase);
+      }).catch((e) => { finAttente(); erreurFirebase(e); });
     });
   });
 
@@ -485,6 +516,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!pseudo) { alert("Entre un pseudo."); return; }
     if (PSEUDO_INVALIDE.test(pseudo)) { alert("Pseudo invalide (pas de . # $ [ ] /)."); return; }
 
+    const finAttente = boutonEnAttente("validerCreation", "Création…");
     attendreFirebase(() => {
       let code = null;
 
@@ -514,7 +546,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         ecouterSalleAttente(code);
         ecouterEtatPartie(code);
-      }).catch(erreurFirebase);
+      }).catch(erreurFirebase).finally(finAttente);
     });
   });
 
@@ -528,6 +560,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     if (PSEUDO_INVALIDE.test(pseudo)) { alert("Pseudo invalide (pas de . # $ [ ] /)."); return; }
 
+    const finAttente = boutonEnAttente("validerRejoindre", "Connexion…");
     attendreFirebase(() => {
       const db = window.firebaseDB;
       const refPartie = window.fbRef(db, `parties/${code}`);
@@ -578,7 +611,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         const refJoueur = window.fbRef(db, `parties/${code}/joueurs/${pseudo}`);
-        window.fbSet(refJoueur, { nom: pseudo, host: false, rejoint: Date.now() }).then(() => {
+        return window.fbSet(refJoueur, { nom: pseudo, host: false, rejoint: Date.now() }).then(() => {
           marquerActivite(code);
           codePartieActuel = code;
           pseudoActuel = pseudo;
@@ -592,22 +625,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
           ecouterSalleAttente(code);
           ecouterEtatPartie(code);
-        }).catch(erreurFirebase);
-      }).catch(erreurFirebase);
+        });
+      }).catch(erreurFirebase).finally(finAttente);
     });
   });
 
   document.getElementById("lancerPartieEnLigne").addEventListener("click", () => {
     if (!estHote || !codePartieActuel) return;
 
+    const finAttente = boutonEnAttente("lancerPartieEnLigne", "Lancement…");
     window.fbGet(window.fbRef(window.firebaseDB, `parties/${codePartieActuel}/joueurs`)).then((snapshot) => {
       const liste = Object.values(snapshot.val() || {})
         .sort((a, b) => (a.rejoint || 0) - (b.rejoint || 0))
         .map(j => j.nom);
 
       if (liste.length < 2) { alert("Il faut au moins 2 joueurs."); return; }
-      lancerMancheEnLigne(liste, true);
-    }).catch(erreurFirebase);
+      return lancerMancheEnLigne(liste, true);
+    }).catch(erreurFirebase).finally(finAttente);
   });
 
   
@@ -757,7 +791,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const mancheAttendue = mancheCourante;
     const refEtat = window.fbRef(window.firebaseDB, `parties/${codePartieActuel}/etatJeu`);
 
-    window.fbRunTransaction(refEtat, (etat) => {
+    return window.fbRunTransaction(refEtat, (etat) => {
       const e = etat || {};
       const possible = depuisSalle ? !e.demarree : (e.demarree && e.manche === mancheAttendue);
       if (!possible) return; // quelqu'un a déjà relancé => abandon
