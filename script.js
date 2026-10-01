@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.5.7";
+  const VERSION_AFFICHEE = "8.5.8";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "Alcuno — version " + VERSION_AFFICHEE;
@@ -77,7 +77,8 @@ document.addEventListener("DOMContentLoaded", function () {
   let dernierTapTitre = 0;
 
   // pointerdown (et pas click) : les taps rapprochés ne génèrent pas tous un "click" sur mobile
-  document.querySelector("header h1").addEventListener("pointerdown", () => {
+  // (titre du bandeau et grand titre de l'écran d'accueil)
+  document.querySelectorAll("header h1, #titreAccueil").forEach((titre) => titre.addEventListener("pointerdown", () => {
     const maintenant = Date.now();
     tapsTitre = (maintenant - dernierTapTitre < 600) ? tapsTitre + 1 : 1;
     dernierTapTitre = maintenant;
@@ -87,7 +88,7 @@ document.addEventListener("DOMContentLoaded", function () {
       ecranCredits.scrollTop = 0;
       ecranCredits.style.display = "";
     }
-  });
+  }));
 
   document.getElementById("btnFermerCredits").addEventListener("click", () => {
     ecranCredits.style.display = "none";
