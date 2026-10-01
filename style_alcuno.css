@@ -3002,8 +3002,8 @@ body.rattrapage [id^="overlay"] *{
   cursor: pointer;
 }
 
-/* Mode en ligne : coupure de réseau => grand logo wifi rouge barré qui clignote au milieu
-   de l'écran, par-dessus tout (y compris les overlays), sans bloquer les taps */
+/* Mode en ligne : coupure de réseau => écran par-dessus tout (y compris les overlays) qui
+   bloque tous les taps, puis grand logo wifi rouge barré qui clignote au milieu (.visible) */
 #coupureReseau{
   position: fixed;
   inset: 0;
@@ -3011,7 +3011,14 @@ body.rattrapage [id^="overlay"] *{
   display: flex;
   align-items: center;
   justify-content: center;
-  pointer-events: none;
+  pointer-events: auto;
+  touch-action: none;
+  background: transparent;
+  transition: background 0.3s;
+}
+
+#coupureReseau.visible{
+  background: rgba(0, 0, 0, 0.45);
 }
 
 #coupureReseau svg{

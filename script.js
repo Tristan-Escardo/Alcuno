@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.5.5";
+  const VERSION_AFFICHEE = "8.5.6";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "version " + VERSION_AFFICHEE;
@@ -784,8 +784,9 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // ===== Coupure de réseau : grand logo wifi rouge barré qui clignote au milieu de l'écran =====
-  // (mode en ligne seulement : tant que la présence est suivie). Affiché après 1,5 s de coupure
-  // (pas pour un simple raté de connexion), retiré dès que Firebase est reconnecté.
+  // (mode en ligne seulement : tant que la présence est suivie). Tous les taps sont bloqués dès
+  // la coupure ; le logo apparaît après 1,5 s (pas pour un simple raté de connexion). Tout est
+  // retiré dès que Firebase est reconnecté.
   let firebaseConnecte = true;
   let timerCoupure = null;
 
@@ -800,16 +801,25 @@ document.addEventListener("DOMContentLoaded", function () {
       if (logo) logo.remove();
       return;
     }
-    if (logo || timerCoupure) return;
+    if (logo) return;
+
+    // Écran transparent par-dessus tout : plus aucun tap ne passe
+    logo = document.createElement("div");
+    logo.id = "coupureReseau";
+    logo.setAttribute("role", "alert");
+    logo.setAttribute("aria-label", "Connexion perdue");
+    ["pointerdown", "pointerup", "click", "touchstart", "touchend", "mousedown", "mouseup", "contextmenu"].forEach((type) => {
+      logo.addEventListener(type, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }, { passive: false });
+    });
+    document.body.appendChild(logo);
 
     timerCoupure = setTimeout(() => {
       timerCoupure = null;
-      if (!desabonnerPresence || (firebaseConnecte && navigator.onLine !== false)) return;
-      if (document.getElementById("coupureReseau")) return;
-      logo = document.createElement("div");
-      logo.id = "coupureReseau";
-      logo.setAttribute("role", "alert");
-      logo.setAttribute("aria-label", "Connexion perdue");
+      if (!logo.isConnected) return;
+      logo.classList.add("visible");
       logo.innerHTML =
         '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" aria-hidden="true">' +
           '<g stroke="#ff2a2a" stroke-width="2.2">' +
@@ -821,7 +831,6 @@ document.addEventListener("DOMContentLoaded", function () {
           '<path d="M3.5 3.5l17 17" stroke="#2B001D" stroke-width="4.6"/>' +
           '<path d="M3.5 3.5l17 17" stroke="#ff2a2a" stroke-width="2.4"/>' +
         '</svg>';
-      document.body.appendChild(logo);
     }, 1500);
   }
 
