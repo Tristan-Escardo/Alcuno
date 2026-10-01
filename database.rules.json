@@ -1,0 +1,62 @@
+{
+  "rules": {
+    "parties": {
+      "$code": {
+        ".read": true,
+        ".write": "!data.exists() || !newData.exists()",
+        ".validate": "$code.matches(/^[A-Z2-9]{5,6}$/)",
+        "version": { ".validate": "newData.isNumber()" },
+        "creee": { ".validate": "newData.isNumber()" },
+        "activite": {
+          ".write": true,
+          ".validate": "newData.isNumber()"
+        },
+        "hote": {
+          ".write": true,
+          ".validate": "newData.isString() && newData.val().length <= 20"
+        },
+        "joueurs": {
+          "$pseudo": {
+            ".write": true,
+            ".validate": "$pseudo.length <= 20 && newData.hasChildren(['nom', 'rejoint'])",
+            "nom": { ".validate": "newData.isString() && newData.val() === $pseudo" },
+            "host": { ".validate": "newData.isBoolean()" },
+            "rejoint": { ".validate": "newData.isNumber()" },
+            "connecte": { ".validate": "newData.isBoolean()" },
+            "$autre": { ".validate": false }
+          }
+        },
+        "etatJeu": {
+          ".write": true,
+          ".validate": "newData.hasChild('demarree')",
+          "demarree": { ".validate": "newData.isBoolean()" },
+          "manche": { ".validate": "newData.isNumber()" },
+          "seed": { ".validate": "newData.isNumber()" },
+          "hote": { ".validate": "newData.isString() && newData.val().length <= 20" },
+          "message": { ".validate": "newData.isString() && newData.val().length <= 100" },
+          "joueurs": { "$i": { ".validate": "newData.isString() && newData.val().length <= 20" } },
+          "$autre": { ".validate": false }
+        },
+        "manches": {
+          "$manche": {
+            "seq": {
+              ".write": true,
+              ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+            },
+            "actions": {
+              "$seq": {
+                ".write": "!data.exists()",
+                ".validate": "$seq.matches(/^[0-9]+$/) && newData.hasChildren(['id', 'par'])",
+                "id": { ".validate": "newData.isString() && newData.val().length <= 60 && newData.val().matches(/^[a-z0-9]+:.+$/)" },
+                "par": { ".validate": "newData.isString() && newData.val().length <= 20 && root.child('parties').child($code).child('joueurs').child(newData.val()).exists()" },
+                "$autre": { ".validate": false }
+              }
+            },
+            "$autre": { ".validate": false }
+          }
+        },
+        "$autre": { ".validate": false }
+      }
+    }
+  }
+}

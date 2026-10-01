@@ -272,9 +272,10 @@ document.addEventListener("DOMContentLoaded", function () {
   // Si ce téléphone se souvient d'une partie en cours, le bouton la propose directement
   function majBoutonRevenir(){
     const memoire = lirePartieLocale();
-    btnRevenirPartie.innerText = (memoire && memoire.code)
-      ? "Revenir dans la partie " + memoire.code
-      : "Revenir dans une partie";
+    // Seulement si ce téléphone se souvient d'une partie en cours (le code n'est pas affiché sur
+    // le bouton, le champ est pré-rempli au tap). Depuis un autre téléphone : « Rejoindre une partie »
+    // avec le même pseudo qu'avant remet aussi le joueur à sa place.
+    btnRevenirPartie.style.display = (memoire && memoire.code) ? "" : "none";
   }
   // (mis à jour quand on entre dans le mode en ligne, pas au chargement : la mémoire locale
   // est définie plus bas dans ce fichier)
@@ -373,7 +374,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const pseudo = document.getElementById("pseudoRejoindre").value.replace(/\s+/g, " ").trim();
     if (!code || !pseudo) {
       alert("Entre le code et ton pseudo.\n\n" +
-            "Tu as été déconnecté d'une partie ? Utilise « Revenir dans une partie » : le code suffit.");
+            "Tu as été déconnecté d'une partie ? Entre le code et le même pseudo qu'avant : tu reprendras ta place.");
       return;
     }
     if (PSEUDO_INVALIDE.test(pseudo)) { alert("Pseudo invalide (pas de . # $ [ ] /)."); return; }
@@ -411,8 +412,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (enJeu) {
           alert("La partie a déjà commencé : on ne peut plus y ajouter de joueur.\n\n" +
-                "Si tu en faisais partie et que tu as été déconnecté, utilise « Revenir dans une partie » : " +
-                "le code suffit pour reprendre ta place.");
+                "Si tu en faisais partie et que tu as été déconnecté, entre exactement le même pseudo " +
+                "qu'avant pour reprendre ta place.");
           return;
         }
 
@@ -832,6 +833,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Parti volontairement / retiré / partie fermée : plus de présence, plus rien à reprendre
     arreterPresence();
     oublierPartieLocale();
+    majBoutonRevenir();
 
     codePartieActuel = null;
     pseudoActuel = null;
