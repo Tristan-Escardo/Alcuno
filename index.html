@@ -140,11 +140,19 @@
                     <button type="button" id="btnPartagerJeu">📤 Partager le lien</button>
                 </div>
 
-                <button type="button" id="btnDiagnostic" class="btnDiagnostic">Copier le diagnostic</button>
-
+                <!-- À propos : comme dans les réglages d'un téléphone, une carte avec des lignes -->
                 <div class="aPropos">
                     <div class="aProposTitre">À propos</div>
-                    <p id="versionJeu" class="versionJeu"></p>
+                    <div class="groupeLignes">
+                        <div class="ligneInfo">
+                            <span>Version</span>
+                            <span id="versionJeu" class="valeurInfo"></span>
+                        </div>
+                        <button type="button" id="btnDiagnostic" class="ligneInfo ligneAction">
+                            <span>Copier le diagnostic</span>
+                            <span class="chevron" aria-hidden="true">›</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>
