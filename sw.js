@@ -19,6 +19,7 @@ const A_PRECHARGER = [
   "./icones/icone-192.png",
   "./icones/icone-512.png",
   "./icones/icone-180.png",
+  "./icones/qr_alcuno.svg",
   "./Cartes/carte_doree.svg",
   "./Cartes/cinq_bleu.webp",
   "./Cartes/cinq_jaune.webp",

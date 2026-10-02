@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.5.12";
+  const VERSION_AFFICHEE = "8.5.13";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "Alcuno — version " + VERSION_AFFICHEE;
@@ -99,6 +99,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const ecranReglages = document.getElementById("ecranReglages");
 
   document.getElementById("btnReglages").addEventListener("click", () => {
+    majLignePartieMemoire();
     ecranReglages.scrollTop = 0;
     ecranReglages.style.display = "";
   });
@@ -127,6 +128,204 @@ document.addEventListener("DOMContentLoaded", function () {
   caseAccessibilite.addEventListener("change", () => {
     ecrireReglage(CLE_ACCESSIBILITE, caseAccessibilite.checked);
     document.documentElement.classList.toggle("accessibilite", caseAccessibilite.checked);
+  });
+
+  // ===== Sons : bruitages fabriqués par le téléphone (Web Audio), aucun fichier à télécharger =====
+  // Le curseur règle le volume du jeu à l'intérieur du volume du téléphone (il ne peut pas le dépasser).
+  const CLE_SONS = "alcuno_sons";
+  const CLE_VOLUME = "alcuno_volume";
+  const caseSons = document.getElementById("optionSons");
+  const curseurVolume = document.getElementById("volumeSons");
+  const ligneVolume = document.getElementById("ligneVolume");
+  caseSons.checked = lireReglage(CLE_SONS, true);
+
+  let volumeSons = 70;
+  try {
+    const v = localStorage.getItem(CLE_VOLUME);
+    if (v !== null && Number(v) >= 0 && Number(v) <= 100) volumeSons = Number(v);
+  } catch (e) {}
+  curseurVolume.value = volumeSons;
+
+  function majLigneVolume(){
+    document.getElementById("volumeValeur").innerText = volumeSons + " %";
+    curseurVolume.disabled = !caseSons.checked;
+    ligneVolume.classList.toggle("inactif", !caseSons.checked);
+  }
+  majLigneVolume();
+
+  caseSons.addEventListener("change", () => {
+    ecrireReglage(CLE_SONS, caseSons.checked);
+    majLigneVolume();
+    if (caseSons.checked) jouerSon("tour"); // petit retour pour montrer que ça marche
+  });
+
+  curseurVolume.addEventListener("input", () => {
+    volumeSons = Number(curseurVolume.value);
+    try { localStorage.setItem(CLE_VOLUME, String(volumeSons)); } catch (e) {}
+    majLigneVolume();
+  });
+  curseurVolume.addEventListener("change", () => jouerSon("tour")); // essai au relâchement
+
+  let contexteSon = null;
+  function contexteAudio(){
+    if (!contexteSon) {
+      const Contexte = window.AudioContext || window.webkitAudioContext;
+      if (!Contexte) return null;
+      try { contexteSon = new Contexte(); } catch (e) { return null; }
+    }
+    if (contexteSon.state === "suspended") contexteSon.resume().catch(() => {});
+    return contexteSon;
+  }
+  // Les téléphones n'autorisent le son qu'après un premier tap : on le prépare à chaque tap
+  document.addEventListener("pointerdown", () => { if (caseSons.checked) contexteAudio(); },
+    { capture: true, passive: true });
+
+  // Une note (oscillateur) avec une attaque et une fin douces, éventuellement qui glisse
+  function noteSon(ctx, sortie, debut, { freq, duree, type = "sine", vol = 0.3, vers = null }){
+    const osc = ctx.createOscillator();
+    const env = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, debut);
+    if (vers) osc.frequency.exponentialRampToValueAtTime(vers, debut + duree);
+    env.gain.setValueAtTime(0.0001, debut);
+    env.gain.exponentialRampToValueAtTime(vol, debut + 0.012);
+    env.gain.exponentialRampToValueAtTime(0.0001, debut + duree);
+    osc.connect(env);
+    env.connect(sortie);
+    osc.start(debut);
+    osc.stop(debut + duree + 0.03);
+  }
+
+  // Petit souffle filtré (bruit) : le « fffp » d'une carte qu'on retourne
+  function souffleSon(ctx, sortie, debut, { duree, vol, freq }){
+    const nb = Math.floor(ctx.sampleRate * duree);
+    const tampon = ctx.createBuffer(1, nb, ctx.sampleRate);
+    const donnees = tampon.getChannelData(0);
+    for (let i = 0; i < nb; i++) donnees[i] = (Math.random() * 2 - 1) * (1 - i / nb);
+    const source = ctx.createBufferSource();
+    source.buffer = tampon;
+    const filtre = ctx.createBiquadFilter();
+    filtre.type = "bandpass";
+    filtre.frequency.setValueAtTime(freq, debut);
+    filtre.frequency.exponentialRampToValueAtTime(freq / 3, debut + duree);
+    filtre.Q.value = 0.9;
+    const env = ctx.createGain();
+    env.gain.setValueAtTime(vol, debut);
+    env.gain.exponentialRampToValueAtTime(0.0001, debut + duree);
+    source.connect(filtre);
+    filtre.connect(env);
+    env.connect(sortie);
+    source.start(debut);
+  }
+
+  // carte | doree | culsec | pigeon | tour | eau
+  function jouerSon(nom){
+    if (!caseSons.checked || volumeSons <= 0) return;
+    if (rattrapageEnCours) return; // reconnexion : pas de sons pour les actions déjà passées
+    const ctx = contexteAudio();
+    if (!ctx) return;
+
+    const sortie = ctx.createGain();
+    sortie.gain.value = Math.pow(volumeSons / 100, 2); // curseur plus naturel à l'oreille
+    sortie.connect(ctx.destination);
+    const t = ctx.currentTime + 0.02;
+
+    if (nom === "carte") {
+      souffleSon(ctx, sortie, t, { duree: 0.11, vol: 0.5, freq: 3200 });
+      noteSon(ctx, sortie, t + 0.07, { freq: 900, duree: 0.05, type: "triangle", vol: 0.12 });
+    } else if (nom === "doree") {
+      [1047, 1319, 1568, 2093, 2637].forEach((f, i) =>
+        noteSon(ctx, sortie, t + i * 0.08, { freq: f, duree: 0.45, type: "triangle", vol: 0.22 }));
+      noteSon(ctx, sortie, t + 0.42, { freq: 3136, duree: 0.6, vol: 0.12 });
+    } else if (nom === "culsec") {
+      noteSon(ctx, sortie, t, { freq: 140, duree: 0.35, vol: 0.5, vers: 50 });
+      noteSon(ctx, sortie, t + 0.12, { freq: 784, duree: 0.18, type: "square", vol: 0.12 });
+      noteSon(ctx, sortie, t + 0.3, { freq: 1047, duree: 0.45, type: "square", vol: 0.12 });
+    } else if (nom === "pigeon") {
+      noteSon(ctx, sortie, t, { freq: 720, duree: 0.16, type: "square", vol: 0.13, vers: 520 });
+      noteSon(ctx, sortie, t + 0.19, { freq: 560, duree: 0.28, type: "square", vol: 0.13, vers: 300 });
+    } else if (nom === "tour") {
+      noteSon(ctx, sortie, t, { freq: 1319, duree: 0.18, vol: 0.28 });
+      noteSon(ctx, sortie, t + 0.12, { freq: 1760, duree: 0.3, vol: 0.28 });
+    } else if (nom === "eau") {
+      noteSon(ctx, sortie, t, { freq: 380, duree: 0.14, vol: 0.35, vers: 950 });
+      noteSon(ctx, sortie, t + 0.2, { freq: 420, duree: 0.16, vol: 0.3, vers: 1100 });
+    }
+  }
+
+  // ===== Rappel « Bois de l'eau 💧 » : toutes les 30 minutes de partie (activé par défaut) =====
+  // Petit bandeau en haut de l'écran, qui ne bloque rien et se ferme au tap ou tout seul.
+  // (Chaque téléphone le gère de son côté : rien n'est envoyé aux autres joueurs.)
+  const CLE_RAPPEL_EAU = "alcuno_rappel_eau";
+  const caseRappelEau = document.getElementById("optionRappelEau");
+  caseRappelEau.checked = lireReglage(CLE_RAPPEL_EAU, true);
+  caseRappelEau.addEventListener("change", () => ecrireReglage(CLE_RAPPEL_EAU, caseRappelEau.checked));
+
+  const MINUTES_RAPPEL_EAU = 30;
+  let tempsDeJeuSansEau = 0; // ms de partie (écran allumé) depuis le dernier rappel
+
+  setInterval(() => {
+    if (!caseRappelEau.checked || !partieLancee || document.visibilityState !== "visible") return;
+    tempsDeJeuSansEau += 15000;
+    if (tempsDeJeuSansEau >= MINUTES_RAPPEL_EAU * 60000) {
+      tempsDeJeuSansEau = 0;
+      afficherRappelEau();
+    }
+  }, 15000);
+
+  function afficherRappelEau(){
+    const ancien = document.getElementById("rappelEau");
+    if (ancien) ancien.remove();
+    const bandeau = document.createElement("div");
+    bandeau.id = "rappelEau";
+    bandeau.setAttribute("role", "status");
+    bandeau.innerHTML =
+      '<span class="rappelEau-icone" aria-hidden="true">💧</span>' +
+      '<span class="rappelEau-texte"><strong>Pense à boire un verre d\'eau !</strong>' +
+      '<span>Ton foie te dira merci 😉</span></span>';
+    const fermer = () => bandeau.remove();
+    bandeau.addEventListener("click", fermer);
+    setTimeout(fermer, 9000);
+    document.body.appendChild(bandeau);
+    jouerSon("eau");
+    vibrer([60, 80, 60]);
+  }
+
+  // ===== Partager le jeu : bouton « Partager » du téléphone, sinon lien copié =====
+  const ADRESSE_JEU = "https://tristan-escardo.github.io/Alcuno/";
+
+  document.getElementById("btnPartagerJeu").addEventListener("click", () => {
+    if (navigator.share) {
+      navigator.share({ title: "Alcuno", text: "On joue à Alcuno ? 🍻", url: ADRESSE_JEU }).catch(() => {});
+      return;
+    }
+    const copie = navigator.clipboard ? navigator.clipboard.writeText(ADRESSE_JEU) : Promise.reject();
+    copie.then(() => afficherToast("Lien copié !"))
+      .catch(() => prompt("Copie le lien du jeu :", ADRESSE_JEU));
+  });
+
+  // ===== Partie en mémoire : la partie en ligne dont ce téléphone se souvient (« Revenir ») =====
+  function majLignePartieMemoire(){
+    const memoire = lirePartieLocale();
+    const ligne = document.getElementById("lignePartieMemoire");
+    if (!memoire || !memoire.code) {
+      ligne.style.display = "none";
+      return;
+    }
+    document.getElementById("textePartieMemoire").innerText =
+      `Partie ${memoire.code}${memoire.pseudo ? " (" + memoire.pseudo + ")" : ""} : proposée par « Revenir dans une partie en cours ».`;
+    ligne.style.display = "";
+  }
+
+  document.getElementById("btnOublierPartie").addEventListener("click", () => {
+    const memoire = lirePartieLocale();
+    if (!memoire || !memoire.code) { majLignePartieMemoire(); return; }
+    if (!confirm(`Oublier la partie ${memoire.code} ?\n\nLe bouton « Revenir dans une partie en cours » ne la proposera plus. ` +
+                 `(Tu pourras toujours la rejoindre avec « Rejoindre » et ton pseudo.)`)) return;
+    oublierPartieLocale();
+    majBoutonRevenir();
+    majLignePartieMemoire();
+    afficherToast("Partie oubliée");
   });
 
   // ===== Vibrations (Android : un iPhone ne peut pas vibrer depuis une page web) =====
@@ -1839,6 +2038,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if(tour !== dernierTourVibre){
         dernierTourVibre = tour;
         vibrer([70, 60, 70]);
+        jouerSon("tour");
       }
     }
 
@@ -2280,6 +2480,7 @@ document.addEventListener("DOMContentLoaded", function () {
           () => appliquerBonusCouleurSiBesoin(carteTrois, { couleur: couleurTrois, joueur: joueurTrois, preserveRuleMessage: true })
         );
         reglerDureeOverlayRegle(msg, DUREE_ANNONCE_PIGEON); // annonce du pigeon : affichée 2 fois plus longtemps
+        jouerSon("pigeon");
         // optionnel : on nettoie
         carteTroisPourTransfertPigeon = "";
         joueurTroisPourTransfertPigeon = null;
@@ -2964,6 +3165,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     vibrer([400, 100, 400]); // c'est lui (ou, en classique, le téléphone de la table) qui prend
 
+    jouerSon("culsec");
+
     // En classique, un seul téléphone pour tous : on précise qui prend le cul sec
     const titre = enLigneActif
       ? "TIENS DANS<br>TA GUEULE."
@@ -3477,6 +3680,7 @@ document.addEventListener("DOMContentLoaded", function () {
       // Le texte complet sert à calculer la durée d'affichage de l'overlay
       montrerOverlayRegle(`CARTE DORÉE\n${texteCarteDoree}`, carteTiree);
       vibrer([150, 70, 150, 70, 300]);
+      jouerSon("doree");
       habillerOverlayCarteDoree(texteCarteDoree);
       reglerDureeOverlayRegle(`CARTE DORÉE\n${texteCarteDoree}`, 1.65); // +65 % de temps de lecture
       executerApresOverlayRegleUnique(() => afficherOverlayCarteDoree(joueurActuel));
@@ -3586,6 +3790,7 @@ document.addEventListener("DOMContentLoaded", function () {
           }
         );
         reglerDureeOverlayRegle(msgPigeon, DUREE_ANNONCE_PIGEON); // annonce du pigeon : affichée 2 fois plus longtemps
+        jouerSon("pigeon");
       
       } else if(indexPigeon===joueurActuel){
         carteTroisPourTransfertPigeon = carteTiree;
@@ -3699,6 +3904,7 @@ document.addEventListener("DOMContentLoaded", function () {
           carte.classList.remove("dos_dore");
         }
         carte.classList.add(carteTiree, "retournee");
+        if(!estCaseDoree) jouerSon("carte");
 
         const joueurActuel = indexJoueur % joueurs.length;
         appliquerRegle(carteTiree, joueurActuel, carte);

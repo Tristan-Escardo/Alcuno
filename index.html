@@ -59,6 +59,23 @@
             <div class="reglages-contenu">
                 <h2>Réglages</h2>
 
+                <div class="blocReglage">
+                    <label class="optionReglage" for="optionSons">
+                        <span class="optionTexte">
+                            <span class="optionTitre">Sons</span>
+                            <span class="optionNote">Carte tirée, carte dorée, pigeon, ton tour en ligne. iPhone : le mode silencieux coupe les sons.</span>
+                        </span>
+                        <input type="checkbox" id="optionSons" checked>
+                        <span class="interrupteur" aria-hidden="true"></span>
+                    </label>
+                    <div class="ligneVolume" id="ligneVolume">
+                        <span class="volumeIcone" aria-hidden="true">🔈</span>
+                        <input type="range" id="volumeSons" min="0" max="100" step="5" value="70" aria-label="Volume des sons">
+                        <span class="volumeIcone" aria-hidden="true">🔊</span>
+                        <span class="volumeValeur" id="volumeValeur">70 %</span>
+                    </div>
+                </div>
+
                 <label class="optionReglage" for="optionVibrations">
                     <span class="optionTexte">
                         <span class="optionTitre">Vibrations</span>
@@ -77,6 +94,15 @@
                     <span class="interrupteur" aria-hidden="true"></span>
                 </label>
 
+                <label class="optionReglage" for="optionRappelEau">
+                    <span class="optionTexte">
+                        <span class="optionTitre">Rappel «&nbsp;Bois de l'eau&nbsp;💧&nbsp;»</span>
+                        <span class="optionNote">Toutes les 30 minutes de partie.</span>
+                    </span>
+                    <input type="checkbox" id="optionRappelEau" checked>
+                    <span class="interrupteur" aria-hidden="true"></span>
+                </label>
+
                 <label class="optionReglage" for="optionAccessibilite">
                     <span class="optionTexte">
                         <span class="optionTitre">Accessibilité pour les gens bourrés 🍻</span>
@@ -85,6 +111,22 @@
                     <input type="checkbox" id="optionAccessibilite">
                     <span class="interrupteur" aria-hidden="true"></span>
                 </label>
+
+                <!-- Partie en ligne dont ce téléphone se souvient (affiché seulement s'il y en a une) -->
+                <div class="optionReglage optionAction" id="lignePartieMemoire" style="display:none;">
+                    <span class="optionTexte">
+                        <span class="optionTitre">Partie en mémoire</span>
+                        <span class="optionNote" id="textePartieMemoire"></span>
+                    </span>
+                    <button type="button" id="btnOublierPartie">Oublier</button>
+                </div>
+
+                <div class="blocPartage">
+                    <div class="aProposTitre">Partager le jeu</div>
+                    <img src="icones/qr_alcuno.svg" alt="QR code du jeu Alcuno" class="qrJeu" width="180" height="180">
+                    <p class="lienJeu">tristan-escardo.github.io/Alcuno</p>
+                    <button type="button" id="btnPartagerJeu">📤 Partager le lien</button>
+                </div>
 
                 <div class="aPropos">
                     <div class="aProposTitre">À propos</div>
