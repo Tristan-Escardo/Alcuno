@@ -1,4 +1,25 @@
+// =============================================================================================
+// ALCUNO : tout le jeu est dans ce fichier, rangé en sections repliables
+// (VS Code : flèche dans la marge à côté de « #region », ou Ctrl+K Ctrl+0 pour tout replier).
+//
+//   Diagnostic : erreurs et avertissements récents
+//   Démarrage : mode de jeu, version du jeu
+//   Écran des créateurs (4 taps sur le titre)
+//   Réglages : thème, Mode PJ, sons, rappel d'eau, partage, diagnostic, partie en mémoire…
+//   Nouvelle version disponible et appli installable
+//   Mode en ligne : codes de partie, menus Créer / Rejoindre / Revenir, transitions, clavier
+//   Mode en ligne : salle d'attente, manches, présence, coupure réseau
+//   Mode en ligne : reconnexion, joueur retiré qui revient, quitter la partie
+//   Plateau, outils, joueurs, retirer un joueur en partie
+//   Overlays des règles : pigeon, annonces, annulations, carte dorée
+//   Duel
+//   Application des règles et déroulement du jeu
+//   Écran « Nouvelle partie »
+//   Mode en ligne : synchronisation des actions, rattrapage
+//   Bouton retour du téléphone et démarrage du jeu
+// =============================================================================================
 document.addEventListener("DOMContentLoaded", function () {
+  // #region Diagnostic : erreurs et avertissements récents
   // ===== Diagnostic : dernières erreurs et avertissements du jeu (dont Firebase) =====
   // Copiés avec le reste par « Copier le diagnostic » (Réglages > À propos)
   const erreursRecentes = [];
@@ -16,6 +37,9 @@ document.addEventListener("DOMContentLoaded", function () {
     };
   });
 
+  // #endregion
+
+  // #region Démarrage : mode de jeu, version du jeu
   // ================== MODE DE JEU (classique / en ligne) ==================
   // Le module Firebase s'exécute souvent AVANT ce code : l'événement "firebase-ready"
   // est alors déjà passé, on se fie donc à la présence de window.firebaseDB
@@ -90,6 +114,9 @@ document.addEventListener("DOMContentLoaded", function () {
   // À l'écran : seulement « 8.7 » (le dernier chiffre change à chaque mise en ligne, en coulisses)
   document.getElementById("versionJeu").innerText = "Alcuno — version " + VERSION_AFFICHEE.split(".").slice(0, 2).join(".");
 
+  // #endregion
+
+  // #region Écran des créateurs (4 taps sur le titre)
   // ===== Easter egg : 4 taps rapides sur le titre ALCUNO => écran des créateurs =====
   const ecranCredits = document.getElementById("ecranCredits");
   let tapsTitre = 0;
@@ -169,6 +196,9 @@ document.addEventListener("DOMContentLoaded", function () {
     setTimeout(() => fin(), 350); // sécurité : animations désactivées sur le téléphone
   }
 
+  // #endregion
+
+  // #region Réglages : thème, Mode PJ, sons, rappel d'eau, partage, diagnostic, partie en mémoire, vibrations, écran allumé
   // ===== Réglages (bouton en haut à droite de l'écran d'accueil, seulement là) =====
   // Chaque réglage est retenu sur le téléphone (stockage local du navigateur)
   const ecranReglages = document.getElementById("ecranReglages");
@@ -567,6 +597,9 @@ document.addEventListener("DOMContentLoaded", function () {
     if (document.visibilityState === "visible") verifierNouvelleVersion();
   });
 
+  // #endregion
+
+  // #region Nouvelle version disponible et appli installable
   // ===== Nouvelle version disponible =====
   // Une appli installée qu'on rouvre depuis les applis récentes reprend l'ancienne page sans la
   // recharger. On regarde donc si une version plus récente est en ligne (au retour dans l'appli,
@@ -664,6 +697,9 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("astuceIphone").hidden = false;
   }
 
+  // #endregion
+
+  // #region Mode en ligne : codes de partie, menus Créer / Rejoindre / Revenir, transitions, clavier
   // Easter egg : de temps en temps, le code de la partie est un de ces noms,
   // complété par des chiffres AVANT ou APRÈS (jamais au milieu) pour faire 5 caractères
   const CODES_EASTER_EGG = ["YLA", "CELIEN", "ROSA", "TRIS"];
@@ -1111,6 +1147,9 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
 
+  // #endregion
+
+  // #region Mode en ligne : salle d'attente, manches, présence, coupure réseau
   function ecouterSalleAttente(code){
     const db = window.firebaseDB;
     const refJoueurs = window.fbRef(db, `parties/${code}/joueurs`);
@@ -1377,6 +1416,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  // #endregion
+
+  // #region Mode en ligne : reconnexion, joueur retiré qui revient, quitter la partie
   // ===== Mémoire : ce téléphone se souvient de son pseudo dans la partie en cours =====
   // (stockage local du navigateur) : pour revenir, le code suffit, sans retaper son pseudo
   const CLE_PARTIE_LOCALE = "alcuno_partie_en_ligne";
@@ -1656,6 +1698,9 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("enLigneChoix").style.display = "";
   }
 
+  // #endregion
+
+  // #region Plateau, outils, joueurs, retirer un joueur en partie
   const plateau = document.getElementById("plateau");
   const joueurActif = document.getElementById("joueurActif");
   const listeJoueurs = document.getElementById("listeJoueurs");
@@ -2624,6 +2669,9 @@ document.addEventListener("DOMContentLoaded", function () {
     executerApresOverlayRegleUnique(afficherOverlayFinUnRestants);
   }
 
+  // #endregion
+
+  // #region Overlays des règles : pigeon, annonces, annulations, carte dorée
   /* ===== PIGEON OVERLAY ===== */
   function afficherOverlayFinUnRestants(){
     if(finUnOverlayAffiche) return;
@@ -3440,6 +3488,9 @@ document.addEventListener("DOMContentLoaded", function () {
     reglerDureeOverlayRegle("", null); // reste jusqu'au tap
   }
 
+  // #endregion
+
+  // #region Duel
   /* ===== DUEL : Choix joueurs puis tirage ===== */
   function lancerOverlayChoixDuel(joueurActuel){
     if(document.getElementById("overlayDuel")) return;
@@ -3892,6 +3943,9 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  // #endregion
+
+  // #region Application des règles et déroulement du jeu
   // ===== Annulations pour pénalités multi-joueurs (SOCIAL / ZERO) =====
   function demanderAnnulationSimple(joueurIndex, nbGorgees, onFinish){
     if(!joueurPeutAnnuler(joueurIndex, nbGorgees)){
@@ -4297,6 +4351,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   btnJouer.addEventListener("pointerdown", lancerPartie);
 
+  // #endregion
+
+  // #region Écran « Nouvelle partie »
   /* ===== ÉCRAN « NOUVELLE PARTIE » (classique et en ligne) ===== */
   const ecranNouvellePartie = document.getElementById("ecranNouvellePartie");
 
@@ -4409,6 +4466,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   btnSupprimer.style.display = "inline-block";
 
+  // #endregion
+
+  // #region Mode en ligne : synchronisation des actions, rattrapage
   /* ===== MODE EN LIGNE : synchronisation des actions ===== */
   // Un élément « de jeu » (carte, bouton d'overlay…) est déclaré via surAction :
   // - en classique, le tap exécute directement le handler ;
@@ -5023,6 +5083,9 @@ document.addEventListener("DOMContentLoaded", function () {
     toast._timer = setTimeout(() => toast.classList.remove("visible"), duree);
   }
 
+  // #endregion
+
+  // #region Bouton retour du téléphone et démarrage du jeu
   /* ===== BOUTON RETOUR DU TÉLÉPHONE (Android) ET DU NAVIGATEUR (Safari, PC) ===== */
   // Le téléphone ne prévient la page que si elle a ajouté des entrées dans l'historique.
   // On en garde quelques-unes d'avance, ajoutées pendant un tap (sinon Chrome les saute),
@@ -5140,4 +5203,5 @@ document.addEventListener("DOMContentLoaded", function () {
   window.addEventListener("resize", () => {
     centrerDerniereLigne();
   });
+  // #endregion
 });
