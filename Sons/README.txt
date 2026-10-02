@@ -5,7 +5,7 @@ Un fichier MP3 par moment du jeu, avec exactement ces noms :
 
   cartes.mp3   une carte est retournée sur le plateau
   doree.mp3    quelqu'un tire la carte dorée (coupé à 3 secondes par le jeu)
-  pigeon.mp3   quelqu'un devient pigeon (premier pigeon ou nouveau pigeon)
+  pigeon.mp3   quelqu'un devient pigeon (premier pigeon ou nouveau pigeon ; coupé à 2 secondes par le jeu)
   tour.mp3     en ligne, c'est ton tour (aussi le son d'essai du curseur de volume)
   eau.mp3      rappel « Bois de l'eau »
   sons_on.mp3  on active les sons dans les réglages
@@ -17,4 +17,4 @@ Pas de son pour le cul sec de la carte dorée (« TIENS DANS TA GUEULE »).
 - Pour changer un son : remplace le fichier en gardant le même nom, puis commit + push.
 - Des sons courts et pas trop lourds (moins de 200 Ko si possible).
 - Le curseur de volume des réglages s'applique à tous ces sons.
-- Pour couper un son plus tôt : DUREE_MAX_SONS dans script.js (ex. { doree: 3 }).
+- Pour couper un son plus tôt : DUREE_MAX_SONS dans script.js (ex. { doree: 3, pigeon: 2 }).
