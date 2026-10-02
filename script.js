@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
   let prochainSeq = 1;
   let traitementEnCours = false;
   let timerTrou = null;
+  let generationFile = 0; // change à chaque remise à zéro de la file (nouvelle manche, resynchronisation)
   let idsUniquesUtilises = new Set(); // boutons « unique » déjà appliqués dans la manche (voir surAction)
 
   // Reconnexion en pleine manche : on rejoue toutes les actions déjà faites, en accéléré
@@ -66,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.5.13";
+  const VERSION_AFFICHEE = "8.5.14";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "Alcuno — version " + VERSION_AFFICHEE;
@@ -4186,16 +4187,58 @@ document.addEventListener("DOMContentLoaded", function () {
     const code = codePartieActuel;
     const manche = mancheCourante;
     const par = pseudoActuel;
+    const refSeq = window.fbRef(db, `parties/${code}/manches/${manche}/seq`);
 
-    return window.fbRunTransaction(window.fbRef(db, `parties/${code}/manches/${manche}/seq`), n => (n || 0) + 1)
+    // Deux téléphones qui envoient au même instant : Firebase refuse le 2e (« permission_denied »)
+    // au lieu de le faire réessayer. On réessaie nous-mêmes, un peu plus tard (3 fois au plus).
+    const reserverNumero = (essai) => window.fbRunTransaction(refSeq, n => (n || 0) + 1).catch((erreur) => {
+      if(essai >= 3 || code !== codePartieActuel || manche !== mancheCourante) throw erreur;
+      return new Promise(r => setTimeout(r, 60 + Math.random() * 180)).then(() => reserverNumero(essai + 1));
+    });
+
+    return reserverNumero(1)
       .then((res) => {
         const seq = res.snapshot.val();
         // Une seule écriture : l'action + la date de dernière activité
         return window.fbUpdate(window.fbRef(db, `parties/${code}`), {
           [`manches/${manche}/actions/${seq}`]: { id, par },
           activite: window.fbServerTimestamp()
+        }).catch((erreur) => {
+          actionRefusee(code, manche, seq);
+          throw erreur;
         });
       });
+  }
+
+  // Firebase montre tout de suite à ce téléphone sa propre action (avant l'accord du serveur) : le
+  // jeu réagit sans attendre. Si le serveur la refuse ensuite (réseau, serveur), les autres
+  // téléphones ne l'ont jamais reçue : ce téléphone ne doit pas la garder.
+  // - pas encore appliquée ici => on la retire de la file (elle est sautée partout pareil) ;
+  // - déjà appliquée ici => on rejoue toute la manche depuis le serveur (comme une reconnexion).
+  let dernierEtatManche = null; // état de la manche en cours (pour la rejouer)
+
+  function actionRefusee(code, manche, seq){
+    if(!enLigneActif || code !== codePartieActuel || manche !== mancheCourante) return;
+
+    const action = fileActions.get(seq);
+    if(seq > prochainSeq || (seq === prochainSeq && action && !traitementEnCours)){
+      fileActions.delete(seq);
+      traiterFile();
+      return;
+    }
+    if(seq === prochainSeq && action){
+      action.refusee = true; // en cours d'essai (« attendre ») : elle sera sautée
+      return;
+    }
+    resynchroniserManche();
+  }
+
+  function resynchroniserManche(){
+    if(!dernierEtatManche || !enLigneActif) return;
+    afficherToast("Connexion instable : remise à jour de la partie…", 3000);
+    repriseEnCours = true;
+    mancheCourante = null; // la même manche est redémarrée, puis rejouée depuis le serveur
+    demarrerMancheEnLigne(dernierEtatManche, { resynchro: true });
   }
 
   // Retrait en ligne : l'action garde le nombre de cartes restantes au moment de la demande.
@@ -4407,16 +4450,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const action = fileActions.get(prochainSeq);
     if(!action){
-      // Trou dans la numérotation (envoi interrompu) : on le saute au bout de 5 s
-      const plusLoin = Array.from(fileActions.keys()).some(k => k > prochainSeq);
+      // Trou dans la numérotation (envoi interrompu ou refusé par le serveur) : on le saute au
+      // bout de 5 s, dès qu'une action plus loin existe. Pendant un rattrapage, les numéros
+      // jusqu'à la fin du rattrapage ont tous été réservés : un trou est sauté même s'il est le dernier.
+      const plusLoin = Array.from(fileActions.keys()).some(k => k > prochainSeq) ||
+        (rattrapageEnCours && prochainSeq <= seqFinRattrapage);
       if(plusLoin && !timerTrou){
         const attendu = prochainSeq;
+        const generation = generationFile;
         timerTrou = setTimeout(() => {
           timerTrou = null;
+          if(generation !== generationFile) return;
           if(prochainSeq === attendu && !fileActions.has(attendu)){
             prochainSeq++;
-            traiterFile();
+            apresActionTraitee();
           }
+          // Toujours : si la file a avancé entre-temps jusqu'à un autre trou, il faut le
+          // repérer maintenant (sinon plus rien ne relance la vérification)
+          traiterFile();
         }, 5000);
       }
       return;
@@ -4424,12 +4475,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     traitementEnCours = true;
     const manche = mancheCourante;
+    const generation = generationFile;
     let attente = 0;
 
     const essayer = () => {
-      if(manche !== mancheCourante) return;
+      if(manche !== mancheCourante || generation !== generationFile) return;
 
-      const resultat = tenterAction(action);
+      // Action refusée par le serveur pendant qu'on attendait de pouvoir l'appliquer : sautée
+      const resultat = action.refusee ? "ignorer" : tenterAction(action);
       // On attend que l'overlay concerné soit affiché chez nous (max 30 s d'écran allumé)
       if(resultat === "attendre" && attente < 30000){
         const pas = rattrapageEnCours ? 20 : 120;
@@ -4441,14 +4494,7 @@ document.addEventListener("DOMContentLoaded", function () {
       fileActions.delete(prochainSeq);
       prochainSeq++;
       traitementEnCours = false;
-
-      if(rattrapageEnCours){
-        if(prochainSeq > seqFinRattrapage){
-          finirRattrapage();
-          setTimeout(verifierRetourDansManche, 0); // joueur retiré qui revient : il demande sa place
-        }
-        else majRattrapage();
-      }
+      apresActionTraitee();
 
       traiterFile();
     };
@@ -4456,7 +4502,24 @@ document.addEventListener("DOMContentLoaded", function () {
     essayer();
   }
 
+  // Diagnostic (console du navigateur / tests) : état de la file d'actions en ligne
+  window.__etatFileAlcuno = () => ({
+    prochainSeq, seqFinRattrapage, rattrapageEnCours, traitementEnCours,
+    trouEnAttente: !!timerTrou, actions: Array.from(fileActions.keys())
+  });
+
+  // Après chaque action traitée (ou trou sauté) : fin du rattrapage quand tout est rejoué
+  function apresActionTraitee(){
+    if(!rattrapageEnCours) return;
+    if(prochainSeq > seqFinRattrapage){
+      finirRattrapage();
+      setTimeout(verifierRetourDansManche, 0); // joueur retiré qui revient : il demande sa place
+    }
+    else majRattrapage();
+  }
+
   function reinitialiserFileActions(){
+    generationFile++; // une action de l'ancienne file encore en attente s'arrête
     fileActions = new Map();
     prochainSeq = 1;
     traitementEnCours = false;
@@ -4534,8 +4597,10 @@ document.addEventListener("DOMContentLoaded", function () {
     predictions = null;
   }
 
-  function demarrerMancheEnLigne(etat){
+  // options.resynchro : même manche rejouée depuis le serveur (voir resynchroniserManche)
+  function demarrerMancheEnLigne(etat, options = {}){
     const etaitEnJeu = enLigneActif;
+    dernierEtatManche = etat;
     enLigneActif = true;
     mancheCourante = etat.manche;
     hotePartie = etat.hote;
@@ -4556,7 +4621,7 @@ document.addEventListener("DOMContentLoaded", function () {
     lancerPartie();
 
     // Manche relancée pendant une partie (« Rejouer ») et pas depuis la salle d'attente
-    if(etaitEnJeu) annoncerNouvellePartie();
+    if(etaitEnJeu && !options.resynchro) annoncerNouvellePartie();
 
     document.body.classList.add("mode-en-ligne");
     fermerEcranNouvellePartie();
