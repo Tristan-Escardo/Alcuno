@@ -1,4 +1,21 @@
 document.addEventListener("DOMContentLoaded", function () {
+  // ===== Diagnostic : dernières erreurs et avertissements du jeu (dont Firebase) =====
+  // Copiés avec le reste par « Copier le diagnostic » (Réglages > À propos)
+  const erreursRecentes = [];
+  function noterErreur(texte){
+    erreursRecentes.push(`${new Date().toLocaleTimeString("fr-FR")} ${String(texte).slice(0, 220)}`);
+    if (erreursRecentes.length > 25) erreursRecentes.shift();
+  }
+  window.addEventListener("error", (e) => noterErreur(`${e.message} (ligne ${e.lineno})`));
+  window.addEventListener("unhandledrejection", (e) => noterErreur(`promesse : ${e.reason && (e.reason.message || e.reason)}`));
+  ["warn", "error"].forEach((type) => {
+    const original = console[type].bind(console);
+    console[type] = (...args) => {
+      try { noterErreur(`${type} : ${args.map(a => (a && a.message) ? a.message : String(a)).join(" ")}`); } catch (e) {}
+      original(...args);
+    };
+  });
+
   // ================== MODE DE JEU (classique / en ligne) ==================
   // Le module Firebase s'exécute souvent AVANT ce code : l'événement "firebase-ready"
   // est alors déjà passé, on se fie donc à la présence de window.firebaseDB
@@ -67,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.6.8";
+  const VERSION_AFFICHEE = "8.6.9";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "Alcuno — version " + VERSION_AFFICHEE;
@@ -396,6 +413,42 @@ document.addEventListener("DOMContentLoaded", function () {
     const copie = navigator.clipboard ? navigator.clipboard.writeText(ADRESSE_JEU) : Promise.reject();
     copie.then(() => afficherToast("Lien copié !"))
       .catch(() => prompt("Copie le lien du jeu :", ADRESSE_JEU));
+  });
+
+  // ===== Diagnostic : tout ce qu'il faut pour comprendre un plantage en ligne, copié en un tap =====
+  function texteDiagnostic(){
+    const etat = window.__etatFileAlcuno ? window.__etatFileAlcuno() : {};
+    const journal = etat.journal || [];
+    delete etat.journal;
+    return [
+      "=== Diagnostic Alcuno ===",
+      `Version ${VERSION_AFFICHEE} | ${new Date().toLocaleString("fr-FR")}`,
+      `Téléphone : ${navigator.userAgent}`,
+      `Réseau : ${navigator.onLine ? "en ligne" : "hors connexion"} | Firebase chargé : ${!!window.firebaseDB}`,
+      `Partie : ${codePartieActuel || "aucune"} | pseudo : ${pseudoActuel || "-"} | manche : ${mancheCourante === null ? "-" : mancheCourante}` +
+        ` | partie en mémoire : ${JSON.stringify(lirePartieLocale())}`,
+      `File d'actions : ${JSON.stringify(etat)}`,
+      "--- Journal des actions en ligne ---",
+      ...(journal.length ? journal : ["(vide)"]),
+      "--- Erreurs récentes ---",
+      ...(erreursRecentes.length ? erreursRecentes : ["aucune"])
+    ].join("\n");
+  }
+
+  document.getElementById("btnDiagnostic").addEventListener("click", () => {
+    const texte = texteDiagnostic();
+    const copie = (navigator.clipboard && navigator.clipboard.writeText)
+      ? navigator.clipboard.writeText(texte)
+      : Promise.reject(new Error("presse-papiers indisponible"));
+    copie.then(() => afficherToast("Diagnostic copié : colle-le dans ton message", 3000))
+      .catch(() => {
+        // Pas de presse-papiers : bouton « Partager » du téléphone, sinon le texte dans une fenêtre
+        if (navigator.share) {
+          navigator.share({ title: "Diagnostic Alcuno", text: texte }).catch(() => {});
+        } else {
+          prompt("Copie ce texte :", texte);
+        }
+      });
   });
 
   // ===== Partie en mémoire : la partie en ligne dont ce téléphone se souvient (« Revenir ») =====
@@ -1481,6 +1534,11 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function quitterPartieEnLigne(){
+    // Diagnostic : où en était la partie au moment de la quitter (le journal est gardé après)
+    if (codePartieActuel) {
+      noterJournal(`partie ${codePartieActuel} quittée (manche ${mancheCourante}, prochaine action ${prochainSeq}, ` +
+        `${fileActions.size} en file, ${traitementEnCours ? "une action en attente" : "rien en attente"})`);
+    }
     if (desabonnerJoueurs) { desabonnerJoueurs(); desabonnerJoueurs = null; }
     if (desabonnerEtat) { desabonnerEtat(); desabonnerEtat = null; }
     libererEcran();
@@ -4045,11 +4103,15 @@ document.addEventListener("DOMContentLoaded", function () {
         // après les overlays éventuels. La dernière carte n'est jamais jouée : elle sert au pari.
         if(cartesRestantes() === 1 && !predictionEnCours){
           const startIdx = nextPlayerIndex(joueurActuel);
+          const generation = generationPartie;
           executerApresOverlayRegleUnique(() => {
-            // Si un duel/pigeon est en cours, on attend que ça finisse avant d'afficher
+            // Si un duel/pigeon est en cours, on attend que ça finisse avant d'afficher.
+            // (Minuteur et pas requestAnimationFrame : celui-ci s'arrête quand l'écran est éteint ou
+            // l'appli en arrière-plan, et le pari ne s'affichait alors qu'au retour sur l'appli)
             const attendre = () => {
+              if(generation !== generationPartie) return; // partie relancée entre-temps
               if(choixPigeonEnCours || duelEnCours){
-                requestAnimationFrame(attendre);
+                setTimeout(attendre, 100);
                 return;
               }
               lancerOverlayPrediction(startIdx);

@@ -78,10 +78,16 @@ const A_PRECHARGER = [
   "./Cartes/zero_vert.webp",
 ];
 
+// Sons (dossier Sons/) : copiés aussi, pour en avoir hors connexion. Un par un et sans bloquer :
+// un fichier absent (son pas encore ajouté) n'empêche pas l'installation du reste.
+const SONS_A_PRECHARGER = ["cartes", "doree", "pigeon", "tour", "eau", "sons_on", "credits"]
+  .map((nom) => `./Sons/${nom}.mp3`);
+
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE)
-      .then((cache) => cache.addAll(A_PRECHARGER))
+      .then((cache) => cache.addAll(A_PRECHARGER)
+        .then(() => Promise.all(SONS_A_PRECHARGER.map((son) => cache.add(son).catch(() => {})))))
       .then(() => self.skipWaiting())
   );
 });

@@ -3572,3 +3572,28 @@ html.accessibilite #enLigne .infoModeSoft{
 @media (prefers-reduced-motion: reduce){
   .page-entree, .page-sortie{ animation-duration: 0.01s; }
 }
+
+/* ===== Réglages > À propos : « Copier le diagnostic » (discret) ===== */
+#ecranReglages .btnDiagnostic{
+  margin-top: 12px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.75);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 999px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#ecranReglages .noteDiagnostic{
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: rgba(255,255,255,0.45);
+}
+
+html.accessibilite #ecranReglages .btnDiagnostic,
+html.accessibilite #ecranReglages .noteDiagnostic{
+  zoom: 1.2;
+}
