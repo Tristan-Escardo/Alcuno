@@ -3573,18 +3573,24 @@ html.accessibilite #enLigne .infoModeSoft{
   .page-entree, .page-sortie{ animation-duration: 0.01s; }
 }
 
-/* ===== Réglages : « Copier le diagnostic », simple petit texte gris (avant « À propos ») ===== */
+/* ===== Réglages : « Copier le diagnostic », texte souligné (avant « À propos ») ===== */
 #ecranReglages .btnDiagnostic{
   align-self: center;
   margin: 14px 0 0;
-  padding: 4px 8px;
-  font-size: 12px;
-  font-weight: 600;
-  color: rgba(255,255,255,0.35);
+  padding: 6px 10px;
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.65);
+  text-decoration: underline;
+  text-underline-offset: 3px;
   background: none;
   border: none;
   cursor: pointer;
   touch-action: manipulation;
+}
+
+#ecranReglages .btnDiagnostic:active{
+  color: #FFD700;
 }
 
 html.accessibilite #ecranReglages .btnDiagnostic{
