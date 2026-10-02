@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.6.4";
+  const VERSION_AFFICHEE = "8.6.5";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "Alcuno — version " + VERSION_AFFICHEE;
@@ -312,7 +312,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Retournement d'une vraie carte : « fwip » (l'air, qui monte), « tic » (le bord de la carte),
-  // puis « tap » (la carte retombe à plat sur la table, avec un petit coup sourd). Légères variations
+  // puis « tap » (la carte retombe à plat sur la table ; que du bruit, aucune note). Légères variations
   // à chaque fois : deux retournements ne sonnent jamais exactement pareil.
   function sonRetournementCarte(ctx, sortie, t){
     const v = 0.9 + Math.random() * 0.2;
@@ -320,7 +320,6 @@ document.addEventListener("DOMContentLoaded", function () {
     bruitSon(ctx, sortie, t, { duree: 0.085, vol: 0.4, type: "bandpass", de: 1200 * v, a: 4800 * v, q: 1.4, attaque: 0.025 });
     bruitSon(ctx, sortie, t + 0.06 + decale, { duree: 0.018, vol: 0.3, type: "highpass", de: 3000 * v, attaque: 0.001 });
     bruitSon(ctx, sortie, t + 0.085 + decale, { duree: 0.045, vol: 0.85, type: "lowpass", de: 1800 * v, attaque: 0.001 });
-    noteSon(ctx, sortie, t + 0.085 + decale, { freq: 170 * v, duree: 0.06, vol: 0.22, vers: 85 * v });
   }
 
   // carte | doree | culsec | pigeon | tour | eau
