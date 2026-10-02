@@ -3613,3 +3613,45 @@ html.accessibilite #ecranReglages .aPropos{
 #enLigne > div{
   margin-block: auto; /* centré quand il y a la place, défilable sinon */
 }
+
+/* ===== Transitions entre les pages (comme Réglages) : en avançant, la page arrive en glissant
+   depuis la droite ; avec « ← Retour » ou ⌂ (classe nav-retour posée par script.js), depuis la
+   gauche. Accueil, mode en ligne (Créer / Rejoindre / Revenir / salle), « Nouvelle partie »,
+   page du mode classique. Les petites fenêtres de confirmation gardent leur simple fondu. ===== */
+/* (mode en ligne : on anime le contenu de chaque écran, pas l'écran lui-même : sinon le bouton
+   « ← Retour », placé par rapport à l'écran, se décalait par-dessus le champ) */
+#choixMode > *,
+#enLigne > div > *,
+#ecranNouvellePartie > *{
+  animation: pageEntree 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+#enLigne > div{
+  animation: none;
+}
+
+html.nav-retour #choixMode > *,
+html.nav-retour #enLigne > div > *,
+html.nav-retour #ecranNouvellePartie > *{
+  animation-name: pageEntreeRetour;
+}
+
+html.nav-retour .page-entree{
+  animation-name: pageEntreeRetour;
+}
+
+@keyframes pageEntreeRetour{
+  from { opacity: 0; transform: translateX(-32px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  #choixMode > *, #enLigne > div > *, #ecranNouvellePartie > *{ animation-duration: 0.01s; }
+}
+
+/* Clavier ouvert (classe posée par script.js) : le contenu du mode en ligne se cale juste
+   au-dessus du clavier, au lieu d'être centré (il remontait trop haut) */
+html.clavier-ouvert #enLigne > div{
+  margin-top: auto;
+  margin-bottom: 16px;
+}

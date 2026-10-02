@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.7.9";
+  const VERSION_AFFICHEE = "8.7.10";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   // À l'écran : seulement « 8.7 » (le dernier chiffre change à chaque mise en ligne, en coulisses)
@@ -710,10 +710,34 @@ document.addEventListener("DOMContentLoaded", function () {
       const zone = window.visualViewport;
       document.documentElement.style.setProperty("--hauteur-visible", `${zone.height}px`);
       document.documentElement.style.setProperty("--haut-visible", `${zone.offsetTop}px`);
+      // Clavier ouvert (zone visible nettement plus petite que l'écran) : contenu calé au-dessus du clavier
+      document.documentElement.classList.toggle("clavier-ouvert", zone.height < window.innerHeight * 0.8);
     };
     window.visualViewport.addEventListener("resize", majZoneVisible);
     window.visualViewport.addEventListener("scroll", majZoneVisible);
     majZoneVisible();
+  }
+
+  // Transitions entre les pages : « ← Retour » et ⌂ => la page suivante arrive depuis la gauche
+  // (classe nav-retour, voir le CSS) ; sinon elle arrive depuis la droite
+  let minuteurNavRetour = null;
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest || !e.target.closest(".btnRetour, .btnAccueilTexte")) return;
+    document.documentElement.classList.add("nav-retour");
+    clearTimeout(minuteurNavRetour);
+    minuteurNavRetour = setTimeout(() => document.documentElement.classList.remove("nav-retour"), 400);
+  }, true);
+
+  // Animation d'arrivée d'un élément déjà affiché (ex. la page du mode classique)
+  function animerArrivee(el){
+    el.classList.remove("page-entree");
+    void el.offsetWidth;
+    el.classList.add("page-entree");
+    el.addEventListener("animationend", function fin(e){
+      if (e.target !== el) return;
+      el.removeEventListener("animationend", fin);
+      el.classList.remove("page-entree");
+    });
   }
 
   // Ouvre le clavier sur un champ. À appeler pendant le tap sur le bouton qui affiche le champ :
@@ -728,6 +752,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("menu").style.display = "";
     document.getElementById("messages").style.display = "";
     document.getElementById("jeu").style.display = "";
+    ["menu", "messages", "jeu"].forEach((id) => animerArrivee(document.getElementById(id)));
     ouvrirClavier(document.getElementById("nomJoueur")); // clavier ouvert pour ajouter les joueurs
   });
 
