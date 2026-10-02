@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.6.7";
+  const VERSION_AFFICHEE = "8.6.8";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "Alcuno — version " + VERSION_AFFICHEE;
@@ -87,6 +87,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (tapsTitre >= 4) {
       tapsTitre = 0;
       ecranCredits.scrollTop = 0;
+      jouerSon("credits");
       ouvrirPage(ecranCredits);
     }
   }));
@@ -247,7 +248,7 @@ document.addEventListener("DOMContentLoaded", function () {
   caseSons.addEventListener("change", () => {
     ecrireReglage(CLE_SONS, caseSons.checked);
     majLigneVolume();
-    if (caseSons.checked) jouerSon("tour"); // petit retour pour montrer que ça marche
+    if (caseSons.checked) jouerSon("sons_on"); // petit retour pour montrer que ça marche
   });
 
   curseurVolume.addEventListener("input", () => {
@@ -274,14 +275,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Fichiers des sons : dossier Sons/, un MP3 par moment du jeu. Pour changer un son, il suffit de
   // remplacer le fichier (même nom). Fichier absent => pas de son à ce moment-là.
-  //   carte.mp3  : une carte est retournée sur le plateau
-  //   doree.mp3  : quelqu'un tire la carte dorée
-  //   culsec.mp3 : tu prends le cul sec de la carte dorée (« TIENS DANS TA GUEULE »)
-  //   pigeon.mp3 : quelqu'un devient pigeon (premier pigeon ou nouveau pigeon)
-  //   tour.mp3   : en ligne, c'est ton tour (aussi le son d'essai des réglages)
-  //   eau.mp3    : rappel « Bois de l'eau »
-  const SONS = ["carte", "doree", "culsec", "pigeon", "tour", "eau"];
+  //   cartes.mp3  : une carte est retournée sur le plateau
+  //   doree.mp3   : quelqu'un tire la carte dorée (coupé à 3 s, voir DUREE_MAX_SONS)
+  //   pigeon.mp3  : quelqu'un devient pigeon (premier pigeon ou nouveau pigeon)
+  //   tour.mp3    : en ligne, c'est ton tour (aussi le son d'essai du curseur de volume)
+  //   eau.mp3     : rappel « Bois de l'eau »
+  //   sons_on.mp3 : on active les sons dans les réglages
+  //   credits.mp3 : 4 taps sur le titre ALCUNO (écran des créateurs)
+  // (pas de son pour le cul sec de la carte dorée)
+  const SONS = ["cartes", "doree", "pigeon", "tour", "eau", "sons_on", "credits"];
+  // Sons coupés au bout de N secondes (avec un petit fondu), même si le fichier est plus long
+  const DUREE_MAX_SONS = { doree: 3 };
   const sonsCharges = {}; // nom -> son décodé (ou null si le fichier n'existe pas)
+  const sonsDemandes = {}; // nom -> moment où il a été demandé alors qu'il n'était pas encore chargé
   let chargementSonsLance = false;
 
   function chargerSons(){
@@ -295,7 +301,12 @@ document.addEventListener("DOMContentLoaded", function () {
           return reponse.arrayBuffer();
         })
         .then((donnees) => new Promise((ok, ko) => ctx.decodeAudioData(donnees, ok, ko)))
-        .then((son) => { sonsCharges[nom] = son; })
+        .then((son) => {
+          sonsCharges[nom] = son;
+          // Demandé juste avant d'être chargé (tout premier tap) : joué maintenant, si c'était il y a < 1,5 s
+          if (sonsDemandes[nom] && Date.now() - sonsDemandes[nom] < 1500) lireSon(nom, son);
+          delete sonsDemandes[nom];
+        })
         .catch(() => { sonsCharges[nom] = null; });
     });
   }
@@ -308,15 +319,30 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!ctx) return;
     chargerSons();
     const son = sonsCharges[nom];
-    if (!son) return; // pas encore chargé, ou pas de fichier pour ce moment
+    if (son === undefined) sonsDemandes[nom] = Date.now(); // pas encore chargé : joué dès qu'il arrive
+    if (!son) return; // (null : pas de fichier pour ce moment)
+    lireSon(nom, son);
+  }
 
+  function lireSon(nom, son){
+    const ctx = contexteAudio();
+    if (!ctx || !caseSons.checked || rattrapageEnCours) return;
     const sortie = ctx.createGain();
-    sortie.gain.value = Math.pow(volumeSons / 100, 2); // curseur plus naturel à l'oreille
+    const volume = Math.pow(volumeSons / 100, 2); // curseur plus naturel à l'oreille
+    sortie.gain.value = volume;
     sortie.connect(ctx.destination);
     const lecture = ctx.createBufferSource();
     lecture.buffer = son;
     lecture.connect(sortie);
-    lecture.start();
+    const debut = ctx.currentTime;
+    lecture.start(debut);
+
+    const dureeMax = DUREE_MAX_SONS[nom];
+    if (dureeMax && son.duration > dureeMax) {
+      sortie.gain.setValueAtTime(volume, debut + dureeMax - 0.3);
+      sortie.gain.linearRampToValueAtTime(0.0001, debut + dureeMax);
+      lecture.stop(debut + dureeMax + 0.02);
+    }
   }
 
   // ===== Rappel « Bois de l'eau 💧 » : toutes les 30 minutes de partie (désactivé par défaut) =====
@@ -3254,7 +3280,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     vibrer([400, 100, 400]); // c'est lui (ou, en classique, le téléphone de la table) qui prend
 
-    jouerSon("culsec");
 
     // En classique, un seul téléphone pour tous : on précise qui prend le cul sec
     const titre = enLigneActif
@@ -4011,7 +4036,7 @@ document.addEventListener("DOMContentLoaded", function () {
           carte.classList.remove("dos_dore");
         }
         carte.classList.add(carteTiree, "retournee");
-        if(!estCaseDoree) jouerSon("carte");
+        if(!estCaseDoree) jouerSon("cartes");
 
         const joueurActuel = indexJoueur % joueurs.length;
         appliquerRegle(carteTiree, joueurActuel, carte);
