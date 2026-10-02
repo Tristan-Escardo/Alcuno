@@ -7,6 +7,8 @@
          Un paramètre différent à chaque chargement force toujours la dernière version. -->
     <script>
         window.ANTI_CACHE = Date.now();
+        // Thème choisi dans les réglages : appliqué tout de suite (pas de flash de bordeaux au chargement)
+        try { var theme = localStorage.getItem("alcuno_theme"); if (theme) document.documentElement.dataset.theme = theme; } catch (e) {}
         document.write('<link rel="stylesheet" href="style_alcuno.css?t=' + window.ANTI_CACHE + '" />');
     </script>
     <title>Alcuno</title>
@@ -103,6 +105,22 @@
                     <input type="checkbox" id="optionAccessibilite">
                     <span class="interrupteur" aria-hidden="true"></span>
                 </label>
+
+                <div class="blocReglage">
+                    <div class="optionReglage optionAction">
+                        <span class="optionTexte">
+                            <span class="optionTitre">Thème</span>
+                            <span class="optionNote">Couleur du fond du jeu.</span>
+                        </span>
+                    </div>
+                    <div class="pastillesTheme" role="group" aria-label="Thème">
+                        <button type="button" class="pastilleTheme" data-theme="bordeaux"><span class="rond" style="background:#2b001d"></span>Bordeaux</button>
+                        <button type="button" class="pastilleTheme" data-theme="noir"><span class="rond" style="background:#0e0e12"></span>Noir</button>
+                        <button type="button" class="pastilleTheme" data-theme="vert"><span class="rond" style="background:#08301e"></span>Casino</button>
+                        <button type="button" class="pastilleTheme" data-theme="bleu"><span class="rond" style="background:#0a1634"></span>Nuit</button>
+                        <button type="button" class="pastilleTheme" data-theme="violet"><span class="rond" style="background:#240e3a"></span>Violet</button>
+                    </div>
+                </div>
 
                 <label class="optionReglage" for="optionModeSoft">
                     <span class="optionTexte">

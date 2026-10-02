@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.7.13";
+  const VERSION_AFFICHEE = "8.7.14";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   // À l'écran : seulement « 8.7 » (le dernier chiffre change à chaque mise en ligne, en coulisses)
@@ -201,6 +201,32 @@ document.addEventListener("DOMContentLoaded", function () {
   caseAccessibilite.addEventListener("change", () => {
     ecrireReglage(CLE_ACCESSIBILITE, caseAccessibilite.checked);
     document.documentElement.classList.toggle("accessibilite", caseAccessibilite.checked);
+  });
+
+  // ===== Thème : couleur du fond du jeu (réglage de ce téléphone, purement visuel) =====
+  // (le thème est déjà posé au tout début du chargement par index.html : pas de flash de couleur)
+  const CLE_THEME = "alcuno_theme";
+  const THEMES = { bordeaux: "#2b001d", noir: "#0e0e12", vert: "#08301e", bleu: "#0a1634", violet: "#240e3a" };
+
+  function appliquerTheme(nom){
+    if (!THEMES[nom]) nom = "bordeaux";
+    document.documentElement.dataset.theme = nom;
+    const barre = document.querySelector('meta[name="theme-color"]'); // barre du téléphone en haut
+    if (barre) barre.setAttribute("content", THEMES[nom]);
+    document.querySelectorAll(".pastilleTheme").forEach((b) => {
+      b.setAttribute("aria-pressed", b.dataset.theme === nom ? "true" : "false");
+    });
+  }
+
+  let themeChoisi = "bordeaux";
+  try { themeChoisi = localStorage.getItem(CLE_THEME) || "bordeaux"; } catch (e) {}
+  appliquerTheme(themeChoisi);
+
+  document.querySelectorAll(".pastilleTheme").forEach((pastille) => {
+    pastille.addEventListener("click", () => {
+      appliquerTheme(pastille.dataset.theme);
+      try { localStorage.setItem(CLE_THEME, pastille.dataset.theme); } catch (e) {}
+    });
   });
 
   // ===== Mode PJ (appelé « soft » dans le code) : moins de gorgées =====

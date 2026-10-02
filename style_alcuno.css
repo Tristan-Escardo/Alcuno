@@ -2,7 +2,7 @@
 /* Anti scroll horizontal (iOS/Android) */
 
 body{
-  background-color: rgb(43, 0, 29);
+  background-color: var(--fond-theme);
   margin: 0;
   font-family: Arial, sans-serif;
   color: white;
@@ -324,7 +324,7 @@ button,
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: rgb(43, 0, 29);
+  background: var(--fond-theme);
 
   display: flex;
   flex-direction: column;
@@ -1686,7 +1686,7 @@ body.no-scroll{
 body{
   background:
     radial-gradient(circle at top center, rgba(255, 215, 0, 0.08) 0%, rgba(255, 215, 0, 0) 26%),
-    rgb(43, 0, 29);
+    var(--fond-theme);
 }
 
 header{
@@ -1821,7 +1821,7 @@ header h1{
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: rgb(43, 0, 29);
+  background: var(--fond-theme);
 
   display: flex;
   flex-direction: column;
@@ -2174,7 +2174,7 @@ header h1{
     radial-gradient(circle at 50% 18%, rgba(255,215,0,0.16), transparent 58%),
     radial-gradient(circle at 15% 85%, rgba(255,77,77,0.10), transparent 45%),
     radial-gradient(circle at 85% 85%, rgba(66,183,255,0.10), transparent 45%),
-    rgb(43, 0, 29);
+    var(--fond-theme);
 }
 
 #ecranCredits .credits-contenu{
@@ -2656,7 +2656,7 @@ header h1{
 }
 
 #choixMode #btnReglages circle{
-  fill: rgb(43, 0, 29);
+  fill: var(--fond-theme);
   stroke: #FFD700;
   stroke-width: 2.4;
 }
@@ -2685,7 +2685,7 @@ header h1{
   padding: 76px 16px calc(28px + env(safe-area-inset-bottom, 0px));
   box-sizing: border-box;
   color: #fff;
-  background: rgb(43, 0, 29);
+  background: var(--fond-theme);
 }
 
 #ecranReglages .reglages-contenu{
@@ -2798,7 +2798,7 @@ header h1{
 
 #ecranReglages .optionReglage input:checked + .interrupteur::after{
   transform: translateX(20px);
-  background: rgb(43, 0, 29);
+  background: var(--fond-theme);
 }
 
 #ecranReglages .optionReglage input:focus-visible + .interrupteur{
@@ -2981,7 +2981,7 @@ body.rattrapage [id^="overlay"] *{
   position: fixed;
   inset: 0;
   z-index: 30000;
-  background: rgb(43, 0, 29);
+  background: var(--fond-theme);
 
   display: flex;
   justify-content: center;
@@ -3047,7 +3047,7 @@ body.rattrapage [id^="overlay"] *{
   border: none;
   border-radius: 10px;
   background: #FFD700;
-  color: #2B001D;
+  color: var(--fond-theme);
   font-weight: 900;
   cursor: pointer;
 }
@@ -3315,7 +3315,7 @@ html.accessibilite #overlayPlus4 .plus4-joueur-btn{
   padding: 9px 16px;
   font-size: 14px;
   font-weight: 900;
-  color: rgb(43, 0, 29);
+  color: var(--fond-theme);
   background: #FFD700;
   border: none;
   border-radius: 999px;
@@ -3601,4 +3601,63 @@ html.clavier-ouvert #enLigne > div{
 
 #overlayPlus4 > :last-child{
   margin-bottom: auto;
+}
+
+
+/* ===== Thème : couleur du fond du jeu (Réglages > Thème, réglage de ce téléphone) =====
+   Tout le fond (jeu, menus, réglages…) utilise --fond-theme ; les cartes, le doré et les
+   écrans d'annonce noirs ne changent pas. */
+:root{ --fond-theme: rgb(43, 0, 29); }              /* Bordeaux (par défaut) */
+html[data-theme="noir"]{ --fond-theme: #0e0e12; }
+html[data-theme="vert"]{ --fond-theme: #08301e; }   /* vert casino */
+html[data-theme="bleu"]{ --fond-theme: #0a1634; }   /* bleu nuit */
+html[data-theme="violet"]{ --fond-theme: #240e3a; }
+
+/* Réglages : pastilles de couleur */
+#ecranReglages .pastillesTheme{
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 0 16px 14px;
+}
+
+#ecranReglages .pastilleTheme{
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+  font-size: 11px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.6);
+  background: none;
+  border: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#ecranReglages .pastilleTheme .rond{
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.25);
+  box-shadow: inset 0 0 0 3px rgba(0,0,0,0.25);
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+#ecranReglages .pastilleTheme[aria-pressed="true"]{
+  color: #FFD700;
+}
+
+#ecranReglages .pastilleTheme[aria-pressed="true"] .rond{
+  border-color: #FFD700;
+  box-shadow: 0 0 0 3px rgba(255,215,0,0.3), 0 0 14px rgba(255,215,0,0.35);
+  transform: scale(1.08);
+}
+
+html.accessibilite #ecranReglages .pastilleTheme{
+  font-size: 13px;
 }
