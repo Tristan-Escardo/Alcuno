@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.7.7";
+  const VERSION_AFFICHEE = "8.7.8";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   // À l'écran : seulement « 8.7 » (le dernier chiffre change à chaque mise en ligne, en coulisses)
@@ -443,7 +443,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const copie = (navigator.clipboard && navigator.clipboard.writeText)
       ? navigator.clipboard.writeText(texte)
       : Promise.reject(new Error("presse-papiers indisponible"));
-    copie.then(() => afficherToast("Diagnostic copié : colle-le dans ton message", 3000))
+    copie.then(() => afficherToast("Diagnostic copié", 3000))
       .catch(() => {
         // Pas de presse-papiers : bouton « Partager » du téléphone, sinon le texte dans une fenêtre
         if (navigator.share) {
@@ -693,14 +693,29 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
   validerAvecEntree(["pseudoCreateur"], "validerCreation");
-  validerAvecEntree(["codeRejoindre", "pseudoRejoindre"], "validerRejoindre");
+  validerAvecEntree(["pseudoRejoindre"], "validerRejoindre");
   validerAvecEntree(["codeRevenir"], "validerRevenir");
+  // Rejoindre : Entrée sur le code => on passe au pseudo s'il est vide (sinon on valide)
+  document.getElementById("codeRejoindre").addEventListener("keydown", (e) => {
+    if (e.key !== "Enter") return;
+    const champPseudo = document.getElementById("pseudoRejoindre");
+    if (!champPseudo.value.trim()) ouvrirClavier(champPseudo);
+    else document.getElementById("validerRejoindre").click();
+  });
+
+  // Ouvre le clavier sur un champ. À appeler pendant le tap sur le bouton qui affiche le champ :
+  // sinon l'iPhone refuse d'ouvrir le clavier tout seul.
+  function ouvrirClavier(champ){
+    if (!champ) return;
+    try { champ.focus({ preventScroll: true }); } catch (e) { champ.focus(); }
+  }
 
   document.getElementById("btnModeClassique").addEventListener("click", () => {
     document.getElementById("choixMode").style.display = "none";
     document.getElementById("menu").style.display = "";
     document.getElementById("messages").style.display = "";
     document.getElementById("jeu").style.display = "";
+    ouvrirClavier(document.getElementById("nomJoueur")); // clavier ouvert pour ajouter les joueurs
   });
 
   // Connexion à Firebase ouverte à l'avance (dès « Mode en ligne », ou au chargement si une partie
@@ -739,11 +754,14 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("btnCreerPartie").addEventListener("click", () => {
     document.getElementById("enLigneChoix").style.display = "none";
     document.getElementById("enLigneCreer").style.display = "";
+    ouvrirClavier(document.getElementById("pseudoCreateur"));
   });
 
   document.getElementById("btnRejoindrePartie").addEventListener("click", () => {
     document.getElementById("enLigneChoix").style.display = "none";
     document.getElementById("enLigneRejoindre").style.display = "";
+    const champCode = document.getElementById("codeRejoindre");
+    ouvrirClavier(champCode.value.trim() ? document.getElementById("pseudoRejoindre") : champCode);
   });
 
   // ===== « Revenir dans une partie » : reconnexion avec le code seulement =====
@@ -798,6 +816,8 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("codeRevenir").value = (memoire && memoire.code) || "";
     document.getElementById("enLigneChoix").style.display = "none";
     document.getElementById("enLigneRevenir").style.display = "";
+    // Code déjà rempli (partie en mémoire) : pas besoin du clavier, il suffit de taper « Revenir »
+    if (!document.getElementById("codeRevenir").value) ouvrirClavier(document.getElementById("codeRevenir"));
   });
 
   document.getElementById("btnRetourRevenir").addEventListener("click", () => {
@@ -2324,7 +2344,11 @@ document.addEventListener("DOMContentLoaded", function () {
 }
 
 
-  btnAjouter.addEventListener("pointerdown", ajouterJoueur);
+  btnAjouter.addEventListener("pointerdown", (e) => {
+    // Clavier ouvert : il reste ouvert pour le joueur suivant (sinon le champ perd le focus à chaque ajout)
+    if (document.activeElement === nomJoueurInput) e.preventDefault();
+    ajouterJoueur();
+  });
   nomJoueurInput.addEventListener("keydown", e=>{ if(e.key==="Enter") ajouterJoueur(); });
 
   const titreSuppression = suppression.querySelector("h2");
@@ -4268,6 +4292,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     nettoyerOverlays();
     retourMenu();
+    ouvrirClavier(nomJoueurInput); // « Modifier les joueurs » : clavier prêt pour en ajouter
   });
 
   function allerAccueil(){

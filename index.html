@@ -162,20 +162,20 @@
             <div id="enLigneRevenir" style="display:none;">
                 <button type="button" id="btnRetourRevenir" class="btnRetour">← Retour</button>
                 <p class="aideEnLigne">Tu as été déconnecté ?<br>Entre le code de la partie : tu reprendras ta place.</p>
-                <input type="text" id="codeRevenir" placeholder="Code de la partie" maxlength="6" />
+                <input type="text" id="codeRevenir" placeholder="Code de la partie" maxlength="6" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="go" />
                 <button type="button" id="validerRevenir">Revenir</button>
             </div>
 
             <div id="enLigneCreer" style="display:none;">
                 <button type="button" id="btnRetourCreer" class="btnRetour">← Retour</button>
-                <input type="text" id="pseudoCreateur" placeholder="Ton pseudo" maxlength="20" />
+                <input type="text" id="pseudoCreateur" placeholder="Ton pseudo" maxlength="20" autocomplete="off" enterkeyhint="go" />
                 <button type="button" id="validerCreation">Créer</button>
             </div>
 
             <div id="enLigneRejoindre" style="display:none;">
                 <button type="button" id="btnRetourRejoindre" class="btnRetour">← Retour</button>
-                <input type="text" id="codeRejoindre" placeholder="Code de la partie" maxlength="6" />
-                <input type="text" id="pseudoRejoindre" placeholder="Ton pseudo" maxlength="20" />
+                <input type="text" id="codeRejoindre" placeholder="Code de la partie" maxlength="6" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="next" />
+                <input type="text" id="pseudoRejoindre" placeholder="Ton pseudo" maxlength="20" autocomplete="off" enterkeyhint="go" />
                 <button type="button" id="validerRejoindre">Rejoindre</button>
             </div>
 
@@ -221,7 +221,7 @@
         </section>
 
         <section class="menu" id="menu" style="display:none;">
-            <input type="text" id="nomJoueur" placeholder="Entrez un nom de joueur" />
+            <input type="text" id="nomJoueur" placeholder="Entrez un nom de joueur" autocomplete="off" enterkeyhint="done" />
             <button type="button" id="ajouterJoueur">Ajouter un joueur</button>
             <button type="button" id="jouer" style="display:none;">Jouer</button>
             <button type="button" id="supprimerJoueur">Supprimer un joueur</button>
