@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.7.2";
+  const VERSION_AFFICHEE = "8.7.3";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "Alcuno — version " + VERSION_AFFICHEE;
@@ -300,8 +300,9 @@ document.addEventListener("DOMContentLoaded", function () {
   //   sons_on.mp3 : on active les sons dans les réglages
   //   credits.mp3 : 4 taps sur le titre ALCUNO (écran des créateurs)
   //   reglage_son.mp3 : on lâche le curseur de volume dans les réglages (pour entendre le volume)
+  //   no_wifi.mp3 : en ligne, coupure de réseau (une fois, quand le logo wifi barré apparaît)
   // (pas de son pour le cul sec de la carte dorée)
-  const SONS = ["cartes", "doree", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son"];
+  const SONS = ["cartes", "doree", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi"];
   // Sons coupés au bout de N secondes (avec un petit fondu), même si le fichier est plus long
   const DUREE_MAX_SONS = { doree: 3, pigeon: 2 };
   const sonsCharges = {}; // nom -> son décodé (ou null si le fichier n'existe pas)
@@ -1263,6 +1264,7 @@ document.addEventListener("DOMContentLoaded", function () {
       timerCoupure = null;
       if (!logo.isConnected) return;
       logo.classList.add("visible");
+      jouerSon("no_wifi"); // une seule fois par coupure (quand le logo apparaît), pas en boucle
       logo.innerHTML =
         '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" aria-hidden="true">' +
           '<g stroke="#ff2a2a" stroke-width="2.2">' +

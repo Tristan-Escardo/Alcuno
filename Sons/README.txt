@@ -11,6 +11,7 @@ Un fichier MP3 par moment du jeu, avec exactement ces noms :
   sons_on.mp3  on active les sons dans les réglages
   credits.mp3  4 taps sur le titre ALCUNO (écran des créateurs)
   reglage_son.mp3  on lâche le curseur de volume dans les réglages (pour entendre le volume)
+  no_wifi.mp3  en ligne, coupure de réseau (une seule fois, quand le logo wifi barré apparaît)
 
 Pas de son pour le cul sec de la carte dorée (« TIENS DANS TA GUEULE »).
 
