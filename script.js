@@ -321,7 +321,7 @@ document.addEventListener("DOMContentLoaded", function () {
     bandeau.innerHTML =
       '<span class="rappelEau-icone" aria-hidden="true">💧</span>' +
       '<span class="rappelEau-texte"><strong>MESSAGE DE TON ANGE GARDIEN</strong>' +
-      '<strong>Boit de l\'eau !</strong>' +
+      '<strong>Bois de l\'eau !</strong>' +
       '<span>Demain tu me diras merci 😉</span></span>';
     const fermer = () => bandeau.remove();
     bandeau.addEventListener("click", fermer);
