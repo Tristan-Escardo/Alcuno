@@ -124,6 +124,14 @@
                     </label>
                 </div>
 
+                <div class="optionReglage optionAction">
+                    <span class="optionTexte">
+                        <span class="optionTitre">Diagnostic</span>
+                        <span class="optionNote">Infos techniques à envoyer en cas de bug.</span>
+                    </span>
+                    <button type="button" id="btnDiagnostic">Copier</button>
+                </div>
+
                 <!-- Partie en ligne dont ce téléphone se souvient (affiché seulement s'il y en a une) -->
                 <div class="optionReglage optionAction" id="lignePartieMemoire" style="display:none;">
                     <span class="optionTexte">
@@ -140,19 +148,9 @@
                     <button type="button" id="btnPartagerJeu">📤 Partager le lien</button>
                 </div>
 
-                <!-- À propos : comme dans les réglages d'un téléphone, une carte avec des lignes -->
                 <div class="aPropos">
                     <div class="aProposTitre">À propos</div>
-                    <div class="groupeLignes">
-                        <div class="ligneInfo">
-                            <span>Version</span>
-                            <span id="versionJeu" class="valeurInfo"></span>
-                        </div>
-                        <button type="button" id="btnDiagnostic" class="ligneInfo ligneAction">
-                            <span>Copier le diagnostic</span>
-                            <span class="chevron" aria-hidden="true">›</span>
-                        </button>
-                    </div>
+                    <p id="versionJeu" class="versionJeu"></p>
                 </div>
             </div>
         </section>

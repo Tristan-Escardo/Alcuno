@@ -3566,66 +3566,13 @@ html.accessibilite #enLigne .infoModeSoft{
   .page-entree, .page-sortie{ animation-duration: 0.01s; }
 }
 
-/* ===== Réglages > À propos : carte avec des lignes, comme les réglages d'un téléphone ===== */
-#ecranReglages .aPropos{
-  text-align: left;
-}
-
-#ecranReglages .aPropos .aProposTitre{
-  text-align: center;
-  margin-bottom: 8px;
-}
-
-#ecranReglages .groupeLignes{
-  border-radius: 16px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,215,0,0.18);
-  overflow: hidden;
-}
-
-#ecranReglages .ligneInfo{
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  width: 100%;
-  box-sizing: border-box;
-  margin: 0;
-  padding: 14px 16px;
-  font-size: 15px;
-  font-weight: 700;
-  color: #fff;
-  text-align: left;
-  background: none;
-  border: none;
-  border-radius: 0;
-}
-
-#ecranReglages .ligneInfo + .ligneInfo{
-  border-top: 1px solid rgba(255,255,255,0.08);
-}
-
-#ecranReglages .valeurInfo{
-  font-weight: 600;
+/* ===== Réglages > À propos : version centrée sous le titre ===== */
+#ecranReglages .versionJeu{
+  margin: 6px 0 0;
+  font-size: 14px;
   color: rgba(255,255,255,0.55);
 }
 
-#ecranReglages .ligneAction{
-  cursor: pointer;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-}
-
-#ecranReglages .ligneAction:active{
-  background: rgba(255,215,0,0.10);
-}
-
-#ecranReglages .chevron{
-  font-size: 22px;
-  line-height: 1;
-  color: #FFD700;
-}
-
-html.accessibilite #ecranReglages .ligneInfo{
-  font-size: 18px;
+html.accessibilite #ecranReglages .aPropos{
+  zoom: 1.3;
 }
