@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.6.0";
+  const VERSION_AFFICHEE = "8.6.1";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "Alcuno — version " + VERSION_AFFICHEE;
@@ -131,7 +131,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.documentElement.classList.toggle("accessibilite", caseAccessibilite.checked);
   });
 
-  // ===== Mode soft : moins de gorgées =====
+  // ===== Mode PJ (appelé « soft » dans le code) : moins de gorgées =====
   // Classique : le réglage de ce téléphone. En ligne : le réglage de l'hôte au moment où il a créé
   // la partie (champ « soft » de la partie dans Firebase) : le même pour tous, et il ne change
   // plus jusqu'à la fin (même si l'hôte change ou si quelqu'un touche à son réglage).
@@ -785,7 +785,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }).then(() => {
         choisirModeSoftEnLigne(soft);
         if (softRefuse) {
-          alert("Le mode soft n'est pas encore disponible en ligne (règles Firebase à mettre à jour) : " +
+          alert("Le Mode PJ n'est pas encore disponible en ligne (règles Firebase à mettre à jour) : " +
                 "la partie est créée en mode normal.");
         }
         codePartieActuel = code;
@@ -4253,11 +4253,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const code = codePartieActuel;
     const manche = mancheCourante;
     const par = pseudoActuel;
+    const vu = prochainSeq - 1;
     const refSeq = window.fbRef(db, `parties/${code}/manches/${manche}/seq`);
 
     // Deux téléphones qui envoient au même instant : Firebase refuse le 2e (« permission_denied »)
     // au lieu de le faire réessayer. On réessaie nous-mêmes, un peu plus tard (3 fois au plus).
     const reserverNumero = (essai) => window.fbRunTransaction(refSeq, n => (n || 0) + 1).catch((erreur) => {
+      noterJournal(`numéro refusé pour ${id} (essai ${essai}) : ${erreur && erreur.message}`);
       if(essai >= 3 || code !== codePartieActuel || manche !== mancheCourante) throw erreur;
       return new Promise(r => setTimeout(r, 60 + Math.random() * 180)).then(() => reserverNumero(essai + 1));
     });
@@ -4265,9 +4267,11 @@ document.addEventListener("DOMContentLoaded", function () {
     return reserverNumero(1)
       .then((res) => {
         const seq = res.snapshot.val();
-        // Une seule écriture : l'action + la date de dernière activité
+        noterJournal(`envoi ${id} => numéro ${seq}`);
+        // Une seule écriture : l'action + la date de dernière activité.
+        // « @vu » : dernière action que ce téléphone avait jouée au moment du tap (voir estUnDoublon)
         return window.fbUpdate(window.fbRef(db, `parties/${code}`), {
-          [`manches/${manche}/actions/${seq}`]: { id, par },
+          [`manches/${manche}/actions/${seq}`]: { id: `${id}@${vu}`, par },
           activite: window.fbServerTimestamp()
         }).catch((erreur) => {
           actionRefusee(code, manche, seq);
@@ -4284,6 +4288,7 @@ document.addEventListener("DOMContentLoaded", function () {
   let dernierEtatManche = null; // état de la manche en cours (pour la rejouer)
 
   function actionRefusee(code, manche, seq){
+    noterJournal(`refus du serveur pour mon action ${seq}`);
     if(!enLigneActif || code !== codePartieActuel || manche !== mancheCourante) return;
 
     const action = fileActions.get(seq);
@@ -4301,6 +4306,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function resynchroniserManche(){
     if(!dernierEtatManche || !enLigneActif) return;
+    noterJournal("remise à jour de la manche depuis le serveur");
     afficherToast("Connexion instable : remise à jour de la partie…", 3000);
     repriseEnCours = true;
     mancheCourante = null; // la même manche est redémarrée, puis rejouée depuis le serveur
@@ -4528,6 +4534,7 @@ document.addEventListener("DOMContentLoaded", function () {
           timerTrou = null;
           if(generation !== generationFile) return;
           if(prochainSeq === attendu && !fileActions.has(attendu)){
+            noterJournal(`trou ${attendu} sauté`);
             prochainSeq++;
             apresActionTraitee();
           }
@@ -4543,12 +4550,16 @@ document.addEventListener("DOMContentLoaded", function () {
     const manche = mancheCourante;
     const generation = generationFile;
     let attente = 0;
+    let attenteNotee = false; // journal : une seule ligne « attendre » par action
 
     const essayer = () => {
       if(manche !== mancheCourante || generation !== generationFile) return;
 
       // Action refusée par le serveur pendant qu'on attendait de pouvoir l'appliquer : sautée
-      const resultat = action.refusee ? "ignorer" : tenterAction(action);
+      const resultat = (action.refusee || estUnDoublon(action)) ? "ignorer" : tenterAction(action);
+      if(resultat === "ok") actionsAppliquees.set(`${action.par}|${action.id}`, prochainSeq);
+      if(resultat !== "attendre" || !attenteNotee) noterJournal(`${prochainSeq} ${action.id} (${action.par}) => ${resultat}`);
+      if(resultat === "attendre") attenteNotee = true;
       // On attend que l'overlay concerné soit affiché chez nous (max 30 s d'écran allumé)
       if(resultat === "attendre" && attente < 30000){
         const pas = rattrapageEnCours ? 20 : 120;
@@ -4569,9 +4580,16 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Diagnostic (console du navigateur / tests) : état de la file d'actions en ligne
+  // + journal des dernières actions traitées (numéro, action, joueur => résultat)
+  const journalFile = [];
+  function noterJournal(texte){
+    journalFile.push(texte);
+    if(journalFile.length > 120) journalFile.shift();
+  }
+
   window.__etatFileAlcuno = () => ({
     prochainSeq, seqFinRattrapage, rattrapageEnCours, traitementEnCours,
-    trouEnAttente: !!timerTrou, actions: Array.from(fileActions.keys())
+    trouEnAttente: !!timerTrou, actions: Array.from(fileActions.keys()), journal: journalFile.slice()
   });
 
   // Après chaque action traitée (ou trou sauté) : fin du rattrapage quand tout est rejoué
@@ -4584,8 +4602,25 @@ document.addEventListener("DOMContentLoaded", function () {
     else majRattrapage();
   }
 
+  // Doublon : le même joueur a tapé deux fois le même élément avant que son 1er tap revienne du
+  // serveur (tap rapide, réseau lent). Si ce même tap a déjà été appliqué APRÈS ce que l'expéditeur
+  // avait vu, le 2e est ignoré. Décidé uniquement avec la file d'actions : pareil sur tous les
+  // téléphones (avant, il restait en attente sur l'élément disparu : abandonné au bout de 30 s sur
+  // un écran allumé, attendu pour toujours sur un écran éteint => téléphones décalés).
+  // Exceptions : les boutons qu'on tape exprès plusieurs fois de suite (+1 et Retour du +4).
+  let actionsAppliquees = new Map(); // "joueur|action" -> numéro de la dernière fois appliquée
+  const ACTIONS_REPETABLES = ["plus4:joueur:", "plus4:annuler", "plus4:reset"];
+
+  function estUnDoublon(action){
+    if(typeof action.vu !== "number") return false;
+    if(ACTIONS_REPETABLES.some(debut => action.id.startsWith(debut))) return false;
+    const derniere = actionsAppliquees.get(`${action.par}|${action.id}`);
+    return derniere !== undefined && derniere > action.vu;
+  }
+
   function reinitialiserFileActions(){
     generationFile++; // une action de l'ancienne file encore en attente s'arrête
+    actionsAppliquees = new Map();
     fileActions = new Map();
     prochainSeq = 1;
     traitementEnCours = false;
@@ -4634,7 +4669,14 @@ document.addEventListener("DOMContentLoaded", function () {
     );
 
     desabonnerActions = window.fbOnChildAdded(refActions, (snapshot) => {
-      fileActions.set(Number(snapshot.key), snapshot.val());
+      // « id@vu » => id + vu (dernière action jouée par l'expéditeur au moment du tap)
+      const action = Object.assign({}, snapshot.val());
+      const morceaux = /^(.*)@(\d+)$/.exec(String(action.id));
+      if(morceaux){
+        action.id = morceaux[1];
+        action.vu = Number(morceaux[2]);
+      }
+      fileActions.set(Number(snapshot.key), action);
       traiterFile();
     });
   }
