@@ -231,13 +231,6 @@ button,
     text-align: center;
 }
 
-.titreJoueurs {
-    font-size: 22px;
-    font-weight: bold;
-    color: #75f6ff;
-    margin-bottom: 8px;
-}
-
 .nomsJoueurs{
     display: grid;
     grid-auto-flow: column;              /* remplit colonne par colonne */
@@ -799,15 +792,6 @@ button,
   overscroll-behavior: contain;
 }
 
-#overlayDuel .titre-duel {
-    font-size: 48px;
-    font-weight: bold;
-    color: #FFD700;
-    text-align: center;
-    text-shadow: 2px 2px 5px #000;
-    animation: pop 0.5s ease forwards;
-}
-
 #overlayDuel button {
     width: 200px;
     max-width: 400px;
@@ -873,19 +857,6 @@ button,
     flex: 0 0 auto;
 }
 
-#controlsGauche,
-#controlsDroite{
-    display: flex;
-    flex-wrap: wrap;     /* ✅ boutons passent à la ligne */
-    gap: 10px;
-    align-items: center;
-}
-
-#controlsGauche button,
-#controlsDroite button{
-    min-width: 170px; /* ajuste si tu veux */
-}
-
 #menu input{
     min-width: 0;
 }
@@ -899,29 +870,6 @@ button,
 }
 
 /* ===== Boutons annulation dans overlayRegleUnique ===== */
-#overlayRegleUnique .bloc-annulation{
-  margin-top: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  align-items: center;
-}
-
-#overlayRegleUnique .titre-annulation{
-  color: #FFD700;
-  font-size: 22px;
-  font-weight: 800;
-  text-align: center;
-  text-shadow: 2px 2px 5px #000;
-}
-
-#overlayRegleUnique .ligne-boutons-annulation{
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 14px;
-}
-
 #overlayRegleUnique .bouton-annulation{
   width: 200px;
   max-width: 400px;
@@ -1243,11 +1191,6 @@ body.no-scroll{
     #menu{
         flex-direction: column;
         align-items: stretch;
-    }
-
-    #controlsGauche,
-    #controlsDroite{
-        width: 100%;
     }
 
     /* boutons + input => mêmes largeurs */
