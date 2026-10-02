@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.6.1";
+  const VERSION_AFFICHEE = "8.6.2";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "Alcuno — version " + VERSION_AFFICHEE;
@@ -177,7 +177,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const ligneVolume = document.getElementById("ligneVolume");
   caseSons.checked = lireReglage(CLE_SONS, true);
 
-  let volumeSons = 70;
+  let volumeSons = 100;
   try {
     const v = localStorage.getItem(CLE_VOLUME);
     if (v !== null && Number(v) >= 0 && Number(v) <= 100) volumeSons = Number(v);
@@ -3394,6 +3394,15 @@ document.addEventListener("DOMContentLoaded", function () {
       const msg = joueurs[perdant] + " boit " + texteGorgees(gorg) +
         (duelMultiplicateur > 1 ? "\nDuel ×" + duelMultiplicateur + " après égalité" : "");
 
+      // Résultat visible tout de suite sur le duel : la carte du perdant en rouge, celle du gagnant estompée
+      const carteDeJ1 = (choixJ1 === 1) ? c1 : c2;
+      const carteDeJ2 = (choixJ1 === 1) ? c2 : c1;
+      c1.style.opacity = ""; // (opacité posée par preparerDuel : sinon la carte du gagnant ne s'estompe pas)
+      c2.style.opacity = "";
+      (perdant === j1 ? carteDeJ1 : carteDeJ2).classList.add("duel-perdant");
+      (perdant === j1 ? carteDeJ2 : carteDeJ1).classList.add("duel-gagnant");
+      info.innerText = joueurs[perdant] + " perd le duel !";
+
       // 1) on enlève l’overlay du duel après le temps de lire le reveal (2,2 s),
       //    ou dès qu'on tape sur l'écran
       let suiteFaite = false;
@@ -3402,9 +3411,13 @@ document.addEventListener("DOMContentLoaded", function () {
         suiteFaite = true;
         overlay.removeEventListener("pointerdown", suite);
 
-        unlockScroll();
-        overlay.remove();
+        // L'annonce « X boit N gorgées » apparaît en fondu PAR-DESSUS le duel, et le duel n'est
+        // retiré dessous qu'une fois l'annonce affichée (avant : le plateau apparaissait entre les deux)
         annoncerBoireAvecAnnulation(perdant, gorg, "", msg);
+        setTimeout(() => {
+          overlay.remove();
+          unlockScroll();
+        }, delai(450));
 
         // Puis on restaure l'état du jeu (sans attendre la fin d'overlay ici)
         setTimeout(() => {

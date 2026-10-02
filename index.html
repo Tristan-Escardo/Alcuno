@@ -71,9 +71,9 @@
                     </label>
                     <div class="ligneVolume" id="ligneVolume">
                         <span class="volumeIcone" aria-hidden="true">🔈</span>
-                        <input type="range" id="volumeSons" min="0" max="100" step="5" value="70" aria-label="Volume des sons">
+                        <input type="range" id="volumeSons" min="0" max="100" step="5" value="100" aria-label="Volume des sons">
                         <span class="volumeIcone" aria-hidden="true">🔊</span>
-                        <span class="volumeValeur" id="volumeValeur">70 %</span>
+                        <span class="volumeValeur" id="volumeValeur">100 %</span>
                     </div>
                 </div>
 
@@ -95,6 +95,24 @@
                     <span class="interrupteur" aria-hidden="true"></span>
                 </label>
 
+                <label class="optionReglage" for="optionAccessibilite">
+                    <span class="optionTexte">
+                        <span class="optionTitre">Accessibilité pour les gens bourrés 🍻</span>
+                        <span class="optionNote">Textes et boutons plus gros.</span>
+                    </span>
+                    <input type="checkbox" id="optionAccessibilite">
+                    <span class="interrupteur" aria-hidden="true"></span>
+                </label>
+
+                <label class="optionReglage" for="optionModeSoft">
+                    <span class="optionTexte">
+                        <span class="optionTitre">Mode PJ</span>
+                        <span class="optionNote">Tu prends 2x moins cher que dans la version normale.<br>En ligne : c'est le réglage de l'hôte qui compte, quand il crée la partie.</span>
+                    </span>
+                    <input type="checkbox" id="optionModeSoft">
+                    <span class="interrupteur" aria-hidden="true"></span>
+                </label>
+
                 <div class="blocReglage">
                     <label class="optionReglage" for="optionRappelEau">
                         <span class="optionTexte">
@@ -105,24 +123,6 @@
                         <span class="interrupteur" aria-hidden="true"></span>
                     </label>
                 </div>
-
-                <label class="optionReglage" for="optionModeSoft">
-                    <span class="optionTexte">
-                        <span class="optionTitre">Mode PJ</span>
-                        <span class="optionNote">Tu prends 2x moins cher que dans la version normale. En ligne : c'est le réglage de l'hôte qui compte, quand il crée la partie.</span>
-                    </span>
-                    <input type="checkbox" id="optionModeSoft">
-                    <span class="interrupteur" aria-hidden="true"></span>
-                </label>
-
-                <label class="optionReglage" for="optionAccessibilite">
-                    <span class="optionTexte">
-                        <span class="optionTitre">Accessibilité pour les gens bourrés 🍻</span>
-                        <span class="optionNote">Textes et boutons plus gros.</span>
-                    </span>
-                    <input type="checkbox" id="optionAccessibilite">
-                    <span class="interrupteur" aria-hidden="true"></span>
-                </label>
 
                 <!-- Partie en ligne dont ce téléphone se souvient (affiché seulement s'il y en a une) -->
                 <div class="optionReglage optionAction" id="lignePartieMemoire" style="display:none;">

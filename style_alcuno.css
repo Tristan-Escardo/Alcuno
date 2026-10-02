@@ -3529,3 +3529,21 @@ html.accessibilite header .badgeSoft,
 html.accessibilite #enLigne .infoModeSoft{
   zoom: 1.2;
 }
+
+/* ===== Duel : résultat visible sur les cartes avant l'annonce des gorgées ===== */
+#overlayDuel .Carte.duel-perdant{
+  box-shadow: 0 0 0 3px #ff3b3b, 0 0 28px rgba(255, 59, 59, 0.8);
+  animation: duelPerdant 0.45s ease-in-out 2;
+}
+
+#overlayDuel .Carte.duel-gagnant{
+  opacity: 0.55;
+  filter: saturate(0.6);
+  transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+@keyframes duelPerdant{
+  0%, 100% { transform: translateX(0) rotate(0); }
+  25%      { transform: translateX(-6px) rotate(-3deg); }
+  75%      { transform: translateX(6px) rotate(3deg); }
+}
