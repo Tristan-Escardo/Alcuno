@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.6.2";
+  const VERSION_AFFICHEE = "8.6.3";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "Alcuno — version " + VERSION_AFFICHEE;
@@ -91,7 +91,38 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }));
 
-  document.getElementById("btnFermerCredits").addEventListener("click", () => {
+  // Bouton d'une page qui défile (Réglages, créateurs) : un tap pendant que la page glisse encore
+  // sur son élan sert d'abord à arrêter le défilement, et le téléphone n'envoie alors pas de
+  // « click » (il fallait taper deux fois). On réagit donc aussi au doigt levé, si le doigt n'a
+  // presque pas bougé (sinon c'est un glissement). Un seul déclenchement par tap.
+  function activerMemePendantElan(bouton, action){
+    let depart = null;
+    let clicDejaFait = false; // le « click » qui suit le doigt levé du même tap ne compte pas
+    let minuteur = null;
+    bouton.addEventListener("pointerdown", (e) => {
+      clicDejaFait = false; // nouveau tap
+      depart = (e.pointerType === "touch" || e.pointerType === "pen") ? { x: e.clientX, y: e.clientY } : null;
+    });
+    bouton.addEventListener("pointerup", (e) => {
+      if (!depart) return;
+      const deplacement = Math.hypot(e.clientX - depart.x, e.clientY - depart.y);
+      depart = null;
+      if (deplacement >= 12) return;
+      clicDejaFait = true;
+      clearTimeout(minuteur);
+      minuteur = setTimeout(() => { clicDejaFait = false; }, 350);
+      action();
+    });
+    bouton.addEventListener("pointercancel", () => { depart = null; });
+    // Un nouveau contact ailleurs sur l'écran : le « click » de l'ancien tap ne viendra plus
+    document.addEventListener("pointerdown", (e) => { if (e.target !== bouton) clicDejaFait = false; }, true);
+    bouton.addEventListener("click", () => {
+      if (clicDejaFait) { clicDejaFait = false; return; }
+      action();
+    });
+  }
+
+  activerMemePendantElan(document.getElementById("btnFermerCredits"), () => {
     ecranCredits.style.display = "none";
   });
 
@@ -105,7 +136,7 @@ document.addEventListener("DOMContentLoaded", function () {
     ecranReglages.style.display = "";
   });
 
-  document.getElementById("btnFermerReglages").addEventListener("click", () => {
+  activerMemePendantElan(document.getElementById("btnFermerReglages"), () => {
     ecranReglages.style.display = "none";
   });
 
@@ -3857,7 +3888,7 @@ document.addEventListener("DOMContentLoaded", function () {
         indexPigeon=joueurActuel;
         nomPigeonOriginal=joueurs[joueurActuel];
         const nPigeon = gorgeesPigeon();
-        const msgPigeon = `${joueurs[joueurActuel]} est le PIGEON !\nIl/elle boit ${texteGorgees(nPigeon)}.\nÀ chaque 3 tiré par un autre, le pigeon boit 1 gorgée.\nPour s'en débarrasser : tirer un 3 et choisir le prochain pigeon.`;
+        const msgPigeon = `${joueurs[joueurActuel]} est le PIGEON !\nIl/elle boit ${texteGorgees(nPigeon)}.\nÀ chaque 3 tiré, le PIGEON boit 1 gorgée.\nPour s'en débarrasser : tirer un 3 et choisir le prochain PIGEON.`;
         annoncerBoireAvecAnnulation(
           joueurActuel,
           nPigeon,
