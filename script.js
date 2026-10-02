@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.6.5";
+  const VERSION_AFFICHEE = "8.6.6";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "Alcuno — version " + VERSION_AFFICHEE;
@@ -322,6 +322,70 @@ document.addEventListener("DOMContentLoaded", function () {
     bruitSon(ctx, sortie, t + 0.085 + decale, { duree: 0.045, vol: 0.85, type: "lowpass", de: 1800 * v, attaque: 0.001 });
   }
 
+  // Roucoulement de pigeon : un son grave qui « roule » (modulé ~26 fois par seconde),
+  // la voix monte puis redescend. Un « rou » = un appel de cette fonction.
+  function roucoulement(ctx, sortie, debut, { duree, de, haut, fin, vol }){
+    const voix = ctx.createOscillator();
+    voix.type = "triangle";
+    voix.frequency.setValueAtTime(de, debut);
+    voix.frequency.linearRampToValueAtTime(haut, debut + duree * 0.35);
+    voix.frequency.linearRampToValueAtTime(fin, debut + duree);
+
+    const gorge = ctx.createBiquadFilter(); // son étouffé, comme dans la gorge
+    gorge.type = "lowpass";
+    gorge.frequency.value = 900;
+    gorge.Q.value = 2;
+
+    const roule = ctx.createOscillator(); // le « rrrr » du roucoulement
+    roule.frequency.value = 26;
+    const profondeur = ctx.createGain();
+    profondeur.gain.value = 0.4;
+    const module = ctx.createGain();
+    module.gain.value = 0.6;
+    roule.connect(profondeur);
+    profondeur.connect(module.gain);
+
+    const env = ctx.createGain();
+    env.gain.setValueAtTime(0.0001, debut);
+    env.gain.exponentialRampToValueAtTime(vol, debut + 0.04);
+    env.gain.setValueAtTime(vol, debut + duree * 0.7);
+    env.gain.exponentialRampToValueAtTime(0.0001, debut + duree);
+
+    voix.connect(gorge);
+    gorge.connect(module);
+    module.connect(env);
+    env.connect(sortie);
+    voix.start(debut);
+    roule.start(debut);
+    voix.stop(debut + duree + 0.03);
+    roule.stop(debut + duree + 0.03);
+  }
+
+  // Pigeon : « rou - rouuu - rou »
+  function sonPigeon(ctx, sortie, t){
+    roucoulement(ctx, sortie, t, { duree: 0.18, de: 360, haut: 420, fin: 380, vol: 0.45 });
+    roucoulement(ctx, sortie, t + 0.24, { duree: 0.5, de: 380, haut: 470, fin: 340, vol: 0.5 });
+    roucoulement(ctx, sortie, t + 0.84, { duree: 0.2, de: 370, haut: 410, fin: 360, vol: 0.4 });
+  }
+
+  // Carte dorée : juste un scintillement (petites notes aiguës éparpillées + léger souffle brillant)
+  function sonCarteDoree(ctx, sortie, t){
+    for (let i = 0; i < 16; i++) {
+      noteSon(ctx, sortie, t + i * 0.045 + Math.random() * 0.03, {
+        freq: 2600 + Math.random() * 3600,
+        duree: 0.16 + Math.random() * 0.18,
+        vol: 0.11 + Math.random() * 0.11
+      });
+    }
+    bruitSon(ctx, sortie, t, { duree: 0.95, vol: 0.09, type: "highpass", de: 6500, attaque: 0.2 });
+  }
+
+  // En ligne, c'est ton tour : « ding-ding »
+  function sonTour(ctx, sortie, t){
+    noteSon(ctx, sortie, t, { freq: 1319, duree: 0.18, vol: 0.28 });
+    noteSon(ctx, sortie, t + 0.12, { freq: 1760, duree: 0.3, vol: 0.28 });
+  }
+
   // carte | doree | culsec | pigeon | tour | eau
   function jouerSon(nom){
     if (!caseSons.checked || volumeSons <= 0) return;
@@ -337,19 +401,15 @@ document.addEventListener("DOMContentLoaded", function () {
     if (nom === "carte") {
       sonRetournementCarte(ctx, sortie, t);
     } else if (nom === "doree") {
-      [1047, 1319, 1568, 2093, 2637].forEach((f, i) =>
-        noteSon(ctx, sortie, t + i * 0.08, { freq: f, duree: 0.45, type: "triangle", vol: 0.22 }));
-      noteSon(ctx, sortie, t + 0.42, { freq: 3136, duree: 0.6, vol: 0.12 });
+      sonCarteDoree(ctx, sortie, t);
     } else if (nom === "culsec") {
       noteSon(ctx, sortie, t, { freq: 140, duree: 0.35, vol: 0.5, vers: 50 });
       noteSon(ctx, sortie, t + 0.12, { freq: 784, duree: 0.18, type: "square", vol: 0.12 });
       noteSon(ctx, sortie, t + 0.3, { freq: 1047, duree: 0.45, type: "square", vol: 0.12 });
     } else if (nom === "pigeon") {
-      noteSon(ctx, sortie, t, { freq: 720, duree: 0.16, type: "square", vol: 0.13, vers: 520 });
-      noteSon(ctx, sortie, t + 0.19, { freq: 560, duree: 0.28, type: "square", vol: 0.13, vers: 300 });
+      sonPigeon(ctx, sortie, t);
     } else if (nom === "tour") {
-      noteSon(ctx, sortie, t, { freq: 1319, duree: 0.18, vol: 0.28 });
-      noteSon(ctx, sortie, t + 0.12, { freq: 1760, duree: 0.3, vol: 0.28 });
+      sonTour(ctx, sortie, t);
     } else if (nom === "eau") {
       noteSon(ctx, sortie, t, { freq: 380, duree: 0.14, vol: 0.35, vers: 950 });
       noteSon(ctx, sortie, t + 0.2, { freq: 420, duree: 0.16, vol: 0.3, vers: 1100 });
