@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.6.3";
+  const VERSION_AFFICHEE = "8.6.4";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "Alcuno — version " + VERSION_AFFICHEE;
@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (tapsTitre >= 4) {
       tapsTitre = 0;
       ecranCredits.scrollTop = 0;
-      ecranCredits.style.display = "";
+      ouvrirPage(ecranCredits);
     }
   }));
 
@@ -122,9 +122,33 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  activerMemePendantElan(document.getElementById("btnFermerCredits"), () => {
-    ecranCredits.style.display = "none";
-  });
+  activerMemePendantElan(document.getElementById("btnFermerCredits"), () => fermerPage(ecranCredits));
+
+  // Pages plein écran (Réglages, créateurs) : elles arrivent en glissant depuis la droite et
+  // repartent en fondu vers la droite (avant : elles apparaissaient / disparaissaient d'un coup)
+  function ouvrirPage(page){
+    page.classList.remove("page-sortie", "page-entree");
+    page.style.display = "";
+    void page.offsetWidth; // relance l'animation même si la page vient d'être fermée
+    page.classList.add("page-entree");
+  }
+
+  function fermerPage(page){
+    if (page.style.display === "none" || page.classList.contains("page-sortie")) return;
+    page.classList.remove("page-entree");
+    page.classList.add("page-sortie");
+    let fini = false;
+    const fin = (e) => {
+      if (e && e.target !== page) return; // (fin d'une animation d'un élément de la page)
+      if (fini) return;
+      fini = true;
+      page.removeEventListener("animationend", fin);
+      page.classList.remove("page-sortie");
+      page.style.display = "none";
+    };
+    page.addEventListener("animationend", fin);
+    setTimeout(() => fin(), 350); // sécurité : animations désactivées sur le téléphone
+  }
 
   // ===== Réglages (bouton en haut à droite de l'écran d'accueil, seulement là) =====
   // Chaque réglage est retenu sur le téléphone (stockage local du navigateur)
@@ -133,12 +157,10 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("btnReglages").addEventListener("click", () => {
     majLignePartieMemoire();
     ecranReglages.scrollTop = 0;
-    ecranReglages.style.display = "";
+    ouvrirPage(ecranReglages);
   });
 
-  activerMemePendantElan(document.getElementById("btnFermerReglages"), () => {
-    ecranReglages.style.display = "none";
-  });
+  activerMemePendantElan(document.getElementById("btnFermerReglages"), () => fermerPage(ecranReglages));
 
   function lireReglage(cle, parDefaut){
     try {
@@ -265,26 +287,40 @@ document.addEventListener("DOMContentLoaded", function () {
     osc.stop(debut + duree + 0.03);
   }
 
-  // Petit souffle filtré (bruit) : le « fffp » d'une carte qu'on retourne
-  function souffleSon(ctx, sortie, debut, { duree, vol, freq }){
-    const nb = Math.floor(ctx.sampleRate * duree);
+  // Bruit filtré (souffle, claquement...) : attaque, puis fondu ; le filtre peut glisser
+  function bruitSon(ctx, sortie, debut, { duree, vol, type = "bandpass", de, a = de, q = 1, attaque = 0.002 }){
+    const nb = Math.max(1, Math.floor(ctx.sampleRate * duree));
     const tampon = ctx.createBuffer(1, nb, ctx.sampleRate);
     const donnees = tampon.getChannelData(0);
-    for (let i = 0; i < nb; i++) donnees[i] = (Math.random() * 2 - 1) * (1 - i / nb);
+    for (let i = 0; i < nb; i++) donnees[i] = Math.random() * 2 - 1;
     const source = ctx.createBufferSource();
     source.buffer = tampon;
     const filtre = ctx.createBiquadFilter();
-    filtre.type = "bandpass";
-    filtre.frequency.setValueAtTime(freq, debut);
-    filtre.frequency.exponentialRampToValueAtTime(freq / 3, debut + duree);
-    filtre.Q.value = 0.9;
+    filtre.type = type;
+    filtre.frequency.setValueAtTime(de, debut);
+    if (a !== de) filtre.frequency.exponentialRampToValueAtTime(a, debut + duree);
+    filtre.Q.value = q;
     const env = ctx.createGain();
-    env.gain.setValueAtTime(vol, debut);
+    env.gain.setValueAtTime(0.0001, debut);
+    env.gain.exponentialRampToValueAtTime(vol, debut + attaque);
     env.gain.exponentialRampToValueAtTime(0.0001, debut + duree);
     source.connect(filtre);
     filtre.connect(env);
     env.connect(sortie);
     source.start(debut);
+    source.stop(debut + duree + 0.02);
+  }
+
+  // Retournement d'une vraie carte : « fwip » (l'air, qui monte), « tic » (le bord de la carte),
+  // puis « tap » (la carte retombe à plat sur la table, avec un petit coup sourd). Légères variations
+  // à chaque fois : deux retournements ne sonnent jamais exactement pareil.
+  function sonRetournementCarte(ctx, sortie, t){
+    const v = 0.9 + Math.random() * 0.2;
+    const decale = (Math.random() - 0.5) * 0.012;
+    bruitSon(ctx, sortie, t, { duree: 0.085, vol: 0.4, type: "bandpass", de: 1200 * v, a: 4800 * v, q: 1.4, attaque: 0.025 });
+    bruitSon(ctx, sortie, t + 0.06 + decale, { duree: 0.018, vol: 0.3, type: "highpass", de: 3000 * v, attaque: 0.001 });
+    bruitSon(ctx, sortie, t + 0.085 + decale, { duree: 0.045, vol: 0.85, type: "lowpass", de: 1800 * v, attaque: 0.001 });
+    noteSon(ctx, sortie, t + 0.085 + decale, { freq: 170 * v, duree: 0.06, vol: 0.22, vers: 85 * v });
   }
 
   // carte | doree | culsec | pigeon | tour | eau
@@ -300,8 +336,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const t = ctx.currentTime + 0.02;
 
     if (nom === "carte") {
-      souffleSon(ctx, sortie, t, { duree: 0.11, vol: 0.5, freq: 3200 });
-      noteSon(ctx, sortie, t + 0.07, { freq: 900, duree: 0.05, type: "triangle", vol: 0.12 });
+      sonRetournementCarte(ctx, sortie, t);
     } else if (nom === "doree") {
       [1047, 1319, 1568, 2093, 2637].forEach((f, i) =>
         noteSon(ctx, sortie, t + i * 0.08, { freq: f, duree: 0.45, type: "triangle", vol: 0.22 }));
