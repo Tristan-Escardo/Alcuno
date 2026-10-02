@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.5.14";
+  const VERSION_AFFICHEE = "8.6.0";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "Alcuno — version " + VERSION_AFFICHEE;
@@ -311,8 +311,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }, 15000);
 
-  // TEMPORAIRE (à retirer ensuite) : bouton des réglages pour voir le rappel tout de suite
-  document.getElementById("btnTesterRappelEau").addEventListener("click", () => afficherRappelEau());
 
   function afficherRappelEau(){
     const ancien = document.getElementById("rappelEau");
@@ -322,7 +320,8 @@ document.addEventListener("DOMContentLoaded", function () {
     bandeau.setAttribute("role", "status");
     bandeau.innerHTML =
       '<span class="rappelEau-icone" aria-hidden="true">💧</span>' +
-      '<span class="rappelEau-texte"><strong>Message de ton ange gardien : Boit de l\'eau !</strong>' +
+      '<span class="rappelEau-texte"><strong>MESSAGE DE TON ANGE GARDIEN</strong>' +
+      '<strong>Boit de l\'eau !</strong>' +
       '<span>Demain tu me diras merci 😉</span></span>';
     const fermer = () => bandeau.remove();
     bandeau.addEventListener("click", fermer);
