@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.6.6";
+  const VERSION_AFFICHEE = "8.6.7";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "Alcuno — version " + VERSION_AFFICHEE;
@@ -221,7 +221,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("infoModeSoft").style.display = softPartieEnLigne ? "" : "none";
   }
 
-  // ===== Sons : bruitages fabriqués par le téléphone (Web Audio), aucun fichier à télécharger =====
+  // ===== Sons : fichiers MP3 du dossier Sons/ (voir SONS plus bas pour la liste des fichiers) =====
   // Le curseur règle le volume du jeu à l'intérieur du volume du téléphone (il ne peut pas le dépasser).
   const CLE_SONS = "alcuno_sons";
   const CLE_VOLUME = "alcuno_volume";
@@ -268,122 +268,36 @@ document.addEventListener("DOMContentLoaded", function () {
     return contexteSon;
   }
   // Les téléphones n'autorisent le son qu'après un premier tap : on le prépare à chaque tap
-  document.addEventListener("pointerdown", () => { if (caseSons.checked) contexteAudio(); },
+  // (et on charge les fichiers des sons au premier tap, pour qu'ils soient prêts à temps)
+  document.addEventListener("pointerdown", () => { if (caseSons.checked) { contexteAudio(); chargerSons(); } },
     { capture: true, passive: true });
 
-  // Une note (oscillateur) avec une attaque et une fin douces, éventuellement qui glisse
-  function noteSon(ctx, sortie, debut, { freq, duree, type = "sine", vol = 0.3, vers = null }){
-    const osc = ctx.createOscillator();
-    const env = ctx.createGain();
-    osc.type = type;
-    osc.frequency.setValueAtTime(freq, debut);
-    if (vers) osc.frequency.exponentialRampToValueAtTime(vers, debut + duree);
-    env.gain.setValueAtTime(0.0001, debut);
-    env.gain.exponentialRampToValueAtTime(vol, debut + 0.012);
-    env.gain.exponentialRampToValueAtTime(0.0001, debut + duree);
-    osc.connect(env);
-    env.connect(sortie);
-    osc.start(debut);
-    osc.stop(debut + duree + 0.03);
-  }
+  // Fichiers des sons : dossier Sons/, un MP3 par moment du jeu. Pour changer un son, il suffit de
+  // remplacer le fichier (même nom). Fichier absent => pas de son à ce moment-là.
+  //   carte.mp3  : une carte est retournée sur le plateau
+  //   doree.mp3  : quelqu'un tire la carte dorée
+  //   culsec.mp3 : tu prends le cul sec de la carte dorée (« TIENS DANS TA GUEULE »)
+  //   pigeon.mp3 : quelqu'un devient pigeon (premier pigeon ou nouveau pigeon)
+  //   tour.mp3   : en ligne, c'est ton tour (aussi le son d'essai des réglages)
+  //   eau.mp3    : rappel « Bois de l'eau »
+  const SONS = ["carte", "doree", "culsec", "pigeon", "tour", "eau"];
+  const sonsCharges = {}; // nom -> son décodé (ou null si le fichier n'existe pas)
+  let chargementSonsLance = false;
 
-  // Bruit filtré (souffle, claquement...) : attaque, puis fondu ; le filtre peut glisser
-  function bruitSon(ctx, sortie, debut, { duree, vol, type = "bandpass", de, a = de, q = 1, attaque = 0.002 }){
-    const nb = Math.max(1, Math.floor(ctx.sampleRate * duree));
-    const tampon = ctx.createBuffer(1, nb, ctx.sampleRate);
-    const donnees = tampon.getChannelData(0);
-    for (let i = 0; i < nb; i++) donnees[i] = Math.random() * 2 - 1;
-    const source = ctx.createBufferSource();
-    source.buffer = tampon;
-    const filtre = ctx.createBiquadFilter();
-    filtre.type = type;
-    filtre.frequency.setValueAtTime(de, debut);
-    if (a !== de) filtre.frequency.exponentialRampToValueAtTime(a, debut + duree);
-    filtre.Q.value = q;
-    const env = ctx.createGain();
-    env.gain.setValueAtTime(0.0001, debut);
-    env.gain.exponentialRampToValueAtTime(vol, debut + attaque);
-    env.gain.exponentialRampToValueAtTime(0.0001, debut + duree);
-    source.connect(filtre);
-    filtre.connect(env);
-    env.connect(sortie);
-    source.start(debut);
-    source.stop(debut + duree + 0.02);
-  }
-
-  // Retournement d'une vraie carte : « fwip » (l'air, qui monte), « tic » (le bord de la carte),
-  // puis « tap » (la carte retombe à plat sur la table ; que du bruit, aucune note). Légères variations
-  // à chaque fois : deux retournements ne sonnent jamais exactement pareil.
-  function sonRetournementCarte(ctx, sortie, t){
-    const v = 0.9 + Math.random() * 0.2;
-    const decale = (Math.random() - 0.5) * 0.012;
-    bruitSon(ctx, sortie, t, { duree: 0.085, vol: 0.4, type: "bandpass", de: 1200 * v, a: 4800 * v, q: 1.4, attaque: 0.025 });
-    bruitSon(ctx, sortie, t + 0.06 + decale, { duree: 0.018, vol: 0.3, type: "highpass", de: 3000 * v, attaque: 0.001 });
-    bruitSon(ctx, sortie, t + 0.085 + decale, { duree: 0.045, vol: 0.85, type: "lowpass", de: 1800 * v, attaque: 0.001 });
-  }
-
-  // Roucoulement de pigeon : un son grave qui « roule » (modulé ~26 fois par seconde),
-  // la voix monte puis redescend. Un « rou » = un appel de cette fonction.
-  function roucoulement(ctx, sortie, debut, { duree, de, haut, fin, vol }){
-    const voix = ctx.createOscillator();
-    voix.type = "triangle";
-    voix.frequency.setValueAtTime(de, debut);
-    voix.frequency.linearRampToValueAtTime(haut, debut + duree * 0.35);
-    voix.frequency.linearRampToValueAtTime(fin, debut + duree);
-
-    const gorge = ctx.createBiquadFilter(); // son étouffé, comme dans la gorge
-    gorge.type = "lowpass";
-    gorge.frequency.value = 900;
-    gorge.Q.value = 2;
-
-    const roule = ctx.createOscillator(); // le « rrrr » du roucoulement
-    roule.frequency.value = 26;
-    const profondeur = ctx.createGain();
-    profondeur.gain.value = 0.4;
-    const module = ctx.createGain();
-    module.gain.value = 0.6;
-    roule.connect(profondeur);
-    profondeur.connect(module.gain);
-
-    const env = ctx.createGain();
-    env.gain.setValueAtTime(0.0001, debut);
-    env.gain.exponentialRampToValueAtTime(vol, debut + 0.04);
-    env.gain.setValueAtTime(vol, debut + duree * 0.7);
-    env.gain.exponentialRampToValueAtTime(0.0001, debut + duree);
-
-    voix.connect(gorge);
-    gorge.connect(module);
-    module.connect(env);
-    env.connect(sortie);
-    voix.start(debut);
-    roule.start(debut);
-    voix.stop(debut + duree + 0.03);
-    roule.stop(debut + duree + 0.03);
-  }
-
-  // Pigeon : « rou - rouuu - rou »
-  function sonPigeon(ctx, sortie, t){
-    roucoulement(ctx, sortie, t, { duree: 0.18, de: 360, haut: 420, fin: 380, vol: 0.45 });
-    roucoulement(ctx, sortie, t + 0.24, { duree: 0.5, de: 380, haut: 470, fin: 340, vol: 0.5 });
-    roucoulement(ctx, sortie, t + 0.84, { duree: 0.2, de: 370, haut: 410, fin: 360, vol: 0.4 });
-  }
-
-  // Carte dorée : juste un scintillement (petites notes aiguës éparpillées + léger souffle brillant)
-  function sonCarteDoree(ctx, sortie, t){
-    for (let i = 0; i < 16; i++) {
-      noteSon(ctx, sortie, t + i * 0.045 + Math.random() * 0.03, {
-        freq: 2600 + Math.random() * 3600,
-        duree: 0.16 + Math.random() * 0.18,
-        vol: 0.11 + Math.random() * 0.11
-      });
-    }
-    bruitSon(ctx, sortie, t, { duree: 0.95, vol: 0.09, type: "highpass", de: 6500, attaque: 0.2 });
-  }
-
-  // En ligne, c'est ton tour : « ding-ding »
-  function sonTour(ctx, sortie, t){
-    noteSon(ctx, sortie, t, { freq: 1319, duree: 0.18, vol: 0.28 });
-    noteSon(ctx, sortie, t + 0.12, { freq: 1760, duree: 0.3, vol: 0.28 });
+  function chargerSons(){
+    const ctx = contexteAudio();
+    if (!ctx || chargementSonsLance) return;
+    chargementSonsLance = true;
+    SONS.forEach((nom) => {
+      fetch(`Sons/${nom}.mp3?t=${window.ANTI_CACHE || Date.now()}`)
+        .then((reponse) => {
+          if (!reponse.ok) throw new Error("absent");
+          return reponse.arrayBuffer();
+        })
+        .then((donnees) => new Promise((ok, ko) => ctx.decodeAudioData(donnees, ok, ko)))
+        .then((son) => { sonsCharges[nom] = son; })
+        .catch(() => { sonsCharges[nom] = null; });
+    });
   }
 
   // carte | doree | culsec | pigeon | tour | eau
@@ -392,28 +306,17 @@ document.addEventListener("DOMContentLoaded", function () {
     if (rattrapageEnCours) return; // reconnexion : pas de sons pour les actions déjà passées
     const ctx = contexteAudio();
     if (!ctx) return;
+    chargerSons();
+    const son = sonsCharges[nom];
+    if (!son) return; // pas encore chargé, ou pas de fichier pour ce moment
 
     const sortie = ctx.createGain();
     sortie.gain.value = Math.pow(volumeSons / 100, 2); // curseur plus naturel à l'oreille
     sortie.connect(ctx.destination);
-    const t = ctx.currentTime + 0.02;
-
-    if (nom === "carte") {
-      sonRetournementCarte(ctx, sortie, t);
-    } else if (nom === "doree") {
-      sonCarteDoree(ctx, sortie, t);
-    } else if (nom === "culsec") {
-      noteSon(ctx, sortie, t, { freq: 140, duree: 0.35, vol: 0.5, vers: 50 });
-      noteSon(ctx, sortie, t + 0.12, { freq: 784, duree: 0.18, type: "square", vol: 0.12 });
-      noteSon(ctx, sortie, t + 0.3, { freq: 1047, duree: 0.45, type: "square", vol: 0.12 });
-    } else if (nom === "pigeon") {
-      sonPigeon(ctx, sortie, t);
-    } else if (nom === "tour") {
-      sonTour(ctx, sortie, t);
-    } else if (nom === "eau") {
-      noteSon(ctx, sortie, t, { freq: 380, duree: 0.14, vol: 0.35, vers: 950 });
-      noteSon(ctx, sortie, t + 0.2, { freq: 420, duree: 0.16, vol: 0.3, vers: 1100 });
-    }
+    const lecture = ctx.createBufferSource();
+    lecture.buffer = son;
+    lecture.connect(sortie);
+    lecture.start();
   }
 
   // ===== Rappel « Bois de l'eau 💧 » : toutes les 30 minutes de partie (désactivé par défaut) =====
