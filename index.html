@@ -242,7 +242,9 @@
         </section>
     </main>
 
-    <script type="module">
+    <!-- async : le jeu démarre sans attendre le téléchargement de Firebase (lent en 4G).
+         Ce qui a besoin de Firebase l'attend (attendreFirebase / événement « firebase-ready ») -->
+    <script type="module" async>
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
         import {
             getDatabase, ref, set, get, update, onValue, onChildAdded, remove, onDisconnect, runTransaction, serverTimestamp
