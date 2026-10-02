@@ -1553,7 +1553,7 @@ body.no-scroll{
   max-width: none;
   min-height: 68px;
   padding: 7px 6px;
-  font-size: 12px;
+  font-size: 15px;
   line-height: 1.05;
   border-radius: 12px;
 }
@@ -1583,7 +1583,7 @@ body.no-scroll{
   #overlayPlus4 .plus4-joueur-btn{
     min-height: 62px;
     padding: 6px 5px;
-    font-size: 11px;
+    font-size: 14px;
     border-radius: 11px;
   }
 
@@ -1602,7 +1602,7 @@ body.no-scroll{
   #overlayPlus4 .plus4-container-joueurs .bouton-pigeon,
   #overlayPlus4 .plus4-joueur-btn{
     min-height: 74px;
-    font-size: 13px;
+    font-size: 16px;
   }
 }
 
@@ -3298,7 +3298,7 @@ html.accessibilite #overlayPlus4 .plus4-container-joueurs .bouton-pigeon,
 html.accessibilite #overlayPlus4 .plus4-joueur-btn{
   zoom: 1;
   min-height: 74px;
-  font-size: 17px;
+  font-size: 19px;
 }
 
 /* Mode en ligne : bouton qui attend la réponse de Firebase (« Création… », « Connexion… »…) */
@@ -3552,8 +3552,13 @@ html.accessibilite #enLigne .infoModeSoft{
   pointer-events: none;
 }
 
+/* Sens d'arrivée : depuis la droite (+32px), ou depuis la gauche après « ← Retour » / ⌂ (-32px,
+   voir html.nav-retour). Une seule animation : changer de sens ne la rejoue pas (avant : changer
+   le nom de l'animation à la fin du retour la rejouait => « saut » bizarre) */
+:root{ --decalage-entree: 32px; }
+
 @keyframes pageEntree{
-  from { opacity: 0; transform: translateX(32px); }
+  from { opacity: 0; transform: translateX(var(--decalage-entree)); }
   to   { opacity: 1; transform: none; }
 }
 
@@ -3630,19 +3635,8 @@ html.accessibilite #ecranReglages .aPropos{
   animation: none;
 }
 
-html.nav-retour #choixMode > *,
-html.nav-retour #enLigne > div > *,
-html.nav-retour #ecranNouvellePartie > *{
-  animation-name: pageEntreeRetour;
-}
-
-html.nav-retour .page-entree{
-  animation-name: pageEntreeRetour;
-}
-
-@keyframes pageEntreeRetour{
-  from { opacity: 0; transform: translateX(-32px); }
-  to   { opacity: 1; transform: none; }
+html.nav-retour{
+  --decalage-entree: -32px;
 }
 
 @media (prefers-reduced-motion: reduce){
