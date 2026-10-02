@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.6.10";
+  const VERSION_AFFICHEE = "8.7.0";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   document.getElementById("versionJeu").innerText = "Alcuno — version " + VERSION_AFFICHEE;
@@ -273,7 +273,7 @@ document.addEventListener("DOMContentLoaded", function () {
     try { localStorage.setItem(CLE_VOLUME, String(volumeSons)); } catch (e) {}
     majLigneVolume();
   });
-  curseurVolume.addEventListener("change", () => jouerSon("tour")); // essai au relâchement
+  curseurVolume.addEventListener("change", () => jouerSon("reglage_son")); // essai au relâchement (Sons/reglage_son.mp3)
 
   let contexteSon = null;
   function contexteAudio(){
@@ -295,12 +295,13 @@ document.addEventListener("DOMContentLoaded", function () {
   //   cartes.mp3  : une carte est retournée sur le plateau
   //   doree.mp3   : quelqu'un tire la carte dorée (coupé à 3 s, voir DUREE_MAX_SONS)
   //   pigeon.mp3  : quelqu'un devient pigeon (premier pigeon ou nouveau pigeon ; coupé à 2 s)
-  //   tour.mp3    : en ligne, c'est ton tour (aussi le son d'essai du curseur de volume)
+  //   tour.mp3    : en ligne, c'est ton tour
   //   eau.mp3     : rappel « Bois de l'eau »
   //   sons_on.mp3 : on active les sons dans les réglages
   //   credits.mp3 : 4 taps sur le titre ALCUNO (écran des créateurs)
+  //   reglage_son.mp3 : on lâche le curseur de volume dans les réglages (pour entendre le volume)
   // (pas de son pour le cul sec de la carte dorée)
-  const SONS = ["cartes", "doree", "pigeon", "tour", "eau", "sons_on", "credits"];
+  const SONS = ["cartes", "doree", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son"];
   // Sons coupés au bout de N secondes (avec un petit fondu), même si le fichier est plus long
   const DUREE_MAX_SONS = { doree: 3, pigeon: 2 };
   const sonsCharges = {}; // nom -> son décodé (ou null si le fichier n'existe pas)
