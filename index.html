@@ -25,6 +25,7 @@
 <body>
     <header>
         <h1>ALCUNO</h1>
+        <span class="badgeSoft" aria-label="Mode soft">🌱 SOFT</span>
         <button type="button" id="btnAccueilClassique" class="btnAccueilTexte" title="Accueil" aria-label="Accueil">⌂</button>
     </header>
 
@@ -94,12 +95,27 @@
                     <span class="interrupteur" aria-hidden="true"></span>
                 </label>
 
-                <label class="optionReglage" for="optionRappelEau">
+                <div class="blocReglage">
+                    <label class="optionReglage" for="optionRappelEau">
+                        <span class="optionTexte">
+                            <span class="optionTitre">Rappel «&nbsp;Bois de l'eau&nbsp;💧&nbsp;»</span>
+                            <span class="optionNote">Toutes les 30 minutes de partie.</span>
+                        </span>
+                        <input type="checkbox" id="optionRappelEau">
+                        <span class="interrupteur" aria-hidden="true"></span>
+                    </label>
+                    <!-- TEMPORAIRE : pour voir à quoi ressemble le rappel (à retirer ensuite) -->
+                    <div class="ligneTestRappel">
+                        <button type="button" id="btnTesterRappelEau">💧 Voir le rappel (test)</button>
+                    </div>
+                </div>
+
+                <label class="optionReglage" for="optionModeSoft">
                     <span class="optionTexte">
-                        <span class="optionTitre">Rappel «&nbsp;Bois de l'eau&nbsp;💧&nbsp;»</span>
-                        <span class="optionNote">Toutes les 30 minutes de partie.</span>
+                        <span class="optionTitre">Mode soft 🌱</span>
+                        <span class="optionNote">Moins de gorgées : +2 → 1, +4 → 2, pigeon → 1, duel divisé par 2 (10 max), cul sec → 3 gorgées. En ligne : c'est le réglage de l'hôte qui compte, quand il crée la partie.</span>
                     </span>
-                    <input type="checkbox" id="optionRappelEau" checked>
+                    <input type="checkbox" id="optionModeSoft">
                     <span class="interrupteur" aria-hidden="true"></span>
                 </label>
 
@@ -168,6 +184,7 @@
             <div id="salleAttente" style="display:none;">
                 <button type="button" id="btnQuitterSalle" class="btnRetour">← Retour</button>
                 <h3 id="codePartieAffiche"></h3>
+                <p id="infoModeSoft" class="infoModeSoft" style="display:none;">🌱 Partie en mode soft : moins de gorgées</p>
                 <div id="listeJoueursEnLigne"></div>
                 <button type="button" id="lancerPartieEnLigne" style="display:none;">Lancer la partie</button>
             </div>

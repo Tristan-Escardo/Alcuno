@@ -3493,3 +3493,56 @@ html.accessibilite #rappelEau .rappelEau-icone{
 html.accessibilite #ecranReglages #btnPartagerJeu{
   font-size: clamp(19px, 4.8vw, 23px);
 }
+
+/* ===== Mode soft : badge « 🌱 SOFT » à gauche du bandeau ALCUNO pendant une partie en mode soft,
+   et rappel dans la salle d'attente en ligne ===== */
+header .badgeSoft{
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  z-index: 2;
+  transform: translateY(-50%);
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  color: #c9ffb8;
+  background: rgba(66, 216, 107, 0.16);
+  border: 1px solid rgba(66, 216, 107, 0.55);
+  pointer-events: none;
+}
+
+body.partie-soft header .badgeSoft{
+  display: inline-block;
+}
+
+#enLigne .infoModeSoft{
+  margin: -8px 0 0;
+  font-size: 15px;
+  font-weight: 800;
+  color: #c9ffb8;
+}
+
+html.accessibilite header .badgeSoft,
+html.accessibilite #enLigne .infoModeSoft{
+  zoom: 1.2;
+}
+
+/* TEMPORAIRE (à retirer avec le bouton) : « 💧 Voir le rappel (test) » dans les réglages */
+#ecranReglages .ligneTestRappel{
+  padding: 0 16px 14px;
+}
+
+#ecranReglages #btnTesterRappelEau{
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 900;
+  color: #fff;
+  background: linear-gradient(135deg, #0a5f9e, #2fa8f0);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  touch-action: manipulation;
+}

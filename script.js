@@ -131,6 +131,43 @@ document.addEventListener("DOMContentLoaded", function () {
     document.documentElement.classList.toggle("accessibilite", caseAccessibilite.checked);
   });
 
+  // ===== Mode soft : moins de gorgées =====
+  // Classique : le réglage de ce téléphone. En ligne : le réglage de l'hôte au moment où il a créé
+  // la partie (champ « soft » de la partie dans Firebase) : le même pour tous, et il ne change
+  // plus jusqu'à la fin (même si l'hôte change ou si quelqu'un touche à son réglage).
+  const CLE_MODE_SOFT = "alcuno_mode_soft";
+  const caseModeSoft = document.getElementById("optionModeSoft");
+  caseModeSoft.checked = lireReglage(CLE_MODE_SOFT, false);
+  caseModeSoft.addEventListener("change", () => ecrireReglage(CLE_MODE_SOFT, caseModeSoft.checked));
+
+  let softPartieEnLigne = false;
+
+  function estModeSoft(){
+    return codePartieActuel ? softPartieEnLigne : caseModeSoft.checked;
+  }
+
+  // Gorgées selon le mode (normal | soft)
+  function texteCulSec(){ return estModeSoft() ? "3 gorgées" : "un CUL SEC"; }
+  function gorgeesPlus2(){ return estModeSoft() ? 1 : 2; }
+  function gorgeesPlus4(){ return estModeSoft() ? 2 : 4; }
+  function gorgeesPigeon(){ return estModeSoft() ? 1 : 2; }
+  // Duel : valeur de la carte du perdant × multiplicateur ; en soft, moitié (arrondie au-dessus), 10 max
+  function gorgeesDuel(valeur, multiplicateur){
+    return estModeSoft() ? Math.min(10, Math.ceil(valeur / 2) * multiplicateur) : valeur * multiplicateur;
+  }
+  function texteGorgees(n){ return `${n} gorgée${n > 1 ? "s" : ""}`; }
+  function texteDoreeJamaisTrouvee(){
+    return estModeSoft()
+      ? "Tout le monde boit 2 gorgées de la part du développeur 😘"
+      : "Tout le monde prend un CUL SEC de la part du développeur 😘";
+  }
+
+  // En ligne : mode de la partie qu'on rejoint / crée, affiché dans la salle d'attente
+  function choisirModeSoftEnLigne(soft){
+    softPartieEnLigne = !!soft;
+    document.getElementById("infoModeSoft").style.display = softPartieEnLigne ? "" : "none";
+  }
+
   // ===== Sons : bruitages fabriqués par le téléphone (Web Audio), aucun fichier à télécharger =====
   // Le curseur règle le volume du jeu à l'intérieur du volume du téléphone (il ne peut pas le dépasser).
   const CLE_SONS = "alcuno_sons";
@@ -254,12 +291,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // ===== Rappel « Bois de l'eau 💧 » : toutes les 30 minutes de partie (activé par défaut) =====
+  // ===== Rappel « Bois de l'eau 💧 » : toutes les 30 minutes de partie (désactivé par défaut) =====
   // Petit bandeau en haut de l'écran, qui ne bloque rien et se ferme au tap ou tout seul.
   // (Chaque téléphone le gère de son côté : rien n'est envoyé aux autres joueurs.)
   const CLE_RAPPEL_EAU = "alcuno_rappel_eau";
   const caseRappelEau = document.getElementById("optionRappelEau");
-  caseRappelEau.checked = lireReglage(CLE_RAPPEL_EAU, true);
+  caseRappelEau.checked = lireReglage(CLE_RAPPEL_EAU, false);
   caseRappelEau.addEventListener("change", () => ecrireReglage(CLE_RAPPEL_EAU, caseRappelEau.checked));
 
   const MINUTES_RAPPEL_EAU = 30;
@@ -274,6 +311,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }, 15000);
 
+  // TEMPORAIRE (à retirer ensuite) : bouton des réglages pour voir le rappel tout de suite
+  document.getElementById("btnTesterRappelEau").addEventListener("click", () => afficherRappelEau());
+
   function afficherRappelEau(){
     const ancien = document.getElementById("rappelEau");
     if (ancien) ancien.remove();
@@ -282,8 +322,8 @@ document.addEventListener("DOMContentLoaded", function () {
     bandeau.setAttribute("role", "status");
     bandeau.innerHTML =
       '<span class="rappelEau-icone" aria-hidden="true">💧</span>' +
-      '<span class="rappelEau-texte"><strong>Pense à boire un verre d\'eau !</strong>' +
-      '<span>Ton foie te dira merci 😉</span></span>';
+      '<span class="rappelEau-texte"><strong>Message de ton ange gardien : Boit de l\'eau !</strong>' +
+      '<span>Demain tu me diras merci 😉</span></span>';
     const fermer = () => bandeau.remove();
     bandeau.addEventListener("click", fermer);
     setTimeout(fermer, 9000);
@@ -719,21 +759,36 @@ document.addEventListener("DOMContentLoaded", function () {
     const finAttente = boutonEnAttente("validerCreation", "Création…");
     attendreFirebase(() => {
       let code = null;
+      let soft = caseModeSoft.checked; // réglage de l'hôte, fixé pour toute la partie
+      let softRefuse = false;
+
+      const creer = (avecSoft) => window.fbSet(window.fbRef(window.firebaseDB, `parties/${code}`), Object.assign({
+        version: VERSION_JEU,
+        hote: pseudo,
+        joueurs: {
+          [pseudo]: { nom: pseudo, host: true, rejoint: Date.now() }
+        },
+        etatJeu: { demarree: false, hote: pseudo },
+        // Pour le nettoyage automatique (.github/workflows/nettoyage.yml)
+        creee: window.fbServerTimestamp(),
+        activite: window.fbServerTimestamp()
+      }, avecSoft ? { soft: true } : {}));
 
       trouverCodeLibre().then((codeLibre) => {
         code = codeLibre;
-        return window.fbSet(window.fbRef(window.firebaseDB, `parties/${code}`), {
-          version: VERSION_JEU,
-          hote: pseudo,
-          joueurs: {
-            [pseudo]: { nom: pseudo, host: true, rejoint: Date.now() }
-          },
-          etatJeu: { demarree: false, hote: pseudo },
-          // Pour le nettoyage automatique (.github/workflows/nettoyage.yml)
-          creee: window.fbServerTimestamp(),
-          activite: window.fbServerTimestamp()
+        // Règles Firebase pas encore à jour pour « soft » : partie créée en mode normal
+        return creer(soft).catch((erreur) => {
+          if (!soft) throw erreur;
+          soft = false;
+          softRefuse = true;
+          return creer(false);
         });
       }).then(() => {
+        choisirModeSoftEnLigne(soft);
+        if (softRefuse) {
+          alert("Le mode soft n'est pas encore disponible en ligne (règles Firebase à mettre à jour) : " +
+                "la partie est créée en mode normal.");
+        }
         codePartieActuel = code;
         pseudoActuel = pseudo;
         estHote = true;
@@ -812,6 +867,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const refJoueur = window.fbRef(db, `parties/${code}/joueurs/${pseudo}`);
         return window.fbSet(refJoueur, { nom: pseudo, host: false, rejoint: Date.now() }).then(() => {
+          choisirModeSoftEnLigne(partie.soft === true);
           marquerActivite(code);
           codePartieActuel = code;
           pseudoActuel = pseudo;
@@ -1224,6 +1280,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Reconnexion : le joueur reprend sa place sous son pseudo exact. En pleine manche, son téléphone
   // rejoue toutes les actions déjà faites (rattrapage accéléré) avant de reprendre en direct.
   function reprendrePlaceEnLigne(code, nom, partie){
+    choisirModeSoftEnLigne(partie.soft === true);
     codePartieActuel = code;
     pseudoActuel = nom;
     estHote = !!(partie.joueurs[nom] && partie.joueurs[nom].host);
@@ -1386,6 +1443,7 @@ document.addEventListener("DOMContentLoaded", function () {
     pseudoActuel = null;
     estHote = false;
     hotePartie = null;
+    choisirModeSoftEnLigne(false);
     deconnectes = new Set();
     enLigneActif = false;
     mancheCourante = null;
@@ -1786,7 +1844,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const subtitle = document.createElement("div");
     subtitle.className = "overlay-subtitle prediction-subtitle";
-    subtitle.innerText = "Chacun choisit un type de carte. Tous ceux qui trouvent distribuent un CUL SEC !.";
+    subtitle.innerText = `Chacun choisit un type de carte. Tous ceux qui trouvent distribuent ${texteCulSec()} !`;
 
     header.appendChild(titre);
     header.appendChild(subtitle);
@@ -1883,13 +1941,13 @@ document.addEventListener("DOMContentLoaded", function () {
           reveal.classList.add("reveal-doree");
           txt.innerHTML =
             '<div class="doree-titre"><span class="doree-etincelle">✦</span> PERSONNE N\'A TROUVÉ LA CARTE DORÉE !! <span class="doree-etincelle">✦</span></div>' +
-            '<div class="doree-texte">Tout le monde prend un CUL SEC de la part du développeur 😘</div>';
+            '<div class="doree-texte">' + texteDoreeJamaisTrouvee() + '</div>';
         } else if(gagnants.length === 0){
           txt.innerText = `Personne n'a trouvé \nLa dernière carte était ${nomType(vraiType)}`;
         } else if(gagnants.length === 1){
-          txt.innerText = `${gagnants[0]} a trouvé ! Il/elle distribue un CUL SEC !`;
+          txt.innerText = `${gagnants[0]} a trouvé ! Il/elle distribue ${texteCulSec()} !`;
         } else {
-          txt.innerText = `${gagnants.join(', ')} ont trouvé ! Chacun distribue un CUL SEC !`;
+          txt.innerText = `${gagnants.join(', ')} ont trouvé ! Chacun distribue ${texteCulSec()} !`;
         }
         reveal.appendChild(txt);
 
@@ -2354,7 +2412,7 @@ document.addEventListener("DOMContentLoaded", function () {
       caseDoree.classList.add("carte_doree", "retournee");
     }
 
-    const texte = "Tout le monde prend un CUL SEC de la part du développeur 😘";
+    const texte = texteDoreeJamaisTrouvee();
     montrerOverlayRegle(`Personne n'a trouvé la CARTE DORÉE !!\n${texte}`, "carte_doree");
     habillerOverlayCarteDoree(
       texte,
@@ -2466,7 +2524,8 @@ document.addEventListener("DOMContentLoaded", function () {
         afficherJoueurs();
         afficherJoueurActif();
         // 2) message demandé (overlay + .messages)
-        const msg = `${joueurs[i]} est le nouveau PIGEON !\nIl/elle boit 2 gorgées pour fêter ça.`;
+        const nPigeon = gorgeesPigeon();
+        const msg = `${joueurs[i]} est le nouveau PIGEON !\nIl/elle boit ${texteGorgees(nPigeon)} pour fêter ça.`;
         // .messages : on l'affiche dans reglePigeon (et il disparaît au prochain tirage)
         // 3) overlay + annulation si compteur (utilise la carte "trois" qui a déclenché le transfert)
         const carteTrois = carteTroisPourTransfertPigeon || "trois_vert";
@@ -2474,7 +2533,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const couleurTrois = couleurTroisPourTransfertPigeon;
         annoncerBoireAvecAnnulation(
           i,
-          2,
+          nPigeon,
           carteTrois,
           msg,
           // puis la gorgée couleur éventuelle de celui qui a tiré le 3
@@ -3116,7 +3175,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const consigne = document.createElement("div");
     consigne.className = "doree-texte";
-    consigne.innerText = "Choisis à qui tu distribues ton CUL SEC";
+    consigne.innerText = estModeSoft() ? "Choisis à qui tu distribues tes 3 gorgées" : "Choisis à qui tu distribues ton CUL SEC";
     overlay.appendChild(consigne);
 
     const liste = document.createElement("div");
@@ -3157,7 +3216,9 @@ document.addEventListener("DOMContentLoaded", function () {
   // En ligne : seul le téléphone de la victime affiche « TIENS DANS TA GUEULE. »
   function afficherOverlayTiensGueule(victime){
     if(enLigneActif && victime !== pseudoActuel){
-      const message = `${victime} prend le CUL SEC de la carte dorée !`;
+      const message = estModeSoft()
+        ? `${victime} boit les 3 gorgées de la carte dorée !`
+        : `${victime} prend le CUL SEC de la carte dorée !`;
       montrerOverlayRegle(message, "carte_doree");
       habillerOverlayCarteDoree(message);
       reglerDureeOverlayRegle(message, null); // reste jusqu'au tap
@@ -3173,7 +3234,7 @@ document.addEventListener("DOMContentLoaded", function () {
       ? "TIENS DANS<br>TA GUEULE."
       : `TIENS DANS<br>TA GUEULE<br>${echapperHtml(avecCouronne(victime))}.`;
     montrerOverlayRegle("TIENS DANS TA GUEULE.", "carte_doree");
-    habillerOverlayCarteDoree("", titre);
+    habillerOverlayCarteDoree(estModeSoft() ? "3 gorgées !" : "", titre);
     reglerDureeOverlayRegle("", null); // reste jusqu'au tap
   }
 
@@ -3329,9 +3390,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const perdant = (v1 < v2) ? j1 : j2;
       const vPerdant = (v1 < v2) ? v1 : v2;
-      const gorg = vPerdant * duelMultiplicateur;
+      const gorg = gorgeesDuel(vPerdant, duelMultiplicateur);
       // Égalités avant : on rappelle le multiplicateur sous le résultat
-      const msg = joueurs[perdant] + " boit " + gorg + " gorgées" +
+      const msg = joueurs[perdant] + " boit " + texteGorgees(gorg) +
         (duelMultiplicateur > 1 ? "\nDuel ×" + duelMultiplicateur + " après égalité" : "");
 
       // 1) on enlève l’overlay du duel après le temps de lire le reveal (2,2 s),
@@ -3451,6 +3512,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if(document.getElementById("overlayPlus4")) return;
 
     choixPigeonEnCours = true;
+    const aDistribuer = gorgeesPlus4(); // 4 (2 en mode soft)
     lockScroll();
     const choisisseur = joueurs[joueurActuel];
 
@@ -3459,7 +3521,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const titre = document.createElement("div");
     titre.className = "titre-pigeon";
-    titre.innerText = "PLUS 4 — Distribue 4 gorgées";
+    titre.innerText = `PLUS 4 — Distribue ${texteGorgees(aDistribuer)}`;
     overlay.appendChild(titre);
 
     const info = document.createElement("div");
@@ -3491,10 +3553,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function refreshUI(){
       const total = totalDistribue();
-      totalBox.innerText = `Gorgées distribuées : ${total} / 4`;
+      totalBox.innerText = `Gorgées distribuées : ${total} / ${aDistribuer}`;
 
-      if(total < 4){
-        info.innerText = "Choisis à qui tu veux distribuer tes 4 gorgées.";
+      if(total < aDistribuer){
+        info.innerText = `Choisis à qui tu veux distribuer tes ${texteGorgees(aDistribuer)}.`;
       } else {
         info.innerText = "Total atteint. Tu peux valider.";
       }
@@ -3507,8 +3569,8 @@ document.addEventListener("DOMContentLoaded", function () {
         ? `${echapperHtml(joueurs[idx])} <span class="plus4-badge">+ ${n}</span>`
         : echapperHtml(joueurs[idx]);
 
-        // optionnel: griser si total déjà à 4 (plus possible d'ajouter)
-        if(total >= 4){
+        // optionnel: griser si le total est atteint (plus possible d'ajouter)
+        if(total >= aDistribuer){
           btn.style.opacity = "0.7";
         } else {
           btn.style.opacity = "1";
@@ -3519,12 +3581,12 @@ document.addEventListener("DOMContentLoaded", function () {
       btnUndo.disabled = (historique.length === 0);
       btnUndo.style.opacity = btnUndo.disabled ? "0.6" : "1";
 
-      // validation uniquement si total == 4
-      btnValider.disabled = (total !== 4);
+      // validation uniquement si le total est atteint
+      btnValider.disabled = (total !== aDistribuer);
       btnValider.style.opacity = btnValider.disabled ? "0.6" : "1";
     }
 
-    // boutons joueurs : UN CLIC = +1 (si total < 4)
+    // boutons joueurs : UN CLIC = +1 (si total < aDistribuer)
     joueurs.forEach((nom, idx)=>{
       const btn = document.createElement("button");
       btn.className = "bouton-pigeon plus4-joueur-btn";
@@ -3533,7 +3595,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       surAction(btn, "plus4:joueur:" + idx, { owner: choisisseur }, ()=>{
         const total = totalDistribue();
-        if(total >= 4) return;
+        if(total >= aDistribuer) return;
 
         dist[idx] += 1;
         historique.push(idx);
@@ -3566,7 +3628,7 @@ document.addEventListener("DOMContentLoaded", function () {
     btnValider.className = "bouton-pigeon plus4-action-btn";
     btnValider.innerText = "Valider";
     surAction(btnValider, "plus4:valider", { owner: choisisseur, once: true }, ()=>{
-      if(totalDistribue() !== 4) return;
+      if(totalDistribue() !== aDistribuer) return;
 
       overlay.remove();
       unlockScroll();
@@ -3670,14 +3732,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     if (carteTiree === "carte_doree") {
-      regleZero.innerText = "CARTE DORÉE : distribue un CUL SEC";
+      regleZero.innerText = `CARTE DORÉE : distribue ${texteCulSec()}`;
       regleZero.style.display = "block";
       zeroEnCours = true;
 
       // Plateau bloqué (et pari de fin en attente) jusqu'au choix de la victime
       choixPigeonEnCours = true;
-      const texteCarteDoree =
-        "Distribue un CUL SEC de la part du développeur, et obligation de se servir un vrai verre avant 😘";
+      const texteCarteDoree = estModeSoft()
+        ? "Distribue 3 gorgées de la part du développeur 😘"
+        : "Distribue un CUL SEC de la part du développeur, et obligation de se servir un vrai verre avant 😘";
       // Le texte complet sert à calculer la durée d'affichage de l'overlay
       montrerOverlayRegle(`CARTE DORÉE\n${texteCarteDoree}`, carteTiree);
       vibrer([150, 70, 150, 70, 300]);
@@ -3725,11 +3788,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     if (carteTiree.startsWith("plus_2")) {
+      const n = gorgeesPlus2();
       annoncerBoireAvecAnnulation(
         joueurActuel,
-        2,
+        n,
         carteTiree,
-        `${joueurs[joueurActuel]} boit 2 gorgées`,
+        `${joueurs[joueurActuel]} boit ${texteGorgees(n)}`,
         () => {
           appliquerBonusCouleurSiBesoin(carteTiree, { couleur: couleurBue, joueur: joueurActuel, preserveRuleMessage: true });
         }
@@ -3780,10 +3844,11 @@ document.addEventListener("DOMContentLoaded", function () {
       if(indexPigeon===null){
         indexPigeon=joueurActuel;
         nomPigeonOriginal=joueurs[joueurActuel];
-        const msgPigeon = `${joueurs[joueurActuel]} est le PIGEON !\nIl/elle boit 2 gorgées.\nÀ chaque 3 tiré par un autre, le pigeon boit 1 gorgée.\nPour s'en débarrasser : tirer un 3 et choisir le prochain pigeon.`;
+        const nPigeon = gorgeesPigeon();
+        const msgPigeon = `${joueurs[joueurActuel]} est le PIGEON !\nIl/elle boit ${texteGorgees(nPigeon)}.\nÀ chaque 3 tiré par un autre, le pigeon boit 1 gorgée.\nPour s'en débarrasser : tirer un 3 et choisir le prochain pigeon.`;
         annoncerBoireAvecAnnulation(
           joueurActuel,
-          2,
+          nPigeon,
           carteTiree,
           msgPigeon,
           () => {
@@ -3838,6 +3903,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     plateau.innerHTML = "";
     lancementPartieA = Date.now();
+    document.body.classList.toggle("partie-soft", estModeSoft()); // badge « 🌱 SOFT » dans le bandeau
     garderEcranAllume(); // pas de mise en veille pendant la partie
 
     // Plateau principal = toutes les cartes SAUF 2/5/6/7/8/9 (paquet duel)
@@ -3947,6 +4013,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function retourMenu(){
     partieLancee = false;
+    document.body.classList.remove("partie-soft");
     finUnOverlayAffiche = false;
 
     // Écrans du retrait en cours de partie (nouvelle manche, départ, partie fermée...)
