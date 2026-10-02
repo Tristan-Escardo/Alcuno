@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.7.8";
+  const VERSION_AFFICHEE = "8.7.9";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   // À l'écran : seulement « 8.7 » (le dernier chiffre change à chaque mise en ligne, en coulisses)
@@ -702,6 +702,19 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!champPseudo.value.trim()) ouvrirClavier(champPseudo);
     else document.getElementById("validerRejoindre").click();
   });
+
+  // Clavier ouvert : zone de l'écran encore visible (au-dessus du clavier), pour que l'écran du mode en
+  // ligne s'y cale (voir #enLigne dans le CSS) : sinon le clavier cache le bouton « Créer » / « Rejoindre »
+  if (window.visualViewport) {
+    const majZoneVisible = () => {
+      const zone = window.visualViewport;
+      document.documentElement.style.setProperty("--hauteur-visible", `${zone.height}px`);
+      document.documentElement.style.setProperty("--haut-visible", `${zone.offsetTop}px`);
+    };
+    window.visualViewport.addEventListener("resize", majZoneVisible);
+    window.visualViewport.addEventListener("scroll", majZoneVisible);
+    majZoneVisible();
+  }
 
   // Ouvre le clavier sur un champ. À appeler pendant le tap sur le bouton qui affiche le champ :
   // sinon l'iPhone refuse d'ouvrir le clavier tout seul.
