@@ -3573,8 +3573,9 @@ html.accessibilite #enLigne .infoModeSoft{
   color: rgba(255,255,255,0.55);
 }
 
-/* « Copier le diagnostic » sous la version : petit bouton discret (gris, pas blanc) */
+/* « Copier le diagnostic » juste avant « À propos » : petit bouton discret (gris, pas blanc) */
 #ecranReglages .btnDiagnostic{
+  align-self: center;
   margin-top: 10px;
   padding: 5px 11px;
   font-size: 12px;
