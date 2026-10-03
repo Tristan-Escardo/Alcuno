@@ -4020,7 +4020,7 @@ html[data-theme="prestige"] #refletPrestige{
   margin: 0;
   z-index: 9000; /* sous les overlays */
   pointer-events: none;
-  box-shadow: 0 0 22px rgba(255, 215, 0, 0.75), 0 10px 24px rgba(0,0,0,0.5);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.55); /* (pas de halo doré : réservé à la carte dorée) */
   will-change: transform, opacity;
 }
 
@@ -4032,7 +4032,7 @@ html[data-theme="prestige"] #refletPrestige{
   animation: pulseBonus 0.6s ease-out;
 }
 @keyframes pulseBonus{
-  0%   { transform: scale(1); text-shadow: none; }
-  40%  { transform: scale(1.8); text-shadow: 0 0 12px rgba(255, 215, 0, 0.95); }
-  100% { transform: scale(1); text-shadow: none; }
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.8); }
+  100% { transform: scale(1); }
 }
