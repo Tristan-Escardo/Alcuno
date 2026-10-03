@@ -2516,14 +2516,53 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
 
+  // Bannière « Tour de » : sous la barre d'infos, puis collée en haut de l'écran.
+  // Avant, elle était toujours « fixe » et sa position recalculée à chaque évènement de défilement :
+  // elle suivait la page avec un temps de retard (saccades). Maintenant :
+  //  - tant que la barre d'infos est à l'écran, elle est posée dans la page (position absolue) et
+  //    c'est le navigateur qui la fait défiler avec le reste, sans calcul ;
+  //  - une fois arrivée en haut, elle passe en position fixe (CSS) et plus rien ne bouge.
+  // Les styles ne sont réécrits que quand ils changent vraiment.
+  let modeSticky = "";
+  let topStickyPage = null;
+  let hautMinSticky = null; // haut de l'écran + encoche (calculé une fois, refait au redimensionnement)
+
+  function mesurerHautMinSticky(){
+    const sonde = document.createElement("div");
+    sonde.style.cssText = "position:fixed;visibility:hidden;pointer-events:none;top:calc(env(safe-area-inset-top, 0px) + " +
+      (window.innerWidth <= 520 ? 8 : 10) + "px)";
+    document.body.appendChild(sonde);
+    const haut = sonde.getBoundingClientRect().top;
+    sonde.remove();
+    return haut;
+  }
+
   function repositionnerStickyJoueurActif(){
     if(!stickyJoueurActif || !messagesBar) return;
+    if(hautMinSticky === null) hautMinSticky = mesurerHautMinSticky();
 
     const rect = messagesBar.getBoundingClientRect();
     const gap = window.innerWidth <= 520 ? 8 : 10;
-    const topSouhaite = Math.max(Math.round(rect.bottom + gap), 0);
+    const ancre = Math.round(rect.bottom + gap); // position voulue, en haut de l'écran
 
-    stickyJoueurActif.style.setProperty("--sticky-anchor-bottom", `${topSouhaite}px`);
+    if(rect.height > 0 && ancre > hautMinSticky){
+      // Position dans la page (pendant un overlay, la page est décalée sur body : même calcul)
+      const origine = document.body.classList.contains("no-scroll")
+        ? document.body.getBoundingClientRect().top
+        : document.documentElement.getBoundingClientRect().top;
+      const top = Math.round(ancre - origine);
+      if(modeSticky !== "page" || top !== topStickyPage){
+        modeSticky = "page";
+        topStickyPage = top;
+        stickyJoueurActif.classList.add("dans-la-page");
+        stickyJoueurActif.style.top = top + "px";
+      }
+    } else if(modeSticky !== "colle"){
+      modeSticky = "colle";
+      topStickyPage = null;
+      stickyJoueurActif.classList.remove("dans-la-page");
+      stickyJoueurActif.style.top = "";
+    }
   }
 
   function creerUIJoueurActifSticky(){
@@ -5500,7 +5539,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   /* ===== INIT ===== */
   window.addEventListener("scroll", repositionnerStickyJoueurActif, { passive: true });
-  window.addEventListener("resize", repositionnerStickyJoueurActif);
+  window.addEventListener("resize", () => { hautMinSticky = null; repositionnerStickyJoueurActif(); });
 
   if(window.visualViewport){
     window.visualViewport.addEventListener("resize", repositionnerStickyJoueurActif);

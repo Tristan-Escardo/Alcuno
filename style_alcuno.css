@@ -1347,8 +1347,7 @@ body.no-scroll{
 #stickyJoueurActif{
   position: fixed;
   --sticky-min-top: calc(env(safe-area-inset-top, 0px) + 10px);
-  --sticky-anchor-bottom: var(--sticky-min-top);
-  top: max(var(--sticky-min-top), var(--sticky-anchor-bottom));
+  top: var(--sticky-min-top);
   left: 50%;
   transform: translateX(-50%) translateY(-8px);
   z-index: 1200;
@@ -1357,9 +1356,9 @@ body.no-scroll{
   padding: 8px 12px;
   border: 1px solid rgba(255, 215, 0, 0.22);
   border-radius: 999px;
-  background: linear-gradient(180deg, rgba(62, 0, 43, 0.72), rgba(22, 0, 16, 0.68));
-  backdrop-filter: blur(10px) saturate(115%);
-  -webkit-backdrop-filter: blur(10px) saturate(115%);
+  /* Fond plus opaque à la place du flou d'arrière-plan : le flou était recalculé à chaque image
+     pendant le défilement (saccades sur téléphone) */
+  background: linear-gradient(180deg, rgba(62, 0, 43, 0.93), rgba(22, 0, 16, 0.91));
   box-shadow: 0 8px 22px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.08);
   display: flex;
   align-items: center;
@@ -1378,6 +1377,11 @@ body.no-scroll{
   flex: 0 0 auto;
   background: radial-gradient(circle at 35% 35%, #fff6bf 0%, #FFD700 45%, #d6a900 100%);
   box-shadow: 0 0 10px rgba(255,215,0,0.28);
+}
+
+/* Sous la barre d'infos : posée dans la page, elle défile avec elle (voir repositionnerStickyJoueurActif) */
+#stickyJoueurActif.dans-la-page{
+  position: absolute;
 }
 
 #stickyJoueurActif.visible{
@@ -2541,8 +2545,8 @@ header h1{
   border-color: var(--couleur-jeu);
   border-color: color-mix(in srgb, var(--couleur-jeu) 75%, transparent);
   background: linear-gradient(180deg,
-    color-mix(in srgb, var(--couleur-jeu) 32%, rgba(62, 0, 43, 0.78)),
-    rgba(22, 0, 16, 0.72));
+    color-mix(in srgb, var(--couleur-jeu) 32%, rgba(62, 0, 43, 0.93)),
+    rgba(22, 0, 16, 0.91));
   box-shadow:
     0 8px 22px rgba(0,0,0,0.18),
     inset 0 1px 0 rgba(255,255,255,0.08),
