@@ -3956,3 +3956,30 @@ html[data-theme="prestige"] #refletPrestige{
 @media (prefers-reduced-motion: reduce){
   #etincellesPrestige, #refletPrestige, #notifHaut .notifHaut-eclats{ display: none !important; }
 }
+
+/* ===== Carte tirée en haut des overlays de choix (+4, duel, nouveau pigeon) ===== */
+#overlayPlus4 .carte-vedette,
+#overlayPigeon .carte-vedette,
+#overlayDuel .Carte.carte-vedette{
+  width: clamp(80px, 22vw, 120px);
+  max-width: none;
+  height: auto;
+  aspect-ratio: 50 / 78;
+  flex: 0 0 auto;
+  border-radius: 8px;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.5);
+  transform: none;
+  cursor: default;
+}
+
+/* Pendant le tirage du duel : le 4 en petit, pour ne pas le confondre avec les 2 cartes du duel */
+#overlayDuel .Carte.carte-vedette-petite{
+  width: clamp(54px, 14vw, 76px);
+}
+
+/* Choix du nouveau pigeon : centré, mais le haut (la carte) reste visible avec beaucoup de joueurs */
+#overlayPigeon{
+  justify-content: flex-start;
+}
+#overlayPigeon > :first-child{ margin-top: auto; }
+#overlayPigeon > :last-child{ margin-bottom: auto; }

@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.8.7";
+  const VERSION_AFFICHEE = "8.8.8";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   // À l'écran : seulement « 8.7 » (le dernier chiffre change à chaque mise en ligne, en coulisses)
@@ -1951,6 +1951,25 @@ document.addEventListener("DOMContentLoaded", function () {
     "neuf_vert","neuf_vert1","neuf_jaune","neuf_jaune1","neuf_rouge","neuf_rouge1","neuf_bleu","neuf_bleu1"
   ];
 
+  // Images des cartes chargées à l'avance (et gardées en mémoire) : sinon, avec un réseau lent,
+  // la 1re fois qu'une carte sort, l'overlay s'affichait sans la carte le temps que l'image arrive
+  let imagesCartes = null;
+  function prechargerImagesCartes(){
+    if(imagesCartes) return;
+    const test = document.createElement("div");
+    test.style.display = "none";
+    document.body.appendChild(test);
+    const urls = new Set();
+    [...classes, "carte_doree"].forEach(c => {
+      test.className = "Carte " + c;
+      const m = getComputedStyle(test).backgroundImage.match(/url\("?([^")]+)"?\)/);
+      if(m) urls.add(m[1]);
+    });
+    test.remove();
+    imagesCartes = [...urls].map(url => { const img = new Image(); img.src = url; return img; });
+  }
+  window.addEventListener("load", () => setTimeout(prechargerImagesCartes, 300));
+
   let joueurs = [];
   let annulations = {}; // { "Alice": 3, "Bob": 0, ... }
   let paquet = [];
@@ -2930,6 +2949,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const overlay=document.createElement("div");
     overlay.id="overlayPigeon";
+    ajouterCarteVedette(overlay, carteTroisPourTransfertPigeon);
 
     const titre=document.createElement("div");
     titre.className="titre-pigeon";
@@ -3078,6 +3098,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     animerSortieOverlay(overlay);
     apresTransition(overlay, DUREE_SORTIE_OVERLAY, () => {
+      if (!overlay.dataset.enFermeture) return; // une nouvelle annonce l'a réutilisé entre-temps
       overlay.remove();
       unlockScroll();
       if(typeof afterClose === "function") afterClose();
@@ -3366,9 +3387,25 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   }
 
+  // Carte tirée, affichée en haut des overlays de choix (+4, duel, nouveau pigeon)
+  function ajouterCarteVedette(parent, classeCarte, classeEnPlus = ""){
+    if(!classeCarte) return;
+    const carte = document.createElement("div");
+    carte.className = `Carte retournee carte-vedette ${classeCarte} ${classeEnPlus}`.trim();
+    parent.appendChild(carte);
+  }
+
   function montrerOverlayRegle(message, classeCarte = "", classeCarteSupplementaire = "") {
     let overlay = document.getElementById("overlayRegleUnique");
     if (overlay) {
+      // Annonce arrivée pendant que le précédent disparaît (ex. en ligne, l'action d'un autre joueur) :
+      // on annule sa sortie (avant, la nouvelle annonce disparaissait avec lui, carte comprise)
+      if (overlay.dataset.enFermeture) {
+        delete overlay.dataset.enFermeture;
+        overlay.style.transition = "opacity 0.3s ease, transform 0.3s ease";
+        overlay.style.opacity = "1";
+        overlay.style.transform = "scale(1)";
+      }
       // Overlay réutilisé : on retire l'habillage doré d'un message carte dorée précédent
       overlay.classList.remove("overlay-doree");
       const cartes = overlay.querySelector(".overlay-regle-cartes");
@@ -3671,7 +3708,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // #region Duel
   /* ===== DUEL : Choix joueurs puis tirage ===== */
-  function lancerOverlayChoixDuel(joueurActuel){
+  function lancerOverlayChoixDuel(joueurActuel, carteDuel = ""){
     if(document.getElementById("overlayDuel")) return;
     const choisisseur = joueurs[joueurActuel];
     duelEnCours = true;
@@ -3685,6 +3722,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const content = document.createElement("div");
     content.className = "duel-content duel-choix-content";
     overlay.appendChild(content);
+    ajouterCarteVedette(content, carteDuel);
 
     const titre = document.createElement("div");
     titre.className = "titre-pigeon duel-main-title";
@@ -3715,7 +3753,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if(picks.length === 2){
           overlay.innerHTML = "";
-          afficherOverlayTirageDuel(overlay, picks[0], picks[1]);
+          afficherOverlayTirageDuel(overlay, picks[0], picks[1], carteDuel);
         }
       });
 
@@ -3725,12 +3763,14 @@ document.addEventListener("DOMContentLoaded", function () {
     document.body.appendChild(overlay);
   }
 
-  function afficherOverlayTirageDuel(overlay, j1, j2){
+  function afficherOverlayTirageDuel(overlay, j1, j2, carteDuel = ""){
     const content = document.createElement("div");
     content.className = "duel-content duel-tirage-content";
     // Si une nouvelle partie démarre pendant le duel, ses minuteurs ne doivent plus rien faire
     const generation = generationPartie;
     overlay.appendChild(content);
+    // Le 4 tiré, en petit : on voit qu'il ne fait pas partie des 2 cartes du duel
+    ajouterCarteVedette(content, carteDuel, "carte-vedette-petite");
 
     const titre = document.createElement("div");
     titre.className = "titre-pigeon duel-main-title";
@@ -3844,7 +3884,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // L'annonce « X boit N gorgées » apparaît en fondu PAR-DESSUS le duel, et le duel n'est
         // retiré dessous qu'une fois l'annonce affichée (avant : le plateau apparaissait entre les deux)
-        annoncerBoireAvecAnnulation(perdant, gorg, "", msg);
+        annoncerBoireAvecAnnulation(perdant, gorg, carteDuel, msg);
         setTimeout(() => {
           overlay.remove();
           unlockScroll();
@@ -3961,6 +4001,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const overlay = document.createElement("div");
     overlay.id = "overlayPlus4";
+    ajouterCarteVedette(overlay, classeCartePlus4);
 
     const titre = document.createElement("div");
     titre.className = "titre-pigeon";
@@ -4329,7 +4370,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Cartes "quatre" => duel
     if(carteTiree.startsWith("quatre")){
-      lancerOverlayChoixDuel(joueurActuel);
+      lancerOverlayChoixDuel(joueurActuel, carteTiree);
     }
 
     // Duel de la couleur choisie : la gorgée couleur s'affiche avant le duel
@@ -4348,6 +4389,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     plateau.innerHTML = "";
+    prechargerImagesCartes(); // (déjà fait à l'ouverture, en principe)
     lancementPartieA = Date.now();
     document.body.classList.toggle("partie-soft", estModeSoft()); // badge « 🌱 SOFT » dans le bandeau
     garderEcranAllume(); // pas de mise en veille pendant la partie
