@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.8.12";
+  const VERSION_AFFICHEE = "8.8.13";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   // À l'écran : le numéro complet, pour voir d'un coup d'œil si un téléphone est à jour
@@ -174,6 +174,8 @@ document.addEventListener("DOMContentLoaded", function () {
   // Pages plein écran (Réglages, créateurs) : elles arrivent en glissant depuis la droite et
   // repartent en fondu vers la droite (avant : elles apparaissaient / disparaissaient d'un coup)
   function ouvrirPage(page){
+    // Créateurs : la page derrière prend le fond du thème, comme cet écran (voir style_alcuno.css)
+    if (page.id === "ecranCredits") document.documentElement.classList.add("credits-ouverts");
     page.classList.remove("page-sortie", "page-entree");
     page.style.display = "";
     void page.offsetWidth; // relance l'animation même si la page vient d'être fermée
@@ -192,6 +194,7 @@ document.addEventListener("DOMContentLoaded", function () {
       page.removeEventListener("animationend", fin);
       page.classList.remove("page-sortie");
       page.style.display = "none";
+      if (page.id === "ecranCredits") document.documentElement.classList.remove("credits-ouverts");
     };
     page.addEventListener("animationend", fin);
     setTimeout(() => fin(), 350); // sécurité : animations désactivées sur le téléphone
@@ -418,6 +421,14 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
   document.documentElement.classList.remove("rouvrir-reglages");
+
+  // Jeu sous l'heure (appli installée depuis la 8.8.9) : sous la page, tout en bas, la couleur du bas
+  // du décor (voir html.sous-l-heure dans style_alcuno.css)
+  function majSousLHeure(){
+    document.documentElement.classList.toggle("sous-l-heure", hauteurZoneHeure() > 0);
+  }
+  majSousLHeure();
+  window.addEventListener("resize", majSousLHeure);
 
   majPastillePrestige();
   let themeChoisi = "bordeaux";
