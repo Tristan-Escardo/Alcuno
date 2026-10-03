@@ -3716,17 +3716,10 @@ html[data-theme="prestige"]{
   display: none;
 }
 
-/* iPhone : bande posée un instant tout en haut après un changement de thème, pour que l'iPhone relise
-   la couleur de sa barre (voir rafraichirBarreIphone dans script.js). Même couleur que le haut de la
-   page : invisible. Au-dessus des Réglages (là où on change de thème), sous les overlays. */
-#teinteHaut{
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: calc(var(--haut-ecran) + 1px);
-  background-color: var(--couleur-barre);
-  z-index: 10002;
+/* iPhone : page rechargée après un changement de thème (voir rafraichirBarreIphone dans script.js) :
+   les Réglages s'affichent dès le premier affichage, pas l'accueil */
+html.rouvrir-reglages #ecranReglages{
+  display: block !important;
 }
 
 /* Cerisier : pétales qui tombent doucement sur l'écran d'accueil (rien avec les autres thèmes) */

@@ -13,6 +13,9 @@
         var couleursBarre = { bordeaux: "#2b001d", noir: "#0e0e12", vert: "#08301e", bleu: "#0a1634", violet: "#3d0f66",
                               cerisier: "#5a1740", prestige: "#937810" };
         document.write('<meta name="theme-color" content="' + (couleursBarre[theme] || couleursBarre.bordeaux) + '">');
+        // iPhone : page rechargée après un changement de thème (voir rafraichirBarreIphone dans script.js) :
+        // on rouvre les Réglages dès le premier affichage
+        try { if (sessionStorage.getItem("alcuno_rouvrir_reglages") !== null) document.documentElement.classList.add("rouvrir-reglages"); } catch (e) {}
         document.write('<link rel="stylesheet" href="style_alcuno.css?t=' + window.ANTI_CACHE + '" />');
     </script>
     <title>Alcuno</title>

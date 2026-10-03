@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.8.11";
+  const VERSION_AFFICHEE = "8.8.12";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   // À l'écran : le numéro complet, pour voir d'un coup d'œil si un téléphone est à jour
@@ -373,27 +373,51 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // iPhone : la barre du haut (sous l'heure) est peinte d'une couleur unie prise sur l'élément fixe du
-  // haut de l'écran, et l'iPhone ne la relit pas quand seule sa couleur change (elle gardait celle du
-  // thème d'avant). Une fois le nouveau thème affiché, on pose un instant tout en haut une bande de la
-  // couleur du haut de la page (invisible), puis on la retire : l'élément du haut change deux fois et
-  // l'iPhone relit la couleur.
-  let bandeBarre = null;
-  function rafraichirBarreIphone(){
-    if (bandeBarre) bandeBarre.remove();
-    // deux images plus tard : le nouveau thème est peint
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      const bande = document.createElement("div");
-      bande.id = "teinteHaut";
-      bande.setAttribute("aria-hidden", "true");
-      document.body.appendChild(bande);
-      bandeBarre = bande;
-      setTimeout(() => {
-        bande.remove();
-        if (bandeBarre === bande) bandeBarre = null;
-      }, 300);
-    }));
+  // iPhone, barre du haut (sous l'heure) : quand le jeu ne passe pas dessous (appli ajoutée à l'écran
+  // d'accueil avant la 8.8.9 : iOS garde le réglage de la barre enregistré à l'installation), c'est
+  // l'iPhone qui la peint, et il ne relit sa couleur qu'au chargement de la page (elle gardait celle du
+  // thème d'avant). Après un changement de thème, on recharge donc la page, et les Réglages se
+  // rouvrent au même endroit. Quand le jeu passe sous l'heure, la barre, c'est la page : rien à faire.
+  const CLE_ROUVRIR_REGLAGES = "alcuno_rouvrir_reglages"; // (lue aussi par le script du <head> de index.html)
+  let rechargementTheme = null;
+
+  // Hauteur de la zone de l'heure occupée par le jeu (0 quand le jeu commence sous la barre du haut)
+  function hauteurZoneHeure(){
+    const sonde = document.createElement("div");
+    sonde.style.cssText = "position:fixed;visibility:hidden;pointer-events:none;padding-top:env(safe-area-inset-top, 0px)";
+    document.body.appendChild(sonde);
+    const hauteur = parseFloat(getComputedStyle(sonde).paddingTop) || 0;
+    sonde.remove();
+    return hauteur;
   }
+
+  function rafraichirBarreIphone(){
+    if (!estIOS || !estEnAppli || hauteurZoneHeure() > 0) return;
+    // petit délai : on voit le nouveau thème, et plusieurs taps d'affilée ne font qu'un rechargement
+    clearTimeout(rechargementTheme);
+    rechargementTheme = setTimeout(() => {
+      const reglagesOuverts = ecranReglages.style.display !== "none" && !ecranReglages.classList.contains("page-sortie");
+      try {
+        if (reglagesOuverts) sessionStorage.setItem(CLE_ROUVRIR_REGLAGES, String(ecranReglages.scrollTop));
+      } catch (e) {}
+      location.reload();
+    }, 400);
+  }
+
+  // Après ce rechargement : Réglages rouverts tels quels (sans animation), au même endroit
+  let positionReglages = null;
+  try {
+    positionReglages = sessionStorage.getItem(CLE_ROUVRIR_REGLAGES);
+    sessionStorage.removeItem(CLE_ROUVRIR_REGLAGES);
+  } catch (e) {}
+  if (positionReglages !== null) {
+    ecranReglages.style.display = "";
+    requestAnimationFrame(() => {
+      majLignePartieMemoire();
+      ecranReglages.scrollTop = Number(positionReglages) || 0;
+    });
+  }
+  document.documentElement.classList.remove("rouvrir-reglages");
 
   majPastillePrestige();
   let themeChoisi = "bordeaux";
@@ -432,8 +456,8 @@ document.addEventListener("DOMContentLoaded", function () {
   document.querySelectorAll(".pastilleTheme").forEach((pastille) => {
     pastille.addEventListener("click", () => {
       appliquerTheme(pastille.dataset.theme);
-      rafraichirBarreIphone();
       try { localStorage.setItem(CLE_THEME, pastille.dataset.theme); } catch (e) {}
+      rafraichirBarreIphone();
     });
   });
 
