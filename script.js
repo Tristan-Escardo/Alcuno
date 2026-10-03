@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.8.2";
+  const VERSION_AFFICHEE = "8.8.3";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   // À l'écran : seulement « 8.7 » (le dernier chiffre change à chaque mise en ligne, en coulisses)
@@ -256,7 +256,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (prestigeDebloque()) return;
     try { localStorage.setItem(CLE_PRESTIGE, "1"); } catch (e) {}
     majPastillePrestige();
-    afficherNotificationHaut("✨", "Thème Prestige débloqué !", "Réglages > Thème");
+    afficherNotificationHaut("✨", "Thème Prestige débloqué !");
   }
 
   // Notification qui arrive du haut de l'écran, aux couleurs du thème (se ferme au tap ou après 5 s)
@@ -322,6 +322,21 @@ document.addEventListener("DOMContentLoaded", function () {
     petale.style.animationDuration = `${duree}s`;
     petale.style.animationDelay = `${-Math.random() * duree}s`; // déjà en train de tomber à l'ouverture
     zonePetales.appendChild(petale);
+  }
+
+  // Prestige : étincelles qui scintillent sur l'écran d'accueil (positions, tailles et rythmes au hasard)
+  const zoneEtincelles = document.getElementById("etincellesPrestige");
+  for (let i = 0; i < 26; i++) {
+    const etincelle = document.createElement("span");
+    const taille = 12 + Math.random() * 18;
+    const duree = 2.5 + Math.random() * 3;
+    etincelle.textContent = "✦";
+    etincelle.style.left = `${Math.random() * 96}%`;
+    etincelle.style.top = `${Math.random() * 96}%`;
+    etincelle.style.fontSize = `${taille}px`;
+    etincelle.style.animationDuration = `${duree}s`;
+    etincelle.style.animationDelay = `${-Math.random() * duree}s`;
+    zoneEtincelles.appendChild(etincelle);
   }
 
   document.querySelectorAll(".pastilleTheme").forEach((pastille) => {

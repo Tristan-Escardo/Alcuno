@@ -35,6 +35,8 @@
         <section class="choixMode" id="choixMode">
             <!-- Thème Cerisier : pétales qui tombent (remplis par script.js) -->
             <div id="petalesCerisier" aria-hidden="true"></div>
+            <!-- Thème Prestige : étincelles qui scintillent (remplies par script.js) -->
+            <div id="etincellesPrestige" aria-hidden="true"></div>
             <!-- Réglages : seulement sur l'écran d'accueil -->
             <button type="button" id="btnReglages" title="Réglages" aria-label="Réglages">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -45,7 +47,7 @@
                 </svg>
             </button>
             <div class="titreAccueil">
-                <h1 id="titreAccueil">ALCUNO</h1>
+                <h1 id="titreAccueil">ALCUNO<span class="couronneTitre" aria-hidden="true"><svg viewBox="0 0 64 48" aria-hidden="true"><defs><linearGradient id="orCouronne" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff3a8"/><stop offset="0.45" stop-color="#ffd23f"/><stop offset="1" stop-color="#c8880a"/></linearGradient></defs><path d="M6 40 L3 12 L18 24 L32 4 L46 24 L61 12 L58 40 Z" fill="url(#orCouronne)" stroke="#7a4b00" stroke-width="2.5" stroke-linejoin="round"/><rect x="5" y="38" width="54" height="8" rx="2" fill="url(#orCouronne)" stroke="#7a4b00" stroke-width="2.5"/><circle cx="3" cy="11" r="3.2" fill="#fff3a8" stroke="#7a4b00" stroke-width="1.5"/><circle cx="32" cy="4" r="3.6" fill="#fff3a8" stroke="#7a4b00" stroke-width="1.5"/><circle cx="61" cy="11" r="3.2" fill="#fff3a8" stroke="#7a4b00" stroke-width="1.5"/><circle cx="32" cy="30" r="4" fill="#e0263a" stroke="#7a4b00" stroke-width="1.2"/><circle cx="17" cy="32" r="2.8" fill="#2f7de1" stroke="#7a4b00" stroke-width="1.2"/><circle cx="47" cy="32" r="2.8" fill="#2f7de1" stroke="#7a4b00" stroke-width="1.2"/></svg></span></h1>
                 <div class="titreAccueilBarre" aria-hidden="true"></div>
             </div>
             <h2>&nbsp;</h2>
@@ -360,5 +362,7 @@
     <script>
         document.write('<script src="script.js?t=' + window.ANTI_CACHE + '"><\/script>');
     </script>
+    <!-- Thème Prestige : reflet doré qui traverse l'écran de temps en temps (ne bloque aucun tap) -->
+    <div id="refletPrestige" aria-hidden="true"></div>
 </body>
 </html>
