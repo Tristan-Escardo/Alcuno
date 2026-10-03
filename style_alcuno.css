@@ -1347,8 +1347,7 @@ body.no-scroll{
 #stickyJoueurActif{
   position: fixed;
   --sticky-min-top: calc(env(safe-area-inset-top, 0px) + 10px);
-  --sticky-anchor-bottom: var(--sticky-min-top);
-  top: max(var(--sticky-min-top), var(--sticky-anchor-bottom));
+  top: var(--sticky-min-top);
   left: 50%;
   transform: translateX(-50%) translateY(-8px);
   z-index: 1200;
@@ -1357,9 +1356,9 @@ body.no-scroll{
   padding: 8px 12px;
   border: 1px solid rgba(255, 215, 0, 0.22);
   border-radius: 999px;
-  background: linear-gradient(180deg, rgba(62, 0, 43, 0.72), rgba(22, 0, 16, 0.68));
-  backdrop-filter: blur(10px) saturate(115%);
-  -webkit-backdrop-filter: blur(10px) saturate(115%);
+  /* Fond plus opaque à la place du flou d'arrière-plan : le flou était recalculé à chaque image
+     pendant le défilement (saccades sur téléphone) */
+  background: linear-gradient(180deg, rgba(62, 0, 43, 0.93), rgba(22, 0, 16, 0.91));
   box-shadow: 0 8px 22px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.08);
   display: flex;
   align-items: center;
@@ -1378,6 +1377,11 @@ body.no-scroll{
   flex: 0 0 auto;
   background: radial-gradient(circle at 35% 35%, #fff6bf 0%, #FFD700 45%, #d6a900 100%);
   box-shadow: 0 0 10px rgba(255,215,0,0.28);
+}
+
+/* Sous la barre d'infos : posée dans la page, elle défile avec elle (voir repositionnerStickyJoueurActif) */
+#stickyJoueurActif.dans-la-page{
+  position: absolute;
 }
 
 #stickyJoueurActif.visible{
@@ -1597,7 +1601,7 @@ body.no-scroll{
 }
 
 #overlayDuel .duel-content{
-  width: min(920px, 92vw);
+  width: min(920px, 100%); /* (92vw dépassait de la marge intérieure : bords des titres coupés) */
   min-height: 100%;
   margin: auto;
   display: flex;
@@ -1612,6 +1616,11 @@ body.no-scroll{
   max-width: min(900px, 92vw);
   line-height: 1.05;
   margin: 0;
+  /* Titre en jaune, plus gros et plus gras que les consignes en dessous (avant : blanc) */
+  color: #FFD700;
+  font-weight: 900;
+  font-size: clamp(26px, 7vw, 56px);
+  text-shadow: 2px 2px 5px #000;
 }
 
 #overlayDuel .duel-boutons{
@@ -2536,8 +2545,8 @@ header h1{
   border-color: var(--couleur-jeu);
   border-color: color-mix(in srgb, var(--couleur-jeu) 75%, transparent);
   background: linear-gradient(180deg,
-    color-mix(in srgb, var(--couleur-jeu) 32%, rgba(62, 0, 43, 0.78)),
-    rgba(22, 0, 16, 0.72));
+    color-mix(in srgb, var(--couleur-jeu) 32%, rgba(62, 0, 43, 0.93)),
+    rgba(22, 0, 16, 0.91));
   box-shadow:
     0 8px 22px rgba(0,0,0,0.18),
     inset 0 1px 0 rgba(255,255,255,0.08),
@@ -3955,4 +3964,79 @@ html[data-theme="prestige"] #refletPrestige{
 
 @media (prefers-reduced-motion: reduce){
   #etincellesPrestige, #refletPrestige, #notifHaut .notifHaut-eclats{ display: none !important; }
+}
+
+/* ===== Carte tirée en haut des overlays de choix (+4, duel, nouveau pigeon) ===== */
+#overlayPlus4 .carte-vedette,
+#overlayPigeon .carte-vedette,
+#overlayDuel .Carte.carte-vedette{
+  width: clamp(80px, 22vw, 120px);
+  max-width: none;
+  height: auto;
+  aspect-ratio: 50 / 78;
+  flex: 0 0 auto;
+  border-radius: 8px;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.5);
+  transform: none;
+  cursor: default;
+}
+
+/* Pendant le tirage du duel : le 4 en petit, pour ne pas le confondre avec les 2 cartes du duel */
+#overlayDuel .Carte.carte-vedette-petite{
+  width: clamp(54px, 14vw, 76px);
+}
+
+/* Choix du nouveau pigeon : centré, mais le haut (la carte) reste visible avec beaucoup de joueurs */
+#overlayPigeon{
+  justify-content: flex-start;
+}
+#overlayPigeon > :first-child{ margin-top: auto; }
+#overlayPigeon > :last-child{ margin-bottom: auto; }
+
+/* ===== Voile noir pendant les enchaînements d'overlays (juste sous les overlays) ===== */
+#voileOverlays{
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  background: #000;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.28s ease, visibility 0s linear 0.28s;
+}
+
+#voileOverlays.visible{
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto; /* pas de tap sur le plateau entre deux overlays */
+  transition: opacity 0.28s ease, visibility 0s;
+}
+
+/* Ces overlays apparaissaient d'un coup : même fondu que les autres */
+#overlayPlus4,
+#overlayCouleur{
+  animation: fadeIn 0.3s ease;
+}
+
+/* ===== Carte « 1 » qui s'envole vers le nom du joueur qui la garde ===== */
+.Carte.carte-envol{
+  position: fixed;
+  margin: 0;
+  z-index: 9000; /* sous les overlays */
+  pointer-events: none;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.55); /* (pas de halo doré : réservé à la carte dorée) */
+  will-change: transform, opacity;
+}
+
+/* Le +1 du joueur grossit un instant à l'arrivée de la carte */
+.bonus-annulation{
+  display: inline-block;
+}
+.bonus-annulation.bonus-pulse{
+  animation: pulseBonus 0.6s ease-out;
+}
+@keyframes pulseBonus{
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.8); }
+  100% { transform: scale(1); }
 }
