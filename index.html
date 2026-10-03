@@ -27,9 +27,12 @@
     <link rel="apple-touch-icon" href="icones/icone-180.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <!-- black-translucent : le jeu s'affiche jusqu'en haut de l'écran, sous l'heure et la Dynamic Island
-         (avec « black », iOS mettait une barre opaque). Les marges du haut utilisent safe-area-inset-top. -->
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Barre du haut opaque (« black ») : l'iPhone la peint de la couleur du thème et le jeu va jusqu'au
+         bas de l'écran. Avec « black-translucent » (8.8.9 à 8.8.22), le jeu passait sous l'heure, mais iOS 27
+         le remonte de 59 px sans l'agrandir : les 59 derniers px de l'écran restaient hors du jeu (bande en
+         bas). iOS retient ce réglage à l'installation : il faut réinstaller l'appli pour qu'il change.
+         Le CSS gère les deux cas (marges du haut en safe-area-inset-top, 0 avec la barre opaque). -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="Alcuno">
     <!-- Aperçu du lien partagé (Messages, WhatsApp…) : l'icône du jeu, pas une image de la page comme le QR code -->
     <meta property="og:title" content="Alcuno">
