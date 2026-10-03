@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.8.5";
+  const VERSION_AFFICHEE = "8.8.7";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   // À l'écran : seulement « 8.7 » (le dernier chiffre change à chaque mise en ligne, en coulisses)
@@ -371,6 +371,31 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  // iPhone (Safari d'iOS 26 et plus) : la barre du haut ne lit plus theme-color, elle prend la
+  // couleur du haut de la page… et ne la relit qu'après un changement de mise en page ou un
+  // défilement. Un simple changement de couleur ne lui suffit pas : on lui en provoque un, invisible.
+  function rafraichirBarreIphone(){
+    const reglages = document.getElementById("ecranReglages");
+    // une fine bande fixe aux couleurs du thème, posée en haut (derrière les pages) puis retirée
+    const bande = document.createElement("div");
+    bande.id = "teinteHaut";
+    bande.setAttribute("aria-hidden", "true");
+    document.body.appendChild(bande);
+    // la page Réglages (fixe, tout en haut) change de mise en page d'un pixel, en bas, le temps d'une image
+    document.documentElement.classList.add("teinte-maj");
+    // défilement d'un pixel aller-retour (de la page et des réglages)
+    const yPage = window.scrollY;
+    const yReglages = reglages ? reglages.scrollTop : 0;
+    window.scrollTo(0, yPage > 0 ? yPage - 1 : yPage + 1);
+    if (reglages) reglages.scrollTop = yReglages > 0 ? yReglages - 1 : yReglages + 1;
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      document.documentElement.classList.remove("teinte-maj");
+      window.scrollTo(0, yPage);
+      if (reglages) reglages.scrollTop = yReglages;
+      setTimeout(() => bande.remove(), 400);
+    }));
+  }
+
   majPastillePrestige();
   let themeChoisi = "bordeaux";
   try { themeChoisi = localStorage.getItem(CLE_THEME) || "bordeaux"; } catch (e) {}
@@ -408,6 +433,7 @@ document.addEventListener("DOMContentLoaded", function () {
   document.querySelectorAll(".pastilleTheme").forEach((pastille) => {
     pastille.addEventListener("click", () => {
       appliquerTheme(pastille.dataset.theme);
+      rafraichirBarreIphone();
       try { localStorage.setItem(CLE_THEME, pastille.dataset.theme); } catch (e) {}
     });
   });
@@ -619,7 +645,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document.getElementById("btnPartagerJeu").addEventListener("click", () => {
     if (navigator.share) {
-      navigator.share({ title: "Alcuno", text: "On joue à Alcuno ? 🍻", url: ADRESSE_JEU }).catch(() => {});
+      navigator.share({ url: ADRESSE_JEU }).catch(() => {}); // juste le lien (aperçu : l'icône du jeu, cf. og:image)
       return;
     }
     const copie = navigator.clipboard ? navigator.clipboard.writeText(ADRESSE_JEU) : Promise.reject();
@@ -2873,7 +2899,7 @@ document.addEventListener("DOMContentLoaded", function () {
       restants.forEach(x => {
         const ligne = document.createElement("div");
         ligne.className = "fin-un-ligne";
-        ligne.innerText = `${x.nom} doit boire ${x.n} gorgée(s) pour les 1 restants`;
+        ligne.innerText = `${x.nom} doit boire ${x.n} gorgée(s) pour ses 1 restants`;
         bloc.appendChild(ligne);
       });
     }
@@ -3797,9 +3823,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const perdant = (v1 < v2) ? j1 : j2;
       const vPerdant = (v1 < v2) ? v1 : v2;
       const gorg = gorgeesDuel(vPerdant, duelMultiplicateur);
-      // Égalités avant : on rappelle le multiplicateur sous le résultat
-      const msg = joueurs[perdant] + " boit " + texteGorgees(gorg) +
-        (duelMultiplicateur > 1 ? "\nDuel ×" + duelMultiplicateur + " après égalité" : "");
+      const msg = joueurs[perdant] + " boit " + texteGorgees(gorg);
 
       // Résultat visible tout de suite sur le duel : la carte du perdant en rouge, celle du gagnant estompée
       const carteDeJ1 = (choixJ1 === 1) ? c1 : c2;
