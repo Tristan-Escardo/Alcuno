@@ -3700,6 +3700,23 @@ html[data-theme="prestige"]{
   display: none;
 }
 
+/* iPhone : de quoi forcer Safari à relire la couleur de la barre du haut après un changement de
+   thème (voir rafraichirBarreIphone dans script.js) */
+#teinteHaut{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--fond-theme);
+  pointer-events: none;
+  z-index: 0; /* derrière les pages et les overlays */
+}
+
+html.teinte-maj #ecranReglages{
+  padding-bottom: calc(29px + env(safe-area-inset-bottom, 0px));
+}
+
 /* Cerisier : pétales qui tombent doucement sur l'écran d'accueil (rien avec les autres thèmes) */
 #petalesCerisier{
   display: none;
