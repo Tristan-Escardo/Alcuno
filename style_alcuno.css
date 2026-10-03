@@ -3692,12 +3692,15 @@ html[data-theme="cerisier"]{
 
 html[data-theme="prestige"]{
   --fond-theme: #3a2806;
+  /* le tout haut du décor ci-dessous, d'une seule couleur sur toute la largeur : la barre de l'iPhone
+     prend celle-ci (à recalculer si on touche aux dégradés : fond + lueur 0.36 + reflet 0.14) */
+  --couleur-barre: #937810;
   --deco-theme:
-    /* reflets d'or en diagonale */
-    linear-gradient(135deg, rgba(255, 223, 90, 0.30) 0%, rgba(255, 215, 0, 0.04) 28%, rgba(255, 236, 140, 0.24) 52%,
-                    rgba(255, 215, 0, 0.03) 74%, rgba(255, 200, 60, 0.22) 100%),
-    /* lueur dorée en haut et en bas */
-    radial-gradient(circle at 50% 0%, rgba(255, 215, 0, 0.38), transparent 55%),
+    /* reflets d'or en diagonale (réguliers sur le haut de l'écran) */
+    linear-gradient(135deg, rgba(255, 223, 90, 0.14) 0%, rgba(255, 223, 90, 0.14) 34%, rgba(255, 236, 140, 0.26) 52%,
+                    rgba(255, 215, 0, 0.04) 74%, rgba(255, 200, 60, 0.22) 100%),
+    /* lueur dorée en haut (sur toute la largeur) et en bas */
+    linear-gradient(to bottom, rgba(255, 215, 0, 0.36), transparent 55%),
     radial-gradient(circle at 50% 110%, rgba(255, 180, 40, 0.30), transparent 50%);
 }
 
@@ -3713,21 +3716,17 @@ html[data-theme="prestige"]{
   display: none;
 }
 
-/* iPhone : de quoi forcer Safari à relire la couleur de la barre du haut après un changement de
-   thème (voir rafraichirBarreIphone dans script.js) */
+/* iPhone : bande posée un instant tout en haut après un changement de thème, pour que l'iPhone relise
+   la couleur de sa barre (voir rafraichirBarreIphone dans script.js). Même couleur que le haut de la
+   page : invisible. Au-dessus des Réglages (là où on change de thème), sous les overlays. */
 #teinteHaut{
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: 2px;
-  background: var(--fond-theme);
-  pointer-events: none;
-  z-index: 0; /* derrière les pages et les overlays */
-}
-
-html.teinte-maj #ecranReglages{
-  padding-bottom: calc(29px + env(safe-area-inset-bottom, 0px));
+  height: calc(var(--haut-ecran) + 1px);
+  background-color: var(--couleur-barre);
+  z-index: 10002;
 }
 
 /* Cerisier : pétales qui tombent doucement sur l'écran d'accueil (rien avec les autres thèmes) */
@@ -4081,18 +4080,17 @@ body{ padding-top: var(--haut-ecran); }
 
 .overlay-opaque{ padding-top: calc(clamp(14px, 3.2vw, 30px) + var(--haut-ecran)); }
 
-/* Barre du haut de l'iPhone : selon les cas (appli installée avant la 8.8.9, Safari, iOS récents),
-   l'iPhone la peint d'une couleur unie, celle du fond du thème, au lieu de laisser voir la page dessous.
-   Les décors en dégradé (Prestige surtout) s'arrêtaient net sous cette barre : une ligne.
-   Le haut de chaque page a donc la couleur du fond du thème dans la zone de l'heure (hauteur de cette
-   zone, 0 quand la page commence sous la barre), puis se fond dans le décor sur 56 px : que l'iPhone
-   peigne sa barre ou non, plus de ligne. */
+/* Barre du haut de l'iPhone (sous l'heure) : l'iPhone la peint d'une couleur unie, la couleur de fond
+   (background-color) de l'écran affiché, au lieu de laisser voir la page dessous. Chaque thème donne
+   donc dans --couleur-barre la couleur du tout haut de son décor : posée en couleur de fond mais cachée
+   sous le décor (le fond du thème y est une couche en dégradé uni), elle ne sert qu'à la barre, qui se
+   fond dans la page. Pas de bande ni de fondu : le décor va jusqu'en haut de l'écran. */
+:root{ --couleur-barre: var(--fond-theme); }
 
 body{
   background:
-    linear-gradient(to bottom, var(--fond-theme) var(--haut-ecran), transparent calc(var(--haut-ecran) + 56px)),
     var(--deco-theme, radial-gradient(circle at top center, rgba(255, 215, 0, 0.08) 0%, rgba(255, 215, 0, 0) 26%)),
-    var(--fond-theme);
+    linear-gradient(var(--fond-theme), var(--fond-theme)) var(--couleur-barre);
 }
 
 #choixMode,
@@ -4103,24 +4101,13 @@ body{
 #ecranConfirmerAccueil,
 #ecranChoixPseudo{
   background:
-    linear-gradient(to bottom, var(--fond-theme) var(--haut-ecran), transparent calc(var(--haut-ecran) + 56px)),
     var(--deco-accueil, var(--deco-theme, none)),
-    var(--fond-theme);
+    linear-gradient(var(--fond-theme), var(--fond-theme)) var(--couleur-barre);
 }
 
 #suppression,
 #ecranReglages{
   background:
-    linear-gradient(to bottom, var(--fond-theme) var(--haut-ecran), transparent calc(var(--haut-ecran) + 56px)),
     var(--deco-theme, none),
-    var(--fond-theme);
-}
-
-#ecranCredits{
-  background:
-    linear-gradient(to bottom, var(--fond-theme) var(--haut-ecran), transparent calc(var(--haut-ecran) + 56px)),
-    radial-gradient(circle at 50% 18%, rgba(255,215,0,0.16), transparent 58%),
-    radial-gradient(circle at 15% 85%, rgba(255,77,77,0.10), transparent 45%),
-    radial-gradient(circle at 85% 85%, rgba(66,183,255,0.10), transparent 45%),
-    var(--fond-theme);
+    linear-gradient(var(--fond-theme), var(--fond-theme)) var(--couleur-barre);
 }

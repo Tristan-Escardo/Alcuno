@@ -9,13 +9,16 @@
         window.ANTI_CACHE = Date.now();
         // Thème choisi dans les réglages : appliqué tout de suite (pas de flash de bordeaux au chargement)
         try { var theme = localStorage.getItem("alcuno_theme"); if (theme) document.documentElement.dataset.theme = theme; } catch (e) {}
+        // Barre du téléphone à la couleur du thème dès le premier affichage (mêmes couleurs que THEMES dans script.js)
+        var couleursBarre = { bordeaux: "#2b001d", noir: "#0e0e12", vert: "#08301e", bleu: "#0a1634", violet: "#3d0f66",
+                              cerisier: "#5a1740", prestige: "#937810" };
+        document.write('<meta name="theme-color" content="' + (couleursBarre[theme] || couleursBarre.bordeaux) + '">');
         document.write('<link rel="stylesheet" href="style_alcuno.css?t=' + window.ANTI_CACHE + '" />');
     </script>
     <title>Alcuno</title>
 
     <!-- Appli installable (PWA) : manifest.json + sw.js -->
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2B001D">
     <link rel="icon" type="image/png" href="icones/icone-192.png">
     <!-- iPhone : icône, plein écran et nom sur l'écran d'accueil -->
     <link rel="apple-touch-icon" href="icones/icone-180.png">
@@ -309,7 +312,7 @@
                 <div class="credits-titre">ALCUNO</div>
                 <p class="credits-phrase">
                     Un jeu imaginé en pleine soirée par<br>
-                    <strong>Tristan, Ylana, Célien &amp; Roseanna (tous bourrés bien sûr !)</strong>
+                    <strong>Tristan, Ylana, Célien &amp; Roseanna (tous bourrés bien sûr)</strong>
                 </p>
 
                 <!-- Photo : mettre le fichier photo_createurs.jpg à côté de index.html -->

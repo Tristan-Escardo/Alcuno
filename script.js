@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.8.10";
+  const VERSION_AFFICHEE = "8.8.11";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   // À l'écran : le numéro complet, pour voir d'un coup d'œil si un téléphone est à jour
@@ -237,8 +237,10 @@ document.addEventListener("DOMContentLoaded", function () {
   // ===== Thème : couleur du fond du jeu (réglage de ce téléphone, purement visuel) =====
   // (le thème est déjà posé au tout début du chargement par index.html : pas de flash de couleur)
   const CLE_THEME = "alcuno_theme";
+  // Couleur de la barre du téléphone pour chaque thème (= --couleur-barre du CSS, le tout haut de la page).
+  // Mêmes couleurs dans le script du <head> de index.html, qui la pose dès le premier affichage.
   const THEMES = { bordeaux: "#2b001d", noir: "#0e0e12", vert: "#08301e", bleu: "#0a1634", violet: "#3d0f66",
-                   cerisier: "#5a1740", prestige: "#3a2806" };
+                   cerisier: "#5a1740", prestige: "#937810" };
 
   // Thème secret « Prestige » : débloqué en découvrant l'écran des créateurs (4 taps sur le titre)
   const CLE_PRESTIGE = "alcuno_theme_prestige";
@@ -371,28 +373,25 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // iPhone (Safari d'iOS 26 et plus) : la barre du haut ne lit plus theme-color, elle prend la
-  // couleur du haut de la page… et ne la relit qu'après un changement de mise en page ou un
-  // défilement. Un simple changement de couleur ne lui suffit pas : on lui en provoque un, invisible.
+  // iPhone : la barre du haut (sous l'heure) est peinte d'une couleur unie prise sur l'élément fixe du
+  // haut de l'écran, et l'iPhone ne la relit pas quand seule sa couleur change (elle gardait celle du
+  // thème d'avant). Une fois le nouveau thème affiché, on pose un instant tout en haut une bande de la
+  // couleur du haut de la page (invisible), puis on la retire : l'élément du haut change deux fois et
+  // l'iPhone relit la couleur.
+  let bandeBarre = null;
   function rafraichirBarreIphone(){
-    const reglages = document.getElementById("ecranReglages");
-    // une fine bande fixe aux couleurs du thème, posée en haut (derrière les pages) puis retirée
-    const bande = document.createElement("div");
-    bande.id = "teinteHaut";
-    bande.setAttribute("aria-hidden", "true");
-    document.body.appendChild(bande);
-    // la page Réglages (fixe, tout en haut) change de mise en page d'un pixel, en bas, le temps d'une image
-    document.documentElement.classList.add("teinte-maj");
-    // défilement d'un pixel aller-retour (de la page et des réglages)
-    const yPage = window.scrollY;
-    const yReglages = reglages ? reglages.scrollTop : 0;
-    window.scrollTo(0, yPage > 0 ? yPage - 1 : yPage + 1);
-    if (reglages) reglages.scrollTop = yReglages > 0 ? yReglages - 1 : yReglages + 1;
+    if (bandeBarre) bandeBarre.remove();
+    // deux images plus tard : le nouveau thème est peint
     requestAnimationFrame(() => requestAnimationFrame(() => {
-      document.documentElement.classList.remove("teinte-maj");
-      window.scrollTo(0, yPage);
-      if (reglages) reglages.scrollTop = yReglages;
-      setTimeout(() => bande.remove(), 400);
+      const bande = document.createElement("div");
+      bande.id = "teinteHaut";
+      bande.setAttribute("aria-hidden", "true");
+      document.body.appendChild(bande);
+      bandeBarre = bande;
+      setTimeout(() => {
+        bande.remove();
+        if (bandeBarre === bande) bandeBarre = null;
+      }, 300);
     }));
   }
 
