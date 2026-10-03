@@ -2,7 +2,7 @@
 /* Anti scroll horizontal (iOS/Android) */
 
 body{
-  background-color: rgb(43, 0, 29);
+  background-color: var(--fond-theme);
   margin: 0;
   font-family: Arial, sans-serif;
   color: white;
@@ -231,13 +231,6 @@ button,
     text-align: center;
 }
 
-.titreJoueurs {
-    font-size: 22px;
-    font-weight: bold;
-    color: #75f6ff;
-    margin-bottom: 8px;
-}
-
 .nomsJoueurs{
     display: grid;
     grid-auto-flow: column;              /* remplit colonne par colonne */
@@ -271,8 +264,8 @@ button,
   font-size: 0.75em;
   font-style: italic;
   font-weight: 700;
-  color: #d0d0d0;
-  background: rgba(255,255,255,0.12);
+  color: #ff5c5c;
+  background: rgba(255,70,70,0.14);
   white-space: nowrap;
 }
 
@@ -331,7 +324,7 @@ button,
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: rgb(43, 0, 29);
+  background: var(--deco-theme, none), var(--fond-theme);
 
   display: flex;
   flex-direction: column;
@@ -799,15 +792,6 @@ button,
   overscroll-behavior: contain;
 }
 
-#overlayDuel .titre-duel {
-    font-size: 48px;
-    font-weight: bold;
-    color: #FFD700;
-    text-align: center;
-    text-shadow: 2px 2px 5px #000;
-    animation: pop 0.5s ease forwards;
-}
-
 #overlayDuel button {
     width: 200px;
     max-width: 400px;
@@ -873,19 +857,6 @@ button,
     flex: 0 0 auto;
 }
 
-#controlsGauche,
-#controlsDroite{
-    display: flex;
-    flex-wrap: wrap;     /* ✅ boutons passent à la ligne */
-    gap: 10px;
-    align-items: center;
-}
-
-#controlsGauche button,
-#controlsDroite button{
-    min-width: 170px; /* ajuste si tu veux */
-}
-
 #menu input{
     min-width: 0;
 }
@@ -899,29 +870,6 @@ button,
 }
 
 /* ===== Boutons annulation dans overlayRegleUnique ===== */
-#overlayRegleUnique .bloc-annulation{
-  margin-top: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  align-items: center;
-}
-
-#overlayRegleUnique .titre-annulation{
-  color: #FFD700;
-  font-size: 22px;
-  font-weight: 800;
-  text-align: center;
-  text-shadow: 2px 2px 5px #000;
-}
-
-#overlayRegleUnique .ligne-boutons-annulation{
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 14px;
-}
-
 #overlayRegleUnique .bouton-annulation{
   width: 200px;
   max-width: 400px;
@@ -1245,11 +1193,6 @@ body.no-scroll{
         align-items: stretch;
     }
 
-    #controlsGauche,
-    #controlsDroite{
-        width: 100%;
-    }
-
     /* boutons + input => mêmes largeurs */
     #menu button,
     #menu input{
@@ -1553,7 +1496,7 @@ body.no-scroll{
   max-width: none;
   min-height: 68px;
   padding: 7px 6px;
-  font-size: 12px;
+  font-size: 15px;
   line-height: 1.05;
   border-radius: 12px;
 }
@@ -1583,7 +1526,7 @@ body.no-scroll{
   #overlayPlus4 .plus4-joueur-btn{
     min-height: 62px;
     padding: 6px 5px;
-    font-size: 11px;
+    font-size: 14px;
     border-radius: 11px;
   }
 
@@ -1602,7 +1545,7 @@ body.no-scroll{
   #overlayPlus4 .plus4-container-joueurs .bouton-pigeon,
   #overlayPlus4 .plus4-joueur-btn{
     min-height: 74px;
-    font-size: 13px;
+    font-size: 16px;
   }
 }
 
@@ -1742,8 +1685,8 @@ body.no-scroll{
 /* ===== HEADER / TOP BAR – intégré au design du jeu ===== */
 body{
   background:
-    radial-gradient(circle at top center, rgba(255, 215, 0, 0.08) 0%, rgba(255, 215, 0, 0) 26%),
-    rgb(43, 0, 29);
+    var(--deco-theme, radial-gradient(circle at top center, rgba(255, 215, 0, 0.08) 0%, rgba(255, 215, 0, 0) 26%)),
+    var(--fond-theme);
 }
 
 header{
@@ -1878,7 +1821,7 @@ header h1{
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: rgb(43, 0, 29);
+  background: var(--deco-accueil, var(--deco-theme, none)), var(--fond-theme);
 
   display: flex;
   flex-direction: column;
@@ -2048,16 +1991,6 @@ header h1{
   text-shadow: 1px 1px 3px #000;
 }
 
-#choixMode .versionJeu{
-  position: absolute;
-  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-  left: 0;
-  right: 0;
-  margin: 0;
-  font-size: 12px;
-  color: rgba(255,255,255,0.35);
-}
-
 /* Salle d'attente : nom à gauche, bouton ✕ à droite */
 #listeJoueursEnLigne div{
   display: flex;
@@ -2204,11 +2137,11 @@ body.mode-en-ligne #jouer{
   max-width: 90vw;
   padding: 12px 18px;
   border-radius: 12px;
-  background: rgba(0,0,0,0.88);
+  background: var(--fond-theme);
   color: #FFD700;
   font-weight: 800;
   text-align: center;
-  box-shadow: 0 0 0 1px rgba(255,215,0,0.3) inset;
+  box-shadow: 0 0 0 1px rgba(255,215,0,0.45) inset, 0 8px 24px rgba(0,0,0,0.45);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s ease, transform 0.2s ease;
@@ -2241,7 +2174,7 @@ header h1{
     radial-gradient(circle at 50% 18%, rgba(255,215,0,0.16), transparent 58%),
     radial-gradient(circle at 15% 85%, rgba(255,77,77,0.10), transparent 45%),
     radial-gradient(circle at 85% 85%, rgba(66,183,255,0.10), transparent 45%),
-    rgb(43, 0, 29);
+    var(--fond-theme);
 }
 
 #ecranCredits .credits-contenu{
@@ -2687,21 +2620,119 @@ header h1{
   }
 }
 
-/* ===== Interrupteur « Vibrations » (écran de départ, en petit en bas) ===== */
-#choixMode .optionVibrations{
+/* ===== Bouton Réglages : curseurs dorés, coin droit de l'écran d'accueil (seulement là) ===== */
+#choixMode #btnReglages{
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: calc(38px + env(safe-area-inset-bottom, 0px));
-  width: max-content;
-  max-width: calc(100% - 32px);
+  top: 24px;
+  right: 18px;
+  z-index: 2;
+  width: auto;
+  min-width: 0;
+  padding: 6px;
+  border: none;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  line-height: 0;
+  opacity: 0.9;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+#choixMode #btnReglages svg{
+  width: 32px;
+  height: 32px;
+  overflow: visible;
+  filter:
+    drop-shadow(0 2px 0 rgba(120, 70, 0, 0.95))
+    drop-shadow(0 3px 6px rgba(0,0,0,0.45));
+}
+
+#choixMode #btnReglages path{
+  fill: none;
+  stroke: #FFD700;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+#choixMode #btnReglages circle{
+  fill: var(--fond-theme);
+  stroke: #FFD700;
+  stroke-width: 2.4;
+}
+
+#choixMode #btnReglages:hover{
+  opacity: 1;
+  background: none;
+  transform: scale(1.06);
+}
+
+@media (max-width: 520px){
+  #choixMode #btnReglages svg{
+    width: 28px;
+    height: 28px;
+  }
+}
+
+/* ===== Écran Réglages ===== */
+#ecranReglages{
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 76px 16px calc(28px + env(safe-area-inset-bottom, 0px));
+  box-sizing: border-box;
+  color: #fff;
+  background: var(--deco-theme, none), var(--fond-theme);
+}
+
+#ecranReglages .reglages-contenu{
+  max-width: 520px;
   margin: 0 auto;
-  display: inline-flex;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: fadeIn 0.25s ease forwards;
+}
+
+#ecranReglages h2{
+  margin: 0 0 6px;
+  text-align: center;
+  color: #FFD700;
+  font-size: clamp(22px, 5vw, 36px);
+  font-weight: 900;
+  text-shadow: 2px 2px 5px #000;
+}
+
+#ecranReglages .btnRetour{
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  padding: 10px 18px;
+  font-size: 15px;
+  font-weight: 900;
+  color: #fff;
+  background-color: #ffcc00;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+  box-shadow:
+    inset 0 -2px 0 rgba(0,0,0,0.18),
+    0 8px 18px rgba(0,0,0,0.25);
+}
+
+/* Une ligne par réglage : texte à gauche, interrupteur à droite */
+#ecranReglages .optionReglage{
+  display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  font-weight: 800;
-  color: rgba(255,255,255,0.72);
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,215,0,0.18);
   cursor: pointer;
   -webkit-user-select: none;
   user-select: none;
@@ -2709,57 +2740,86 @@ header h1{
   -webkit-tap-highlight-color: transparent;
 }
 
+#ecranReglages .optionTexte{
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+}
+
+#ecranReglages .optionTitre{
+  font-size: clamp(16px, 4vw, 19px);
+  font-weight: 900;
+  color: #FFD700;
+}
+
+#ecranReglages .optionNote{
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: rgba(255,255,255,0.62);
+}
+
 /* la vraie case à cocher reste accessible mais invisible */
-#choixMode .optionVibrations input{
+#ecranReglages .optionReglage input{
   position: absolute;
   opacity: 0;
   width: 1px;
   height: 1px;
 }
 
-#choixMode .interrupteur{
+#ecranReglages .interrupteur{
   position: relative;
   flex: 0 0 auto;
-  width: 34px;
-  height: 20px;
+  width: 46px;
+  height: 26px;
   border-radius: 999px;
   background: rgba(255,255,255,0.18);
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
   transition: background-color 0.2s ease;
 }
 
-#choixMode .interrupteur::after{
+#ecranReglages .interrupteur::after{
   content: "";
   position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 14px;
-  height: 14px;
+  top: 4px;
+  left: 4px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background: #fff;
   transition: transform 0.2s ease, background-color 0.2s ease;
 }
 
-#choixMode .optionVibrations input:checked + .interrupteur{
+#ecranReglages .optionReglage input:checked + .interrupteur{
   background: #FFD700;
 }
 
-#choixMode .optionVibrations input:checked + .interrupteur::after{
-  transform: translateX(14px);
-  background: rgb(43, 0, 29);
+#ecranReglages .optionReglage input:checked + .interrupteur::after{
+  transform: translateX(20px);
+  background: var(--fond-theme);
 }
 
-#choixMode .optionVibrations input:focus-visible + .interrupteur{
+#ecranReglages .optionReglage input:focus-visible + .interrupteur{
   outline: 2px solid #FFD700;
   outline-offset: 2px;
 }
 
-#choixMode .optionNote{
-  font-weight: 600;
-  color: rgba(255,255,255,0.42);
+#ecranReglages .aPropos{
+  margin-top: 10px;
+  text-align: center;
 }
 
-/* ===== Installer l'appli (écran de départ, au-dessus de l'interrupteur Vibrations) ===== */
+#ecranReglages .aProposTitre{
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,215,0,0.7);
+}
+
+/* ===== Installer l'appli (écran de départ, en bas) ===== */
 #choixMode [hidden]{
   display: none !important;
 }
@@ -2768,7 +2828,7 @@ header h1{
   position: absolute;
   left: 0;
   right: 0;
-  bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(22px + env(safe-area-inset-bottom, 0px));
   display: flex;
   justify-content: center;
   padding-inline: 16px;
@@ -2921,7 +2981,7 @@ body.rattrapage [id^="overlay"] *{
   position: fixed;
   inset: 0;
   z-index: 30000;
-  background: rgb(43, 0, 29);
+  background: var(--fond-theme);
 
   display: flex;
   justify-content: center;
@@ -2956,4 +3016,922 @@ body.rattrapage [id^="overlay"] *{
   line-height: 1.4;
   color: rgba(255,255,255,0.8);
   text-align: center;
+}
+
+/* ===== Bandeau « Nouvelle version disponible » ===== */
+#bandeauMiseAJour{
+  position: fixed;
+  top: calc(10px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30002;
+  width: max-content;
+  max-width: calc(100% - 24px);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 8px 8px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,215,0,0.45);
+  background: rgba(20, 0, 14, 0.95);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.4);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+#bandeauMiseAJour .maj{
+  flex: 0 0 auto;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 10px;
+  background: #FFD700;
+  color: var(--fond-theme);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+#bandeauMiseAJour .plusTard{
+  flex: 0 0 auto;
+  padding: 6px 8px;
+  border: none;
+  background: none;
+  color: rgba(255,255,255,0.6);
+  font-size: 15px;
+  cursor: pointer;
+}
+
+/* Mode en ligne : coupure de réseau => écran par-dessus tout (y compris les overlays) qui
+   bloque tous les taps, puis grand logo wifi rouge barré qui clignote au milieu (.visible) */
+#coupureReseau{
+  position: fixed;
+  inset: 0;
+  z-index: 40000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  touch-action: none;
+  background: transparent;
+  transition: background 0.3s;
+}
+
+#coupureReseau.visible{
+  background: rgba(0, 0, 0, 0.45);
+}
+
+#coupureReseau svg{
+  width: min(48vw, 240px);
+  height: auto;
+  filter: drop-shadow(0 0 14px rgba(255, 30, 30, 0.75));
+  animation: clignoteCoupure 1s ease-in-out infinite;
+}
+
+@keyframes clignoteCoupure{
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.15; }
+}
+
+/* ===== Réglage « Accessibilité pour les gens bourrés » : textes et boutons plus gros =====
+   (+30 % pour les textes, +20 % pour les boutons ; aussi dans la page Réglages.
+   Zoom sur les éléments de texte seulement : la mise en page et le plateau ne bougent pas) */
+html.accessibilite .overlay-regle-texte,
+html.accessibilite .titre-pigeon,
+html.accessibilite .overlay-subtitle,
+html.accessibilite #overlayCouleur div.titre-couleur,
+html.accessibilite .duel-info,
+html.accessibilite .duel-label,
+html.accessibilite .plus4-info,
+html.accessibilite .plus4-total,
+html.accessibilite .fin-un-ligne,
+html.accessibilite .fin-choix-turn,
+html.accessibilite .fin-choix-recap,
+html.accessibilite .fin-choix-resultat,
+html.accessibilite .doree-titre,
+html.accessibilite .doree-texte,
+html.accessibilite .joueurActif,
+html.accessibilite .nomsJoueurs,
+html.accessibilite #messageTexte,
+html.accessibilite .regleZero,
+html.accessibilite .reglePigeon,
+html.accessibilite #stickyJoueurActif .sticky-label,
+html.accessibilite #ecranReglages .optionTexte,
+html.accessibilite #stickyJoueurActif .sticky-nom{
+  zoom: 1.3;
+}
+
+html.accessibilite .bouton-pigeon,
+html.accessibilite .bouton-doree,
+html.accessibilite .bouton-annulation,
+html.accessibilite .titreBloc,
+html.accessibilite #ecranReglages .interrupteur,
+html.accessibilite #toastEnLigne{
+  zoom: 1.2;
+}
+
+/* ===== Grand titre ALCUNO de l'écran d'accueil (comme le bandeau, en plus grand) ===== */
+#choixMode .titreAccueil{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: clamp(10px, 4vh, 36px);
+}
+
+#choixMode #titreAccueil{
+  margin: 0;
+  font-family: Impact, Haettenschweiler, "Arial Black", sans-serif;
+  font-size: clamp(64px, 19vw, 120px);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.10em;
+  padding-left: 0.10em; /* compense l'espacement après la dernière lettre : vraiment centré */
+  color: #FFD700;
+  text-transform: uppercase;
+  text-shadow:
+    0 3px 0 rgba(120, 70, 0, 0.95),
+    0 6px 16px rgba(0,0,0,0.5),
+    0 0 34px rgba(255, 215, 0, 0.28);
+  animation: fadeIn 0.25s ease forwards, lueurTitreAccueil 3.5s ease-in-out 0.3s infinite;
+  touch-action: manipulation; /* easter egg : 4 taps rapides, sans zoom */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+#choixMode .titreAccueilBarre{
+  width: min(78%, 360px);
+  height: 5px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ff4d4d 0%, #ffd700 34%, #42d86b 67%, #42b7ff 100%);
+  box-shadow: 0 0 14px rgba(255, 215, 0, 0.25);
+}
+
+@keyframes lueurTitreAccueil{
+  0%, 100% {
+    text-shadow:
+      0 3px 0 rgba(120, 70, 0, 0.95),
+      0 6px 16px rgba(0,0,0,0.5),
+      0 0 34px rgba(255, 215, 0, 0.28);
+  }
+  50% {
+    text-shadow:
+      0 3px 0 rgba(120, 70, 0, 0.95),
+      0 6px 16px rgba(0,0,0,0.5),
+      0 0 48px rgba(255, 215, 0, 0.55);
+  }
+}
+
+/* Réglages : la liste des moments où ça vibre, sous « Android uniquement » */
+#ecranReglages .optionNote + .optionNote{
+  margin-top: 4px;
+}
+
+/* Mode bourré : boutons des menus et des écrans (taille du texte +20 %, largeurs inchangées :
+   un zoom les ferait dépasser de l'écran) */
+html.accessibilite #choixMode button:not(#btnReglages):not(.btnInstaller),
+html.accessibilite #enLigne button:not(.btnAccueilTexte):not(.btnRetour):not(.btnExclure),
+html.accessibilite #ecranNouvellePartie button:not(.btnAccueilTexte):not(.btnRetour),
+html.accessibilite #ecranConfirmerHote button,
+html.accessibilite #ecranConfirmerRetrait button,
+html.accessibilite #ecranConfirmerAccueil button,
+html.accessibilite #ecranChoixPseudo button{
+  font-size: clamp(22px, 4.8vw, 29px);
+}
+
+html.accessibilite .btnRetour{
+  font-size: 18px !important;
+}
+
+html.accessibilite #choixMode .btnInstaller{
+  font-size: 17px;
+}
+
+html.accessibilite #enLigne input{
+  font-size: 20px;
+}
+
+html.accessibilite #listeJoueursEnLigne div{
+  font-size: 1.2em;
+}
+
+html.accessibilite #enLigne .btnExclure{
+  font-size: 19px;
+}
+
+/* En partie : « Supprimer un joueur », « Nouvelle partie », liste et « Terminé » du retrait */
+html.accessibilite #menu button,
+html.accessibilite .suppression button{
+  font-size: clamp(19px, 4.2vw, 24px);
+}
+
+html.accessibilite #listeSuppression .supp-name,
+html.accessibilite #termineSuppression{
+  font-size: clamp(19px, 4.8vw, 26px);
+}
+
+/* +4 : boutons des joueurs (grille de 2) plus gros, sans zoom (sinon ils se chevauchent) */
+html.accessibilite #overlayPlus4 .plus4-container-joueurs{
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: min(300px, 84vw);
+  max-width: 300px;
+}
+
+html.accessibilite #overlayPlus4 .plus4-container-joueurs .bouton-pigeon,
+html.accessibilite #overlayPlus4 .plus4-joueur-btn{
+  zoom: 1;
+  min-height: 74px;
+  font-size: 19px;
+}
+
+/* Mode en ligne : bouton qui attend la réponse de Firebase (« Création… », « Connexion… »…) */
+#enLigne button.enAttente,
+#enLigne button.enAttente:hover{
+  opacity: 0.75;
+  transform: none;
+  cursor: wait;
+  animation: boutonEnAttente 0.9s ease-in-out infinite;
+}
+
+@keyframes boutonEnAttente{
+  0%, 100% { opacity: 0.75; }
+  50%      { opacity: 0.5; }
+}
+
+/* ===== Réglages : Sons (interrupteur + curseur de volume dans la même carte) ===== */
+#ecranReglages .blocReglage{
+  border-radius: 16px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,215,0,0.18);
+}
+
+#ecranReglages .blocReglage .optionReglage{
+  background: none;
+  border: none;
+}
+
+#ecranReglages .ligneVolume{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px 14px;
+  transition: opacity 0.2s ease;
+}
+
+#ecranReglages .ligneVolume.inactif{
+  opacity: 0.35;
+}
+
+#ecranReglages .ligneVolume input[type="range"]{
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 28px;
+  margin: 0;
+  accent-color: #FFD700;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#ecranReglages .volumeIcone{
+  font-size: 16px;
+  line-height: 1;
+}
+
+#ecranReglages .volumeValeur{
+  min-width: 3.4em;
+  text-align: right;
+  font-size: 14px;
+  font-weight: 900;
+  color: #FFD700;
+}
+
+/* ===== Réglages : « Partie en mémoire » avec un bouton « Oublier » ===== */
+#ecranReglages .optionAction{
+  cursor: default;
+}
+
+#ecranReglages .optionAction button{
+  flex: 0 0 auto;
+  padding: 9px 16px;
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--fond-theme);
+  background: #FFD700;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+/* ===== Réglages : Partager le jeu (QR code + bouton « Partager ») ===== */
+#ecranReglages .blocPartage{
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+#ecranReglages .qrJeu{
+  width: 180px;
+  height: 180px;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(255,215,0,0.55), 0 10px 24px rgba(0,0,0,0.35);
+  image-rendering: pixelated;
+}
+
+#ecranReglages .lienJeu{
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.7);
+  word-break: break-all;
+}
+
+#ecranReglages #btnPartagerJeu{
+  width: min(320px, 80vw);
+  padding: 14px 20px;
+  font-size: clamp(16px, 4vw, 19px);
+  font-weight: 900;
+  color: #fff;
+  background-color: #ffcc00;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+  box-shadow:
+    inset 0 -2px 0 rgba(0,0,0,0.18),
+    0 8px 18px rgba(0,0,0,0.25);
+  touch-action: manipulation;
+}
+
+/* ===== Rappel « Bois de l'eau 💧 » : bandeau bleu en haut, ne bloque rien, se ferme au tap ===== */
+#rappelEau{
+  position: fixed;
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  z-index: 30003;
+  width: min(420px, calc(100% - 24px));
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  color: #fff;
+  background: linear-gradient(135deg, #0a5f9e, #2fa8f0);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(255,255,255,0.25);
+  cursor: pointer;
+  animation: rappelEauArrive 0.4s ease-out both;
+  transform: translateX(-50%);
+}
+
+#rappelEau .rappelEau-icone{
+  font-size: 32px;
+  line-height: 1;
+}
+
+#rappelEau .rappelEau-texte{
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+}
+
+#rappelEau .rappelEau-texte strong{
+  font-size: 17px;
+  font-weight: 900;
+}
+
+#rappelEau .rappelEau-texte span{
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+@keyframes rappelEauArrive{
+  from { opacity: 0; transform: translate(-50%, -24px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* Mode bourré : nouveaux éléments des réglages et rappel d'eau plus gros */
+html.accessibilite #ecranReglages .volumeValeur,
+html.accessibilite #ecranReglages .volumeIcone,
+html.accessibilite #ecranReglages .optionAction button,
+html.accessibilite #ecranReglages .lienJeu,
+html.accessibilite #rappelEau .rappelEau-texte,
+html.accessibilite #rappelEau .rappelEau-icone{
+  zoom: 1.25;
+}
+
+html.accessibilite #ecranReglages #btnPartagerJeu{
+  font-size: clamp(19px, 4.8vw, 23px);
+}
+
+/* ===== Mode PJ (« soft » dans le code) : badge « PJ » à gauche du bandeau ALCUNO pendant une partie en Mode PJ,
+   et rappel dans la salle d'attente en ligne ===== */
+header .badgeSoft{
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  z-index: 2;
+  transform: translateY(-50%);
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  color: #c9ffb8;
+  background: rgba(66, 216, 107, 0.16);
+  border: 1px solid rgba(66, 216, 107, 0.55);
+  pointer-events: none;
+}
+
+body.partie-soft header .badgeSoft{
+  display: inline-block;
+}
+
+#enLigne .infoModeSoft{
+  margin: -8px 0 0;
+  font-size: 15px;
+  font-weight: 800;
+  color: #c9ffb8;
+}
+
+html.accessibilite header .badgeSoft,
+html.accessibilite #enLigne .infoModeSoft{
+  zoom: 1.2;
+}
+
+/* ===== Duel : résultat visible sur les cartes avant l'annonce des gorgées ===== */
+#overlayDuel .Carte.duel-perdant{
+  box-shadow: 0 0 0 3px #ff3b3b, 0 0 28px rgba(255, 59, 59, 0.8);
+  animation: duelPerdant 0.45s ease-in-out 2;
+}
+
+#overlayDuel .Carte.duel-gagnant{
+  opacity: 0.55;
+  filter: saturate(0.6);
+  transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+@keyframes duelPerdant{
+  0%, 100% { transform: translateX(0) rotate(0); }
+  25%      { transform: translateX(-6px) rotate(-3deg); }
+  75%      { transform: translateX(6px) rotate(3deg); }
+}
+
+/* ===== Pages plein écran (Réglages, créateurs) : arrivée en glissant depuis la droite,
+   départ en fondu vers la droite (au lieu d'apparaître / disparaître d'un coup) ===== */
+.page-entree{
+  animation: pageEntree 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.page-sortie{
+  animation: pageSortie 0.22s ease-in both;
+  pointer-events: none;
+}
+
+/* Sens d'arrivée : depuis la droite (+32px), ou depuis la gauche après « ← Retour » / ⌂ (-32px,
+   voir html.nav-retour). Une seule animation : changer de sens ne la rejoue pas (avant : changer
+   le nom de l'animation à la fin du retour la rejouait => « saut » bizarre) */
+:root{ --decalage-entree: 32px; }
+
+@keyframes pageEntree{
+  from { opacity: 0; transform: translateX(var(--decalage-entree)); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes pageSortie{
+  from { opacity: 1; transform: none; }
+  to   { opacity: 0; transform: translateX(32px); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .page-entree, .page-sortie{ animation-duration: 0.01s; }
+}
+
+/* ===== Réglages > À propos : version centrée sous le titre ===== */
+#ecranReglages .versionJeu{
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: rgba(255,255,255,0.55);
+}
+
+/* « Copier le diagnostic » sous la version (À propos) : petit bouton discret (gris, pas blanc) */
+#ecranReglages .btnDiagnostic{
+  align-self: center;
+  margin-top: 10px;
+  padding: 5px 11px;
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.45);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 999px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#ecranReglages .btnDiagnostic:active{
+  color: #FFD700;
+  border-color: rgba(255,215,0,0.5);
+}
+
+html.accessibilite #ecranReglages .aPropos{
+  zoom: 1.3;
+}
+
+/* ===== Mode en ligne : clavier ouvert => l'écran se cale sur la partie visible au-dessus du
+   clavier (--haut-visible / --hauteur-visible, mis à jour par script.js) au lieu de rester sur
+   toute la hauteur du téléphone (le clavier cachait le bouton « Créer » / « Rejoindre »).
+   Contenu centré dans cette zone, et on peut faire défiler s'il ne tient pas. ===== */
+#enLigne{
+  inset: auto 0;
+  top: var(--haut-visible, 0px);
+  height: var(--hauteur-visible, 100%);
+  justify-content: flex-start;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+#enLigne > div{
+  margin-block: auto; /* centré quand il y a la place, défilable sinon */
+}
+
+/* ===== Transitions entre les pages (comme Réglages) : en avançant, la page arrive en glissant
+   depuis la droite ; avec « ← Retour » ou ⌂ (classe nav-retour posée par script.js), depuis la
+   gauche. Accueil, mode en ligne (Créer / Rejoindre / Revenir / salle), « Nouvelle partie »,
+   page du mode classique. Les petites fenêtres de confirmation gardent leur simple fondu. ===== */
+/* (mode en ligne : on anime le contenu de chaque écran, pas l'écran lui-même : sinon le bouton
+   « ← Retour », placé par rapport à l'écran, se décalait par-dessus le champ) */
+#choixMode > *,
+#enLigne > div > *,
+#ecranNouvellePartie > *{
+  animation: pageEntree 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+#enLigne > div{
+  animation: none;
+}
+
+html.nav-retour{
+  --decalage-entree: -32px;
+}
+
+@media (prefers-reduced-motion: reduce){
+  #choixMode > *, #enLigne > div > *, #ecranNouvellePartie > *{ animation-duration: 0.01s; }
+}
+
+/* Clavier ouvert (classe posée par script.js) : le contenu du mode en ligne se cale juste
+   au-dessus du clavier, au lieu d'être centré (il remontait trop haut) */
+html.clavier-ouvert #enLigne > div{
+  margin-top: auto;
+  margin-bottom: 16px;
+}
+
+/* ===== +4 : contenu centré verticalement quand il y a la place (avant : tout tassé en haut
+   avec peu de joueurs) ; avec beaucoup de joueurs, il défile toujours depuis le haut ===== */
+#overlayPlus4 > :first-child{
+  margin-top: auto;
+}
+
+#overlayPlus4 > :last-child{
+  margin-bottom: auto;
+}
+
+
+/* ===== Thème : couleur du fond du jeu (Réglages > Thème, réglage de ce téléphone) =====
+   Tout le fond (jeu, menus, réglages…) utilise --fond-theme ; les cartes, le doré et les
+   écrans d'annonce noirs ne changent pas. */
+:root{ --fond-theme: rgb(43, 0, 29); }              /* Bordeaux (par défaut) */
+html[data-theme="noir"]{ --fond-theme: #0e0e12; }
+html[data-theme="vert"]{ --fond-theme: #08301e; }   /* vert casino */
+html[data-theme="bleu"]{ --fond-theme: #0a1634; }   /* bleu nuit */
+html[data-theme="violet"]{ --fond-theme: #3d0f66; }
+
+/* Réglages : pastilles de couleur */
+#ecranReglages .pastillesTheme{
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 0 16px 14px;
+}
+
+#ecranReglages .pastilleTheme{
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+  font-size: 11px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.6);
+  background: none;
+  border: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#ecranReglages .pastilleTheme .rond{
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.25);
+  box-shadow: inset 0 0 0 3px rgba(0,0,0,0.25);
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+#ecranReglages .pastilleTheme[aria-pressed="true"]{
+  color: #FFD700;
+}
+
+#ecranReglages .pastilleTheme[aria-pressed="true"] .rond{
+  border-color: #FFD700;
+  box-shadow: 0 0 0 3px rgba(255,215,0,0.3), 0 0 14px rgba(255,215,0,0.35);
+  transform: scale(1.08);
+}
+
+html.accessibilite #ecranReglages .pastilleTheme{
+  font-size: 13px;
+}
+
+
+/* ===== Thèmes spéciaux : Cerisier (rose + décors japonais) et Prestige (doré, secret) =====
+   --deco-theme : décors posés par-dessus la couleur du fond (fond du jeu, menus, réglages) */
+html[data-theme="cerisier"]{
+  --fond-theme: #5a1740;
+  --deco-theme:
+    url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 220 220%22%3E%3Cg transform=%22translate(40 50) rotate(20) scale(0.9)%22 opacity=%220.16%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(165 120) rotate(50) scale(1.1)%22 opacity=%220.14%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(80 185) rotate(5) scale(0.8)%22 opacity=%220.12%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cellipse cx=%22130%22 cy=%2240%22 rx=%222.6%22 ry=%224.6%22 transform=%22rotate(35 130 40)%22 fill=%22%23ffc2db%22 opacity=%220.16%22/%3E%3Cellipse cx=%22190%22 cy=%2230%22 rx=%222.08%22 ry=%223.6799999999999997%22 transform=%22rotate(-20 190 30)%22 fill=%22%23ffc2db%22 opacity=%220.13%22/%3E%3Cellipse cx=%2220%22 cy=%22140%22 rx=%222.3400000000000003%22 ry=%224.14%22 transform=%22rotate(70 20 140)%22 fill=%22%23ffc2db%22 opacity=%220.14%22/%3E%3Cellipse cx=%22120%22 cy=%22160%22 rx=%222.08%22 ry=%223.6799999999999997%22 transform=%22rotate(15 120 160)%22 fill=%22%23ffc2db%22 opacity=%220.12%22/%3E%3Cellipse cx=%22200%22 cy=%22200%22 rx=%222.3400000000000003%22 ry=%224.14%22 transform=%22rotate(-45 200 200)%22 fill=%22%23ffc2db%22 opacity=%220.13%22/%3E%3C/svg%3E") 0 0 / 220px 220px repeat,
+    radial-gradient(circle at 15% 85%, rgba(255, 150, 200, 0.12), transparent 45%);
+  /* la branche fleurie seulement sur l'accueil et les menus (pas derrière le texte des réglages ni le plateau) */
+  --deco-accueil:
+    url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 320 220%22%3E%3Cg fill=%22none%22 stroke=%22%233a1420%22 stroke-linecap=%22round%22%3E%3Cpath d=%22M330 18 C 270 30, 230 40, 175 78 S 95 120, 40 132%22 stroke-width=%227%22/%3E%3Cpath d=%22M240 40 C 225 70, 215 95, 222 128%22 stroke-width=%224.5%22/%3E%3Cpath d=%22M175 78 C 160 95, 150 120, 155 150%22 stroke-width=%223.5%22/%3E%3Cpath d=%22M110 112 C 95 100, 82 92, 62 92%22 stroke-width=%223%22/%3E%3Cpath d=%22M290 26 C 300 50, 296 70, 284 90%22 stroke-width=%223%22/%3E%3C/g%3E%3Cg transform=%22translate(250 30) rotate(10) scale(1.7)%22 opacity=%221%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(222 128) rotate(30) scale(1.5)%22 opacity=%221%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(200 60) rotate(50) scale(1.3)%22 opacity=%221%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(155 150) rotate(5) scale(1.4)%22 opacity=%221%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(130 98) rotate(40) scale(1.2)%22 opacity=%221%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(62 92) rotate(20) scale(1.3)%22 opacity=%221%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(40 132) rotate(60) scale(1.5)%22 opacity=%221%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(284 90) rotate(15) scale(1.4)%22 opacity=%221%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(300 50) rotate(70) scale(1.1)%22 opacity=%221%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(95 125) rotate(25) scale(1.0)%22 opacity=%220.9%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(178 100) rotate(12) scale(1.0)%22 opacity=%220.9%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg fill=%22%23ffd6e7%22%3E%3Ccircle cx=%22232%22 cy=%2252%22 r=%222.2%22/%3E%3Ccircle cx=%22186%22 cy=%2282%22 r=%222%22/%3E%3Ccircle cx=%22146%22 cy=%22120%22 r=%221.8%22/%3E%3Ccircle cx=%2275%22 cy=%22110%22 r=%222%22/%3E%3Ccircle cx=%22268%22 cy=%2272%22 r=%221.8%22/%3E%3C/g%3E%3C/svg%3E") right 0 top 54px / min(64vw, 310px) auto no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 220 220%22%3E%3Cg transform=%22translate(40 50) rotate(20) scale(0.9)%22 opacity=%220.16%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(165 120) rotate(50) scale(1.1)%22 opacity=%220.14%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(80 185) rotate(5) scale(0.8)%22 opacity=%220.12%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cellipse cx=%22130%22 cy=%2240%22 rx=%222.6%22 ry=%224.6%22 transform=%22rotate(35 130 40)%22 fill=%22%23ffc2db%22 opacity=%220.16%22/%3E%3Cellipse cx=%22190%22 cy=%2230%22 rx=%222.08%22 ry=%223.6799999999999997%22 transform=%22rotate(-20 190 30)%22 fill=%22%23ffc2db%22 opacity=%220.13%22/%3E%3Cellipse cx=%2220%22 cy=%22140%22 rx=%222.3400000000000003%22 ry=%224.14%22 transform=%22rotate(70 20 140)%22 fill=%22%23ffc2db%22 opacity=%220.14%22/%3E%3Cellipse cx=%22120%22 cy=%22160%22 rx=%222.08%22 ry=%223.6799999999999997%22 transform=%22rotate(15 120 160)%22 fill=%22%23ffc2db%22 opacity=%220.12%22/%3E%3Cellipse cx=%22200%22 cy=%22200%22 rx=%222.3400000000000003%22 ry=%224.14%22 transform=%22rotate(-45 200 200)%22 fill=%22%23ffc2db%22 opacity=%220.13%22/%3E%3C/svg%3E") 0 0 / 220px 220px repeat,
+    radial-gradient(circle at 15% 85%, rgba(255, 150, 200, 0.12), transparent 45%);
+}
+
+html[data-theme="prestige"]{
+  --fond-theme: #3a2806;
+  --deco-theme:
+    /* reflets d'or en diagonale */
+    linear-gradient(135deg, rgba(255, 223, 90, 0.30) 0%, rgba(255, 215, 0, 0.04) 28%, rgba(255, 236, 140, 0.24) 52%,
+                    rgba(255, 215, 0, 0.03) 74%, rgba(255, 200, 60, 0.22) 100%),
+    /* lueur dorée en haut et en bas */
+    radial-gradient(circle at 50% 0%, rgba(255, 215, 0, 0.38), transparent 55%),
+    radial-gradient(circle at 50% 110%, rgba(255, 180, 40, 0.30), transparent 50%);
+}
+
+/* Réglages : 7 pastilles => 2 lignes (4 + 3) */
+#ecranReglages .pastillesTheme{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  row-gap: 10px;
+}
+
+/* Prestige pas encore débloqué : pastille cachée */
+#ecranReglages .pastilleTheme[hidden]{
+  display: none;
+}
+
+/* Cerisier : pétales qui tombent doucement sur l'écran d'accueil (rien avec les autres thèmes) */
+#petalesCerisier{
+  display: none;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: -1; /* derrière le contenu de l'accueil, au-dessus de son fond */
+  animation: none !important;
+}
+
+html[data-theme="cerisier"] #petalesCerisier{
+  display: block;
+}
+
+#petalesCerisier span{
+  position: absolute;
+  top: -24px;
+  width: 11px;
+  height: 15px;
+  border-radius: 80% 0 80% 0;
+  background: linear-gradient(135deg, #ffd3e5, #ff9cc5);
+  opacity: 0.75;
+  animation: chutePetale linear infinite;
+}
+
+@keyframes chutePetale{
+  0%   { transform: translate(0, 0) rotate(0deg); }
+  25%  { transform: translate(28px, 26vh) rotate(110deg); }
+  50%  { transform: translate(-18px, 52vh) rotate(220deg); }
+  75%  { transform: translate(24px, 78vh) rotate(330deg); }
+  100% { transform: translate(-10px, 108vh) rotate(440deg); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  #petalesCerisier{ display: none !important; }
+}
+
+
+/* ===== Notification du haut (ex. « Thème Prestige débloqué ! ») : arrive d'en haut, en or massif
+   avec des étincelles ; se ferme au tap, en la glissant vers le haut ou toute seule ===== */
+#notifHaut{
+  position: fixed;
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  z-index: 30004;
+  width: min(420px, calc(100% - 24px));
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  color: #3b2400;
+  /* lingot : dégradé d'or avec un éclat clair en diagonale */
+  background: linear-gradient(135deg, #9a6400 0%, #e9b52a 18%, #fff2a8 36%, #f3c63c 52%,
+                              #b77c06 74%, #f6d35a 100%);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.5), 0 0 22px rgba(255, 200, 40, 0.55),
+              inset 0 0 0 1.5px rgba(255, 248, 200, 0.85), inset 0 -3px 0 rgba(120, 70, 0, 0.45);
+  cursor: grab;
+  touch-action: none;      /* le doigt fait glisser la notification, pas la page */
+  user-select: none;
+  -webkit-user-select: none;
+  transform: translate(-50%, 0);
+  animation: notifHautArrive 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+#notifHaut .notifHaut-icone,
+#notifHaut .notifHaut-texte{
+  position: relative;      /* au-dessus des étincelles et du reflet */
+}
+
+#notifHaut .notifHaut-icone{
+  font-size: 30px;
+  line-height: 1;
+  filter: drop-shadow(0 1px 0 rgba(255, 250, 220, 0.8));
+}
+
+/* Étincelles et reflet, coupés aux bords arrondis de la notification */
+#notifHaut .notifHaut-eclats{
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+#notifHaut .notifHaut-eclats span{
+  position: absolute;
+  line-height: 1;
+  color: #fff;
+  text-shadow: 0 0 4px #fff, 0 0 10px rgba(255, 250, 200, 0.95);
+  opacity: 0;
+  animation: etincelle ease-in-out infinite;
+}
+
+#notifHaut .notifHaut-eclats::before{
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: 0;
+  width: 40%;
+  height: 200%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.75), transparent);
+  transform: translateX(-150%) rotate(20deg);
+  animation: refletNotif 2.6s ease-in-out 0.5s infinite;
+}
+
+@keyframes refletNotif{
+  0%       { transform: translateX(-150%) rotate(20deg); }
+  45%, 100% { transform: translateX(320%) rotate(20deg); }
+}
+
+#notifHaut .notifHaut-texte{
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+}
+
+#notifHaut .notifHaut-texte strong{
+  font-size: 16px;
+  font-weight: 900;
+  color: #3b2400;
+  text-shadow: 0 1px 0 rgba(255, 250, 215, 0.85); /* effet gravé dans l'or */
+}
+
+@keyframes notifHautArrive{
+  from { opacity: 0; transform: translate(-50%, -120%); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+
+html.accessibilite #notifHaut .notifHaut-texte,
+html.accessibilite #notifHaut .notifHaut-icone{
+  zoom: 1.25;
+}
+
+
+/* ===== Thème Prestige : effet « lingot d'or » ===== */
+/* Couronne dorée penchée vers la droite, posée en haut à droite du titre ALCUNO (accueil) */
+#choixMode #titreAccueil{
+  position: relative;
+}
+
+#choixMode .couronneTitre{
+  display: none;
+  position: absolute;
+  top: -0.36em;
+  right: -0.2em;
+  width: 0.62em;
+  transform: rotate(24deg);
+  transform-origin: 50% 100%;
+  filter: drop-shadow(0 3px 0 rgba(120, 70, 0, 0.9)) drop-shadow(0 0 10px rgba(255, 215, 0, 0.55));
+  pointer-events: none;
+}
+
+#choixMode .couronneTitre svg{
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+html[data-theme="prestige"] #choixMode .couronneTitre{
+  display: block;
+}
+
+/* Étincelles : petites étoiles dorées qui scintillent sur l'accueil */
+#etincellesPrestige{
+  display: none;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: -1;
+  animation: none !important;
+}
+
+html[data-theme="prestige"] #etincellesPrestige{
+  display: block;
+}
+
+#etincellesPrestige span{
+  position: absolute;
+  line-height: 1;
+  color: #fff6c2;
+  text-shadow: 0 0 6px #ffe066, 0 0 14px rgba(255, 215, 0, 0.9), 0 0 24px rgba(255, 190, 40, 0.6);
+  opacity: 0;
+  animation: etincelle ease-in-out infinite;
+}
+
+@keyframes etincelle{
+  0%, 100% { opacity: 0; transform: scale(0.2) rotate(0deg); }
+  12%      { opacity: 1; transform: scale(1.15) rotate(30deg); }
+  32%      { opacity: 0.9; transform: scale(0.9) rotate(70deg); }
+  45%      { opacity: 0; transform: scale(0.2) rotate(110deg); }
+}
+
+/* Reflet doré qui traverse tout l'écran de temps en temps (au-dessus des pages, sans bloquer les taps) */
+#refletPrestige{
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 10005;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+html[data-theme="prestige"] #refletPrestige{
+  display: block;
+}
+
+#refletPrestige::before{
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: 0;
+  width: 45vw;
+  height: 200%;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 236, 150, 0.08) 30%,
+                              rgba(255, 246, 200, 0.38) 50%, rgba(255, 236, 150, 0.08) 70%, transparent 100%);
+  transform: translateX(-60vw) rotate(18deg);
+  mix-blend-mode: screen;
+  animation: refletLingot 7s ease-in-out infinite;
+}
+
+@keyframes refletLingot{
+  0%       { transform: translateX(-60vw) rotate(18deg); }
+  22%      { transform: translateX(130vw) rotate(18deg); }
+  22.01%, 100% { transform: translateX(130vw) rotate(18deg); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  #etincellesPrestige, #refletPrestige, #notifHaut .notifHaut-eclats{ display: none !important; }
 }

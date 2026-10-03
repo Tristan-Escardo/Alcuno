@@ -7,6 +7,8 @@
          Un paramètre différent à chaque chargement force toujours la dernière version. -->
     <script>
         window.ANTI_CACHE = Date.now();
+        // Thème choisi dans les réglages : appliqué tout de suite (pas de flash de bordeaux au chargement)
+        try { var theme = localStorage.getItem("alcuno_theme"); if (theme) document.documentElement.dataset.theme = theme; } catch (e) {}
         document.write('<link rel="stylesheet" href="style_alcuno.css?t=' + window.ANTI_CACHE + '" />');
     </script>
     <title>Alcuno</title>
@@ -25,26 +27,149 @@
 <body>
     <header>
         <h1>ALCUNO</h1>
+        <span class="badgeSoft" aria-label="Mode PJ">PJ</span>
         <button type="button" id="btnAccueilClassique" class="btnAccueilTexte" title="Accueil" aria-label="Accueil">⌂</button>
     </header>
 
     <main>
         <section class="choixMode" id="choixMode">
-            <h2>Comment voulez-vous jouer ?</h2>
-            <button type="button" id="btnModeClassique">Mode classique (Hors connexion)</button>
+            <!-- Thème Cerisier : pétales qui tombent (remplis par script.js) -->
+            <div id="petalesCerisier" aria-hidden="true"></div>
+            <!-- Thème Prestige : étincelles qui scintillent (remplies par script.js) -->
+            <div id="etincellesPrestige" aria-hidden="true"></div>
+            <!-- Réglages : seulement sur l'écran d'accueil -->
+            <button type="button" id="btnReglages" title="Réglages" aria-label="Réglages">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M3 6h18M3 12h18M3 18h18" />
+                    <circle cx="8" cy="6" r="2.4" />
+                    <circle cx="16" cy="12" r="2.4" />
+                    <circle cx="10" cy="18" r="2.4" />
+                </svg>
+            </button>
+            <div class="titreAccueil">
+                <h1 id="titreAccueil">ALCUNO<span class="couronneTitre" aria-hidden="true"><svg viewBox="0 0 64 48" aria-hidden="true"><defs><linearGradient id="orCouronne" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff3a8"/><stop offset="0.45" stop-color="#ffd23f"/><stop offset="1" stop-color="#c8880a"/></linearGradient></defs><path d="M6 40 L3 12 L18 24 L32 4 L46 24 L61 12 L58 40 Z" fill="url(#orCouronne)" stroke="#7a4b00" stroke-width="2.5" stroke-linejoin="round"/><rect x="5" y="38" width="54" height="8" rx="2" fill="url(#orCouronne)" stroke="#7a4b00" stroke-width="2.5"/><circle cx="3" cy="11" r="3.2" fill="#fff3a8" stroke="#7a4b00" stroke-width="1.5"/><circle cx="32" cy="4" r="3.6" fill="#fff3a8" stroke="#7a4b00" stroke-width="1.5"/><circle cx="61" cy="11" r="3.2" fill="#fff3a8" stroke="#7a4b00" stroke-width="1.5"/><circle cx="32" cy="30" r="4" fill="#e0263a" stroke="#7a4b00" stroke-width="1.2"/><circle cx="17" cy="32" r="2.8" fill="#2f7de1" stroke="#7a4b00" stroke-width="1.2"/><circle cx="47" cy="32" r="2.8" fill="#2f7de1" stroke="#7a4b00" stroke-width="1.2"/></svg></span></h1>
+                <div class="titreAccueilBarre" aria-hidden="true"></div>
+            </div>
+            <h2>&nbsp;</h2>
             <button type="button" id="btnModeEnLigne">Mode en ligne</button>
+            <button type="button" id="btnModeClassique">Mode classique<br>(Hors connexion)</button>
             <!-- Installer l'appli : bouton sur Android (quand Chrome le permet), astuce sur iPhone.
                  Rien ne s'affiche quand le jeu est déjà ouvert en appli. -->
             <div class="installerAppli" id="installerAppli" hidden>
                 <button type="button" id="btnInstallerAppli" class="btnInstaller" hidden>📲 Installer l'appli</button>
                 <p id="astuceIphone" class="astuceIphone" hidden>📲 Pour installer l'appli : bouton <strong>Partager</strong> → <strong>Sur l'écran d'accueil</strong></p>
             </div>
-            <label class="optionVibrations" for="optionVibrations">
-                <input type="checkbox" id="optionVibrations" checked>
-                <span class="interrupteur" aria-hidden="true"></span>
-                Vibrations <span class="optionNote">(Android uniquement)</span>
-            </label>
-            <p id="versionJeu" class="versionJeu"></p>
+        </section>
+
+        <section class="ecranReglages" id="ecranReglages" style="display:none;">
+            <button type="button" id="btnFermerReglages" class="btnRetour">← Retour</button>
+            <div class="reglages-contenu">
+                <h2>Réglages</h2>
+
+                <div class="blocReglage">
+                    <label class="optionReglage" for="optionSons">
+                        <span class="optionTexte">
+                            <span class="optionTitre">Sons</span>
+                            <span class="optionNote">Carte tirée, carte dorée, pigeon, ton tour en ligne. iPhone : le mode silencieux coupe les sons.</span>
+                        </span>
+                        <input type="checkbox" id="optionSons" checked>
+                        <span class="interrupteur" aria-hidden="true"></span>
+                    </label>
+                    <div class="ligneVolume" id="ligneVolume">
+                        <span class="volumeIcone" aria-hidden="true">🔈</span>
+                        <input type="range" id="volumeSons" min="0" max="100" step="5" value="100" aria-label="Volume des sons">
+                        <span class="volumeIcone" aria-hidden="true">🔊</span>
+                        <span class="volumeValeur" id="volumeValeur">100 %</span>
+                    </div>
+                </div>
+
+                <label class="optionReglage" for="optionVibrations">
+                    <span class="optionTexte">
+                        <span class="optionTitre">Vibrations</span>
+                        <span class="optionNote">Android uniquement</span>
+                    </span>
+                    <input type="checkbox" id="optionVibrations" checked>
+                    <span class="interrupteur" aria-hidden="true"></span>
+                </label>
+
+                <label class="optionReglage" for="optionEcranAllume">
+                    <span class="optionTexte">
+                        <span class="optionTitre">Écran toujours allumé</span>
+                        <span class="optionNote">Pendant les parties, le téléphone ne se met pas en veille.</span>
+                    </span>
+                    <input type="checkbox" id="optionEcranAllume" checked>
+                    <span class="interrupteur" aria-hidden="true"></span>
+                </label>
+
+                <label class="optionReglage" for="optionAccessibilite">
+                    <span class="optionTexte">
+                        <span class="optionTitre">Accessibilité pour les gens bourrés 🍻</span>
+                        <span class="optionNote">Textes et boutons plus gros.</span>
+                    </span>
+                    <input type="checkbox" id="optionAccessibilite">
+                    <span class="interrupteur" aria-hidden="true"></span>
+                </label>
+
+                <div class="blocReglage">
+                    <div class="optionReglage optionAction">
+                        <span class="optionTexte">
+                            <span class="optionTitre">Thème</span>
+                        </span>
+                    </div>
+                    <div class="pastillesTheme" role="group" aria-label="Thème">
+                        <button type="button" class="pastilleTheme" data-theme="bordeaux"><span class="rond" style="background:#2b001d"></span>Bordeaux</button>
+                        <button type="button" class="pastilleTheme" data-theme="noir"><span class="rond" style="background:#0e0e12"></span>Noir</button>
+                        <button type="button" class="pastilleTheme" data-theme="vert"><span class="rond" style="background:#08301e"></span>Casino</button>
+                        <button type="button" class="pastilleTheme" data-theme="bleu"><span class="rond" style="background:#0a1634"></span>Nuit</button>
+                        <button type="button" class="pastilleTheme" data-theme="violet"><span class="rond" style="background:#3d0f66"></span>Violet</button>
+                        <button type="button" class="pastilleTheme" data-theme="cerisier"><span class="rond" style="background:linear-gradient(135deg,#5a1740 35%,#ff9cc5)"></span>Cerisier</button>
+                        <!-- Thème secret : débloqué en découvrant l'écran des créateurs (4 taps sur le titre) -->
+                        <button type="button" class="pastilleTheme" data-theme="prestige" id="pastillePrestige" hidden><span class="rond" style="background:linear-gradient(135deg,#3a2806 15%,#d4a017 60%,#fff2b0)"></span>Prestige</button>
+                    </div>
+                </div>
+
+                <label class="optionReglage" for="optionModeSoft">
+                    <span class="optionTexte">
+                        <span class="optionTitre">Mode PJ</span>
+                        <span class="optionNote">Tu prends 2x moins cher que dans la version normale.<br>En ligne : c'est le réglage de l'hôte qui compte, quand il crée la partie.</span>
+                    </span>
+                    <input type="checkbox" id="optionModeSoft">
+                    <span class="interrupteur" aria-hidden="true"></span>
+                </label>
+
+                <div class="blocReglage">
+                    <label class="optionReglage" for="optionRappelEau">
+                        <span class="optionTexte">
+                            <span class="optionTitre">Rappel «&nbsp;Bois de l'eau&nbsp;💧&nbsp;»</span>
+                            <span class="optionNote">Toutes les 30 minutes de partie.</span>
+                        </span>
+                        <input type="checkbox" id="optionRappelEau">
+                        <span class="interrupteur" aria-hidden="true"></span>
+                    </label>
+                </div>
+
+                <!-- Partie en ligne dont ce téléphone se souvient (affiché seulement s'il y en a une) -->
+                <div class="optionReglage optionAction" id="lignePartieMemoire" style="display:none;">
+                    <span class="optionTexte">
+                        <span class="optionTitre">Partie en mémoire</span>
+                        <span class="optionNote" id="textePartieMemoire"></span>
+                    </span>
+                    <button type="button" id="btnOublierPartie">Oublier</button>
+                </div>
+
+                <div class="blocPartage">
+                    <div class="aProposTitre">Partager le jeu</div>
+                    <img src="icones/qr_alcuno.svg" alt="QR code du jeu Alcuno" class="qrJeu" width="180" height="180">
+                    <p class="lienJeu">tristan-escardo.github.io/Alcuno</p>
+                    <button type="button" id="btnPartagerJeu">📤 Partager le lien</button>
+                </div>
+
+                <div class="aPropos">
+                    <div class="aProposTitre">À propos</div>
+                    <p id="versionJeu" class="versionJeu"></p>
+                    <button type="button" id="btnDiagnostic" class="btnDiagnostic">Copier le diagnostic</button>
+                </div>
+            </div>
         </section>
 
         <section class="enLigne" id="enLigne" style="display:none;">
@@ -60,26 +185,27 @@
             <div id="enLigneRevenir" style="display:none;">
                 <button type="button" id="btnRetourRevenir" class="btnRetour">← Retour</button>
                 <p class="aideEnLigne">Tu as été déconnecté ?<br>Entre le code de la partie : tu reprendras ta place.</p>
-                <input type="text" id="codeRevenir" placeholder="Code de la partie" maxlength="6" />
+                <input type="text" id="codeRevenir" placeholder="Code de la partie" maxlength="6" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="go" />
                 <button type="button" id="validerRevenir">Revenir</button>
             </div>
 
             <div id="enLigneCreer" style="display:none;">
                 <button type="button" id="btnRetourCreer" class="btnRetour">← Retour</button>
-                <input type="text" id="pseudoCreateur" placeholder="Ton pseudo" maxlength="20" />
+                <input type="text" id="pseudoCreateur" placeholder="Ton pseudo" maxlength="20" autocomplete="off" enterkeyhint="go" />
                 <button type="button" id="validerCreation">Créer</button>
             </div>
 
             <div id="enLigneRejoindre" style="display:none;">
                 <button type="button" id="btnRetourRejoindre" class="btnRetour">← Retour</button>
-                <input type="text" id="codeRejoindre" placeholder="Code de la partie" maxlength="6" />
-                <input type="text" id="pseudoRejoindre" placeholder="Ton pseudo" maxlength="20" />
+                <input type="text" id="codeRejoindre" placeholder="Code de la partie" maxlength="6" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="next" />
+                <input type="text" id="pseudoRejoindre" placeholder="Ton pseudo" maxlength="20" autocomplete="off" enterkeyhint="go" />
                 <button type="button" id="validerRejoindre">Rejoindre</button>
             </div>
 
             <div id="salleAttente" style="display:none;">
                 <button type="button" id="btnQuitterSalle" class="btnRetour">← Retour</button>
                 <h3 id="codePartieAffiche"></h3>
+                <p id="infoModeSoft" class="infoModeSoft" style="display:none;">Partie en Mode PJ</p>
                 <div id="listeJoueursEnLigne"></div>
                 <button type="button" id="lancerPartieEnLigne" style="display:none;">Lancer la partie</button>
             </div>
@@ -118,7 +244,7 @@
         </section>
 
         <section class="menu" id="menu" style="display:none;">
-            <input type="text" id="nomJoueur" placeholder="Entrez un nom de joueur" />
+            <input type="text" id="nomJoueur" placeholder="Entrez un nom de joueur" autocomplete="off" enterkeyhint="done" />
             <button type="button" id="ajouterJoueur">Ajouter un joueur</button>
             <button type="button" id="jouer" style="display:none;">Jouer</button>
             <button type="button" id="supprimerJoueur">Supprimer un joueur</button>
@@ -196,7 +322,9 @@
         </section>
     </main>
 
-    <script type="module">
+    <!-- async : le jeu démarre sans attendre le téléchargement de Firebase (lent en 4G).
+         Ce qui a besoin de Firebase l'attend (attendreFirebase / événement « firebase-ready ») -->
+    <script type="module" async>
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
         import {
             getDatabase, ref, set, get, update, onValue, onChildAdded, remove, onDisconnect, runTransaction, serverTimestamp
@@ -234,5 +362,7 @@
     <script>
         document.write('<script src="script.js?t=' + window.ANTI_CACHE + '"><\/script>');
     </script>
+    <!-- Thème Prestige : reflet doré qui traverse l'écran de temps en temps (ne bloque aucun tap) -->
+    <div id="refletPrestige" aria-hidden="true"></div>
 </body>
 </html>

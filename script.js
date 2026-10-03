@@ -1,4 +1,45 @@
+// =============================================================================================
+// ALCUNO : tout le jeu est dans ce fichier, rangé en sections repliables
+// (VS Code : flèche dans la marge à côté de « #region », ou Ctrl+K Ctrl+0 pour tout replier).
+//
+//   Diagnostic : erreurs et avertissements récents
+//   Démarrage : mode de jeu, version du jeu
+//   Écran des créateurs (4 taps sur le titre)
+//   Réglages : thème, Mode PJ, sons, rappel d'eau, partage, diagnostic, partie en mémoire…
+//   Nouvelle version disponible et appli installable
+//   Mode en ligne : codes de partie, menus Créer / Rejoindre / Revenir, transitions, clavier
+//   Mode en ligne : salle d'attente, manches, présence, coupure réseau
+//   Mode en ligne : reconnexion, joueur retiré qui revient, quitter la partie
+//   Plateau, outils, joueurs, retirer un joueur en partie
+//   Overlays des règles : pigeon, annonces, annulations, carte dorée
+//   Duel
+//   Application des règles et déroulement du jeu
+//   Écran « Nouvelle partie »
+//   Mode en ligne : synchronisation des actions, rattrapage
+//   Bouton retour du téléphone et démarrage du jeu
+// =============================================================================================
 document.addEventListener("DOMContentLoaded", function () {
+  // #region Diagnostic : erreurs et avertissements récents
+  // ===== Diagnostic : dernières erreurs et avertissements du jeu (dont Firebase) =====
+  // Copiés avec le reste par « Copier le diagnostic » (Réglages > À propos)
+  const erreursRecentes = [];
+  function noterErreur(texte){
+    erreursRecentes.push(`${new Date().toLocaleTimeString("fr-FR")} ${String(texte).slice(0, 220)}`);
+    if (erreursRecentes.length > 25) erreursRecentes.shift();
+  }
+  window.addEventListener("error", (e) => noterErreur(`${e.message} (ligne ${e.lineno})`));
+  window.addEventListener("unhandledrejection", (e) => noterErreur(`promesse : ${e.reason && (e.reason.message || e.reason)}`));
+  ["warn", "error"].forEach((type) => {
+    const original = console[type].bind(console);
+    console[type] = (...args) => {
+      try { noterErreur(`${type} : ${args.map(a => (a && a.message) ? a.message : String(a)).join(" ")}`); } catch (e) {}
+      original(...args);
+    };
+  });
+
+  // #endregion
+
+  // #region Démarrage : mode de jeu, version du jeu
   // ================== MODE DE JEU (classique / en ligne) ==================
   // Le module Firebase s'exécute souvent AVANT ce code : l'événement "firebase-ready"
   // est alors déjà passé, on se fie donc à la présence de window.firebaseDB
@@ -28,12 +69,21 @@ document.addEventListener("DOMContentLoaded", function () {
   let prochainSeq = 1;
   let traitementEnCours = false;
   let timerTrou = null;
+  let generationFile = 0; // change à chaque remise à zéro de la file (nouvelle manche, resynchronisation)
   let idsUniquesUtilises = new Set(); // boutons « unique » déjà appliqués dans la manche (voir surAction)
 
   // Reconnexion en pleine manche : on rejoue toutes les actions déjà faites, en accéléré
   let repriseEnCours = false;     // la prochaine manche démarrée est une reprise (reprendrePlaceEnLigne)
   let rattrapageEnCours = false;  // délais du jeu quasi nuls pendant le rattrapage (voir delai())
   let seqFinRattrapage = 0;       // numéro de la dernière action à rattraper
+
+  // Joueur retiré qui revient : il est remis dans la manche par une action « retour »
+  // (voir verifierRetourDansManche), appliquée au même moment sur tous les téléphones
+  let ordreManche = [];           // joueurs au début de la manche : on revient à sa place d'origine
+  let retourEnCours = false;      // ce téléphone attend d'être remis dans la manche
+  let retourEnvoye = false;       // notre demande de retour est dans la file, pas encore traitée
+  let retourAnnonce = false;      // message « Tu reviens dans la partie… » déjà affiché
+  let timerRetour = null;
 
   const PSEUDO_INVALIDE = /[.#$\[\]\/]/;
 
@@ -58,18 +108,23 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.5.0";
+  const VERSION_AFFICHEE = "8.8.5";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
-  document.getElementById("versionJeu").innerText = "version " + VERSION_AFFICHEE;
+  // À l'écran : seulement « 8.7 » (le dernier chiffre change à chaque mise en ligne, en coulisses)
+  document.getElementById("versionJeu").innerText = "Alcuno — version " + VERSION_AFFICHEE.split(".").slice(0, 2).join(".");
 
+  // #endregion
+
+  // #region Écran des créateurs (4 taps sur le titre)
   // ===== Easter egg : 4 taps rapides sur le titre ALCUNO => écran des créateurs =====
   const ecranCredits = document.getElementById("ecranCredits");
   let tapsTitre = 0;
   let dernierTapTitre = 0;
 
   // pointerdown (et pas click) : les taps rapprochés ne génèrent pas tous un "click" sur mobile
-  document.querySelector("header h1").addEventListener("pointerdown", () => {
+  // (titre du bandeau et grand titre de l'écran d'accueil)
+  document.querySelectorAll("header h1, #titreAccueil").forEach((titre) => titre.addEventListener("pointerdown", () => {
     const maintenant = Date.now();
     tapsTitre = (maintenant - dernierTapTitre < 600) ? tapsTitre + 1 : 1;
     dernierTapTitre = maintenant;
@@ -77,16 +132,563 @@ document.addEventListener("DOMContentLoaded", function () {
     if (tapsTitre >= 4) {
       tapsTitre = 0;
       ecranCredits.scrollTop = 0;
-      ecranCredits.style.display = "";
+      jouerSon("credits");
+      ouvrirPage(ecranCredits);
+      debloquerPrestige(); // découvrir les créateurs débloque le thème secret « Prestige »
     }
+  }));
+
+  // Bouton d'une page qui défile (Réglages, créateurs) : un tap pendant que la page glisse encore
+  // sur son élan sert d'abord à arrêter le défilement, et le téléphone n'envoie alors pas de
+  // « click » (il fallait taper deux fois). On réagit donc aussi au doigt levé, si le doigt n'a
+  // presque pas bougé (sinon c'est un glissement). Un seul déclenchement par tap.
+  function activerMemePendantElan(bouton, action){
+    let depart = null;
+    let clicDejaFait = false; // le « click » qui suit le doigt levé du même tap ne compte pas
+    let minuteur = null;
+    bouton.addEventListener("pointerdown", (e) => {
+      clicDejaFait = false; // nouveau tap
+      depart = (e.pointerType === "touch" || e.pointerType === "pen") ? { x: e.clientX, y: e.clientY } : null;
+    });
+    bouton.addEventListener("pointerup", (e) => {
+      if (!depart) return;
+      const deplacement = Math.hypot(e.clientX - depart.x, e.clientY - depart.y);
+      depart = null;
+      if (deplacement >= 12) return;
+      clicDejaFait = true;
+      clearTimeout(minuteur);
+      minuteur = setTimeout(() => { clicDejaFait = false; }, 350);
+      action();
+    });
+    bouton.addEventListener("pointercancel", () => { depart = null; });
+    // Un nouveau contact ailleurs sur l'écran : le « click » de l'ancien tap ne viendra plus
+    document.addEventListener("pointerdown", (e) => { if (e.target !== bouton) clicDejaFait = false; }, true);
+    bouton.addEventListener("click", () => {
+      if (clicDejaFait) { clicDejaFait = false; return; }
+      action();
+    });
+  }
+
+  activerMemePendantElan(document.getElementById("btnFermerCredits"), () => fermerPage(ecranCredits));
+
+  // Pages plein écran (Réglages, créateurs) : elles arrivent en glissant depuis la droite et
+  // repartent en fondu vers la droite (avant : elles apparaissaient / disparaissaient d'un coup)
+  function ouvrirPage(page){
+    page.classList.remove("page-sortie", "page-entree");
+    page.style.display = "";
+    void page.offsetWidth; // relance l'animation même si la page vient d'être fermée
+    page.classList.add("page-entree");
+  }
+
+  function fermerPage(page){
+    if (page.style.display === "none" || page.classList.contains("page-sortie")) return;
+    page.classList.remove("page-entree");
+    page.classList.add("page-sortie");
+    let fini = false;
+    const fin = (e) => {
+      if (e && e.target !== page) return; // (fin d'une animation d'un élément de la page)
+      if (fini) return;
+      fini = true;
+      page.removeEventListener("animationend", fin);
+      page.classList.remove("page-sortie");
+      page.style.display = "none";
+    };
+    page.addEventListener("animationend", fin);
+    setTimeout(() => fin(), 350); // sécurité : animations désactivées sur le téléphone
+  }
+
+  // #endregion
+
+  // #region Réglages : thème, Mode PJ, sons, rappel d'eau, partage, diagnostic, partie en mémoire, vibrations, écran allumé
+  // ===== Réglages (bouton en haut à droite de l'écran d'accueil, seulement là) =====
+  // Chaque réglage est retenu sur le téléphone (stockage local du navigateur)
+  const ecranReglages = document.getElementById("ecranReglages");
+
+  document.getElementById("btnReglages").addEventListener("click", () => {
+    majLignePartieMemoire();
+    ecranReglages.scrollTop = 0;
+    ouvrirPage(ecranReglages);
   });
 
-  document.getElementById("btnFermerCredits").addEventListener("click", () => {
-    ecranCredits.style.display = "none";
+  activerMemePendantElan(document.getElementById("btnFermerReglages"), () => fermerPage(ecranReglages));
+
+  function lireReglage(cle, parDefaut){
+    try {
+      const valeur = localStorage.getItem(cle);
+      return valeur === null ? parDefaut : valeur === "1";
+    } catch (e) { return parDefaut; }
+  }
+
+  function ecrireReglage(cle, actif){
+    try { localStorage.setItem(cle, actif ? "1" : "0"); } catch (e) {}
+  }
+
+  // Accessibilité pour les gens bourrés : textes et boutons plus gros (classe sur <html>)
+  const CLE_ACCESSIBILITE = "alcuno_accessibilite";
+  const caseAccessibilite = document.getElementById("optionAccessibilite");
+  caseAccessibilite.checked = lireReglage(CLE_ACCESSIBILITE, false);
+  document.documentElement.classList.toggle("accessibilite", caseAccessibilite.checked);
+
+  caseAccessibilite.addEventListener("change", () => {
+    ecrireReglage(CLE_ACCESSIBILITE, caseAccessibilite.checked);
+    document.documentElement.classList.toggle("accessibilite", caseAccessibilite.checked);
+  });
+
+  // ===== Thème : couleur du fond du jeu (réglage de ce téléphone, purement visuel) =====
+  // (le thème est déjà posé au tout début du chargement par index.html : pas de flash de couleur)
+  const CLE_THEME = "alcuno_theme";
+  const THEMES = { bordeaux: "#2b001d", noir: "#0e0e12", vert: "#08301e", bleu: "#0a1634", violet: "#3d0f66",
+                   cerisier: "#5a1740", prestige: "#3a2806" };
+
+  // Thème secret « Prestige » : débloqué en découvrant l'écran des créateurs (4 taps sur le titre)
+  const CLE_PRESTIGE = "alcuno_theme_prestige";
+  function prestigeDebloque(){
+    try { return localStorage.getItem(CLE_PRESTIGE) === "1"; } catch (e) { return false; }
+  }
+
+  // Pastille cachée tant que le thème n'est pas débloqué
+  function majPastillePrestige(){
+    const pastille = document.getElementById("pastillePrestige");
+    if (pastille) pastille.hidden = !prestigeDebloque();
+  }
+
+  function debloquerPrestige(){
+    if (prestigeDebloque()) return;
+    try { localStorage.setItem(CLE_PRESTIGE, "1"); } catch (e) {}
+    majPastillePrestige();
+    afficherNotificationHaut("✨", "Thème Prestige débloqué !");
+  }
+
+  // Notification qui arrive du haut de l'écran, en or avec des étincelles. Comme sur un téléphone :
+  // on la glisse vers le haut pour la fermer, on la retient au doigt (elle ne part pas tant qu'on
+  // la tient), un simple tap la ferme, sinon elle s'en va toute seule après 5 s.
+  function afficherNotificationHaut(icone, titre){
+    const ancienne = document.getElementById("notifHaut");
+    if (ancienne) ancienne.remove();
+    const notif = document.createElement("div");
+    notif.id = "notifHaut";
+    notif.setAttribute("role", "status");
+    const eclats = document.createElement("span");
+    eclats.className = "notifHaut-eclats";
+    eclats.setAttribute("aria-hidden", "true");
+    for (let i = 0; i < 9; i++) {
+      const etincelle = document.createElement("span");
+      etincelle.textContent = "✦";
+      etincelle.style.left = (4 + Math.random() * 88) + "%";
+      etincelle.style.top = (8 + Math.random() * 70) + "%";
+      etincelle.style.fontSize = (8 + Math.random() * 9).toFixed(0) + "px";
+      const duree = 1.6 + Math.random() * 1.6;
+      etincelle.style.animationDuration = duree.toFixed(2) + "s";
+      etincelle.style.animationDelay = (-Math.random() * duree).toFixed(2) + "s";
+      eclats.appendChild(etincelle);
+    }
+    const ligneIcone = document.createElement("span");
+    ligneIcone.className = "notifHaut-icone";
+    ligneIcone.setAttribute("aria-hidden", "true");
+    ligneIcone.textContent = icone;
+    const bloc = document.createElement("span");
+    bloc.className = "notifHaut-texte";
+    const fort = document.createElement("strong");
+    fort.textContent = titre;
+    bloc.append(fort);
+    notif.append(eclats, ligneIcone, bloc);
+
+    let partie = false;
+    let minuteur = null;
+    const placer = (decalage, transition) => {
+      notif.style.animation = "none"; // l'animation d'arrivée ne doit plus imposer sa position
+      notif.style.transition = transition || "none";
+      notif.style.transform = `translate(-50%, ${decalage}px)`;
+    };
+    const fermer = () => {
+      if (partie) return;
+      partie = true;
+      clearTimeout(minuteur);
+      placer(-(notif.offsetHeight + notif.offsetTop + 20), "transform 0.28s ease-in, opacity 0.28s ease-in");
+      notif.style.opacity = "0";
+      setTimeout(() => notif.remove(), 300);
+    };
+    const programmerDepart = (delai) => {
+      clearTimeout(minuteur);
+      minuteur = setTimeout(fermer, delai);
+    };
+
+    // Glissement au doigt
+    let departY = null;
+    let decalage = 0;
+    let dernierY = 0;
+    let dernierT = 0;
+    let vitesse = 0;
+    notif.addEventListener("pointerdown", (e) => {
+      if (partie) return;
+      clearTimeout(minuteur); // tenue au doigt : elle reste
+      departY = e.clientY;
+      dernierY = e.clientY;
+      dernierT = e.timeStamp;
+      decalage = 0;
+      vitesse = 0;
+      try { notif.setPointerCapture(e.pointerId); } catch (err) {}
+      placer(0);
+    });
+    notif.addEventListener("pointermove", (e) => {
+      if (departY === null || partie) return;
+      const dy = e.clientY - departY;
+      // vers le haut elle suit le doigt ; vers le bas elle résiste (élastique)
+      decalage = dy < 0 ? dy : dy * 0.3;
+      if (e.timeStamp > dernierT) vitesse = (e.clientY - dernierY) / (e.timeStamp - dernierT);
+      dernierY = e.clientY;
+      dernierT = e.timeStamp;
+      placer(decalage);
+    });
+    const lacher = (e) => {
+      if (departY === null || partie) return;
+      const bouge = Math.abs(e.clientY - departY);
+      departY = null;
+      if (e.type === "pointerup" && bouge < 8) return fermer();                 // simple tap
+      if (decalage < -notif.offsetHeight * 0.35 || vitesse < -0.5) return fermer(); // jetée vers le haut
+      placer(0, "transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)");                // revient à sa place
+      programmerDepart(3000);
+    };
+    notif.addEventListener("pointerup", lacher);
+    notif.addEventListener("pointercancel", lacher);
+
+    programmerDepart(5000);
+    document.body.appendChild(notif);
+  }
+
+  function appliquerTheme(nom){
+    if (!THEMES[nom] || (nom === "prestige" && !prestigeDebloque())) nom = "bordeaux";
+    document.documentElement.dataset.theme = nom;
+    // Barre du téléphone en haut : on remplace la balise au lieu de la modifier (sinon Chrome sur
+    // Android ne repeint parfois la barre qu'au premier changement de thème)
+    document.querySelectorAll('meta[name="theme-color"]').forEach((ancienne) => ancienne.remove());
+    const barre = document.createElement("meta");
+    barre.name = "theme-color";
+    barre.content = THEMES[nom];
+    document.head.appendChild(barre);
+    document.querySelectorAll(".pastilleTheme").forEach((b) => {
+      b.setAttribute("aria-pressed", b.dataset.theme === nom ? "true" : "false");
+    });
+  }
+
+  majPastillePrestige();
+  let themeChoisi = "bordeaux";
+  try { themeChoisi = localStorage.getItem(CLE_THEME) || "bordeaux"; } catch (e) {}
+  appliquerTheme(themeChoisi);
+
+  // Cerisier : pétales qui tombent sur l'écran d'accueil (positions, tailles et vitesses au hasard)
+  const zonePetales = document.getElementById("petalesCerisier");
+  for (let i = 0; i < 14; i++) {
+    const petale = document.createElement("span");
+    const taille = 0.7 + Math.random() * 0.7;
+    const duree = 9 + Math.random() * 9;
+    petale.style.left = `${Math.random() * 100}%`;
+    petale.style.width = `${11 * taille}px`;
+    petale.style.height = `${15 * taille}px`;
+    petale.style.animationDuration = `${duree}s`;
+    petale.style.animationDelay = `${-Math.random() * duree}s`; // déjà en train de tomber à l'ouverture
+    zonePetales.appendChild(petale);
+  }
+
+  // Prestige : étincelles qui scintillent sur l'écran d'accueil (positions, tailles et rythmes au hasard)
+  const zoneEtincelles = document.getElementById("etincellesPrestige");
+  for (let i = 0; i < 26; i++) {
+    const etincelle = document.createElement("span");
+    const taille = 12 + Math.random() * 18;
+    const duree = 2.5 + Math.random() * 3;
+    etincelle.textContent = "✦";
+    etincelle.style.left = `${Math.random() * 96}%`;
+    etincelle.style.top = `${Math.random() * 96}%`;
+    etincelle.style.fontSize = `${taille}px`;
+    etincelle.style.animationDuration = `${duree}s`;
+    etincelle.style.animationDelay = `${-Math.random() * duree}s`;
+    zoneEtincelles.appendChild(etincelle);
+  }
+
+  document.querySelectorAll(".pastilleTheme").forEach((pastille) => {
+    pastille.addEventListener("click", () => {
+      appliquerTheme(pastille.dataset.theme);
+      try { localStorage.setItem(CLE_THEME, pastille.dataset.theme); } catch (e) {}
+    });
+  });
+
+  // ===== Mode PJ (appelé « soft » dans le code) : moins de gorgées =====
+  // Classique : le réglage de ce téléphone. En ligne : le réglage de l'hôte au moment où il a créé
+  // la partie (champ « soft » de la partie dans Firebase) : le même pour tous, et il ne change
+  // plus jusqu'à la fin (même si l'hôte change ou si quelqu'un touche à son réglage).
+  const CLE_MODE_SOFT = "alcuno_mode_soft";
+  const caseModeSoft = document.getElementById("optionModeSoft");
+  caseModeSoft.checked = lireReglage(CLE_MODE_SOFT, false);
+  caseModeSoft.addEventListener("change", () => ecrireReglage(CLE_MODE_SOFT, caseModeSoft.checked));
+
+  let softPartieEnLigne = false;
+
+  function estModeSoft(){
+    return codePartieActuel ? softPartieEnLigne : caseModeSoft.checked;
+  }
+
+  // Gorgées selon le mode (normal | soft)
+  function texteCulSec(){ return estModeSoft() ? "3 gorgées" : "un CUL SEC"; }
+  function gorgeesPlus2(){ return estModeSoft() ? 1 : 2; }
+  function gorgeesPlus4(){ return estModeSoft() ? 2 : 4; }
+  function gorgeesPigeon(){ return estModeSoft() ? 1 : 2; }
+  // Duel : valeur de la carte du perdant × multiplicateur ; en soft, moitié (arrondie au-dessus), 10 max
+  function gorgeesDuel(valeur, multiplicateur){
+    return estModeSoft() ? Math.min(10, Math.ceil(valeur / 2) * multiplicateur) : valeur * multiplicateur;
+  }
+  function texteGorgees(n){ return `${n} gorgée${n > 1 ? "s" : ""}`; }
+  function texteDoreeJamaisTrouvee(){
+    return estModeSoft()
+      ? "Tout le monde boit 2 gorgées de la part du développeur 😘"
+      : "Tout le monde prend un CUL SEC de la part du développeur 😘";
+  }
+
+  // En ligne : mode de la partie qu'on rejoint / crée, affiché dans la salle d'attente
+  function choisirModeSoftEnLigne(soft){
+    softPartieEnLigne = !!soft;
+    document.getElementById("infoModeSoft").style.display = softPartieEnLigne ? "" : "none";
+  }
+
+  // ===== Sons : fichiers MP3 du dossier Sons/ (voir SONS plus bas pour la liste des fichiers) =====
+  // Le curseur règle le volume du jeu à l'intérieur du volume du téléphone (il ne peut pas le dépasser).
+  const CLE_SONS = "alcuno_sons";
+  const CLE_VOLUME = "alcuno_volume";
+  const caseSons = document.getElementById("optionSons");
+  const curseurVolume = document.getElementById("volumeSons");
+  const ligneVolume = document.getElementById("ligneVolume");
+  caseSons.checked = lireReglage(CLE_SONS, true);
+
+  let volumeSons = 100;
+  try {
+    const v = localStorage.getItem(CLE_VOLUME);
+    if (v !== null && Number(v) >= 0 && Number(v) <= 100) volumeSons = Number(v);
+  } catch (e) {}
+  curseurVolume.value = volumeSons;
+
+  function majLigneVolume(){
+    document.getElementById("volumeValeur").innerText = volumeSons + " %";
+    curseurVolume.disabled = !caseSons.checked;
+    ligneVolume.classList.toggle("inactif", !caseSons.checked);
+  }
+  majLigneVolume();
+
+  caseSons.addEventListener("change", () => {
+    ecrireReglage(CLE_SONS, caseSons.checked);
+    majLigneVolume();
+    if (caseSons.checked) jouerSon("sons_on"); // petit retour pour montrer que ça marche
+  });
+
+  curseurVolume.addEventListener("input", () => {
+    volumeSons = Number(curseurVolume.value);
+    try { localStorage.setItem(CLE_VOLUME, String(volumeSons)); } catch (e) {}
+    majLigneVolume();
+  });
+  curseurVolume.addEventListener("change", () => jouerSon("reglage_son")); // essai au relâchement (Sons/reglage_son.mp3)
+
+  let contexteSon = null;
+  function contexteAudio(){
+    if (!contexteSon) {
+      const Contexte = window.AudioContext || window.webkitAudioContext;
+      if (!Contexte) return null;
+      try { contexteSon = new Contexte(); } catch (e) { return null; }
+    }
+    if (contexteSon.state === "suspended") contexteSon.resume().catch(() => {});
+    return contexteSon;
+  }
+  // Les téléphones n'autorisent le son qu'après un premier tap : on le prépare à chaque tap
+  // (et on charge les fichiers des sons au premier tap, pour qu'ils soient prêts à temps)
+  document.addEventListener("pointerdown", () => { if (caseSons.checked) { contexteAudio(); chargerSons(); } },
+    { capture: true, passive: true });
+
+  // Fichiers des sons : dossier Sons/, un MP3 par moment du jeu. Pour changer un son, il suffit de
+  // remplacer le fichier (même nom). Fichier absent => pas de son à ce moment-là.
+  //   cartes.mp3  : une carte est retournée sur le plateau
+  //   doree.mp3   : quelqu'un tire la carte dorée (coupé à 3 s, voir DUREE_MAX_SONS)
+  //   pigeon.mp3  : quelqu'un devient pigeon (premier pigeon ou nouveau pigeon ; coupé à 2 s)
+  //   tour.mp3    : en ligne, c'est ton tour
+  //   eau.mp3     : rappel « Bois de l'eau »
+  //   sons_on.mp3 : on active les sons dans les réglages
+  //   credits.mp3 : 4 taps sur le titre ALCUNO (écran des créateurs)
+  //   reglage_son.mp3 : on lâche le curseur de volume dans les réglages (pour entendre le volume)
+  //   no_wifi.mp3 : en ligne, coupure de réseau (une fois, quand le logo wifi barré apparaît)
+  // (pas de son pour le cul sec de la carte dorée)
+  const SONS = ["cartes", "doree", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi"];
+  // Sons coupés au bout de N secondes (avec un petit fondu), même si le fichier est plus long
+  const DUREE_MAX_SONS = { doree: 3, pigeon: 2 };
+  const sonsCharges = {}; // nom -> son décodé (ou null si le fichier n'existe pas)
+  const sonsDemandes = {}; // nom -> moment où il a été demandé alors qu'il n'était pas encore chargé
+  let chargementSonsLance = false;
+
+  function chargerSons(){
+    const ctx = contexteAudio();
+    if (!ctx || chargementSonsLance) return;
+    chargementSonsLance = true;
+    SONS.forEach((nom) => {
+      fetch(`Sons/${nom}.mp3?t=${window.ANTI_CACHE || Date.now()}`)
+        .then((reponse) => {
+          if (!reponse.ok) throw new Error("absent");
+          return reponse.arrayBuffer();
+        })
+        .then((donnees) => new Promise((ok, ko) => ctx.decodeAudioData(donnees, ok, ko)))
+        .then((son) => {
+          sonsCharges[nom] = son;
+          // Demandé juste avant d'être chargé (tout premier tap) : joué maintenant, si c'était il y a < 1,5 s
+          if (sonsDemandes[nom] && Date.now() - sonsDemandes[nom] < 1500) lireSon(nom, son);
+          delete sonsDemandes[nom];
+        })
+        .catch(() => { sonsCharges[nom] = null; });
+    });
+  }
+
+  // carte | doree | culsec | pigeon | tour | eau
+  function jouerSon(nom){
+    if (!caseSons.checked || volumeSons <= 0) return;
+    if (rattrapageEnCours) return; // reconnexion : pas de sons pour les actions déjà passées
+    const ctx = contexteAudio();
+    if (!ctx) return;
+    chargerSons();
+    const son = sonsCharges[nom];
+    if (son === undefined) sonsDemandes[nom] = Date.now(); // pas encore chargé : joué dès qu'il arrive
+    if (!son) return; // (null : pas de fichier pour ce moment)
+    lireSon(nom, son);
+  }
+
+  function lireSon(nom, son){
+    const ctx = contexteAudio();
+    if (!ctx || !caseSons.checked || rattrapageEnCours) return;
+    const sortie = ctx.createGain();
+    const volume = Math.pow(volumeSons / 100, 2); // curseur plus naturel à l'oreille
+    sortie.gain.value = volume;
+    sortie.connect(ctx.destination);
+    const lecture = ctx.createBufferSource();
+    lecture.buffer = son;
+    lecture.connect(sortie);
+    const debut = ctx.currentTime;
+    lecture.start(debut);
+
+    const dureeMax = DUREE_MAX_SONS[nom];
+    if (dureeMax && son.duration > dureeMax) {
+      sortie.gain.setValueAtTime(volume, debut + dureeMax - 0.3);
+      sortie.gain.linearRampToValueAtTime(0.0001, debut + dureeMax);
+      lecture.stop(debut + dureeMax + 0.02);
+    }
+  }
+
+  // ===== Rappel « Bois de l'eau 💧 » : toutes les 30 minutes de partie (désactivé par défaut) =====
+  // Petit bandeau en haut de l'écran, qui ne bloque rien et se ferme au tap ou tout seul.
+  // (Chaque téléphone le gère de son côté : rien n'est envoyé aux autres joueurs.)
+  const CLE_RAPPEL_EAU = "alcuno_rappel_eau";
+  const caseRappelEau = document.getElementById("optionRappelEau");
+  caseRappelEau.checked = lireReglage(CLE_RAPPEL_EAU, false);
+  caseRappelEau.addEventListener("change", () => ecrireReglage(CLE_RAPPEL_EAU, caseRappelEau.checked));
+
+  const MINUTES_RAPPEL_EAU = 30;
+  let tempsDeJeuSansEau = 0; // ms de partie (écran allumé) depuis le dernier rappel
+
+  setInterval(() => {
+    if (!caseRappelEau.checked || !partieLancee || document.visibilityState !== "visible") return;
+    tempsDeJeuSansEau += 15000;
+    if (tempsDeJeuSansEau >= MINUTES_RAPPEL_EAU * 60000) {
+      tempsDeJeuSansEau = 0;
+      afficherRappelEau();
+    }
+  }, 15000);
+
+
+  function afficherRappelEau(){
+    const ancien = document.getElementById("rappelEau");
+    if (ancien) ancien.remove();
+    const bandeau = document.createElement("div");
+    bandeau.id = "rappelEau";
+    bandeau.setAttribute("role", "status");
+    bandeau.innerHTML =
+      '<span class="rappelEau-icone" aria-hidden="true">💧</span>' +
+      '<span class="rappelEau-texte"><strong>MESSAGE DE TON ANGE GARDIEN</strong>' +
+      '<strong>Bois de l\'eau !</strong>' +
+      '<span>Demain tu me diras merci 😉</span></span>';
+    const fermer = () => bandeau.remove();
+    bandeau.addEventListener("click", fermer);
+    setTimeout(fermer, 9000);
+    document.body.appendChild(bandeau);
+    jouerSon("eau");
+    vibrer([60, 80, 60]);
+  }
+
+  // ===== Partager le jeu : bouton « Partager » du téléphone, sinon lien copié =====
+  const ADRESSE_JEU = "https://tristan-escardo.github.io/Alcuno/";
+
+  document.getElementById("btnPartagerJeu").addEventListener("click", () => {
+    if (navigator.share) {
+      navigator.share({ title: "Alcuno", text: "On joue à Alcuno ? 🍻", url: ADRESSE_JEU }).catch(() => {});
+      return;
+    }
+    const copie = navigator.clipboard ? navigator.clipboard.writeText(ADRESSE_JEU) : Promise.reject();
+    copie.then(() => afficherToast("Lien copié !"))
+      .catch(() => prompt("Copie le lien du jeu :", ADRESSE_JEU));
+  });
+
+  // ===== Diagnostic : tout ce qu'il faut pour comprendre un plantage en ligne, copié en un tap =====
+  function texteDiagnostic(){
+    const etat = window.__etatFileAlcuno ? window.__etatFileAlcuno() : {};
+    const journal = etat.journal || [];
+    delete etat.journal;
+    return [
+      "=== Diagnostic Alcuno ===",
+      `Version ${VERSION_AFFICHEE} | ${new Date().toLocaleString("fr-FR")}`,
+      `Téléphone : ${navigator.userAgent}`,
+      `Réseau : ${navigator.onLine ? "en ligne" : "hors connexion"} | Firebase chargé : ${!!window.firebaseDB}`,
+      `Partie : ${codePartieActuel || "aucune"} | pseudo : ${pseudoActuel || "-"} | manche : ${mancheCourante === null ? "-" : mancheCourante}` +
+        ` | partie en mémoire : ${JSON.stringify(lirePartieLocale())}`,
+      `File d'actions : ${JSON.stringify(etat)}`,
+      "--- Journal des actions en ligne ---",
+      ...(journal.length ? journal : ["(vide)"]),
+      "--- Erreurs récentes ---",
+      ...(erreursRecentes.length ? erreursRecentes : ["aucune"])
+    ].join("\n");
+  }
+
+  document.getElementById("btnDiagnostic").addEventListener("click", () => {
+    const texte = texteDiagnostic();
+    const copie = (navigator.clipboard && navigator.clipboard.writeText)
+      ? navigator.clipboard.writeText(texte)
+      : Promise.reject(new Error("presse-papiers indisponible"));
+    copie.then(() => afficherToast("Diagnostic copié", 3000))
+      .catch(() => {
+        // Pas de presse-papiers : bouton « Partager » du téléphone, sinon le texte dans une fenêtre
+        if (navigator.share) {
+          navigator.share({ title: "Diagnostic Alcuno", text: texte }).catch(() => {});
+        } else {
+          prompt("Copie ce texte :", texte);
+        }
+      });
+  });
+
+  // ===== Partie en mémoire : la partie en ligne dont ce téléphone se souvient (« Revenir ») =====
+  function majLignePartieMemoire(){
+    const memoire = lirePartieLocale();
+    const ligne = document.getElementById("lignePartieMemoire");
+    if (!memoire || !memoire.code) {
+      ligne.style.display = "none";
+      return;
+    }
+    document.getElementById("textePartieMemoire").innerText =
+      `Partie ${memoire.code}${memoire.pseudo ? " (" + memoire.pseudo + ")" : ""} : proposée par « Revenir dans une partie en cours ».`;
+    ligne.style.display = "";
+  }
+
+  document.getElementById("btnOublierPartie").addEventListener("click", () => {
+    const memoire = lirePartieLocale();
+    if (!memoire || !memoire.code) { majLignePartieMemoire(); return; }
+    if (!confirm(`Oublier la partie ${memoire.code} ?\n\nLe bouton « Revenir dans une partie en cours » ne la proposera plus. ` +
+                 `(Tu pourras toujours la rejoindre avec « Rejoindre » et ton pseudo.)`)) return;
+    oublierPartieLocale();
+    majBoutonRevenir();
+    majLignePartieMemoire();
+    afficherToast("Partie oubliée");
   });
 
   // ===== Vibrations (Android : un iPhone ne peut pas vibrer depuis une page web) =====
-  // Interrupteur en bas de l'écran de départ, activé par défaut, choix retenu sur le téléphone
+  // Activées par défaut
   const CLE_VIBRATIONS = "alcuno_vibrations";
   const caseVibrations = document.getElementById("optionVibrations");
   let vibrationsActives = true;
@@ -110,10 +712,20 @@ document.addEventListener("DOMContentLoaded", function () {
   // ===== Écran toujours allumé pendant une partie (Wake Lock) =====
   // Un téléphone en veille ne reçoit plus les actions en ligne et prend du retard.
   // Le navigateur relâche le verrou quand on change d'appli : on le redemande au retour.
+  // Réglage « Écran toujours allumé » (activé par défaut)
   let verrouEcran = null;
   let demandeVerrouEnCours = false;
+  const CLE_ECRAN_ALLUME = "alcuno_ecran_allume";
+  const caseEcranAllume = document.getElementById("optionEcranAllume");
+  caseEcranAllume.checked = lireReglage(CLE_ECRAN_ALLUME, true);
+
+  caseEcranAllume.addEventListener("change", () => {
+    ecrireReglage(CLE_ECRAN_ALLUME, caseEcranAllume.checked);
+    if (!caseEcranAllume.checked) libererEcran();
+  });
 
   function garderEcranAllume(){
+    if (!caseEcranAllume.checked) return;
     if (verrouEcran || demandeVerrouEnCours) return;
     if (!("wakeLock" in navigator) || document.visibilityState !== "visible") return;
 
@@ -135,7 +747,59 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible" && (partieLancee || codePartieActuel)) garderEcranAllume();
+    if (document.visibilityState === "visible") verifierNouvelleVersion();
   });
+
+  // #endregion
+
+  // #region Nouvelle version disponible et appli installable
+  // ===== Nouvelle version disponible =====
+  // Une appli installée qu'on rouvre depuis les applis récentes reprend l'ancienne page sans la
+  // recharger. On regarde donc si une version plus récente est en ligne (au retour dans l'appli,
+  // et toutes les 5 min) ; si oui, un bandeau propose de mettre à jour en un tap.
+  // Jamais en pleine partie ni dans une partie en ligne : on ne coupe personne.
+  let versionEnLigne = null;
+
+  // "8.5.1" => 80501 (même calcul que VERSION_JEU), pour comparer les versions
+  function versionEnNombre(texte){
+    return String(texte).split(".").reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
+  }
+
+  function verifierNouvelleVersion(){
+    if (document.visibilityState !== "visible" || navigator.onLine === false) return;
+    fetch("script.js?verif=" + Date.now(), { cache: "no-store" })
+      .then((reponse) => reponse.ok ? reponse.text() : "")
+      .then((texte) => {
+        const trouve = texte.match(/VERSION_AFFICHEE = "([^"]+)"/);
+        // Seulement si la version en ligne est PLUS RÉCENTE que celle de ce téléphone
+        if (trouve && versionEnNombre(trouve[1]) > VERSION_JEU) {
+          versionEnLigne = trouve[1];
+          afficherBandeauMiseAJour();
+        }
+      })
+      .catch(() => {}); // pas de réseau : on réessaiera plus tard
+  }
+
+  function afficherBandeauMiseAJour(){
+    if (!versionEnLigne) return;
+    if (partieLancee || codePartieActuel) return; // pas en pleine partie (affiché au retour à l'accueil)
+    if (document.getElementById("bandeauMiseAJour")) return;
+
+    const bandeau = document.createElement("div");
+    bandeau.id = "bandeauMiseAJour";
+    bandeau.innerHTML =
+      `<span class="texte">Nouvelle version disponible (${echapperHtml(versionEnLigne)})</span>` +
+      `<button type="button" class="maj">Mettre à jour</button>` +
+      `<button type="button" class="plusTard" aria-label="Plus tard">✕</button>`;
+    // Adresse neuve (?v=...) : contourne le cache et recharge toute l'appli
+    bandeau.querySelector(".maj").addEventListener("click", () => {
+      location.replace(location.pathname + "?v=" + encodeURIComponent(versionEnLigne));
+    });
+    bandeau.querySelector(".plusTard").addEventListener("click", () => bandeau.remove());
+    document.body.appendChild(bandeau);
+  }
+
+  setInterval(verifierNouvelleVersion, 5 * 60 * 1000);
 
   // ===== Appli installable (PWA) =====
   // Service worker « réseau d'abord » (sw.js) : dernière version avec internet, copie locale sans.
@@ -186,6 +850,9 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("astuceIphone").hidden = false;
   }
 
+  // #endregion
+
+  // #region Mode en ligne : codes de partie, menus Créer / Rejoindre / Revenir, transitions, clavier
   // Easter egg : de temps en temps, le code de la partie est un de ces noms,
   // complété par des chiffres AVANT ou APRÈS (jamais au milieu) pour faire 5 caractères
   const CODES_EASTER_EGG = ["YLA", "CELIEN", "ROSA", "TRIS"];
@@ -241,17 +908,98 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
   validerAvecEntree(["pseudoCreateur"], "validerCreation");
-  validerAvecEntree(["codeRejoindre", "pseudoRejoindre"], "validerRejoindre");
+  validerAvecEntree(["pseudoRejoindre"], "validerRejoindre");
   validerAvecEntree(["codeRevenir"], "validerRevenir");
+  // Rejoindre : Entrée sur le code => on passe au pseudo s'il est vide (sinon on valide)
+  document.getElementById("codeRejoindre").addEventListener("keydown", (e) => {
+    if (e.key !== "Enter") return;
+    const champPseudo = document.getElementById("pseudoRejoindre");
+    if (!champPseudo.value.trim()) ouvrirClavier(champPseudo);
+    else document.getElementById("validerRejoindre").click();
+  });
+
+  // Clavier ouvert : zone de l'écran encore visible (au-dessus du clavier), pour que l'écran du mode en
+  // ligne s'y cale (voir #enLigne dans le CSS) : sinon le clavier cache le bouton « Créer » / « Rejoindre »
+  if (window.visualViewport) {
+    const majZoneVisible = () => {
+      const zone = window.visualViewport;
+      document.documentElement.style.setProperty("--hauteur-visible", `${zone.height}px`);
+      document.documentElement.style.setProperty("--haut-visible", `${zone.offsetTop}px`);
+      // Clavier ouvert (zone visible nettement plus petite que l'écran) : contenu calé au-dessus du clavier
+      document.documentElement.classList.toggle("clavier-ouvert", zone.height < window.innerHeight * 0.8);
+    };
+    window.visualViewport.addEventListener("resize", majZoneVisible);
+    window.visualViewport.addEventListener("scroll", majZoneVisible);
+    majZoneVisible();
+  }
+
+  // Transitions entre les pages : « ← Retour » et ⌂ => la page suivante arrive depuis la gauche
+  // (classe nav-retour, voir le CSS) ; sinon elle arrive depuis la droite
+  let minuteurNavRetour = null;
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest || !e.target.closest(".btnRetour, .btnAccueilTexte")) return;
+    document.documentElement.classList.add("nav-retour");
+    clearTimeout(minuteurNavRetour);
+    minuteurNavRetour = setTimeout(() => document.documentElement.classList.remove("nav-retour"), 400);
+  }, true);
+
+  // Animation d'arrivée d'un élément déjà affiché (ex. la page du mode classique)
+  function animerArrivee(el){
+    el.classList.remove("page-entree");
+    void el.offsetWidth;
+    el.classList.add("page-entree");
+    el.addEventListener("animationend", function fin(e){
+      if (e.target !== el) return;
+      el.removeEventListener("animationend", fin);
+      el.classList.remove("page-entree");
+    });
+  }
+
+  // Ouvre le clavier sur un champ. À appeler pendant le tap sur le bouton qui affiche le champ :
+  // sinon l'iPhone refuse d'ouvrir le clavier tout seul.
+  function ouvrirClavier(champ){
+    if (!champ) return;
+    try { champ.focus({ preventScroll: true }); } catch (e) { champ.focus(); }
+  }
 
   document.getElementById("btnModeClassique").addEventListener("click", () => {
     document.getElementById("choixMode").style.display = "none";
     document.getElementById("menu").style.display = "";
     document.getElementById("messages").style.display = "";
     document.getElementById("jeu").style.display = "";
+    ["menu", "messages", "jeu"].forEach((id) => animerArrivee(document.getElementById(id)));
+    ouvrirClavier(document.getElementById("nomJoueur")); // clavier ouvert pour ajouter les joueurs
   });
 
+  // Connexion à Firebase ouverte à l'avance (dès « Mode en ligne », ou au chargement si une partie
+  // est en mémoire) : sinon le 1er tap « Créer » / « Rejoindre » attend aussi la connexion
+  let firebasePrechauffe = false;
+
+  function prechaufferFirebase(){
+    if (firebasePrechauffe) return;
+    firebasePrechauffe = true;
+    attendreFirebase(() => {
+      window.fbOnValue(window.fbRef(window.firebaseDB, ".info/connected"), () => {});
+    });
+  }
+
+  // Bouton qui attend Firebase : il réagit tout de suite (texte « … », grisé) et ne peut pas
+  // être tapé deux fois. Renvoie la fonction qui le remet comme avant.
+  function boutonEnAttente(id, texte){
+    const bouton = document.getElementById(id);
+    const texteAvant = bouton.innerText;
+    bouton.disabled = true;
+    bouton.classList.add("enAttente");
+    bouton.innerText = texte;
+    return () => {
+      bouton.disabled = false;
+      bouton.classList.remove("enAttente");
+      bouton.innerText = texteAvant;
+    };
+  }
+
   document.getElementById("btnModeEnLigne").addEventListener("click", () => {
+    prechaufferFirebase();
     document.getElementById("choixMode").style.display = "none";
     document.getElementById("enLigne").style.display = "";
   });
@@ -259,33 +1007,70 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("btnCreerPartie").addEventListener("click", () => {
     document.getElementById("enLigneChoix").style.display = "none";
     document.getElementById("enLigneCreer").style.display = "";
+    ouvrirClavier(document.getElementById("pseudoCreateur"));
   });
 
   document.getElementById("btnRejoindrePartie").addEventListener("click", () => {
     document.getElementById("enLigneChoix").style.display = "none";
     document.getElementById("enLigneRejoindre").style.display = "";
+    const champCode = document.getElementById("codeRejoindre");
+    ouvrirClavier(champCode.value.trim() ? document.getElementById("pseudoRejoindre") : champCode);
   });
 
   // ===== « Revenir dans une partie » : reconnexion avec le code seulement =====
   const btnRevenirPartie = document.getElementById("btnRevenirPartie");
 
   // Si ce téléphone se souvient d'une partie en cours, le bouton la propose directement
+  // (le code n'est pas affiché sur le bouton, le champ est pré-rempli au tap). Depuis un autre
+  // téléphone : « Rejoindre une partie » avec le même pseudo qu'avant remet aussi le joueur à sa place.
+  // Le bouton n'apparaît que si la partie peut vraiment être reprise, vérifié dans Firebase :
+  // - partie supprimée ou créée avec une ancienne version => oubliée, plus de bouton ;
+  // - plus aucun autre joueur connecté dedans => pas de bouton (il revient si quelqu'un se reconnecte).
+  let verificationRevenir = 0;
+
   function majBoutonRevenir(){
     const memoire = lirePartieLocale();
-    // Seulement si ce téléphone se souvient d'une partie en cours (le code n'est pas affiché sur
-    // le bouton, le champ est pré-rempli au tap). Depuis un autre téléphone : « Rejoindre une partie »
-    // avec le même pseudo qu'avant remet aussi le joueur à sa place.
-    btnRevenirPartie.style.display = (memoire && memoire.code) ? "" : "none";
+    const numero = ++verificationRevenir;
+    if (!memoire || !memoire.code) {
+      btnRevenirPartie.style.display = "none";
+      return;
+    }
+
+    prechaufferFirebase(); // partie en mémoire : le joueur va sans doute revenir en ligne
+    attendreFirebase(() => {
+      window.fbGet(window.fbRef(window.firebaseDB, `parties/${memoire.code}`)).then((snapshot) => {
+        if (numero !== verificationRevenir) return; // une vérification plus récente a été lancée
+        const partie = snapshot.val();
+        const versionPartie = partie && typeof partie.version === "number" ? partie.version : 0;
+
+        if (!partie || versionPartie < VERSION_JEU) {
+          oublierPartieLocale();
+          btnRevenirPartie.style.display = "none";
+          return;
+        }
+
+        // Connecté = pas marqué « false » (sans info de présence, on considère le joueur là)
+        const joueursPartie = partie.joueurs || {};
+        const quelquUn = Object.keys(joueursPartie)
+          .some(nom => nom !== memoire.pseudo && joueursPartie[nom].connecte !== false);
+        btnRevenirPartie.style.display = quelquUn ? "" : "none";
+      }).catch(() => {}); // hors connexion : on laisse le bouton tel quel
+    });
   }
-  // (mis à jour quand on entre dans le mode en ligne, pas au chargement : la mémoire locale
-  // est définie plus bas dans ce fichier)
   document.getElementById("btnModeEnLigne").addEventListener("click", majBoutonRevenir);
+
+  // Retour sur l'appli (téléphone déverrouillé...) hors partie : le bouton est revérifié
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && !codePartieActuel) majBoutonRevenir();
+  });
 
   btnRevenirPartie.addEventListener("click", () => {
     const memoire = lirePartieLocale();
     document.getElementById("codeRevenir").value = (memoire && memoire.code) || "";
     document.getElementById("enLigneChoix").style.display = "none";
     document.getElementById("enLigneRevenir").style.display = "";
+    // Code déjà rempli (partie en mémoire) : pas besoin du clavier, il suffit de taper « Revenir »
+    if (!document.getElementById("codeRevenir").value) ouvrirClavier(document.getElementById("codeRevenir"));
   });
 
   document.getElementById("btnRetourRevenir").addEventListener("click", () => {
@@ -297,8 +1082,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const code = document.getElementById("codeRevenir").value.trim().toUpperCase();
     if (!code) { alert("Entre le code de la partie."); return; }
 
+    const finAttente = boutonEnAttente("validerRevenir", "Connexion…");
     attendreFirebase(() => {
       window.fbGet(window.fbRef(window.firebaseDB, `parties/${code}`)).then((snapshot) => {
+        finAttente();
         if (!snapshot.exists()) {
           oublierPartieLocale();
           majBoutonRevenir();
@@ -323,7 +1110,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (!versionCompatible(partie)) return;
         revenirAvecLeCode(code, partie, !!(partie.etatJeu && partie.etatJeu.demarree));
-      }).catch(erreurFirebase);
+      }).catch((e) => { finAttente(); erreurFirebase(e); });
     });
   });
 
@@ -351,23 +1138,39 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!pseudo) { alert("Entre un pseudo."); return; }
     if (PSEUDO_INVALIDE.test(pseudo)) { alert("Pseudo invalide (pas de . # $ [ ] /)."); return; }
 
+    const finAttente = boutonEnAttente("validerCreation", "Création…");
     attendreFirebase(() => {
       let code = null;
+      let soft = caseModeSoft.checked; // réglage de l'hôte, fixé pour toute la partie
+      let softRefuse = false;
+
+      const creer = (avecSoft) => window.fbSet(window.fbRef(window.firebaseDB, `parties/${code}`), Object.assign({
+        version: VERSION_JEU,
+        hote: pseudo,
+        joueurs: {
+          [pseudo]: { nom: pseudo, host: true, rejoint: Date.now() }
+        },
+        etatJeu: { demarree: false, hote: pseudo },
+        // Pour le nettoyage automatique (.github/workflows/nettoyage.yml)
+        creee: window.fbServerTimestamp(),
+        activite: window.fbServerTimestamp()
+      }, avecSoft ? { soft: true } : {}));
 
       trouverCodeLibre().then((codeLibre) => {
         code = codeLibre;
-        return window.fbSet(window.fbRef(window.firebaseDB, `parties/${code}`), {
-          version: VERSION_JEU,
-          hote: pseudo,
-          joueurs: {
-            [pseudo]: { nom: pseudo, host: true, rejoint: Date.now() }
-          },
-          etatJeu: { demarree: false, hote: pseudo },
-          // Pour le nettoyage automatique (.github/workflows/nettoyage.yml)
-          creee: window.fbServerTimestamp(),
-          activite: window.fbServerTimestamp()
+        // Règles Firebase pas encore à jour pour « soft » : partie créée en mode normal
+        return creer(soft).catch((erreur) => {
+          if (!soft) throw erreur;
+          soft = false;
+          softRefuse = true;
+          return creer(false);
         });
       }).then(() => {
+        choisirModeSoftEnLigne(soft);
+        if (softRefuse) {
+          alert("Le Mode PJ n'est pas encore disponible en ligne (règles Firebase à mettre à jour) : " +
+                "la partie est créée en mode normal.");
+        }
         codePartieActuel = code;
         pseudoActuel = pseudo;
         estHote = true;
@@ -380,7 +1183,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         ecouterSalleAttente(code);
         ecouterEtatPartie(code);
-      }).catch(erreurFirebase);
+      }).catch(erreurFirebase).finally(finAttente);
     });
   });
 
@@ -394,6 +1197,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     if (PSEUDO_INVALIDE.test(pseudo)) { alert("Pseudo invalide (pas de . # $ [ ] /)."); return; }
 
+    const finAttente = boutonEnAttente("validerRejoindre", "Connexion…");
     attendreFirebase(() => {
       const db = window.firebaseDB;
       const refPartie = window.fbRef(db, `parties/${code}`);
@@ -426,6 +1230,17 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         if (enJeu) {
+          // Joueur retiré (ou parti) pendant la partie : il peut y revenir sous le même pseudo
+          const nomRetire = joueurRetire(partie, pseudo);
+          if (nomRetire) {
+            const ok = confirm(
+              `« ${nomRetire} » a été retiré de cette partie.\n\n` +
+              `C'est toi ? Appuie sur OK pour y revenir : tu retrouveras la partie là où elle en est.`
+            );
+            if (ok) revenirApresRetrait(code, nomRetire, partie);
+            return;
+          }
+
           alert("La partie a déjà commencé : on ne peut plus y ajouter de joueur.\n\n" +
                 "Si tu en faisais partie et que tu as été déconnecté, entre exactement le même pseudo " +
                 "qu'avant pour reprendre ta place.");
@@ -433,7 +1248,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         const refJoueur = window.fbRef(db, `parties/${code}/joueurs/${pseudo}`);
-        window.fbSet(refJoueur, { nom: pseudo, host: false, rejoint: Date.now() }).then(() => {
+        return window.fbSet(refJoueur, { nom: pseudo, host: false, rejoint: Date.now() }).then(() => {
+          choisirModeSoftEnLigne(partie.soft === true);
           marquerActivite(code);
           codePartieActuel = code;
           pseudoActuel = pseudo;
@@ -447,22 +1263,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
           ecouterSalleAttente(code);
           ecouterEtatPartie(code);
-        }).catch(erreurFirebase);
-      }).catch(erreurFirebase);
+        });
+      }).catch(erreurFirebase).finally(finAttente);
     });
   });
 
   document.getElementById("lancerPartieEnLigne").addEventListener("click", () => {
     if (!estHote || !codePartieActuel) return;
 
+    const finAttente = boutonEnAttente("lancerPartieEnLigne", "Lancement…");
     window.fbGet(window.fbRef(window.firebaseDB, `parties/${codePartieActuel}/joueurs`)).then((snapshot) => {
       const liste = Object.values(snapshot.val() || {})
         .sort((a, b) => (a.rejoint || 0) - (b.rejoint || 0))
         .map(j => j.nom);
 
       if (liste.length < 2) { alert("Il faut au moins 2 joueurs."); return; }
-      lancerMancheEnLigne(liste, true);
-    }).catch(erreurFirebase);
+      return lancerMancheEnLigne(liste, true);
+    }).catch(erreurFirebase).finally(finAttente);
   });
 
   
@@ -483,6 +1300,9 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
 
+  // #endregion
+
+  // #region Mode en ligne : salle d'attente, manches, présence, coupure réseau
   function ecouterSalleAttente(code){
     const db = window.firebaseDB;
     const refJoueurs = window.fbRef(db, `parties/${code}/joueurs`);
@@ -500,8 +1320,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // On n'est plus dans la liste : un autre joueur nous a retiré
       if (!data[pseudoActuel]) {
+        // Joueur retiré qui revient : sa fiche a pu être effacée en retard (nettoyage du retrait) => on la remet
+        if (retourEnCours) {
+          remettreFicheJoueur();
+          return;
+        }
+        const code = codePartieActuel;
+        const nom = pseudoActuel;
         quitterPartieEnLigne();
-        alert("Tu as été retiré de la partie.");
+        alerteRetire(code, nom);
         return;
       }
 
@@ -525,7 +1352,8 @@ document.addEventListener("DOMContentLoaded", function () {
       tries.forEach((j) => {
         const div = document.createElement("div");
         const nom = document.createElement("span");
-        nom.innerText = avecCouronne(j.nom) + (j.host ? " (hôte)" : "") + (deconnectes.has(j.nom) ? " (déconnecté(e))" : "");
+        nom.innerText = avecCouronne(j.nom) + (j.host ? " (hôte)" : "");
+        ajouterBadgeDeconnecte(nom, deconnectes.has(j.nom));
         div.appendChild(nom);
 
         // Tout le monde peut retirer les autres joueurs (pour partir soi-même : « Retour »)
@@ -604,7 +1432,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const mancheAttendue = mancheCourante;
     const refEtat = window.fbRef(window.firebaseDB, `parties/${codePartieActuel}/etatJeu`);
 
-    window.fbRunTransaction(refEtat, (etat) => {
+    return window.fbRunTransaction(refEtat, (etat) => {
       const e = etat || {};
       const possible = depuisSalle ? !e.demarree : (e.demarree && e.manche === mancheAttendue);
       if (!possible) return; // quelqu'un a déjà relancé => abandon
@@ -641,6 +1469,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function retourSalleEnLigne(etat){
     enLigneActif = false;
+    arreterRetour(); // en salle d'attente, plus de manche où revenir
     if (desabonnerActions) { desabonnerActions(); desabonnerActions = null; }
     reinitialiserFileActions();
     reinitialiserEcransJeu();
@@ -666,6 +1495,7 @@ document.addEventListener("DOMContentLoaded", function () {
     refPresence = window.fbRef(window.firebaseDB, `parties/${code}/joueurs/${nom}/connecte`);
     const refConnecte = refPresence;
     desabonnerPresence = window.fbOnValue(window.fbRef(window.firebaseDB, ".info/connected"), (snapshot) => {
+      majCoupureReseau(snapshot.val() === true);
       if (snapshot.val() !== true) return;
       // (re)connecté au serveur : on prépare le « false » automatique, puis on passe à true
       window.fbOnDisconnect(refConnecte).set(false)
@@ -674,14 +1504,74 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  // ===== Coupure de réseau : grand logo wifi rouge barré qui clignote au milieu de l'écran =====
+  // (mode en ligne seulement : tant que la présence est suivie). Tous les taps sont bloqués dès
+  // la coupure ; le logo apparaît après 1,5 s (pas pour un simple raté de connexion). Tout est
+  // retiré dès que Firebase est reconnecté.
+  let firebaseConnecte = true;
+  let timerCoupure = null;
+
+  function majCoupureReseau(connecte){
+    if (connecte !== undefined) firebaseConnecte = connecte;
+    const coupe = !!desabonnerPresence && (!firebaseConnecte || navigator.onLine === false);
+    let logo = document.getElementById("coupureReseau");
+
+    if (!coupe) {
+      clearTimeout(timerCoupure);
+      timerCoupure = null;
+      if (logo) logo.remove();
+      return;
+    }
+    if (logo) return;
+
+    // Écran transparent par-dessus tout : plus aucun tap ne passe
+    logo = document.createElement("div");
+    logo.id = "coupureReseau";
+    logo.setAttribute("role", "alert");
+    logo.setAttribute("aria-label", "Connexion perdue");
+    ["pointerdown", "pointerup", "click", "touchstart", "touchend", "mousedown", "mouseup", "contextmenu"].forEach((type) => {
+      logo.addEventListener(type, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }, { passive: false });
+    });
+    document.body.appendChild(logo);
+
+    timerCoupure = setTimeout(() => {
+      timerCoupure = null;
+      if (!logo.isConnected) return;
+      logo.classList.add("visible");
+      jouerSon("no_wifi"); // une seule fois par coupure (quand le logo apparaît), pas en boucle
+      logo.innerHTML =
+        '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" aria-hidden="true">' +
+          '<g stroke="#ff2a2a" stroke-width="2.2">' +
+            '<path d="M2 8.8a15 15 0 0 1 20 0"/>' +
+            '<path d="M5.2 12.2a10.5 10.5 0 0 1 13.6 0"/>' +
+            '<path d="M8.6 15.6a5.5 5.5 0 0 1 6.8 0"/>' +
+          '</g>' +
+          '<circle cx="12" cy="19.4" r="1.4" fill="#ff2a2a"/>' +
+          '<path d="M3.5 3.5l17 17" stroke="#2B001D" stroke-width="4.6"/>' +
+          '<path d="M3.5 3.5l17 17" stroke="#ff2a2a" stroke-width="2.4"/>' +
+        '</svg>';
+    }, 1500);
+  }
+
+  // Le téléphone signale aussi la perte du réseau tout de suite (wifi coupé, mode avion)
+  window.addEventListener("offline", () => majCoupureReseau());
+  window.addEventListener("online", () => majCoupureReseau());
+
   function arreterPresence(){
     if (desabonnerPresence) { desabonnerPresence(); desabonnerPresence = null; }
+    majCoupureReseau(true); // plus en ligne : plus de logo
     if (refPresence) {
       window.fbOnDisconnect(refPresence).cancel().catch(() => {});
       refPresence = null;
     }
   }
 
+  // #endregion
+
+  // #region Mode en ligne : reconnexion, joueur retiré qui revient, quitter la partie
   // ===== Mémoire : ce téléphone se souvient de son pseudo dans la partie en cours =====
   // (stockage local du navigateur) : pour revenir, le code suffit, sans retaper son pseudo
   const CLE_PARTIE_LOCALE = "alcuno_partie_en_ligne";
@@ -698,6 +1588,9 @@ document.addEventListener("DOMContentLoaded", function () {
     try { return JSON.parse(localStorage.getItem(CLE_PARTIE_LOCALE)); } catch (e) { return null; }
   }
 
+  // Au chargement (ici : après la mémoire locale) : bouton « Revenir » déjà juste à l'ouverture du mode en ligne
+  majBoutonRevenir();
+
   // Revenir avec le code seulement (champ pseudo vide) :
   // 1) ce téléphone se souvient de son pseudo dans cette partie => il reprend sa place directement ;
   // 2) sinon (autre téléphone...), on propose les joueurs déconnectés : un seul => confirmation,
@@ -708,6 +1601,18 @@ document.addEventListener("DOMContentLoaded", function () {
     const memoire = lirePartieLocale();
     if (memoire && memoire.code === code && joueursPartie[memoire.pseudo]) {
       reprendrePlaceEnLigne(code, memoire.pseudo, partie);
+      return;
+    }
+
+    // Ce téléphone a été retiré de la partie : il peut y revenir (en salle d'attente : si personne
+    // n'a pris son pseudo entre-temps)
+    const pseudoLibre = () => !Object.keys(joueursPartie).some(n =>
+      n.toLocaleLowerCase("fr-FR") === String(memoire.pseudo).toLocaleLowerCase("fr-FR"));
+    if (memoire && memoire.code === code && memoire.pseudo &&
+        (enJeu ? joueurRetire(partie, memoire.pseudo) : pseudoLibre())) {
+      if (confirm(`Tu as été retiré de la partie ${code}.\n\nY revenir en tant que « ${memoire.pseudo} » ?`)) {
+        revenirApresRetrait(code, memoire.pseudo, partie);
+      }
       return;
     }
 
@@ -764,6 +1669,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Reconnexion : le joueur reprend sa place sous son pseudo exact. En pleine manche, son téléphone
   // rejoue toutes les actions déjà faites (rattrapage accéléré) avant de reprendre en direct.
   function reprendrePlaceEnLigne(code, nom, partie){
+    choisirModeSoftEnLigne(partie.soft === true);
     codePartieActuel = code;
     pseudoActuel = nom;
     estHote = !!(partie.joueurs[nom] && partie.joueurs[nom].host);
@@ -781,10 +1687,81 @@ document.addEventListener("DOMContentLoaded", function () {
     ecouterEtatPartie(code); // manche en cours => démarrée en mode rattrapage (demarrerMancheEnLigne)
   }
 
+  // ===== Joueur retiré qui revient =====
+  // Pseudo exact d'un joueur retiré de la partie (majuscules ignorées), ou null : il était dans la
+  // manche en cours au départ, ou a été retiré pendant une manche (actions « retrait »)
+  function joueurRetire(partie, pseudo){
+    const cherche = String(pseudo).toLocaleLowerCase("fr-FR");
+    const memeNom = n => String(n).toLocaleLowerCase("fr-FR") === cherche;
+    if (Object.keys(partie.joueurs || {}).some(memeNom)) return null; // toujours dans la partie
+
+    const anciens = Object.values((partie.etatJeu && partie.etatJeu.joueurs) || {});
+    Object.values(partie.manches || {}).forEach((manche) => {
+      Object.values((manche && manche.actions) || {}).forEach((action) => {
+        if (action && typeof action.id === "string" && action.id.startsWith("retrait:")) {
+          anciens.push(action.id.split(":").slice(2).join(":"));
+        }
+      });
+    });
+    return anciens.find(memeNom) || null;
+  }
+
+  // Le joueur se remet une fiche dans la partie, puis rattrape la manche en cours en spectateur ;
+  // à la fin du rattrapage, il demande à être remis dans le jeu (verifierRetourDansManche)
+  function revenirApresRetrait(code, nom, partie){
+    const enJeu = !!(partie.etatJeu && partie.etatJeu.demarree);
+    const fiche = { nom, host: false, rejoint: Date.now() };
+
+    window.fbSet(window.fbRef(window.firebaseDB, `parties/${code}/joueurs/${nom}`), fiche).then(() => {
+      retourEnCours = enJeu;
+      const joueursPartie = Object.assign({}, partie.joueurs, { [nom]: fiche });
+      reprendrePlaceEnLigne(code, nom, Object.assign({}, partie, { joueurs: joueursPartie }));
+    }).catch(erreurFirebase);
+  }
+
+  // Fiche effacée par le nettoyage d'un retrait arrivé en retard : on la remet
+  function remettreFicheJoueur(){
+    const code = codePartieActuel;
+    const nom = pseudoActuel;
+    if (!code || !nom) return;
+    window.fbSet(window.fbRef(window.firebaseDB, `parties/${code}/joueurs/${nom}`),
+      { nom, host: false, rejoint: Date.now() })
+      .then(() => { if (codePartieActuel === code) suivrePresence(code, nom); })
+      .catch(() => {});
+  }
+
+  // Retiré par un autre joueur : ce téléphone garde la partie en mémoire pour pouvoir y revenir
+  function alerteRetire(code, nom){
+    if (code && nom) {
+      memoriserPartieLocale(code, nom);
+      majBoutonRevenir();
+    }
+    alert("Tu as été retiré de la partie.\n\nPour y revenir : « Revenir dans une partie en cours ».");
+  }
+
+  function arreterRetour(){
+    retourEnCours = false;
+    retourEnvoye = false;
+    retourAnnonce = false;
+    clearTimeout(timerRetour);
+    timerRetour = null;
+  }
+
   // Quitte la partie (Accueil, ou Retour dans la salle d'attente)
   function quitterPartie(){
     const code = codePartieActuel;
     const pseudo = pseudoActuel;
+
+    // Joueur retiré qui revenait, pas encore remis dans la manche : il repart sans arrêter la partie
+    // (sa demande de retour déjà envoyée est annulée par un retrait juste derrière, si possible)
+    if (enLigneActif && partieLancee && code && !joueurs.includes(pseudo)) {
+      const annulation = retourEnvoye ? ecrireAction(idRetrait(pseudo)).catch(() => {}) : Promise.resolve();
+      quitterPartieEnLigne();
+      annulation.then(() => {
+        window.fbSet(window.fbRef(window.firebaseDB, `parties/${code}/joueurs/${pseudo}`), null).catch(() => {});
+      });
+      return;
+    }
 
     // En pleine partie à plus de 2 : on se retire seulement, la partie continue sans nous
     // (à 2, il ne resterait qu'un joueur : tout le monde repasse en salle d'attente)
@@ -840,6 +1817,11 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function quitterPartieEnLigne(){
+    // Diagnostic : où en était la partie au moment de la quitter (le journal est gardé après)
+    if (codePartieActuel) {
+      noterJournal(`partie ${codePartieActuel} quittée (manche ${mancheCourante}, prochaine action ${prochainSeq}, ` +
+        `${fileActions.size} en file, ${traitementEnCours ? "une action en attente" : "rien en attente"})`);
+    }
     if (desabonnerJoueurs) { desabonnerJoueurs(); desabonnerJoueurs = null; }
     if (desabonnerEtat) { desabonnerEtat(); desabonnerEtat = null; }
     libererEcran();
@@ -849,11 +1831,13 @@ document.addEventListener("DOMContentLoaded", function () {
     arreterPresence();
     oublierPartieLocale();
     majBoutonRevenir();
+    arreterRetour();
 
     codePartieActuel = null;
     pseudoActuel = null;
     estHote = false;
     hotePartie = null;
+    choisirModeSoftEnLigne(false);
     deconnectes = new Set();
     enLigneActif = false;
     mancheCourante = null;
@@ -867,6 +1851,9 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("enLigneChoix").style.display = "";
   }
 
+  // #endregion
+
+  // #region Plateau, outils, joueurs, retirer un joueur en partie
   const plateau = document.getElementById("plateau");
   const joueurActif = document.getElementById("joueurActif");
   const listeJoueurs = document.getElementById("listeJoueurs");
@@ -1254,7 +2241,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const subtitle = document.createElement("div");
     subtitle.className = "overlay-subtitle prediction-subtitle";
-    subtitle.innerText = "Chacun choisit un type de carte. Tous ceux qui trouvent distribuent un CUL SEC !.";
+    subtitle.innerText = `Chacun choisit un type de carte. Tous ceux qui trouvent distribuent ${texteCulSec()} !`;
 
     header.appendChild(titre);
     header.appendChild(subtitle);
@@ -1351,13 +2338,13 @@ document.addEventListener("DOMContentLoaded", function () {
           reveal.classList.add("reveal-doree");
           txt.innerHTML =
             '<div class="doree-titre"><span class="doree-etincelle">✦</span> PERSONNE N\'A TROUVÉ LA CARTE DORÉE !! <span class="doree-etincelle">✦</span></div>' +
-            '<div class="doree-texte">Tout le monde prend un CUL SEC de la part du développeur 😘</div>';
+            '<div class="doree-texte">' + texteDoreeJamaisTrouvee() + '</div>';
         } else if(gagnants.length === 0){
           txt.innerText = `Personne n'a trouvé \nLa dernière carte était ${nomType(vraiType)}`;
         } else if(gagnants.length === 1){
-          txt.innerText = `${gagnants[0]} a trouvé ! Il/elle distribue un CUL SEC !`;
+          txt.innerText = `${gagnants[0]} a trouvé ! Il/elle distribue ${texteCulSec()} !`;
         } else {
-          txt.innerText = `${gagnants.join(', ')} ont trouvé ! Chacun distribue un CUL SEC !`;
+          txt.innerText = `${gagnants.join(', ')} ont trouvé ! Chacun distribue ${texteCulSec()} !`;
         }
         reveal.appendChild(txt);
 
@@ -1497,7 +2484,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const n = Number(annulations[nom] || 0);
     const estPigeon = idx === indexPigeon;
 
-    nomEl.innerText = (estPigeon ? `PIGEON (${avecCouronne(nom)})` : avecCouronne(nom)) + texteDeconnecte(nom);
+    nomEl.innerText = estPigeon ? `PIGEON (${avecCouronne(nom)})` : avecCouronne(nom);
+    ajouterBadgeDeconnecte(nomEl, !!texteDeconnecte(nom));
     bonusEl.innerText = n > 0 ? `+${n}` : "";
     if(enLigneActif && nom === pseudoActuel){
       labelEl.innerText = "À toi !";
@@ -1506,6 +2494,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if(tour !== dernierTourVibre){
         dernierTourVibre = tour;
         vibrer([70, 60, 70]);
+        jouerSon("tour");
       }
     }
 
@@ -1532,6 +2521,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function badgeDeconnecte(nom){
     return texteDeconnecte(nom) ? ` <span class="joueur-deconnecte">déconnecté(e)</span>` : "";
+  }
+
+  // Même mention (rouge, en italique, plus petite), ajoutée à un élément affiché en texte
+  function ajouterBadgeDeconnecte(el, deconnecte){
+    if(!deconnecte) return;
+    const badge = document.createElement("span");
+    badge.className = "joueur-deconnecte";
+    badge.innerText = "déconnecté(e)";
+    el.appendChild(badge);
   }
 
   function afficherJoueurs(){
@@ -1575,7 +2573,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const n = Number(annulations[nom] || 0);
     const libelle = idx === indexPigeon ? `PIGEON (${avecCouronne(nom)})` : avecCouronne(nom);
     const bonus = n > 0 ? ` +${n}` : "";
-    joueurActif.innerText = "Joueur actif : " + libelle + bonus + texteDeconnecte(nom);
+    joueurActif.innerText = "Joueur actif : " + libelle + bonus;
+    ajouterBadgeDeconnecte(joueurActif, !!texteDeconnecte(nom));
 
     majStickyJoueurActif();
   }
@@ -1607,7 +2606,11 @@ document.addEventListener("DOMContentLoaded", function () {
 }
 
 
-  btnAjouter.addEventListener("pointerdown", ajouterJoueur);
+  btnAjouter.addEventListener("pointerdown", (e) => {
+    // Clavier ouvert : il reste ouvert pour le joueur suivant (sinon le champ perd le focus à chaque ajout)
+    if (document.activeElement === nomJoueurInput) e.preventDefault();
+    ajouterJoueur();
+  });
   nomJoueurInput.addEventListener("keydown", e=>{ if(e.key==="Enter") ajouterJoueur(); });
 
   const titreSuppression = suppression.querySelector("h2");
@@ -1810,7 +2813,7 @@ document.addEventListener("DOMContentLoaded", function () {
       caseDoree.classList.add("carte_doree", "retournee");
     }
 
-    const texte = "Tout le monde prend un CUL SEC de la part du développeur 😘";
+    const texte = texteDoreeJamaisTrouvee();
     montrerOverlayRegle(`Personne n'a trouvé la CARTE DORÉE !!\n${texte}`, "carte_doree");
     habillerOverlayCarteDoree(
       texte,
@@ -1819,6 +2822,9 @@ document.addEventListener("DOMContentLoaded", function () {
     executerApresOverlayRegleUnique(afficherOverlayFinUnRestants);
   }
 
+  // #endregion
+
+  // #region Overlays des règles : pigeon, annonces, annulations, carte dorée
   /* ===== PIGEON OVERLAY ===== */
   function afficherOverlayFinUnRestants(){
     if(finUnOverlayAffiche) return;
@@ -1922,7 +2928,8 @@ document.addEventListener("DOMContentLoaded", function () {
         afficherJoueurs();
         afficherJoueurActif();
         // 2) message demandé (overlay + .messages)
-        const msg = `${joueurs[i]} est le nouveau PIGEON !\nIl/elle boit 2 gorgées pour fêter ça.`;
+        const nPigeon = gorgeesPigeon();
+        const msg = `${joueurs[i]} est le nouveau PIGEON !\nIl/elle boit ${texteGorgees(nPigeon)} pour fêter ça.`;
         // .messages : on l'affiche dans reglePigeon (et il disparaît au prochain tirage)
         // 3) overlay + annulation si compteur (utilise la carte "trois" qui a déclenché le transfert)
         const carteTrois = carteTroisPourTransfertPigeon || "trois_vert";
@@ -1930,12 +2937,14 @@ document.addEventListener("DOMContentLoaded", function () {
         const couleurTrois = couleurTroisPourTransfertPigeon;
         annoncerBoireAvecAnnulation(
           i,
-          2,
+          nPigeon,
           carteTrois,
           msg,
           // puis la gorgée couleur éventuelle de celui qui a tiré le 3
           () => appliquerBonusCouleurSiBesoin(carteTrois, { couleur: couleurTrois, joueur: joueurTrois, preserveRuleMessage: true })
         );
+        reglerDureeOverlayRegle(msg, DUREE_ANNONCE_PIGEON); // annonce du pigeon : affichée 2 fois plus longtemps
+        jouerSon("pigeon");
         // optionnel : on nettoie
         carteTroisPourTransfertPigeon = "";
         joueurTroisPourTransfertPigeon = null;
@@ -2485,6 +3494,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Change la durée d'affichage de l'overlay de règle qui vient d'être montré.
   // facteur = null : il reste affiché jusqu'à ce qu'on tape dessus.
+  // Annonce d'un pigeon (premier pigeon ou nouveau pigeon choisi) : 2 fois le temps de lecture normal
+  const DUREE_ANNONCE_PIGEON = 2;
+
   function reglerDureeOverlayRegle(message, facteur){
     if(overlayRegleTimeout){
       clearTimeout(overlayRegleTimeout);
@@ -2567,7 +3579,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const consigne = document.createElement("div");
     consigne.className = "doree-texte";
-    consigne.innerText = "Choisis à qui tu distribues ton CUL SEC";
+    consigne.innerText = estModeSoft() ? "Choisis à qui tu distribues tes 3 gorgées" : "Choisis à qui tu distribues ton CUL SEC";
     overlay.appendChild(consigne);
 
     const liste = document.createElement("div");
@@ -2608,7 +3620,9 @@ document.addEventListener("DOMContentLoaded", function () {
   // En ligne : seul le téléphone de la victime affiche « TIENS DANS TA GUEULE. »
   function afficherOverlayTiensGueule(victime){
     if(enLigneActif && victime !== pseudoActuel){
-      const message = `${victime} prend le CUL SEC de la carte dorée !`;
+      const message = estModeSoft()
+        ? `${victime} boit les 3 gorgées de la carte dorée !`
+        : `${victime} prend le CUL SEC de la carte dorée !`;
       montrerOverlayRegle(message, "carte_doree");
       habillerOverlayCarteDoree(message);
       reglerDureeOverlayRegle(message, null); // reste jusqu'au tap
@@ -2617,15 +3631,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
     vibrer([400, 100, 400]); // c'est lui (ou, en classique, le téléphone de la table) qui prend
 
+
     // En classique, un seul téléphone pour tous : on précise qui prend le cul sec
     const titre = enLigneActif
       ? "TIENS DANS<br>TA GUEULE."
       : `TIENS DANS<br>TA GUEULE<br>${echapperHtml(avecCouronne(victime))}.`;
     montrerOverlayRegle("TIENS DANS TA GUEULE.", "carte_doree");
-    habillerOverlayCarteDoree("", titre);
+    habillerOverlayCarteDoree(estModeSoft() ? "3 gorgées !" : "", titre);
     reglerDureeOverlayRegle("", null); // reste jusqu'au tap
   }
 
+  // #endregion
+
+  // #region Duel
   /* ===== DUEL : Choix joueurs puis tirage ===== */
   function lancerOverlayChoixDuel(joueurActuel){
     if(document.getElementById("overlayDuel")) return;
@@ -2778,10 +3796,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const perdant = (v1 < v2) ? j1 : j2;
       const vPerdant = (v1 < v2) ? v1 : v2;
-      const gorg = vPerdant * duelMultiplicateur;
+      const gorg = gorgeesDuel(vPerdant, duelMultiplicateur);
       // Égalités avant : on rappelle le multiplicateur sous le résultat
-      const msg = joueurs[perdant] + " boit " + gorg + " gorgées" +
+      const msg = joueurs[perdant] + " boit " + texteGorgees(gorg) +
         (duelMultiplicateur > 1 ? "\nDuel ×" + duelMultiplicateur + " après égalité" : "");
+
+      // Résultat visible tout de suite sur le duel : la carte du perdant en rouge, celle du gagnant estompée
+      const carteDeJ1 = (choixJ1 === 1) ? c1 : c2;
+      const carteDeJ2 = (choixJ1 === 1) ? c2 : c1;
+      c1.style.opacity = ""; // (opacité posée par preparerDuel : sinon la carte du gagnant ne s'estompe pas)
+      c2.style.opacity = "";
+      (perdant === j1 ? carteDeJ1 : carteDeJ2).classList.add("duel-perdant");
+      (perdant === j1 ? carteDeJ2 : carteDeJ1).classList.add("duel-gagnant");
+      info.innerText = joueurs[perdant] + " perd le duel !";
 
       // 1) on enlève l’overlay du duel après le temps de lire le reveal (2,2 s),
       //    ou dès qu'on tape sur l'écran
@@ -2791,9 +3818,13 @@ document.addEventListener("DOMContentLoaded", function () {
         suiteFaite = true;
         overlay.removeEventListener("pointerdown", suite);
 
-        unlockScroll();
-        overlay.remove();
+        // L'annonce « X boit N gorgées » apparaît en fondu PAR-DESSUS le duel, et le duel n'est
+        // retiré dessous qu'une fois l'annonce affichée (avant : le plateau apparaissait entre les deux)
         annoncerBoireAvecAnnulation(perdant, gorg, "", msg);
+        setTimeout(() => {
+          overlay.remove();
+          unlockScroll();
+        }, delai(450));
 
         // Puis on restaure l'état du jeu (sans attendre la fin d'overlay ici)
         setTimeout(() => {
@@ -2900,6 +3931,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if(document.getElementById("overlayPlus4")) return;
 
     choixPigeonEnCours = true;
+    const aDistribuer = gorgeesPlus4(); // 4 (2 en mode soft)
     lockScroll();
     const choisisseur = joueurs[joueurActuel];
 
@@ -2908,7 +3940,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const titre = document.createElement("div");
     titre.className = "titre-pigeon";
-    titre.innerText = "PLUS 4 — Distribue 4 gorgées";
+    titre.innerText = `PLUS 4 — Distribue ${texteGorgees(aDistribuer)}`;
     overlay.appendChild(titre);
 
     const info = document.createElement("div");
@@ -2940,10 +3972,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function refreshUI(){
       const total = totalDistribue();
-      totalBox.innerText = `Gorgées distribuées : ${total} / 4`;
+      totalBox.innerText = `Gorgées distribuées : ${total} / ${aDistribuer}`;
 
-      if(total < 4){
-        info.innerText = "Choisis à qui tu veux distribuer tes 4 gorgées.";
+      if(total < aDistribuer){
+        info.innerText = `Choisis à qui tu veux distribuer tes ${texteGorgees(aDistribuer)}.`;
       } else {
         info.innerText = "Total atteint. Tu peux valider.";
       }
@@ -2956,8 +3988,8 @@ document.addEventListener("DOMContentLoaded", function () {
         ? `${echapperHtml(joueurs[idx])} <span class="plus4-badge">+ ${n}</span>`
         : echapperHtml(joueurs[idx]);
 
-        // optionnel: griser si total déjà à 4 (plus possible d'ajouter)
-        if(total >= 4){
+        // optionnel: griser si le total est atteint (plus possible d'ajouter)
+        if(total >= aDistribuer){
           btn.style.opacity = "0.7";
         } else {
           btn.style.opacity = "1";
@@ -2968,12 +4000,12 @@ document.addEventListener("DOMContentLoaded", function () {
       btnUndo.disabled = (historique.length === 0);
       btnUndo.style.opacity = btnUndo.disabled ? "0.6" : "1";
 
-      // validation uniquement si total == 4
-      btnValider.disabled = (total !== 4);
+      // validation uniquement si le total est atteint
+      btnValider.disabled = (total !== aDistribuer);
       btnValider.style.opacity = btnValider.disabled ? "0.6" : "1";
     }
 
-    // boutons joueurs : UN CLIC = +1 (si total < 4)
+    // boutons joueurs : UN CLIC = +1 (si total < aDistribuer)
     joueurs.forEach((nom, idx)=>{
       const btn = document.createElement("button");
       btn.className = "bouton-pigeon plus4-joueur-btn";
@@ -2982,7 +4014,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       surAction(btn, "plus4:joueur:" + idx, { owner: choisisseur }, ()=>{
         const total = totalDistribue();
-        if(total >= 4) return;
+        if(total >= aDistribuer) return;
 
         dist[idx] += 1;
         historique.push(idx);
@@ -3015,7 +4047,7 @@ document.addEventListener("DOMContentLoaded", function () {
     btnValider.className = "bouton-pigeon plus4-action-btn";
     btnValider.innerText = "Valider";
     surAction(btnValider, "plus4:valider", { owner: choisisseur, once: true }, ()=>{
-      if(totalDistribue() !== 4) return;
+      if(totalDistribue() !== aDistribuer) return;
 
       overlay.remove();
       unlockScroll();
@@ -3064,6 +4096,9 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  // #endregion
+
+  // #region Application des règles et déroulement du jeu
   // ===== Annulations pour pénalités multi-joueurs (SOCIAL / ZERO) =====
   function demanderAnnulationSimple(joueurIndex, nbGorgees, onFinish){
     if(!joueurPeutAnnuler(joueurIndex, nbGorgees)){
@@ -3119,17 +4154,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     if (carteTiree === "carte_doree") {
-      regleZero.innerText = "CARTE DORÉE : distribue un CUL SEC";
+      regleZero.innerText = `CARTE DORÉE : distribue ${texteCulSec()}`;
       regleZero.style.display = "block";
       zeroEnCours = true;
 
       // Plateau bloqué (et pari de fin en attente) jusqu'au choix de la victime
       choixPigeonEnCours = true;
-      const texteCarteDoree =
-        "Distribue un CUL SEC de la part du développeur, et obligation de se servir un vrai verre avant 😘";
+      const texteCarteDoree = estModeSoft()
+        ? "Distribue 3 gorgées de la part du développeur 😘"
+        : "Distribue un CUL SEC de la part du développeur, et obligation de se servir un vrai verre avant 😘";
       // Le texte complet sert à calculer la durée d'affichage de l'overlay
       montrerOverlayRegle(`CARTE DORÉE\n${texteCarteDoree}`, carteTiree);
       vibrer([150, 70, 150, 70, 300]);
+      jouerSon("doree");
       habillerOverlayCarteDoree(texteCarteDoree);
       reglerDureeOverlayRegle(`CARTE DORÉE\n${texteCarteDoree}`, 1.65); // +65 % de temps de lecture
       executerApresOverlayRegleUnique(() => afficherOverlayCarteDoree(joueurActuel));
@@ -3173,11 +4210,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     if (carteTiree.startsWith("plus_2")) {
+      const n = gorgeesPlus2();
       annoncerBoireAvecAnnulation(
         joueurActuel,
-        2,
+        n,
         carteTiree,
-        `${joueurs[joueurActuel]} boit 2 gorgées`,
+        `${joueurs[joueurActuel]} boit ${texteGorgees(n)}`,
         () => {
           appliquerBonusCouleurSiBesoin(carteTiree, { couleur: couleurBue, joueur: joueurActuel, preserveRuleMessage: true });
         }
@@ -3228,15 +4266,19 @@ document.addEventListener("DOMContentLoaded", function () {
       if(indexPigeon===null){
         indexPigeon=joueurActuel;
         nomPigeonOriginal=joueurs[joueurActuel];
+        const nPigeon = gorgeesPigeon();
+        const msgPigeon = `${joueurs[joueurActuel]} est le PIGEON !\nIl/elle boit ${texteGorgees(nPigeon)}.\nÀ chaque 3 tiré, le PIGEON boit 1 gorgée.\nPour s'en débarrasser : tirer un 3 et choisir le prochain PIGEON.`;
         annoncerBoireAvecAnnulation(
           joueurActuel,
-          2,
+          nPigeon,
           carteTiree,
-          `${joueurs[joueurActuel]} est le PIGEON !\nIl/elle boit 2 gorgées.\nÀ chaque 3 tiré par un autre, le pigeon boit 1 gorgée.\nPour s'en débarrasser : tirer un 3 et choisir le prochain pigeon.`,
+          msgPigeon,
           () => {
             appliquerBonusCouleurSiBesoin(carteTiree, { couleur: couleurBue, joueur: joueurActuel, preserveRuleMessage: true });
           }
         );
+        reglerDureeOverlayRegle(msgPigeon, DUREE_ANNONCE_PIGEON); // annonce du pigeon : affichée 2 fois plus longtemps
+        jouerSon("pigeon");
       
       } else if(indexPigeon===joueurActuel){
         carteTroisPourTransfertPigeon = carteTiree;
@@ -3283,6 +4325,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     plateau.innerHTML = "";
     lancementPartieA = Date.now();
+    document.body.classList.toggle("partie-soft", estModeSoft()); // badge « 🌱 SOFT » dans le bandeau
     garderEcranAllume(); // pas de mise en veille pendant la partie
 
     // Plateau principal = toutes les cartes SAUF 2/5/6/7/8/9 (paquet duel)
@@ -3350,6 +4393,7 @@ document.addEventListener("DOMContentLoaded", function () {
           carte.classList.remove("dos_dore");
         }
         carte.classList.add(carteTiree, "retournee");
+        if(!estCaseDoree) jouerSon("cartes");
 
         const joueurActuel = indexJoueur % joueurs.length;
         appliquerRegle(carteTiree, joueurActuel, carte);
@@ -3358,11 +4402,15 @@ document.addEventListener("DOMContentLoaded", function () {
         // après les overlays éventuels. La dernière carte n'est jamais jouée : elle sert au pari.
         if(cartesRestantes() === 1 && !predictionEnCours){
           const startIdx = nextPlayerIndex(joueurActuel);
+          const generation = generationPartie;
           executerApresOverlayRegleUnique(() => {
-            // Si un duel/pigeon est en cours, on attend que ça finisse avant d'afficher
+            // Si un duel/pigeon est en cours, on attend que ça finisse avant d'afficher.
+            // (Minuteur et pas requestAnimationFrame : celui-ci s'arrête quand l'écran est éteint ou
+            // l'appli en arrière-plan, et le pari ne s'affichait alors qu'au retour sur l'appli)
             const attendre = () => {
+              if(generation !== generationPartie) return; // partie relancée entre-temps
               if(choixPigeonEnCours || duelEnCours){
-                requestAnimationFrame(attendre);
+                setTimeout(attendre, 100);
                 return;
               }
               lancerOverlayPrediction(startIdx);
@@ -3391,6 +4439,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function retourMenu(){
     partieLancee = false;
+    document.body.classList.remove("partie-soft");
     finUnOverlayAffiche = false;
 
     // Écrans du retrait en cours de partie (nouvelle manche, départ, partie fermée...)
@@ -3455,6 +4504,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   btnJouer.addEventListener("pointerdown", lancerPartie);
 
+  // #endregion
+
+  // #region Écran « Nouvelle partie »
   /* ===== ÉCRAN « NOUVELLE PARTIE » (classique et en ligne) ===== */
   const ecranNouvellePartie = document.getElementById("ecranNouvellePartie");
 
@@ -3514,9 +4566,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     nettoyerOverlays();
     retourMenu();
+    ouvrirClavier(nomJoueurInput); // « Modifier les joueurs » : clavier prêt pour en ajouter
   });
 
   function allerAccueil(){
+    setTimeout(afficherBandeauMiseAJour, 0); // nouvelle version repérée pendant la partie : proposée maintenant
     if(codePartieActuel) quitterPartie();
     reinitialiserEcransJeu();
     libererEcran();
@@ -3565,6 +4619,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   btnSupprimer.style.display = "inline-block";
 
+  // #endregion
+
+  // #region Mode en ligne : synchronisation des actions, rattrapage
   /* ===== MODE EN LIGNE : synchronisation des actions ===== */
   // Un élément « de jeu » (carte, bouton d'overlay…) est déclaré via surAction :
   // - en classique, le tap exécute directement le handler ;
@@ -3630,16 +4687,64 @@ document.addEventListener("DOMContentLoaded", function () {
     const code = codePartieActuel;
     const manche = mancheCourante;
     const par = pseudoActuel;
+    const vu = prochainSeq - 1;
+    const refSeq = window.fbRef(db, `parties/${code}/manches/${manche}/seq`);
 
-    return window.fbRunTransaction(window.fbRef(db, `parties/${code}/manches/${manche}/seq`), n => (n || 0) + 1)
+    // Deux téléphones qui envoient au même instant : Firebase refuse le 2e (« permission_denied »)
+    // au lieu de le faire réessayer. On réessaie nous-mêmes, un peu plus tard (3 fois au plus).
+    const reserverNumero = (essai) => window.fbRunTransaction(refSeq, n => (n || 0) + 1).catch((erreur) => {
+      noterJournal(`numéro refusé pour ${id} (essai ${essai}) : ${erreur && erreur.message}`);
+      if(essai >= 3 || code !== codePartieActuel || manche !== mancheCourante) throw erreur;
+      return new Promise(r => setTimeout(r, 60 + Math.random() * 180)).then(() => reserverNumero(essai + 1));
+    });
+
+    return reserverNumero(1)
       .then((res) => {
         const seq = res.snapshot.val();
-        // Une seule écriture : l'action + la date de dernière activité
+        noterJournal(`envoi ${id} => numéro ${seq}`);
+        // Une seule écriture : l'action + la date de dernière activité.
+        // « @vu » : dernière action que ce téléphone avait jouée au moment du tap (voir estUnDoublon)
         return window.fbUpdate(window.fbRef(db, `parties/${code}`), {
-          [`manches/${manche}/actions/${seq}`]: { id, par },
+          [`manches/${manche}/actions/${seq}`]: { id: `${id}@${vu}`, par },
           activite: window.fbServerTimestamp()
+        }).catch((erreur) => {
+          actionRefusee(code, manche, seq);
+          throw erreur;
         });
       });
+  }
+
+  // Firebase montre tout de suite à ce téléphone sa propre action (avant l'accord du serveur) : le
+  // jeu réagit sans attendre. Si le serveur la refuse ensuite (réseau, serveur), les autres
+  // téléphones ne l'ont jamais reçue : ce téléphone ne doit pas la garder.
+  // - pas encore appliquée ici => on la retire de la file (elle est sautée partout pareil) ;
+  // - déjà appliquée ici => on rejoue toute la manche depuis le serveur (comme une reconnexion).
+  let dernierEtatManche = null; // état de la manche en cours (pour la rejouer)
+
+  function actionRefusee(code, manche, seq){
+    noterJournal(`refus du serveur pour mon action ${seq}`);
+    if(!enLigneActif || code !== codePartieActuel || manche !== mancheCourante) return;
+
+    const action = fileActions.get(seq);
+    if(seq > prochainSeq || (seq === prochainSeq && action && !traitementEnCours)){
+      fileActions.delete(seq);
+      traiterFile();
+      return;
+    }
+    if(seq === prochainSeq && action){
+      action.refusee = true; // en cours d'essai (« attendre ») : elle sera sautée
+      return;
+    }
+    resynchroniserManche();
+  }
+
+  function resynchroniserManche(){
+    if(!dernierEtatManche || !enLigneActif) return;
+    noterJournal("remise à jour de la manche depuis le serveur");
+    afficherToast("Connexion instable : remise à jour de la partie…", 3000);
+    repriseEnCours = true;
+    mancheCourante = null; // la même manche est redémarrée, puis rejouée depuis le serveur
+    demarrerMancheEnLigne(dernierEtatManche, { resynchro: true });
   }
 
   // Retrait en ligne : l'action garde le nombre de cartes restantes au moment de la demande.
@@ -3674,12 +4779,15 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     if(nom === pseudoActuel){
+      // Pendant le rattrapage, c'est un joueur retiré qui revient : il reste, et demandera
+      // à être remis dans la manche à la fin du rattrapage (verifierRetourDansManche)
+      if(rattrapageEnCours) return "ok";
       const code = codePartieActuel;
       setTimeout(() => {
         if(codePartieActuel !== code) return; // déjà parti
         quitterPartieEnLigne();
         if(action.par === nom) allerAccueil();
-        else alert("Tu as été retiré de la partie.");
+        else alerteRetire(code, nom);
       }, 0);
     } else if(!rattrapageEnCours){
       afficherToast(action.par === nom ? `${nom} a quitté la partie` : `${nom} a été retiré de la partie`, 3000);
@@ -3707,9 +4815,115 @@ document.addEventListener("DOMContentLoaded", function () {
     }).catch(() => {});
   }
 
+  // Joueur retiré qui revient : tant qu'il n'est pas dans la manche, il la regarde et demande à y
+  // être remis (action « retour:<cartes restantes>:<nom> », ou « retour:fin:<nom> » une fois la
+  // manche finie). La demande part plateau au repos, sinon on réessaie un peu plus tard.
+  function verifierRetourDansManche(){
+    clearTimeout(timerRetour);
+    timerRetour = null;
+    if(!enLigneActif || !pseudoActuel || rattrapageEnCours || retourEnvoye) return;
+    if(joueurs.includes(pseudoActuel)){
+      retourEnCours = false;
+      retourAnnonce = false;
+      return;
+    }
+    retourEnCours = true;
+
+    // Toutes les actions reçues doivent être appliquées ici avant de demander (état à jour)
+    const id = (traitementEnCours || fileActions.size > 0) ? null
+      : finUnOverlayAffiche ? `retour:fin:${pseudoActuel}`
+      : plateauLibre() ? `retour:${cartesRestantes()}:${pseudoActuel}`
+      : null;
+    if(!id){
+      if(!retourAnnonce){
+        retourAnnonce = true;
+        afficherToast("Tu reviens dans la partie à la fin de l'action en cours…", 3000);
+      }
+      timerRetour = setTimeout(verifierRetourDansManche, 500);
+      return;
+    }
+
+    retourEnvoye = true;
+    const manche = mancheCourante;
+    ecrireAction(id).then(() => {
+      // Sécurité : demande jamais traitée (envoi interrompu) => on la refait
+      timerRetour = setTimeout(() => {
+        if(manche !== mancheCourante) return;
+        retourEnvoye = false;
+        verifierRetourDansManche();
+      }, 20000);
+    }).catch(() => {
+      retourEnvoye = false;
+      if(manche === mancheCourante) timerRetour = setTimeout(verifierRetourDansManche, 2000);
+    });
+  }
+
+  // Comme le retrait : ignoré si une carte a été tirée depuis la demande (le joueur redemande
+  // tout seul), appliqué plateau au repos. Seul le joueur lui-même peut demander son retour.
+  function appliquerRetourEnLigne(action){
+    const [, restantes, ...reste] = action.id.split(":");
+    const nom = reste.join(":");
+
+    let resultat;
+    if(action.par !== nom || joueurs.includes(nom)) resultat = "ignorer";
+    else if(restantes === "fin") resultat = finUnOverlayAffiche ? "ok" : "attendre";
+    else if(finUnOverlayAffiche || cartesRestantes() !== Number(restantes)) resultat = "ignorer";
+    else resultat = plateauLibre() ? "ok" : "attendre";
+    if(resultat === "attendre") return resultat;
+
+    if(resultat === "ok") ajouterJoueurEnJeu(nom);
+
+    if(nom === pseudoActuel){
+      if(!rattrapageEnCours){
+        retourEnvoye = false;
+        if(resultat === "ok"){
+          retourEnCours = false;
+          retourAnnonce = false;
+          clearTimeout(timerRetour);
+          timerRetour = null;
+          afficherToast("Te revoilà dans la partie !", 3000);
+          // Fiche effacée entre-temps par le nettoyage du retrait : on la remet
+          const code = codePartieActuel;
+          window.fbGet(window.fbRef(window.firebaseDB, `parties/${code}/joueurs/${nom}`)).then((snapshot) => {
+            if(!snapshot.exists() && codePartieActuel === code) remettreFicheJoueur();
+          }).catch(() => {});
+        } else {
+          setTimeout(verifierRetourDansManche, 0); // redemande (ou déjà revenu)
+        }
+      }
+    } else if(resultat === "ok" && !rattrapageEnCours){
+      afficherToast(`${nom} est revenu(e) dans la partie`, 3000);
+    }
+    return resultat;
+  }
+
+  // Remet un joueur retiré dans la partie (en ligne, identique sur tous les téléphones) : à sa place
+  // d'origine dans l'ordre de la manche (sinon à la fin), sans changer à qui c'est le tour
+  function ajouterJoueurEnJeu(nom){
+    if(joueurs.includes(nom)) return false;
+
+    const rang = ordreManche.indexOf(nom);
+    let idx = rang < 0 ? -1 : joueurs.findIndex((j) => {
+      const r = ordreManche.indexOf(j);
+      return r < 0 || r > rang;
+    });
+    if(idx < 0) idx = joueurs.length;
+
+    const courant = joueurs.length > 0 ? indexJoueur % joueurs.length : 0;
+    joueurs.splice(idx, 0, nom);
+    annulations[nom] = 0;
+    indexJoueur = idx <= courant ? courant + 1 : courant;
+    if(indexPigeon !== null && indexPigeon >= idx) indexPigeon++;
+
+    afficherJoueurs();
+    afficherJoueurActif();
+    return true;
+  }
+
   // "ok" | "attendre" (élément pas encore là / pas prêt) | "ignorer" (action devenue sans objet)
   function tenterAction(action){
     if(action.id.startsWith("retrait:")) return appliquerRetraitEnLigne(action);
+    if(action.id.startsWith("retour:")) return appliquerRetourEnLigne(action);
 
     // Bouton à usage unique dans la manche (ex. « Terminer ») déjà appliqué : si deux joueurs
     // ont appuyé en même temps, le 2e appui est ignoré au lieu d'attendre un bouton disparu
@@ -3742,16 +4956,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const action = fileActions.get(prochainSeq);
     if(!action){
-      // Trou dans la numérotation (envoi interrompu) : on le saute au bout de 5 s
-      const plusLoin = Array.from(fileActions.keys()).some(k => k > prochainSeq);
+      // Trou dans la numérotation (envoi interrompu ou refusé par le serveur) : on le saute au
+      // bout de 5 s, dès qu'une action plus loin existe. Pendant un rattrapage, les numéros
+      // jusqu'à la fin du rattrapage ont tous été réservés : un trou est sauté même s'il est le dernier.
+      const plusLoin = Array.from(fileActions.keys()).some(k => k > prochainSeq) ||
+        (rattrapageEnCours && prochainSeq <= seqFinRattrapage);
       if(plusLoin && !timerTrou){
         const attendu = prochainSeq;
+        const generation = generationFile;
         timerTrou = setTimeout(() => {
           timerTrou = null;
+          if(generation !== generationFile) return;
           if(prochainSeq === attendu && !fileActions.has(attendu)){
+            noterJournal(`trou ${attendu} sauté`);
             prochainSeq++;
-            traiterFile();
+            apresActionTraitee();
           }
+          // Toujours : si la file a avancé entre-temps jusqu'à un autre trou, il faut le
+          // repérer maintenant (sinon plus rien ne relance la vérification)
+          traiterFile();
         }, 5000);
       }
       return;
@@ -3759,12 +4982,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     traitementEnCours = true;
     const manche = mancheCourante;
+    const generation = generationFile;
     let attente = 0;
+    let attenteNotee = false; // journal : une seule ligne « attendre » par action
 
     const essayer = () => {
-      if(manche !== mancheCourante) return;
+      if(manche !== mancheCourante || generation !== generationFile) return;
 
-      const resultat = tenterAction(action);
+      // Action refusée par le serveur pendant qu'on attendait de pouvoir l'appliquer : sautée
+      const resultat = (action.refusee || estUnDoublon(action)) ? "ignorer" : tenterAction(action);
+      if(resultat === "ok") actionsAppliquees.set(`${action.par}|${action.id}`, prochainSeq);
+      if(resultat !== "attendre" || !attenteNotee) noterJournal(`${prochainSeq} ${action.id} (${action.par}) => ${resultat}`);
+      if(resultat === "attendre") attenteNotee = true;
       // On attend que l'overlay concerné soit affiché chez nous (max 30 s d'écran allumé)
       if(resultat === "attendre" && attente < 30000){
         const pas = rattrapageEnCours ? 20 : 120;
@@ -3776,11 +5005,7 @@ document.addEventListener("DOMContentLoaded", function () {
       fileActions.delete(prochainSeq);
       prochainSeq++;
       traitementEnCours = false;
-
-      if(rattrapageEnCours){
-        if(prochainSeq > seqFinRattrapage) finirRattrapage();
-        else majRattrapage();
-      }
+      apresActionTraitee();
 
       traiterFile();
     };
@@ -3788,7 +5013,48 @@ document.addEventListener("DOMContentLoaded", function () {
     essayer();
   }
 
+  // Diagnostic (console du navigateur / tests) : état de la file d'actions en ligne
+  // + journal des dernières actions traitées (numéro, action, joueur => résultat)
+  const journalFile = [];
+  function noterJournal(texte){
+    journalFile.push(texte);
+    if(journalFile.length > 120) journalFile.shift();
+  }
+
+  window.__etatFileAlcuno = () => ({
+    prochainSeq, seqFinRattrapage, rattrapageEnCours, traitementEnCours,
+    trouEnAttente: !!timerTrou, actions: Array.from(fileActions.keys()), journal: journalFile.slice()
+  });
+
+  // Après chaque action traitée (ou trou sauté) : fin du rattrapage quand tout est rejoué
+  function apresActionTraitee(){
+    if(!rattrapageEnCours) return;
+    if(prochainSeq > seqFinRattrapage){
+      finirRattrapage();
+      setTimeout(verifierRetourDansManche, 0); // joueur retiré qui revient : il demande sa place
+    }
+    else majRattrapage();
+  }
+
+  // Doublon : le même joueur a tapé deux fois le même élément avant que son 1er tap revienne du
+  // serveur (tap rapide, réseau lent). Si ce même tap a déjà été appliqué APRÈS ce que l'expéditeur
+  // avait vu, le 2e est ignoré. Décidé uniquement avec la file d'actions : pareil sur tous les
+  // téléphones (avant, il restait en attente sur l'élément disparu : abandonné au bout de 30 s sur
+  // un écran allumé, attendu pour toujours sur un écran éteint => téléphones décalés).
+  // Exceptions : les boutons qu'on tape exprès plusieurs fois de suite (+1 et Retour du +4).
+  let actionsAppliquees = new Map(); // "joueur|action" -> numéro de la dernière fois appliquée
+  const ACTIONS_REPETABLES = ["plus4:joueur:", "plus4:annuler", "plus4:reset"];
+
+  function estUnDoublon(action){
+    if(typeof action.vu !== "number") return false;
+    if(ACTIONS_REPETABLES.some(debut => action.id.startsWith(debut))) return false;
+    const derniere = actionsAppliquees.get(`${action.par}|${action.id}`);
+    return derniere !== undefined && derniere > action.vu;
+  }
+
   function reinitialiserFileActions(){
+    generationFile++; // une action de l'ancienne file encore en attente s'arrête
+    actionsAppliquees = new Map();
     fileActions = new Map();
     prochainSeq = 1;
     traitementEnCours = false;
@@ -3837,7 +5103,14 @@ document.addEventListener("DOMContentLoaded", function () {
     );
 
     desabonnerActions = window.fbOnChildAdded(refActions, (snapshot) => {
-      fileActions.set(Number(snapshot.key), snapshot.val());
+      // « id@vu » => id + vu (dernière action jouée par l'expéditeur au moment du tap)
+      const action = Object.assign({}, snapshot.val());
+      const morceaux = /^(.*)@(\d+)$/.exec(String(action.id));
+      if(morceaux){
+        action.id = morceaux[1];
+        action.vu = Number(morceaux[2]);
+      }
+      fileActions.set(Number(snapshot.key), action);
       traiterFile();
     });
   }
@@ -3866,8 +5139,10 @@ document.addEventListener("DOMContentLoaded", function () {
     predictions = null;
   }
 
-  function demarrerMancheEnLigne(etat){
+  // options.resynchro : même manche rejouée depuis le serveur (voir resynchroniserManche)
+  function demarrerMancheEnLigne(etat, options = {}){
     const etaitEnJeu = enLigneActif;
+    dernierEtatManche = etat;
     enLigneActif = true;
     mancheCourante = etat.manche;
     hotePartie = etat.hote;
@@ -3875,14 +5150,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
     nettoyerOverlays();
     joueurs = Object.values(etat.joueurs || {});
+    ordreManche = joueurs.slice();
     annulations = {};
     retourMenu();
+
+    // Demande de retour faite dans la manche précédente : elle n'y sera jamais traitée
+    retourEnvoye = false;
+    clearTimeout(timerRetour);
+    timerRetour = null;
 
     aleatoire = generateurAleatoire(etat.seed);
     lancerPartie();
 
     // Manche relancée pendant une partie (« Rejouer ») et pas depuis la salle d'attente
-    if(etaitEnJeu) annoncerNouvellePartie();
+    if(etaitEnJeu && !options.resynchro) annoncerNouvellePartie();
 
     document.body.classList.add("mode-en-ligne");
     fermerEcranNouvellePartie();
@@ -3894,6 +5175,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if(!repriseEnCours){
       ecouterActions();
+      verifierRetourDansManche(); // pas dans la nouvelle manche (joueur qui revenait) : il demande sa place
       return;
     }
 
@@ -3908,9 +5190,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const cible = Number(snapshot.val() || 0);
         if(cible > 0) commencerRattrapage(cible);
         ecouterActions();
+        if(cible === 0) verifierRetourDansManche();
       })
       .catch(() => {
-        if(manche === mancheCourante) ecouterActions();
+        if(manche !== mancheCourante) return;
+        ecouterActions();
+        verifierRetourDansManche();
       });
   }
 
@@ -3951,6 +5236,9 @@ document.addEventListener("DOMContentLoaded", function () {
     toast._timer = setTimeout(() => toast.classList.remove("visible"), duree);
   }
 
+  // #endregion
+
+  // #region Bouton retour du téléphone et démarrage du jeu
   /* ===== BOUTON RETOUR DU TÉLÉPHONE (Android) ET DU NAVIGATEUR (Safari, PC) ===== */
   // Le téléphone ne prévient la page que si elle a ajouté des entrées dans l'historique.
   // On en garde quelques-unes d'avance, ajoutées pendant un tap (sinon Chrome les saute),
@@ -3981,6 +5269,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if(annonce){ taper(annonce); return true; }
 
     if(estVisible(ecranCredits)){ activer("btnFermerCredits"); return true; }
+    if(estVisible(ecranReglages)){ activer("btnFermerReglages"); return true; }
 
     // Overlays du jeu : le plus récent se ferme comme au tap (ceux où il faut choisir ne bougent pas),
     // sauf le +4 où « Retour » enlève la dernière gorgée distribuée
@@ -4067,4 +5356,5 @@ document.addEventListener("DOMContentLoaded", function () {
   window.addEventListener("resize", () => {
     centrerDerniereLigne();
   });
+  // #endregion
 });
