@@ -4098,12 +4098,12 @@ html{ min-height: 100%; }
 body{
   background:
     var(--deco-theme, radial-gradient(circle at top center, rgba(255, 215, 0, 0.08) 0%, rgba(255, 215, 0, 0) 26%) no-repeat),
-    linear-gradient(var(--fond-theme), var(--fond-theme)) no-repeat var(--couleur-barre);
+    linear-gradient(var(--fond-theme), var(--fond-theme)) no-repeat,
+    /* sous la page (bande du bas de l'iPhone quand le jeu passe sous l'heure) : la couleur du bas du
+       décor, en couche répétée sur tout l'écran. Pas de classe posée au démarrage : à l'ouverture de
+       l'appli, l'iPhone donne parfois une zone de l'heure de 0, et la bande du bas revenait. */
+    linear-gradient(var(--couleur-bas), var(--couleur-bas)) var(--couleur-barre);
 }
-
-/* Jeu sous l'heure (appli installée depuis la 8.8.9) : la barre du haut, c'est la page ; sous la page,
-   tout en bas, la couleur du bas du décor (--couleur-barre ne sert qu'aux anciennes installations) */
-html.sous-l-heure body{ background-color: var(--couleur-bas); }
 
 /* Créateurs : la page derrière prend le fond du thème, comme cet écran */
 html.credits-ouverts body{ background: var(--fond-theme); }
