@@ -13,6 +13,7 @@ Un fichier MP3 par moment du jeu, avec exactement ces noms :
   reglage_son.mp3  on lâche le curseur de volume dans les réglages (pour entendre le volume)
   no_wifi.mp3  en ligne, coupure de réseau (une seule fois, quand le logo wifi barré apparaît)
   distribuer_gorgees.mp3  +4 : on tape sur un joueur pour lui donner une gorgée (coupé à 1,3 seconde par le jeu)
+  annuler_gorgees.mp3  quelqu'un annule 1 gorgée ou plus (rien pour « Annuler 0 »)
 
 Pas de son pour le cul sec de la carte dorée (« TIENS DANS TA GUEULE »).
 
