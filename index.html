@@ -2,36 +2,25 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <!-- Anti-cache : GitHub Pages fait garder les fichiers 10 min par les navigateurs.
          Un paramètre différent à chaque chargement force toujours la dernière version. -->
     <script>
         window.ANTI_CACHE = Date.now();
         // Thème choisi dans les réglages : appliqué tout de suite (pas de flash de bordeaux au chargement)
         try { var theme = localStorage.getItem("alcuno_theme"); if (theme) document.documentElement.dataset.theme = theme; } catch (e) {}
-        // Barre du téléphone à la couleur du thème dès le premier affichage (mêmes couleurs que THEMES dans script.js)
-        var couleursBarre = { bordeaux: "#2b001d", noir: "#0e0e12", vert: "#08301e", bleu: "#0a1634", violet: "#3d0f66",
-                              cerisier: "#5a1740", prestige: "#937810" };
-        document.write('<meta name="theme-color" content="' + (couleursBarre[theme] || couleursBarre.bordeaux) + '">');
-        // iPhone : page rechargée après un changement de thème (voir rafraichirBarreIphone dans script.js) :
-        // on rouvre les Réglages dès le premier affichage
-        try { if (sessionStorage.getItem("alcuno_rouvrir_reglages") !== null) document.documentElement.classList.add("rouvrir-reglages"); } catch (e) {}
         document.write('<link rel="stylesheet" href="style_alcuno.css?t=' + window.ANTI_CACHE + '" />');
     </script>
     <title>Alcuno</title>
 
     <!-- Appli installable (PWA) : manifest.json + sw.js -->
     <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2B001D">
     <link rel="icon" type="image/png" href="icones/icone-192.png">
     <!-- iPhone : icône, plein écran et nom sur l'écran d'accueil -->
     <link rel="apple-touch-icon" href="icones/icone-180.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <!-- Barre du haut opaque (« black ») : l'iPhone la peint de la couleur du thème et le jeu va jusqu'au
-         bas de l'écran. Avec « black-translucent » (8.8.9 à 8.8.22), le jeu passait sous l'heure, mais iOS 27
-         le remonte de 59 px sans l'agrandir : les 59 derniers px de l'écran restaient hors du jeu (bande en
-         bas). iOS retient ce réglage à l'installation : il faut réinstaller l'appli pour qu'il change.
-         Le CSS gère les deux cas (marges du haut en safe-area-inset-top, 0 avec la barre opaque). -->
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="Alcuno">
     <!-- Aperçu du lien partagé (Messages, WhatsApp…) : l'icône du jeu, pas une image de la page comme le QR code -->
@@ -43,8 +32,6 @@
     <meta property="og:image:height" content="512">
 </head>
 <body>
-    <!-- iPhone : bande fixe sur la zone de l'heure pendant la partie (voir #hautJeu dans style_alcuno.css) -->
-    <div id="hautJeu" aria-hidden="true"></div>
     <header>
         <h1>ALCUNO</h1>
         <span class="badgeSoft" aria-label="Mode PJ">PJ</span>
@@ -70,6 +57,7 @@
                 <h1 id="titreAccueil">ALCUNO<span class="couronneTitre" aria-hidden="true"><svg viewBox="0 0 64 48" aria-hidden="true"><defs><linearGradient id="orCouronne" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff3a8"/><stop offset="0.45" stop-color="#ffd23f"/><stop offset="1" stop-color="#c8880a"/></linearGradient></defs><path d="M6 40 L3 12 L18 24 L32 4 L46 24 L61 12 L58 40 Z" fill="url(#orCouronne)" stroke="#7a4b00" stroke-width="2.5" stroke-linejoin="round"/><rect x="5" y="38" width="54" height="8" rx="2" fill="url(#orCouronne)" stroke="#7a4b00" stroke-width="2.5"/><circle cx="3" cy="11" r="3.2" fill="#fff3a8" stroke="#7a4b00" stroke-width="1.5"/><circle cx="32" cy="4" r="3.6" fill="#fff3a8" stroke="#7a4b00" stroke-width="1.5"/><circle cx="61" cy="11" r="3.2" fill="#fff3a8" stroke="#7a4b00" stroke-width="1.5"/><circle cx="32" cy="30" r="4" fill="#e0263a" stroke="#7a4b00" stroke-width="1.2"/><circle cx="17" cy="32" r="2.8" fill="#2f7de1" stroke="#7a4b00" stroke-width="1.2"/><circle cx="47" cy="32" r="2.8" fill="#2f7de1" stroke="#7a4b00" stroke-width="1.2"/></svg></span></h1>
                 <div class="titreAccueilBarre" aria-hidden="true"></div>
             </div>
+            <h2>&nbsp;</h2>
             <button type="button" id="btnModeEnLigne">Mode en ligne</button>
             <button type="button" id="btnModeClassique">Mode classique<br>(Hors connexion)</button>
             <!-- Installer l'appli : bouton sur Android (quand Chrome le permet), astuce sur iPhone.
@@ -319,7 +307,7 @@
                 <div class="credits-titre">ALCUNO</div>
                 <p class="credits-phrase">
                     Un jeu imaginé en pleine soirée par<br>
-                    <strong>Tristan, Ylana, Célien &amp; Roseanna (tous bourrés bien sûr)</strong>
+                    <strong>Tristan, Ylana, Célien &amp; Roseanna (tous bourrés bien sûr !)</strong>
                 </p>
 
                 <!-- Photo : mettre le fichier photo_createurs.jpg à côté de index.html -->

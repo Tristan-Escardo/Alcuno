@@ -108,11 +108,11 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.8.23";
+  const VERSION_AFFICHEE = "8.8.24";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
-  // À l'écran : le numéro complet, pour voir d'un coup d'œil si un téléphone est à jour
-  document.getElementById("versionJeu").innerText = "Alcuno — version " + VERSION_AFFICHEE;
+  // À l'écran : seulement « 8.7 » (le dernier chiffre change à chaque mise en ligne, en coulisses)
+  document.getElementById("versionJeu").innerText = "Alcuno — version " + VERSION_AFFICHEE.split(".").slice(0, 2).join(".");
 
   // #endregion
 
@@ -174,8 +174,6 @@ document.addEventListener("DOMContentLoaded", function () {
   // Pages plein écran (Réglages, créateurs) : elles arrivent en glissant depuis la droite et
   // repartent en fondu vers la droite (avant : elles apparaissaient / disparaissaient d'un coup)
   function ouvrirPage(page){
-    // Créateurs : la page derrière prend le fond du thème, comme cet écran (voir style_alcuno.css)
-    if (page.id === "ecranCredits") document.documentElement.classList.add("credits-ouverts");
     page.classList.remove("page-sortie", "page-entree");
     page.style.display = "";
     void page.offsetWidth; // relance l'animation même si la page vient d'être fermée
@@ -194,7 +192,6 @@ document.addEventListener("DOMContentLoaded", function () {
       page.removeEventListener("animationend", fin);
       page.classList.remove("page-sortie");
       page.style.display = "none";
-      if (page.id === "ecranCredits") document.documentElement.classList.remove("credits-ouverts");
     };
     page.addEventListener("animationend", fin);
     setTimeout(() => fin(), 350); // sécurité : animations désactivées sur le téléphone
@@ -240,10 +237,8 @@ document.addEventListener("DOMContentLoaded", function () {
   // ===== Thème : couleur du fond du jeu (réglage de ce téléphone, purement visuel) =====
   // (le thème est déjà posé au tout début du chargement par index.html : pas de flash de couleur)
   const CLE_THEME = "alcuno_theme";
-  // Couleur de la barre du téléphone pour chaque thème (= --couleur-barre du CSS, le tout haut de la page).
-  // Mêmes couleurs dans le script du <head> de index.html, qui la pose dès le premier affichage.
   const THEMES = { bordeaux: "#2b001d", noir: "#0e0e12", vert: "#08301e", bleu: "#0a1634", violet: "#3d0f66",
-                   cerisier: "#5a1740", prestige: "#937810" };
+                   cerisier: "#5a1740", prestige: "#3a2806" };
 
   // Thème secret « Prestige » : débloqué en découvrant l'écran des créateurs (4 taps sur le titre)
   const CLE_PRESTIGE = "alcuno_theme_prestige";
@@ -376,51 +371,30 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // iPhone, barre du haut (sous l'heure) : quand le jeu ne passe pas dessous (appli ajoutée à l'écran
-  // d'accueil avant la 8.8.9 : iOS garde le réglage de la barre enregistré à l'installation), c'est
-  // l'iPhone qui la peint, et il ne relit sa couleur qu'au chargement de la page (elle gardait celle du
-  // thème d'avant). Après un changement de thème, on recharge donc la page, et les Réglages se
-  // rouvrent au même endroit. Quand le jeu passe sous l'heure, la barre, c'est la page : rien à faire.
-  const CLE_ROUVRIR_REGLAGES = "alcuno_rouvrir_reglages"; // (lue aussi par le script du <head> de index.html)
-  let rechargementTheme = null;
-
-  // Hauteur de la zone de l'heure occupée par le jeu (0 quand le jeu commence sous la barre du haut)
-  function hauteurZoneHeure(){
-    const sonde = document.createElement("div");
-    sonde.style.cssText = "position:fixed;visibility:hidden;pointer-events:none;padding-top:env(safe-area-inset-top, 0px)";
-    document.body.appendChild(sonde);
-    const hauteur = parseFloat(getComputedStyle(sonde).paddingTop) || 0;
-    sonde.remove();
-    return hauteur;
-  }
-
+  // iPhone (Safari d'iOS 26 et plus) : la barre du haut ne lit plus theme-color, elle prend la
+  // couleur du haut de la page… et ne la relit qu'après un changement de mise en page ou un
+  // défilement. Un simple changement de couleur ne lui suffit pas : on lui en provoque un, invisible.
   function rafraichirBarreIphone(){
-    if (!estIOS || !estEnAppli || hauteurZoneHeure() > 0) return;
-    // petit délai : on voit le nouveau thème, et plusieurs taps d'affilée ne font qu'un rechargement
-    clearTimeout(rechargementTheme);
-    rechargementTheme = setTimeout(() => {
-      const reglagesOuverts = ecranReglages.style.display !== "none" && !ecranReglages.classList.contains("page-sortie");
-      try {
-        if (reglagesOuverts) sessionStorage.setItem(CLE_ROUVRIR_REGLAGES, String(ecranReglages.scrollTop));
-      } catch (e) {}
-      location.reload();
-    }, 400);
+    const reglages = document.getElementById("ecranReglages");
+    // une fine bande fixe aux couleurs du thème, posée en haut (derrière les pages) puis retirée
+    const bande = document.createElement("div");
+    bande.id = "teinteHaut";
+    bande.setAttribute("aria-hidden", "true");
+    document.body.appendChild(bande);
+    // la page Réglages (fixe, tout en haut) change de mise en page d'un pixel, en bas, le temps d'une image
+    document.documentElement.classList.add("teinte-maj");
+    // défilement d'un pixel aller-retour (de la page et des réglages)
+    const yPage = window.scrollY;
+    const yReglages = reglages ? reglages.scrollTop : 0;
+    window.scrollTo(0, yPage > 0 ? yPage - 1 : yPage + 1);
+    if (reglages) reglages.scrollTop = yReglages > 0 ? yReglages - 1 : yReglages + 1;
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      document.documentElement.classList.remove("teinte-maj");
+      window.scrollTo(0, yPage);
+      if (reglages) reglages.scrollTop = yReglages;
+      setTimeout(() => bande.remove(), 400);
+    }));
   }
-
-  // Après ce rechargement : Réglages rouverts tels quels (sans animation), au même endroit
-  let positionReglages = null;
-  try {
-    positionReglages = sessionStorage.getItem(CLE_ROUVRIR_REGLAGES);
-    sessionStorage.removeItem(CLE_ROUVRIR_REGLAGES);
-  } catch (e) {}
-  if (positionReglages !== null) {
-    ecranReglages.style.display = "";
-    requestAnimationFrame(() => {
-      majLignePartieMemoire();
-      ecranReglages.scrollTop = Number(positionReglages) || 0;
-    });
-  }
-  document.documentElement.classList.remove("rouvrir-reglages");
 
   majPastillePrestige();
   let themeChoisi = "bordeaux";
@@ -459,8 +433,8 @@ document.addEventListener("DOMContentLoaded", function () {
   document.querySelectorAll(".pastilleTheme").forEach((pastille) => {
     pastille.addEventListener("click", () => {
       appliquerTheme(pastille.dataset.theme);
-      try { localStorage.setItem(CLE_THEME, pastille.dataset.theme); } catch (e) {}
       rafraichirBarreIphone();
+      try { localStorage.setItem(CLE_THEME, pastille.dataset.theme); } catch (e) {}
     });
   });
 
@@ -538,41 +512,19 @@ document.addEventListener("DOMContentLoaded", function () {
   curseurVolume.addEventListener("change", () => jouerSon("reglage_son")); // essai au relâchement (Sons/reglage_son.mp3)
 
   let contexteSon = null;
-  let repriseRatee = false; // au tap précédent, le son était coupé et la reprise n'a pas marché
   function contexteAudio(){
-    if (contexteSon && contexteSon.state === "closed") contexteSon = null;
     if (!contexteSon) {
       const Contexte = window.AudioContext || window.webkitAudioContext;
       if (!Contexte) return null;
       try { contexteSon = new Contexte(); } catch (e) { return null; }
     }
-    // « suspended », ou « interrupted » sur iPhone (appli en arrière-plan, appel, autre appli qui joue
-    // du son…) : on relance. Avant, seul « suspended » était relancé : le son restait coupé jusqu'au
-    // redémarrage de l'appli.
-    if (contexteSon.state !== "running") contexteSon.resume().catch(() => {});
+    if (contexteSon.state === "suspended") contexteSon.resume().catch(() => {});
     return contexteSon;
   }
   // Les téléphones n'autorisent le son qu'après un premier tap : on le prépare à chaque tap
-  // (et on charge les fichiers des sons au premier tap, pour qu'ils soient prêts à temps).
-  // Si le son est encore coupé au tap suivant, l'iPhone l'a bloqué pour de bon : on repart d'un
-  // contexte neuf, créé pendant le tap (les sons déjà chargés resservent tels quels).
-  document.addEventListener("pointerdown", () => {
-    if (!caseSons.checked) return;
-    if (contexteSon && contexteSon.state !== "running" && repriseRatee) {
-      try { contexteSon.close(); } catch (e) {}
-      contexteSon = null;
-    }
-    const ctx = contexteAudio();
-    chargerSons();
-    repriseRatee = false;
-    if (ctx && ctx.state !== "running") setTimeout(() => { repriseRatee = ctx.state !== "running"; }, 300);
-  }, { capture: true, passive: true });
-  // Retour dans l'appli : on relance le son tout de suite
-  document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible" && contexteSon && contexteSon.state !== "running") {
-      contexteSon.resume().catch(() => {});
-    }
-  });
+  // (et on charge les fichiers des sons au premier tap, pour qu'ils soient prêts à temps)
+  document.addEventListener("pointerdown", () => { if (caseSons.checked) { contexteAudio(); chargerSons(); } },
+    { capture: true, passive: true });
 
   // Fichiers des sons : dossier Sons/, un MP3 par moment du jeu. Pour changer un son, il suffit de
   // remplacer le fichier (même nom). Fichier absent => pas de son à ce moment-là.
@@ -585,13 +537,10 @@ document.addEventListener("DOMContentLoaded", function () {
   //   credits.mp3 : 4 taps sur le titre ALCUNO (écran des créateurs)
   //   reglage_son.mp3 : on lâche le curseur de volume dans les réglages (pour entendre le volume)
   //   no_wifi.mp3 : en ligne, coupure de réseau (une fois, quand le logo wifi barré apparaît)
-  //   distribuer_gorgees.mp3 : +4, on tape sur un joueur pour lui donner une gorgée (coupé à 0,8 s)
-  //   annuler_gorgees.mp3 : quelqu'un annule 1 gorgée ou plus
-  //   annuler_0_gorgees.mp3 : quelqu'un tape « Annuler 0 » (il n'annule rien)
   // (pas de son pour le cul sec de la carte dorée)
-  const SONS = ["cartes", "doree", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees"];
+  const SONS = ["cartes", "doree", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi"];
   // Sons coupés au bout de N secondes (avec un petit fondu), même si le fichier est plus long
-  const DUREE_MAX_SONS = { doree: 3, pigeon: 2, distribuer_gorgees: 0.8 };
+  const DUREE_MAX_SONS = { doree: 3, pigeon: 2 };
   const sonsCharges = {}; // nom -> son décodé (ou null si le fichier n'existe pas)
   const sonsDemandes = {}; // nom -> moment où il a été demandé alors qu'il n'était pas encore chargé
   let chargementSonsLance = false;
@@ -705,36 +654,6 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // ===== Diagnostic : tout ce qu'il faut pour comprendre un plantage en ligne, copié en un tap =====
-  // Écran : appli installée ou navigateur, et zones de l'heure / du bas (pour la barre du haut de l'iPhone)
-  function infosEcranDiagnostic(){
-    const sonde = document.createElement("div");
-    sonde.style.cssText = "position:fixed;visibility:hidden;pointer-events:none;" +
-      "padding-top:env(safe-area-inset-top, 0px);padding-bottom:env(safe-area-inset-bottom, 0px)";
-    document.body.appendChild(sonde);
-    const zone = getComputedStyle(sonde);
-    const haut = zone.paddingTop, bas = zone.paddingBottom;
-    sonde.remove();
-    // Bas d'un élément fixe calé en haut avec ce style (bande vide en bas de l'iPhone : quelle hauteur
-    // le jeu voit-il vraiment ?)
-    const basFixe = (style) => {
-      const s = document.createElement("div");
-      s.style.cssText = "position:fixed;top:0;left:0;width:1px;visibility:hidden;pointer-events:none;" + style;
-      document.body.appendChild(s);
-      const b = Math.round(s.getBoundingClientRect().bottom);
-      s.remove();
-      return b;
-    };
-    const zoneVisible = window.visualViewport;
-    const accueil = document.getElementById("choixMode").getBoundingClientRect();
-    return `Écran : ${estEnAppli ? "appli installée" : "navigateur"} | fenêtre ${window.innerWidth}×${window.innerHeight}` +
-      ` | écran ${screen.width}×${screen.height} | zone de l'heure ${haut} | zone du bas ${bas}` +
-      ` | thème ${document.documentElement.dataset.theme || "-"}` +
-      ` | bas des écrans fixes ${basFixe("bottom:0")} | 100vh ${basFixe("height:100vh")} | 100dvh ${basFixe("height:100dvh")}` +
-      ` | 100lvh ${basFixe("height:100lvh")} | html ${document.documentElement.clientHeight}` +
-      ` | zone visible ${zoneVisible ? Math.round(zoneVisible.height) + " décalée de " + Math.round(zoneVisible.offsetTop) : "-"}` +
-      ` | accueil ${Math.round(accueil.top)}→${Math.round(accueil.bottom)} | pixels ×${window.devicePixelRatio}`;
-  }
-
   function texteDiagnostic(){
     const etat = window.__etatFileAlcuno ? window.__etatFileAlcuno() : {};
     const journal = etat.journal || [];
@@ -744,7 +663,6 @@ document.addEventListener("DOMContentLoaded", function () {
       `Version ${VERSION_AFFICHEE} | ${new Date().toLocaleString("fr-FR")}`,
       `Téléphone : ${navigator.userAgent}`,
       `Réseau : ${navigator.onLine ? "en ligne" : "hors connexion"} | Firebase chargé : ${!!window.firebaseDB}`,
-      infosEcranDiagnostic(),
       `Partie : ${codePartieActuel || "aucune"} | pseudo : ${pseudoActuel || "-"} | manche : ${mancheCourante === null ? "-" : mancheCourante}` +
         ` | partie en mémoire : ${JSON.stringify(lirePartieLocale())}`,
       `File d'actions : ${JSON.stringify(etat)}`,
@@ -3440,7 +3358,6 @@ document.addEventListener("DOMContentLoaded", function () {
         overlay.dataset.netFerme = "1";
         const utilise = i;
         const reste = nbGorgees - utilise;
-        jouerSon(utilise > 0 ? "annuler_gorgees" : "annuler_0_gorgees");
         const messageResultat = utilise > 0
           ? `${utilise} gorgée(s) annulée(s). \nTu bois ${reste} gorgée(s).`
           : `Tu n’annules rien. \nTu bois ${reste} gorgée(s).`;
@@ -4129,7 +4046,6 @@ document.addEventListener("DOMContentLoaded", function () {
           // La gauche montre carteA, la droite montre carteB (positions fixes)
           c1.classList.add(carteA);
           c2.classList.add(carteB);
-          jouerSon("cartes"); // les 2 cartes du duel se retournent
 
           // Labels clairs : qui a quoi
           if(choixJ1 === 1){
@@ -4248,7 +4164,6 @@ document.addEventListener("DOMContentLoaded", function () {
         dist[idx] += 1;
         historique.push(idx);
         refreshUI();
-        jouerSon("distribuer_gorgees");
       });
 
       container.appendChild(btn);
