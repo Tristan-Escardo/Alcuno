@@ -4080,3 +4080,47 @@ body{ padding-top: var(--haut-ecran); }
 #overlayPredictionFin{ padding-top: calc(clamp(12px, 3vw, 30px) + var(--haut-ecran)); }
 
 .overlay-opaque{ padding-top: calc(clamp(14px, 3.2vw, 30px) + var(--haut-ecran)); }
+
+/* Barre du haut de l'iPhone : selon les cas (appli installée avant la 8.8.9, Safari, iOS récents),
+   l'iPhone la peint d'une couleur unie, celle du fond du thème, au lieu de laisser voir la page dessous.
+   Les décors en dégradé (Prestige surtout) s'arrêtaient net sous cette barre : une ligne.
+   Le haut de chaque page a donc la couleur du fond du thème dans la zone de l'heure (hauteur de cette
+   zone, 0 quand la page commence sous la barre), puis se fond dans le décor sur 56 px : que l'iPhone
+   peigne sa barre ou non, plus de ligne. */
+
+body{
+  background:
+    linear-gradient(to bottom, var(--fond-theme) var(--haut-ecran), transparent calc(var(--haut-ecran) + 56px)),
+    var(--deco-theme, radial-gradient(circle at top center, rgba(255, 215, 0, 0.08) 0%, rgba(255, 215, 0, 0) 26%)),
+    var(--fond-theme);
+}
+
+#choixMode,
+#enLigne,
+#ecranNouvellePartie,
+#ecranConfirmerHote,
+#ecranConfirmerRetrait,
+#ecranConfirmerAccueil,
+#ecranChoixPseudo{
+  background:
+    linear-gradient(to bottom, var(--fond-theme) var(--haut-ecran), transparent calc(var(--haut-ecran) + 56px)),
+    var(--deco-accueil, var(--deco-theme, none)),
+    var(--fond-theme);
+}
+
+#suppression,
+#ecranReglages{
+  background:
+    linear-gradient(to bottom, var(--fond-theme) var(--haut-ecran), transparent calc(var(--haut-ecran) + 56px)),
+    var(--deco-theme, none),
+    var(--fond-theme);
+}
+
+#ecranCredits{
+  background:
+    linear-gradient(to bottom, var(--fond-theme) var(--haut-ecran), transparent calc(var(--haut-ecran) + 56px)),
+    radial-gradient(circle at 50% 18%, rgba(255,215,0,0.16), transparent 58%),
+    radial-gradient(circle at 15% 85%, rgba(255,77,77,0.10), transparent 45%),
+    radial-gradient(circle at 85% 85%, rgba(66,183,255,0.10), transparent 45%),
+    var(--fond-theme);
+}
