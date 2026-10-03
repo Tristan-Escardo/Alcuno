@@ -3700,8 +3700,9 @@ html[data-theme="prestige"]{
     /* reflets d'or en diagonale (réguliers sur le haut et sur le bas de l'écran) */
     linear-gradient(135deg, rgba(255, 223, 90, 0.14) 0%, rgba(255, 223, 90, 0.14) 34%, rgba(255, 236, 140, 0.26) 52%,
                     rgba(255, 223, 90, 0.14) 66%, rgba(255, 223, 90, 0.14) 100%) no-repeat,
-    /* lueur dorée en haut et en bas (sur toute la largeur, la même des deux côtés) */
-    linear-gradient(to bottom, rgba(255, 215, 0, 0.36), transparent 55%) no-repeat,
+    /* lueur dorée en haut et en bas (sur toute la largeur, la même des deux côtés) ; en haut, elle
+       garde sa couleur sur toute la zone de l'heure (bande #hautJeu de la même couleur en partie) */
+    linear-gradient(to bottom, rgba(255, 215, 0, 0.36) var(--haut-ecran), transparent 55%) no-repeat,
     linear-gradient(to top, rgba(255, 215, 0, 0.36), transparent 45%) no-repeat;
 }
 
@@ -4160,4 +4161,70 @@ html.overlay-ouvert body::before{ display: none; }
 #ecranCredits{
   bottom: var(--bas-ecran);
   box-shadow: 0 160px 0 0 var(--fond-theme);
+}
+
+/* Pareil pour les overlays (noirs), le voile noir entre deux overlays et les autres écrans plein écran :
+   plus rien de fixe ne touche le bas. Sinon, quand le voile s'efface en fondu (il n'est déjà plus
+   touchable), l'iPhone montrait le plateau dans la zone du bas alors que le reste était encore noir. */
+#overlayPlus4,
+#overlayDuel,
+#overlayPigeon,
+#overlayCarteDoree,
+#overlayCouleur,
+#overlayFinUnRestants,
+#overlayPredictionFin,
+#overlayRegleUnique,
+#overlayAnnulation,
+#overlayResultatAnnulation,
+.overlay-opaque{
+  height: calc(100dvh - var(--bas-ecran));
+  min-height: calc(100dvh - var(--bas-ecran));
+  box-shadow: 0 160px 0 0 #000;
+}
+
+#voileOverlays{
+  bottom: var(--bas-ecran);
+  box-shadow: 0 160px 0 0 #000;
+}
+
+#annonceNouvellePartie{
+  bottom: var(--bas-ecran);
+  box-shadow: 0 160px 0 0 rgba(20, 0, 14, 0.94);
+}
+
+#ecranRattrapage{
+  bottom: var(--bas-ecran);
+  box-shadow: 0 160px 0 0 var(--fond-theme);
+}
+
+#coupureReseau{
+  bottom: var(--bas-ecran);
+}
+
+#coupureReseau.visible{
+  box-shadow: 0 160px 0 0 rgba(0, 0, 0, 0.45);
+}
+
+/* ===== iPhone, haut de l'écran en partie =====
+   La page défile sous l'heure et, sans rien de fixe tout en haut, l'iPhone floutait ce qui passe dessous.
+   Bande fixe de la couleur du haut du décor sur la zone de l'heure : l'iPhone la reprend en couleur unie
+   (comme sur l'accueil) et le plateau glisse dessous. 0 de haut sans zone de l'heure (Android,
+   ordinateur). Sous la bannière « Tour de », les cartes qui s'envolent, les overlays et les écrans fixes. */
+#hautJeu{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--haut-ecran);
+  background-color: var(--couleur-barre);
+  z-index: 1150;
+}
+
+/* Overlays et voile s'arrêtent au-dessus de la zone du bas de l'iPhone : pendant qu'ils sont affichés,
+   un tap tout en bas ne doit pas atteindre le plateau ni les menus derrière */
+html.overlay-ouvert main,
+html.overlay-ouvert body > header,
+body:has(> #voileOverlays.visible) main,
+body:has(> #voileOverlays.visible) > header{
+  pointer-events: none;
 }

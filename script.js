@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.8.19";
+  const VERSION_AFFICHEE = "8.8.20";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   // À l'écran : le numéro complet, pour voir d'un coup d'œil si un téléphone est à jour
@@ -4113,6 +4113,7 @@ document.addEventListener("DOMContentLoaded", function () {
           // La gauche montre carteA, la droite montre carteB (positions fixes)
           c1.classList.add(carteA);
           c2.classList.add(carteB);
+          jouerSon("cartes"); // les 2 cartes du duel se retournent
 
           // Labels clairs : qui a quoi
           if(choixJ1 === 1){
