@@ -4040,3 +4040,43 @@ html[data-theme="prestige"] #refletPrestige{
   40%  { transform: scale(1.8); }
   100% { transform: scale(1); }
 }
+
+/* ===== iPhone : le jeu va jusqu'en haut de l'écran (sous l'heure et la Dynamic Island) =====
+   (index.html : viewport-fit=cover + barre « black-translucent »). Ce qui est collé en haut descend
+   de la hauteur de cette zone. Sur les écrans sans encoche, env(...) vaut 0 : rien ne change. */
+:root{ --haut-ecran: env(safe-area-inset-top, 0px); }
+
+body{ padding-top: var(--haut-ecran); }
+
+#choixMode,
+#enLigne,
+#ecranNouvellePartie,
+#ecranConfirmerHote,
+#ecranConfirmerRetrait,
+#ecranConfirmerAccueil,
+#ecranChoixPseudo{ padding-top: calc(24px + var(--haut-ecran)); }
+
+#choixMode .btnRetour,
+#ecranNouvellePartie .btnRetour,
+#ecranNouvellePartie .btnAccueil,
+#enLigne .btnRetour,
+#ecranCredits .btnRetour,
+#ecranReglages .btnRetour{ top: calc(20px + var(--haut-ecran)); }
+
+#enLigne #btnAccueilEnLigne,
+#ecranNouvellePartie #btnAccueil{ top: calc(26px + var(--haut-ecran)); }
+
+#choixMode #btnReglages{ top: calc(24px + var(--haut-ecran)); }
+
+#ecranCredits{ padding-top: calc(72px + var(--haut-ecran)); }
+#ecranReglages{ padding-top: calc(76px + var(--haut-ecran)); }
+#suppression{ padding-top: calc(20px + var(--haut-ecran)); }
+
+#overlayPlus4,
+#overlayDuel,
+#overlayPigeon,
+#overlayCouleur,
+#overlayFinUnRestants,
+#overlayPredictionFin{ padding-top: calc(clamp(12px, 3vw, 30px) + var(--haut-ecran)); }
+
+.overlay-opaque{ padding-top: calc(clamp(14px, 3.2vw, 30px) + var(--haut-ecran)); }
