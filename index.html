@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
     <!-- Anti-cache : GitHub Pages fait garder les fichiers 10 min par les navigateurs.
          Un paramètre différent à chaque chargement force toujours la dernière version. -->
     <script>
@@ -21,7 +21,9 @@
     <link rel="apple-touch-icon" href="icones/icone-180.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <!-- black-translucent : le jeu s'affiche jusqu'en haut de l'écran, sous l'heure et la Dynamic Island
+         (avec « black », iOS mettait une barre opaque). Les marges du haut utilisent safe-area-inset-top. -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Alcuno">
     <!-- Aperçu du lien partagé (Messages, WhatsApp…) : l'icône du jeu, pas une image de la page comme le QR code -->
     <meta property="og:title" content="Alcuno">
