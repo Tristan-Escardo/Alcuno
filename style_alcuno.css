@@ -3685,9 +3685,7 @@ html[data-theme="prestige"]{
                     rgba(255, 215, 0, 0.03) 74%, rgba(255, 200, 60, 0.22) 100%),
     /* lueur dorée en haut et en bas */
     radial-gradient(circle at 50% 0%, rgba(255, 215, 0, 0.38), transparent 55%),
-    radial-gradient(circle at 50% 110%, rgba(255, 180, 40, 0.30), transparent 50%),
-    /* fin brossé doré */
-    repeating-linear-gradient(115deg, rgba(255, 220, 120, 0.06) 0 2px, transparent 2px 9px);
+    radial-gradient(circle at 50% 110%, rgba(255, 180, 40, 0.30), transparent 50%);
 }
 
 /* Réglages : 7 pastilles => 2 lignes (4 + 3) */
@@ -3741,8 +3739,8 @@ html[data-theme="cerisier"] #petalesCerisier{
 }
 
 
-/* ===== Notification du haut (ex. « Thème Prestige débloqué ! ») : arrive d'en haut, aux couleurs
-   du thème, liseré doré ; se ferme au tap ou toute seule ===== */
+/* ===== Notification du haut (ex. « Thème Prestige débloqué ! ») : arrive d'en haut, en or massif
+   avec des étincelles ; se ferme au tap, en la glissant vers le haut ou toute seule ===== */
 #notifHaut{
   position: fixed;
   top: calc(12px + env(safe-area-inset-top, 0px));
@@ -3755,21 +3753,64 @@ html[data-theme="cerisier"] #petalesCerisier{
   gap: 12px;
   padding: 12px 16px;
   border-radius: 16px;
-  color: #fff;
-  background: var(--deco-theme, none), var(--fond-theme);
-  box-shadow: 0 12px 28px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,215,0,0.55);
-  cursor: pointer;
+  color: #3b2400;
+  /* lingot : dégradé d'or avec un éclat clair en diagonale */
+  background: linear-gradient(135deg, #9a6400 0%, #e9b52a 18%, #fff2a8 36%, #f3c63c 52%,
+                              #b77c06 74%, #f6d35a 100%);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.5), 0 0 22px rgba(255, 200, 40, 0.55),
+              inset 0 0 0 1.5px rgba(255, 248, 200, 0.85), inset 0 -3px 0 rgba(120, 70, 0, 0.45);
+  cursor: grab;
+  touch-action: none;      /* le doigt fait glisser la notification, pas la page */
+  user-select: none;
+  -webkit-user-select: none;
   transform: translate(-50%, 0);
   animation: notifHautArrive 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
-#notifHaut.depart{
-  animation: notifHautPart 0.3s ease-in both;
+#notifHaut .notifHaut-icone,
+#notifHaut .notifHaut-texte{
+  position: relative;      /* au-dessus des étincelles et du reflet */
 }
 
 #notifHaut .notifHaut-icone{
   font-size: 30px;
   line-height: 1;
+  filter: drop-shadow(0 1px 0 rgba(255, 250, 220, 0.8));
+}
+
+/* Étincelles et reflet, coupés aux bords arrondis de la notification */
+#notifHaut .notifHaut-eclats{
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+#notifHaut .notifHaut-eclats span{
+  position: absolute;
+  line-height: 1;
+  color: #fff;
+  text-shadow: 0 0 4px #fff, 0 0 10px rgba(255, 250, 200, 0.95);
+  opacity: 0;
+  animation: etincelle ease-in-out infinite;
+}
+
+#notifHaut .notifHaut-eclats::before{
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: 0;
+  width: 40%;
+  height: 200%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.75), transparent);
+  transform: translateX(-150%) rotate(20deg);
+  animation: refletNotif 2.6s ease-in-out 0.5s infinite;
+}
+
+@keyframes refletNotif{
+  0%       { transform: translateX(-150%) rotate(20deg); }
+  45%, 100% { transform: translateX(320%) rotate(20deg); }
 }
 
 #notifHaut .notifHaut-texte{
@@ -3782,7 +3823,8 @@ html[data-theme="cerisier"] #petalesCerisier{
 #notifHaut .notifHaut-texte strong{
   font-size: 16px;
   font-weight: 900;
-  color: #FFD700;
+  color: #3b2400;
+  text-shadow: 0 1px 0 rgba(255, 250, 215, 0.85); /* effet gravé dans l'or */
 }
 
 @keyframes notifHautArrive{
@@ -3790,10 +3832,6 @@ html[data-theme="cerisier"] #petalesCerisier{
   to   { opacity: 1; transform: translate(-50%, 0); }
 }
 
-@keyframes notifHautPart{
-  from { opacity: 1; transform: translate(-50%, 0); }
-  to   { opacity: 0; transform: translate(-50%, -120%); }
-}
 
 html.accessibilite #notifHaut .notifHaut-texte,
 html.accessibilite #notifHaut .notifHaut-icone{
@@ -3895,5 +3933,5 @@ html[data-theme="prestige"] #refletPrestige{
 }
 
 @media (prefers-reduced-motion: reduce){
-  #etincellesPrestige, #refletPrestige{ display: none !important; }
+  #etincellesPrestige, #refletPrestige, #notifHaut .notifHaut-eclats{ display: none !important; }
 }

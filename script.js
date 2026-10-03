@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.8.4";
+  const VERSION_AFFICHEE = "8.8.5";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   // À l'écran : seulement « 8.7 » (le dernier chiffre change à chaque mise en ligne, en coulisses)
@@ -259,13 +259,29 @@ document.addEventListener("DOMContentLoaded", function () {
     afficherNotificationHaut("✨", "Thème Prestige débloqué !");
   }
 
-  // Notification qui arrive du haut de l'écran, aux couleurs du thème (se ferme au tap ou après 5 s)
+  // Notification qui arrive du haut de l'écran, en or avec des étincelles. Comme sur un téléphone :
+  // on la glisse vers le haut pour la fermer, on la retient au doigt (elle ne part pas tant qu'on
+  // la tient), un simple tap la ferme, sinon elle s'en va toute seule après 5 s.
   function afficherNotificationHaut(icone, titre){
     const ancienne = document.getElementById("notifHaut");
     if (ancienne) ancienne.remove();
     const notif = document.createElement("div");
     notif.id = "notifHaut";
     notif.setAttribute("role", "status");
+    const eclats = document.createElement("span");
+    eclats.className = "notifHaut-eclats";
+    eclats.setAttribute("aria-hidden", "true");
+    for (let i = 0; i < 9; i++) {
+      const etincelle = document.createElement("span");
+      etincelle.textContent = "✦";
+      etincelle.style.left = (4 + Math.random() * 88) + "%";
+      etincelle.style.top = (8 + Math.random() * 70) + "%";
+      etincelle.style.fontSize = (8 + Math.random() * 9).toFixed(0) + "px";
+      const duree = 1.6 + Math.random() * 1.6;
+      etincelle.style.animationDuration = duree.toFixed(2) + "s";
+      etincelle.style.animationDelay = (-Math.random() * duree).toFixed(2) + "s";
+      eclats.appendChild(etincelle);
+    }
     const ligneIcone = document.createElement("span");
     ligneIcone.className = "notifHaut-icone";
     ligneIcone.setAttribute("aria-hidden", "true");
@@ -275,16 +291,68 @@ document.addEventListener("DOMContentLoaded", function () {
     const fort = document.createElement("strong");
     fort.textContent = titre;
     bloc.append(fort);
-    notif.append(ligneIcone, bloc);
+    notif.append(eclats, ligneIcone, bloc);
+
     let partie = false;
+    let minuteur = null;
+    const placer = (decalage, transition) => {
+      notif.style.animation = "none"; // l'animation d'arrivée ne doit plus imposer sa position
+      notif.style.transition = transition || "none";
+      notif.style.transform = `translate(-50%, ${decalage}px)`;
+    };
     const fermer = () => {
       if (partie) return;
       partie = true;
-      notif.classList.add("depart");
-      setTimeout(() => notif.remove(), 320);
+      clearTimeout(minuteur);
+      placer(-(notif.offsetHeight + notif.offsetTop + 20), "transform 0.28s ease-in, opacity 0.28s ease-in");
+      notif.style.opacity = "0";
+      setTimeout(() => notif.remove(), 300);
     };
-    notif.addEventListener("click", fermer);
-    setTimeout(fermer, 5000);
+    const programmerDepart = (delai) => {
+      clearTimeout(minuteur);
+      minuteur = setTimeout(fermer, delai);
+    };
+
+    // Glissement au doigt
+    let departY = null;
+    let decalage = 0;
+    let dernierY = 0;
+    let dernierT = 0;
+    let vitesse = 0;
+    notif.addEventListener("pointerdown", (e) => {
+      if (partie) return;
+      clearTimeout(minuteur); // tenue au doigt : elle reste
+      departY = e.clientY;
+      dernierY = e.clientY;
+      dernierT = e.timeStamp;
+      decalage = 0;
+      vitesse = 0;
+      try { notif.setPointerCapture(e.pointerId); } catch (err) {}
+      placer(0);
+    });
+    notif.addEventListener("pointermove", (e) => {
+      if (departY === null || partie) return;
+      const dy = e.clientY - departY;
+      // vers le haut elle suit le doigt ; vers le bas elle résiste (élastique)
+      decalage = dy < 0 ? dy : dy * 0.3;
+      if (e.timeStamp > dernierT) vitesse = (e.clientY - dernierY) / (e.timeStamp - dernierT);
+      dernierY = e.clientY;
+      dernierT = e.timeStamp;
+      placer(decalage);
+    });
+    const lacher = (e) => {
+      if (departY === null || partie) return;
+      const bouge = Math.abs(e.clientY - departY);
+      departY = null;
+      if (e.type === "pointerup" && bouge < 8) return fermer();                 // simple tap
+      if (decalage < -notif.offsetHeight * 0.35 || vitesse < -0.5) return fermer(); // jetée vers le haut
+      placer(0, "transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)");                // revient à sa place
+      programmerDepart(3000);
+    };
+    notif.addEventListener("pointerup", lacher);
+    notif.addEventListener("pointercancel", lacher);
+
+    programmerDepart(5000);
     document.body.appendChild(notif);
   }
 
