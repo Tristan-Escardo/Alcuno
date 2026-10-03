@@ -3611,7 +3611,7 @@ html.clavier-ouvert #enLigne > div{
 html[data-theme="noir"]{ --fond-theme: #0e0e12; }
 html[data-theme="vert"]{ --fond-theme: #08301e; }   /* vert casino */
 html[data-theme="bleu"]{ --fond-theme: #0a1634; }   /* bleu nuit */
-html[data-theme="violet"]{ --fond-theme: #240e3a; }
+html[data-theme="violet"]{ --fond-theme: #3d0f66; }
 
 /* Réglages : pastilles de couleur */
 #ecranReglages .pastillesTheme{
