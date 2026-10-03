@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.8.13";
+  const VERSION_AFFICHEE = "8.8.14";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   // À l'écran : le numéro complet, pour voir d'un coup d'œil si un téléphone est à jour
@@ -546,19 +546,41 @@ document.addEventListener("DOMContentLoaded", function () {
   curseurVolume.addEventListener("change", () => jouerSon("reglage_son")); // essai au relâchement (Sons/reglage_son.mp3)
 
   let contexteSon = null;
+  let repriseRatee = false; // au tap précédent, le son était coupé et la reprise n'a pas marché
   function contexteAudio(){
+    if (contexteSon && contexteSon.state === "closed") contexteSon = null;
     if (!contexteSon) {
       const Contexte = window.AudioContext || window.webkitAudioContext;
       if (!Contexte) return null;
       try { contexteSon = new Contexte(); } catch (e) { return null; }
     }
-    if (contexteSon.state === "suspended") contexteSon.resume().catch(() => {});
+    // « suspended », ou « interrupted » sur iPhone (appli en arrière-plan, appel, autre appli qui joue
+    // du son…) : on relance. Avant, seul « suspended » était relancé : le son restait coupé jusqu'au
+    // redémarrage de l'appli.
+    if (contexteSon.state !== "running") contexteSon.resume().catch(() => {});
     return contexteSon;
   }
   // Les téléphones n'autorisent le son qu'après un premier tap : on le prépare à chaque tap
-  // (et on charge les fichiers des sons au premier tap, pour qu'ils soient prêts à temps)
-  document.addEventListener("pointerdown", () => { if (caseSons.checked) { contexteAudio(); chargerSons(); } },
-    { capture: true, passive: true });
+  // (et on charge les fichiers des sons au premier tap, pour qu'ils soient prêts à temps).
+  // Si le son est encore coupé au tap suivant, l'iPhone l'a bloqué pour de bon : on repart d'un
+  // contexte neuf, créé pendant le tap (les sons déjà chargés resservent tels quels).
+  document.addEventListener("pointerdown", () => {
+    if (!caseSons.checked) return;
+    if (contexteSon && contexteSon.state !== "running" && repriseRatee) {
+      try { contexteSon.close(); } catch (e) {}
+      contexteSon = null;
+    }
+    const ctx = contexteAudio();
+    chargerSons();
+    repriseRatee = false;
+    if (ctx && ctx.state !== "running") setTimeout(() => { repriseRatee = ctx.state !== "running"; }, 300);
+  }, { capture: true, passive: true });
+  // Retour dans l'appli : on relance le son tout de suite
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && contexteSon && contexteSon.state !== "running") {
+      contexteSon.resume().catch(() => {});
+    }
+  });
 
   // Fichiers des sons : dossier Sons/, un MP3 par moment du jeu. Pour changer un son, il suffit de
   // remplacer le fichier (même nom). Fichier absent => pas de son à ce moment-là.
@@ -571,8 +593,9 @@ document.addEventListener("DOMContentLoaded", function () {
   //   credits.mp3 : 4 taps sur le titre ALCUNO (écran des créateurs)
   //   reglage_son.mp3 : on lâche le curseur de volume dans les réglages (pour entendre le volume)
   //   no_wifi.mp3 : en ligne, coupure de réseau (une fois, quand le logo wifi barré apparaît)
+  //   distribuer_gorgees.mp3 : +4, on tape sur un joueur pour lui donner une gorgée
   // (pas de son pour le cul sec de la carte dorée)
-  const SONS = ["cartes", "doree", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi"];
+  const SONS = ["cartes", "doree", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi", "distribuer_gorgees"];
   // Sons coupés au bout de N secondes (avec un petit fondu), même si le fichier est plus long
   const DUREE_MAX_SONS = { doree: 3, pigeon: 2 };
   const sonsCharges = {}; // nom -> son décodé (ou null si le fichier n'existe pas)
@@ -4213,6 +4236,7 @@ document.addEventListener("DOMContentLoaded", function () {
         dist[idx] += 1;
         historique.push(idx);
         refreshUI();
+        jouerSon("distribuer_gorgees");
       });
 
       container.appendChild(btn);

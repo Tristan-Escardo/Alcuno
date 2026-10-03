@@ -12,6 +12,7 @@ Un fichier MP3 par moment du jeu, avec exactement ces noms :
   credits.mp3  4 taps sur le titre ALCUNO (écran des créateurs)
   reglage_son.mp3  on lâche le curseur de volume dans les réglages (pour entendre le volume)
   no_wifi.mp3  en ligne, coupure de réseau (une seule fois, quand le logo wifi barré apparaît)
+  distribuer_gorgees.mp3  +4 : on tape sur un joueur pour lui donner une gorgée
 
 Pas de son pour le cul sec de la carte dorée (« TIENS DANS TA GUEULE »).
 

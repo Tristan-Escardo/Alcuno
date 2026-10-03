@@ -3936,6 +3936,11 @@ html[data-theme="prestige"] #refletPrestige{
   display: block;
 }
 
+/* Pas de reflet sur les overlays */
+html.overlay-ouvert #refletPrestige{
+  display: none;
+}
+
 #refletPrestige::before{
   content: "";
   position: absolute;
