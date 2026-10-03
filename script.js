@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.8.20";
+  const VERSION_AFFICHEE = "8.8.21";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   // À l'écran : le numéro complet, pour voir d'un coup d'œil si un téléphone est à jour
@@ -941,6 +941,34 @@ document.addEventListener("DOMContentLoaded", function () {
     blocInstaller.hidden = false;
     document.getElementById("astuceIphone").hidden = false;
   }
+
+  // iPhone, appli installée : iOS donne au jeu une fenêtre plus courte que l'écran (de la hauteur de la
+  // zone de l'heure), alors que le jeu commence tout en haut : les écrans fixes s'arrêtaient avant le bas
+  // de l'écran (bande vide en bas). On mesure ce qui manque entre le bas des éléments fixes et le bas de
+  // l'écran ; le CSS (html.manque-bas) les fait descendre d'autant.
+  const estIPhone = /iphone/i.test(navigator.userAgent);
+  function majManqueBas(){
+    let manque = 0;
+    if (estIPhone && estEnAppli) {
+      const sonde = document.createElement("div");
+      sonde.style.cssText = "position:fixed;left:0;bottom:0;width:1px;height:1px;visibility:hidden;pointer-events:none";
+      document.body.appendChild(sonde);
+      const basFixe = sonde.getBoundingClientRect().bottom;
+      sonde.remove();
+      const portrait = window.innerWidth <= window.innerHeight;
+      const hauteurEcran = portrait ? Math.max(screen.width, screen.height) : Math.min(screen.width, screen.height);
+      manque = Math.round(hauteurEcran - basFixe);
+      if (manque < 0 || manque > 120) manque = 0; // valeur étrange : on ne touche à rien
+    }
+    document.documentElement.style.setProperty("--manque-bas", manque + "px");
+    document.documentElement.classList.toggle("manque-bas", manque > 0);
+  }
+  majManqueBas();
+  window.addEventListener("resize", majManqueBas);
+  window.addEventListener("orientationchange", () => setTimeout(majManqueBas, 300));
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") majManqueBas(); });
+  setTimeout(majManqueBas, 600); // (à l'ouverture de l'appli, l'iPhone ajuste parfois la fenêtre un peu après)
+  setTimeout(majManqueBas, 2000);
 
   // #endregion
 

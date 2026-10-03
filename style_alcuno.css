@@ -2070,7 +2070,8 @@ body.mode-en-ligne #jouer{
 
 /* Boutons « Accueil » : symbole ⌂ doré comme le titre ALCUNO (sans cadre) :
    - mode classique : coin droit du bandeau, avant de lancer la partie
-   - mode en ligne : coin droit des écrans Créer / Rejoindre / Revenir / salle d'attente
+   - mode en ligne : coin droit des écrans Revenir / salle d'attente (pas sur le choix Créer / Rejoindre,
+     ni sur Créer et Rejoindre : le bouton Retour suffit)
    - écran « Nouvelle partie » (classique et en ligne) : coin droit */
 #btnAccueilClassique,
 #enLigne #btnAccueilEnLigne,
@@ -2122,6 +2123,14 @@ body.mode-en-ligne #jouer{
   opacity: 1;
   background: none;
   transform: scale(1.06);
+}
+
+/* Pas de ⌂ sur le choix Créer / Rejoindre, ni sur Créer et Rejoindre (sous-écran affiché = sans
+   « display: none » dans son style) */
+#enLigne:has(> #enLigneChoix:not([style*="none"])) #btnAccueilEnLigne,
+#enLigne:has(> #enLigneCreer:not([style*="none"])) #btnAccueilEnLigne,
+#enLigne:has(> #enLigneRejoindre:not([style*="none"])) #btnAccueilEnLigne{
+  display: none;
 }
 
 @media (max-width: 520px){
@@ -4132,77 +4141,62 @@ html.overlay-ouvert body::before{ display: none; }
     linear-gradient(var(--fond-theme), var(--fond-theme)) var(--couleur-barre);
 }
 
-/* ===== iPhone, bande en bas de l'accueil, des menus et des réglages =====
-   Jamais pendant une partie : là, ce qui touche le bas de l'écran est la page elle-même (son décor est
-   un calque que l'iPhone ignore). Ces écrans-ci sont des éléments fixes posés sur la page et, quand un
-   tel élément touche le bas, l'iPhone peint sa propre bande dans la zone du bas (barre pour revenir à
-   l'écran d'accueil). Ils s'arrêtent donc juste au-dessus de cette zone, et leur couleur continue
-   dessous en ombre (l'iPhone ne la compte pas comme un élément, on ne peut pas la toucher, elle ne
-   change rien à la mise en page). Sans zone du bas (Android, ordinateur), rien ne change. */
-:root{ --bas-ecran: env(safe-area-inset-bottom, 0px); }
-
-#choixMode,
-#ecranNouvellePartie,
-#ecranConfirmerHote,
-#ecranConfirmerRetrait,
-#ecranConfirmerAccueil,
-#ecranChoixPseudo,
-#suppression,
-#ecranReglages{
-  bottom: var(--bas-ecran);
-  box-shadow: 0 160px 0 0 var(--couleur-barre);
+/* ===== iPhone, appli installée : bande vide en bas de l'écran =====
+   Depuis que le jeu passe sous l'heure, iOS lui donne une fenêtre plus courte que l'écran, de la hauteur
+   de la zone de l'heure (59 px sur iPhone 15), alors que le jeu commence tout en haut : tout ce qui est
+   fixe et calé sur le bas (accueil, menus, réglages, overlays, voile…) s'arrêtait 59 px avant le bas de
+   l'écran, et il restait une bande vide (vue sur une capture : la page des réglages coupée net). En
+   partie, pas de bande : la page défile et son contenu continue jusqu'en bas.
+   script.js mesure ce qui manque entre le bas de ces écrans et le bas de l'écran (--manque-bas, classe
+   html.manque-bas seulement s'il manque quelque chose) : ils descendent d'autant. Ailleurs (Android,
+   ordinateur, Safari), rien ne change. */
+html.manque-bas #choixMode,
+html.manque-bas #ecranNouvellePartie,
+html.manque-bas #ecranConfirmerHote,
+html.manque-bas #ecranConfirmerRetrait,
+html.manque-bas #ecranConfirmerAccueil,
+html.manque-bas #ecranChoixPseudo,
+html.manque-bas #suppression,
+html.manque-bas #ecranReglages,
+html.manque-bas #ecranCredits,
+html.manque-bas #voileOverlays,
+html.manque-bas #annonceNouvellePartie,
+html.manque-bas #ecranRattrapage,
+html.manque-bas #coupureReseau,
+html.manque-bas #refletPrestige,
+html.manque-bas body::before{
+  bottom: calc(-1 * var(--manque-bas));
 }
 
-#enLigne{
-  height: calc(var(--hauteur-visible, 100%) - var(--bas-ecran));
-  box-shadow: 0 160px 0 0 var(--couleur-barre);
+/* Overlays : hauteur 100dvh d'habitude (barres de Safari) ; ici, du haut au vrai bas de l'écran */
+html.manque-bas #overlayPlus4,
+html.manque-bas #overlayDuel,
+html.manque-bas #overlayPigeon,
+html.manque-bas #overlayCarteDoree,
+html.manque-bas #overlayCouleur,
+html.manque-bas #overlayFinUnRestants,
+html.manque-bas #overlayPredictionFin,
+html.manque-bas #overlayRegleUnique,
+html.manque-bas #overlayAnnulation,
+html.manque-bas #overlayResultatAnnulation,
+html.manque-bas .overlay-opaque{
+  height: auto;
+  min-height: 0;
+  bottom: calc(-1 * var(--manque-bas));
 }
 
-#ecranCredits{
-  bottom: var(--bas-ecran);
-  box-shadow: 0 160px 0 0 var(--fond-theme);
+/* Mode en ligne : hauteur de la partie visible (clavier) ; clavier fermé, jusqu'au vrai bas */
+html.manque-bas:not(.clavier-ouvert) #enLigne{
+  height: calc(var(--hauteur-visible, 100%) + var(--manque-bas));
 }
 
-/* Pareil pour les overlays (noirs), le voile noir entre deux overlays et les autres écrans plein écran :
-   plus rien de fixe ne touche le bas. Sinon, quand le voile s'efface en fondu (il n'est déjà plus
-   touchable), l'iPhone montrait le plateau dans la zone du bas alors que le reste était encore noir. */
-#overlayPlus4,
-#overlayDuel,
-#overlayPigeon,
-#overlayCarteDoree,
-#overlayCouleur,
-#overlayFinUnRestants,
-#overlayPredictionFin,
-#overlayRegleUnique,
-#overlayAnnulation,
-#overlayResultatAnnulation,
-.overlay-opaque{
-  height: calc(100dvh - var(--bas-ecran));
-  min-height: calc(100dvh - var(--bas-ecran));
-  box-shadow: 0 160px 0 0 #000;
+/* Petits éléments calés sur le bas : à leur place par rapport au vrai bas de l'écran */
+html.manque-bas #toastEnLigne{
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px) - var(--manque-bas));
 }
 
-#voileOverlays{
-  bottom: var(--bas-ecran);
-  box-shadow: 0 160px 0 0 #000;
-}
-
-#annonceNouvellePartie{
-  bottom: var(--bas-ecran);
-  box-shadow: 0 160px 0 0 rgba(20, 0, 14, 0.94);
-}
-
-#ecranRattrapage{
-  bottom: var(--bas-ecran);
-  box-shadow: 0 160px 0 0 var(--fond-theme);
-}
-
-#coupureReseau{
-  bottom: var(--bas-ecran);
-}
-
-#coupureReseau.visible{
-  box-shadow: 0 160px 0 0 rgba(0, 0, 0, 0.45);
+html.manque-bas #btnCodePartie{
+  bottom: calc(10px + env(safe-area-inset-bottom, 0px) - var(--manque-bas));
 }
 
 /* ===== iPhone, haut de l'écran en partie =====
@@ -4220,8 +4214,8 @@ html.overlay-ouvert body::before{ display: none; }
   z-index: 1150;
 }
 
-/* Overlays et voile s'arrêtent au-dessus de la zone du bas de l'iPhone : pendant qu'ils sont affichés,
-   un tap tout en bas ne doit pas atteindre le plateau ni les menus derrière */
+/* Pendant un overlay ou le voile entre deux overlays : plateau, menus et en-tête derrière non touchables
+   (sécurité : un tap ne doit jamais retourner une carte derrière un overlay) */
 html.overlay-ouvert main,
 html.overlay-ouvert body > header,
 body:has(> #voileOverlays.visible) main,
