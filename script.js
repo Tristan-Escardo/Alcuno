@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.8.0";
+  const VERSION_AFFICHEE = "8.8.1";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   // À l'écran : seulement « 8.7 » (le dernier chiffre change à chaque mise en ligne, en coulisses)
@@ -134,6 +134,7 @@ document.addEventListener("DOMContentLoaded", function () {
       ecranCredits.scrollTop = 0;
       jouerSon("credits");
       ouvrirPage(ecranCredits);
+      debloquerPrestige(); // découvrir les créateurs débloque le thème secret « Prestige »
     }
   }));
 
@@ -236,21 +237,61 @@ document.addEventListener("DOMContentLoaded", function () {
   // ===== Thème : couleur du fond du jeu (réglage de ce téléphone, purement visuel) =====
   // (le thème est déjà posé au tout début du chargement par index.html : pas de flash de couleur)
   const CLE_THEME = "alcuno_theme";
-  const THEMES = { bordeaux: "#2b001d", noir: "#0e0e12", vert: "#08301e", bleu: "#0a1634", violet: "#3d0f66" };
+  const THEMES = { bordeaux: "#2b001d", noir: "#0e0e12", vert: "#08301e", bleu: "#0a1634", violet: "#3d0f66",
+                   cerisier: "#5a1740", prestige: "#15100a" };
+
+  // Thème secret « Prestige » : débloqué en découvrant l'écran des créateurs (4 taps sur le titre)
+  const CLE_PRESTIGE = "alcuno_theme_prestige";
+  function prestigeDebloque(){
+    try { return localStorage.getItem(CLE_PRESTIGE) === "1"; } catch (e) { return false; }
+  }
+
+  // Pastille cachée tant que le thème n'est pas débloqué
+  function majPastillePrestige(){
+    const pastille = document.getElementById("pastillePrestige");
+    if (pastille) pastille.hidden = !prestigeDebloque();
+  }
+
+  function debloquerPrestige(){
+    if (prestigeDebloque()) return;
+    try { localStorage.setItem(CLE_PRESTIGE, "1"); } catch (e) {}
+    majPastillePrestige();
+    afficherToast("✨ Thème Prestige débloqué ! (Réglages > Thème)", 4000);
+  }
 
   function appliquerTheme(nom){
-    if (!THEMES[nom]) nom = "bordeaux";
+    if (!THEMES[nom] || (nom === "prestige" && !prestigeDebloque())) nom = "bordeaux";
     document.documentElement.dataset.theme = nom;
-    const barre = document.querySelector('meta[name="theme-color"]'); // barre du téléphone en haut
-    if (barre) barre.setAttribute("content", THEMES[nom]);
+    // Barre du téléphone en haut : on remplace la balise au lieu de la modifier (sinon Chrome sur
+    // Android ne repeint parfois la barre qu'au premier changement de thème)
+    document.querySelectorAll('meta[name="theme-color"]').forEach((ancienne) => ancienne.remove());
+    const barre = document.createElement("meta");
+    barre.name = "theme-color";
+    barre.content = THEMES[nom];
+    document.head.appendChild(barre);
     document.querySelectorAll(".pastilleTheme").forEach((b) => {
       b.setAttribute("aria-pressed", b.dataset.theme === nom ? "true" : "false");
     });
   }
 
+  majPastillePrestige();
   let themeChoisi = "bordeaux";
   try { themeChoisi = localStorage.getItem(CLE_THEME) || "bordeaux"; } catch (e) {}
   appliquerTheme(themeChoisi);
+
+  // Cerisier : pétales qui tombent sur l'écran d'accueil (positions, tailles et vitesses au hasard)
+  const zonePetales = document.getElementById("petalesCerisier");
+  for (let i = 0; i < 14; i++) {
+    const petale = document.createElement("span");
+    const taille = 0.7 + Math.random() * 0.7;
+    const duree = 9 + Math.random() * 9;
+    petale.style.left = `${Math.random() * 100}%`;
+    petale.style.width = `${11 * taille}px`;
+    petale.style.height = `${15 * taille}px`;
+    petale.style.animationDuration = `${duree}s`;
+    petale.style.animationDelay = `${-Math.random() * duree}s`; // déjà en train de tomber à l'ouverture
+    zonePetales.appendChild(petale);
+  }
 
   document.querySelectorAll(".pastilleTheme").forEach((pastille) => {
     pastille.addEventListener("click", () => {

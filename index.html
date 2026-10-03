@@ -33,6 +33,8 @@
 
     <main>
         <section class="choixMode" id="choixMode">
+            <!-- Thème Cerisier : pétales qui tombent (remplis par script.js) -->
+            <div id="petalesCerisier" aria-hidden="true"></div>
             <!-- Réglages : seulement sur l'écran d'accueil -->
             <button type="button" id="btnReglages" title="Réglages" aria-label="Réglages">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -118,6 +120,9 @@
                         <button type="button" class="pastilleTheme" data-theme="vert"><span class="rond" style="background:#08301e"></span>Casino</button>
                         <button type="button" class="pastilleTheme" data-theme="bleu"><span class="rond" style="background:#0a1634"></span>Nuit</button>
                         <button type="button" class="pastilleTheme" data-theme="violet"><span class="rond" style="background:#3d0f66"></span>Violet</button>
+                        <button type="button" class="pastilleTheme" data-theme="cerisier"><span class="rond" style="background:linear-gradient(135deg,#5a1740 35%,#ff9cc5)"></span>Cerisier</button>
+                        <!-- Thème secret : débloqué en découvrant l'écran des créateurs (4 taps sur le titre) -->
+                        <button type="button" class="pastilleTheme" data-theme="prestige" id="pastillePrestige" hidden><span class="rond" style="background:linear-gradient(135deg,#15100a 30%,#d4a017 75%,#fff2b0)"></span>Prestige</button>
                     </div>
                 </div>
 

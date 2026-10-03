@@ -324,7 +324,7 @@ button,
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: var(--fond-theme);
+  background: var(--deco-theme, none), var(--fond-theme);
 
   display: flex;
   flex-direction: column;
@@ -1685,7 +1685,7 @@ body.no-scroll{
 /* ===== HEADER / TOP BAR – intégré au design du jeu ===== */
 body{
   background:
-    radial-gradient(circle at top center, rgba(255, 215, 0, 0.08) 0%, rgba(255, 215, 0, 0) 26%),
+    var(--deco-theme, radial-gradient(circle at top center, rgba(255, 215, 0, 0.08) 0%, rgba(255, 215, 0, 0) 26%)),
     var(--fond-theme);
 }
 
@@ -1821,7 +1821,7 @@ header h1{
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: var(--fond-theme);
+  background: var(--deco-accueil, var(--deco-theme, none)), var(--fond-theme);
 
   display: flex;
   flex-direction: column;
@@ -2685,7 +2685,7 @@ header h1{
   padding: 76px 16px calc(28px + env(safe-area-inset-bottom, 0px));
   box-sizing: border-box;
   color: #fff;
-  background: var(--fond-theme);
+  background: var(--deco-theme, none), var(--fond-theme);
 }
 
 #ecranReglages .reglages-contenu{
@@ -3660,4 +3660,77 @@ html[data-theme="violet"]{ --fond-theme: #3d0f66; }
 
 html.accessibilite #ecranReglages .pastilleTheme{
   font-size: 13px;
+}
+
+
+/* ===== Thèmes spéciaux : Cerisier (rose + décors japonais) et Prestige (doré, secret) =====
+   --deco-theme : décors posés par-dessus la couleur du fond (fond du jeu, menus, réglages) */
+html[data-theme="cerisier"]{
+  --fond-theme: #5a1740;
+  --deco-theme:
+    url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 220 220%22%3E%3Cg transform=%22translate(40 50) rotate(20) scale(0.9)%22 opacity=%220.16%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(165 120) rotate(50) scale(1.1)%22 opacity=%220.14%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(80 185) rotate(5) scale(0.8)%22 opacity=%220.12%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cellipse cx=%22130%22 cy=%2240%22 rx=%222.6%22 ry=%224.6%22 transform=%22rotate(35 130 40)%22 fill=%22%23ffc2db%22 opacity=%220.16%22/%3E%3Cellipse cx=%22190%22 cy=%2230%22 rx=%222.08%22 ry=%223.6799999999999997%22 transform=%22rotate(-20 190 30)%22 fill=%22%23ffc2db%22 opacity=%220.13%22/%3E%3Cellipse cx=%2220%22 cy=%22140%22 rx=%222.3400000000000003%22 ry=%224.14%22 transform=%22rotate(70 20 140)%22 fill=%22%23ffc2db%22 opacity=%220.14%22/%3E%3Cellipse cx=%22120%22 cy=%22160%22 rx=%222.08%22 ry=%223.6799999999999997%22 transform=%22rotate(15 120 160)%22 fill=%22%23ffc2db%22 opacity=%220.12%22/%3E%3Cellipse cx=%22200%22 cy=%22200%22 rx=%222.3400000000000003%22 ry=%224.14%22 transform=%22rotate(-45 200 200)%22 fill=%22%23ffc2db%22 opacity=%220.13%22/%3E%3C/svg%3E") 0 0 / 220px 220px repeat,
+    radial-gradient(circle at 15% 85%, rgba(255, 150, 200, 0.12), transparent 45%);
+  /* la branche fleurie seulement sur l'accueil et les menus (pas derrière le texte des réglages ni le plateau) */
+  --deco-accueil:
+    url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 320 220%22%3E%3Cg fill=%22none%22 stroke=%22%233a1420%22 stroke-linecap=%22round%22%3E%3Cpath d=%22M330 18 C 270 30, 230 40, 175 78 S 95 120, 40 132%22 stroke-width=%227%22/%3E%3Cpath d=%22M240 40 C 225 70, 215 95, 222 128%22 stroke-width=%224.5%22/%3E%3Cpath d=%22M175 78 C 160 95, 150 120, 155 150%22 stroke-width=%223.5%22/%3E%3Cpath d=%22M110 112 C 95 100, 82 92, 62 92%22 stroke-width=%223%22/%3E%3Cpath d=%22M290 26 C 300 50, 296 70, 284 90%22 stroke-width=%223%22/%3E%3C/g%3E%3Cg transform=%22translate(250 30) rotate(10) scale(1.7)%22 opacity=%221%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(222 128) rotate(30) scale(1.5)%22 opacity=%221%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(200 60) rotate(50) scale(1.3)%22 opacity=%221%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(155 150) rotate(5) scale(1.4)%22 opacity=%221%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(130 98) rotate(40) scale(1.2)%22 opacity=%221%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(62 92) rotate(20) scale(1.3)%22 opacity=%221%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(40 132) rotate(60) scale(1.5)%22 opacity=%221%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(284 90) rotate(15) scale(1.4)%22 opacity=%221%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(300 50) rotate(70) scale(1.1)%22 opacity=%221%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(95 125) rotate(25) scale(1.0)%22 opacity=%220.9%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(178 100) rotate(12) scale(1.0)%22 opacity=%220.9%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg fill=%22%23ffd6e7%22%3E%3Ccircle cx=%22232%22 cy=%2252%22 r=%222.2%22/%3E%3Ccircle cx=%22186%22 cy=%2282%22 r=%222%22/%3E%3Ccircle cx=%22146%22 cy=%22120%22 r=%221.8%22/%3E%3Ccircle cx=%2275%22 cy=%22110%22 r=%222%22/%3E%3Ccircle cx=%22268%22 cy=%2272%22 r=%221.8%22/%3E%3C/g%3E%3C/svg%3E") right 0 top 54px / min(64vw, 310px) auto no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 220 220%22%3E%3Cg transform=%22translate(40 50) rotate(20) scale(0.9)%22 opacity=%220.16%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(165 120) rotate(50) scale(1.1)%22 opacity=%220.14%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(80 185) rotate(5) scale(0.8)%22 opacity=%220.12%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cellipse cx=%22130%22 cy=%2240%22 rx=%222.6%22 ry=%224.6%22 transform=%22rotate(35 130 40)%22 fill=%22%23ffc2db%22 opacity=%220.16%22/%3E%3Cellipse cx=%22190%22 cy=%2230%22 rx=%222.08%22 ry=%223.6799999999999997%22 transform=%22rotate(-20 190 30)%22 fill=%22%23ffc2db%22 opacity=%220.13%22/%3E%3Cellipse cx=%2220%22 cy=%22140%22 rx=%222.3400000000000003%22 ry=%224.14%22 transform=%22rotate(70 20 140)%22 fill=%22%23ffc2db%22 opacity=%220.14%22/%3E%3Cellipse cx=%22120%22 cy=%22160%22 rx=%222.08%22 ry=%223.6799999999999997%22 transform=%22rotate(15 120 160)%22 fill=%22%23ffc2db%22 opacity=%220.12%22/%3E%3Cellipse cx=%22200%22 cy=%22200%22 rx=%222.3400000000000003%22 ry=%224.14%22 transform=%22rotate(-45 200 200)%22 fill=%22%23ffc2db%22 opacity=%220.13%22/%3E%3C/svg%3E") 0 0 / 220px 220px repeat,
+    radial-gradient(circle at 15% 85%, rgba(255, 150, 200, 0.12), transparent 45%);
+}
+
+html[data-theme="prestige"]{
+  --fond-theme: #15100a;
+  --deco-theme:
+    linear-gradient(135deg, rgba(255, 215, 0, 0.12) 0%, transparent 35%, rgba(255, 215, 0, 0.07) 65%, transparent 85%),
+    radial-gradient(circle at 50% 0%, rgba(255, 200, 60, 0.22), transparent 55%),
+    radial-gradient(circle at 50% 110%, rgba(255, 170, 30, 0.16), transparent 50%);
+}
+
+/* Réglages : 7 pastilles => 2 lignes (4 + 3) */
+#ecranReglages .pastillesTheme{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  row-gap: 10px;
+}
+
+/* Prestige pas encore débloqué : pastille cachée */
+#ecranReglages .pastilleTheme[hidden]{
+  display: none;
+}
+
+/* Cerisier : pétales qui tombent doucement sur l'écran d'accueil (rien avec les autres thèmes) */
+#petalesCerisier{
+  display: none;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: -1; /* derrière le contenu de l'accueil, au-dessus de son fond */
+  animation: none !important;
+}
+
+html[data-theme="cerisier"] #petalesCerisier{
+  display: block;
+}
+
+#petalesCerisier span{
+  position: absolute;
+  top: -24px;
+  width: 11px;
+  height: 15px;
+  border-radius: 80% 0 80% 0;
+  background: linear-gradient(135deg, #ffd3e5, #ff9cc5);
+  opacity: 0.75;
+  animation: chutePetale linear infinite;
+}
+
+@keyframes chutePetale{
+  0%   { transform: translate(0, 0) rotate(0deg); }
+  25%  { transform: translate(28px, 26vh) rotate(110deg); }
+  50%  { transform: translate(-18px, 52vh) rotate(220deg); }
+  75%  { transform: translate(24px, 78vh) rotate(330deg); }
+  100% { transform: translate(-10px, 108vh) rotate(440deg); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  #petalesCerisier{ display: none !important; }
 }
