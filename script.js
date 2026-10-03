@@ -654,6 +654,20 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // ===== Diagnostic : tout ce qu'il faut pour comprendre un plantage en ligne, copié en un tap =====
+  // Écran : appli installée ou navigateur, et zones de l'heure / du bas (pour la barre du haut de l'iPhone)
+  function infosEcranDiagnostic(){
+    const sonde = document.createElement("div");
+    sonde.style.cssText = "position:fixed;visibility:hidden;pointer-events:none;" +
+      "padding-top:env(safe-area-inset-top, 0px);padding-bottom:env(safe-area-inset-bottom, 0px)";
+    document.body.appendChild(sonde);
+    const zone = getComputedStyle(sonde);
+    const haut = zone.paddingTop, bas = zone.paddingBottom;
+    sonde.remove();
+    return `Écran : ${estEnAppli ? "appli installée" : "navigateur"} | fenêtre ${window.innerWidth}×${window.innerHeight}` +
+      ` | écran ${screen.width}×${screen.height} | zone de l'heure ${haut} | zone du bas ${bas}` +
+      ` | thème ${document.documentElement.dataset.theme || "-"}`;
+  }
+
   function texteDiagnostic(){
     const etat = window.__etatFileAlcuno ? window.__etatFileAlcuno() : {};
     const journal = etat.journal || [];
@@ -663,6 +677,7 @@ document.addEventListener("DOMContentLoaded", function () {
       `Version ${VERSION_AFFICHEE} | ${new Date().toLocaleString("fr-FR")}`,
       `Téléphone : ${navigator.userAgent}`,
       `Réseau : ${navigator.onLine ? "en ligne" : "hors connexion"} | Firebase chargé : ${!!window.firebaseDB}`,
+      infosEcranDiagnostic(),
       `Partie : ${codePartieActuel || "aucune"} | pseudo : ${pseudoActuel || "-"} | manche : ${mancheCourante === null ? "-" : mancheCourante}` +
         ` | partie en mémoire : ${JSON.stringify(lirePartieLocale())}`,
       `File d'actions : ${JSON.stringify(etat)}`,
