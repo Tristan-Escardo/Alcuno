@@ -2162,16 +2162,32 @@ document.addEventListener("DOMContentLoaded", function () {
   voileOverlays.id = "voileOverlays"; // (pas « overlay... » : nettoyerOverlays() ne doit pas le supprimer)
   document.body.appendChild(voileOverlays);
   let minuteurVoile = null;
+  let apresTousOverlays = []; // fonctions à lancer une fois le plateau de nouveau visible
+
+  function overlayOuvert(){
+    return [...document.body.children].some(el => el.id.startsWith("overlay"));
+  }
 
   function majVoileOverlays(){
-    const ouvert = [...document.body.children].some(el => el.id.startsWith("overlay"));
     clearTimeout(minuteurVoile);
-    if(ouvert){
+    if(overlayOuvert()){
       voileOverlays.classList.add("visible");
       return;
     }
     // Petit délai : laisse au prochain overlay de l'enchaînement le temps d'arriver
-    minuteurVoile = setTimeout(() => voileOverlays.classList.remove("visible"), delai(90));
+    minuteurVoile = setTimeout(() => {
+      voileOverlays.classList.remove("visible");
+      // Le plateau réapparaît en fondu : on attend qu'il soit bien visible
+      const file = apresTousOverlays;
+      apresTousOverlays = [];
+      if(file.length) setTimeout(() => file.forEach(f => f()), delai(120));
+    }, delai(90));
+  }
+
+  // Lance callback quand plus aucun overlay n'est affiché (tout de suite s'il n'y en a pas)
+  function quandPlateauVisible(callback){
+    if(!overlayOuvert() && !voileOverlays.classList.contains("visible")) callback();
+    else apresTousOverlays.push(callback);
   }
   new MutationObserver(majVoileOverlays).observe(document.body, { childList: true });
   
@@ -4228,6 +4244,50 @@ document.addEventListener("DOMContentLoaded", function () {
     return m ? m[1] : null;
   }
 
+  // La carte « 1 » s'envole du plateau vers le nom du joueur qui la garde, puis son +1 pulse
+  function envolerCarteVersJoueur(carteElement, classeCarte, nom){
+    const depart = carteElement.getBoundingClientRect();
+    carteElement.classList.add("carte-disparue"); // le trou reste à sa place
+    const sansAnimation = rattrapageEnCours || !carteElement.animate ||
+      (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    if(sansAnimation || depart.width === 0) return;
+
+    // Le +1 du joueur dans la liste « Joueurs » (s'il est à l'écran), sinon vers le haut de l'écran
+    const ligneJoueur = () => listeJoueurs.querySelectorAll(".joueur-ligne")[joueurs.indexOf(nom)];
+    const cible = ligneJoueur();
+    const zone = cible && (cible.querySelector(".bonus-annulation") || cible).getBoundingClientRect();
+    const cibleVisible = zone && zone.width > 0 && zone.bottom > 0 && zone.top < window.innerHeight;
+    const arriveeX = cibleVisible ? zone.left + zone.width / 2 : depart.left + depart.width / 2;
+    const arriveeY = cibleVisible ? zone.top + zone.height / 2 : -depart.height;
+    const dx = arriveeX - (depart.left + depart.width / 2);
+    const dy = arriveeY - (depart.top + depart.height / 2);
+
+    const vol = document.createElement("div");
+    vol.className = "Carte retournee carte-envol " + classeCarte;
+    Object.assign(vol.style, {
+      left: depart.left + "px", top: depart.top + "px",
+      width: depart.width + "px", height: depart.height + "px"
+    });
+    document.body.appendChild(vol);
+
+    const animation = vol.animate([
+      { transform: "translate(0, 0) scale(1) rotate(0deg)", opacity: 1, offset: 0 },
+      { transform: "translate(0, -10px) scale(1.15) rotate(-4deg)", opacity: 1, offset: 0.25 }, // on la « prend »
+      { transform: `translate(${dx}px, ${dy}px) scale(0.22) rotate(8deg)`, opacity: 0.35, offset: 1 }
+    ], { duration: 950, easing: "ease-in-out", fill: "forwards" });
+
+    animation.onfinish = () => {
+      vol.remove();
+      const ligne = cibleVisible && ligneJoueur();
+      const badge = ligne && ligne.querySelector(".bonus-annulation");
+      if(badge){
+        badge.classList.remove("bonus-pulse");
+        void badge.offsetWidth; // relance l'animation
+        badge.classList.add("bonus-pulse");
+      }
+    };
+  }
+
   /* ===== Application des règles ===== */
   function appliquerRegle(carteTiree, joueurActuel, carteElement){
     // Gorgée pour la couleur choisie : décidée maintenant (et la couleur effacée),
@@ -4327,11 +4387,17 @@ document.addEventListener("DOMContentLoaded", function () {
       annulations[nom] = Number(annulations[nom] || 0) + 1;
       afficherJoueurs();
 
-      // la carte reste visible 6s puis devient "trou"
-      if(carteElement){
-        setTimeout(() => {
-          carteElement.classList.add("carte-disparue");
-        }, delai(2000));
+      // Comme en vrai, le joueur garde la carte avec lui : une fois les overlays fermés, elle
+      // s'envole vers son nom (là où s'affiche son +1) et laisse un trou sur le plateau.
+      // (avant, elle disparaissait d'un coup : on croyait à un bug)
+      if(carteElement && rattrapageEnCours){
+        carteElement.classList.add("carte-disparue"); // reconnexion : pas d'animation pour les cartes déjà jouées
+      } else if(carteElement){
+        const generation = generationPartie;
+        quandPlateauVisible(() => {
+          if(generation !== generationPartie || !carteElement.isConnected) return;
+          envolerCarteVersJoueur(carteElement, carteTiree, nom);
+        });
       }
 
       // Couleur choisie : la gorgée s'affiche APRÈS « +1 annulation » (sinon elle l'effaçait)

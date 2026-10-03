@@ -4013,3 +4013,26 @@ html[data-theme="prestige"] #refletPrestige{
 #overlayCouleur{
   animation: fadeIn 0.3s ease;
 }
+
+/* ===== Carte « 1 » qui s'envole vers le nom du joueur qui la garde ===== */
+.Carte.carte-envol{
+  position: fixed;
+  margin: 0;
+  z-index: 9000; /* sous les overlays */
+  pointer-events: none;
+  box-shadow: 0 0 22px rgba(255, 215, 0, 0.75), 0 10px 24px rgba(0,0,0,0.5);
+  will-change: transform, opacity;
+}
+
+/* Le +1 du joueur grossit un instant à l'arrivée de la carte */
+.bonus-annulation{
+  display: inline-block;
+}
+.bonus-annulation.bonus-pulse{
+  animation: pulseBonus 0.6s ease-out;
+}
+@keyframes pulseBonus{
+  0%   { transform: scale(1); text-shadow: none; }
+  40%  { transform: scale(1.8); text-shadow: 0 0 12px rgba(255, 215, 0, 0.95); }
+  100% { transform: scale(1); text-shadow: none; }
+}
