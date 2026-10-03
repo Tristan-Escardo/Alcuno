@@ -3785,12 +3785,6 @@ html[data-theme="cerisier"] #petalesCerisier{
   color: #FFD700;
 }
 
-#notifHaut .notifHaut-texte span{
-  font-size: 13px;
-  font-weight: 600;
-  opacity: 0.85;
-}
-
 @keyframes notifHautArrive{
   from { opacity: 0; transform: translate(-50%, -120%); }
   to   { opacity: 1; transform: translate(-50%, 0); }

@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.8.3";
+  const VERSION_AFFICHEE = "8.8.4";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   // À l'écran : seulement « 8.7 » (le dernier chiffre change à chaque mise en ligne, en coulisses)
@@ -260,7 +260,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Notification qui arrive du haut de l'écran, aux couleurs du thème (se ferme au tap ou après 5 s)
-  function afficherNotificationHaut(icone, titre, texte){
+  function afficherNotificationHaut(icone, titre){
     const ancienne = document.getElementById("notifHaut");
     if (ancienne) ancienne.remove();
     const notif = document.createElement("div");
@@ -274,9 +274,7 @@ document.addEventListener("DOMContentLoaded", function () {
     bloc.className = "notifHaut-texte";
     const fort = document.createElement("strong");
     fort.textContent = titre;
-    const detail = document.createElement("span");
-    detail.textContent = texte;
-    bloc.append(fort, detail);
+    bloc.append(fort);
     notif.append(ligneIcone, bloc);
     let partie = false;
     const fermer = () => {
