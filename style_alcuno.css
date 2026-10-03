@@ -2137,11 +2137,11 @@ body.mode-en-ligne #jouer{
   max-width: 90vw;
   padding: 12px 18px;
   border-radius: 12px;
-  background: rgba(0,0,0,0.88);
+  background: var(--fond-theme);
   color: #FFD700;
   font-weight: 800;
   text-align: center;
-  box-shadow: 0 0 0 1px rgba(255,215,0,0.3) inset;
+  box-shadow: 0 0 0 1px rgba(255,215,0,0.45) inset, 0 8px 24px rgba(0,0,0,0.45);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s ease, transform 0.2s ease;
@@ -3678,11 +3678,16 @@ html[data-theme="cerisier"]{
 }
 
 html[data-theme="prestige"]{
-  --fond-theme: #15100a;
+  --fond-theme: #3a2806;
   --deco-theme:
-    linear-gradient(135deg, rgba(255, 215, 0, 0.12) 0%, transparent 35%, rgba(255, 215, 0, 0.07) 65%, transparent 85%),
-    radial-gradient(circle at 50% 0%, rgba(255, 200, 60, 0.22), transparent 55%),
-    radial-gradient(circle at 50% 110%, rgba(255, 170, 30, 0.16), transparent 50%);
+    /* reflets d'or en diagonale */
+    linear-gradient(135deg, rgba(255, 223, 90, 0.30) 0%, rgba(255, 215, 0, 0.04) 28%, rgba(255, 236, 140, 0.24) 52%,
+                    rgba(255, 215, 0, 0.03) 74%, rgba(255, 200, 60, 0.22) 100%),
+    /* lueur dorée en haut et en bas */
+    radial-gradient(circle at 50% 0%, rgba(255, 215, 0, 0.38), transparent 55%),
+    radial-gradient(circle at 50% 110%, rgba(255, 180, 40, 0.30), transparent 50%),
+    /* fin brossé doré */
+    repeating-linear-gradient(115deg, rgba(255, 220, 120, 0.06) 0 2px, transparent 2px 9px);
 }
 
 /* Réglages : 7 pastilles => 2 lignes (4 + 3) */
@@ -3733,4 +3738,70 @@ html[data-theme="cerisier"] #petalesCerisier{
 
 @media (prefers-reduced-motion: reduce){
   #petalesCerisier{ display: none !important; }
+}
+
+
+/* ===== Notification du haut (ex. « Thème Prestige débloqué ! ») : arrive d'en haut, aux couleurs
+   du thème, liseré doré ; se ferme au tap ou toute seule ===== */
+#notifHaut{
+  position: fixed;
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  z-index: 30004;
+  width: min(420px, calc(100% - 24px));
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  color: #fff;
+  background: var(--deco-theme, none), var(--fond-theme);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,215,0,0.55);
+  cursor: pointer;
+  transform: translate(-50%, 0);
+  animation: notifHautArrive 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+#notifHaut.depart{
+  animation: notifHautPart 0.3s ease-in both;
+}
+
+#notifHaut .notifHaut-icone{
+  font-size: 30px;
+  line-height: 1;
+}
+
+#notifHaut .notifHaut-texte{
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+}
+
+#notifHaut .notifHaut-texte strong{
+  font-size: 16px;
+  font-weight: 900;
+  color: #FFD700;
+}
+
+#notifHaut .notifHaut-texte span{
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+@keyframes notifHautArrive{
+  from { opacity: 0; transform: translate(-50%, -120%); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@keyframes notifHautPart{
+  from { opacity: 1; transform: translate(-50%, 0); }
+  to   { opacity: 0; transform: translate(-50%, -120%); }
+}
+
+html.accessibilite #notifHaut .notifHaut-texte,
+html.accessibilite #notifHaut .notifHaut-icone{
+  zoom: 1.25;
 }

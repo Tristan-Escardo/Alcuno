@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.8.1";
+  const VERSION_AFFICHEE = "8.8.2";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   // À l'écran : seulement « 8.7 » (le dernier chiffre change à chaque mise en ligne, en coulisses)
@@ -238,7 +238,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // (le thème est déjà posé au tout début du chargement par index.html : pas de flash de couleur)
   const CLE_THEME = "alcuno_theme";
   const THEMES = { bordeaux: "#2b001d", noir: "#0e0e12", vert: "#08301e", bleu: "#0a1634", violet: "#3d0f66",
-                   cerisier: "#5a1740", prestige: "#15100a" };
+                   cerisier: "#5a1740", prestige: "#3a2806" };
 
   // Thème secret « Prestige » : débloqué en découvrant l'écran des créateurs (4 taps sur le titre)
   const CLE_PRESTIGE = "alcuno_theme_prestige";
@@ -256,7 +256,38 @@ document.addEventListener("DOMContentLoaded", function () {
     if (prestigeDebloque()) return;
     try { localStorage.setItem(CLE_PRESTIGE, "1"); } catch (e) {}
     majPastillePrestige();
-    afficherToast("✨ Thème Prestige débloqué ! (Réglages > Thème)", 4000);
+    afficherNotificationHaut("✨", "Thème Prestige débloqué !", "Réglages > Thème");
+  }
+
+  // Notification qui arrive du haut de l'écran, aux couleurs du thème (se ferme au tap ou après 5 s)
+  function afficherNotificationHaut(icone, titre, texte){
+    const ancienne = document.getElementById("notifHaut");
+    if (ancienne) ancienne.remove();
+    const notif = document.createElement("div");
+    notif.id = "notifHaut";
+    notif.setAttribute("role", "status");
+    const ligneIcone = document.createElement("span");
+    ligneIcone.className = "notifHaut-icone";
+    ligneIcone.setAttribute("aria-hidden", "true");
+    ligneIcone.textContent = icone;
+    const bloc = document.createElement("span");
+    bloc.className = "notifHaut-texte";
+    const fort = document.createElement("strong");
+    fort.textContent = titre;
+    const detail = document.createElement("span");
+    detail.textContent = texte;
+    bloc.append(fort, detail);
+    notif.append(ligneIcone, bloc);
+    let partie = false;
+    const fermer = () => {
+      if (partie) return;
+      partie = true;
+      notif.classList.add("depart");
+      setTimeout(() => notif.remove(), 320);
+    };
+    notif.addEventListener("click", fermer);
+    setTimeout(fermer, 5000);
+    document.body.appendChild(notif);
   }
 
   function appliquerTheme(nom){
