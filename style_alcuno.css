@@ -1597,7 +1597,7 @@ body.no-scroll{
 }
 
 #overlayDuel .duel-content{
-  width: min(920px, 92vw);
+  width: min(920px, 100%); /* (92vw dépassait de la marge intérieure : bords des titres coupés) */
   min-height: 100%;
   margin: auto;
   display: flex;
@@ -1612,6 +1612,11 @@ body.no-scroll{
   max-width: min(900px, 92vw);
   line-height: 1.05;
   margin: 0;
+  /* Titre en jaune, plus gros et plus gras que les consignes en dessous (avant : blanc) */
+  color: #FFD700;
+  font-weight: 900;
+  font-size: clamp(26px, 7vw, 56px);
+  text-shadow: 2px 2px 5px #000;
 }
 
 #overlayDuel .duel-boutons{
