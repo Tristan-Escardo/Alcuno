@@ -3682,28 +3682,27 @@ html[data-theme="cerisier"]{
   --fond-theme: #5a1740;
   --deco-theme:
     url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 220 220%22%3E%3Cg transform=%22translate(40 50) rotate(20) scale(0.9)%22 opacity=%220.16%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(165 120) rotate(50) scale(1.1)%22 opacity=%220.14%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(80 185) rotate(5) scale(0.8)%22 opacity=%220.12%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cellipse cx=%22130%22 cy=%2240%22 rx=%222.6%22 ry=%224.6%22 transform=%22rotate(35 130 40)%22 fill=%22%23ffc2db%22 opacity=%220.16%22/%3E%3Cellipse cx=%22190%22 cy=%2230%22 rx=%222.08%22 ry=%223.6799999999999997%22 transform=%22rotate(-20 190 30)%22 fill=%22%23ffc2db%22 opacity=%220.13%22/%3E%3Cellipse cx=%2220%22 cy=%22140%22 rx=%222.3400000000000003%22 ry=%224.14%22 transform=%22rotate(70 20 140)%22 fill=%22%23ffc2db%22 opacity=%220.14%22/%3E%3Cellipse cx=%22120%22 cy=%22160%22 rx=%222.08%22 ry=%223.6799999999999997%22 transform=%22rotate(15 120 160)%22 fill=%22%23ffc2db%22 opacity=%220.12%22/%3E%3Cellipse cx=%22200%22 cy=%22200%22 rx=%222.3400000000000003%22 ry=%224.14%22 transform=%22rotate(-45 200 200)%22 fill=%22%23ffc2db%22 opacity=%220.13%22/%3E%3C/svg%3E") 0 0 / 220px 220px repeat,
-    radial-gradient(circle at 15% 85%, rgba(255, 150, 200, 0.12), transparent 45%) no-repeat;
+    radial-gradient(circle at 15% 70%, rgba(255, 150, 200, 0.12), transparent 45%) no-repeat;
   /* la branche fleurie seulement sur l'accueil et les menus (pas derrière le texte des réglages ni le plateau) */
   --deco-accueil:
     url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 320 220%22%3E%3Cg fill=%22none%22 stroke=%22%233a1420%22 stroke-linecap=%22round%22%3E%3Cpath d=%22M330 18 C 270 30, 230 40, 175 78 S 95 120, 40 132%22 stroke-width=%227%22/%3E%3Cpath d=%22M240 40 C 225 70, 215 95, 222 128%22 stroke-width=%224.5%22/%3E%3Cpath d=%22M175 78 C 160 95, 150 120, 155 150%22 stroke-width=%223.5%22/%3E%3Cpath d=%22M110 112 C 95 100, 82 92, 62 92%22 stroke-width=%223%22/%3E%3Cpath d=%22M290 26 C 300 50, 296 70, 284 90%22 stroke-width=%223%22/%3E%3C/g%3E%3Cg transform=%22translate(250 30) rotate(10) scale(1.7)%22 opacity=%221%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(222 128) rotate(30) scale(1.5)%22 opacity=%221%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(200 60) rotate(50) scale(1.3)%22 opacity=%221%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(155 150) rotate(5) scale(1.4)%22 opacity=%221%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(130 98) rotate(40) scale(1.2)%22 opacity=%221%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(62 92) rotate(20) scale(1.3)%22 opacity=%221%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(40 132) rotate(60) scale(1.5)%22 opacity=%221%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(284 90) rotate(15) scale(1.4)%22 opacity=%221%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(300 50) rotate(70) scale(1.1)%22 opacity=%221%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(95 125) rotate(25) scale(1.0)%22 opacity=%220.9%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(178 100) rotate(12) scale(1.0)%22 opacity=%220.9%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg fill=%22%23ffd6e7%22%3E%3Ccircle cx=%22232%22 cy=%2252%22 r=%222.2%22/%3E%3Ccircle cx=%22186%22 cy=%2282%22 r=%222%22/%3E%3Ccircle cx=%22146%22 cy=%22120%22 r=%221.8%22/%3E%3Ccircle cx=%2275%22 cy=%22110%22 r=%222%22/%3E%3Ccircle cx=%22268%22 cy=%2272%22 r=%221.8%22/%3E%3C/g%3E%3C/svg%3E") right 0 top 54px / min(64vw, 310px) auto no-repeat,
     url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 220 220%22%3E%3Cg transform=%22translate(40 50) rotate(20) scale(0.9)%22 opacity=%220.16%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(165 120) rotate(50) scale(1.1)%22 opacity=%220.14%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cg transform=%22translate(80 185) rotate(5) scale(0.8)%22 opacity=%220.12%22%3E%3Cg fill=%22%23ffb3d1%22%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(0)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(72)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(144)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(216)%22/%3E%3Cellipse cx=%220%22 cy=%22-5.2%22 rx=%223.6%22 ry=%225.6%22 transform=%22rotate(288)%22/%3E%3C/g%3E%3Ccircle r=%221.9%22 fill=%22%23e8558f%22/%3E%3C/g%3E%3Cellipse cx=%22130%22 cy=%2240%22 rx=%222.6%22 ry=%224.6%22 transform=%22rotate(35 130 40)%22 fill=%22%23ffc2db%22 opacity=%220.16%22/%3E%3Cellipse cx=%22190%22 cy=%2230%22 rx=%222.08%22 ry=%223.6799999999999997%22 transform=%22rotate(-20 190 30)%22 fill=%22%23ffc2db%22 opacity=%220.13%22/%3E%3Cellipse cx=%2220%22 cy=%22140%22 rx=%222.3400000000000003%22 ry=%224.14%22 transform=%22rotate(70 20 140)%22 fill=%22%23ffc2db%22 opacity=%220.14%22/%3E%3Cellipse cx=%22120%22 cy=%22160%22 rx=%222.08%22 ry=%223.6799999999999997%22 transform=%22rotate(15 120 160)%22 fill=%22%23ffc2db%22 opacity=%220.12%22/%3E%3Cellipse cx=%22200%22 cy=%22200%22 rx=%222.3400000000000003%22 ry=%224.14%22 transform=%22rotate(-45 200 200)%22 fill=%22%23ffc2db%22 opacity=%220.13%22/%3E%3C/svg%3E") 0 0 / 220px 220px repeat,
-    radial-gradient(circle at 15% 85%, rgba(255, 150, 200, 0.12), transparent 45%) no-repeat;
+    radial-gradient(circle at 15% 70%, rgba(255, 150, 200, 0.12), transparent 45%) no-repeat;
 }
 
 html[data-theme="prestige"]{
   --fond-theme: #3a2806;
-  /* le tout haut et le tout bas du décor ci-dessous, chacun d'une seule couleur sur toute la largeur :
-     l'iPhone peint ou floute ces couleurs-là sous l'heure et tout en bas (à recalculer si on touche aux
-     dégradés : haut = fond + lueur du haut 0.36 + reflet 0.14 ; bas = fond + lueur du bas 0.30 + reflet 0.16) */
+  /* le tout haut ET le tout bas du décor ci-dessous ont exactement cette couleur, sur toute la largeur :
+     c'est celle que l'iPhone peint sous l'heure et dans la bande du bas (à recalculer si on touche aux
+     dégradés : fond + lueur 0.36 + reflet 0.14, en haut comme en bas) */
   --couleur-barre: #937810;
-  --couleur-bas: #8b6517;
   --deco-theme:
     /* reflets d'or en diagonale (réguliers sur le haut et sur le bas de l'écran) */
     linear-gradient(135deg, rgba(255, 223, 90, 0.14) 0%, rgba(255, 223, 90, 0.14) 34%, rgba(255, 236, 140, 0.26) 52%,
-                    rgba(255, 200, 60, 0.16) 66%, rgba(255, 200, 60, 0.16) 100%) no-repeat,
-    /* lueur dorée en haut et en bas (sur toute la largeur) */
+                    rgba(255, 223, 90, 0.14) 66%, rgba(255, 223, 90, 0.14) 100%) no-repeat,
+    /* lueur dorée en haut et en bas (sur toute la largeur, la même des deux côtés) */
     linear-gradient(to bottom, rgba(255, 215, 0, 0.36), transparent 55%) no-repeat,
-    linear-gradient(to top, rgba(255, 180, 40, 0.30), transparent 45%) no-repeat;
+    linear-gradient(to top, rgba(255, 215, 0, 0.36), transparent 45%) no-repeat;
 }
 
 /* Réglages : 7 pastilles => 2 lignes (4 + 3) */
@@ -4080,37 +4079,38 @@ body{ padding-top: var(--haut-ecran); }
 
 .overlay-opaque{ padding-top: calc(clamp(14px, 3.2vw, 30px) + var(--haut-ecran)); }
 
-/* Barre du haut de l'iPhone (sous l'heure) : l'iPhone la peint d'une couleur unie, la couleur de fond
-   (background-color) de l'écran affiché, au lieu de laisser voir la page dessous. Chaque thème donne
-   donc dans --couleur-barre la couleur du tout haut de son décor : posée en couleur de fond mais cachée
-   sous le décor (le fond du thème y est une couche en dégradé uni), elle ne sert qu'à la barre, qui se
-   fond dans la page. Pas de bande ni de fondu : le décor va jusqu'en haut de l'écran. */
-:root{
-  --couleur-barre: var(--fond-theme);
-  --couleur-bas: var(--fond-theme); /* idem pour le tout bas du décor */
-}
+/* Barre du haut (sous l'heure) et bande du bas de l'iPhone : l'iPhone les peint d'une couleur unie, la
+   couleur de fond (background-color) de la page, sans regarder ce qui est dessiné (vérifié : en 8.8.13
+   la bande du bas suivait cette couleur, pas la page). Chaque thème donne donc dans --couleur-barre la
+   couleur du tout haut ET du tout bas de son décor (Prestige : décor fait pour, les deux sont égaux), et
+   c'est la couleur de fond de la page. Pas de bande ni de fondu : le décor va d'un bord à l'autre. */
+:root{ --couleur-barre: var(--fond-theme); }
 
-/* La page derrière les écrans (fond du jeu) : toute la hauteur de l'écran, sans se répéter (l'iPhone la
-   floute sous l'heure et tout en bas, même quand un écran fixe est par-dessus). En dessous : la couleur
-   de fond. */
 html{ min-height: 100%; }
 
-body{
+body{ background: var(--couleur-barre); }
+
+/* Décor du fond du jeu, fixe sur l'écran (comme l'accueil) : même pendant une partie qui défile, le
+   haut et le bas de l'écran ont la couleur du haut / bas du décor, donc celle des bandes de l'iPhone
+   (avant, le décor s'étirait sur toute la longueur de la page : en bas de l'écran, son milieu). */
+body::before{
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
   background:
     var(--deco-theme, radial-gradient(circle at top center, rgba(255, 215, 0, 0.08) 0%, rgba(255, 215, 0, 0) 26%) no-repeat),
-    linear-gradient(var(--fond-theme), var(--fond-theme)) no-repeat,
-    /* sous la page (bande du bas de l'iPhone quand le jeu passe sous l'heure) : la couleur du bas du
-       décor, en couche répétée sur tout l'écran. Pas de classe posée au démarrage : à l'ouverture de
-       l'appli, l'iPhone donne parfois une zone de l'heure de 0, et la bande du bas revenait. */
-    linear-gradient(var(--couleur-bas), var(--couleur-bas)) var(--couleur-barre);
+    var(--fond-theme);
 }
 
 /* Créateurs : la page derrière prend le fond du thème, comme cet écran */
 html.credits-ouverts body{ background: var(--fond-theme); }
+html.credits-ouverts body::before{ display: none; }
 
-/* Overlay ouvert (fond noir) : la page derrière passe en noir aussi. Sinon l'iPhone floutait son décor
-   sous l'heure et tout en bas : bandes dorées en Prestige. */
+/* Overlay ouvert (fond noir) : la page derrière passe en noir aussi (sinon bandes dorées en Prestige) */
 html.overlay-ouvert body{ background: #000; }
+html.overlay-ouvert body::before{ display: none; }
 
 #choixMode,
 #enLigne,
