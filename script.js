@@ -2152,6 +2152,28 @@ document.addEventListener("DOMContentLoaded", function () {
     const y = top ? Math.abs(parseInt(top, 10)) : scrollYBeforeLock;
     window.scrollTo(0, y);
   }
+
+  // ===== Voile noir pendant les enchaînements d'overlays =====
+  // Quand un overlay en remplace un autre (règle puis annulation, +4 validé puis « X boit »...),
+  // le plateau réapparaissait une fraction de seconde entre les deux puis le noir revenait d'un coup :
+  // effet de flash agressif. Ce voile reste noir tant qu'un overlay est affiché (ou qu'un autre
+  // arrive juste après) et ne s'efface en fondu qu'à la fin de l'enchaînement.
+  const voileOverlays = document.createElement("div");
+  voileOverlays.id = "voileOverlays"; // (pas « overlay... » : nettoyerOverlays() ne doit pas le supprimer)
+  document.body.appendChild(voileOverlays);
+  let minuteurVoile = null;
+
+  function majVoileOverlays(){
+    const ouvert = [...document.body.children].some(el => el.id.startsWith("overlay"));
+    clearTimeout(minuteurVoile);
+    if(ouvert){
+      voileOverlays.classList.add("visible");
+      return;
+    }
+    // Petit délai : laisse au prochain overlay de l'enchaînement le temps d'arriver
+    minuteurVoile = setTimeout(() => voileOverlays.classList.remove("visible"), delai(90));
+  }
+  new MutationObserver(majVoileOverlays).observe(document.body, { childList: true });
   
   function centrerDerniereLigne(){
     const cards = Array.from(plateau.querySelectorAll(".Carte"));
@@ -3179,6 +3201,7 @@ document.addEventListener("DOMContentLoaded", function () {
     overlay.addEventListener("pointerdown", fermer);
 
     document.body.appendChild(overlay);
+    getComputedStyle(overlay).opacity; // départ du fondu bien pris en compte (sinon il apparaissait d'un coup)
     requestAnimationFrame(() => {
       overlay.style.opacity = "1";
       overlay.style.transform = "scale(1)";
@@ -3299,6 +3322,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     document.body.appendChild(overlay);
+    getComputedStyle(overlay).opacity; // départ du fondu bien pris en compte (sinon il apparaissait d'un coup)
     requestAnimationFrame(() => {
       overlay.style.opacity = "1";
       overlay.style.transform = "scale(1)";
@@ -3497,6 +3521,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     lockScroll();
     document.body.appendChild(overlay);
+    getComputedStyle(overlay).opacity; // départ du fondu bien pris en compte
 
     requestAnimationFrame(() => {
       overlay.style.opacity = "1";
