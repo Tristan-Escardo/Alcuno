@@ -3137,6 +3137,10 @@ html.accessibilite #toastEnLigne{
   align-items: center;
   gap: 12px;
   margin-bottom: clamp(10px, 4vh, 36px);
+  /* ni le titre ni la barre de couleurs dessous ne se surlignent / copient (appui long sur iPhone) */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
 #choixMode #titreAccueil{

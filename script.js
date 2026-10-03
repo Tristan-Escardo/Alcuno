@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.8.6";
+  const VERSION_AFFICHEE = "8.8.7";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   // À l'écran : seulement « 8.7 » (le dernier chiffre change à chaque mise en ligne, en coulisses)
@@ -645,7 +645,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document.getElementById("btnPartagerJeu").addEventListener("click", () => {
     if (navigator.share) {
-      navigator.share({ title: "Alcuno", text: "On joue à Alcuno ? 🍻", url: ADRESSE_JEU }).catch(() => {});
+      navigator.share({ url: ADRESSE_JEU }).catch(() => {}); // juste le lien (aperçu : l'icône du jeu, cf. og:image)
       return;
     }
     const copie = navigator.clipboard ? navigator.clipboard.writeText(ADRESSE_JEU) : Promise.reject();
