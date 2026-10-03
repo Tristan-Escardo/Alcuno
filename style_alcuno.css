@@ -4080,3 +4080,47 @@ body{ padding-top: var(--haut-ecran); }
 #overlayPredictionFin{ padding-top: calc(clamp(12px, 3vw, 30px) + var(--haut-ecran)); }
 
 .overlay-opaque{ padding-top: calc(clamp(14px, 3.2vw, 30px) + var(--haut-ecran)); }
+
+/* Quand l'iPhone garde sa barre du haut opaque (appli installée avant la 8.8.9 : iOS garde l'ancien
+   réglage tant qu'on ne la réinstalle pas ; idem dans Safari et sur Android), il peint cette barre avec
+   la couleur du fond du thème, et les dégradés du décor (Prestige surtout) s'arrêtaient net dessous :
+   une ligne. Le haut de la page part donc de cette même couleur et se fond dans le décor.
+   Quand le jeu passe bien sous l'heure (zone du haut > 0), pas de fondu : le décor monte jusqu'en haut. */
+:root{ --fondu-haut: max(0px, calc(56px - var(--haut-ecran) * 100)); }
+
+body{
+  background:
+    linear-gradient(to bottom, var(--fond-theme), transparent var(--fondu-haut)),
+    var(--deco-theme, radial-gradient(circle at top center, rgba(255, 215, 0, 0.08) 0%, rgba(255, 215, 0, 0) 26%)),
+    var(--fond-theme);
+}
+
+#choixMode,
+#enLigne,
+#ecranNouvellePartie,
+#ecranConfirmerHote,
+#ecranConfirmerRetrait,
+#ecranConfirmerAccueil,
+#ecranChoixPseudo{
+  background:
+    linear-gradient(to bottom, var(--fond-theme), transparent var(--fondu-haut)),
+    var(--deco-accueil, var(--deco-theme, none)),
+    var(--fond-theme);
+}
+
+#suppression,
+#ecranReglages{
+  background:
+    linear-gradient(to bottom, var(--fond-theme), transparent var(--fondu-haut)),
+    var(--deco-theme, none),
+    var(--fond-theme);
+}
+
+#ecranCredits{
+  background:
+    linear-gradient(to bottom, var(--fond-theme), transparent var(--fondu-haut)),
+    radial-gradient(circle at 50% 18%, rgba(255,215,0,0.16), transparent 58%),
+    radial-gradient(circle at 15% 85%, rgba(255,77,77,0.10), transparent 45%),
+    radial-gradient(circle at 85% 85%, rgba(66,183,255,0.10), transparent 45%),
+    var(--fond-theme);
+}
