@@ -4130,3 +4130,34 @@ html.overlay-ouvert body::before{ display: none; }
     var(--deco-theme, none),
     linear-gradient(var(--fond-theme), var(--fond-theme)) var(--couleur-barre);
 }
+
+/* ===== iPhone, bande en bas de l'accueil, des menus et des réglages =====
+   Jamais pendant une partie : là, ce qui touche le bas de l'écran est la page elle-même (son décor est
+   un calque que l'iPhone ignore). Ces écrans-ci sont des éléments fixes posés sur la page et, quand un
+   tel élément touche le bas, l'iPhone peint sa propre bande dans la zone du bas (barre pour revenir à
+   l'écran d'accueil). Ils s'arrêtent donc juste au-dessus de cette zone, et leur couleur continue
+   dessous en ombre (l'iPhone ne la compte pas comme un élément, on ne peut pas la toucher, elle ne
+   change rien à la mise en page). Sans zone du bas (Android, ordinateur), rien ne change. */
+:root{ --bas-ecran: env(safe-area-inset-bottom, 0px); }
+
+#choixMode,
+#ecranNouvellePartie,
+#ecranConfirmerHote,
+#ecranConfirmerRetrait,
+#ecranConfirmerAccueil,
+#ecranChoixPseudo,
+#suppression,
+#ecranReglages{
+  bottom: var(--bas-ecran);
+  box-shadow: 0 160px 0 0 var(--couleur-barre);
+}
+
+#enLigne{
+  height: calc(var(--hauteur-visible, 100%) - var(--bas-ecran));
+  box-shadow: 0 160px 0 0 var(--couleur-barre);
+}
+
+#ecranCredits{
+  bottom: var(--bas-ecran);
+  box-shadow: 0 160px 0 0 var(--fond-theme);
+}

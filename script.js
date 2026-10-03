@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.8.18";
+  const VERSION_AFFICHEE = "8.8.19";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   // À l'écran : le numéro complet, pour voir d'un coup d'œil si un téléphone est à jour
@@ -585,13 +585,13 @@ document.addEventListener("DOMContentLoaded", function () {
   //   credits.mp3 : 4 taps sur le titre ALCUNO (écran des créateurs)
   //   reglage_son.mp3 : on lâche le curseur de volume dans les réglages (pour entendre le volume)
   //   no_wifi.mp3 : en ligne, coupure de réseau (une fois, quand le logo wifi barré apparaît)
-  //   distribuer_gorgees.mp3 : +4, on tape sur un joueur pour lui donner une gorgée (coupé à 1,3 s)
+  //   distribuer_gorgees.mp3 : +4, on tape sur un joueur pour lui donner une gorgée (coupé à 0,8 s)
   //   annuler_gorgees.mp3 : quelqu'un annule 1 gorgée ou plus
   //   annuler_0_gorgees.mp3 : quelqu'un tape « Annuler 0 » (il n'annule rien)
   // (pas de son pour le cul sec de la carte dorée)
   const SONS = ["cartes", "doree", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees"];
   // Sons coupés au bout de N secondes (avec un petit fondu), même si le fichier est plus long
-  const DUREE_MAX_SONS = { doree: 3, pigeon: 2, distribuer_gorgees: 1.3 };
+  const DUREE_MAX_SONS = { doree: 3, pigeon: 2, distribuer_gorgees: 0.8 };
   const sonsCharges = {}; // nom -> son décodé (ou null si le fichier n'existe pas)
   const sonsDemandes = {}; // nom -> moment où il a été demandé alors qu'il n'était pas encore chargé
   let chargementSonsLance = false;
