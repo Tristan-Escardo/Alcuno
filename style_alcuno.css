@@ -4242,11 +4242,11 @@ html[data-theme="givre"] #listeJoueursEnLigne div{
   color: #0a7f8a;
 }
 html[data-theme="givre"] .bonus-annulation{
-  color: #c06a00;
+  color: #1a7fd0;
 }
 html[data-theme="givre"] .regleZero,
 html[data-theme="givre"] .reglePigeon{
-  color: #b05e00;
+  color: var(--givre-accent);
 }
 html[data-theme="givre"] #messageTexte{
   text-shadow: 0 2px 6px rgba(13, 53, 80, 0.25);
@@ -4256,16 +4256,6 @@ html[data-theme="givre"] #enLigne .infoModeSoft{
   color: #17803a;
 }
 
-/* Bandeau « Tour de » : pastille bleu nuit (le nom reste en couleur, lisible) */
-html[data-theme="givre"] #stickyJoueurActif{
-  background: linear-gradient(180deg, rgba(16, 64, 98, 0.95), rgba(8, 38, 62, 0.93));
-  border-color: rgba(120, 220, 255, 0.35);
-}
-html[data-theme="givre"] #stickyJoueurActif.has-couleur{
-  background: linear-gradient(180deg,
-    color-mix(in srgb, var(--couleur-jeu) 32%, rgba(16, 64, 98, 0.95)),
-    rgba(8, 38, 62, 0.93));
-}
 
 /* En ligne : salle d'attente, message en bas */
 html[data-theme="givre"] #listeJoueursEnLigne div{
@@ -4523,4 +4513,41 @@ html[data-theme="givre"] #messageTexte{
 }
 html[data-theme="givre"] #overlayCouleur .carre-couleur{
   box-shadow: 0 6px 16px rgba(13, 53, 80, 0.25);
+}
+
+/* Bannière « Tour de » : pastille blanche givrée, nom en bleu (pigeon : turquoise foncé ;
+   couleur choisie : teinte légère de la couleur, nom de la couleur en foncé) */
+html[data-theme="givre"] #stickyJoueurActif{
+  background: rgba(255, 255, 255, 0.96);
+  border-color: var(--givre-bord);
+  box-shadow: 0 8px 22px rgba(13, 53, 80, 0.15);
+}
+html[data-theme="givre"] #stickyJoueurActif .sticky-label{
+  color: var(--givre-doux);
+}
+html[data-theme="givre"] #stickyJoueurActif .sticky-nom{
+  color: var(--givre-accent);
+}
+html[data-theme="givre"] #stickyJoueurActif .sticky-bonus{
+  color: #fff;
+  background: #1a7fd0;
+  border-color: #1a7fd0;
+}
+html[data-theme="givre"] #stickyJoueurActif.is-pigeon{
+  border-color: rgba(10, 127, 138, 0.4);
+}
+html[data-theme="givre"] #stickyJoueurActif.is-pigeon .sticky-nom{
+  color: #0a7f8a;
+}
+html[data-theme="givre"] #stickyJoueurActif.is-pigeon .sticky-bonus{
+  background: #0a7f8a;
+  border-color: #0a7f8a;
+}
+html[data-theme="givre"] #stickyJoueurActif.has-couleur{
+  background: color-mix(in srgb, var(--couleur-jeu) 16%, #fff);
+  box-shadow: 0 8px 22px rgba(13, 53, 80, 0.15), 0 0 14px color-mix(in srgb, var(--couleur-jeu) 40%, transparent);
+}
+html[data-theme="givre"] #stickyJoueurActif.has-couleur .sticky-couleur{
+  background: color-mix(in srgb, var(--couleur-jeu) 30%, #fff);
+  color: color-mix(in srgb, var(--couleur-jeu) 45%, #0d3550);
 }
