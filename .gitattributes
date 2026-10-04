@@ -1,2 +1,2 @@
-# Scripts bash des tests : toujours en fins de ligne Unix (sinon bash refuse le )
+# Scripts bash des tests : toujours en fins de ligne Unix (sinon bash refuse les retours chariot)
 *.sh text eol=lf

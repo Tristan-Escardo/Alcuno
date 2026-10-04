@@ -79,12 +79,12 @@ $tap = "document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: t
 $autoTest = $autoClassique.Replace('    const choix = [', '    if ($("#overlayAnnulation")) { const bs = $$("#overlayAnnulation .bouton-annulation").filter(cliquable); if (bs.length) { window.__nbAnnul = (window.__nbAnnul || 0) + 1; const b = bs[Math.min(bs.length - 1, window.__nbAnnul % 2)]; window.__clicsAnnul = (window.__clicsAnnul || []).concat(b.innerText); pd(b); return setTimeout(tick, 300); } }' + "`n" + '    const choix = [')
 try {
   $O = Ouvrir $jeu; Telephone $O
-  Attendre $O "document.getElementById('versionJeu') && document.getElementById('versionJeu').innerText" 30 | Out-Null
+  Attendre $O "document.getElementById('versionJeu') && document.getElementById('versionJeu').innerText && !document.documentElement.classList.contains('chargement')" 30 | Out-Null
   Cdp $O "Page.enable" @{} | Out-Null
   Cdp $O "Page.addScriptToEvaluateOnNewDocument" @{ source = $espion } | Out-Null
   Eval $O "localStorage.clear(); location.reload(); 'ok'" | Out-Null
   Start-Sleep -Seconds 3
-  Attendre $O "document.getElementById('versionJeu') && document.getElementById('versionJeu').innerText" 30 | Out-Null
+  Attendre $O "document.getElementById('versionJeu') && document.getElementById('versionJeu').innerText && !document.documentElement.classList.contains('chargement')" 30 | Out-Null
   Write-Output "Version : $(Eval $O "document.getElementById('versionJeu').innerText")"
   Eval $O $tap | Out-Null
   Start-Sleep -Seconds 3

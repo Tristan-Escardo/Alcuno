@@ -7,6 +7,17 @@
          Un paramètre différent à chaque chargement force toujours la dernière version. -->
     <script>
         window.ANTI_CACHE = Date.now();
+        // Fichiers du jeu, dans l'ordre (aussi dans sw.js, pour le hors connexion). Téléchargés tout de suite
+        // et en parallèle : en bas de la page, ils s'exécutent d'affilée, sans attente entre deux fichiers
+        // (aucun bouton ni minuteur ne peut se déclencher avant que tout le jeu soit là).
+        window.FICHIERS_JEU = ["script.js", "js/reglages.js", "js/en-ligne.js", "js/plateau.js", "js/regles.js",
+                               "js/synchro-en-ligne.js", "js/retour-demarrage.js"];
+        window.FICHIERS_JEU.forEach(function (f) {
+            document.write('<link rel="preload" as="script" href="' + f + '?t=' + window.ANTI_CACHE + '">');
+        });
+        // Pas de tap tant que tous les fichiers ne sont pas exécutés (retiré à la fin de js/retour-demarrage.js) :
+        // un bouton du premier fichier peut appeler du code des suivants
+        document.documentElement.classList.add("chargement");
         // Thème choisi dans les réglages : appliqué tout de suite (pas de flash de bordeaux au chargement)
         try { var theme = localStorage.getItem("alcuno_theme"); if (theme) document.documentElement.dataset.theme = theme; } catch (e) {}
         // Barre du téléphone à la couleur du thème dès le premier affichage (mêmes couleurs que THEMES dans script.js)
@@ -378,7 +389,9 @@
     </script>
     
     <script>
-        document.write('<script src="script.js?t=' + window.ANTI_CACHE + '"><\/script>');
+        window.FICHIERS_JEU.forEach(function (f) {
+            document.write('<script src="' + f + '?t=' + window.ANTI_CACHE + '"><\/script>');
+        });
     </script>
     <!-- Thème Prestige : reflet doré qui traverse l'écran de temps en temps (ne bloque aucun tap) -->
     <div id="refletPrestige" aria-hidden="true"></div>

@@ -49,7 +49,7 @@ function Attendre($onglet, [string]$condition, [int]$maxSec = 60) {
   return Eval $onglet $expr
 }
 function Preparer($onglet) {
-  Attendre $onglet "document.getElementById('btnModeEnLigne') && window.firebaseDB && document.getElementById('versionJeu').innerText" 30 | Out-Null
+  Attendre $onglet "document.getElementById('btnModeEnLigne') && window.firebaseDB && document.getElementById('versionJeu').innerText && !document.documentElement.classList.contains('chargement')" 30 | Out-Null
   Eval $onglet ("window.__console = []; ['log', 'warn', 'error'].forEach((t) => { const f = console[t].bind(console); console[t] = (...a) => { const s = a.map(x => (x && x.stack) ? x.stack : String(x)).join(' '); if (/FIREBASE|rror/.test(s)) window.__console.push(t + ': ' + s.slice(0, 400)); f(...a); }; }); window.__toasts = []; new MutationObserver(() => { const t = document.getElementById('toastEnLigne'); if (t && t.innerText && window.__toasts[window.__toasts.length - 1] !== t.innerText) window.__toasts.push(t.innerText); }).observe(document.documentElement, { subtree: true, childList: true, characterData: true }); window.__alertes = []; window.alert = (m) => window.__alertes.push(String(m)); window.confirm = (m) => { window.__alertes.push('CONFIRM: ' + String(m).slice(0, 70)); return true; }; " + $auto + "; 'ok'") | Out-Null
 }
 $retournees = "document.querySelectorAll('#plateau .Carte.retournee').length"

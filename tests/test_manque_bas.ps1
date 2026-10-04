@@ -81,14 +81,14 @@ $rect = "(sel) => { const e = document.querySelector(sel); if (!e) return sel + 
 $accueil = "(() => { const b = document.getElementById('btnAccueilEnLigne'); return getComputedStyle(b).display === 'none' ? 'caché' : 'visible'; })()"
 try {
   $O = Ouvrir $jeu; Telephone $O
-  Attendre $O "document.getElementById('versionJeu') && document.getElementById('versionJeu').innerText" 30 | Out-Null
+  Attendre $O "document.getElementById('versionJeu') && document.getElementById('versionJeu').innerText && !document.documentElement.classList.contains('chargement')" 30 | Out-Null
   Cdp $O "Page.enable" @{} | Out-Null
   Cdp $O "Emulation.setUserAgentOverride" @{ userAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1" } | Out-Null
   Cdp $O "Page.addScriptToEvaluateOnNewDocument" @{ source = "Object.defineProperty(Navigator.prototype, 'standalone', { get: () => true, configurable: true }); window.__err = []; addEventListener('error', (e) => window.__err.push(e.message));" } | Out-Null
   Iphone $O 793
   Eval $O "localStorage.clear(); localStorage.setItem('alcuno_theme', 'violet'); location.reload(); 'ok'" | Out-Null
   Start-Sleep -Seconds 3
-  Attendre $O "document.getElementById('versionJeu') && document.getElementById('versionJeu').innerText" 30 | Out-Null
+  Attendre $O "document.getElementById('versionJeu') && document.getElementById('versionJeu').innerText && !document.documentElement.classList.contains('chargement')" 30 | Out-Null
   Eval $O "window.__rect = $rect; 'ok'" | Out-Null
   Write-Output "Fenêtre 793 / écran 852 : classe manque-bas = $(Eval $O "document.documentElement.classList.contains('manque-bas')") | --manque-bas = $(Eval $O "document.documentElement.style.getPropertyValue('--manque-bas')")"
   Write-Output "Diagnostic : $(Eval $O "(() => { let t = ''; const n = navigator.clipboard; return 'ok'; })()")"
@@ -128,7 +128,7 @@ try {
   Write-Output "⌂ en salle d'attente : $(Eval $O $accueil)"
   Eval $O "location.reload(); 'ok'" | Out-Null
   Start-Sleep -Seconds 3
-  Attendre $O "document.getElementById('versionJeu') && document.getElementById('versionJeu').innerText" 30 | Out-Null
+  Attendre $O "document.getElementById('versionJeu') && document.getElementById('versionJeu').innerText && !document.documentElement.classList.contains('chargement')" 30 | Out-Null
   Eval $O "window.__rect = $rect; 'ok'" | Out-Null
   # Partie + overlay avec la fenêtre courte
   Eval $O $partie | Out-Null

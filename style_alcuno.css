@@ -1,4 +1,9 @@
 /* ===== GLOBAL ===== */
+/* Le temps que tous les fichiers du jeu soient exécutés (quelques millisecondes) : pas de tap */
+html.chargement body{
+  pointer-events: none;
+}
+
 /* Anti scroll horizontal (iOS/Android) */
 
 body{

@@ -76,7 +76,7 @@ function Telephone($onglet) {
 $pt = "const n = document.getElementById('notifHaut'); const ev = (t, y) => n.dispatchEvent(new PointerEvent(t, { bubbles: true, pointerId: 7, clientX: 200, clientY: y }));"
 try {
   $O = Ouvrir $jeu; Telephone $O
-  Attendre $O "document.getElementById('versionJeu') && document.getElementById('versionJeu').innerText" 30 | Out-Null
+  Attendre $O "document.getElementById('versionJeu') && document.getElementById('versionJeu').innerText && !document.documentElement.classList.contains('chargement')" 30 | Out-Null
   Eval $O "localStorage.clear(); localStorage.setItem('alcuno_theme', 'prestige'); localStorage.setItem('alcuno_theme_prestige', '1'); location.reload(); 'ok'" | Out-Null; Start-Sleep -Seconds 3
   Capturer $O "or_accueil"
   Eval $O "window.__erreursTest = []; window.addEventListener('error', (e) => window.__erreursTest.push(e.message)); localStorage.removeItem('alcuno_theme_prestige'); 'ok'" | Out-Null

@@ -49,7 +49,7 @@ function Attendre($onglet, [string]$condition, [int]$maxSec = 60) {
   return Eval $onglet $expr
 }
 function Preparer($onglet) {
-  Attendre $onglet "document.getElementById('btnModeEnLigne') && window.firebaseDB && document.getElementById('versionJeu').innerText" 30 | Out-Null
+  Attendre $onglet "document.getElementById('btnModeEnLigne') && window.firebaseDB && document.getElementById('versionJeu').innerText && !document.documentElement.classList.contains('chargement')" 30 | Out-Null
   Eval $onglet ("window.__alertes = []; window.alert = (m) => window.__alertes.push(String(m)); window.confirm = (m) => { window.__alertes.push('CONFIRM: ' + String(m).slice(0, 70)); return true; }; " + $auto + "; 'ok'") | Out-Null
 }
 $retournees = "document.querySelectorAll('#plateau .Carte.retournee').length"

@@ -74,7 +74,7 @@ function Telephone($onglet) {
   Cdp $onglet "Emulation.setDeviceMetricsOverride" @{ width = 390; height = 844; deviceScaleFactor = 1; mobile = $true } | Out-Null
 }
 $etat = "JSON.stringify({ chargements: sessionStorage.getItem('__chargements'), theme: document.documentElement.dataset.theme, reglages: getComputedStyle(document.getElementById('ecranReglages')).display, defil: document.getElementById('ecranReglages').scrollTop, classe: document.documentElement.classList.contains('rouvrir-reglages'), drapeau: sessionStorage.getItem('alcuno_rouvrir_reglages'), meta: Array.from(document.querySelectorAll('meta[name=theme-color]')).map(m => m.content).join(','), erreurs: window.__err })"
-$pret = "document.getElementById('versionJeu') && document.getElementById('versionJeu').innerText.includes('8.8')"
+$pret = "document.getElementById('versionJeu') && document.getElementById('versionJeu').innerText && !document.documentElement.classList.contains('chargement')"
 try {
   $O = Ouvrir $jeu; Telephone $O
   Attendre $O $pret 30 | Out-Null

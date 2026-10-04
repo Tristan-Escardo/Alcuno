@@ -6,7 +6,8 @@ GRAINE="${1:-12345}"
 perl -0pe "
   s{<script type=\"module\">.*?</script>}{}s;
   s{href=\"style_alcuno\.css}{href=\"$W/style_alcuno.css};
-  s{src=\"script\.js}{src=\"$W/script.js};
+  s{src=\"' \+ f}{src=\"$W/' + f}g;
+  s{href=\"' \+ f}{href=\"$W/' + f}g;
   s{<head>}{<head>\n<script src=\"prelude.js\"></script>};
   s{</body>}{<script src=\"joueur_auto.js\"></script>\n</body>};
 " "$P/index.html" > "$S/partie.html"

@@ -78,12 +78,12 @@ $espion = "window.__ctxs = []; const C = window.AudioContext; window.AudioContex
 $tap = "document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })); 'ok'"
 try {
   $O = Ouvrir $jeu; Telephone $O
-  Attendre $O "document.getElementById('versionJeu') && document.getElementById('versionJeu').innerText" 30 | Out-Null
+  Attendre $O "document.getElementById('versionJeu') && document.getElementById('versionJeu').innerText && !document.documentElement.classList.contains('chargement')" 30 | Out-Null
   Cdp $O "Page.enable" @{} | Out-Null
   Cdp $O "Page.addScriptToEvaluateOnNewDocument" @{ source = $espion } | Out-Null
   Eval $O "localStorage.clear(); localStorage.setItem('alcuno_theme', 'prestige'); localStorage.setItem('alcuno_theme_prestige', '1'); location.reload(); 'ok'" | Out-Null
   Start-Sleep -Seconds 3
-  Attendre $O "document.getElementById('versionJeu') && document.getElementById('versionJeu').innerText" 30 | Out-Null
+  Attendre $O "document.getElementById('versionJeu') && document.getElementById('versionJeu').innerText && !document.documentElement.classList.contains('chargement')" 30 | Out-Null
   Eval $O $tap | Out-Null
   Start-Sleep -Seconds 3
   $duree = Eval $O "fetch('Sons/distribuer_gorgees.mp3').then(r => r.arrayBuffer()).then(d => new (Object.getPrototypeOf(window.__ctxs[0]).constructor)().decodeAudioData(d)).then(b => Math.round(b.duration * 100) / 100)"
