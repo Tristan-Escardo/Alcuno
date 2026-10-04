@@ -4405,7 +4405,7 @@ html[data-theme="givre"] input:focus{
 }
 
 /* Réglages > Thème : chaque nom dans la couleur de son thème (--c sur fond sombre, --c-givre sur le
-   fond clair de Givre, posées sur chaque pastille dans index.html), avec un émoji */
+   fond clair de Givre, posées sur chaque pastille dans index.html) */
 #ecranReglages .pastilleTheme,
 #ecranReglages .pastilleTheme[aria-pressed="true"]{
   color: var(--c);
@@ -4420,19 +4420,4 @@ html[data-theme="givre"] #ecranReglages .pastilleTheme[aria-pressed="true"]{
 }
 #ecranReglages .pastilleTheme[aria-pressed="true"] .nomTheme{
   opacity: 1;
-}
-/* textes plus gros (accessibilité) ou petit téléphone : l'émoji passe sous le nom, sinon les noms se chevauchent */
-html.accessibilite #ecranReglages .pastilleTheme .nomTheme{
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-}
-@media (max-width: 379px){
-  #ecranReglages .pastilleTheme .nomTheme{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-  }
 }
