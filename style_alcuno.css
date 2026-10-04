@@ -4083,3 +4083,325 @@ html.credits-ouverts body::before{ display: none; }
 /* Overlay ouvert (fond noir) : la page derrière passe en noir aussi (sinon bandes dorées en Prestige) */
 html.overlay-ouvert body{ background: #000; }
 html.overlay-ouvert body::before{ display: none; }
+
+
+/* ===== Thème clair « Givre » : bleu glacier, texte bleu nuit, boutons cyan (sans motif) =====
+   Le jeu est fait pour des fonds sombres : ce bloc remplace les couleurs claires (blanc, or) des
+   écrans du thème par des couleurs foncées. Les overlays des règles et les cartes ne changent pas.
+   --couleur-barre : bleu moyen, pour que l'heure de l'iPhone reste lisible (en blanc comme en noir). */
+html[data-theme="givre"]{
+  --fond-theme: #e4f5fc;
+  --couleur-barre: #2a7fb0;
+  --givre-texte: #0d3550;
+  --givre-doux: #3f6680;
+  --givre-accent: #0f6aa6;
+  --givre-bouton: linear-gradient(180deg, #27aee8, #1474b8);
+  --givre-panneau: rgba(255, 255, 255, 0.78);
+  --givre-bord: rgba(20, 121, 184, 0.28);
+  --deco-theme: linear-gradient(transparent, transparent);
+}
+
+html[data-theme="givre"] body{
+  color: var(--givre-texte);
+}
+
+/* Titres ALCUNO (accueil, bandeau, créateurs) et symboles dorés : bleu glacier en relief */
+html[data-theme="givre"] #choixMode #titreAccueil,
+html[data-theme="givre"] header h1,
+html[data-theme="givre"] #ecranCredits .credits-titre{
+  color: #1a9be0;
+  text-shadow:
+    0 3px 0 #0b5a8c,
+    0 6px 14px rgba(13, 53, 80, 0.25),
+    0 0 26px rgba(255, 255, 255, 0.9);
+}
+html[data-theme="givre"] #choixMode #titreAccueil{
+  animation: fadeIn 0.25s ease forwards, lueurTitreGivre 3.5s ease-in-out 0.3s infinite;
+}
+@keyframes lueurTitreGivre{
+  0%, 100% { text-shadow: 0 3px 0 #0b5a8c, 0 6px 14px rgba(13, 53, 80, 0.25), 0 0 26px rgba(255, 255, 255, 0.9); }
+  50%      { text-shadow: 0 3px 0 #0b5a8c, 0 6px 14px rgba(13, 53, 80, 0.25), 0 0 40px rgba(255, 255, 255, 1); }
+}
+html[data-theme="givre"] #choixMode .titreAccueilBarre{
+  box-shadow: 0 0 14px rgba(26, 155, 224, 0.3);
+}
+html[data-theme="givre"] #btnAccueilClassique,
+html[data-theme="givre"] #enLigne #btnAccueilEnLigne,
+html[data-theme="givre"] #ecranNouvellePartie #btnAccueil{
+  color: #1a9be0;
+  -webkit-text-stroke-color: #1a9be0;
+  text-shadow: 0 2px 0 #0b5a8c, 0 3px 8px rgba(13, 53, 80, 0.2);
+}
+html[data-theme="givre"] #choixMode #btnReglages path,
+html[data-theme="givre"] #choixMode #btnReglages circle{
+  stroke: #1a9be0;
+}
+html[data-theme="givre"] #choixMode #btnReglages svg{
+  filter: drop-shadow(0 2px 0 #0b5a8c) drop-shadow(0 3px 6px rgba(13, 53, 80, 0.2));
+}
+
+/* Titres des écrans */
+html[data-theme="givre"] #ecranNouvellePartie h2,
+html[data-theme="givre"] #ecranConfirmerHote h2,
+html[data-theme="givre"] #ecranConfirmerRetrait h2,
+html[data-theme="givre"] #ecranConfirmerAccueil h2,
+html[data-theme="givre"] #ecranChoixPseudo h2,
+html[data-theme="givre"] #enLigne h2,
+html[data-theme="givre"] #enLigne h3,
+html[data-theme="givre"] #ecranReglages h2,
+html[data-theme="givre"] #suppression h2{
+  color: var(--givre-accent);
+  text-shadow: 0 2px 8px rgba(255, 255, 255, 0.9);
+}
+html[data-theme="givre"] #ecranConfirmerHote .texteConfirmation,
+html[data-theme="givre"] #ecranConfirmerRetrait .texteConfirmation,
+html[data-theme="givre"] #ecranConfirmerAccueil .texteConfirmation,
+html[data-theme="givre"] #ecranChoixPseudo .texteConfirmation{
+  color: var(--givre-texte);
+  text-shadow: none;
+}
+
+/* Boutons : cyan glacé, texte blanc */
+html[data-theme="givre"] #choixMode button:not(#btnReglages):not(.btnAccueilTexte),
+html[data-theme="givre"] #ecranNouvellePartie button:not(.btnAccueilTexte),
+html[data-theme="givre"] #ecranConfirmerHote button,
+html[data-theme="givre"] #ecranConfirmerRetrait button,
+html[data-theme="givre"] #ecranConfirmerAccueil button,
+html[data-theme="givre"] #ecranChoixPseudo button,
+html[data-theme="givre"] #enLigne button:not(.btnAccueilTexte):not(.btnExclure),
+html[data-theme="givre"] .menu button,
+html[data-theme="givre"] .suppression button,
+html[data-theme="givre"] #termineSuppression,
+html[data-theme="givre"] #ecranReglages .btnRetour,
+html[data-theme="givre"] #ecranCredits .btnRetour,
+html[data-theme="givre"] #ecranReglages #btnPartagerJeu,
+html[data-theme="givre"] #ecranReglages .optionAction button{
+  background: var(--givre-bouton);
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(8, 60, 100, 0.55);
+  box-shadow:
+    inset 0 -2px 0 rgba(8, 60, 100, 0.25),
+    0 6px 14px rgba(26, 146, 214, 0.28);
+}
+html[data-theme="givre"] #listeSuppression .supp-retrait{
+  background: #fff;
+  color: var(--givre-texte);
+  text-shadow: none;
+  box-shadow: 0 0 0 1px var(--givre-bord) inset;
+}
+html[data-theme="givre"] .btnRetour:hover,
+html[data-theme="givre"] .btnAccueil:hover{
+  background: linear-gradient(180deg, #6fd6f6, #3aa6e0) !important;
+}
+
+/* Champs de texte */
+html[data-theme="givre"] #enLigne input,
+html[data-theme="givre"] #menu input{
+  background: #fff;
+  color: var(--givre-texte);
+  border: 1px solid var(--givre-bord);
+  box-shadow: none;
+}
+html[data-theme="givre"] #enLigne input::placeholder,
+html[data-theme="givre"] #menu input::placeholder{
+  color: #7a98ad;
+}
+
+/* Panneaux : blancs, bord bleuté */
+html[data-theme="givre"] header{
+  background: var(--givre-panneau);
+  box-shadow: inset 0 0 0 1px var(--givre-bord), 0 10px 24px rgba(13, 53, 80, 0.1);
+}
+html[data-theme="givre"] header::before{
+  display: none;
+}
+html[data-theme="givre"] #menu,
+html[data-theme="givre"] .messages{
+  background: var(--givre-panneau);
+  box-shadow: inset 0 0 0 1px var(--givre-bord);
+}
+html[data-theme="givre"] .blocMessages{
+  border-color: var(--givre-bord);
+}
+html[data-theme="givre"] .titreBloc{
+  color: var(--givre-doux);
+}
+html[data-theme="givre"] .joueurActif{
+  color: var(--givre-accent);
+}
+html[data-theme="givre"] .listeJoueurs{
+  color: #0a7f9e;
+}
+html[data-theme="givre"] .nomsJoueurs,
+html[data-theme="givre"] #listeJoueursEnLigne div{
+  color: #0a7f8a;
+}
+html[data-theme="givre"] .bonus-annulation{
+  color: #c06a00;
+}
+html[data-theme="givre"] .regleZero,
+html[data-theme="givre"] .reglePigeon{
+  color: #b05e00;
+}
+html[data-theme="givre"] #messageTexte{
+  text-shadow: 0 2px 6px rgba(13, 53, 80, 0.25);
+}
+html[data-theme="givre"] header .badgeSoft,
+html[data-theme="givre"] #enLigne .infoModeSoft{
+  color: #17803a;
+}
+
+/* Bandeau « Tour de » : pastille bleu nuit (le nom reste en couleur, lisible) */
+html[data-theme="givre"] #stickyJoueurActif{
+  background: linear-gradient(180deg, rgba(16, 64, 98, 0.95), rgba(8, 38, 62, 0.93));
+  border-color: rgba(120, 220, 255, 0.35);
+}
+html[data-theme="givre"] #stickyJoueurActif.has-couleur{
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--couleur-jeu) 32%, rgba(16, 64, 98, 0.95)),
+    rgba(8, 38, 62, 0.93));
+}
+
+/* En ligne : salle d'attente, message en bas */
+html[data-theme="givre"] #listeJoueursEnLigne div{
+  background: var(--givre-panneau);
+  box-shadow: 0 0 0 1px var(--givre-bord) inset;
+}
+html[data-theme="givre"] #enLigne .btnExclure{
+  color: var(--givre-texte);
+  background-color: rgba(13, 53, 80, 0.08);
+  text-shadow: none;
+}
+html[data-theme="givre"] #codePartieAffiche{
+  color: var(--givre-accent);
+}
+html[data-theme="givre"] #toastEnLigne{
+  background: #fff;
+  color: var(--givre-accent);
+  box-shadow: 0 0 0 1px var(--givre-bord) inset, 0 8px 24px rgba(13, 53, 80, 0.2);
+}
+
+/* Retirer un joueur */
+html[data-theme="givre"] #listeSuppression{
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 0 1px var(--givre-bord) inset;
+}
+html[data-theme="givre"] #listeSuppression .supp-item{
+  background: #fff;
+  color: var(--givre-texte);
+  box-shadow: 0 0 0 1px var(--givre-bord) inset;
+}
+
+/* Réglages */
+html[data-theme="givre"] #ecranReglages{
+  color: var(--givre-texte);
+}
+html[data-theme="givre"] #ecranReglages .blocReglage,
+html[data-theme="givre"] #ecranReglages .optionReglage{
+  background: var(--givre-panneau);
+  border-color: var(--givre-bord);
+}
+html[data-theme="givre"] #ecranReglages .blocReglage .optionReglage{
+  background: none;
+}
+html[data-theme="givre"] #ecranReglages .optionTitre,
+html[data-theme="givre"] #ecranReglages .volumeValeur{
+  color: var(--givre-accent);
+}
+html[data-theme="givre"] #ecranReglages .optionNote,
+html[data-theme="givre"] #ecranReglages .lienJeu,
+html[data-theme="givre"] #ecranReglages .versionJeu{
+  color: var(--givre-doux);
+}
+html[data-theme="givre"] #ecranReglages .aProposTitre{
+  color: var(--givre-accent);
+}
+html[data-theme="givre"] #ecranReglages .interrupteur{
+  background: rgba(13, 53, 80, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(13, 53, 80, 0.1);
+}
+html[data-theme="givre"] #ecranReglages .optionReglage input:checked + .interrupteur{
+  background: #1a92d6;
+}
+html[data-theme="givre"] #ecranReglages .optionReglage input:checked + .interrupteur::after{
+  background: #fff;
+}
+html[data-theme="givre"] #ecranReglages .ligneVolume input[type="range"]{
+  accent-color: #1a92d6;
+}
+html[data-theme="givre"] #ecranReglages .btnDiagnostic{
+  color: var(--givre-doux);
+  background: rgba(255, 255, 255, 0.6);
+  border-color: var(--givre-bord);
+}
+html[data-theme="givre"] #ecranReglages .qrJeu{
+  box-shadow: 0 0 0 3px rgba(26, 146, 214, 0.45), 0 10px 24px rgba(13, 53, 80, 0.15);
+}
+html[data-theme="givre"] #ecranReglages .pastilleTheme{
+  color: var(--givre-doux);
+}
+html[data-theme="givre"] #ecranReglages .pastilleTheme .rond{
+  border-color: rgba(13, 53, 80, 0.2);
+}
+html[data-theme="givre"] #ecranReglages .pastilleTheme[aria-pressed="true"]{
+  color: var(--givre-accent);
+}
+html[data-theme="givre"] #ecranReglages .pastilleTheme[aria-pressed="true"] .rond{
+  border-color: #1a92d6;
+  box-shadow: 0 0 0 3px rgba(26, 146, 214, 0.3), 0 0 14px rgba(26, 146, 214, 0.35);
+}
+
+/* Créateurs */
+html[data-theme="givre"] #ecranCredits{
+  color: var(--givre-texte);
+  background: var(--fond-theme);
+}
+html[data-theme="givre"] #ecranCredits .credits-phrase{
+  color: var(--givre-texte);
+}
+html[data-theme="givre"] #ecranCredits .credits-phrase strong,
+html[data-theme="givre"] #ecranCredits .credits-nom{
+  color: var(--givre-accent);
+  text-shadow: none;
+}
+html[data-theme="givre"] #ecranCredits .credits-nom{
+  background: var(--givre-panneau);
+  box-shadow: 0 0 0 1px var(--givre-bord) inset;
+}
+html[data-theme="givre"] #ecranCredits .cadrePhoto{
+  background: rgba(255, 255, 255, 0.6);
+  border-color: rgba(26, 146, 214, 0.55);
+  box-shadow: 0 14px 30px rgba(13, 53, 80, 0.2);
+}
+html[data-theme="givre"] #ecranCredits .photoVide{
+  color: var(--givre-accent);
+  border-color: rgba(26, 146, 214, 0.45);
+}
+html[data-theme="givre"] #ecranCredits .credits-pied{
+  color: var(--givre-doux);
+}
+
+/* Accueil (installer l'appli), en ligne (aide, rattrapage), bandeau de mise à jour */
+html[data-theme="givre"] #choixMode .btnInstaller{
+  color: var(--givre-accent);
+  background: rgba(255, 255, 255, 0.7);
+  border-color: var(--givre-bord);
+}
+html[data-theme="givre"] #choixMode .astuceIphone,
+html[data-theme="givre"] #enLigne .aideEnLigne{
+  color: var(--givre-doux);
+}
+html[data-theme="givre"] #choixMode .astuceIphone strong{
+  color: var(--givre-accent);
+}
+html[data-theme="givre"] #ecranRattrapage{
+  color: var(--givre-accent);
+  text-shadow: none;
+}
+html[data-theme="givre"] #bandeauMiseAJour .maj{
+  color: #2b001d;
+}
+html[data-theme="givre"] input:focus{
+  outline: 2px solid #1a92d6;
+  outline-offset: 0;
+}
