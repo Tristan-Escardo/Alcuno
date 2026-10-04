@@ -1,3 +1,7 @@
 # Dossier brut des cartes HD (244 Mo) : converti en WebP dans Cartes/, ne pas envoyer sur GitHub
 Carte uno/
 __MACOSX/
+
+# Tests (tests/README.txt) : fichiers produits en lançant les tests
+tests/partie.html
+tests/acc/
