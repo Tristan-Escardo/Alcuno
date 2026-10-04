@@ -4088,10 +4088,10 @@ html.overlay-ouvert body::before{ display: none; }
 /* ===== Thème clair « Givre » : bleu glacier, texte bleu nuit, boutons cyan (sans motif) =====
    Le jeu est fait pour des fonds sombres : ce bloc remplace les couleurs claires (blanc, or) des
    écrans du thème par des couleurs foncées. Les overlays des règles et les cartes ne changent pas.
-   --couleur-barre : bleu moyen, pour que l'heure de l'iPhone reste lisible (en blanc comme en noir). */
+   --couleur-barre : la couleur du fond (barre du téléphone comprise). */
 html[data-theme="givre"]{
   --fond-theme: #e4f5fc;
-  --couleur-barre: #2a7fb0;
+  --couleur-barre: #e4f5fc;
   --givre-texte: #0d3550;
   --givre-doux: #3f6680;
   --givre-accent: #0f6aa6;
@@ -4122,7 +4122,10 @@ html[data-theme="givre"] #choixMode #titreAccueil{
   0%, 100% { text-shadow: 0 3px 0 #0b5a8c, 0 6px 14px rgba(13, 53, 80, 0.25), 0 0 26px rgba(255, 255, 255, 0.9); }
   50%      { text-shadow: 0 3px 0 #0b5a8c, 0 6px 14px rgba(13, 53, 80, 0.25), 0 0 40px rgba(255, 255, 255, 1); }
 }
-html[data-theme="givre"] #choixMode .titreAccueilBarre{
+/* barre sous le titre (accueil et bandeau des parties) : bleue comme le titre */
+html[data-theme="givre"] #choixMode .titreAccueilBarre,
+html[data-theme="givre"] header::after{
+  background: linear-gradient(90deg, #0b5a8c, #1a9be0 50%, #0b5a8c);
   box-shadow: 0 0 14px rgba(26, 155, 224, 0.3);
 }
 html[data-theme="givre"] #btnAccueilClassique,
