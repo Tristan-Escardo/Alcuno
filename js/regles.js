@@ -287,7 +287,7 @@ function afficherOverlayResultatAnnulation(message, afterClose = null){
   texte.style.fontSize = "clamp(22px, 5vw, 42px)";
   texte.style.fontWeight = "900";
   texte.style.textShadow = "2px 2px 5px #000";
-  texte.style.maxWidth = "min(820px, 92vw)";
+  texte.style.maxWidth = "min(820px, 100%)";
   overlay.appendChild(texte);
 
   let enFermeture = false;
@@ -361,7 +361,7 @@ function afficherOverlayAnnulation(joueurIndex, nbGorgees, onDone = null, afterC
   sousTitre.innerText = "Combien de gorgées veux-tu annuler ?";
   sousTitre.style.fontSize = "clamp(18px, 4vw, 28px)";
   sousTitre.style.fontWeight = "800";
-  sousTitre.style.maxWidth = "min(780px, 92vw)";
+  sousTitre.style.maxWidth = "min(780px, 100%)";
   overlay.appendChild(sousTitre);
 
   const boutons = document.createElement("div");
@@ -369,7 +369,7 @@ function afficherOverlayAnnulation(joueurIndex, nbGorgees, onDone = null, afterC
   boutons.style.flexWrap = "wrap";
   boutons.style.justifyContent = "center";
   boutons.style.gap = "14px";
-  boutons.style.width = "min(760px, 92vw)";
+  boutons.style.width = "min(760px, 100%)"; // (92vw dépassait de la marge de l'overlay : il défilait de côté)
   overlay.appendChild(boutons);
 
   let enFermeture = false;
@@ -392,7 +392,7 @@ function afficherOverlayAnnulation(joueurIndex, nbGorgees, onDone = null, afterC
     const btn = document.createElement("button");
     btn.className = "bouton-annulation";
     btn.innerText = `Annuler ${i}`;
-    btn.style.width = "min(420px, 92vw)";
+    btn.style.width = "min(420px, 100%)";
     btn.style.padding = "clamp(12px, 3.2vw, 22px)";
     btn.style.fontSize = "clamp(16px, 4vw, 28px)";
     btn.style.fontWeight = "800";

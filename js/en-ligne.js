@@ -694,13 +694,18 @@ function majCoupureReseau(connecte){
     jouerSon("no_wifi"); // une seule fois par coupure (quand le logo apparaît), pas en boucle
     logo.innerHTML =
       '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" aria-hidden="true">' +
-        '<g stroke="#ff2a2a" stroke-width="2.2">' +
+        // Découpe transparente des ondes autour de la barre (avant : une barre foncée dessous,
+        // qui faisait un contour noir)
+        '<mask id="coupureWifiMasque" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">' +
+          '<rect width="24" height="24" fill="#fff"/>' +
+          '<path d="M3.5 3.5l17 17" stroke="#000" stroke-width="4.6"/>' +
+        '</mask>' +
+        '<g stroke="#ff2a2a" stroke-width="2.2" mask="url(#coupureWifiMasque)">' +
           '<path d="M2 8.8a15 15 0 0 1 20 0"/>' +
           '<path d="M5.2 12.2a10.5 10.5 0 0 1 13.6 0"/>' +
           '<path d="M8.6 15.6a5.5 5.5 0 0 1 6.8 0"/>' +
         '</g>' +
-        '<circle cx="12" cy="19.4" r="1.4" fill="#ff2a2a"/>' +
-        '<path d="M3.5 3.5l17 17" stroke="#2B001D" stroke-width="4.6"/>' +
+        '<circle cx="12" cy="19.4" r="1.4" fill="#ff2a2a" mask="url(#coupureWifiMasque)"/>' +
         '<path d="M3.5 3.5l17 17" stroke="#ff2a2a" stroke-width="2.4"/>' +
       '</svg>';
   }, 1500);

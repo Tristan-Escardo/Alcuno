@@ -935,7 +935,7 @@ button,
 }
 
 #overlayFinUnRestants .fin-un-lignes{
-  width: min(900px, 92vw);
+  width: min(900px, 100%); /* (92vw dépassait de la marge intérieure : l'overlay défilait de côté) */
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -1683,12 +1683,12 @@ body.no-scroll{
 
 @media (max-width: 520px){
   #overlayDuel .duel-content{
-    width: min(96vw, 520px);
+    width: min(100%, 520px); /* (96vw dépassait de la marge intérieure) */
     gap: 14px;
   }
 
   #overlayDuel .duel-boutons{
-    width: min(96vw, 420px);
+    width: min(100%, 420px);
     gap: 14px;
   }
 
@@ -2390,7 +2390,7 @@ header h1{
 
 /* Boutons des joueurs : or métallique, texte rubis */
 #overlayCarteDoree .doree-boutons{
-  width: min(420px, 92vw);
+  width: min(420px, 100%); /* (92vw : dépassait, l'overlay défilait de côté) */
   margin-bottom: auto;
   padding-top: 6px;
   display: flex;
