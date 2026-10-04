@@ -5,6 +5,16 @@ TESTS DU JEU
 Il faut Google Chrome installé à l'endroit habituel (C:\Program Files\Google\Chrome\Application\chrome.exe).
 Les tests ouvrent Chrome sans fenêtre et jouent tout seuls.
 
+Tout lancer d'un coup (environ 10 minutes)
+------------------------------------------
+  Dans PowerShell, depuis le dossier tests :  powershell -File tout_tester.ps1
+     -enLigne : ajoute les tests en ligne (vrai Firebase, environ 15 minutes de plus)
+     -rapide  : lisibilité seulement sur Givre et Bordeaux (au lieu des 8 thèmes)
+
+  Lance les tests ci-dessous l'un après l'autre (et le petit serveur web des tests de sons), vérifie
+  la sortie de chacun et affiche un résumé. Résultat attendu : « TOUT EST OK ».
+  La sortie complète de chaque test est gardée dans tests/resultats/ (ignoré par git).
+
 Partie classique (le plus important, environ 1 minute)
 ------------------------------------------------------
   bash tests/generer.sh          (depuis le dossier du jeu, dans Git Bash)
@@ -37,7 +47,9 @@ Autres vérifications
                                captures dans tests/acc/ (ignoré par git)
   test_sons.ps1, test_annuler.ps1   sons (distribution, annulation, relance du son coupé). Ces deux-là
                                ont besoin d'un petit serveur : depuis le dossier du jeu,
-                               python3 -m http.server 8765 , puis lancer le test dans un autre terminal.
+                               python tests/serveur.py , puis lancer le test dans un autre terminal
+                               (pas « python -m http.server » : il refuse des connexions sous Windows
+                               et des fichiers du jeu échouent au hasard).
 
 Lisibilité des textes dans tous les thèmes (environ 5 minutes)
 --------------------------------------------------------------
