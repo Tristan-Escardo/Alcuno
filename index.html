@@ -115,14 +115,14 @@
                 </div>
 
                 <div class="blocReglage">
-                    <label class="optionReglage" for="optionSons">
+                    <div class="optionReglage">
                         <span class="optionTexte">
                             <span class="optionTitre">Sons</span>
                             <span class="optionNote">Carte tirée, carte dorée, pigeon, ton tour en ligne. iPhone : le mode silencieux coupe les sons.</span>
                         </span>
-                        <input type="checkbox" id="optionSons" checked>
-                        <span class="interrupteur" aria-hidden="true"></span>
-                    </label>
+                        <input type="checkbox" id="optionSons" checked aria-label="Sons">
+                        <label class="interrupteur" for="optionSons" aria-hidden="true"></label>
+                    </div>
                     <div class="ligneVolume" id="ligneVolume">
                         <span class="volumeIcone" aria-hidden="true">🔈</span>
                         <input type="range" id="volumeSons" min="0" max="100" step="5" value="100" aria-label="Volume des sons">
@@ -131,51 +131,51 @@
                     </div>
                 </div>
 
-                <label class="optionReglage" for="optionVibrations">
+                <div class="optionReglage">
                     <span class="optionTexte">
                         <span class="optionTitre">Vibrations</span>
                         <span class="optionNote">Android uniquement</span>
                     </span>
-                    <input type="checkbox" id="optionVibrations" checked>
-                    <span class="interrupteur" aria-hidden="true"></span>
-                </label>
+                    <input type="checkbox" id="optionVibrations" checked aria-label="Vibrations">
+                    <label class="interrupteur" for="optionVibrations" aria-hidden="true"></label>
+                </div>
 
-                <label class="optionReglage" for="optionEcranAllume">
+                <div class="optionReglage">
                     <span class="optionTexte">
                         <span class="optionTitre">Écran toujours allumé</span>
                         <span class="optionNote">Pendant les parties, le téléphone ne se met pas en veille.</span>
                     </span>
-                    <input type="checkbox" id="optionEcranAllume" checked>
-                    <span class="interrupteur" aria-hidden="true"></span>
-                </label>
+                    <input type="checkbox" id="optionEcranAllume" checked aria-label="Écran toujours allumé">
+                    <label class="interrupteur" for="optionEcranAllume" aria-hidden="true"></label>
+                </div>
 
-                <label class="optionReglage" for="optionAccessibilite">
+                <div class="optionReglage">
                     <span class="optionTexte">
                         <span class="optionTitre">Accessibilité pour les gens bourrés 🍻</span>
                         <span class="optionNote">Textes et boutons plus gros.</span>
                     </span>
-                    <input type="checkbox" id="optionAccessibilite">
-                    <span class="interrupteur" aria-hidden="true"></span>
-                </label>
+                    <input type="checkbox" id="optionAccessibilite" aria-label="Accessibilité pour les gens bourrés 🍻">
+                    <label class="interrupteur" for="optionAccessibilite" aria-hidden="true"></label>
+                </div>
 
-                <label class="optionReglage" for="optionModeSoft">
+                <div class="optionReglage">
                     <span class="optionTexte">
                         <span class="optionTitre">Mode PJ</span>
                         <span class="optionNote">Tu prends 2x moins cher que dans la version normale.<br>En ligne : c'est le réglage de l'hôte qui compte, quand il crée la partie.</span>
                     </span>
-                    <input type="checkbox" id="optionModeSoft">
-                    <span class="interrupteur" aria-hidden="true"></span>
-                </label>
+                    <input type="checkbox" id="optionModeSoft" aria-label="Mode PJ">
+                    <label class="interrupteur" for="optionModeSoft" aria-hidden="true"></label>
+                </div>
 
                 <div class="blocReglage">
-                    <label class="optionReglage" for="optionRappelEau">
+                    <div class="optionReglage">
                         <span class="optionTexte">
                             <span class="optionTitre">Rappel «&nbsp;Bois de l'eau&nbsp;💧&nbsp;»</span>
                             <span class="optionNote">Toutes les 30 minutes de partie.</span>
                         </span>
-                        <input type="checkbox" id="optionRappelEau">
-                        <span class="interrupteur" aria-hidden="true"></span>
-                    </label>
+                        <input type="checkbox" id="optionRappelEau" aria-label="Rappel « Bois de l'eau 💧 »">
+                        <label class="interrupteur" for="optionRappelEau" aria-hidden="true"></label>
+                    </div>
                 </div>
 
                 <!-- Partie en ligne dont ce téléphone se souvient (affiché seulement s'il y en a une) -->
