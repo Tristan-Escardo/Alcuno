@@ -4341,14 +4341,8 @@ html[data-theme="givre"] #ecranReglages .btnDiagnostic{
 html[data-theme="givre"] #ecranReglages .qrJeu{
   box-shadow: 0 0 0 3px rgba(26, 146, 214, 0.45), 0 10px 24px rgba(13, 53, 80, 0.15);
 }
-html[data-theme="givre"] #ecranReglages .pastilleTheme{
-  color: var(--givre-doux);
-}
 html[data-theme="givre"] #ecranReglages .pastilleTheme .rond{
   border-color: rgba(13, 53, 80, 0.2);
-}
-html[data-theme="givre"] #ecranReglages .pastilleTheme[aria-pressed="true"]{
-  color: var(--givre-accent);
 }
 html[data-theme="givre"] #ecranReglages .pastilleTheme[aria-pressed="true"] .rond{
   border-color: #1a92d6;
@@ -4408,4 +4402,37 @@ html[data-theme="givre"] #bandeauMiseAJour .maj{
 html[data-theme="givre"] input:focus{
   outline: 2px solid #1a92d6;
   outline-offset: 0;
+}
+
+/* Réglages > Thème : chaque nom dans la couleur de son thème (--c sur fond sombre, --c-givre sur le
+   fond clair de Givre, posées sur chaque pastille dans index.html), avec un émoji */
+#ecranReglages .pastilleTheme,
+#ecranReglages .pastilleTheme[aria-pressed="true"]{
+  color: var(--c);
+}
+html[data-theme="givre"] #ecranReglages .pastilleTheme,
+html[data-theme="givre"] #ecranReglages .pastilleTheme[aria-pressed="true"]{
+  color: var(--c-givre);
+}
+#ecranReglages .pastilleTheme .nomTheme{
+  white-space: nowrap;
+  opacity: 0.8;
+}
+#ecranReglages .pastilleTheme[aria-pressed="true"] .nomTheme{
+  opacity: 1;
+}
+/* textes plus gros (accessibilité) ou petit téléphone : l'émoji passe sous le nom, sinon les noms se chevauchent */
+html.accessibilite #ecranReglages .pastilleTheme .nomTheme{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+@media (max-width: 379px){
+  #ecranReglages .pastilleTheme .nomTheme{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
 }
