@@ -3634,7 +3634,7 @@ html.clavier-ouvert #enLigne > div{
    Tout le fond (jeu, menus, réglages…) utilise --fond-theme ; les cartes, le doré et les
    écrans d'annonce noirs ne changent pas. */
 :root{ --fond-theme: rgb(43, 0, 29); }              /* Bordeaux (par défaut) */
-html[data-theme="noir"]{ --fond-theme: #0e0e12; }
+html[data-theme="noir"]{ --fond-theme: #000000; }   /* thème « Sombre » : noir pur */
 html[data-theme="vert"]{ --fond-theme: #08301e; }   /* vert casino */
 html[data-theme="bleu"]{ --fond-theme: #0a1634; }   /* bleu nuit */
 html[data-theme="violet"]{ --fond-theme: #3d0f66; }

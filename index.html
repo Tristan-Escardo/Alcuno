@@ -21,7 +21,7 @@
         // Thème choisi dans les réglages : appliqué tout de suite (pas de flash de bordeaux au chargement)
         try { var theme = localStorage.getItem("alcuno_theme"); if (theme) document.documentElement.dataset.theme = theme; } catch (e) {}
         // Barre du téléphone à la couleur du thème dès le premier affichage (mêmes couleurs que THEMES dans script.js)
-        var couleursBarre = { bordeaux: "#2b001d", noir: "#0e0e12", vert: "#08301e", bleu: "#0a1634", violet: "#3d0f66",
+        var couleursBarre = { bordeaux: "#2b001d", noir: "#000000", vert: "#08301e", bleu: "#0a1634", violet: "#3d0f66",
                               cerisier: "#5a1740", prestige: "#937810" };
         document.write('<meta name="theme-color" content="' + (couleursBarre[theme] || couleursBarre.bordeaux) + '">');
         // iPhone : page rechargée après un changement de thème (voir rafraichirBarreIphone dans script.js) :
@@ -103,7 +103,7 @@
                     </div>
                     <div class="pastillesTheme" role="group" aria-label="Thème">
                         <button type="button" class="pastilleTheme" data-theme="bordeaux"><span class="rond" style="background:#2b001d"></span>Bordeaux</button>
-                        <button type="button" class="pastilleTheme" data-theme="noir"><span class="rond" style="background:#0e0e12"></span>Noir</button>
+                        <button type="button" class="pastilleTheme" data-theme="noir"><span class="rond" style="background:#000000"></span>Sombre</button>
                         <button type="button" class="pastilleTheme" data-theme="vert"><span class="rond" style="background:#08301e"></span>Casino</button>
                         <button type="button" class="pastilleTheme" data-theme="bleu"><span class="rond" style="background:#0a1634"></span>Nuit</button>
                         <button type="button" class="pastilleTheme" data-theme="violet"><span class="rond" style="background:#3d0f66"></span>Violet</button>
