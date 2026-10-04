@@ -4422,3 +4422,105 @@ html[data-theme="givre"] #ecranReglages .pastilleTheme[aria-pressed="true"]{
 #ecranReglages .pastilleTheme[aria-pressed="true"] .nomTheme{
   opacity: 1;
 }
+
+/* ===== Givre : overlays des règles aussi en givre (fond glacier, textes bleus, boutons cyan) =====
+   !important : beaucoup de ces couleurs sont posées par le JS directement sur les éléments
+   (fond noir, texte or, boutons or) ; les cartes et les carrés de couleur ne changent pas. */
+html[data-theme="givre"] :is(#overlayCouleur, #overlayPlus4, #overlayPigeon, #overlayCarteDoree, #overlayFinUnRestants,
+  #overlayDuel, #overlayRegleUnique, #overlayAnnulation, #overlayResultatAnnulation, #overlayPredictionFin, .overlay-opaque){
+  background: var(--fond-theme) !important;
+  color: var(--givre-accent) !important;
+  box-shadow: none !important;
+}
+/* Page derrière, voile entre deux overlays, barre des boutons du +4 */
+html[data-theme="givre"].overlay-ouvert,
+html[data-theme="givre"].overlay-ouvert body,
+html[data-theme="givre"] #voileOverlays,
+html[data-theme="givre"] .plus4-actions{
+  background: var(--fond-theme);
+}
+
+/* Tous les textes : bleu glacier, sans l'ombre noire */
+html[data-theme="givre"] :is(#overlayCouleur, #overlayPlus4, #overlayPigeon, #overlayCarteDoree, #overlayFinUnRestants,
+  #overlayDuel, #overlayRegleUnique, #overlayAnnulation, #overlayResultatAnnulation, #overlayPredictionFin, .overlay-opaque)
+  :not(button):not(button *):not(.Carte){
+  color: var(--givre-accent) !important;
+  text-shadow: none !important;
+}
+/* Textes secondaires : bleu nuit ([data-theme] en double : passe devant la règle de tous les textes) */
+html[data-theme="givre"][data-theme] :is(#overlayRegleUnique .regle-detail, #overlayRegleUnique .doree-texte, #overlayCarteDoree .doree-texte,
+  #overlayPredictionFin .doree-texte, #overlayRegleUnique .celien-citation, #overlayPlus4 .plus4-info, .overlay-subtitle,
+  .fin-choix-recap .ligne, #overlayDuel .duel-info){
+  color: var(--givre-texte) !important;
+}
+/* Grands titres en relief, comme ALCUNO (même astuce) */
+html[data-theme="givre"][data-theme] :is(#overlayRegleUnique .doree-titre, #overlayCarteDoree .doree-titre, #overlayPredictionFin .doree-titre,
+  #overlayRegleUnique .celien-signature, .prediction-title){
+  color: #1a9be0 !important;
+  text-shadow: 0 2px 0 #0b5a8c, 0 0 22px rgba(255, 255, 255, 0.9) !important;
+}
+html[data-theme="givre"] #overlayRegleUnique .celien-bloc{
+  border-top-color: var(--givre-bord);
+}
+
+/* Boutons : cyan glacé, texte blanc (même ceux colorés par le JS) */
+html[data-theme="givre"] :is(#overlayPlus4, #overlayPigeon, #overlayCarteDoree, #overlayFinUnRestants, #overlayDuel,
+  #overlayRegleUnique, #overlayAnnulation, #overlayPredictionFin, .overlay-opaque) button{
+  background: var(--givre-bouton) !important;
+  color: #fff !important;
+  border: none !important;
+  text-shadow: 0 1px 2px rgba(8, 60, 100, 0.55) !important;
+  box-shadow: inset 0 -2px 0 rgba(8, 60, 100, 0.25), 0 6px 14px rgba(26, 146, 214, 0.28) !important;
+}
+html[data-theme="givre"] :is(#overlayPlus4, #overlayPigeon, #overlayCarteDoree, #overlayFinUnRestants, #overlayDuel,
+  #overlayRegleUnique, #overlayAnnulation, #overlayPredictionFin, .overlay-opaque) button *{
+  color: inherit !important;
+}
+
+/* Panneaux du pari de fin : blancs */
+html[data-theme="givre"] :is(.prediction-header, .prediction-subtitle, .fin-choix-recap, .fin-choix-card){
+  background: var(--givre-panneau) !important;
+  border-color: var(--givre-bord) !important;
+  box-shadow: none !important;
+}
+html[data-theme="givre"] .fin-choix-recap .ligne{
+  border-bottom-color: var(--givre-bord);
+}
+
+/* Lueurs dorées des cartes (carte dorée, cartes du duel) : bleues */
+html[data-theme="givre"] :is(#overlayCarteDoree .doree-carte-vedette, #overlayRegleUnique.overlay-doree .Carte,
+  #overlayPredictionFin .reveal-doree .Carte){
+  animation-name: lueurGivre;
+}
+@keyframes lueurGivre{
+  0%, 100% { box-shadow: 0 0 0 1px rgba(26, 146, 214, 0.5), 0 10px 26px rgba(13, 53, 80, 0.25), 0 0 18px rgba(26, 155, 224, 0.3); }
+  50%      { box-shadow: 0 0 0 1px rgba(26, 146, 214, 0.9), 0 10px 26px rgba(13, 53, 80, 0.25), 0 0 38px rgba(26, 155, 224, 0.6); }
+}
+html[data-theme="givre"] #overlayDuel .Carte.duel-a-choisir{
+  animation-name: duelPulseGivre;
+}
+@keyframes duelPulseGivre{
+  0%, 100% { box-shadow: 0 0 0 2px rgba(26, 146, 214, 0.55), 0 0 10px rgba(26, 146, 214, 0.25); }
+  50%      { box-shadow: 0 0 0 2px rgba(26, 146, 214, 0.95), 0 0 28px rgba(26, 146, 214, 0.6); }
+}
+
+/* Annonce « Nouvelle partie » */
+html[data-theme="givre"] #annonceNouvellePartie{
+  background: rgba(228, 245, 252, 0.95);
+}
+html[data-theme="givre"] #annonceNouvellePartie .annonce-titre{
+  color: #1a9be0;
+  text-shadow: 0 2px 0 #0b5a8c, 0 0 26px rgba(255, 255, 255, 0.9);
+}
+html[data-theme="givre"] #annonceNouvellePartie .annonce-texte{
+  color: var(--givre-texte);
+  text-shadow: none;
+}
+
+/* Couleur choisie (bloc Règles, sur panneau blanc) : contour sombre, sinon le jaune ne se lit pas */
+html[data-theme="givre"] #messageTexte{
+  text-shadow: 0 0 2px #0d3550, 0 1px 2px #0d3550, 0 0 1px #0d3550;
+}
+html[data-theme="givre"] #overlayCouleur .carre-couleur{
+  box-shadow: 0 6px 16px rgba(13, 53, 80, 0.25);
+}

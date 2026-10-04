@@ -38,3 +38,17 @@ Autres vérifications
   test_sons.ps1, test_annuler.ps1   sons (distribution, annulation, relance du son coupé). Ces deux-là
                                ont besoin d'un petit serveur : depuis le dossier du jeu,
                                python3 -m http.server 8765 , puis lancer le test dans un autre terminal.
+
+Lisibilité des textes dans tous les thèmes (environ 5 minutes)
+--------------------------------------------------------------
+  Dans PowerShell, depuis le dossier tests :  powershell -File test_contraste.ps1
+  (un seul thème, plus rapide :  powershell -File test_contraste.ps1 -themes givre)
+
+  Passe sur chaque écran (accueil, réglages, en ligne, plateau, créateurs…) et sur chaque overlay
+  des règles (en Givre et en Bordeaux), et mesure le contraste de chaque texte avec son fond.
+  Compare à contraste_reference.txt (les textes déjà connus un peu pâles, comme le blanc sur les
+  boutons jaunes) : signale tout texte NOUVEAU sous le seuil, ou MOINS BIEN lisible qu'avant.
+  Résultat attendu : « RÉSULTAT : OK ».
+  Si un changement est voulu (nouvelle couleur, nouveau bouton) : relancer avec -enregistrer
+  pour mettre à jour la référence, puis la publier avec le reste.
+  Fichiers : contraste.js (la mesure), contraste_actuel.txt (dernier passage, ignoré par git).

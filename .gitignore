@@ -5,3 +5,4 @@ __MACOSX/
 # Tests (tests/README.txt) : fichiers produits en lançant les tests
 tests/partie.html
 tests/acc/
+tests/contraste_actuel.txt

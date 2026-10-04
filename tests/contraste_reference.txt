@@ -1,0 +1,265 @@
+bleu | accueil | #choixMode > #btnModeClassique « Mode classique (Hors connexion »	1.51
+bleu | accueil | #choixMode > #btnModeEnLigne « Mode en ligne »	1.51
+bleu | créateurs | #ecranCredits > #btnFermerCredits « ← Retour »	1.51
+bleu | ecranChoixPseudo | #ecranChoixPseudo > #btnChoixPseudoAnnuler « Annuler »	1.51
+bleu | ecranConfirmerAccueil | #ecranConfirmerAccueil > #btnConfirmerAccueilNon « Non »	1.51
+bleu | ecranConfirmerAccueil | #ecranConfirmerAccueil > #btnConfirmerAccueilOui « Oui »	1.51
+bleu | ecranConfirmerHote | #ecranConfirmerHote > #btnConfirmerHoteNon « Non »	1.51
+bleu | ecranConfirmerHote | #ecranConfirmerHote > #btnConfirmerHoteOui « Oui »	1.51
+bleu | ecranConfirmerRetrait | #ecranConfirmerRetrait > #btnConfirmerRetraitNon « Non »	1.51
+bleu | ecranConfirmerRetrait | #ecranConfirmerRetrait > #btnConfirmerRetraitOui « Oui »	1.51
+bleu | ecranNouvellePartie | #ecranNouvellePartie > #btnModifierJoueurs « Modifier les joueurs »	1.51
+bleu | ecranNouvellePartie | #ecranNouvellePartie > #btnRejouerMemes « Rejouer (avec les mêmes joueur »	1.51
+bleu | ecranNouvellePartie | #ecranNouvellePartie > #btnRetourNouvellePartie « ← Retour »	1.51
+bleu | enLigneChoix | #enLigneChoix > #btnCreerPartie « Créer une partie »	1.51
+bleu | enLigneChoix | #enLigneChoix > #btnRejoindrePartie « Rejoindre une partie »	1.51
+bleu | enLigneChoix | #enLigneChoix > #btnRetourChoixMode « ← Retour »	1.51
+bleu | enLigneCreer | #enLigneCreer > #btnRetourCreer « ← Retour »	1.51
+bleu | enLigneCreer | #enLigneCreer > #validerCreation « Créer »	1.51
+bleu | enLigneRejoindre | #enLigneRejoindre > #btnRetourRejoindre « ← Retour »	1.51
+bleu | enLigneRejoindre | #enLigneRejoindre > #validerRejoindre « Rejoindre »	1.51
+bleu | enLigneRevenir | #enLigneRevenir > #btnRetourRevenir « ← Retour »	1.51
+bleu | enLigneRevenir | #enLigneRevenir > #validerRevenir « Revenir »	1.51
+bleu | plateau | #menu > #nouvellePartie « Nouvelle partie »	1.51
+bleu | plateau | #menu > #supprimerJoueur « Supprimer un joueur »	1.51
+bleu | réglages | #ecranReglages > #btnFermerReglages « ← Retour »	1.51
+bleu | réglages | div.blocPartage > #btnPartagerJeu « 📤 Partager le lien »	1.51
+bleu | retirer un joueur | #suppression > #termineSuppression « Annuler »	1.4
+bleu | salleAttente | #salleAttente > #btnQuitterSalle « ← Retour »	1.51
+bleu | salleAttente | #salleAttente > #lancerPartieEnLigne « Lancer la partie »	1.51
+bordeaux | accueil | #choixMode > #btnModeClassique « Mode classique (Hors connexion »	1.51
+bordeaux | accueil | #choixMode > #btnModeEnLigne « Mode en ligne »	1.51
+bordeaux | créateurs | #ecranCredits > #btnFermerCredits « ← Retour »	1.51
+bordeaux | ecranChoixPseudo | #ecranChoixPseudo > #btnChoixPseudoAnnuler « Annuler »	1.51
+bordeaux | ecranConfirmerAccueil | #ecranConfirmerAccueil > #btnConfirmerAccueilNon « Non »	1.51
+bordeaux | ecranConfirmerAccueil | #ecranConfirmerAccueil > #btnConfirmerAccueilOui « Oui »	1.51
+bordeaux | ecranConfirmerHote | #ecranConfirmerHote > #btnConfirmerHoteNon « Non »	1.51
+bordeaux | ecranConfirmerHote | #ecranConfirmerHote > #btnConfirmerHoteOui « Oui »	1.51
+bordeaux | ecranConfirmerRetrait | #ecranConfirmerRetrait > #btnConfirmerRetraitNon « Non »	1.51
+bordeaux | ecranConfirmerRetrait | #ecranConfirmerRetrait > #btnConfirmerRetraitOui « Oui »	1.51
+bordeaux | ecranNouvellePartie | #ecranNouvellePartie > #btnModifierJoueurs « Modifier les joueurs »	1.51
+bordeaux | ecranNouvellePartie | #ecranNouvellePartie > #btnRejouerMemes « Rejouer (avec les mêmes joueur »	1.51
+bordeaux | ecranNouvellePartie | #ecranNouvellePartie > #btnRetourNouvellePartie « ← Retour »	1.51
+bordeaux | enLigneChoix | #enLigneChoix > #btnCreerPartie « Créer une partie »	1.51
+bordeaux | enLigneChoix | #enLigneChoix > #btnRejoindrePartie « Rejoindre une partie »	1.51
+bordeaux | enLigneChoix | #enLigneChoix > #btnRetourChoixMode « ← Retour »	1.51
+bordeaux | enLigneCreer | #enLigneCreer > #btnRetourCreer « ← Retour »	1.51
+bordeaux | enLigneCreer | #enLigneCreer > #validerCreation « Créer »	1.51
+bordeaux | enLigneRejoindre | #enLigneRejoindre > #btnRetourRejoindre « ← Retour »	1.51
+bordeaux | enLigneRejoindre | #enLigneRejoindre > #validerRejoindre « Rejoindre »	1.51
+bordeaux | enLigneRevenir | #enLigneRevenir > #btnRetourRevenir « ← Retour »	1.51
+bordeaux | enLigneRevenir | #enLigneRevenir > #validerRevenir « Revenir »	1.51
+bordeaux | plateau | #menu > #nouvellePartie « Nouvelle partie »	1.51
+bordeaux | plateau | #menu > #supprimerJoueur « Supprimer un joueur »	1.51
+bordeaux | réglages | #ecranReglages > #btnFermerReglages « ← Retour »	1.51
+bordeaux | réglages | div.blocPartage > #btnPartagerJeu « 📤 Partager le lien »	1.51
+bordeaux | retirer un joueur | #suppression > #termineSuppression « Annuler »	1.4
+bordeaux | salleAttente | #salleAttente > #btnQuitterSalle « ← Retour »	1.51
+bordeaux | salleAttente | #salleAttente > #lancerPartieEnLigne « Lancer la partie »	1.51
+cerisier | accueil | #choixMode > #btnModeClassique « Mode classique (Hors connexion »	1.51
+cerisier | accueil | #choixMode > #btnModeEnLigne « Mode en ligne »	1.51
+cerisier | créateurs | #ecranCredits > #btnFermerCredits « ← Retour »	1.51
+cerisier | ecranChoixPseudo | #ecranChoixPseudo > #btnChoixPseudoAnnuler « Annuler »	1.51
+cerisier | ecranConfirmerAccueil | #ecranConfirmerAccueil > #btnConfirmerAccueilNon « Non »	1.51
+cerisier | ecranConfirmerAccueil | #ecranConfirmerAccueil > #btnConfirmerAccueilOui « Oui »	1.51
+cerisier | ecranConfirmerHote | #ecranConfirmerHote > #btnConfirmerHoteNon « Non »	1.51
+cerisier | ecranConfirmerHote | #ecranConfirmerHote > #btnConfirmerHoteOui « Oui »	1.51
+cerisier | ecranConfirmerRetrait | #ecranConfirmerRetrait > #btnConfirmerRetraitNon « Non »	1.51
+cerisier | ecranConfirmerRetrait | #ecranConfirmerRetrait > #btnConfirmerRetraitOui « Oui »	1.51
+cerisier | ecranNouvellePartie | #ecranNouvellePartie > #btnModifierJoueurs « Modifier les joueurs »	1.51
+cerisier | ecranNouvellePartie | #ecranNouvellePartie > #btnRejouerMemes « Rejouer (avec les mêmes joueur »	1.51
+cerisier | ecranNouvellePartie | #ecranNouvellePartie > #btnRetourNouvellePartie « ← Retour »	1.51
+cerisier | enLigneChoix | #enLigneChoix > #btnCreerPartie « Créer une partie »	1.51
+cerisier | enLigneChoix | #enLigneChoix > #btnRejoindrePartie « Rejoindre une partie »	1.51
+cerisier | enLigneChoix | #enLigneChoix > #btnRetourChoixMode « ← Retour »	1.51
+cerisier | enLigneCreer | #enLigneCreer > #btnRetourCreer « ← Retour »	1.51
+cerisier | enLigneCreer | #enLigneCreer > #validerCreation « Créer »	1.51
+cerisier | enLigneRejoindre | #enLigneRejoindre > #btnRetourRejoindre « ← Retour »	1.51
+cerisier | enLigneRejoindre | #enLigneRejoindre > #validerRejoindre « Rejoindre »	1.51
+cerisier | enLigneRevenir | #enLigneRevenir > #btnRetourRevenir « ← Retour »	1.51
+cerisier | enLigneRevenir | #enLigneRevenir > #validerRevenir « Revenir »	1.51
+cerisier | plateau | #menu > #nouvellePartie « Nouvelle partie »	1.51
+cerisier | plateau | #menu > #supprimerJoueur « Supprimer un joueur »	1.51
+cerisier | réglages | #ecranReglages > #btnFermerReglages « ← Retour »	1.51
+cerisier | réglages | div.blocPartage > #btnPartagerJeu « 📤 Partager le lien »	1.51
+cerisier | retirer un joueur | #suppression > #termineSuppression « Annuler »	1.4
+cerisier | salleAttente | #salleAttente > #btnQuitterSalle « ← Retour »	1.51
+cerisier | salleAttente | #salleAttente > #lancerPartieEnLigne « Lancer la partie »	1.51
+givre | accueil | #choixMode > #btnModeClassique « Mode classique (Hors connexion »	2.53
+givre | accueil | #choixMode > #btnModeEnLigne « Mode en ligne »	2.53
+givre | accueil | div.titreAccueil > #titreAccueil « ALCUNO »	2.76
+givre | créateurs | #ecranCredits > #btnFermerCredits « ← Retour »	2.53
+givre | créateurs | div.credits-contenu > div.credits-titre « ALCUNO »	2.76
+givre | ecranChoixPseudo | #ecranChoixPseudo > #btnChoixPseudoAnnuler « Annuler »	2.53
+givre | ecranConfirmerAccueil | #ecranConfirmerAccueil > #btnConfirmerAccueilNon « Non »	2.53
+givre | ecranConfirmerAccueil | #ecranConfirmerAccueil > #btnConfirmerAccueilOui « Oui »	2.53
+givre | ecranConfirmerHote | #ecranConfirmerHote > #btnConfirmerHoteNon « Non »	2.53
+givre | ecranConfirmerHote | #ecranConfirmerHote > #btnConfirmerHoteOui « Oui »	2.53
+givre | ecranConfirmerRetrait | #ecranConfirmerRetrait > #btnConfirmerRetraitNon « Non »	2.53
+givre | ecranConfirmerRetrait | #ecranConfirmerRetrait > #btnConfirmerRetraitOui « Oui »	2.53
+givre | ecranNouvellePartie | #ecranNouvellePartie > #btnAccueil « ⌂ »	2.76
+givre | ecranNouvellePartie | #ecranNouvellePartie > #btnModifierJoueurs « Modifier les joueurs »	2.53
+givre | ecranNouvellePartie | #ecranNouvellePartie > #btnRejouerMemes « Rejouer (avec les mêmes joueur »	2.53
+givre | ecranNouvellePartie | #ecranNouvellePartie > #btnRetourNouvellePartie « ← Retour »	2.53
+givre | enLigneChoix | #enLigneChoix > #btnCreerPartie « Créer une partie »	2.53
+givre | enLigneChoix | #enLigneChoix > #btnRejoindrePartie « Rejoindre une partie »	2.53
+givre | enLigneChoix | #enLigneChoix > #btnRetourChoixMode « ← Retour »	2.53
+givre | enLigneCreer | #enLigneCreer > #btnRetourCreer « ← Retour »	2.53
+givre | enLigneCreer | #enLigneCreer > #validerCreation « Créer »	2.53
+givre | enLigneRejoindre | #enLigneRejoindre > #btnRetourRejoindre « ← Retour »	2.53
+givre | enLigneRejoindre | #enLigneRejoindre > #validerRejoindre « Rejoindre »	2.53
+givre | enLigneRevenir | #enLigne > #btnAccueilEnLigne « ⌂ »	2.76
+givre | enLigneRevenir | #enLigneRevenir > #btnRetourRevenir « ← Retour »	2.53
+givre | enLigneRevenir | #enLigneRevenir > #validerRevenir « Revenir »	2.53
+givre | overlay annulation | div > button.bouton-annulation « Annuler 0 »	2.53
+givre | overlay annulation | div > button.bouton-annulation « Annuler 1 »	2.53
+givre | overlay annulation | div > button.bouton-annulation « Annuler 2 »	2.53
+givre | overlay celien | div.celien-bloc > div.celien-signature « Célien 👑 »	2.76
+givre | overlay doree annonce | div.overlay-regle-texte > div.doree-titre « CARTE DORÉE »	2.76
+givre | overlay doree choix | #overlayCarteDoree > div.doree-titre « CARTE DORÉE »	2.76
+givre | overlay doree choix | div.doree-boutons > button.bouton-doree « Celien 👑 »	2.53
+givre | overlay doree choix | div.doree-boutons > button.bouton-doree « Roseanna 👑 »	2.53
+givre | overlay doree choix | div.doree-boutons > button.bouton-doree « Tristan »	2.53
+givre | overlay doree choix | div.doree-boutons > button.bouton-doree « Ylana 👑 »	2.53
+givre | overlay duel | div.duel-boutons > button.bouton-pigeon « Celien »	2.53
+givre | overlay duel | div.duel-boutons > button.bouton-pigeon « Roseanna »	2.53
+givre | overlay duel | div.duel-boutons > button.bouton-pigeon « Tristan »	2.53
+givre | overlay duel | div.duel-boutons > button.bouton-pigeon « Ylana »	2.53
+givre | overlay fin | #overlayFinUnRestants > button.bouton-pigeon « Terminer »	2.53
+givre | overlay pigeon | #overlayPigeon > button.bouton-pigeon « Celien »	2.53
+givre | overlay pigeon | #overlayPigeon > button.bouton-pigeon « Roseanna »	2.53
+givre | overlay pigeon | #overlayPigeon > button.bouton-pigeon « Tristan »	2.53
+givre | overlay pigeon | #overlayPigeon > button.bouton-pigeon « Ylana »	2.53
+givre | overlay plus4 | div.plus4-actions > button.bouton-pigeon.plus4-action-btn « Annuler »	2.53
+givre | overlay plus4 | div.plus4-actions > button.bouton-pigeon.plus4-action-btn « Retour »	2.53
+givre | overlay plus4 | div.plus4-actions > button.bouton-pigeon.plus4-action-btn « Valider »	2.53
+givre | overlay plus4 | div.plus4-container-joueurs > button.bouton-pigeon.plus4-joueur-btn « Celien »	2.53
+givre | overlay plus4 | div.plus4-container-joueurs > button.bouton-pigeon.plus4-joueur-btn « Roseanna »	2.53
+givre | overlay plus4 | div.plus4-container-joueurs > button.bouton-pigeon.plus4-joueur-btn « Tristan »	2.53
+givre | overlay plus4 | div.plus4-container-joueurs > button.bouton-pigeon.plus4-joueur-btn « Ylana »	2.53
+givre | overlay tiens | div.overlay-regle-texte > div.doree-titre « TIENS DANS TA GUEULE 1. »	2.76
+givre | plateau | #menu > #nouvellePartie « Nouvelle partie »	2.53
+givre | plateau | #menu > #supprimerJoueur « Supprimer un joueur »	2.53
+givre | réglages | #ecranReglages > #btnFermerReglages « ← Retour »	2.53
+givre | réglages | #lignePartieMemoire > #btnOublierPartie « Oublier »	2.53
+givre | réglages | div.blocPartage > #btnPartagerJeu « 📤 Partager le lien »	2.53
+givre | retirer un joueur | #suppression > #termineSuppression « Annuler »	2.53
+givre | salleAttente | #enLigne > #btnAccueilEnLigne « ⌂ »	2.76
+givre | salleAttente | #salleAttente > #btnQuitterSalle « ← Retour »	2.53
+givre | salleAttente | #salleAttente > #lancerPartieEnLigne « Lancer la partie »	2.53
+noir | accueil | #choixMode > #btnModeClassique « Mode classique (Hors connexion »	1.51
+noir | accueil | #choixMode > #btnModeEnLigne « Mode en ligne »	1.51
+noir | créateurs | #ecranCredits > #btnFermerCredits « ← Retour »	1.51
+noir | ecranChoixPseudo | #ecranChoixPseudo > #btnChoixPseudoAnnuler « Annuler »	1.51
+noir | ecranConfirmerAccueil | #ecranConfirmerAccueil > #btnConfirmerAccueilNon « Non »	1.51
+noir | ecranConfirmerAccueil | #ecranConfirmerAccueil > #btnConfirmerAccueilOui « Oui »	1.51
+noir | ecranConfirmerHote | #ecranConfirmerHote > #btnConfirmerHoteNon « Non »	1.51
+noir | ecranConfirmerHote | #ecranConfirmerHote > #btnConfirmerHoteOui « Oui »	1.51
+noir | ecranConfirmerRetrait | #ecranConfirmerRetrait > #btnConfirmerRetraitNon « Non »	1.51
+noir | ecranConfirmerRetrait | #ecranConfirmerRetrait > #btnConfirmerRetraitOui « Oui »	1.51
+noir | ecranNouvellePartie | #ecranNouvellePartie > #btnModifierJoueurs « Modifier les joueurs »	1.51
+noir | ecranNouvellePartie | #ecranNouvellePartie > #btnRejouerMemes « Rejouer (avec les mêmes joueur »	1.51
+noir | ecranNouvellePartie | #ecranNouvellePartie > #btnRetourNouvellePartie « ← Retour »	1.51
+noir | enLigneChoix | #enLigneChoix > #btnCreerPartie « Créer une partie »	1.51
+noir | enLigneChoix | #enLigneChoix > #btnRejoindrePartie « Rejoindre une partie »	1.51
+noir | enLigneChoix | #enLigneChoix > #btnRetourChoixMode « ← Retour »	1.51
+noir | enLigneCreer | #enLigneCreer > #btnRetourCreer « ← Retour »	1.51
+noir | enLigneCreer | #enLigneCreer > #validerCreation « Créer »	1.51
+noir | enLigneRejoindre | #enLigneRejoindre > #btnRetourRejoindre « ← Retour »	1.51
+noir | enLigneRejoindre | #enLigneRejoindre > #validerRejoindre « Rejoindre »	1.51
+noir | enLigneRevenir | #enLigneRevenir > #btnRetourRevenir « ← Retour »	1.51
+noir | enLigneRevenir | #enLigneRevenir > #validerRevenir « Revenir »	1.51
+noir | plateau | #menu > #nouvellePartie « Nouvelle partie »	1.51
+noir | plateau | #menu > #supprimerJoueur « Supprimer un joueur »	1.51
+noir | réglages | #ecranReglages > #btnFermerReglages « ← Retour »	1.51
+noir | réglages | div.blocPartage > #btnPartagerJeu « 📤 Partager le lien »	1.51
+noir | retirer un joueur | #suppression > #termineSuppression « Annuler »	1.4
+noir | salleAttente | #salleAttente > #btnQuitterSalle « ← Retour »	1.51
+noir | salleAttente | #salleAttente > #lancerPartieEnLigne « Lancer la partie »	1.51
+prestige | accueil | #choixMode > #btnModeClassique « Mode classique (Hors connexion »	1.51
+prestige | accueil | #choixMode > #btnModeEnLigne « Mode en ligne »	1.51
+prestige | créateurs | #ecranCredits > #btnFermerCredits « ← Retour »	1.51
+prestige | ecranChoixPseudo | #ecranChoixPseudo > #btnChoixPseudoAnnuler « Annuler »	1.51
+prestige | ecranConfirmerAccueil | #ecranConfirmerAccueil > #btnConfirmerAccueilNon « Non »	1.51
+prestige | ecranConfirmerAccueil | #ecranConfirmerAccueil > #btnConfirmerAccueilOui « Oui »	1.51
+prestige | ecranConfirmerHote | #ecranConfirmerHote > #btnConfirmerHoteNon « Non »	1.51
+prestige | ecranConfirmerHote | #ecranConfirmerHote > #btnConfirmerHoteOui « Oui »	1.51
+prestige | ecranConfirmerRetrait | #ecranConfirmerRetrait > #btnConfirmerRetraitNon « Non »	1.51
+prestige | ecranConfirmerRetrait | #ecranConfirmerRetrait > #btnConfirmerRetraitOui « Oui »	1.51
+prestige | ecranNouvellePartie | #ecranNouvellePartie > #btnModifierJoueurs « Modifier les joueurs »	1.51
+prestige | ecranNouvellePartie | #ecranNouvellePartie > #btnRejouerMemes « Rejouer (avec les mêmes joueur »	1.51
+prestige | ecranNouvellePartie | #ecranNouvellePartie > #btnRetourNouvellePartie « ← Retour »	1.51
+prestige | enLigneChoix | #enLigneChoix > #btnCreerPartie « Créer une partie »	1.51
+prestige | enLigneChoix | #enLigneChoix > #btnRejoindrePartie « Rejoindre une partie »	1.51
+prestige | enLigneChoix | #enLigneChoix > #btnRetourChoixMode « ← Retour »	1.51
+prestige | enLigneCreer | #enLigneCreer > #btnRetourCreer « ← Retour »	1.51
+prestige | enLigneCreer | #enLigneCreer > #validerCreation « Créer »	1.51
+prestige | enLigneRejoindre | #enLigneRejoindre > #btnRetourRejoindre « ← Retour »	1.51
+prestige | enLigneRejoindre | #enLigneRejoindre > #validerRejoindre « Rejoindre »	1.51
+prestige | enLigneRevenir | #enLigneRevenir > #btnRetourRevenir « ← Retour »	1.51
+prestige | enLigneRevenir | #enLigneRevenir > #validerRevenir « Revenir »	1.51
+prestige | plateau | #menu > #nouvellePartie « Nouvelle partie »	1.51
+prestige | plateau | #menu > #supprimerJoueur « Supprimer un joueur »	1.51
+prestige | réglages | #ecranReglages > #btnFermerReglages « ← Retour »	1.51
+prestige | réglages | div.blocPartage > #btnPartagerJeu « 📤 Partager le lien »	1.51
+prestige | retirer un joueur | #suppression > #termineSuppression « Annuler »	1.4
+prestige | salleAttente | #salleAttente > #btnQuitterSalle « ← Retour »	1.51
+prestige | salleAttente | #salleAttente > #lancerPartieEnLigne « Lancer la partie »	1.51
+vert | accueil | #choixMode > #btnModeClassique « Mode classique (Hors connexion »	1.51
+vert | accueil | #choixMode > #btnModeEnLigne « Mode en ligne »	1.51
+vert | créateurs | #ecranCredits > #btnFermerCredits « ← Retour »	1.51
+vert | ecranChoixPseudo | #ecranChoixPseudo > #btnChoixPseudoAnnuler « Annuler »	1.51
+vert | ecranConfirmerAccueil | #ecranConfirmerAccueil > #btnConfirmerAccueilNon « Non »	1.51
+vert | ecranConfirmerAccueil | #ecranConfirmerAccueil > #btnConfirmerAccueilOui « Oui »	1.51
+vert | ecranConfirmerHote | #ecranConfirmerHote > #btnConfirmerHoteNon « Non »	1.51
+vert | ecranConfirmerHote | #ecranConfirmerHote > #btnConfirmerHoteOui « Oui »	1.51
+vert | ecranConfirmerRetrait | #ecranConfirmerRetrait > #btnConfirmerRetraitNon « Non »	1.51
+vert | ecranConfirmerRetrait | #ecranConfirmerRetrait > #btnConfirmerRetraitOui « Oui »	1.51
+vert | ecranNouvellePartie | #ecranNouvellePartie > #btnModifierJoueurs « Modifier les joueurs »	1.51
+vert | ecranNouvellePartie | #ecranNouvellePartie > #btnRejouerMemes « Rejouer (avec les mêmes joueur »	1.51
+vert | ecranNouvellePartie | #ecranNouvellePartie > #btnRetourNouvellePartie « ← Retour »	1.51
+vert | enLigneChoix | #enLigneChoix > #btnCreerPartie « Créer une partie »	1.51
+vert | enLigneChoix | #enLigneChoix > #btnRejoindrePartie « Rejoindre une partie »	1.51
+vert | enLigneChoix | #enLigneChoix > #btnRetourChoixMode « ← Retour »	1.51
+vert | enLigneCreer | #enLigneCreer > #btnRetourCreer « ← Retour »	1.51
+vert | enLigneCreer | #enLigneCreer > #validerCreation « Créer »	1.51
+vert | enLigneRejoindre | #enLigneRejoindre > #btnRetourRejoindre « ← Retour »	1.51
+vert | enLigneRejoindre | #enLigneRejoindre > #validerRejoindre « Rejoindre »	1.51
+vert | enLigneRevenir | #enLigneRevenir > #btnRetourRevenir « ← Retour »	1.51
+vert | enLigneRevenir | #enLigneRevenir > #validerRevenir « Revenir »	1.51
+vert | plateau | #menu > #nouvellePartie « Nouvelle partie »	1.51
+vert | plateau | #menu > #supprimerJoueur « Supprimer un joueur »	1.51
+vert | réglages | #ecranReglages > #btnFermerReglages « ← Retour »	1.51
+vert | réglages | div.blocPartage > #btnPartagerJeu « 📤 Partager le lien »	1.51
+vert | retirer un joueur | #suppression > #termineSuppression « Annuler »	1.4
+vert | salleAttente | #salleAttente > #btnQuitterSalle « ← Retour »	1.51
+vert | salleAttente | #salleAttente > #lancerPartieEnLigne « Lancer la partie »	1.51
+violet | accueil | #choixMode > #btnModeClassique « Mode classique (Hors connexion »	1.51
+violet | accueil | #choixMode > #btnModeEnLigne « Mode en ligne »	1.51
+violet | créateurs | #ecranCredits > #btnFermerCredits « ← Retour »	1.51
+violet | ecranChoixPseudo | #ecranChoixPseudo > #btnChoixPseudoAnnuler « Annuler »	1.51
+violet | ecranConfirmerAccueil | #ecranConfirmerAccueil > #btnConfirmerAccueilNon « Non »	1.51
+violet | ecranConfirmerAccueil | #ecranConfirmerAccueil > #btnConfirmerAccueilOui « Oui »	1.51
+violet | ecranConfirmerHote | #ecranConfirmerHote > #btnConfirmerHoteNon « Non »	1.51
+violet | ecranConfirmerHote | #ecranConfirmerHote > #btnConfirmerHoteOui « Oui »	1.51
+violet | ecranConfirmerRetrait | #ecranConfirmerRetrait > #btnConfirmerRetraitNon « Non »	1.51
+violet | ecranConfirmerRetrait | #ecranConfirmerRetrait > #btnConfirmerRetraitOui « Oui »	1.51
+violet | ecranNouvellePartie | #ecranNouvellePartie > #btnModifierJoueurs « Modifier les joueurs »	1.51
+violet | ecranNouvellePartie | #ecranNouvellePartie > #btnRejouerMemes « Rejouer (avec les mêmes joueur »	1.51
+violet | ecranNouvellePartie | #ecranNouvellePartie > #btnRetourNouvellePartie « ← Retour »	1.51
+violet | enLigneChoix | #enLigneChoix > #btnCreerPartie « Créer une partie »	1.51
+violet | enLigneChoix | #enLigneChoix > #btnRejoindrePartie « Rejoindre une partie »	1.51
+violet | enLigneChoix | #enLigneChoix > #btnRetourChoixMode « ← Retour »	1.51
+violet | enLigneCreer | #enLigneCreer > #btnRetourCreer « ← Retour »	1.51
+violet | enLigneCreer | #enLigneCreer > #validerCreation « Créer »	1.51
+violet | enLigneRejoindre | #enLigneRejoindre > #btnRetourRejoindre « ← Retour »	1.51
+violet | enLigneRejoindre | #enLigneRejoindre > #validerRejoindre « Rejoindre »	1.51
+violet | enLigneRevenir | #enLigneRevenir > #btnRetourRevenir « ← Retour »	1.51
+violet | enLigneRevenir | #enLigneRevenir > #validerRevenir « Revenir »	1.51
+violet | plateau | #menu > #nouvellePartie « Nouvelle partie »	1.51
+violet | plateau | #menu > #supprimerJoueur « Supprimer un joueur »	1.51
+violet | réglages | #ecranReglages > #btnFermerReglages « ← Retour »	1.51
+violet | réglages | div.blocPartage > #btnPartagerJeu « 📤 Partager le lien »	1.51
+violet | retirer un joueur | #suppression > #termineSuppression « Annuler »	1.4
+violet | salleAttente | #salleAttente > #btnQuitterSalle « ← Retour »	1.51
+violet | salleAttente | #salleAttente > #lancerPartieEnLigne « Lancer la partie »	1.51
