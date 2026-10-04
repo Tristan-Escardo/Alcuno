@@ -327,6 +327,7 @@ button,
 #suppression{
   position: fixed;
   inset: 0;
+  margin: 0; /* sinon le margin-bottom de .suppression le raccourcit : le plateau se voyait en bas */
   z-index: 9999;
   background:
     var(--deco-theme, none),
