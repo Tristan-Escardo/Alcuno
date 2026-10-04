@@ -1,0 +1,2 @@
+# Scripts bash des tests : toujours en fins de ligne Unix (sinon bash refuse le )
+*.sh text eol=lf
