@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
   // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
   // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-  const VERSION_AFFICHEE = "8.9";
+  const VERSION_AFFICHEE = "8.9.1";
   const VERSION_JEU = VERSION_AFFICHEE.split(".")
     .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
   // À l'écran : le numéro complet, pour voir d'un coup d'œil si un téléphone est à jour
@@ -3383,7 +3383,7 @@ document.addEventListener("DOMContentLoaded", function () {
     overlay.style.webkitOverflowScrolling = "touch";
 
     const titre = document.createElement("div");
-    titre.innerText = `${nom}, tu as +${dispo} annulation(s).`;
+    titre.innerText = `${nom}, tu as ${dispo} annulation(s).`;
     titre.style.fontSize = "clamp(24px, 5vw, 46px)";
     titre.style.fontWeight = "900";
     titre.style.textShadow = "2px 2px 5px #000";
@@ -4918,6 +4918,9 @@ document.addEventListener("DOMContentLoaded", function () {
     el._net = Object.assign({ owner: null, pret: null, valide: null, once: false, unique: false }, options, { handler });
 
     el.addEventListener(options.evenement || "pointerdown", (e) => {
+      // Tap sur le plateau ou les menus alors qu'un overlay (ou le voile entre deux) est affiché : ignoré.
+      // Seulement les taps de ce téléphone : les actions des autres sont toujours rejouées.
+      if(el.closest("main") && (overlayOuvert() || voileOverlays.classList.contains("visible"))) return;
       if(!enLigneActif){
         handler(e);
         return;

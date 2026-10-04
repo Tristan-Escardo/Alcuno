@@ -2,7 +2,6 @@
 /* Anti scroll horizontal (iOS/Android) */
 
 body{
-  background-color: var(--fond-theme);
   margin: 0;
   font-family: Arial, sans-serif;
   color: white;
@@ -324,7 +323,9 @@ button,
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: var(--deco-theme, none), var(--fond-theme);
+  background:
+    var(--deco-theme, none),
+    linear-gradient(var(--fond-theme), var(--fond-theme)) var(--couleur-barre);
 
   display: flex;
   flex-direction: column;
@@ -1692,12 +1693,6 @@ body.no-scroll{
 
 
 /* ===== HEADER / TOP BAR – intégré au design du jeu ===== */
-body{
-  background:
-    var(--deco-theme, radial-gradient(circle at top center, rgba(255, 215, 0, 0.08) 0%, rgba(255, 215, 0, 0) 26%)),
-    var(--fond-theme);
-}
-
 header{
   width: min(1200px, 100%);
   margin: 12px auto 14px auto;
@@ -1830,7 +1825,9 @@ header h1{
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: var(--deco-accueil, var(--deco-theme, none)), var(--fond-theme);
+  background:
+    var(--deco-accueil, var(--deco-theme, none)),
+    linear-gradient(var(--fond-theme), var(--fond-theme)) var(--couleur-barre);
 
   display: flex;
   flex-direction: column;
@@ -2703,7 +2700,9 @@ header h1{
   padding: 76px 16px calc(28px + env(safe-area-inset-bottom, 0px));
   box-sizing: border-box;
   color: #fff;
-  background: var(--deco-theme, none), var(--fond-theme);
+  background:
+    var(--deco-theme, none),
+    linear-gradient(var(--fond-theme), var(--fond-theme)) var(--couleur-barre);
 }
 
 #ecranReglages .reglages-contenu{
@@ -3709,9 +3708,8 @@ html[data-theme="prestige"]{
     /* reflets d'or en diagonale (réguliers sur le haut et sur le bas de l'écran) */
     linear-gradient(135deg, rgba(255, 223, 90, 0.14) 0%, rgba(255, 223, 90, 0.14) 34%, rgba(255, 236, 140, 0.26) 52%,
                     rgba(255, 223, 90, 0.14) 66%, rgba(255, 223, 90, 0.14) 100%) no-repeat,
-    /* lueur dorée en haut et en bas (sur toute la largeur, la même des deux côtés) ; en haut, elle
-       garde sa couleur sur toute la zone de l'heure (bande #hautJeu de la même couleur en partie) */
-    linear-gradient(to bottom, rgba(255, 215, 0, 0.36) var(--haut-ecran), transparent 55%) no-repeat,
+    /* lueur dorée en haut et en bas (sur toute la largeur, la même des deux côtés) */
+    linear-gradient(to bottom, rgba(255, 215, 0, 0.36), transparent 55%) no-repeat,
     linear-gradient(to top, rgba(255, 215, 0, 0.36), transparent 45%) no-repeat;
 }
 
@@ -4049,51 +4047,10 @@ html.overlay-ouvert #refletPrestige{
   100% { transform: scale(1); }
 }
 
-/* ===== iPhone : le jeu va jusqu'en haut de l'écran (sous l'heure et la Dynamic Island) =====
-   (index.html : viewport-fit=cover + barre « black-translucent »). Ce qui est collé en haut descend
-   de la hauteur de cette zone. Sur les écrans sans encoche, env(...) vaut 0 : rien ne change. */
-:root{ --haut-ecran: env(safe-area-inset-top, 0px); }
-
-body{ padding-top: var(--haut-ecran); }
-
-#choixMode,
-#enLigne,
-#ecranNouvellePartie,
-#ecranConfirmerHote,
-#ecranConfirmerRetrait,
-#ecranConfirmerAccueil,
-#ecranChoixPseudo{ padding-top: calc(24px + var(--haut-ecran)); }
-
-#choixMode .btnRetour,
-#ecranNouvellePartie .btnRetour,
-#ecranNouvellePartie .btnAccueil,
-#enLigne .btnRetour,
-#ecranCredits .btnRetour,
-#ecranReglages .btnRetour{ top: calc(20px + var(--haut-ecran)); }
-
-#enLigne #btnAccueilEnLigne,
-#ecranNouvellePartie #btnAccueil{ top: calc(26px + var(--haut-ecran)); }
-
-#choixMode #btnReglages{ top: calc(24px + var(--haut-ecran)); }
-
-#ecranCredits{ padding-top: calc(72px + var(--haut-ecran)); }
-#ecranReglages{ padding-top: calc(76px + var(--haut-ecran)); }
-#suppression{ padding-top: calc(20px + var(--haut-ecran)); }
-
-#overlayPlus4,
-#overlayDuel,
-#overlayPigeon,
-#overlayCouleur,
-#overlayFinUnRestants,
-#overlayPredictionFin{ padding-top: calc(clamp(12px, 3vw, 30px) + var(--haut-ecran)); }
-
-.overlay-opaque{ padding-top: calc(clamp(14px, 3.2vw, 30px) + var(--haut-ecran)); }
-
-/* Barre du haut (sous l'heure) et bande du bas de l'iPhone : l'iPhone les peint d'une couleur unie, la
-   couleur de fond (background-color) de la page, sans regarder ce qui est dessiné (vérifié : en 8.8.13
-   la bande du bas suivait cette couleur, pas la page). Chaque thème donne donc dans --couleur-barre la
-   couleur du tout haut ET du tout bas de son décor (Prestige : décor fait pour, les deux sont égaux), et
-   c'est la couleur de fond de la page. Pas de bande ni de fondu : le décor va d'un bord à l'autre. */
+/* Barre de l'heure de l'iPhone : il la peint d'une couleur unie, prise sur la couleur de fond
+   (background-color) de la page. Chaque thème donne donc dans --couleur-barre la couleur du tout haut
+   (et du tout bas) de son décor (Prestige : décor fait pour) : c'est la couleur de fond de la page et des
+   écrans fixes, cachée sous le décor (le fond du thème y est une couche en dégradé uni). */
 :root{ --couleur-barre: var(--fond-theme); }
 
 html{ min-height: 100%; }
@@ -4121,46 +4078,3 @@ html.credits-ouverts body::before{ display: none; }
 /* Overlay ouvert (fond noir) : la page derrière passe en noir aussi (sinon bandes dorées en Prestige) */
 html.overlay-ouvert body{ background: #000; }
 html.overlay-ouvert body::before{ display: none; }
-
-#choixMode,
-#enLigne,
-#ecranNouvellePartie,
-#ecranConfirmerHote,
-#ecranConfirmerRetrait,
-#ecranConfirmerAccueil,
-#ecranChoixPseudo{
-  background:
-    var(--deco-accueil, var(--deco-theme, none)),
-    linear-gradient(var(--fond-theme), var(--fond-theme)) var(--couleur-barre);
-}
-
-#suppression,
-#ecranReglages{
-  background:
-    var(--deco-theme, none),
-    linear-gradient(var(--fond-theme), var(--fond-theme)) var(--couleur-barre);
-}
-
-/* ===== iPhone, haut de l'écran en partie =====
-   La page défile sous l'heure et, sans rien de fixe tout en haut, l'iPhone floutait ce qui passe dessous.
-   Bande fixe de la couleur du haut du décor sur la zone de l'heure : l'iPhone la reprend en couleur unie
-   (comme sur l'accueil) et le plateau glisse dessous. 0 de haut sans zone de l'heure (Android,
-   ordinateur). Sous la bannière « Tour de », les cartes qui s'envolent, les overlays et les écrans fixes. */
-#hautJeu{
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: var(--haut-ecran);
-  background-color: var(--couleur-barre);
-  z-index: 1150;
-}
-
-/* Pendant un overlay ou le voile entre deux overlays : plateau, menus et en-tête derrière non touchables
-   (sécurité : un tap ne doit jamais retourner une carte derrière un overlay) */
-html.overlay-ouvert main,
-html.overlay-ouvert body > header,
-body:has(> #voileOverlays.visible) main,
-body:has(> #voileOverlays.visible) > header{
-  pointer-events: none;
-}
