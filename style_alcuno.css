@@ -4809,8 +4809,8 @@ html.accessibilite #ecranInstallation #btnInstallationInstaller{ font-size: 26px
 html.accessibilite #ecranInstallation #btnInstallationPlusTard{ font-size: 19px; }
 
 /* ===== Boutons jaunes à texte blanc : plus lisibles (thèmes sombres ; Givre a ses boutons cyan) =====
-   Léger dégradé doré (le jaune du haut reste celui d'avant) et ombre du texte plus marquée. Les boutons
-   or à texte noir des overlays des règles ne changent pas (déjà bien lisibles). */
+   Léger dégradé doré (le jaune du haut reste celui d'avant) et ombre du texte plus marquée.
+   Mêmes boutons dans les overlays des règles (règle suivante). */
 html:not([data-theme="givre"]) :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu,
   #btnCreerPartie, #btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre,
   #lancerPartieEnLigne, #btnRejouerMemes, #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button,
@@ -4820,4 +4820,16 @@ html:not([data-theme="givre"]) :is(#btnModeEnLigne, #btnModeClassique, .btnRetou
   background-image: linear-gradient(180deg, #ffd426, #f6b800);
   color: #fff;
   text-shadow: 0 1px 0 rgba(122, 74, 0, 0.85), 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* Boutons de choix des overlays des règles (pigeon, duel, +4, annulations, pari de fin, fin) : même
+   style que les autres boutons (avant : or à texte noir). !important : le JS colore certains de ces
+   boutons directement (annulations, joueurs déjà choisis du duel). Carte dorée : boutons or métallique
+   inchangés. */
+html:not([data-theme="givre"]) :is(#overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayDuel button,
+  #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
+  #overlayAnnulation button){
+  background: linear-gradient(180deg, #ffd426, #f6b800) !important;
+  color: #fff !important;
+  text-shadow: 0 1px 0 rgba(122, 74, 0, 0.85), 0 2px 4px rgba(0, 0, 0, 0.4) !important;
 }
