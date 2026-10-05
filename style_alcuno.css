@@ -4412,3 +4412,222 @@ html[data-theme="givre"] #stickyJoueurActif.has-couleur .sticky-couleur{
   background: color-mix(in srgb, var(--couleur-jeu) 30%, #fff);
   color: color-mix(in srgb, var(--couleur-jeu) 45%, #0d3550);
 }
+
+/* ===== Règles du jeu : bouton « ? » (accueil + bandeau de la partie) et écran des règles ===== */
+/* Accueil : en haut à gauche, même style que le bouton Réglages (en haut à droite) */
+#choixMode #btnRegles{
+  position: absolute;
+  top: 24px;
+  left: 18px;
+  z-index: 2;
+  width: auto;
+  min-width: 0;
+  padding: 6px;
+  border: none;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  line-height: 0;
+  opacity: 0.9;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+#choixMode #btnRegles svg{
+  width: 32px;
+  height: 32px;
+  overflow: visible;
+  filter: drop-shadow(0 2px 0 rgba(120, 70, 0, 0.95)) drop-shadow(0 3px 6px rgba(0,0,0,0.45));
+}
+#choixMode #btnRegles circle{
+  fill: var(--fond-theme);
+  stroke: #FFD700;
+  stroke-width: 2.4;
+}
+#choixMode #btnRegles path,
+#choixMode #btnRegles circle.point{
+  fill: none;
+  stroke: #FFD700;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+#choixMode #btnRegles:hover{
+  opacity: 1;
+  transform: scale(1.06);
+}
+@media (max-width: 520px){
+  #choixMode #btnRegles svg{ width: 28px; height: 28px; }
+}
+
+/* Bandeau de la partie : « ? » doré comme le ⌂, juste à sa gauche (seul à droite en ligne, sans ⌂) */
+header #btnReglesJeu{
+  position: absolute;
+  top: 50%;
+  right: 56px;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: auto;
+  min-width: 0;
+  padding: 6px 4px;
+  border: none;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  font-family: Impact, Haettenschweiler, "Arial Black", sans-serif;
+  font-size: 28px;
+  font-weight: 900;
+  -webkit-text-stroke: 1px #FFD700;
+  line-height: 1;
+  color: #FFD700;
+  text-shadow: 0 2px 0 rgba(120, 70, 0, 0.95), 0 3px 8px rgba(0,0,0,0.45);
+  opacity: 0.9;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+header #btnReglesJeu:hover{
+  opacity: 1;
+  transform: translateY(-50%) scale(1.06);
+}
+body.mode-en-ligne header #btnReglesJeu{ right: 16px; }
+@media (max-width: 520px){
+  header #btnReglesJeu{ font-size: 24px; right: 44px; }
+  body.mode-en-ligne header #btnReglesJeu{ right: 10px; }
+}
+
+/* L'écran : mise en page des Réglages (au-dessus des overlays : en ligne, le jeu peut avancer derrière) */
+#ecranRegles{
+  position: fixed;
+  inset: 0;
+  z-index: 10002;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 76px 16px calc(28px + env(safe-area-inset-bottom, 0px));
+  box-sizing: border-box;
+  color: #fff;
+  background: var(--deco-theme, none), var(--fond-theme);
+}
+#ecranRegles .btnRetour{
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  padding: 10px 18px;
+  font-size: 15px;
+  font-weight: 900;
+  color: #fff;
+  background-color: #ffcc00;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+  box-shadow: inset 0 -2px 0 rgba(0,0,0,0.18), 0 8px 18px rgba(0,0,0,0.25);
+}
+#ecranRegles .regles-contenu{
+  max-width: 520px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: fadeIn 0.25s ease forwards;
+}
+#ecranRegles h2{
+  margin: 0 0 6px;
+  text-align: center;
+  color: #FFD700;
+  font-size: clamp(22px, 5vw, 36px);
+  font-weight: 900;
+  text-shadow: 2px 2px 5px #000;
+}
+#ecranRegles #listeRegles{
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+#ecranRegles .reglesNotePJ{
+  margin: 0;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 800;
+  color: #c9ffb8;
+}
+#ecranRegles .blocRegles{
+  padding: 12px 14px 4px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,215,0,0.18);
+}
+#ecranRegles .blocRegles h3{
+  margin: 0 0 6px;
+  font-size: 17px;
+  font-weight: 900;
+  color: #FFD700;
+}
+#ecranRegles .ligneRegle{
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 0;
+}
+#ecranRegles .ligneRegle + .ligneRegle{
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+/* Petite carte à gauche : juste une image (ni tap, ni zoom au survol) */
+#ecranRegles .ligneRegle .Carte{
+  flex: 0 0 auto;
+  width: 46px;
+  max-width: none;
+  height: auto;
+  aspect-ratio: 50 / 78;
+  border-radius: 6px;
+  cursor: default;
+  pointer-events: none;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.35);
+}
+#ecranRegles .texteRegle{
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+#ecranRegles .nomRegle{
+  font-size: 16px;
+  font-weight: 900;
+  color: #fff;
+}
+#ecranRegles .detailRegle{
+  font-size: 14px;
+  line-height: 1.35;
+  color: rgba(255,255,255,0.82);
+}
+
+/* Givre (thème clair) : mêmes couleurs que ses Réglages */
+html[data-theme="givre"] #choixMode #btnRegles circle,
+html[data-theme="givre"] #choixMode #btnRegles path{ stroke: #1a9be0; }
+html[data-theme="givre"] #choixMode #btnRegles svg{
+  filter: drop-shadow(0 2px 0 #0b5a8c) drop-shadow(0 3px 6px rgba(13, 53, 80, 0.2));
+}
+html[data-theme="givre"] header #btnReglesJeu{
+  color: #1a9be0;
+  -webkit-text-stroke-color: #1a9be0;
+  text-shadow: 0 2px 0 #0b5a8c, 0 3px 8px rgba(13, 53, 80, 0.2);
+}
+html[data-theme="givre"] #ecranRegles{ color: var(--givre-texte); }
+html[data-theme="givre"] #ecranRegles h2,
+html[data-theme="givre"] #ecranRegles .blocRegles h3{
+  color: var(--givre-accent);
+  text-shadow: 0 2px 8px rgba(255, 255, 255, 0.9);
+}
+html[data-theme="givre"] #ecranRegles .blocRegles{
+  background: var(--givre-panneau);
+  border-color: var(--givre-bord);
+}
+html[data-theme="givre"] #ecranRegles .nomRegle{ color: var(--givre-texte); }
+html[data-theme="givre"] #ecranRegles .detailRegle{ color: var(--givre-texte); opacity: 0.85; }
+html[data-theme="givre"] #ecranRegles .ligneRegle + .ligneRegle{ border-top-color: var(--givre-bord); }
+html[data-theme="givre"] #ecranRegles .reglesNotePJ{ color: #127a3e; }
+html[data-theme="givre"] #ecranRegles .btnRetour{
+  background: var(--givre-bouton);
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(8, 60, 100, 0.55);
+  box-shadow: inset 0 -2px 0 rgba(8, 60, 100, 0.25), 0 6px 14px rgba(26, 146, 214, 0.28);
+}
