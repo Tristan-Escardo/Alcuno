@@ -4869,7 +4869,7 @@ html:not([data-theme="givre"]) :is(#overlayPigeon .bouton-pigeon, #overlayPlus4 
   /* Plateau : 13 cartes par rangée (4 rangées pleines) au lieu de 6 */
   :root{ --cols: 13; }
 
-  /* Accueil */
+  /* Accueil et menus (sur Android, appli installée, ils restent bloqués en portrait) */
   #choixMode{ gap: 14px; padding-top: 14px; padding-bottom: 14px; }
   #choixMode #titreAccueil{ font-size: min(19vw, 24vh); }
   #choixMode .titreAccueil{ gap: 8px; margin-bottom: 4px; }
