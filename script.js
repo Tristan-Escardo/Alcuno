@@ -124,7 +124,7 @@ function avecCouronne(nom){
 // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
 // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
 // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-const VERSION_AFFICHEE = "9.0.6";
+const VERSION_AFFICHEE = "9.0.7";
 const VERSION_JEU = VERSION_AFFICHEE.split(".")
   .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
 // À l'écran : le numéro complet, pour voir d'un coup d'œil si un téléphone est à jour
@@ -158,12 +158,23 @@ document.querySelectorAll("header h1, #titreAccueil").forEach((titre) => titre.a
 // sur son élan sert d'abord à arrêter le défilement, et le téléphone n'envoie alors pas de
 // « click » (il fallait taper deux fois). On réagit donc aussi au doigt levé, si le doigt n'a
 // presque pas bougé (sinon c'est un glissement). Un seul déclenchement par tap.
+// Le « click » qui suit ce doigt levé est avalé, où qu'il tombe : la page qui se ferme ne capte
+// plus les taps (pointer-events: none pendant sa sortie), et sur iPhone ce click tombait sur le
+// bouton caché dessous (← Retour des Réglages => ouvrait les Règles du jeu, au même endroit).
+let clicAAvaler = false;
+let minuteurClicAAvaler = null;
+document.addEventListener("click", (e) => {
+  if (!clicAAvaler) return;
+  clicAAvaler = false;
+  e.preventDefault();
+  e.stopPropagation();
+}, true);
+// Un nouveau contact sur l'écran : le « click » de l'ancien tap ne viendra plus
+document.addEventListener("pointerdown", () => { clicAAvaler = false; }, true);
+
 function activerMemePendantElan(bouton, action){
   let depart = null;
-  let clicDejaFait = false; // le « click » qui suit le doigt levé du même tap ne compte pas
-  let minuteur = null;
   bouton.addEventListener("pointerdown", (e) => {
-    clicDejaFait = false; // nouveau tap
     depart = (e.pointerType === "touch" || e.pointerType === "pen") ? { x: e.clientX, y: e.clientY } : null;
   });
   bouton.addEventListener("pointerup", (e) => {
@@ -171,18 +182,13 @@ function activerMemePendantElan(bouton, action){
     const deplacement = Math.hypot(e.clientX - depart.x, e.clientY - depart.y);
     depart = null;
     if (deplacement >= 12) return;
-    clicDejaFait = true;
-    clearTimeout(minuteur);
-    minuteur = setTimeout(() => { clicDejaFait = false; }, 350);
+    clicAAvaler = true;
+    clearTimeout(minuteurClicAAvaler);
+    minuteurClicAAvaler = setTimeout(() => { clicAAvaler = false; }, 350);
     action();
   });
   bouton.addEventListener("pointercancel", () => { depart = null; });
-  // Un nouveau contact ailleurs sur l'écran : le « click » de l'ancien tap ne viendra plus
-  document.addEventListener("pointerdown", (e) => { if (e.target !== bouton) clicDejaFait = false; }, true);
-  bouton.addEventListener("click", () => {
-    if (clicDejaFait) { clicDejaFait = false; return; }
-    action();
-  });
+  bouton.addEventListener("click", action); // souris, clavier (le click d'un tap est avalé plus haut)
 }
 
 activerMemePendantElan(document.getElementById("btnFermerCredits"), () => fermerPage(ecranCredits));
