@@ -2460,9 +2460,11 @@ header h1{
   width: 100% !important;
 }
 
-/* Les rangées de joueurs restent serrées au lieu de s'étirer sur toute la hauteur */
+/* Les rangées de joueurs restent serrées au lieu de s'étirer sur toute la hauteur, et ne rétrécissent
+   jamais (avant : quand l'overlay était plus haut que l'écran, cette zone était écrasée jusqu'à 0 px et
+   les joueurs disparaissaient, vu sur PC) : c'est tout l'overlay qui défile */
 #overlayPlus4 .plus4-container-joueurs{
-  flex: 0 1 auto;
+  flex: 0 0 auto;
   align-content: start;
 }
 
@@ -4864,8 +4866,8 @@ html:not([data-theme="givre"]) :is(#overlayPigeon .bouton-pigeon, #overlayPlus4 
   flex-shrink: 0;
 }
 
-/* ===== Téléphone en paysage (peu de hauteur) : tout plus compact ===== */
-@media (orientation: landscape) and (max-height: 500px){
+/* ===== Écran en largeur et peu haut (téléphone en paysage, fenêtre de PC basse) : tout plus compact ===== */
+@media (orientation: landscape) and (max-height: 700px){
   /* Plateau : 13 cartes par rangée (4 rangées pleines) au lieu de 6 */
   :root{ --cols: 13; }
 
