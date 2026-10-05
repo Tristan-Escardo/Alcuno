@@ -33,6 +33,7 @@ function retourDansLAppli(){
   if(annonce){ taper(annonce); return true; }
 
   if(estVisible(ecranCredits)){ activer("btnFermerCredits"); return true; }
+  if(estVisible(ecranRegles)){ activer("btnFermerRegles"); return true; }
   if(estVisible(ecranReglages)){ activer("btnFermerReglages"); return true; }
 
   // Overlays du jeu : le plus récent se ferme comme au tap (ceux où il faut choisir ne bougent pas),

@@ -760,3 +760,81 @@ if (estIOS && !estEnAppli) {
 }
 
 // #endregion
+
+// #region Écran des règles du jeu (bouton « ? » de l'accueil et du bandeau de la partie)
+// Rempli à chaque ouverture : les gorgées suivent le Mode PJ. Pas de carte dorée (c'est une surprise).
+const ecranRegles = document.getElementById("ecranRegles");
+
+function remplirRegles(){
+  const pj = estModeSoft();
+  const duel = pj
+    ? "Choisis 2 joueurs. Chacun prend une carte cachée : celui qui a la plus petite boit la moitié de sa valeur (10 gorgées max). Égalité : on recommence, gorgées doublées."
+    : "Choisis 2 joueurs. Chacun prend une carte cachée : celui qui a la plus petite boit sa valeur en gorgées. Égalité : on recommence, gorgées doublées.";
+  const parties = [
+    { titre: "Comment on joue", regles: [
+      { carte: "", nom: "Chacun son tour", texte: "Les cartes sont face cachée. Chacun son tour, retourne une carte et applique sa règle." }
+    ]},
+    { titre: "Les cartes", regles: [
+      { carte: "zero_bleu", nom: "0", texte: "Tout le monde boit 1 gorgée, sauf toi." },
+      { carte: "un_rouge", nom: "1 : annulation", texte: "Tu gardes la carte : quand tu dois boire, tu peux t'en servir pour annuler 1 gorgée." },
+      { carte: "plus_2_jaune", nom: "+2", texte: `Tu bois ${texteGorgees(gorgeesPlus2())}.` },
+      { carte: "plus_4", nom: "+4", texte: `Tu distribues ${texteGorgees(gorgeesPlus4())} comme tu veux.` },
+      { carte: "trois_vert", nom: "3 : le Pigeon", texte: `Le premier qui tire un 3 devient le Pigeon et boit ${texteGorgees(gorgeesPigeon())}. À chaque 3 tiré par un autre, le Pigeon boit 1 gorgée. Si le Pigeon tire un 3, il choisit le nouveau Pigeon, qui boit ${texteGorgees(gorgeesPigeon())}.` },
+      { carte: "quatre_bleu", nom: "4 : duel", texte: duel },
+      { carte: "interdit_rouge", nom: "Sociale", texte: "Tout le monde boit 1 gorgée." },
+      { carte: "switch_vert", nom: "Changement de sens", texte: "Le sens du jeu est inversé." },
+      { carte: "couleur", nom: "Couleur", texte: "Choisis une couleur : le prochain qui tire une carte de cette couleur boit 1 gorgée en plus." }
+    ]},
+    { titre: "Fin de la partie", regles: [
+      { carte: "", nom: "Pari sur la dernière carte", texte: `Quand il ne reste qu'une carte, chacun parie sur son type. Ceux qui trouvent distribuent ${texteCulSec()}.` },
+      { carte: "un_jaune", nom: "Les 1 pas utilisés", texte: "Chaque 1 gardé et pas utilisé se boit à la fin : 1 gorgée par carte." }
+    ]}
+  ];
+
+  const liste = document.getElementById("listeRegles");
+  liste.innerHTML = "";
+  if(pj){
+    const note = document.createElement("p");
+    note.className = "reglesNotePJ";
+    note.innerText = "Mode PJ activé : moins de gorgées.";
+    liste.appendChild(note);
+  }
+  parties.forEach(partie => {
+    const bloc = document.createElement("div");
+    bloc.className = "blocRegles";
+    const titre = document.createElement("h3");
+    titre.innerText = partie.titre;
+    bloc.appendChild(titre);
+    partie.regles.forEach(r => {
+      const ligne = document.createElement("div");
+      ligne.className = "ligneRegle";
+      const carte = document.createElement("div");
+      carte.className = ("Carte retournee " + r.carte).trim(); // sans classe : le dos de la carte
+      carte.setAttribute("aria-hidden", "true");
+      const texte = document.createElement("div");
+      texte.className = "texteRegle";
+      const nom = document.createElement("span");
+      nom.className = "nomRegle";
+      nom.innerText = r.nom;
+      const detail = document.createElement("span");
+      detail.className = "detailRegle";
+      detail.innerText = r.texte;
+      texte.append(nom, detail);
+      ligne.append(carte, texte);
+      bloc.appendChild(ligne);
+    });
+    liste.appendChild(bloc);
+  });
+}
+
+function ouvrirRegles(){
+  remplirRegles();
+  ecranRegles.scrollTop = 0;
+  ouvrirPage(ecranRegles);
+}
+
+document.getElementById("btnRegles").addEventListener("click", ouvrirRegles);
+document.getElementById("btnReglesJeu").addEventListener("click", ouvrirRegles);
+activerMemePendantElan(document.getElementById("btnFermerRegles"), () => fermerPage(ecranRegles));
+
+// #endregion
