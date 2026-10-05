@@ -4833,3 +4833,125 @@ html:not([data-theme="givre"]) :is(#overlayPigeon .bouton-pigeon, #overlayPlus4 
   color: #fff !important;
   text-shadow: 0 1px 0 rgba(122, 74, 0, 0.85), 0 2px 4px rgba(0, 0, 0, 0.4) !important;
 }
+
+/* ===== Écrans et overlays plus hauts que l'écran (téléphone en paysage, petit téléphone, beaucoup de
+   joueurs) : centrés tant qu'ils tiennent, sinon calés en haut et on peut défiler. Avant : centrés quand
+   même, le haut sortait de l'écran et ne pouvait jamais être atteint (titre du duel, carte de la règle,
+   ALCUNO de l'accueil coupés). !important : le JS centre certains overlays directement. ===== */
+:is(#choixMode, #enLigne, #ecranNouvellePartie, #ecranConfirmerHote, #ecranConfirmerRetrait,
+    #ecranConfirmerAccueil, #ecranChoixPseudo, #overlayRegleUnique, #overlayAnnulation,
+    #overlayResultatAnnulation, #overlayFinUnRestants, #overlayCouleur){
+  justify-content: flex-start !important;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+/* deux cales invisibles au début et à la fin : elles se partagent la place libre (contenu centré) et
+   tombent à zéro quand le contenu est trop haut (contenu calé en haut) */
+:is(#choixMode, #enLigne, #ecranNouvellePartie, #ecranConfirmerHote, #ecranConfirmerRetrait,
+    #ecranConfirmerAccueil, #ecranChoixPseudo, #overlayRegleUnique, #overlayAnnulation,
+    #overlayResultatAnnulation, #overlayFinUnRestants, #overlayCouleur)::before{
+  content: "";
+  margin-top: auto;
+}
+:is(#choixMode, #enLigne, #ecranNouvellePartie, #ecranConfirmerHote, #ecranConfirmerRetrait,
+    #ecranConfirmerAccueil, #ecranChoixPseudo, #overlayRegleUnique, #overlayAnnulation,
+    #overlayResultatAnnulation, #overlayFinUnRestants, #overlayCouleur)::after{
+  content: "";
+  margin-bottom: auto;
+}
+/* Duel : le bloc ne se laisse plus écraser à la hauteur de l'écran (son haut débordait au-dessus) */
+#overlayDuel .duel-content{
+  flex-shrink: 0;
+}
+
+/* ===== Téléphone en paysage (peu de hauteur) : tout plus compact ===== */
+@media (orientation: landscape) and (max-height: 500px){
+  /* Plateau : 13 cartes par rangée (4 rangées pleines) au lieu de 6 */
+  :root{ --cols: 13; }
+
+  /* Accueil */
+  #choixMode{ gap: 14px; padding-top: 14px; padding-bottom: 14px; }
+  #choixMode #titreAccueil{ font-size: min(19vw, 24vh); }
+  #choixMode .titreAccueil{ gap: 8px; margin-bottom: 4px; }
+  #choixMode button:not(#btnReglages):not(.btnAccueilTexte):not(.btnInstaller),
+  #enLigne button:not(.btnAccueilTexte):not(.btnRetour):not(.btnExclure),
+  #ecranNouvellePartie button:not(.btnAccueilTexte):not(.btnRetour),
+  #ecranConfirmerHote button,
+  #ecranConfirmerRetrait button,
+  #ecranConfirmerAccueil button,
+  #ecranChoixPseudo button{
+    padding-top: 12px;
+    padding-bottom: 12px;
+    font-size: 20px;
+  }
+  #enLigne > div{ gap: 12px; }
+
+  /* Bandeau ALCUNO de la partie : moins haut */
+  header{ padding: 10px 16px 12px; margin-top: 8px; margin-bottom: 10px; }
+  header h1{ font-size: min(7vw, 10vh); }
+
+  /* Overlays : cartes, titres et boutons plus petits */
+  #overlayRegleUnique{ --card-w: 64px; font-size: 24px; }
+  #overlayPlus4 .carte-vedette,
+  #overlayPigeon .carte-vedette,
+  #overlayDuel .Carte.carte-vedette,
+  #overlayCarteDoree .doree-carte-vedette,
+  #overlayRegleUnique.overlay-doree .Carte{
+    width: 58px;
+  }
+  #overlayDuel .Carte.carte-vedette-petite{ width: 44px; }
+  #overlayDuel{ --card-w: 72px; }
+  #overlayPigeon,
+  #overlayCarteDoree,
+  #overlayPlus4{ gap: 10px; padding-top: 14px; padding-bottom: 14px; }
+  #overlayPigeon .titre-pigeon,
+  #overlayPlus4 .titre-pigeon,
+  #overlayDuel .titre-pigeon,
+  #overlayFinUnRestants .titre-pigeon,
+  #overlayCouleur div.titre-couleur{
+    font-size: 26px;
+  }
+  #overlayCarteDoree .doree-titre,
+  #overlayRegleUnique .doree-titre{ font-size: 30px; }
+  #overlayRegleUnique.overlay-doree .doree-titre:only-child{ font-size: 44px; }
+  #overlayDuel .duel-content{ gap: 10px; }
+  #overlayDuel .duel-info{ font-size: 20px; }
+  #overlayPigeon .bouton-pigeon,
+  #overlayDuel .duel-boutons .bouton-pigeon,
+  #overlayFinUnRestants .bouton-pigeon,
+  #overlayCarteDoree .bouton-doree,
+  #overlayAnnulation button{
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+    font-size: 20px !important;
+    min-height: 0 !important;
+  }
+  #overlayDuel .duel-boutons{ gap: 8px; }
+  #overlayCarteDoree .doree-boutons{
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    width: min(620px, 100%);
+  }
+  #overlayCouleur{ gap: 16px; }
+  #overlayCouleur .container-couleurs{ grid-template-columns: repeat(4, 88px); gap: 14px; }
+  #overlayCouleur .carre-couleur{ width: 88px; }
+
+  /* +4 : les boutons Valider / Retour / Annuler sur une seule ligne (avant : empilés, ils couvraient
+     la moitié de l'écran) */
+  #overlayPlus4 .plus4-info{ font-size: 15px; }
+  #overlayPlus4 .plus4-total{ font-size: 18px; margin-bottom: 0; }
+  #overlayPlus4 .plus4-actions{ flex-wrap: nowrap; padding: 8px 0; margin-top: 4px; }
+  #overlayPlus4 .plus4-actions .plus4-action-btn{ flex: 1 1 0; width: auto; max-width: 220px; padding: 10px 8px; font-size: 17px; }
+  #overlayPlus4 .plus4-container-joueurs{
+    grid-template-columns: repeat(4, minmax(88px, 130px));
+    width: min(560px, 100%);
+    max-width: none;
+  }
+  #overlayPlus4 .plus4-container-joueurs .bouton-pigeon,
+  #overlayPlus4 .plus4-container-joueurs .plus4-joueur-btn{ min-height: 46px; padding: 6px 8px; }
+
+  /* Pari de fin : en-tête moins haut */
+  .prediction-title{ font-size: 30px; }
+  .prediction-header{ padding: 10px 14px; gap: 6px; }
+}
