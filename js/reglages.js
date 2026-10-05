@@ -825,8 +825,13 @@ if (estTelephone && !estEnAppli) {
   blocInstaller.hidden = false;
   if (!installationRemiseAPlusTard()) {
     // Android : on laisse un instant à Chrome pour dire s'il sait installer (bouton) ; sinon les étapes
+    // (pas si on a déjà quitté l'accueil entre-temps : il surgirait par-dessus ce qu'on est en train de faire)
+    const toujoursSurAccueil = () => document.getElementById("choixMode").style.display !== "none" &&
+      ecranReglages.style.display === "none" && ecranRegles.style.display === "none";
     if (estIOS) ouvrirEcranInstallation();
-    else setTimeout(() => { if (!installationRemiseAPlusTard()) ouvrirEcranInstallation(); }, demandeInstallation ? 0 : 1500);
+    else setTimeout(() => {
+      if (!installationRemiseAPlusTard() && toujoursSurAccueil()) ouvrirEcranInstallation();
+    }, demandeInstallation ? 0 : 1500);
   }
 }
 
