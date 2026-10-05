@@ -51,7 +51,7 @@ function afficherOverlayFinUnRestants(){
     restants.forEach(x => {
       const ligne = document.createElement("div");
       ligne.className = "fin-un-ligne";
-      ligne.innerText = `${x.nom} doit boire ${x.n} gorgée(s) pour ses 1 restants`;
+      ligne.innerText = `${x.nom} doit boire ${texteGorgees(x.n)} pour ses 1 restants`;
       bloc.appendChild(ligne);
     });
   }
@@ -351,7 +351,7 @@ function afficherOverlayAnnulation(joueurIndex, nbGorgees, onDone = null, afterC
   overlay.style.webkitOverflowScrolling = "touch";
 
   const titre = document.createElement("div");
-  titre.innerText = `${nom}, tu as ${dispo} annulation(s).`;
+  titre.innerText = `${nom}, tu as ${dispo} annulation${dispo > 1 ? "s" : ""}.`;
   titre.style.fontSize = "clamp(24px, 5vw, 46px)";
   titre.style.fontWeight = "900";
   titre.style.textShadow = "2px 2px 5px #000";
@@ -410,8 +410,8 @@ function afficherOverlayAnnulation(joueurIndex, nbGorgees, onDone = null, afterC
       const reste = nbGorgees - utilise;
       jouerSon(utilise > 0 ? "annuler_gorgees" : "annuler_0_gorgees");
       const messageResultat = utilise > 0
-        ? `${utilise} gorgée(s) annulée(s). \nTu bois ${reste} gorgée(s).`
-        : `Tu n’annules rien. \nTu bois ${reste} gorgée(s).`;
+        ? `${texteGorgees(utilise)} annulée${utilise > 1 ? "s" : ""}. \nTu bois ${texteGorgees(reste)}.`
+        : `Tu n’annules rien. \nTu bois ${texteGorgees(reste)}.`;
 
       annulations[nom] = Math.max(0, dispo - utilise);
       afficherJoueurs();
@@ -440,7 +440,7 @@ function afficherOverlayAnnulation(joueurIndex, nbGorgees, onDone = null, afterC
 // Annonce "X boit N" + propose annulation si dispo
 function annoncerBoireAvecAnnulation(joueurIndex, nbGorgees, classeCarte = "", prefixMsg = null, onFinish = null){
   const nom = joueurs[joueurIndex];
-  const msg = prefixMsg ? prefixMsg : `${nom} boit ${nbGorgees} gorgée(s)`;
+  const msg = prefixMsg ? prefixMsg : `${nom} boit ${texteGorgees(nbGorgees)}`;
 
   if (nbGorgees > 15) {
     // Easter egg : message signé Célien, mise en forme premium
@@ -1276,7 +1276,7 @@ function distribuerFilePlus4(file, classeCartePlus4){
 
 function demanderAnnulationPlus4(joueurIndex, nbGorgees, classeCartePlus4, onFinish){
   const nom = joueurs[joueurIndex];
-  const msg = `${nom} boit ${nbGorgees} gorgée(s) (+4)`;
+  const msg = `${nom} boit ${texteGorgees(nbGorgees)} (+4)`;
 
   montrerOverlayRegle(msg, classeCartePlus4);
 

@@ -4792,3 +4792,18 @@ html[data-theme="givre"] #ecranInstallation #btnInstallationInstaller{
   box-shadow: inset 0 -3px 0 rgba(8, 60, 100, 0.25), 0 6px 18px rgba(26, 146, 214, 0.35);
 }
 html[data-theme="givre"] #ecranInstallation #btnInstallationPlusTard{ color: var(--givre-texte); }
+
+/* ===== Mode bourré (textes plus gros) : écrans « Règles du jeu » et « Installer Alcuno » ===== */
+html.accessibilite #ecranRegles h2{ font-size: clamp(26px, 6vw, 42px); }
+html.accessibilite #ecranRegles .blocRegles h3{ font-size: 21px; }
+html.accessibilite #ecranRegles .nomRegle{ font-size: 20px; }
+html.accessibilite #ecranRegles .detailRegle{ font-size: 17px; }
+html.accessibilite #ecranRegles .reglesNotePJ{ font-size: 17px; }
+html.accessibilite #ecranRegles .ligneRegle .Carte{ width: 54px; }
+html.accessibilite #ecranInstallation h2{ font-size: clamp(30px, 8vw, 40px); }
+html.accessibilite #ecranInstallation .installationPourquoi{ font-size: 18px; }
+html.accessibilite #ecranInstallation .etapeInstallation{ font-size: 20px; }
+html.accessibilite #ecranInstallation .etapeInstallation small{ font-size: 16px; }
+html.accessibilite #ecranInstallation .numeroEtape{ width: 40px; height: 40px; font-size: 21px; }
+html.accessibilite #ecranInstallation #btnInstallationInstaller{ font-size: 26px; }
+html.accessibilite #ecranInstallation #btnInstallationPlusTard{ font-size: 19px; }
