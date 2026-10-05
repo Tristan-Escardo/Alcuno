@@ -4869,7 +4869,7 @@ html:not([data-theme="givre"]) :is(#overlayPigeon .bouton-pigeon, #overlayPlus4 
   /* Plateau : 13 cartes par rangée (4 rangées pleines) au lieu de 6 */
   :root{ --cols: 13; }
 
-  /* Accueil et menus (sur Android, appli installée, ils restent bloqués en portrait) */
+  /* Accueil et menus */
   #choixMode{ gap: 14px; padding-top: 14px; padding-bottom: 14px; }
   #choixMode #titreAccueil{ font-size: min(19vw, 24vh); }
   #choixMode .titreAccueil{ gap: 8px; margin-bottom: 4px; }
@@ -4954,4 +4954,11 @@ html:not([data-theme="givre"]) :is(#overlayPigeon .bouton-pigeon, #overlayPlus4 
   /* Pari de fin : en-tête moins haut */
   .prediction-title{ font-size: 30px; }
   .prediction-header{ padding: 10px 14px; gap: 6px; }
+}
+
+/* Téléphone en paysage, Prestige : les bandes de l'encoche sur les côtés (hors de la page, l'iPhone les
+   peint avec la couleur de fond de la page, sans motif possible) prennent la couleur du décor sur les
+   bords à mi-hauteur (fond + reflet 0.14 + un peu de lueur), au lieu du doré clair du haut / bas */
+@media (orientation: landscape) and (max-height: 500px){
+  html[data-theme="prestige"]{ --couleur-barre: #5b4712; }
 }

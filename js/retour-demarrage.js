@@ -107,32 +107,6 @@ window.addEventListener("popstate", () => {
   afficherToast("Appuie encore une fois sur retour pour quitter");
 });
 
-/* ===== PAYSAGE : SEULEMENT LE PLATEAU ET LES OVERLAYS ===== */
-// Android, appli installée : les autres pages (accueil, menus, réglages, règles, créateurs…) sont
-// bloquées en portrait (screen.orientation.lock ; manifest.json en « any » pour que le plateau puisse
-// tourner). Ailleurs (iPhone, navigateur) le blocage n'existe pas : ces pages ont aussi une mise en
-// page paysage (style_alcuno.css, « Téléphone en paysage »).
-const PAGES_PORTRAIT = ["choixMode", "enLigne", "ecranReglages", "ecranRegles", "ecranCredits",
-  "ecranNouvellePartie", "ecranConfirmerHote", "ecranConfirmerRetrait", "ecranConfirmerAccueil",
-  "ecranChoixPseudo", "ecranInstallation"].map((id) => document.getElementById(id)).filter(Boolean);
-let pagePortraitAffichee = null;
-
-function majOrientationPages(){
-  const pagePortrait = PAGES_PORTRAIT.some((page) =>
-    page.style.display !== "none" && !page.classList.contains("page-sortie"));
-  if(pagePortrait === pagePortraitAffichee) return;
-  pagePortraitAffichee = pagePortrait;
-  try {
-    if(pagePortrait) screen.orientation.lock("portrait").catch(() => {});
-    else screen.orientation.unlock();
-  } catch (e) {}
-}
-
-// Une page s'affiche ou se cache : style.display (et classe page-sortie pendant sa fermeture)
-const observateurPages = new MutationObserver(majOrientationPages);
-PAGES_PORTRAIT.forEach((page) => observateurPages.observe(page, { attributes: true, attributeFilter: ["style", "class"] }));
-majOrientationPages();
-
 /* ===== INIT ===== */
 window.addEventListener("scroll", repositionnerStickyJoueurActif, { passive: true });
 window.addEventListener("resize", () => { hautMinSticky = null; repositionnerStickyJoueurActif(); });
