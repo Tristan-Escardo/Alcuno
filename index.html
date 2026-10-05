@@ -58,7 +58,12 @@
     <header>
         <h1>ALCUNO</h1>
         <span class="badgeSoft" aria-label="Mode PJ">PJ</span>
-        <button type="button" id="btnReglesJeu" class="btnAccueilTexte" title="Règles du jeu" aria-label="Règles du jeu">?</button>
+        <button type="button" id="btnReglesJeu" class="btnAccueilTexte" title="Règles du jeu" aria-label="Règles du jeu">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path class="couverture" d="M12 6.6C9.9 5 7 4.5 3.2 4.9v13.6c3.8-.4 6.7.1 8.8 1.7 2.1-1.6 5-2.1 8.8-1.7V4.9C17 4.5 14.1 5 12 6.6z" />
+                <path d="M12 6.6v13.6M6 8.6h3.6M6 11.6h3.6M14.4 8.6H18M14.4 11.6H18" />
+            </svg>
+        </button>
         <button type="button" id="btnAccueilClassique" class="btnAccueilTexte" title="Accueil" aria-label="Accueil">⌂</button>
     </header>
 
@@ -80,9 +85,8 @@
             <!-- Règles du jeu : en haut à gauche, en miroir des Réglages -->
             <button type="button" id="btnRegles" class="btnAccueilTexte" title="Règles du jeu" aria-label="Règles du jeu">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <circle cx="12" cy="12" r="9.6" />
-                    <path d="M9.2 9.3a2.9 2.9 0 1 1 4.1 2.6c-.8.4-1.3 1-1.3 1.9v.6" />
-                    <circle class="point" cx="12" cy="17.6" r="0.4" />
+                    <path class="couverture" d="M12 6.6C9.9 5 7 4.5 3.2 4.9v13.6c3.8-.4 6.7.1 8.8 1.7 2.1-1.6 5-2.1 8.8-1.7V4.9C17 4.5 14.1 5 12 6.6z" />
+                    <path d="M12 6.6v13.6M6 8.6h3.6M6 11.6h3.6M14.4 8.6H18M14.4 11.6H18" />
                 </svg>
             </button>
             <div class="titreAccueil">
@@ -333,7 +337,7 @@
             <div class="plateau" id="plateau"></div>
         </div>
         <!-- Easter egg : 4 taps rapides sur le titre ALCUNO -->
-        <!-- Règles du jeu (bouton « ? » de l'accueil et du bandeau) : contenu rempli par js/reglages.js -->
+        <!-- Règles du jeu (bouton livre de l'accueil et du bandeau) : contenu rempli par js/reglages.js -->
         <section class="ecranRegles" id="ecranRegles" style="display:none;">
             <button type="button" id="btnFermerRegles" class="btnRetour">← Retour</button>
             <div class="regles-contenu">
