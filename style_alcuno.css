@@ -4983,3 +4983,41 @@ html:not([data-theme="givre"]) :is(#overlayPigeon .bouton-pigeon, #overlayPlus4 
   }
   html:is(.overlay-ouvert, .credits-ouverts)::after{ display: none; }
 }
+
+/* ===== Retour visuel des boutons (le dégradé imposé plus haut masquait leur couleur de survol) =====
+   Luminosité plutôt que couleur : marche sur le jaune comme sur le cyan de Givre.
+   Au doigt : plus sombre et un peu plus petit pendant l'appui. À la souris : un peu plus clair au survol
+   (seulement si l'appareil a une souris, sinon l'effet reste « collé » après un tap). */
+:is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
+  #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #lancerPartieEnLigne, #btnRejouerMemes,
+  #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
+  #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
+  #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+  #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayDuel button,
+  #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
+  #overlayAnnulation button){
+  transition: transform 0.12s ease, filter 0.12s ease, scale 0.12s ease;
+}
+@media (hover: hover){
+  :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
+    #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #lancerPartieEnLigne, #btnRejouerMemes,
+    #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
+    #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
+    #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+    #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayDuel button,
+    #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
+    #overlayAnnulation button):hover:not(:disabled){
+    filter: brightness(1.1);
+  }
+}
+html :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
+  #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #lancerPartieEnLigne, #btnRejouerMemes,
+  #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
+  #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
+  #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+  #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayDuel button,
+  #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
+  #overlayAnnulation button):active:not(:disabled){
+  filter: brightness(0.82);
+  scale: 0.96; /* (scale et pas transform : les animations d'apparition de ces boutons fixent leur transform) */
+}
