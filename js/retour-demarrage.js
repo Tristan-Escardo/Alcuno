@@ -33,6 +33,7 @@ function retourDansLAppli(){
   if(annonce){ taper(annonce); return true; }
 
   if(estVisible(ecranCredits)){ activer("btnFermerCredits"); return true; }
+  if(estVisible(ecranInstallation)){ activer("btnInstallationPlusTard"); return true; }
   if(estVisible(ecranRegles)){ activer("btnFermerRegles"); return true; }
   if(estVisible(ecranReglages)){ activer("btnFermerReglages"); return true; }
 

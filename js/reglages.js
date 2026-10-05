@@ -737,36 +737,97 @@ const blocInstaller = document.getElementById("installerAppli");
 const btnInstallerAppli = document.getElementById("btnInstallerAppli");
 let demandeInstallation = null;
 
-// Android (Chrome) : le navigateur signale qu'on peut installer => on montre le bouton
+const estIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+  (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const estAndroid = /android/i.test(navigator.userAgent);
+const estTelephone = estIOS || estAndroid;
+
+// ===== Écran « Installer Alcuno » (téléphone, jeu pas installé) =====
+// Affiché tout seul à l'ouverture. « Jouer sans installer » le ferme jusqu'à la prochaine ouverture du
+// jeu (sessionStorage) ; le petit bouton « Installer l'appli » en bas de l'accueil le rouvre.
+//  - iPhone / iPad : Apple ne permet pas de bouton, on montre les étapes de Safari
+//  - Android avec Chrome : le navigateur sait installer => gros bouton « Installer » (un tap)
+//  - Android, autre navigateur ou Chrome qui ne propose pas l'installation : les étapes du menu ⋮
+const ecranInstallation = document.getElementById("ecranInstallation");
+const btnInstallationInstaller = document.getElementById("btnInstallationInstaller");
+const CLE_INSTALLATION_PLUS_TARD = "alcuno_installation_plus_tard";
+const ICONE_PARTAGER = '<svg viewBox="0 0 24 24" class="iconeEtape" aria-hidden="true"><path d="M12 3v12M7.5 7.5 12 3l4.5 4.5M6 11H5v10h14V11h-1"/></svg>';
+const ICONE_AJOUTER = '<svg viewBox="0 0 24 24" class="iconeEtape" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8v8M8 12h8"/></svg>';
+const ICONE_MENU = '<svg viewBox="0 0 24 24" class="iconeEtape" aria-hidden="true"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg>';
+
+function majEcranInstallation(){
+  const etapes = estIOS
+    ? [`Dans Safari, touche ${ICONE_PARTAGER} <b>Partager</b><small>(ou ••• puis Partager)</small>`,
+       `Choisis ${ICONE_AJOUTER} <b>Sur l'écran d'accueil</b>`,
+       "Touche <b>Ajouter</b>"]
+    : [`Touche le menu ${ICONE_MENU} du navigateur`,
+       "Choisis <b>Installer l'application</b> ou <b>Ajouter à l'écran d'accueil</b>",
+       "Confirme"];
+  const zone = document.getElementById("installationEtapes");
+  zone.hidden = !!demandeInstallation; // Chrome sait installer : pas besoin d'étapes
+  zone.innerHTML = etapes.map((texte, i) =>
+    `<div class="etapeInstallation"><span class="numeroEtape">${i + 1}</span><span>${texte}</span></div>`).join("");
+  btnInstallationInstaller.hidden = !demandeInstallation;
+}
+
+function ouvrirEcranInstallation(){
+  majEcranInstallation();
+  ouvrirPage(ecranInstallation);
+}
+
+function fermerEcranInstallation(){
+  try { sessionStorage.setItem(CLE_INSTALLATION_PLUS_TARD, "1"); } catch (e) {}
+  fermerPage(ecranInstallation);
+}
+
+function installationRemiseAPlusTard(){
+  try { return sessionStorage.getItem(CLE_INSTALLATION_PLUS_TARD) === "1"; } catch (e) { return false; }
+}
+
+activerMemePendantElan(document.getElementById("btnInstallationPlusTard"), fermerEcranInstallation);
+
+// Android (Chrome) : le navigateur signale qu'on peut installer
 window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
   if (estEnAppli) return;
   demandeInstallation = e;
   blocInstaller.hidden = false;
-  btnInstallerAppli.hidden = false;
+  if (ecranInstallation.style.display !== "none") majEcranInstallation(); // les étapes deviennent un bouton
 });
 
-btnInstallerAppli.addEventListener("click", () => {
+function lancerInstallation(){
   if (!demandeInstallation) return;
   demandeInstallation.prompt();
-  demandeInstallation.userChoice.finally(() => {
-    demandeInstallation = null;
-    btnInstallerAppli.hidden = true;
-    blocInstaller.hidden = true;
+  demandeInstallation.userChoice.then((choix) => {
+    if (choix && choix.outcome === "accepted") fermerPage(ecranInstallation);
+  }).finally(() => {
+    demandeInstallation = null; // Chrome ne la propose qu'une fois
+    if (!estTelephone) blocInstaller.hidden = true;
+    if (ecranInstallation.style.display !== "none") majEcranInstallation();
   });
+}
+
+btnInstallationInstaller.addEventListener("click", lancerInstallation);
+
+// Petit bouton en bas de l'accueil : téléphone => l'écran ; ordinateur avec Chrome => installe directement
+btnInstallerAppli.addEventListener("click", () => {
+  if (estTelephone) ouvrirEcranInstallation();
+  else lancerInstallation();
 });
 
 window.addEventListener("appinstalled", () => {
   demandeInstallation = null;
   blocInstaller.hidden = true;
+  fermerPage(ecranInstallation);
 });
 
-// iPhone / iPad : pas de bouton possible (Apple ne le permet pas), on affiche l'astuce Safari
-const estIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) ||
-  (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-if (estIOS && !estEnAppli) {
+if (estTelephone && !estEnAppli) {
   blocInstaller.hidden = false;
-  document.getElementById("astuceIphone").hidden = false;
+  if (!installationRemiseAPlusTard()) {
+    // Android : on laisse un instant à Chrome pour dire s'il sait installer (bouton) ; sinon les étapes
+    if (estIOS) ouvrirEcranInstallation();
+    else setTimeout(() => { if (!installationRemiseAPlusTard()) ouvrirEcranInstallation(); }, demandeInstallation ? 0 : 1500);
+  }
 }
 
 // #endregion
