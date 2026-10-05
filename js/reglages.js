@@ -272,12 +272,21 @@ document.querySelectorAll(".pastilleTheme").forEach((pastille) => {
 const CLE_MODE_SOFT = "alcuno_mode_soft";
 const caseModeSoft = document.getElementById("optionModeSoft");
 caseModeSoft.checked = lireReglage(CLE_MODE_SOFT, false);
-caseModeSoft.addEventListener("change", () => ecrireReglage(CLE_MODE_SOFT, caseModeSoft.checked));
+caseModeSoft.addEventListener("change", () => {
+  ecrireReglage(CLE_MODE_SOFT, caseModeSoft.checked);
+  majTitrePJ();
+});
 
 let softPartieEnLigne = false;
 
 function estModeSoft(){
   return codePartieActuel ? softPartieEnLigne : caseModeSoft.checked;
+}
+
+// Titre du bandeau « ALCUNO PJ » : suit le Mode PJ tout de suite (réglage, ou mode de la partie en ligne),
+// pas seulement au lancement d'une partie (classe « partie-soft » sur body)
+function majTitrePJ(){
+  document.body.classList.toggle("partie-soft", estModeSoft());
 }
 
 // Gorgées selon le mode (normal | soft)
@@ -300,6 +309,7 @@ function texteDoreeJamaisTrouvee(){
 function choisirModeSoftEnLigne(soft){
   softPartieEnLigne = !!soft;
   document.getElementById("infoModeSoft").style.display = softPartieEnLigne ? "" : "none";
+  majTitrePJ();
 }
 
 // ===== Sons : fichiers MP3 du dossier Sons/ (voir SONS plus bas pour la liste des fichiers) =====

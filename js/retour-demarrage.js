@@ -116,6 +116,7 @@ if(window.visualViewport){
 }
 
 creerUIJoueurActifSticky();
+majTitrePJ(); // « ALCUNO PJ » si le Mode PJ est déjà activé
 afficherJoueurs();
 majStickyJoueurActif();
 window.addEventListener("resize", () => {

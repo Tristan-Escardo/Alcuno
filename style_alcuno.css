@@ -3324,7 +3324,7 @@ html.accessibilite #ecranReglages #btnPartagerJeu{
   font-size: clamp(19px, 4.8vw, 23px);
 }
 
-/* ===== Mode PJ (« soft » dans le code) : badge « PJ » à gauche du bandeau ALCUNO pendant une partie en Mode PJ,
+/* ===== Mode PJ (« soft » dans le code) : « PJ » dans le titre du bandeau (voir plus bas) dès que le Mode PJ est actif,
    et rappel dans la salle d'attente en ligne ===== */
 header .badgeSoft{
   display: none;
