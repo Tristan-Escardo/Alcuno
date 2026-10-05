@@ -4622,30 +4622,26 @@ html[data-theme="givre"] #ecranRegles .btnRetour{
   box-shadow: inset 0 -2px 0 rgba(8, 60, 100, 0.25), 0 6px 14px rgba(26, 146, 214, 0.28);
 }
 
-/* ===== Mode PJ : « PJ » collé juste après ALCUNO dans le bandeau, comme une partie du titre
-   (même police et même couleur que le titre, en plus petit ; le titre reste centré) ===== */
+/* ===== Mode PJ : « PJ » juste après ALCUNO dans le bandeau, comme un mot du titre
+   (même police, même taille, même couleur et mêmes ombres que ALCUNO : il hérite de tout) ===== */
 header h1 .badgeSoft{
-  position: absolute;
-  left: 100%;
-  bottom: 0.06em;
-  top: auto;
-  transform: none;
+  position: static;
+  margin-left: 0.25em;
   padding: 0;
   border: none;
   border-radius: 0;
   background: none;
-  font-family: inherit;
-  font-size: 0.5em;
-  font-weight: inherit;
-  letter-spacing: 0.06em;
-  line-height: 1;
+  transform: none;
+  font: inherit;
+  letter-spacing: inherit;
   color: inherit;
-  text-shadow: inherit;
-  white-space: nowrap;
 }
 body.partie-soft header h1 .badgeSoft{
-  display: block;
+  display: inline;
 }
 html[data-theme="givre"] header h1 .badgeSoft{
   color: inherit;
+}
+html.accessibilite header h1 .badgeSoft{
+  zoom: 1;
 }
