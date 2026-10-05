@@ -757,7 +757,7 @@ const ICONE_MENU = '<svg viewBox="0 0 24 24" class="iconeEtape" aria-hidden="tru
 
 function majEcranInstallation(){
   const etapes = estIOS
-    ? [`Dans Safari, touche ${ICONE_PARTAGER} <b>Partager</b><small>(ou <b>•••</b> puis Partager)</small>`,
+    ? [`Dans Safari, touche ${ICONE_PARTAGER} <b>Partager</b><small>(ou ••• puis Partager)</small>`,
        `Choisis ${ICONE_AJOUTER} <b>Sur l'écran d'accueil</b>`,
        "Touche <b>Ajouter</b> : l'icône Alcuno apparaît 🎉"]
     : [`Touche le menu ${ICONE_MENU} du navigateur`,
