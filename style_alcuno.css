@@ -4413,7 +4413,7 @@ html[data-theme="givre"] #stickyJoueurActif.has-couleur .sticky-couleur{
   color: color-mix(in srgb, var(--couleur-jeu) 45%, #0d3550);
 }
 
-/* ===== Règles du jeu : bouton « ? » (accueil + bandeau de la partie) et écran des règles ===== */
+/* ===== Règles du jeu : bouton livre ouvert (accueil + bandeau de la partie) et écran des règles ===== */
 /* Accueil : en haut à gauche, même style que le bouton Réglages (en haut à droite) */
 #choixMode #btnRegles{
   position: absolute;
@@ -4432,54 +4432,26 @@ html[data-theme="givre"] #stickyJoueurActif.has-couleur .sticky-couleur{
   cursor: pointer;
   transition: opacity 0.15s ease, transform 0.15s ease;
 }
-#choixMode #btnRegles svg{
-  width: 32px;
-  height: 32px;
-  overflow: visible;
-  filter: drop-shadow(0 2px 0 rgba(120, 70, 0, 0.95)) drop-shadow(0 3px 6px rgba(0,0,0,0.45));
-}
-#choixMode #btnRegles circle{
-  fill: var(--fond-theme);
-  stroke: #FFD700;
-  stroke-width: 2.4;
-}
-#choixMode #btnRegles path,
-#choixMode #btnRegles circle.point{
-  fill: none;
-  stroke: #FFD700;
-  stroke-width: 2.4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
 #choixMode #btnRegles:hover{
   opacity: 1;
   transform: scale(1.06);
 }
-@media (max-width: 520px){
-  #choixMode #btnRegles svg{ width: 28px; height: 28px; }
-}
 
-/* Bandeau de la partie : « ? » doré comme le ⌂, juste à sa gauche (seul à droite en ligne, sans ⌂) */
+/* Bandeau de la partie : à gauche, en miroir du ⌂ */
 header #btnReglesJeu{
   position: absolute;
   top: 50%;
-  right: 56px;
+  left: 14px;
   transform: translateY(-50%);
   z-index: 2;
   width: auto;
   min-width: 0;
-  padding: 6px 4px;
+  padding: 4px;
   border: none;
   border-radius: 0;
   background: none;
   box-shadow: none;
-  font-family: Impact, Haettenschweiler, "Arial Black", sans-serif;
-  font-size: 28px;
-  font-weight: 900;
-  -webkit-text-stroke: 1px #FFD700;
-  line-height: 1;
-  color: #FFD700;
-  text-shadow: 0 2px 0 rgba(120, 70, 0, 0.95), 0 3px 8px rgba(0,0,0,0.45);
+  line-height: 0;
   opacity: 0.9;
   cursor: pointer;
   transition: opacity 0.15s ease, transform 0.15s ease;
@@ -4488,10 +4460,32 @@ header #btnReglesJeu:hover{
   opacity: 1;
   transform: translateY(-50%) scale(1.06);
 }
-body.mode-en-ligne header #btnReglesJeu{ right: 16px; }
+
+/* Le livre : trait doré, couverture couleur du fond, même relief que les boutons Réglages / ⌂ */
+#choixMode #btnRegles svg,
+header #btnReglesJeu svg{
+  width: 32px;
+  height: 32px;
+  overflow: visible;
+  filter: drop-shadow(0 2px 0 rgba(120, 70, 0, 0.95)) drop-shadow(0 3px 6px rgba(0,0,0,0.45));
+}
+#choixMode #btnRegles path,
+header #btnReglesJeu path{
+  fill: none;
+  stroke: #FFD700;
+  stroke-width: 2.1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+#choixMode #btnRegles path.couverture,
+header #btnReglesJeu path.couverture{
+  fill: var(--fond-theme);
+  stroke-width: 2.4;
+}
 @media (max-width: 520px){
-  header #btnReglesJeu{ font-size: 24px; right: 44px; }
-  body.mode-en-ligne header #btnReglesJeu{ right: 10px; }
+  #choixMode #btnRegles svg,
+  header #btnReglesJeu svg{ width: 28px; height: 28px; }
+  header #btnReglesJeu{ left: 10px; }
 }
 
 /* L'écran : mise en page des Réglages (au-dessus des overlays : en ligne, le jeu peut avancer derrière) */
@@ -4601,15 +4595,11 @@ body.mode-en-ligne header #btnReglesJeu{ right: 16px; }
 }
 
 /* Givre (thème clair) : mêmes couleurs que ses Réglages */
-html[data-theme="givre"] #choixMode #btnRegles circle,
-html[data-theme="givre"] #choixMode #btnRegles path{ stroke: #1a9be0; }
-html[data-theme="givre"] #choixMode #btnRegles svg{
+html[data-theme="givre"] #choixMode #btnRegles path,
+html[data-theme="givre"] header #btnReglesJeu path{ stroke: #1a9be0; }
+html[data-theme="givre"] #choixMode #btnRegles svg,
+html[data-theme="givre"] header #btnReglesJeu svg{
   filter: drop-shadow(0 2px 0 #0b5a8c) drop-shadow(0 3px 6px rgba(13, 53, 80, 0.2));
-}
-html[data-theme="givre"] header #btnReglesJeu{
-  color: #1a9be0;
-  -webkit-text-stroke-color: #1a9be0;
-  text-shadow: 0 2px 0 #0b5a8c, 0 3px 8px rgba(13, 53, 80, 0.2);
 }
 html[data-theme="givre"] #ecranRegles{ color: var(--givre-texte); }
 html[data-theme="givre"] #ecranRegles h2,
@@ -4630,4 +4620,28 @@ html[data-theme="givre"] #ecranRegles .btnRetour{
   color: #fff;
   text-shadow: 0 1px 2px rgba(8, 60, 100, 0.55);
   box-shadow: inset 0 -2px 0 rgba(8, 60, 100, 0.25), 0 6px 14px rgba(26, 146, 214, 0.28);
+}
+
+/* ===== Mode PJ : « PJ » juste après ALCUNO dans le bandeau, comme un mot du titre
+   (même police, même taille, même couleur et mêmes ombres que ALCUNO : il hérite de tout) ===== */
+header h1 .badgeSoft{
+  position: static;
+  margin-left: 0.25em;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  transform: none;
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+}
+body.partie-soft header h1 .badgeSoft{
+  display: inline;
+}
+html[data-theme="givre"] header h1 .badgeSoft{
+  color: inherit;
+}
+html.accessibilite header h1 .badgeSoft{
+  zoom: 1;
 }

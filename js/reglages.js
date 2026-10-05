@@ -761,7 +761,7 @@ if (estIOS && !estEnAppli) {
 
 // #endregion
 
-// #region Écran des règles du jeu (bouton « ? » de l'accueil et du bandeau de la partie)
+// #region Écran des règles du jeu (bouton livre de l'accueil et du bandeau de la partie)
 // Rempli à chaque ouverture : les gorgées suivent le Mode PJ. Pas de carte dorée (c'est une surprise).
 const ecranRegles = document.getElementById("ecranRegles");
 
@@ -772,7 +772,7 @@ function remplirRegles(){
     : "Choisis 2 joueurs. Chacun prend une carte cachée : celui qui a la plus petite boit sa valeur en gorgées. Égalité : on recommence, gorgées doublées.";
   const parties = [
     { titre: "Comment on joue", regles: [
-      { carte: "", nom: "Chacun son tour", texte: "Les cartes sont face cachée. Chacun son tour, retourne une carte et applique sa règle." }
+      { carte: "", nom: "À ton tour", texte: "Toutes les cartes sont posées face cachée. Quand c'est ton tour, retourne la carte de ton choix et applique sa règle. Ensuite, c'est au joueur suivant." }
     ]},
     { titre: "Les cartes", regles: [
       { carte: "zero_bleu", nom: "0", texte: "Tout le monde boit 1 gorgée, sauf toi." },
@@ -787,7 +787,7 @@ function remplirRegles(){
     ]},
     { titre: "Fin de la partie", regles: [
       { carte: "", nom: "Pari sur la dernière carte", texte: `Quand il ne reste qu'une carte, chacun parie sur son type. Ceux qui trouvent distribuent ${texteCulSec()}.` },
-      { carte: "un_jaune", nom: "Les 1 pas utilisés", texte: "Chaque 1 gardé et pas utilisé se boit à la fin : 1 gorgée par carte." }
+      { carte: "un_jaune", nom: "Les 1 restants", texte: "Chaque 1 gardé jusqu'à la fin se transforme en gorgée à boire (1 gorgée par carte)." }
     ]}
   ];
 
