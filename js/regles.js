@@ -1574,7 +1574,7 @@ function lancerPartie(){
   plateau.innerHTML = "";
   prechargerImagesCartes(); // (déjà fait à l'ouverture, en principe)
   lancementPartieA = Date.now();
-  document.body.classList.toggle("partie-soft", estModeSoft()); // badge « 🌱 SOFT » dans le bandeau
+  majTitrePJ(); // « ALCUNO PJ » dans le bandeau
   garderEcranAllume(); // pas de mise en veille pendant la partie
 
   // Plateau principal = toutes les cartes SAUF 2/5/6/7/8/9 (paquet duel)
@@ -1688,7 +1688,7 @@ function lancerPartie(){
 
 function retourMenu(){
   partieLancee = false;
-  document.body.classList.remove("partie-soft");
+  majTitrePJ(); // le titre suit le réglage Mode PJ, partie ou pas
   finUnOverlayAffiche = false;
 
   // Écrans du retrait en cours de partie (nouvelle manche, départ, partie fermée...)
