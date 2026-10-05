@@ -94,11 +94,10 @@
             </div>
             <button type="button" id="btnModeEnLigne">Mode en ligne</button>
             <button type="button" id="btnModeClassique">Mode classique<br>(Hors connexion)</button>
-            <!-- Installer l'appli : bouton sur Android (quand Chrome le permet), astuce sur iPhone.
-                 Rien ne s'affiche quand le jeu est déjà ouvert en appli. -->
+            <!-- Installer l'appli : petit bouton en bas (téléphone : rouvre l'écran « Installer Alcuno » ;
+                 ordinateur avec Chrome : installe directement). Rien quand le jeu est déjà ouvert en appli. -->
             <div class="installerAppli" id="installerAppli" hidden>
-                <button type="button" id="btnInstallerAppli" class="btnInstaller" hidden>📲 Installer l'appli</button>
-                <p id="astuceIphone" class="astuceIphone" hidden>📲 Pour installer l'appli : bouton <strong>Partager</strong> → <strong>Sur l'écran d'accueil</strong></p>
+                <button type="button" id="btnInstallerAppli" class="btnInstaller">📲 Installer l'appli</button>
             </div>
         </section>
 
@@ -342,6 +341,19 @@
             <div class="regles-contenu">
                 <h2>Règles du jeu</h2>
                 <div id="listeRegles"></div>
+            </div>
+        </section>
+
+        <!-- Installer Alcuno : écran plein affiché à l'ouverture sur téléphone quand le jeu n'est pas installé
+             (iPhone : les étapes ; Android avec Chrome : bouton Installer ; autre navigateur : les étapes) -->
+        <section class="ecranInstallation" id="ecranInstallation" style="display:none;">
+            <div class="installation-contenu">
+                <img class="installationIcone" src="icones/icone-180.png" alt="">
+                <h2>Installer Alcuno</h2>
+                <p class="installationPourquoi">Le jeu s'ouvre en plein écran depuis ton écran d'accueil, comme une vraie appli, et le mode classique marche même sans réseau.</p>
+                <div id="installationEtapes"></div>
+                <button type="button" id="btnInstallationInstaller" hidden>📲 Installer</button>
+                <button type="button" id="btnInstallationPlusTard">Jouer sans installer</button>
             </div>
         </section>
 

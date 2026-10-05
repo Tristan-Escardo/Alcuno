@@ -4645,3 +4645,150 @@ html[data-theme="givre"] header h1 .badgeSoft{
 html.accessibilite header h1 .badgeSoft{
   zoom: 1;
 }
+
+/* ===== Écran « Installer Alcuno » (téléphone, jeu pas installé : voir js/reglages.js) ===== */
+#ecranInstallation{
+  position: fixed;
+  inset: 0;
+  z-index: 10003;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: max(44px, env(safe-area-inset-top, 0px)) 20px calc(26px + env(safe-area-inset-bottom, 0px));
+  box-sizing: border-box;
+  color: #fff;
+  background: var(--deco-theme, none), var(--fond-theme);
+}
+#ecranInstallation .installation-contenu{
+  min-height: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+#ecranInstallation .installationIcone{
+  width: 88px;
+  height: 88px;
+  margin-top: auto;
+  border-radius: 22px;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.5);
+}
+#ecranInstallation h2{
+  margin: 0;
+  text-align: center;
+  color: #FFD700;
+  font-size: clamp(26px, 7vw, 34px);
+  font-weight: 900;
+  text-shadow: 2px 2px 5px #000;
+}
+#ecranInstallation .installationPourquoi{
+  margin: -4px 0 4px;
+  max-width: 32ch;
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.4;
+  color: rgba(255,255,255,0.82);
+}
+#ecranInstallation #installationEtapes{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+#ecranInstallation #installationEtapes[hidden]{ display: none; }
+#ecranInstallation .etapeInstallation{
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,215,0,0.25);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: left;
+}
+#ecranInstallation .etapeInstallation b{ color: #FFD700; }
+#ecranInstallation .etapeInstallation small{
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0.75;
+}
+#ecranInstallation .numeroEtape{
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #FFD700;
+  color: #2b001d;
+  font-size: 18px;
+  font-weight: 900;
+}
+#ecranInstallation .iconeEtape{
+  width: 1.25em;
+  height: 1.25em;
+  vertical-align: -0.25em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+#ecranInstallation .iconeEtape circle{ fill: currentColor; stroke: none; }
+#ecranInstallation .iconeEtape rect{ fill: none; }
+/* Android avec Chrome : le gros bouton qui installe en un tap */
+#ecranInstallation #btnInstallationInstaller{
+  width: min(86vw, 360px);
+  margin-top: 6px;
+  padding: 18px;
+  border: none;
+  border-radius: 18px;
+  background: #ffcc00;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 900;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+  box-shadow: inset 0 -3px 0 rgba(0,0,0,0.18), 0 0 26px rgba(255,215,0,0.45);
+  cursor: pointer;
+}
+#ecranInstallation #btnInstallationPlusTard{
+  width: auto;
+  margin-top: auto;
+  padding: 12px 18px;
+  border: none;
+  background: none;
+  box-shadow: none;
+  color: rgba(255,255,255,0.75);
+  font-size: 16px;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+/* Givre (thème clair) */
+html[data-theme="givre"] #ecranInstallation{ color: var(--givre-texte); }
+html[data-theme="givre"] #ecranInstallation h2{
+  color: var(--givre-accent);
+  text-shadow: 0 2px 8px rgba(255, 255, 255, 0.9);
+}
+html[data-theme="givre"] #ecranInstallation .installationPourquoi{ color: var(--givre-texte); opacity: 0.85; }
+html[data-theme="givre"] #ecranInstallation .etapeInstallation{
+  background: var(--givre-panneau);
+  border-color: var(--givre-bord);
+}
+html[data-theme="givre"] #ecranInstallation .etapeInstallation b{ color: var(--givre-accent); }
+html[data-theme="givre"] #ecranInstallation .numeroEtape{ background: var(--givre-accent); color: #fff; }
+html[data-theme="givre"] #ecranInstallation #btnInstallationInstaller{
+  background: var(--givre-bouton);
+  box-shadow: inset 0 -3px 0 rgba(8, 60, 100, 0.25), 0 6px 18px rgba(26, 146, 214, 0.35);
+}
+html[data-theme="givre"] #ecranInstallation #btnInstallationPlusTard{ color: var(--givre-texte); }
