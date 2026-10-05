@@ -906,8 +906,37 @@ function remplirRegles(){
 function ouvrirRegles(){
   remplirRegles();
   ecranRegles.scrollTop = 0;
+  choixDejaEnAttente = new Set(choixEnAttentePourMoi()); // déjà là à l'ouverture : on ne referme pas pour eux
   ouvrirPage(ecranRegles);
 }
+
+// En ligne : si, pendant qu'on lit les règles, c'est à nous de choisir quelque chose (nouveau Pigeon, +4,
+// duel, annulation, couleur...), l'écran des règles se ferme tout seul : sinon il cachait le choix
+// et les autres attendaient sans comprendre.
+let choixDejaEnAttente = new Set();
+let verificationReglesPrevue = false;
+
+function choixEnAttentePourMoi(){
+  if(!enLigneActif) return [];
+  return [...document.querySelectorAll('[id^="overlay"] [data-net-id]')]
+    .filter(el => el._net && actionPrete(el) && proprietaireAction(el) === pseudoActuel);
+}
+
+function fermerReglesSiCestAMoi(){
+  if(ecranRegles.style.display === "none" || ecranRegles.classList.contains("page-sortie")) return;
+  if(!choixEnAttentePourMoi().some(el => !choixDejaEnAttente.has(el))) return;
+  fermerPage(ecranRegles);
+  afficherToast("C'est à toi de choisir !", 2500);
+}
+
+new MutationObserver(() => {
+  if(!enLigneActif || ecranRegles.style.display === "none" || verificationReglesPrevue) return;
+  verificationReglesPrevue = true;
+  requestAnimationFrame(() => {
+    verificationReglesPrevue = false;
+    fermerReglesSiCestAMoi();
+  });
+}).observe(document.body, { childList: true, subtree: true });
 
 document.getElementById("btnRegles").addEventListener("click", ouvrirRegles);
 document.getElementById("btnReglesJeu").addEventListener("click", ouvrirRegles);
