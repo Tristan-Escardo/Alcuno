@@ -759,10 +759,10 @@ function majEcranInstallation(){
   const etapes = estIOS
     ? [`Dans Safari, touche ${ICONE_PARTAGER} <b>Partager</b><small>(ou ••• puis Partager)</small>`,
        `Choisis ${ICONE_AJOUTER} <b>Sur l'écran d'accueil</b>`,
-       "Touche <b>Ajouter</b> : l'icône Alcuno apparaît 🎉"]
+       "Touche <b>Ajouter</b>"]
     : [`Touche le menu ${ICONE_MENU} du navigateur`,
        "Choisis <b>Installer l'application</b> ou <b>Ajouter à l'écran d'accueil</b>",
-       "Confirme : l'icône Alcuno apparaît 🎉"];
+       "Confirme"];
   const zone = document.getElementById("installationEtapes");
   zone.hidden = !!demandeInstallation; // Chrome sait installer : pas besoin d'étapes
   zone.innerHTML = etapes.map((texte, i) =>
