@@ -4,6 +4,7 @@
 #   powershell -File tout_tester.ps1 -enLigne    + les tests en ligne (vrai Firebase, environ 15 minutes de plus)
 #   powershell -File tout_tester.ps1 -rapide     lisibilité sur Givre et Bordeaux seulement (au lieu des 8 thèmes)
 # La sortie complète de chaque test est gardée dans tests/resultats/ (ignoré par git).
+# Après un push : powershell -File verifier_mise_en_ligne.ps1 (le site en ligne a-t-il bien la nouvelle version ?)
 param([switch]$enLigne, [switch]$rapide)
 
 $banc = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -45,6 +46,8 @@ try {
 
   $themes = if ($rapide) { "givre,bordeaux" } else { "bordeaux,noir,vert,bleu,violet,cerisier,givre,prestige" }
   Tester "Lisibilité des thèmes" { powershell -ExecutionPolicy Bypass -File (Join-Path $banc "test_contraste.ps1") -themes $themes } @('RÉSULTAT : OK')
+
+  Tester "Rien ne déborde (portrait, paysage, PC)" { powershell -ExecutionPolicy Bypass -File (Join-Path $banc "test_debordement.ps1") } @('RÉSULTAT : OK') @('PROBLÈME', 'EXCEPTION')
 
   Tester "Changement de thème (iPhone)" { powershell -ExecutionPolicy Bypass -File (Join-Path $banc "test_rechargement_theme.ps1") } @(
     '1\)[^\r\n]*"theme":"bleu","reglages":"block"',

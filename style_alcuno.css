@@ -193,8 +193,10 @@ button,
     cursor: pointer;
 }
 
-.Carte:hover {
-    transform: scale(1.05);
+@media (hover: hover){ /* survol : seulement avec une souris (sur téléphone il reste collé après un tap) */
+  .Carte:hover {
+      transform: scale(1.05);
+  }
 }
 
 .retournee {
@@ -289,10 +291,12 @@ button,
 }
 
 /* Hover */
-.menu button:hover,
-.suppression button:hover{
-  background-color: #ffea70;
-  transform: scale(1.05);
+@media (hover: hover){ /* survol : seulement avec une souris (sur téléphone il reste collé après un tap) */
+  .menu button:hover,
+  .suppression button:hover{
+    background-color: #ffea70;
+    transform: scale(1.05);
+  }
 }
 
 /* Click */
@@ -370,9 +374,11 @@ button,
   user-select: none;
 }
 
-#listeSuppression .supp-item:hover{
-  background: rgba(255,215,0,0.10);
-  box-shadow: 0 0 0 1px rgba(255,215,0,0.22) inset;
+@media (hover: hover){ /* survol : seulement avec une souris (sur téléphone il reste collé après un tap) */
+  #listeSuppression .supp-item:hover{
+    background: rgba(255,215,0,0.10);
+    box-shadow: 0 0 0 1px rgba(255,215,0,0.22) inset;
+  }
 }
 
 /* Checkbox simple mais clean (support moderne) */
@@ -411,9 +417,11 @@ button,
   transition: transform 0.15s ease, background-color 0.15s ease;
 }
 
-#termineSuppression:hover{
-  background-color: #ffea70;
-  transform: scale(1.05);
+@media (hover: hover){ /* survol : seulement avec une souris (sur téléphone il reste collé après un tap) */
+  #termineSuppression:hover{
+    background-color: #ffea70;
+    transform: scale(1.05);
+  }
 }
 
 #termineSuppression:active{
@@ -466,9 +474,11 @@ button,
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
-#overlayCouleur .carre-couleur:hover {
-    transform: scale(1.1);
-    box-shadow: 0 0 25px rgba(0,0,0,0.7);
+@media (hover: hover){ /* survol : seulement avec une souris (sur téléphone il reste collé après un tap) */
+  #overlayCouleur .carre-couleur:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 25px rgba(0,0,0,0.7);
+  }
 }
 
 /* ===== Overlay PLUS 4 ===== */
@@ -514,9 +524,11 @@ button,
   animation: slideUp 0.5s ease forwards;
 }
 
-#overlayPlus4 .bouton-pigeon:hover{
-  background-color: #ffea70;
-  transform: scale(1.10);
+@media (hover: hover){ /* survol : seulement avec une souris (sur téléphone il reste collé après un tap) */
+  #overlayPlus4 .bouton-pigeon:hover{
+    background-color: #ffea70;
+    transform: scale(1.10);
+  }
 }
 
 #overlayPlus4 .plus4-joueur-btn{
@@ -525,8 +537,10 @@ button,
   box-shadow: 0 8px 18px rgba(0,0,0,0.18);
 }
 
-#overlayPlus4 .plus4-joueur-btn:hover{
-  transform: translateY(-1px) scale(1.02);
+@media (hover: hover){ /* survol : seulement avec une souris (sur téléphone il reste collé après un tap) */
+  #overlayPlus4 .plus4-joueur-btn:hover{
+    transform: translateY(-1px) scale(1.02);
+  }
 }
 
 #overlayPlus4 .plus4-action-btn{
@@ -639,10 +653,12 @@ button,
     animation: slideUp 0.5s ease forwards;
 }
 
-#overlayPigeon .bouton-pigeon:hover,
-#overlayCarteDoree .bouton-pigeon:hover {
-    background-color: #ffea70;
-    transform: scale(1.15);
+@media (hover: hover){ /* survol : seulement avec une souris (sur téléphone il reste collé après un tap) */
+  #overlayPigeon .bouton-pigeon:hover,
+  #overlayCarteDoree .bouton-pigeon:hover {
+      background-color: #ffea70;
+      transform: scale(1.15);
+  }
 }
 
 /* ===== ANIMATIONS ===== */
@@ -700,9 +716,11 @@ button,
     animation: slideUp 0.5s ease forwards;
 }
 
-#overlayDuel button:hover {
-    background-color: #ffea70;
-    transform: scale(1.15);
+@media (hover: hover){ /* survol : seulement avec une souris (sur téléphone il reste collé après un tap) */
+  #overlayDuel button:hover {
+      background-color: #ffea70;
+      transform: scale(1.15);
+  }
 }
 
 /* Container des deux cartes de dos pour le duel */
@@ -712,9 +730,11 @@ button,
     justify-content: center;
 }
 
-#overlayDuel .Carte:not(.retournee):not(.duel-selected):hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 20px #FFD700;
+@media (hover: hover){ /* survol : seulement avec une souris (sur téléphone il reste collé après un tap) */
+  #overlayDuel .Carte:not(.retournee):not(.duel-selected):hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px #FFD700;
+  }
 }
 
 #overlayDuel .Carte,
@@ -762,9 +782,11 @@ button,
   animation: slideUp 0.5s ease forwards; /* tu l'as déjà défini */
 }
 
-#overlayRegleUnique .bouton-annulation:hover{
-  background-color: #ffea70;
-  transform: scale(1.10);
+@media (hover: hover){ /* survol : seulement avec une souris (sur téléphone il reste collé après un tap) */
+  #overlayRegleUnique .bouton-annulation:hover{
+    background-color: #ffea70;
+    transform: scale(1.10);
+  }
 }
 
 /* ===== Overlay FIN "1 restants" ===== */
@@ -795,10 +817,12 @@ button,
   animation: slideUp 0.5s ease forwards;
 }
 
-#overlayFinUnRestants .bouton-pigeon:hover,
-#overlayPredictionFin .bouton-pigeon:hover{
-  background-color: #ffea70;
-  transform: scale(1.10);
+@media (hover: hover){ /* survol : seulement avec une souris (sur téléphone il reste collé après un tap) */
+  #overlayFinUnRestants .bouton-pigeon:hover,
+  #overlayPredictionFin .bouton-pigeon:hover{
+    background-color: #ffea70;
+    transform: scale(1.10);
+  }
 }
 
 #overlayFinUnRestants .fin-un-lignes{
@@ -1756,15 +1780,17 @@ header h1{
   width: min(320px, 80vw);
 }
 
-#choixMode button:hover,
-#ecranNouvellePartie button:hover,
-#ecranConfirmerHote button:hover,
-#ecranConfirmerRetrait button:hover,
-#ecranConfirmerAccueil button:hover,
-#ecranChoixPseudo button:hover,
-#enLigne button:hover{
-  background-color: #ffea70;
-  transform: scale(1.05);
+@media (hover: hover){ /* survol : seulement avec une souris (sur téléphone il reste collé après un tap) */
+  #choixMode button:hover,
+  #ecranNouvellePartie button:hover,
+  #ecranConfirmerHote button:hover,
+  #ecranConfirmerRetrait button:hover,
+  #ecranConfirmerAccueil button:hover,
+  #ecranChoixPseudo button:hover,
+  #enLigne button:hover{
+    background-color: #ffea70;
+    transform: scale(1.05);
+  }
 }
 
 #choixMode button:active,
@@ -1843,8 +1869,10 @@ header h1{
   right: 20px;
 }
 
-.btnAccueil:hover{
-  background-color: rgba(255,255,255,0.22) !important;
+@media (hover: hover){ /* survol : seulement avec une souris (sur téléphone il reste collé après un tap) */
+  .btnAccueil:hover{
+    background-color: rgba(255,255,255,0.22) !important;
+  }
 }
 
 /* Écran « Retirer l'hôte ? » */
@@ -1878,12 +1906,16 @@ header h1{
   box-shadow: none;
 }
 
-#enLigne .btnExclure:hover{
-  background-color: rgba(255,80,80,0.55);
+@media (hover: hover){ /* survol : seulement avec une souris (sur téléphone il reste collé après un tap) */
+  #enLigne .btnExclure:hover{
+    background-color: rgba(255,80,80,0.55);
+  }
 }
 
-.btnRetour:hover{
-  background-color: rgba(255,255,255,0.22) !important;
+@media (hover: hover){ /* survol : seulement avec une souris (sur téléphone il reste collé après un tap) */
+  .btnRetour:hover{
+    background-color: rgba(255,255,255,0.22) !important;
+  }
 }
 
 @media (min-width: 521px){
@@ -1968,9 +2000,11 @@ body.mode-en-ligne #jouer{
   transform: translateY(-50%);
 }
 
-#btnAccueilClassique:hover{
-  opacity: 1;
-  transform: translateY(-50%) scale(1.06);
+@media (hover: hover){ /* survol : seulement avec une souris (sur téléphone il reste collé après un tap) */
+  #btnAccueilClassique:hover{
+    opacity: 1;
+    transform: translateY(-50%) scale(1.06);
+  }
 }
 
 #enLigne #btnAccueilEnLigne,
@@ -1979,11 +2013,13 @@ body.mode-en-ligne #jouer{
   right: 20px;
 }
 
-#enLigne #btnAccueilEnLigne:hover,
-#ecranNouvellePartie #btnAccueil:hover{
-  opacity: 1;
-  background: none;
-  transform: scale(1.06);
+@media (hover: hover){ /* survol : seulement avec une souris (sur téléphone il reste collé après un tap) */
+  #enLigne #btnAccueilEnLigne:hover,
+  #ecranNouvellePartie #btnAccueil:hover{
+    opacity: 1;
+    background: none;
+    transform: scale(1.06);
+  }
 }
 
 /* Pas de ⌂ sur le choix Créer / Rejoindre, ni sur Créer et Rejoindre (sous-écran affiché = sans
@@ -2542,10 +2578,12 @@ header h1{
   stroke-width: 2.4;
 }
 
-#choixMode #btnReglages:hover{
-  opacity: 1;
-  background: none;
-  transform: scale(1.06);
+@media (hover: hover){ /* survol : seulement avec une souris (sur téléphone il reste collé après un tap) */
+  #choixMode #btnReglages:hover{
+    opacity: 1;
+    background: none;
+    transform: scale(1.06);
+  }
 }
 
 @media (max-width: 520px){
@@ -2739,9 +2777,11 @@ header h1{
   text-shadow: none;
 }
 
-#choixMode .btnInstaller:hover{
-  background: rgba(255,215,0,0.18);
-  transform: none;
+@media (hover: hover){ /* survol : seulement avec une souris (sur téléphone il reste collé après un tap) */
+  #choixMode .btnInstaller:hover{
+    background: rgba(255,215,0,0.18);
+    transform: none;
+  }
 }
 
 #choixMode .astuceIphone{
@@ -4434,9 +4474,11 @@ html[data-theme="givre"] #stickyJoueurActif.has-couleur .sticky-couleur{
   cursor: pointer;
   transition: opacity 0.15s ease, transform 0.15s ease;
 }
-#choixMode #btnRegles:hover{
-  opacity: 1;
-  transform: scale(1.06);
+@media (hover: hover){ /* survol : seulement avec une souris (sur téléphone il reste collé après un tap) */
+  #choixMode #btnRegles:hover{
+    opacity: 1;
+    transform: scale(1.06);
+  }
 }
 
 /* Bandeau de la partie : à gauche, en miroir du ⌂ */
@@ -4458,9 +4500,11 @@ header #btnReglesJeu{
   cursor: pointer;
   transition: opacity 0.15s ease, transform 0.15s ease;
 }
-header #btnReglesJeu:hover{
-  opacity: 1;
-  transform: translateY(-50%) scale(1.06);
+@media (hover: hover){ /* survol : seulement avec une souris (sur téléphone il reste collé après un tap) */
+  header #btnReglesJeu:hover{
+    opacity: 1;
+    transform: translateY(-50%) scale(1.06);
+  }
 }
 
 /* Le livre : trait doré, couverture couleur du fond, même relief que les boutons Réglages / ⌂ */
@@ -4998,10 +5042,10 @@ html:not([data-theme="givre"]) :is(#overlayPigeon .bouton-pigeon, #overlayPlus4 
   #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayDuel button,
   #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
   #overlayAnnulation button){
-  transition: transform 0.12s ease, filter 0.12s ease, scale 0.12s ease;
+  transition: transform 0.12s ease, filter 0.12s ease, scale 0.12s ease, translate 0.12s ease, box-shadow 0.12s ease;
 }
 @media (hover: hover){
-  :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
+  html body :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
     #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #lancerPartieEnLigne, #btnRejouerMemes,
     #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
     #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
@@ -5009,17 +5053,45 @@ html:not([data-theme="givre"]) :is(#overlayPigeon .bouton-pigeon, #overlayPlus4 
     #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayDuel button,
     #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
     #overlayAnnulation button):hover:not(:disabled){
-    filter: brightness(1.1);
+    filter: brightness(1.18);
+    translate: 0 -3px;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9), 0 6px 20px rgba(255, 220, 90, 0.55) !important;
   }
 }
-html :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
+html body :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
   #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #lancerPartieEnLigne, #btnRejouerMemes,
   #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
   #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
   #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
   #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayDuel button,
   #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
-  #overlayAnnulation button):active:not(:disabled){
-  filter: brightness(0.82);
-  scale: 0.96; /* (scale et pas transform : les animations d'apparition de ces boutons fixent leur transform) */
+  #overlayAnnulation button):is(:active, .bouton-appuye):not(:disabled){
+  filter: brightness(0.72);
+  translate: 0 0;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9), inset 0 3px 8px rgba(0, 0, 0, 0.35) !important;
+  scale: 0.93; /* (scale et pas transform : les animations d'apparition de ces boutons fixent leur transform) */
+}
+
+/* Givre : anneau et lueur bleus (le blanc et le jaune ne se voient pas sur le fond clair) */
+@media (hover: hover){
+  html[data-theme="givre"] body :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
+  #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #lancerPartieEnLigne, #btnRejouerMemes,
+  #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
+  #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
+  #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+  #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayDuel button,
+  #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
+  #overlayAnnulation button):hover:not(:disabled){
+    box-shadow: 0 0 0 3px #0f6aa6, 0 6px 20px rgba(26, 146, 214, 0.5) !important;
+  }
+}
+html[data-theme="givre"] body :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
+  #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #lancerPartieEnLigne, #btnRejouerMemes,
+  #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
+  #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
+  #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+  #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayDuel button,
+  #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
+  #overlayAnnulation button):is(:active, .bouton-appuye):not(:disabled){
+  box-shadow: 0 0 0 3px #0f6aa6, inset 0 3px 8px rgba(0, 0, 0, 0.35) !important;
 }

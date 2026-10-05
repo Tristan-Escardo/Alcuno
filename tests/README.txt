@@ -64,3 +64,21 @@ Lisibilité des textes dans tous les thèmes (environ 5 minutes)
   Si un changement est voulu (nouvelle couleur, nouveau bouton) : relancer avec -enregistrer
   pour mettre à jour la référence, puis la publier avec le reste.
   Fichiers : contraste.js (la mesure), contraste_actuel.txt (dernier passage, ignoré par git).
+
+Rien ne déborde (environ 4 minutes, inclus dans tout_tester.ps1)
+---------------------------------------------------------------
+  Dans PowerShell, depuis le dossier tests :  powershell -File test_debordement.ps1
+  (un seul format :  -formats paysage   ;   formats : portrait, paysage, pc)
+
+  Passe sur chaque écran et chaque overlay en téléphone portrait (390 x 844), téléphone en paysage
+  (844 x 390) et fenêtre de PC basse (1280 x 645). Signale ce qui est COUPÉ EN HAUT (impossible à
+  atteindre en défilant), ce qui DÉBORDE SUR LE CÔTÉ et les boutons ÉCRASÉS à 0 px.
+  Résultat attendu : « RÉSULTAT : OK ». Fichiers : debordement.js, debordement_actuel.txt (ignoré par git).
+
+Après chaque mise en ligne (git push)
+-------------------------------------
+  Dans PowerShell, depuis le dossier tests :  powershell -File verifier_mise_en_ligne.ps1
+
+  Attend que GitHub Pages ait publié le dernier commit, puis vérifie que le site en ligne affiche la
+  même version que le code. Résultat attendu : « RÉSULTAT : OK, le site en ligne est en x.y.z ».
+  En cas d'échec de la publication (incident passager côté GitHub) : refaire un push.
