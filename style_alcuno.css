@@ -4807,3 +4807,17 @@ html.accessibilite #ecranInstallation .etapeInstallation small{ font-size: 16px;
 html.accessibilite #ecranInstallation .numeroEtape{ width: 40px; height: 40px; font-size: 21px; }
 html.accessibilite #ecranInstallation #btnInstallationInstaller{ font-size: 26px; }
 html.accessibilite #ecranInstallation #btnInstallationPlusTard{ font-size: 19px; }
+
+/* ===== Boutons jaunes à texte blanc : plus lisibles (thèmes sombres ; Givre a ses boutons cyan) =====
+   Léger dégradé doré (le jaune du haut reste celui d'avant) et ombre du texte plus marquée. Les boutons
+   or à texte noir des overlays des règles ne changent pas (déjà bien lisibles). */
+html:not([data-theme="givre"]) :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu,
+  #btnCreerPartie, #btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre,
+  #lancerPartieEnLigne, #btnRejouerMemes, #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button,
+  #btnConfirmerAccueilOui, #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon,
+  #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie,
+  #termineSuppression, #btnInstallationInstaller){
+  background-image: linear-gradient(180deg, #ffd426, #f6b800);
+  color: #fff;
+  text-shadow: 0 1px 0 rgba(122, 74, 0, 0.85), 0 2px 4px rgba(0, 0, 0, 0.4);
+}
