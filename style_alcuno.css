@@ -4956,9 +4956,30 @@ html:not([data-theme="givre"]) :is(#overlayPigeon .bouton-pigeon, #overlayPlus4 
   .prediction-header{ padding: 10px 14px; gap: 6px; }
 }
 
-/* Téléphone en paysage, Prestige : les bandes de l'encoche sur les côtés (hors de la page, l'iPhone les
-   peint avec la couleur de fond de la page, sans motif possible) prennent la couleur du décor sur les
-   bords à mi-hauteur (fond + reflet 0.14 + un peu de lueur), au lieu du doré clair du haut / bas */
+/* ===== Téléphone en paysage, Prestige et Cerisier : cadre sur les côtés =====
+   Les bandes de l'encoche (à gauche et à droite, hors de la page) sont peintes par l'iPhone d'une seule
+   couleur, celle du fond de la page : impossible d'y mettre le motif. On en fait un cadre voulu : le bord
+   intérieur de la page continue la bande (même couleur), avec un fin liseré, puis se fond dans le décor.
+   Pas pendant les overlays ni l'écran des créateurs (le fond de la page y change de couleur). */
 @media (orientation: landscape) and (max-height: 500px){
-  html[data-theme="prestige"]{ --couleur-barre: #5b4712; }
+  html[data-theme="cerisier"]{ --couleur-barre: #3c0a2a; }
+  html:is([data-theme="prestige"], [data-theme="cerisier"])::after{
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 2147483000;
+    pointer-events: none;
+    background:
+      linear-gradient(to right, var(--couleur-barre) 0 7px, var(--lisere-cadre) 7px 9px, var(--fondu-cadre) 9px, transparent 30px) left / 30px 100% no-repeat,
+      linear-gradient(to left, var(--couleur-barre) 0 7px, var(--lisere-cadre) 7px 9px, var(--fondu-cadre) 9px, transparent 30px) right / 30px 100% no-repeat;
+  }
+  html[data-theme="prestige"]{
+    --lisere-cadre: #ffe27a;
+    --fondu-cadre: rgba(147, 120, 16, 0.55);
+  }
+  html[data-theme="cerisier"]{
+    --lisere-cadre: #ff9cc5;
+    --fondu-cadre: rgba(60, 10, 42, 0.6);
+  }
+  html:is(.overlay-ouvert, .credits-ouverts)::after{ display: none; }
 }
