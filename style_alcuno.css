@@ -5125,3 +5125,33 @@ html[data-theme="givre"] body :is(#btnModeEnLigne, #btnModeClassique, .btnRetour
     flex: 0 0 calc(25% - 6px); /* 4 par rangée (fenêtres basses) */
   }
 }
+
+/* Mêmes effets partout (accueil, menus, overlays) : léger agrandissement au survol, petit tassement à
+   l'appui. Dans les overlays, l'animation d'apparition des boutons (slideUp, gardée à la fin) bloquait
+   leur transform : elle ne la garde plus une fois finie (l'état final est le même que sans animation). */
+:is(#overlayPigeon, #overlayPlus4, #overlayDuel, #overlayFinUnRestants, #overlayPredictionFin, #overlayRegleUnique,
+    #overlayAnnulation, #overlayCarteDoree) button{
+  animation-fill-mode: backwards !important;
+}
+@media (hover: hover){
+  html body :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
+  #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #lancerPartieEnLigne, #btnRejouerMemes,
+  #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
+  #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
+  #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+  #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayDuel button,
+  #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
+  #overlayAnnulation button):hover:not(:disabled){
+    transform: scale(1.05);
+  }
+}
+html body :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
+  #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #lancerPartieEnLigne, #btnRejouerMemes,
+  #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
+  #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
+  #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+  #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayDuel button,
+  #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
+  #overlayAnnulation button):is(:active, .bouton-appuye):not(:disabled){
+  transform: scale(0.98);
+}
