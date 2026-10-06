@@ -1137,7 +1137,7 @@ function afficherOverlayPlus4(joueurActuel, classeCartePlus4){
 
   const titre = document.createElement("div");
   titre.className = "titre-pigeon";
-  titre.innerText = `PLUS 4 — Distribue ${texteGorgees(aDistribuer)}`;
+  titre.innerText = `PLUS 4\nDistribue ${texteGorgees(aDistribuer)}`; // « PLUS 4 » au-dessus
   overlay.appendChild(titre);
 
   const totalBox = document.createElement("div");
