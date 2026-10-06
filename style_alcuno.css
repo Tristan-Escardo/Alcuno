@@ -78,7 +78,6 @@ header {
     display: grid;
     grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
     gap: var(--gap);                 /* ✅ même espace H/V */
-    width: 100%;
     margin: 0 auto;
     padding: 10px;
     justify-items: center;           /* centre la carte dans sa case */
@@ -86,7 +85,6 @@ header {
 }
 
 .messages{
-    width: 100%;
     margin: 0 auto 16px auto;
 
     display: flex;
@@ -548,13 +546,6 @@ button,
 }
 
 
-#overlayPlus4 .plus4-info{
-  color: #FFD700;
-  font-size: 18px;
-  font-weight: 700;
-  text-align: center;
-}
-
 #overlayPlus4 .plus4-total{
   color: #FFD700;
   font-size: 22px;
@@ -578,11 +569,6 @@ button,
   bottom: 0;
   background: rgb(0,0,0);
   padding: 12px 0;
-}
-
-#overlayPlus4 .plus4-container-joueurs{
-  flex-direction: column;
-  align-items: center;
 }
 
 #overlayPlus4 .plus4-actions{
@@ -1381,9 +1367,7 @@ body.no-scroll{
 
 /* ===== Override final : +4 ultra compact ===== */
 #overlayPlus4 .plus4-container-joueurs{
-  display: grid;
   grid-template-columns: repeat(2, minmax(88px, 118px));
-  justify-content: center;
   gap: 8px;
   width: min(250px, 74vw);
   max-width: 250px;
@@ -2501,7 +2485,6 @@ header h1{
    les joueurs disparaissaient, vu sur PC) : c'est tout l'overlay qui défile */
 #overlayPlus4 .plus4-container-joueurs{
   flex: 0 0 auto;
-  align-content: start;
 }
 
 /* ===== Duel : halo qui suit les cartes qu'on peut toucher ===== */
@@ -2784,19 +2767,6 @@ header h1{
   }
 }
 
-#choixMode .astuceIphone{
-  margin: 0;
-  max-width: 34ch;
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.4;
-  color: rgba(255,255,255,0.72);
-}
-
-#choixMode .astuceIphone strong{
-  color: #FFD700;
-}
-
 /* ===== Overlays de règle : 1re ligne en titre, suite en détails plus petits ===== */
 #overlayRegleUnique .regle-titre{
   line-height: 1.15;
@@ -3034,7 +3004,6 @@ html.accessibilite .overlay-subtitle,
 html.accessibilite #overlayCouleur div.titre-couleur,
 html.accessibilite .duel-info,
 html.accessibilite .duel-label,
-html.accessibilite .plus4-info,
 html.accessibilite .plus4-total,
 html.accessibilite .fin-un-ligne,
 html.accessibilite .fin-choix-turn,
@@ -4279,12 +4248,8 @@ html[data-theme="givre"] #choixMode .btnInstaller{
   background: rgba(255, 255, 255, 0.7);
   border-color: var(--givre-bord);
 }
-html[data-theme="givre"] #choixMode .astuceIphone,
 html[data-theme="givre"] #enLigne .aideEnLigne{
   color: var(--givre-doux);
-}
-html[data-theme="givre"] #choixMode .astuceIphone strong{
-  color: var(--givre-accent);
 }
 html[data-theme="givre"] #ecranRattrapage{
   color: var(--givre-accent);
@@ -4342,7 +4307,7 @@ html[data-theme="givre"] :is(#overlayCouleur, #overlayPlus4, #overlayPigeon, #ov
 }
 /* Textes secondaires : bleu nuit ([data-theme] en double : passe devant la règle de tous les textes) */
 html[data-theme="givre"][data-theme] :is(#overlayRegleUnique .regle-detail, #overlayRegleUnique .doree-texte, #overlayCarteDoree .doree-texte,
-  #overlayPredictionFin .doree-texte, #overlayRegleUnique .celien-citation, #overlayPlus4 .plus4-info, .overlay-subtitle,
+  #overlayPredictionFin .doree-texte, #overlayRegleUnique .celien-citation, .overlay-subtitle,
   .fin-choix-recap .ligne, #overlayDuel .duel-info){
   color: var(--givre-texte) !important;
 }
@@ -4985,7 +4950,6 @@ html:not([data-theme="givre"]) :is(#overlayPigeon .bouton-pigeon, #overlayPlus4 
 
   /* +4 : les boutons Valider / Retour / Annuler sur une seule ligne (avant : empilés, ils couvraient
      la moitié de l'écran) */
-  #overlayPlus4 .plus4-info{ font-size: 15px; }
   #overlayPlus4 .plus4-total{ font-size: 18px; margin-bottom: 0; }
   #overlayPlus4 .plus4-actions{ flex-wrap: nowrap; padding: 8px 0; margin-top: 4px; }
   #overlayPlus4 .plus4-actions .plus4-action-btn{ flex: 1 1 0; width: auto; max-width: 220px; padding: 10px 8px; font-size: 17px; }
@@ -5042,7 +5006,7 @@ html:not([data-theme="givre"]) :is(#overlayPigeon .bouton-pigeon, #overlayPlus4 
   #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayDuel button,
   #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
   #overlayAnnulation button){
-  transition: transform 0.12s ease, filter 0.12s ease, scale 0.12s ease, translate 0.12s ease, box-shadow 0.12s ease;
+  transition: transform 0.12s ease, filter 0.12s ease, translate 0.12s ease, box-shadow 0.12s ease;
 }
 @media (hover: hover){
   html body :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
@@ -5058,7 +5022,6 @@ html:not([data-theme="givre"]) :is(#overlayPigeon .bouton-pigeon, #overlayPlus4 
     box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9), 0 6px 20px rgba(255, 220, 90, 0.55) !important;
   }
 }
-/* (appui : pas d'effet en plus, comme à l'accueil) */
 
 /* Givre : anneau et lueur bleus (le blanc et le jaune ne se voient pas sur le fond clair) */
 @media (hover: hover){

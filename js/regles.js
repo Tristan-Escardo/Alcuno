@@ -876,11 +876,8 @@ function lancerOverlayChoixDuel(joueurActuel, carteDuel = ""){
       if(picks.includes(idx)) return;
 
       picks.push(idx);
-      btn.disabled = true;
-      btn.style.opacity = "0.6";
+      btn.disabled = true; // (aspect « déjà choisi » : style_alcuno.css, #overlayDuel .duel-boutons button:disabled)
       btn.style.cursor = "not-allowed";
-      btn.style.backgroundColor = "#ffea70";
-      btn.style.color = "#000";
 
       if(picks.length === 2){
         // Le tirage remplace l'écran 0,2 s plus tard : on voit le « pop » du 2e bouton (script.js).
