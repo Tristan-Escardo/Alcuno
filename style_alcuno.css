@@ -5104,3 +5104,24 @@ html[data-theme="givre"] body :is(#btnModeEnLigne, #btnModeClassique, .btnRetour
   margin-left: auto;
   margin-right: auto;
 }
+
+/* ===== +4 : chaque rangée de joueurs centrée =====
+   La grille gardait ses colonnes vides : avec 2 joueurs sur une fenêtre basse de PC (4 colonnes), ils
+   étaient collés à gauche ; sur téléphone (2 colonnes), un nombre impair laissait le dernier seul à
+   gauche. Les boutons sont maintenant posés en ligne et centrés, même nombre par rangée qu'avant. */
+#overlayPlus4 .plus4-container-joueurs{
+  display: flex;
+  flex-direction: row; /* (une vieille règle les mettait en colonne) */
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: stretch;
+  align-content: flex-start;
+}
+#overlayPlus4 .plus4-container-joueurs .plus4-joueur-btn{
+  flex: 0 0 calc(50% - 4px); /* 2 par rangée */
+}
+@media (orientation: landscape) and (max-height: 700px){
+  #overlayPlus4 .plus4-container-joueurs .plus4-joueur-btn{
+    flex: 0 0 calc(25% - 6px); /* 4 par rangée (fenêtres basses) */
+  }
+}

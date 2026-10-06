@@ -1137,12 +1137,8 @@ function afficherOverlayPlus4(joueurActuel, classeCartePlus4){
 
   const titre = document.createElement("div");
   titre.className = "titre-pigeon";
-  titre.innerText = `PLUS 4 — Distribue ${texteGorgees(aDistribuer)}`;
+  titre.innerText = `PLUS 4\nDistribue ${texteGorgees(aDistribuer)}`; // « PLUS 4 » au-dessus
   overlay.appendChild(titre);
-
-  const info = document.createElement("div");
-  info.className = "plus4-info";
-  overlay.appendChild(info);
 
   const totalBox = document.createElement("div");
   totalBox.className = "plus4-total";
@@ -1170,12 +1166,6 @@ function afficherOverlayPlus4(joueurActuel, classeCartePlus4){
   function refreshUI(){
     const total = totalDistribue();
     totalBox.innerText = `Gorgées distribuées : ${total} / ${aDistribuer}`;
-
-    if(total < aDistribuer){
-      info.innerText = `Choisis à qui tu veux distribuer tes ${texteGorgees(aDistribuer)}.`;
-    } else {
-      info.innerText = "Total atteint. Tu peux valider.";
-    }
 
     // update boutons joueurs (badge)
     [...container.querySelectorAll("button[data-idx]")].forEach(btn=>{
