@@ -5095,3 +5095,12 @@ html[data-theme="givre"] body :is(#btnModeEnLigne, #btnModeClassique, .btnRetour
   #overlayAnnulation button):is(:active, .bouton-appuye):not(:disabled){
   box-shadow: 0 0 0 3px #0f6aa6, inset 0 3px 8px rgba(0, 0, 0, 0.35) !important;
 }
+
+/* ===== Partie sur PC : bloc Joueur actif / Joueurs / Règles et plateau de la même largeur que le
+   bandeau ALCUNO et le menu au-dessus (avant : toute la largeur de la fenêtre, donc plus larges) ===== */
+.messages,
+.plateau{
+  width: min(1200px, 100%);
+  margin-left: auto;
+  margin-right: auto;
+}
