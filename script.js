@@ -124,7 +124,7 @@ function avecCouronne(nom){
 // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
 // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
 // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-const VERSION_AFFICHEE = "9.1.10";
+const VERSION_AFFICHEE = "9.1.11";
 const VERSION_JEU = VERSION_AFFICHEE.split(".")
   .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
 // À l'écran : le numéro complet, pour voir d'un coup d'œil si un téléphone est à jour
@@ -171,6 +171,75 @@ document.addEventListener("click", (e) => {
 }, true);
 // Un nouveau contact sur l'écran : le « click » de l'ancien tap ne viendra plus
 document.addEventListener("pointerdown", () => { clicAAvaler = false; }, true);
+
+// Tap / clic sur un bouton (accueil, Retour, menus, overlays des règles) : petit « pop »
+// (le bouton se tasse puis revient, un peu plus clair un instant). Ces boutons réagissent dès le toucher et,
+// souvent, l'écran suivant les remplace aussitôt (pigeon, 2e joueur du duel, annulation) : dans ce cas une
+// copie du bouton fait le pop à sa place, par-dessus, puis s'efface. Purement visuel : le jeu n'attend pas.
+const BOUTONS_AVEC_POP = "#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu, #btnCreerPartie, " +
+  "#btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #lancerPartieEnLigne, " +
+  "#btnRejouerMemes, #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui, " +
+  "#btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, " +
+  "#ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression, #btnInstallationInstaller, " +
+  "#btnOublierPartie, #listeSuppression button, " +
+  "#overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayDuel button, " +
+  "#overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation, " +
+  "#overlayAnnulation button, #overlayCarteDoree .bouton-doree";
+const IMAGES_POP_BOUTON = [
+  { scale: 1, filter: "brightness(1)" },
+  { scale: 0.92, filter: "brightness(1.3)", offset: 0.35 },
+  { scale: 1, filter: "brightness(1)" }
+];
+const STYLES_COPIES_BOUTON = ["background-color", "background-image", "color", "font-family", "font-size", "font-weight",
+  "font-style", "letter-spacing", "line-height", "text-shadow", "text-align", "border-radius", "border", "box-shadow",
+  "padding", "opacity"];
+document.addEventListener("pointerdown", (e) => {
+  const bouton = e.target.closest && e.target.closest("button");
+  if (!bouton || bouton.disabled || !bouton.matches(BOUTONS_AVEC_POP)) return;
+  // Relevé maintenant : juste après, le bouton peut avoir disparu
+  const r = bouton.getBoundingClientRect();
+  const st = getComputedStyle(bouton);
+  const styles = STYLES_COPIES_BOUTON.map((p) => `${p}:${st.getPropertyValue(p)}`).join(";");
+  const texte = bouton.innerText;
+  const visible = () => {
+    const dessus = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+    return bouton.isConnected && dessus && bouton.contains(dessus);
+  };
+  // Copie du bouton à sa place, par-dessus tout, qui fait le pop (ou sa fin) puis s'efface
+  const popCopie = (images, duree) => {
+    const copie = document.createElement("div");
+    copie.textContent = texte;
+    copie.style.cssText = styles + `;position:fixed;left:${r.left}px;top:${r.top}px;width:${r.width}px;` +
+      `height:${r.height}px;margin:0;box-sizing:border-box;display:flex;align-items:center;justify-content:center;` +
+      "z-index:2147483000;pointer-events:none;white-space:pre-line";
+    document.body.appendChild(copie);
+    const pop = copie.animate(images, { duration: duree, easing: "ease-out" });
+    pop.onfinish = pop.oncancel = () => copie.remove();
+  };
+  setTimeout(() => {
+    if (!visible()) {
+      // L'écran suivant a déjà remplacé le bouton (pigeon, 2e joueur du duel, annulation…)
+      popCopie([
+        { scale: 1, filter: "brightness(1)", opacity: 1 },
+        { scale: 0.92, filter: "brightness(1.3)", opacity: 1, offset: 0.3 },
+        { scale: 1, filter: "brightness(1)", opacity: 1, offset: 0.65 },
+        { scale: 1, filter: "brightness(1)", opacity: 0 }
+      ], 420);
+      return;
+    }
+    const pop = bouton.animate(IMAGES_POP_BOUTON, { duration: 260, easing: "ease-out" });
+    // Accueil, Retour… : la page change au lever du doigt, un peu après. Si le bouton est recouvert
+    // pendant le pop, une copie finit le pop par-dessus la nouvelle page.
+    setTimeout(() => {
+      if (pop.playState !== "running" || visible()) return;
+      popCopie([
+        { scale: 0.95, filter: "brightness(1.2)", opacity: 1 },
+        { scale: 1, filter: "brightness(1)", opacity: 1, offset: 0.5 },
+        { scale: 1, filter: "brightness(1)", opacity: 0 }
+      ], 280);
+    }, 150);
+  }, 0);
+}, true);
 
 function activerMemePendantElan(bouton, action){
   let depart = null;
