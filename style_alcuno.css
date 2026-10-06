@@ -5125,3 +5125,13 @@ html[data-theme="givre"] body :is(#btnModeEnLigne, #btnModeClassique, .btnRetour
     flex: 0 0 calc(25% - 6px); /* 4 par rangée (fenêtres basses) */
   }
 }
+
+/* ===== +4 : un peu d'air entre la carte, le titre (« PLUS 4 » / « Distribue N gorgées ») et le compteur ===== */
+#overlayPlus4 .carte-vedette{ margin-bottom: 10px; }
+#overlayPlus4 .titre-pigeon{ line-height: 1.25; margin: 0 0 6px; }
+#overlayPlus4 .plus4-total{ margin: 4px 0 14px; }
+@media (orientation: landscape) and (max-height: 700px){
+  #overlayPlus4 .carte-vedette{ margin-bottom: 6px; }
+  #overlayPlus4 .titre-pigeon{ margin-bottom: 4px; }
+  #overlayPlus4 .plus4-total{ margin: 2px 0 8px; }
+}
