@@ -126,4 +126,5 @@ window.addEventListener("resize", () => {
 
 // Tout le jeu est chargé : les taps sont de nouveau pris en compte (voir « chargement » dans index.html)
 document.documentElement.classList.remove("chargement");
+try { sessionStorage.removeItem("alcuno_rechargement_auto"); } catch (e) {} // (voir echecChargementJeu dans index.html)
 // #endregion

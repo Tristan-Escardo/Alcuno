@@ -18,6 +18,43 @@
         // Pas de tap tant que tous les fichiers ne sont pas exécutés (retiré à la fin de js/retour-demarrage.js) :
         // un bouton du premier fichier peut appeler du code des suivants
         document.documentElement.classList.add("chargement");
+        // Un fichier du jeu ne se charge pas (réseau qui coupe au premier lancement…) ou plante avant la fin :
+        // le jeu resterait bloqué en « chargement » (plus aucun tap). On recharge la page une fois toute
+        // seule ; si ça échoue encore, message « Réessayer » (construit ici, sans le CSS du jeu qui peut
+        // manquer aussi). Le drapeau est effacé quand le jeu a bien démarré (fin de js/retour-demarrage.js).
+        window.echecChargementJeu = function () {
+            if (window.echecChargementGere) return;
+            window.echecChargementGere = true;
+            var cle = "alcuno_rechargement_auto", dejaFait = false;
+            try { dejaFait = sessionStorage.getItem(cle) === "1"; } catch (e) {}
+            if (!dejaFait) {
+                try { sessionStorage.setItem(cle, "1"); } catch (e) {}
+                location.reload();
+                return;
+            }
+            try { sessionStorage.removeItem(cle); } catch (e) {}
+            var afficher = function () {
+                var m = document.createElement("div");
+                m.id = "echecChargement";
+                m.setAttribute("role", "alert");
+                m.style.cssText = "position:fixed;inset:0;z-index:2147483647;display:flex;flex-direction:column;" +
+                    "align-items:center;justify-content:center;gap:18px;padding:24px;box-sizing:border-box;" +
+                    "background:#2b001d;color:#fff;font:700 18px Arial,sans-serif;text-align:center;pointer-events:auto";
+                m.innerHTML = '<div style="font-size:42px">📶</div>' +
+                    '<div>Le jeu n’a pas pu se charger.<br>Vérifie ta connexion internet.</div>' +
+                    '<button type="button" style="padding:16px 34px;border:none;border-radius:14px;background:#ffcc00;' +
+                    'color:#fff;font:900 20px Arial,sans-serif;text-shadow:0 1px 2px rgba(0,0,0,.45);cursor:pointer">Réessayer</button>';
+                m.querySelector("button").addEventListener("click", function () { location.reload(); });
+                document.body.appendChild(m);
+            };
+            if (document.body) afficher(); else document.addEventListener("DOMContentLoaded", afficher);
+        };
+        // Sécurité : page chargée, mais le jeu n'a pas démarré au bout de 4 s (un fichier a planté en route)
+        window.addEventListener("load", function () {
+            setTimeout(function () {
+                if (document.documentElement.classList.contains("chargement")) window.echecChargementJeu();
+            }, 4000);
+        });
         // Thème choisi dans les réglages : appliqué tout de suite (pas de flash de bordeaux au chargement)
         try { var theme = localStorage.getItem("alcuno_theme"); if (theme) document.documentElement.dataset.theme = theme; } catch (e) {}
         // Barre du téléphone à la couleur du thème dès le premier affichage (mêmes couleurs que THEMES dans script.js)
@@ -424,7 +461,7 @@
     
     <script>
         window.FICHIERS_JEU.forEach(function (f) {
-            document.write('<script src="' + f + '?t=' + window.ANTI_CACHE + '"><\/script>');
+            document.write('<script src="' + f + '?t=' + window.ANTI_CACHE + '" onerror="echecChargementJeu()"><\/script>');
         });
     </script>
     <!-- Thème Prestige : reflet doré qui traverse l'écran de temps en temps (ne bloque aucun tap) -->
