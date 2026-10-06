@@ -1079,13 +1079,19 @@ function afficherOverlayTirageDuel(overlay, j1, j2, carteDuel = ""){
       if(which === 1) label1.innerText = "Carte de " + joueurs[j2];
       else label2.innerText = "Carte de " + joueurs[j2];
 
-      info.innerText = "On retourne les cartes…";
-      overlay.classList.add("reveal");
-
-      c1.classList.remove("duel-selected");
-      c2.classList.remove("duel-selected");
-      c1.style.boxShadow = "";
-      c2.style.boxShadow = "";
+      // La 2e carte se met aussi en retrait (comme celle de J1) : on voit qu'elle a été prise, puis on
+      // passe au retournement (avant : l'effet était retiré aussitôt, rien ne se voyait au 2e tap)
+      const choisie2 = (which === 1) ? c1 : c2;
+      choisie2.classList.add("duel-selected");
+      setTimeout(() => {
+        if(generation !== generationPartie) return;
+        info.innerText = "On retourne les cartes…";
+        overlay.classList.add("reveal");
+        c1.classList.remove("duel-selected");
+        c2.classList.remove("duel-selected");
+        c1.style.boxShadow = "";
+        c2.style.boxShadow = "";
+      }, delai(450));
 
       // Reveal des 2 cartes (on ajoute les classes maintenant)
       setTimeout(() => {
