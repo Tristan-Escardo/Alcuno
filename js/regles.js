@@ -883,8 +883,13 @@ function lancerOverlayChoixDuel(joueurActuel, carteDuel = ""){
       btn.style.color = "#000";
 
       if(picks.length === 2){
-        overlay.innerHTML = "";
-        afficherOverlayTirageDuel(overlay, picks[0], picks[1], carteDuel);
+        // Le tirage remplace l'écran 0,2 s plus tard : on voit le « pop » du 2e bouton (script.js).
+        // En ligne, la carte choisie ensuite attend que le tirage soit affiché (tenterAction).
+        setTimeout(() => {
+          if(!overlay.isConnected) return; // (partie relancée / overlay fermé entre-temps)
+          overlay.innerHTML = "";
+          afficherOverlayTirageDuel(overlay, picks[0], picks[1], carteDuel);
+        }, delai(200));
       }
     });
 
