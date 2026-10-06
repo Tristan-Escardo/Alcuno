@@ -4872,7 +4872,7 @@ html:not([data-theme="givre"]) :is(#btnModeEnLigne, #btnModeClassique, .btnRetou
    style que les autres boutons (avant : or à texte noir). !important : le JS colore certains de ces
    boutons directement (annulations, joueurs déjà choisis du duel). Carte dorée : boutons or métallique
    inchangés. */
-html:not([data-theme="givre"]) :is(#overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayDuel button,
+html:not([data-theme="givre"]) :is(#overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayDuel button:not(:disabled),
   #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
   #overlayAnnulation button){
   background: linear-gradient(180deg, #ffd426, #f6b800) !important;
@@ -5058,19 +5058,7 @@ html:not([data-theme="givre"]) :is(#overlayPigeon .bouton-pigeon, #overlayPlus4 
     box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9), 0 6px 20px rgba(255, 220, 90, 0.55) !important;
   }
 }
-html body :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
-  #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #lancerPartieEnLigne, #btnRejouerMemes,
-  #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
-  #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
-  #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
-  #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayDuel button,
-  #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
-  #overlayAnnulation button):is(:active, .bouton-appuye):not(:disabled){
-  filter: brightness(0.72);
-  translate: 0 0;
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9), inset 0 3px 8px rgba(0, 0, 0, 0.35) !important;
-  scale: 0.93; /* (scale et pas transform : les animations d'apparition de ces boutons fixent leur transform) */
-}
+/* (appui : pas d'effet en plus, comme à l'accueil) */
 
 /* Givre : anneau et lueur bleus (le blanc et le jaune ne se voient pas sur le fond clair) */
 @media (hover: hover){
@@ -5085,16 +5073,7 @@ html body :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu, #
     box-shadow: 0 0 0 3px #0f6aa6, 0 6px 20px rgba(26, 146, 214, 0.5) !important;
   }
 }
-html[data-theme="givre"] body :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
-  #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #lancerPartieEnLigne, #btnRejouerMemes,
-  #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
-  #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
-  #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
-  #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayDuel button,
-  #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
-  #overlayAnnulation button):is(:active, .bouton-appuye):not(:disabled){
-  box-shadow: 0 0 0 3px #0f6aa6, inset 0 3px 8px rgba(0, 0, 0, 0.35) !important;
-}
+
 
 /* ===== Partie sur PC : bloc Joueur actif / Joueurs / Règles et plateau de la même largeur que le
    bandeau ALCUNO et le menu au-dessus (avant : toute la largeur de la fenêtre, donc plus larges) ===== */
@@ -5126,32 +5105,15 @@ html[data-theme="givre"] body :is(#btnModeEnLigne, #btnModeClassique, .btnRetour
   }
 }
 
-/* Mêmes effets partout (accueil, menus, overlays) : léger agrandissement au survol, petit tassement à
-   l'appui. Dans les overlays, l'animation d'apparition des boutons (slideUp, gardée à la fin) bloquait
-   leur transform : elle ne la garde plus une fois finie (l'état final est le même que sans animation). */
-:is(#overlayPigeon, #overlayPlus4, #overlayDuel, #overlayFinUnRestants, #overlayPredictionFin, #overlayRegleUnique,
-    #overlayAnnulation, #overlayCarteDoree) button{
-  animation-fill-mode: backwards !important;
+/* Duel : joueur déjà choisi (désactivé par le JS, qui le passait aussi à 60 % d'opacité : il paraissait
+   foncé) : jaune clair à texte noir, pleinement visible ; en Givre, bleu clair à texte bleu nuit */
+#overlayDuel .duel-boutons button:disabled{
+  opacity: 1 !important;
+  background: #fff1a8 !important;
+  color: #2b001d !important;
+  text-shadow: none !important;
 }
-@media (hover: hover){
-  html body :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
-  #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #lancerPartieEnLigne, #btnRejouerMemes,
-  #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
-  #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
-  #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
-  #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayDuel button,
-  #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
-  #overlayAnnulation button):hover:not(:disabled){
-    transform: scale(1.05);
-  }
-}
-html body :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
-  #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #lancerPartieEnLigne, #btnRejouerMemes,
-  #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
-  #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
-  #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
-  #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayDuel button,
-  #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
-  #overlayAnnulation button):is(:active, .bouton-appuye):not(:disabled){
-  transform: scale(0.98);
+html[data-theme="givre"] #overlayDuel .duel-boutons button:disabled{
+  background: #bfe6f8 !important;
+  color: var(--givre-texte) !important;
 }

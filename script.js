@@ -124,7 +124,7 @@ function avecCouronne(nom){
 // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
 // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
 // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-const VERSION_AFFICHEE = "9.1.9";
+const VERSION_AFFICHEE = "9.1.10";
 const VERSION_JEU = VERSION_AFFICHEE.split(".")
   .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
 // À l'écran : le numéro complet, pour voir d'un coup d'œil si un téléphone est à jour
@@ -171,16 +171,6 @@ document.addEventListener("click", (e) => {
 }, true);
 // Un nouveau contact sur l'écran : le « click » de l'ancien tap ne viendra plus
 document.addEventListener("pointerdown", () => { clicAAvaler = false; }, true);
-
-// Bouton touché : marqué « appuyé » 400 ms (style dans style_alcuno.css, comme :active). Les boutons des
-// overlays réagissent dès le toucher et l'overlay disparaît aussitôt : sans ça, on ne voyait pas quel
-// bouton avait été pris.
-document.addEventListener("pointerdown", (e) => {
-  const bouton = e.target.closest && e.target.closest("button");
-  if (!bouton || bouton.disabled) return;
-  bouton.classList.add("bouton-appuye");
-  setTimeout(() => bouton.classList.remove("bouton-appuye"), 400);
-}, true);
 
 function activerMemePendantElan(bouton, action){
   let depart = null;

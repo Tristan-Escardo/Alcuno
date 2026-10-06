@@ -1175,10 +1175,9 @@ function afficherOverlayPlus4(joueurActuel, classeCartePlus4){
       ? `${echapperHtml(joueurs[idx])} <span class="plus4-badge">+ ${n}</span>`
       : echapperHtml(joueurs[idx]);
 
-      // Total atteint : plus possible d'en ajouter, les joueurs sont désactivés (grisés, ne réagissent
-      // plus) jusqu'à « Retour » ou « Annuler »
+      // Total atteint : plus possible d'en ajouter, les joueurs ne réagissent plus (même apparence)
+      // jusqu'à « Retour » ou « Annuler »
       btn.disabled = total >= aDistribuer;
-      btn.style.opacity = btn.disabled ? "0.45" : "1";
     });
 
     // enable/disable undo
