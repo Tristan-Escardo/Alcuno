@@ -142,14 +142,16 @@ function basculerSaisie(enSaisie){
     const decalage = avant[i] - el.getBoundingClientRect().top;
     if (Math.abs(decalage) > 1) {
       el.animate([{ translate: `0 ${decalage}px` }, { translate: "0 0" }],
-        { duration: 260, easing: "cubic-bezier(0.2, 0.8, 0.2, 1)" });
+        { duration: 420, easing: "cubic-bezier(0.25, 0.8, 0.25, 1)" });
     }
   });
+  // Disparition : fondu un peu plus rapide que le glissement ; retour : fondu qui commence un peu après,
+  // quand les champs ont presque fini de descendre (pas de bouton qui surgit sur eux)
   elementsScanner.forEach((el) => {
     const anim = el.animate(enSaisie
-      ? [{ filter: "opacity(1)", scale: "1" }, { filter: "opacity(0)", scale: "0.92" }]
-      : [{ filter: "opacity(0)", scale: "0.92" }, { filter: "opacity(1)", scale: "1" }],
-      { duration: enSaisie ? 200 : 260, easing: "ease-out", fill: "forwards" });
+      ? [{ filter: "opacity(1)", scale: "1" }, { filter: "opacity(0)", scale: "0.97" }]
+      : [{ filter: "opacity(0)", scale: "0.97" }, { filter: "opacity(1)", scale: "1" }],
+      { duration: enSaisie ? 300 : 380, delay: enSaisie ? 0 : 120, easing: "ease-in-out", fill: "both" });
     fonduScanner.set(el, anim);
     anim.finished.then(() => { if (fonduScanner.get(el) === anim) arreterFonduScanner(el); }).catch(() => {});
   });
@@ -161,12 +163,14 @@ ecranEnLigne.addEventListener("focusin", (e) => {
   clearTimeout(minuteurSaisie);
   basculerSaisie(true);
 });
+// (Android : un tap sur un bouton fait quitter le champ, d'où l'attente avant de rendre la place au bouton
+// Scanner. iPhone : non, le bouton revient tout de suite, en même temps que le clavier descend.)
 ecranEnLigne.addEventListener("focusout", () => {
   clearTimeout(minuteurSaisie);
   minuteurSaisie = setTimeout(() => {
     const champ = document.activeElement;
     if (!champ || champ.tagName !== "INPUT" || !ecranEnLigne.contains(champ)) basculerSaisie(false);
-  }, 300);
+  }, estIOS ? 60 : 300);
 });
 
 // Clavier ouvert : l'iPhone laisse glisser toute la page (on voyait le haut du jeu derrière, et la
