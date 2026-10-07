@@ -179,8 +179,9 @@ document.getElementById("btnCreerPartie").addEventListener("click", () => {
 document.getElementById("btnRejoindrePartie").addEventListener("click", () => {
   document.getElementById("enLigneChoix").style.display = "none";
   document.getElementById("enLigneRejoindre").style.display = "";
-  const champCode = document.getElementById("codeRejoindre");
-  ouvrirClavier(champCode.value.trim() ? document.getElementById("pseudoRejoindre") : champCode);
+  // Code déjà rempli (lien d'un QR code) : clavier prêt pour le pseudo. Sinon pas de clavier :
+  // on voit d'abord « Scanner le QR code » (il se cache quand on tape le code à la main)
+  if (document.getElementById("codeRejoindre").value.trim()) ouvrirClavier(document.getElementById("pseudoRejoindre"));
 });
 
 // ===== Scanner le QR code d'une partie (caméra) =====
