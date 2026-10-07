@@ -1856,18 +1856,6 @@ header h1{
   border-radius: 20px;
   box-shadow: 0 0 0 100vmax rgba(0,0,0,0.45);
 }
-#ecranScanner .texteScanner{
-  position: absolute;
-  top: max(40px, calc(env(safe-area-inset-top, 0px) + 20px));
-  left: 16px;
-  right: 16px;
-  margin: 0;
-  text-align: center;
-  color: #fff;
-  font-size: 19px;
-  font-weight: bold;
-  text-shadow: 0 2px 6px rgba(0,0,0,0.8);
-}
 #ecranScanner button{
   position: absolute;
   bottom: calc(30px + env(safe-area-inset-bottom, 0px));
