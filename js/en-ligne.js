@@ -183,6 +183,120 @@ document.getElementById("btnRejoindrePartie").addEventListener("click", () => {
   ouvrirClavier(champCode.value.trim() ? document.getElementById("pseudoRejoindre") : champCode);
 });
 
+// ===== Scanner le QR code d'une partie (caméra) =====
+// Android/Chrome : le lecteur du navigateur (BarcodeDetector). iPhone : il n'existe pas, on charge
+// js/jsQR.js (seulement au premier scan : inutile de le télécharger pour tout le monde).
+const ecranScanner = document.getElementById("ecranScanner");
+const videoScanner = document.getElementById("videoScanner");
+let fluxScanner = null;
+let numeroScanner = 0; // change à chaque ouverture / fermeture : une lecture en cours d'un scan fermé s'arrête
+
+// Texte du QR code => code de la partie (lien …/?code=ABC12 du jeu, ou le code tout seul)
+function codeDepuisQR(texte){
+  texte = String(texte || "").trim();
+  let code = texte;
+  if (/^https?:\/\//i.test(texte)) {
+    try { code = new URL(texte).searchParams.get("code") || ""; } catch (e) { code = ""; }
+  }
+  code = code.trim().toUpperCase();
+  return /^[A-Z0-9]{4,6}$/.test(code) ? code : "";
+}
+
+function chargerJsQR(){
+  return new Promise((ok, echec) => {
+    if (window.jsQR) { ok(); return; }
+    const s = document.createElement("script");
+    s.src = "js/jsQR.js";
+    s.onload = ok;
+    s.onerror = echec;
+    document.head.appendChild(s);
+  });
+}
+
+// Renvoie une fonction qui lit l'image actuelle de la vidéo (texte du QR code, ou "")
+async function preparerLecteurQR(){
+  if ("BarcodeDetector" in window) {
+    try {
+      const formats = await window.BarcodeDetector.getSupportedFormats();
+      if (formats.includes("qr_code")) {
+        const detecteur = new window.BarcodeDetector({ formats: ["qr_code"] });
+        return async () => {
+          const trouves = await detecteur.detect(videoScanner);
+          return trouves.length ? trouves[0].rawValue : "";
+        };
+      }
+    } catch (e) {}
+  }
+  await chargerJsQR();
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  return async () => {
+    const l = videoScanner.videoWidth, h = videoScanner.videoHeight;
+    if (!l || !h) return "";
+    const echelle = Math.min(1, 640 / Math.max(l, h)); // image réduite : lecture rapide, assez nette
+    canvas.width = Math.round(l * echelle);
+    canvas.height = Math.round(h * echelle);
+    ctx.drawImage(videoScanner, 0, 0, canvas.width, canvas.height);
+    const image = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const resultat = window.jsQR(image.data, image.width, image.height, { inversionAttempts: "dontInvert" });
+    return resultat ? resultat.data : "";
+  };
+}
+
+function fermerScanner(){
+  numeroScanner++;
+  if (fluxScanner) fluxScanner.getTracks().forEach((piste) => piste.stop());
+  fluxScanner = null;
+  videoScanner.srcObject = null;
+  fermerPage(ecranScanner);
+}
+
+async function ouvrirScanner(){
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    alert("Ce téléphone ne permet pas de scanner ici : entre le code à la main.");
+    return;
+  }
+  const numero = ++numeroScanner;
+  ouvrirPage(ecranScanner);
+  try {
+    const [flux, lire] = await Promise.all([
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false }),
+      preparerLecteurQR()
+    ]);
+    if (numero !== numeroScanner) { flux.getTracks().forEach((piste) => piste.stop()); return; } // fermé entre-temps
+    fluxScanner = flux;
+    videoScanner.srcObject = flux;
+    await videoScanner.play().catch(() => {});
+    const lireEncore = async () => {
+      if (numero !== numeroScanner) return;
+      let texte = "";
+      try { texte = await lire(); } catch (e) {}
+      if (numero !== numeroScanner) return;
+      const code = codeDepuisQR(texte);
+      if (!code) { setTimeout(lireEncore, 150); return; } // ~7 essais par seconde
+      fermerScanner();
+      vibrer(40);
+      document.getElementById("codeRejoindre").value = code;
+      const champPseudo = document.getElementById("pseudoRejoindre");
+      if (!champPseudo.value.trim()) ouvrirClavier(champPseudo);
+    };
+    lireEncore();
+  } catch (e) {
+    if (numero !== numeroScanner) return;
+    fermerScanner();
+    alert(e && e.name === "NotAllowedError"
+      ? "Autorise la caméra pour scanner le QR code (ou entre le code à la main)."
+      : "Impossible d'ouvrir la caméra : entre le code à la main.");
+  }
+}
+
+document.getElementById("btnScannerQR").addEventListener("click", ouvrirScanner);
+document.getElementById("btnFermerScanner").addEventListener("click", fermerScanner);
+// Appli mise en arrière-plan : la caméra est coupée par le téléphone, on referme le scan
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden && ecranScanner.style.display !== "none") fermerScanner();
+});
+
 // ===== « Revenir dans une partie » : reconnexion avec le code seulement =====
 const btnRevenirPartie = document.getElementById("btnRevenirPartie");
 

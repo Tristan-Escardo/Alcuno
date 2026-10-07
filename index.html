@@ -276,6 +276,7 @@
             <div id="enLigneRejoindre" style="display:none;">
                 <button type="button" id="btnRetourRejoindre" class="btnRetour">← Retour</button>
                 <input type="text" id="codeRejoindre" placeholder="Code de la partie" maxlength="6" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="next" />
+                <button type="button" id="btnScannerQR" class="btnScanner">📷 Scanner le QR code</button>
                 <input type="text" id="pseudoRejoindre" placeholder="Ton pseudo" maxlength="20" autocomplete="off" enterkeyhint="go" />
                 <button type="button" id="validerRejoindre">Rejoindre</button>
             </div>
@@ -384,6 +385,14 @@
 
         <!-- Installer Alcuno : écran plein affiché à l'ouverture sur téléphone quand le jeu n'est pas installé
              (iPhone : les étapes ; Android avec Chrome : bouton Installer ; autre navigateur : les étapes) -->
+        <!-- Mode en ligne : la caméra lit le QR code de la salle d'attente et remplit le code de la partie -->
+        <section class="ecranScanner" id="ecranScanner" style="display:none;">
+            <video id="videoScanner" playsinline muted autoplay></video>
+            <div class="cadreScanner"></div>
+            <p class="texteScanner">Vise le QR code de la partie</p>
+            <button type="button" id="btnFermerScanner">Annuler</button>
+        </section>
+
         <section class="ecranInstallation" id="ecranInstallation" style="display:none;">
             <div class="installation-contenu">
                 <img class="installationIcone" src="icones/icone-180.png" alt="">

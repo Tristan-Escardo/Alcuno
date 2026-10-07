@@ -1813,6 +1813,67 @@ header h1{
   align-items: center;
 }
 
+/* Rejoindre : « Scanner le QR code », plus discret que « Rejoindre » */
+#enLigne .btnScanner{
+  background-color: rgba(255,255,255,0.1);
+  box-shadow: 0 0 0 1px rgba(255,215,0,0.45) inset;
+  padding: 12px 18px;
+  font-size: 17px;
+}
+
+/* Scan du QR code : la caméra en plein écran, un cadre pour viser */
+#ecranScanner{
+  position: fixed;
+  inset: 0;
+  z-index: 10004;
+  overflow: hidden;
+  background: #000;
+}
+#ecranScanner video{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+#ecranScanner .cadreScanner{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(70vw, 70vh, 320px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border: 3px solid #ffcc00;
+  border-radius: 20px;
+  box-shadow: 0 0 0 100vmax rgba(0,0,0,0.45);
+}
+#ecranScanner .texteScanner{
+  position: absolute;
+  top: max(40px, calc(env(safe-area-inset-top, 0px) + 20px));
+  left: 16px;
+  right: 16px;
+  margin: 0;
+  text-align: center;
+  color: #fff;
+  font-size: 19px;
+  font-weight: bold;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+}
+#ecranScanner button{
+  position: absolute;
+  bottom: calc(30px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 14px 34px;
+  border: none;
+  border-radius: 14px;
+  background: #ffcc00;
+  color: #fff;
+  font-size: 19px;
+  font-weight: 900;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+}
+
 #listeJoueursEnLigne{
   width: min(320px, 84vw);
   display: flex;
