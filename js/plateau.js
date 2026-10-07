@@ -707,6 +707,22 @@ function creerUIJoueurActifSticky(){
   repositionnerStickyJoueurActif();
 }
 
+// Son « À toi » (en ligne, seulement sur le téléphone du joueur dont c'est le tour) : joué s'il n'a
+// toujours pas joué son tour (retourné sa carte) 2 minutes après que c'est devenu son tour. Regarder
+// les règles, faire défiler, etc. ne compte pas : seul le tour joué (ou passé à un autre) l'annule.
+const DELAI_RAPPEL_TOUR = 2 * 60 * 1000;
+let minuteurRappelTour = null;
+
+function programmerRappelTour(tour){
+  clearTimeout(minuteurRappelTour);
+  minuteurRappelTour = setTimeout(() => {
+    if(!enLigneActif || !partieLancee || joueurs.length === 0) return;
+    if(`${mancheCourante}:${cartesRestantes()}` !== tour) return; // tour joué entre-temps
+    if(joueurs[indexJoueur % joueurs.length] !== pseudoActuel) return; // plus son tour
+    jouerSon("tour");
+  }, DELAI_RAPPEL_TOUR);
+}
+
 function majStickyJoueurActif(){
   if(!stickyJoueurActif) return;
 
@@ -739,10 +755,8 @@ function majStickyJoueurActif(){
     const tour = `${mancheCourante}:${cartesRestantes()}`;
     if(tour !== dernierTourVibre){
       dernierTourVibre = tour;
-      if(plateau.querySelector(".retournee")){
-        vibrer([70, 60, 70]);
-        jouerSon("tour");
-      }
+      if(plateau.querySelector(".retournee")) vibrer([70, 60, 70]);
+      programmerRappelTour(tour);
     }
   }
 
