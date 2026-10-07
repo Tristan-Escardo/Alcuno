@@ -1813,6 +1813,21 @@ header h1{
   align-items: center;
 }
 
+/* Rejoindre : icône appareil photo du bouton Scanner, en trait de la couleur du texte (blanc) */
+#enLigne .iconeBouton{
+  width: 1.1em;
+  height: 1.1em;
+  margin-right: 0.4em;
+  vertical-align: -0.2em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 1px 0 rgba(122, 74, 0, 0.6));
+}
+html[data-theme="givre"] #enLigne .iconeBouton{ filter: none; }
+
 /* Rejoindre : « ou entre le code » entre le bouton Scanner et les champs, avec un trait de chaque côté */
 #enLigne .separateurOu{
   display: flex;
