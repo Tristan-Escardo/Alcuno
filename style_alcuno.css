@@ -3587,6 +3587,12 @@ html.clavier-ouvert #enLigne > div{
   margin-bottom: 16px;
 }
 
+/* Mode en ligne : l'en-tête du jeu (titre ALCUNO) reste derrière l'écran ; caché pour qu'il
+   n'apparaisse jamais au bord (ex. quand l'iPhone décale la page avec le clavier ouvert) */
+html:has(#enLigne:not([style*="none"])) body > header{
+  visibility: hidden;
+}
+
 /* Clavier ouvert : jamais de contenu sous « ← Retour » (il défile s'il ne tient pas), et sur
    « Rejoindre » le bouton Scanner et « ou entre le code » laissent la place aux champs */
 html.clavier-ouvert #enLigne{

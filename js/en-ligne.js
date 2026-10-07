@@ -83,6 +83,16 @@ if (window.visualViewport) {
   majZoneVisible();
 }
 
+// Clavier ouvert : l'iPhone laisse glisser toute la page (on voyait le haut du jeu derrière, et la
+// zone visible changeait : le bouton Scanner revenait). On bloque ce glissement sur l'écran du mode en
+// ligne, sauf si son contenu ne tient pas et doit défiler.
+document.addEventListener("touchmove", (e) => {
+  const ecran = document.getElementById("enLigne");
+  if (ecran.style.display === "none" || !document.documentElement.classList.contains("clavier-ouvert")) return;
+  if (ecran.scrollHeight > ecran.clientHeight + 1 && ecran.contains(e.target)) return;
+  e.preventDefault();
+}, { passive: false });
+
 // Transitions entre les pages : « ← Retour » et ⌂ => la page suivante arrive depuis la gauche
 // (classe nav-retour, voir le CSS) ; sinon elle arrive depuis la droite
 let minuteurNavRetour = null;
