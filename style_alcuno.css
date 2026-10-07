@@ -1849,7 +1849,7 @@ html[data-theme="givre"] #enLigne .iconeBouton{ filter: none; }
 #ecranScanner{
   position: fixed;
   inset: 0;
-  z-index: 10004;
+  z-index: 10006; /* au-dessus du reflet doré du thème Prestige (#refletPrestige) */
   overflow: hidden;
   background: #000;
 }
@@ -3551,12 +3551,21 @@ html.accessibilite #ecranReglages .aPropos{
   overscroll-behavior: contain;
   padding-top: calc(var(--haut-visible, 0px) + 24px);
   padding-bottom: calc(var(--bas-cache, 0px) + 24px);
+  /* clavier qui s'ouvre / se ferme : le contenu glisse vers sa nouvelle place au lieu d'y sauter */
+  transition: padding-top 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), padding-bottom 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 #enLigne .btnRetour{
   top: calc(var(--haut-visible, 0px) + 20px);
 }
 #enLigne #btnAccueilEnLigne{
   top: calc(var(--haut-visible, 0px) + 26px);
+}
+#enLigne .btnRetour,
+#enLigne #btnAccueilEnLigne{
+  transition: top 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+@media (prefers-reduced-motion: reduce){
+  #enLigne, #enLigne .btnRetour, #enLigne #btnAccueilEnLigne{ transition: none; }
 }
 
 #enLigne > div{
@@ -3587,12 +3596,8 @@ html.nav-retour{
   #choixMode > *, #enLigne > div > *, #ecranNouvellePartie > *{ animation-duration: 0.01s; }
 }
 
-/* Clavier ouvert (classe posée par script.js) : le contenu du mode en ligne se cale juste
-   au-dessus du clavier, au lieu d'être centré (il remontait trop haut) */
-html.clavier-ouvert #enLigne > div{
-  margin-top: auto;
-  margin-bottom: 16px;
-}
+/* (Clavier ouvert : le contenu reste centré, entre « ← Retour » et le clavier, voir les marges de #enLigne :
+   le caler d'un coup en bas faisait sauter tout l'écran à l'ouverture du clavier) */
 
 /* Mode en ligne : l'en-tête du jeu (titre ALCUNO) reste derrière l'écran ; caché pour qu'il
    n'apparaisse jamais au bord (ex. quand l'iPhone décale la page avec le clavier ouvert) */
