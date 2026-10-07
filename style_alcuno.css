@@ -3605,10 +3605,31 @@ html.clavier-ouvert #enLigne{
   padding-top: calc(var(--haut-visible, 0px) + 72px);
 }
 /* Pendant qu'on tape dans un champ (classe posée par js/en-ligne.js) : sur « Rejoindre », le bouton
-   Scanner et « ou entre le code » laissent la place aux champs */
+   Scanner et « ou entre le code » laissent la place aux champs, en douceur (fondu, léger rétrécissement,
+   l'espace se referme). Fondu avec filter et rétrécissement avec scale : opacity et transform sont
+   tenus par l'animation d'arrivée de l'écran. --ecart = l'écart entre les éléments, qui se referme aussi. */
+#enLigneRejoindre{ --ecart: 16px; }
+#enLigneRejoindre #btnScannerQR,
+#enLigneRejoindre .separateurOu{
+  max-height: 140px;
+  transition: max-height 0.3s ease, padding 0.3s ease, margin-bottom 0.3s ease,
+    filter 0.22s ease, scale 0.3s ease;
+}
+#enLigneRejoindre .separateurOu{ max-height: 40px; }
 html.saisie-en-ligne #enLigneRejoindre #btnScannerQR,
 html.saisie-en-ligne #enLigneRejoindre .separateurOu{
-  display: none;
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-bottom: calc(-1 * var(--ecart));
+  overflow: hidden;
+  filter: opacity(0);
+  scale: 0.9;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce){
+  #enLigneRejoindre #btnScannerQR,
+  #enLigneRejoindre .separateurOu{ transition-duration: 0.01s; }
 }
 
 /* ===== +4 : contenu centré verticalement quand il y a la place (avant : tout tassé en haut
@@ -5011,7 +5032,7 @@ html:not([data-theme="givre"]) :is(#overlayPigeon .bouton-pigeon, #overlayPlus4 
     padding-bottom: 12px;
     font-size: 20px;
   }
-  #enLigne > div{ gap: 12px; }
+  #enLigne > div{ gap: 12px; --ecart: 12px; }
 
   /* Bandeau ALCUNO de la partie : moins haut */
   header{ padding: 10px 16px 12px; margin-top: 8px; margin-bottom: 10px; }
