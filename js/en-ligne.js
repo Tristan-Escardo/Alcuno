@@ -70,26 +70,56 @@ document.getElementById("codeRejoindre").addEventListener("keydown", (e) => {
 
 // Clavier ouvert : zone de l'écran encore visible (au-dessus du clavier), pour que l'écran du mode en
 // ligne s'y cale (voir #enLigne dans le CSS) : sinon le clavier cache le bouton « Créer » / « Rejoindre »
+const ecranEnLigne = document.getElementById("enLigne");
+let clavierEtaitOuvert = false;
 if (window.visualViewport) {
   const majZoneVisible = () => {
     const zone = window.visualViewport;
-    document.documentElement.style.setProperty("--hauteur-visible", `${zone.height}px`);
     document.documentElement.style.setProperty("--haut-visible", `${zone.offsetTop}px`);
+    // Hauteur cachée sous la zone visible (le clavier) : le contenu s'arrête au-dessus
+    document.documentElement.style.setProperty("--bas-cache",
+      `${Math.max(0, window.innerHeight - zone.offsetTop - zone.height)}px`);
     // Clavier ouvert (zone visible nettement plus petite que l'écran) : contenu calé au-dessus du clavier
-    document.documentElement.classList.toggle("clavier-ouvert", zone.height < window.innerHeight * 0.8);
+    const ouvert = zone.height < window.innerHeight * 0.8;
+    document.documentElement.classList.toggle("clavier-ouvert", ouvert);
+    // Android : clavier fermé avec le bouton retour, le champ garde le focus => on le quitte
+    // (sinon le bouton Scanner resterait caché, voir « saisie-en-ligne » plus bas)
+    if (estAndroid && clavierEtaitOuvert && !ouvert) {
+      const champ = document.activeElement;
+      if (champ && champ.tagName === "INPUT" && ecranEnLigne.contains(champ)) champ.blur();
+    }
+    clavierEtaitOuvert = ouvert;
   };
   window.visualViewport.addEventListener("resize", majZoneVisible);
   window.visualViewport.addEventListener("scroll", majZoneVisible);
   majZoneVisible();
 }
 
+// Saisie dans un champ du mode en ligne : le bouton Scanner et « ou entre le code » se cachent (voir
+// le CSS). Lié au champ et pas à la taille de l'écran, que l'iPhone change quand on fait glisser la page.
+// Retirée un peu après la sortie du champ : un tap sur « Rejoindre » ne fait pas bouger les boutons.
+let minuteurSaisie = null;
+ecranEnLigne.addEventListener("focusin", (e) => {
+  if (e.target.tagName !== "INPUT") return;
+  clearTimeout(minuteurSaisie);
+  document.documentElement.classList.add("saisie-en-ligne");
+});
+ecranEnLigne.addEventListener("focusout", () => {
+  clearTimeout(minuteurSaisie);
+  minuteurSaisie = setTimeout(() => {
+    const champ = document.activeElement;
+    if (!champ || champ.tagName !== "INPUT" || !ecranEnLigne.contains(champ)) {
+      document.documentElement.classList.remove("saisie-en-ligne");
+    }
+  }, 300);
+});
+
 // Clavier ouvert : l'iPhone laisse glisser toute la page (on voyait le haut du jeu derrière, et la
 // zone visible changeait : le bouton Scanner revenait). On bloque ce glissement sur l'écran du mode en
 // ligne, sauf si son contenu ne tient pas et doit défiler.
 document.addEventListener("touchmove", (e) => {
-  const ecran = document.getElementById("enLigne");
-  if (ecran.style.display === "none" || !document.documentElement.classList.contains("clavier-ouvert")) return;
-  if (ecran.scrollHeight > ecran.clientHeight + 1 && ecran.contains(e.target)) return;
+  if (ecranEnLigne.style.display === "none" || !document.documentElement.classList.contains("clavier-ouvert")) return;
+  if (ecranEnLigne.scrollHeight > ecranEnLigne.clientHeight + 1 && ecranEnLigne.contains(e.target)) return;
   e.preventDefault();
 }, { passive: false });
 

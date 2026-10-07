@@ -3539,17 +3539,24 @@ html.accessibilite #ecranReglages .aPropos{
   zoom: 1.3;
 }
 
-/* ===== Mode en ligne : clavier ouvert => l'écran se cale sur la partie visible au-dessus du
-   clavier (--haut-visible / --hauteur-visible, mis à jour par script.js) au lieu de rester sur
+/* ===== Mode en ligne : clavier ouvert => le contenu se cale sur la partie visible au-dessus du
+   clavier (--haut-visible / --bas-cache, mis à jour par js/en-ligne.js) au lieu de rester sur
    toute la hauteur du téléphone (le clavier cachait le bouton « Créer » / « Rejoindre »).
+   Le fond, lui, couvre toujours tout l'écran : quand l'iPhone fait glisser la page avec le clavier
+   ouvert, on ne voit jamais ce qu'il y a derrière (avant : le titre ALCUNO du jeu).
    Contenu centré dans cette zone, et on peut faire défiler s'il ne tient pas. ===== */
 #enLigne{
-  inset: auto 0;
-  top: var(--haut-visible, 0px);
-  height: var(--hauteur-visible, 100%);
   justify-content: flex-start;
   overflow-y: auto;
   overscroll-behavior: contain;
+  padding-top: calc(var(--haut-visible, 0px) + 24px);
+  padding-bottom: calc(var(--bas-cache, 0px) + 24px);
+}
+#enLigne .btnRetour{
+  top: calc(var(--haut-visible, 0px) + 20px);
+}
+#enLigne #btnAccueilEnLigne{
+  top: calc(var(--haut-visible, 0px) + 26px);
 }
 
 #enLigne > div{
@@ -3593,13 +3600,14 @@ html:has(#enLigne:not([style*="none"])) body > header{
   visibility: hidden;
 }
 
-/* Clavier ouvert : jamais de contenu sous « ← Retour » (il défile s'il ne tient pas), et sur
-   « Rejoindre » le bouton Scanner et « ou entre le code » laissent la place aux champs */
+/* Clavier ouvert : jamais de contenu sous « ← Retour » (il défile s'il ne tient pas) */
 html.clavier-ouvert #enLigne{
-  padding-top: 72px;
+  padding-top: calc(var(--haut-visible, 0px) + 72px);
 }
-html.clavier-ouvert #enLigneRejoindre #btnScannerQR,
-html.clavier-ouvert #enLigneRejoindre .separateurOu{
+/* Pendant qu'on tape dans un champ (classe posée par js/en-ligne.js) : sur « Rejoindre », le bouton
+   Scanner et « ou entre le code » laissent la place aux champs */
+html.saisie-en-ligne #enLigneRejoindre #btnScannerQR,
+html.saisie-en-ligne #enLigneRejoindre .separateurOu{
   display: none;
 }
 
