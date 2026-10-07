@@ -367,7 +367,10 @@ function contexteAudio(){
 // (et on charge les fichiers des sons au premier tap, pour qu'ils soient prêts à temps).
 // Si le son est encore coupé au tap suivant, l'iPhone l'a bloqué pour de bon : on repart d'un
 // contexte neuf, créé pendant le tap (les sons déjà chargés resservent tels quels).
-document.addEventListener("pointerdown", () => {
+// iPhone : le son ne se débloque qu'à la fin du toucher (doigt relevé) ou au clic, pas au début du
+// toucher. En classique, ça passait quand même (le son de la carte est joué dans le clic) ; en ligne,
+// tous les sons arrivent plus tard par Firebase : sans ça, le son n'était jamais débloqué.
+function debloquerSon(){
   if (!caseSons.checked) return;
   if (contexteSon && contexteSon.state !== "running" && repriseRatee) {
     try { contexteSon.close(); } catch (e) {}
@@ -376,8 +379,19 @@ document.addEventListener("pointerdown", () => {
   const ctx = contexteAudio();
   chargerSons();
   repriseRatee = false;
-  if (ctx && ctx.state !== "running") setTimeout(() => { repriseRatee = ctx.state !== "running"; }, 300);
-}, { capture: true, passive: true });
+  if (!ctx || ctx.state === "running") return;
+  // Un son muet joué pendant le geste : ce qui débloque vraiment le son sur iPhone
+  try {
+    const muet = ctx.createBufferSource();
+    muet.buffer = ctx.createBuffer(1, 1, 22050);
+    muet.connect(ctx.destination);
+    muet.start(0);
+  } catch (e) {}
+  setTimeout(() => { repriseRatee = ctx.state !== "running"; }, 300);
+}
+["pointerdown", "touchend", "click"].forEach((type) => {
+  document.addEventListener(type, debloquerSon, { capture: true, passive: true });
+});
 // Après la caméra (scan du QR code) : l'iPhone peut laisser le son coupé ou l'envoyer dans l'écouteur
 // du haut. On repart d'un contexte de son neuf, relancé au prochain tap (les sons chargés resservent).
 function repartirSonApresCamera(){
