@@ -345,7 +345,10 @@ async function preparerLecteurQR(){
 
 function fermerScanner(){
   numeroScanner++;
-  if (fluxScanner) fluxScanner.getTracks().forEach((piste) => piste.stop());
+  if (fluxScanner) {
+    fluxScanner.getTracks().forEach((piste) => piste.stop());
+    repartirSonApresCamera(); // sinon, sur iPhone, plus de son ensuite (dont toute la partie en ligne)
+  }
   fluxScanner = null;
   videoScanner.srcObject = null;
   fermerPage(ecranScanner);

@@ -733,7 +733,7 @@ function majStickyJoueurActif(){
   ajouterBadgeDeconnecte(nomEl, !!texteDeconnecte(nom));
   bonusEl.innerText = n > 0 ? `+${n}` : "";
   if(enLigneActif && nom === pseudoActuel){
-    labelEl.innerText = "À toi !";
+    labelEl.innerText = "À toi";
     // Vibre une seule fois par tour (un tour = un nombre de cartes restantes dans la manche).
     // Pas au tout premier tour (aucune carte retournée) : tout le monde voit la partie démarrer
     const tour = `${mancheCourante}:${cartesRestantes()}`;

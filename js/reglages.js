@@ -378,6 +378,13 @@ document.addEventListener("pointerdown", () => {
   repriseRatee = false;
   if (ctx && ctx.state !== "running") setTimeout(() => { repriseRatee = ctx.state !== "running"; }, 300);
 }, { capture: true, passive: true });
+// Après la caméra (scan du QR code) : l'iPhone peut laisser le son coupé ou l'envoyer dans l'écouteur
+// du haut. On repart d'un contexte de son neuf, relancé au prochain tap (les sons chargés resservent).
+function repartirSonApresCamera(){
+  if (!contexteSon) return;
+  try { contexteSon.close(); } catch (e) {}
+  contexteSon = null;
+}
 // Retour dans l'appli : on relance le son tout de suite
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible" && contexteSon && contexteSon.state !== "running") {
