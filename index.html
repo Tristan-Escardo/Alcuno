@@ -10,7 +10,7 @@
         // Fichiers du jeu, dans l'ordre (aussi dans sw.js, pour le hors connexion). Téléchargés tout de suite
         // et en parallèle : en bas de la page, ils s'exécutent d'affilée, sans attente entre deux fichiers
         // (aucun bouton ni minuteur ne peut se déclencher avant que tout le jeu soit là).
-        window.FICHIERS_JEU = ["script.js", "js/reglages.js", "js/en-ligne.js", "js/plateau.js", "js/regles.js",
+        window.FICHIERS_JEU = ["script.js", "js/qrcode.js", "js/reglages.js", "js/en-ligne.js", "js/plateau.js", "js/regles.js",
                                "js/synchro-en-ligne.js", "js/retour-demarrage.js"];
         window.FICHIERS_JEU.forEach(function (f) {
             document.write('<link rel="preload" as="script" href="' + f + '?t=' + window.ANTI_CACHE + '">');
@@ -282,6 +282,7 @@
 
             <div id="salleAttente" style="display:none;">
                 <button type="button" id="btnQuitterSalle" class="btnRetour">← Retour</button>
+                <div id="qrPartie" class="qrPartie" role="img" aria-label="QR code pour rejoindre la partie"></div>
                 <h3 id="codePartieAffiche"></h3>
                 <p id="infoModeSoft" class="infoModeSoft" style="display:none;">Partie en Mode PJ</p>
                 <div id="listeJoueursEnLigne"></div>

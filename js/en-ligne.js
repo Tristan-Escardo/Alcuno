@@ -148,6 +148,22 @@ function boutonEnAttente(id, texte){
   };
 }
 
+// Code de la partie + QR code au-dessus : le scanner ouvre le jeu avec le code déjà rempli (voir ?code= plus bas)
+function afficherCodePartie(code){
+  document.getElementById("codePartieAffiche").innerText = "Code de la partie : " + code;
+  const zone = document.getElementById("qrPartie");
+  try {
+    const qr = qrcode(0, "M");
+    qr.addData("https://tristan-escardo.github.io/Alcuno/?code=" + encodeURIComponent(code));
+    qr.make();
+    zone.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 4, scalable: true });
+    zone.style.display = "";
+  } catch (e) {
+    zone.innerHTML = "";
+    zone.style.display = "none"; // sans QR code, le code écrit suffit
+  }
+}
+
 document.getElementById("btnModeEnLigne").addEventListener("click", () => {
   prechaufferFirebase();
   document.getElementById("choixMode").style.display = "none";
@@ -328,7 +344,7 @@ document.getElementById("validerCreation").addEventListener("click", () => {
       suivrePresence(code, pseudo);
 
       document.getElementById("enLigneCreer").style.display = "none";
-      document.getElementById("codePartieAffiche").innerText = "Code de la partie : " + code;
+      afficherCodePartie(code);
       document.getElementById("salleAttente").style.display = "";
 
       ecouterSalleAttente(code);
@@ -408,7 +424,7 @@ document.getElementById("validerRejoindre").addEventListener("click", () => {
         suivrePresence(code, pseudo);
 
         document.getElementById("enLigneRejoindre").style.display = "none";
-        document.getElementById("codePartieAffiche").innerText = "Code de la partie : " + code;
+        afficherCodePartie(code);
         document.getElementById("salleAttente").style.display = "";
 
         ecouterSalleAttente(code);
@@ -832,7 +848,7 @@ function reprendrePlaceEnLigne(code, nom, partie){
 
   document.getElementById("enLigneRejoindre").style.display = "none";
   document.getElementById("enLigneRevenir").style.display = "none";
-  document.getElementById("codePartieAffiche").innerText = "Code de la partie : " + code;
+  afficherCodePartie(code);
   document.getElementById("salleAttente").style.display = "";
 
   marquerActivite(code);
