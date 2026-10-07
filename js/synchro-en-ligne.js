@@ -555,6 +555,9 @@ function demarrerMancheEnLigne(etat, options = {}){
   document.getElementById("enLigne").style.display = "none";
   messagesBar.style.display = "";
   document.getElementById("jeu").style.display = "";
+  // Bandeau « Tour de » placé pendant lancerPartie(), quand le jeu était encore caché (il se collait
+  // alors tout en haut de l'écran) : on le replace sous la barre des messages maintenant qu'elle est là
+  repositionnerStickyJoueurActif();
   afficherBadgeCode();
 
   if(!repriseEnCours){
