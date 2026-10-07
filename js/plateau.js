@@ -734,12 +734,15 @@ function majStickyJoueurActif(){
   bonusEl.innerText = n > 0 ? `+${n}` : "";
   if(enLigneActif && nom === pseudoActuel){
     labelEl.innerText = "À toi !";
-    // Vibre une seule fois par tour (un tour = un nombre de cartes restantes dans la manche)
+    // Vibre une seule fois par tour (un tour = un nombre de cartes restantes dans la manche).
+    // Pas au tout premier tour (aucune carte retournée) : tout le monde voit la partie démarrer
     const tour = `${mancheCourante}:${cartesRestantes()}`;
     if(tour !== dernierTourVibre){
       dernierTourVibre = tour;
-      vibrer([70, 60, 70]);
-      jouerSon("tour");
+      if(plateau.querySelector(".retournee")){
+        vibrer([70, 60, 70]);
+        jouerSon("tour");
+      }
     }
   }
 
