@@ -129,12 +129,11 @@ document.documentElement.classList.remove("chargement");
 try { sessionStorage.removeItem("alcuno_rechargement_auto"); } catch (e) {} // (voir echecChargementJeu dans index.html)
 // #endregion
 
-// (après le démarrage complet) Lien d'un QR code (…/?code=ABC123) : on ouvre directement « Rejoindre une partie » avec le code rempli
+// (après le démarrage complet) Invitation par QR code : on ouvre directement « Rejoindre une partie »
+// avec le code rempli (lien scanné, ou appli lancée juste après l'avoir installée depuis ce lien)
 (function(){
-  let code = "";
-  try { code = (new URLSearchParams(location.search).get("code") || "").trim().toUpperCase().slice(0, 6); } catch (e) {}
+  const code = lireCodeInvitation(estEnAppli);
   if (!code) return;
-  try { history.replaceState(null, "", location.pathname); } catch (e) {} // le code ne reste pas dans l'adresse
   document.getElementById("codeRejoindre").value = code;
   document.getElementById("btnModeEnLigne").click();
   document.getElementById("btnRejoindrePartie").click();

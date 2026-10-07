@@ -50,6 +50,33 @@ window.addEventListener("unhandledrejection", (e) => noterErreur(`promesse : ${e
 // #endregion
 
 // #region Démarrage : mode de jeu, version du jeu
+// ================== INVITATION PAR QR CODE (…/?code=ABC123) ==================
+// Le QR code de la salle d'attente ouvre le site avec le code de la partie. On le garde 2 h dans le
+// téléphone : si la personne installe l'appli et la lance ensuite, la partie l'attend encore
+// (Android : l'appli et Chrome partagent la mémoire ; iPhone : non, le code reste à taper).
+const CLE_CODE_INVITATION = "alcuno_code_invitation";
+const DUREE_CODE_INVITATION = 2 * 60 * 60 * 1000;
+const codeInvitationLien = (() => {
+  let code = "";
+  try { code = (new URLSearchParams(location.search).get("code") || "").trim().toUpperCase().slice(0, 6); } catch (e) {}
+  if (!code) return "";
+  try { localStorage.setItem(CLE_CODE_INVITATION, JSON.stringify({ code, date: Date.now() })); } catch (e) {}
+  try { history.replaceState(null, "", location.pathname); } catch (e) {} // le code ne reste pas dans l'adresse
+  return code;
+})();
+
+// Code à proposer au démarrage : celui du lien, sinon (dans l'appli) celui gardé d'un scan récent
+function lireCodeInvitation(enAppli){
+  if (codeInvitationLien) return codeInvitationLien;
+  if (!enAppli) return "";
+  try {
+    const memo = JSON.parse(localStorage.getItem(CLE_CODE_INVITATION) || "null");
+    localStorage.removeItem(CLE_CODE_INVITATION); // proposé une seule fois dans l'appli
+    if (memo && memo.code && Date.now() - memo.date < DUREE_CODE_INVITATION) return memo.code;
+  } catch (e) {}
+  return "";
+}
+
 // ================== MODE DE JEU (classique / en ligne) ==================
 // Le module Firebase s'exécute souvent AVANT ce code : l'événement "firebase-ready"
 // est alors déjà passé, on se fie donc à la présence de window.firebaseDB

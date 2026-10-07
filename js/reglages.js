@@ -823,7 +823,8 @@ window.addEventListener("appinstalled", () => {
 
 if (estTelephone && !estEnAppli) {
   blocInstaller.hidden = false;
-  if (!installationRemiseAPlusTard()) {
+  // Arrivé par le QR code d'une partie : on va droit à la partie (le bouton « Installer l'appli » reste en bas)
+  if (!installationRemiseAPlusTard() && !codeInvitationLien) {
     // Android : on laisse un instant à Chrome pour dire s'il sait installer (bouton) ; sinon les étapes
     // (pas si on a déjà quitté l'accueil entre-temps : il surgirait par-dessus ce qu'on est en train de faire)
     const toujoursSurAccueil = () => document.getElementById("choixMode").style.display !== "none" &&
