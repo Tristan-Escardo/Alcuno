@@ -411,7 +411,7 @@ document.addEventListener("visibilitychange", () => {
 //   cartes.mp3  : une carte est retournée sur le plateau
 //   doree.mp3   : quelqu'un tire la carte dorée (coupé à 3 s, voir DUREE_MAX_SONS)
 //   pigeon.mp3  : quelqu'un devient pigeon (premier pigeon ou nouveau pigeon ; coupé à 2 s)
-//   tour.mp3    : en ligne, c'est ton tour
+//   tour.mp3    : en ligne, c'est ton tour et tu n'as toujours pas joué au bout de 2 minutes
 //   eau.mp3     : rappel « Bois de l'eau »
 //   sons_on.mp3 : on active les sons dans les réglages
 //   credits.mp3 : 4 taps sur le titre ALCUNO (écran des créateurs)
