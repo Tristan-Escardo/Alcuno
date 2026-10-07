@@ -75,12 +75,14 @@ let clavierEtaitOuvert = false;
 if (window.visualViewport) {
   const majZoneVisible = () => {
     const zone = window.visualViewport;
+    // Hauteur de l'écran du mode en ligne (tout l'écran, clavier compris) ; avant son affichage, la fenêtre
+    const hauteurEcran = ecranEnLigne.clientHeight || window.innerHeight;
     document.documentElement.style.setProperty("--haut-visible", `${zone.offsetTop}px`);
     // Hauteur cachée sous la zone visible (le clavier) : le contenu s'arrête au-dessus
     document.documentElement.style.setProperty("--bas-cache",
-      `${Math.max(0, window.innerHeight - zone.offsetTop - zone.height)}px`);
+      `${Math.max(0, hauteurEcran - zone.offsetTop - zone.height)}px`);
     // Clavier ouvert (zone visible nettement plus petite que l'écran) : contenu calé au-dessus du clavier
-    const ouvert = zone.height < window.innerHeight * 0.8;
+    const ouvert = zone.height < hauteurEcran * 0.8;
     document.documentElement.classList.toggle("clavier-ouvert", ouvert);
     // Android : clavier fermé avec le bouton retour, le champ garde le focus => on le quitte
     // (sinon le bouton Scanner resterait caché, voir « saisie-en-ligne » plus bas)
@@ -98,19 +100,72 @@ if (window.visualViewport) {
 // Saisie dans un champ du mode en ligne : le bouton Scanner et « ou entre le code » se cachent (voir
 // le CSS). Lié au champ et pas à la taille de l'écran, que l'iPhone change quand on fait glisser la page.
 // Retirée un peu après la sortie du champ : un tap sur « Rejoindre » ne fait pas bouger les boutons.
+// Sur « Rejoindre », en douceur : le bouton Scanner et « ou entre le code » s'effacent (ou reviennent) en
+// fondu pendant que les champs glissent vers leur nouvelle place. La mise en page, elle, change d'un coup
+// (voir en-sortie dans le CSS) : elle est juste tout de suite, même si le clavier s'ouvre en même temps.
+const elementsScanner = [document.getElementById("btnScannerQR"), document.querySelector("#enLigneRejoindre .separateurOu")];
+const fonduScanner = new Map(); // élément => son animation de fondu en cours
+const mouvementReduit = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+function arreterFonduScanner(el){
+  const anim = fonduScanner.get(el);
+  fonduScanner.delete(el);
+  if (anim) anim.cancel();
+  el.classList.remove("en-sortie");
+  el.style.left = el.style.top = el.style.width = el.style.height = "";
+}
+
+function basculerSaisie(enSaisie){
+  const racine = document.documentElement;
+  if (racine.classList.contains("saisie-en-ligne") === enSaisie) return;
+  const ecranRejoindre = document.getElementById("enLigneRejoindre");
+  const animer = ecranEnLigne.style.display !== "none" && ecranRejoindre.style.display !== "none" &&
+    !mouvementReduit.matches && typeof Element.prototype.animate === "function";
+  elementsScanner.forEach(arreterFonduScanner);
+  if (!animer) { racine.classList.toggle("saisie-en-ligne", enSaisie); return; }
+
+  const champs = Array.from(ecranRejoindre.children)
+    .filter((el) => !elementsScanner.includes(el) && !el.classList.contains("btnRetour"));
+  const avant = champs.map((el) => el.getBoundingClientRect().top);
+  if (enSaisie) {
+    // Restent dessinés à leur place le temps du fondu (hors de la mise en page)
+    const places = elementsScanner.map((el) => el.getBoundingClientRect());
+    elementsScanner.forEach((el, i) => {
+      el.classList.add("en-sortie");
+      Object.assign(el.style, { left: `${places[i].left}px`, top: `${places[i].top}px`,
+        width: `${places[i].width}px`, height: `${places[i].height}px` });
+    });
+  }
+  racine.classList.toggle("saisie-en-ligne", enSaisie);
+
+  champs.forEach((el, i) => {
+    const decalage = avant[i] - el.getBoundingClientRect().top;
+    if (Math.abs(decalage) > 1) {
+      el.animate([{ translate: `0 ${decalage}px` }, { translate: "0 0" }],
+        { duration: 260, easing: "cubic-bezier(0.2, 0.8, 0.2, 1)" });
+    }
+  });
+  elementsScanner.forEach((el) => {
+    const anim = el.animate(enSaisie
+      ? [{ filter: "opacity(1)", scale: "1" }, { filter: "opacity(0)", scale: "0.92" }]
+      : [{ filter: "opacity(0)", scale: "0.92" }, { filter: "opacity(1)", scale: "1" }],
+      { duration: enSaisie ? 200 : 260, easing: "ease-out", fill: "forwards" });
+    fonduScanner.set(el, anim);
+    anim.finished.then(() => { if (fonduScanner.get(el) === anim) arreterFonduScanner(el); }).catch(() => {});
+  });
+}
+
 let minuteurSaisie = null;
 ecranEnLigne.addEventListener("focusin", (e) => {
   if (e.target.tagName !== "INPUT") return;
   clearTimeout(minuteurSaisie);
-  document.documentElement.classList.add("saisie-en-ligne");
+  basculerSaisie(true);
 });
 ecranEnLigne.addEventListener("focusout", () => {
   clearTimeout(minuteurSaisie);
   minuteurSaisie = setTimeout(() => {
     const champ = document.activeElement;
-    if (!champ || champ.tagName !== "INPUT" || !ecranEnLigne.contains(champ)) {
-      document.documentElement.classList.remove("saisie-en-ligne");
-    }
+    if (!champ || champ.tagName !== "INPUT" || !ecranEnLigne.contains(champ)) basculerSaisie(false);
   }, 300);
 });
 
