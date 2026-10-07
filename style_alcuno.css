@@ -3587,6 +3587,16 @@ html.clavier-ouvert #enLigne > div{
   margin-bottom: 16px;
 }
 
+/* Clavier ouvert : jamais de contenu sous « ← Retour » (il défile s'il ne tient pas), et sur
+   « Rejoindre » le bouton Scanner et « ou entre le code » laissent la place aux champs */
+html.clavier-ouvert #enLigne{
+  padding-top: 72px;
+}
+html.clavier-ouvert #enLigneRejoindre #btnScannerQR,
+html.clavier-ouvert #enLigneRejoindre .separateurOu{
+  display: none;
+}
+
 /* ===== +4 : contenu centré verticalement quand il y a la place (avant : tout tassé en haut
    avec peu de joueurs) ; avec beaucoup de joueurs, il défile toujours depuis le haut ===== */
 #overlayPlus4 > :first-child{
