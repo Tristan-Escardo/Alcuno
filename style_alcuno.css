@@ -1813,12 +1813,21 @@ header h1{
   align-items: center;
 }
 
-/* Rejoindre : « Scanner le QR code », plus discret que « Rejoindre » */
-#enLigne .btnScanner{
-  background-color: rgba(255,255,255,0.1);
-  box-shadow: 0 0 0 1px rgba(255,215,0,0.45) inset;
-  padding: 12px 18px;
-  font-size: 17px;
+/* Rejoindre : « ou entre le code » entre le bouton Scanner et les champs, avec un trait de chaque côté */
+#enLigne .separateurOu{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(320px, 80vw);
+  color: rgba(255,255,255,0.72);
+  font-size: 14px;
+}
+#enLigne .separateurOu::before,
+#enLigne .separateurOu::after{
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(255,215,0,0.35);
 }
 
 /* Scan du QR code : la caméra en plein écran, un cadre pour viser */
@@ -4148,6 +4157,9 @@ html[data-theme="givre"] .btnAccueil:hover{
 }
 
 /* Champs de texte */
+html[data-theme="givre"] #enLigne .separateurOu{ color: var(--givre-texte); opacity: 0.75; }
+html[data-theme="givre"] #enLigne .separateurOu::before,
+html[data-theme="givre"] #enLigne .separateurOu::after{ background: var(--givre-bord); }
 html[data-theme="givre"] #enLigne input,
 html[data-theme="givre"] #menu input{
   background: #fff;
@@ -4900,7 +4912,7 @@ html.accessibilite #ecranInstallation #btnInstallationPlusTard{ font-size: 19px;
    Léger dégradé doré (le jaune du haut reste celui d'avant) et ombre du texte plus marquée.
    Mêmes boutons dans les overlays des règles (règle suivante). */
 html:not([data-theme="givre"]) :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu,
-  #btnCreerPartie, #btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre,
+  #btnCreerPartie, #btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR,
   #lancerPartieEnLigne, #btnRejouerMemes, #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button,
   #btnConfirmerAccueilOui, #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon,
   #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie,
@@ -5076,7 +5088,7 @@ html:not([data-theme="givre"]) :is(#overlayPigeon .bouton-pigeon, #overlayPlus4 
    Au doigt : plus sombre et un peu plus petit pendant l'appui. À la souris : un peu plus clair au survol
    (seulement si l'appareil a une souris, sinon l'effet reste « collé » après un tap). */
 :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
-  #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #lancerPartieEnLigne, #btnRejouerMemes,
+  #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
   #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
   #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
   #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
@@ -5087,7 +5099,7 @@ html:not([data-theme="givre"]) :is(#overlayPigeon .bouton-pigeon, #overlayPlus4 
 }
 @media (hover: hover){
   html body :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
-    #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #lancerPartieEnLigne, #btnRejouerMemes,
+    #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
     #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
     #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
     #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
@@ -5103,7 +5115,7 @@ html:not([data-theme="givre"]) :is(#overlayPigeon .bouton-pigeon, #overlayPlus4 
 /* Givre : anneau et lueur bleus (le blanc et le jaune ne se voient pas sur le fond clair) */
 @media (hover: hover){
   html[data-theme="givre"] body :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
-  #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #lancerPartieEnLigne, #btnRejouerMemes,
+  #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
   #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
   #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
   #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,

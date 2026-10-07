@@ -151,7 +151,7 @@ function avecCouronne(nom){
 // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
 // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
 // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
-const VERSION_AFFICHEE = "9.3.2";
+const VERSION_AFFICHEE = "9.3.3";
 const VERSION_JEU = VERSION_AFFICHEE.split(".")
   .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
 // À l'écran : le numéro complet, pour voir d'un coup d'œil si un téléphone est à jour
@@ -203,8 +203,8 @@ document.addEventListener("pointerdown", () => { clicAAvaler = false; }, true);
 // (il se tasse puis revient, un peu plus clair un instant, 0,2 s). Seulement tant qu'il est à l'écran :
 // rien ne reste par-dessus l'écran suivant.
 const BOUTONS_AVEC_POP = "#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu, #btnCreerPartie, " +
-  "#btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #lancerPartieEnLigne, " +
-  "#btnRejouerMemes, #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui, " +
+  "#btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, " +
+  "#lancerPartieEnLigne, #btnRejouerMemes, #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui, " +
   "#btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, " +
   "#ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression, #btnInstallationInstaller, " +
   "#btnOublierPartie, #listeSuppression button, " +
