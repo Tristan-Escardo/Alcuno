@@ -707,7 +707,7 @@ function creerUIJoueurActifSticky(){
   repositionnerStickyJoueurActif();
 }
 
-// Son « À toi » (en ligne, seulement sur le téléphone du joueur dont c'est le tour) : joué s'il n'a
+// Son « À toi » et bandeau qui clignote (en ligne, seulement sur le téléphone du joueur dont c'est le tour) : s'il n'a
 // toujours pas joué son tour (retourné sa carte) 2 minutes après que c'est devenu son tour, puis toutes
 // les 2 minutes tant qu'il ne l'a pas joué. Regarder les règles, faire défiler, etc. ne compte pas :
 // seul le tour joué (ou passé à un autre) l'arrête.
@@ -721,8 +721,18 @@ function programmerRappelTour(tour){
     if(`${mancheCourante}:${cartesRestantes()}` !== tour) return; // tour joué entre-temps
     if(joueurs[indexJoueur % joueurs.length] !== pseudoActuel) return; // plus son tour
     jouerSon("tour");
+    faireClignoterBandeauTour(); // même sans le son (sons coupés, musique forte…)
     programmerRappelTour(tour); // et encore dans 2 minutes s'il ne joue toujours pas
   }, DELAI_RAPPEL_TOUR);
+}
+
+// Le bandeau « À toi » clignote 3 fois (voir rappel-tour dans le CSS)
+function faireClignoterBandeauTour(){
+  if(!stickyJoueurActif) return;
+  stickyJoueurActif.classList.remove("rappel-tour");
+  void stickyJoueurActif.offsetWidth; // relance l'animation si elle était déjà là
+  stickyJoueurActif.classList.add("rappel-tour");
+  stickyJoueurActif.addEventListener("animationend", () => stickyJoueurActif.classList.remove("rappel-tour"), { once: true });
 }
 
 function majStickyJoueurActif(){

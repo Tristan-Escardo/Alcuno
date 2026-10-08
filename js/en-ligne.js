@@ -72,6 +72,24 @@ document.getElementById("codeRejoindre").addEventListener("keydown", (e) => {
 // ligne s'y cale (voir #enLigne dans le CSS) : sinon le clavier cache le bouton « Créer » / « Rejoindre »
 const ecranEnLigne = document.getElementById("enLigne");
 let clavierEtaitOuvert = false;
+
+// Clavier ouvert : l'iPhone laisse glisser toute la page (on voyait le haut du jeu derrière, et la
+// zone visible changeait : le bouton Scanner revenait). On bloque ce glissement sur l'écran du mode en
+// ligne, sauf si son contenu ne tient pas et doit défiler. Écouteur posé seulement pendant que le
+// clavier est ouvert : le reste du temps (plateau…), le défilement n'attend jamais le jeu.
+function bloquerGlissement(e){
+  if (ecranEnLigne.style.display === "none") return;
+  if (ecranEnLigne.scrollHeight > ecranEnLigne.clientHeight + 1 && ecranEnLigne.contains(e.target)) return;
+  e.preventDefault();
+}
+let glissementBloque = false;
+function majBlocageGlissement(ouvert){
+  if (ouvert === glissementBloque) return;
+  glissementBloque = ouvert;
+  if (ouvert) document.addEventListener("touchmove", bloquerGlissement, { passive: false });
+  else document.removeEventListener("touchmove", bloquerGlissement);
+}
+
 if (window.visualViewport) {
   const majZoneVisible = () => {
     const zone = window.visualViewport;
@@ -84,6 +102,7 @@ if (window.visualViewport) {
     // Clavier ouvert (zone visible nettement plus petite que l'écran) : contenu calé au-dessus du clavier
     const ouvert = zone.height < hauteurEcran * 0.8;
     document.documentElement.classList.toggle("clavier-ouvert", ouvert);
+    majBlocageGlissement(ouvert);
     // Android : clavier fermé avec le bouton retour, le champ garde le focus => on le quitte
     // (sinon le bouton Scanner resterait caché, voir « saisie-en-ligne » plus bas)
     if (estAndroid && clavierEtaitOuvert && !ouvert) {
@@ -172,15 +191,6 @@ ecranEnLigne.addEventListener("focusout", () => {
     if (!champ || champ.tagName !== "INPUT" || !ecranEnLigne.contains(champ)) basculerSaisie(false);
   }, estIOS ? 60 : 300);
 });
-
-// Clavier ouvert : l'iPhone laisse glisser toute la page (on voyait le haut du jeu derrière, et la
-// zone visible changeait : le bouton Scanner revenait). On bloque ce glissement sur l'écran du mode en
-// ligne, sauf si son contenu ne tient pas et doit défiler.
-document.addEventListener("touchmove", (e) => {
-  if (ecranEnLigne.style.display === "none" || !document.documentElement.classList.contains("clavier-ouvert")) return;
-  if (ecranEnLigne.scrollHeight > ecranEnLigne.clientHeight + 1 && ecranEnLigne.contains(e.target)) return;
-  e.preventDefault();
-}, { passive: false });
 
 // Transitions entre les pages : « ← Retour » et ⌂ => la page suivante arrive depuis la gauche
 // (classe nav-retour, voir le CSS) ; sinon elle arrive depuis la droite
