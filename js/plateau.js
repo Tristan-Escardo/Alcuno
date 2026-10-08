@@ -708,8 +708,9 @@ function creerUIJoueurActifSticky(){
 }
 
 // Son « À toi » (en ligne, seulement sur le téléphone du joueur dont c'est le tour) : joué s'il n'a
-// toujours pas joué son tour (retourné sa carte) 2 minutes après que c'est devenu son tour. Regarder
-// les règles, faire défiler, etc. ne compte pas : seul le tour joué (ou passé à un autre) l'annule.
+// toujours pas joué son tour (retourné sa carte) 2 minutes après que c'est devenu son tour, puis toutes
+// les 2 minutes tant qu'il ne l'a pas joué. Regarder les règles, faire défiler, etc. ne compte pas :
+// seul le tour joué (ou passé à un autre) l'arrête.
 const DELAI_RAPPEL_TOUR = 2 * 60 * 1000;
 let minuteurRappelTour = null;
 
@@ -720,6 +721,7 @@ function programmerRappelTour(tour){
     if(`${mancheCourante}:${cartesRestantes()}` !== tour) return; // tour joué entre-temps
     if(joueurs[indexJoueur % joueurs.length] !== pseudoActuel) return; // plus son tour
     jouerSon("tour");
+    programmerRappelTour(tour); // et encore dans 2 minutes s'il ne joue toujours pas
   }, DELAI_RAPPEL_TOUR);
 }
 
