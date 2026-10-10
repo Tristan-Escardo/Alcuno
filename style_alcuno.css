@@ -2053,7 +2053,7 @@ body.mode-en-ligne #jouer{
   box-shadow: none;
 
   font-family: Impact, Haettenschweiler, "Arial Black", sans-serif;
-  font-size: 30px;
+  font-size: 35px; /* le symbole ⌂ paraît plus petit que sa taille : à peu près la taille du livre des règles */
   font-weight: 900;
   -webkit-text-stroke: 1.2px #FFD700; /* épaissit le trait du symbole */
   line-height: 1;
@@ -2107,7 +2107,7 @@ body.mode-en-ligne #jouer{
   #btnAccueilClassique,
   #enLigne #btnAccueilEnLigne,
   #ecranNouvellePartie #btnAccueil{
-    font-size: 26px;
+    font-size: 31px;
   }
 
   #btnAccueilClassique{
