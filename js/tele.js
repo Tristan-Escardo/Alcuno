@@ -71,7 +71,7 @@ function relierTele(code){
   attendreFirebase(envoyerEtatTele);
   majBoutonCaster();
   fermerEcranCaster();
-  afficherToast("📺 Télé connectée", 2500);
+  afficherToast("Télé connectée", 2500);
 }
 
 function arreterTele(){
@@ -196,7 +196,7 @@ function envoyerEtatTele(){
       pauseTeleJusqua = Date.now() + 5000; // (pas en boucle)
       if (!erreurTeleSignalee) {
         erreurTeleSignalee = true;
-        afficherToast("📺 La télé ne reçoit pas la partie (réseau ?)", 3500);
+        afficherToast("La télé ne reçoit pas la partie (réseau ?)", 3500);
       }
     });
 }
@@ -256,7 +256,7 @@ function demarrerPageTele(){
     <div class="tele-attente">
       <div class="tele-attente-texte">
         <div class="tele-titre">ALCUNO</div>
-        <div class="tele-sous-titre">📺 Mode télé</div>
+        <div class="tele-sous-titre">Mode télé</div>
         <div class="tele-etape"><span class="tele-num">1</span><span>Sur le téléphone de la partie (mode classique) : bouton <b>Caster</b></span></div>
         <div class="tele-etape"><span class="tele-num">2</span><span>Scanne ce QR code avec l'appli</span></div>
         <div class="tele-etape"><span class="tele-num">3</span><span>La partie s'affiche ici en grand</span></div>
