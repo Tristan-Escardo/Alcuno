@@ -73,11 +73,12 @@ document.getElementById("codeRejoindre").addEventListener("keydown", (e) => {
 // sinon le clavier cache le bouton « Créer » / « Rejoindre », ou le champ du code de la télé
 const ecranEnLigne = document.getElementById("enLigne");
 const ecranCasterClavier = document.getElementById("ecranCaster");
+const ecranBugClavier = document.getElementById("ecranBug");
 let clavierEtaitOuvert = false;
 
 // Écran plein écran avec un champ de saisie actuellement affiché (mode en ligne ou Caster), ou null
 function ecranSaisieAffiche(){
-  return [ecranCasterClavier, ecranEnLigne].find(el => el && el.style.display !== "none") || null;
+  return [ecranBugClavier, ecranCasterClavier, ecranEnLigne].find(el => el && el.style.display !== "none") || null;
 }
 
 // Clavier ouvert : l'iPhone laisse glisser toute la page (on voyait le haut du jeu derrière, et la
@@ -102,9 +103,12 @@ let minuteurChampVisible = null;
 function remonterChampAuDessusDuClavier(){
   const ecran = ecranSaisieAffiche();
   const champ = document.activeElement;
-  if (!ecran || !champ || champ.tagName !== "INPUT" || !ecran.contains(champ)) return;
+  if (!ecran || !champ || !["INPUT", "TEXTAREA"].includes(champ.tagName) || !ecran.contains(champ)) return;
   const zone = window.visualViewport;
-  const bas = (champ.closest(".casterCode") || champ).getBoundingClientRect().bottom; // (avec le bouton OK)
+  // (avec son bouton : OK du code de la télé, « Envoyer » sous la zone de texte d'un bug)
+  const suivant = champ.nextElementSibling;
+  const bas = Math.max((champ.closest(".casterCode") || champ).getBoundingClientRect().bottom,
+    suivant && suivant.tagName === "BUTTON" ? suivant.getBoundingClientRect().bottom : 0);
   const depasse = bas - (zone.offsetTop + zone.height - 12);
   if (depasse > 0) ecran.scrollBy({ top: depasse, behavior: mouvementReduit.matches ? "auto" : "smooth" });
 }

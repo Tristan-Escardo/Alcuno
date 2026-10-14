@@ -52,6 +52,7 @@ function actionRetour(){
   if(estVisible(ecranCredits)) return () => activer("btnFermerCredits");
   if(estVisible(ecranInstallation)) return () => activer("btnInstallationPlusTard");
   if(estVisible(ecranRegles)) return () => activer("btnFermerRegles");
+  if(estVisible(ecranBug)) return () => activer("btnBugRetour"); // (par-dessus les Réglages)
   if(estVisible(ecranReglages)) return () => activer("btnFermerReglages");
 
   // Overlays du jeu : le plus récent se ferme comme au tap (ceux où il faut choisir ne bougent pas),
@@ -133,6 +134,7 @@ function nomEcran(){
   if(estVisible(ecranCredits)) return "credits";
   if(estVisible(ecranInstallation)) return "installation";
   if(estVisible(ecranRegles)) return "regles";
+  if(estVisible(ecranBug)) return "bug";
   if(estVisible(ecranReglages)) return "reglages";
   for(const [ecran] of ECRANS_RETOUR){
     if(estVisible(document.getElementById(ecran))) return ecran;

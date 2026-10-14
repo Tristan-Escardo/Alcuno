@@ -1740,7 +1740,8 @@ header h1{
 #ecranConfirmerRetrait,
 #ecranConfirmerAccueil,
 #ecranChoixPseudo,
-#ecranCaster{
+#ecranCaster,
+#ecranBug{
   position: fixed;
   inset: 0;
   z-index: 9999;
@@ -1767,7 +1768,8 @@ header h1{
 #ecranConfirmerRetrait > *,
 #ecranConfirmerAccueil > *,
 #ecranChoixPseudo > *,
-#ecranCaster > *{
+#ecranCaster > *,
+#ecranBug > *{
   animation: fadeIn 0.25s ease forwards;
 }
 
@@ -1778,6 +1780,7 @@ header h1{
 #ecranConfirmerAccueil h2,
 #ecranChoixPseudo h2,
 #ecranCaster h2,
+#ecranBug h2,
 #enLigne h2,
 #enLigne h3{
   margin: 0;
@@ -1794,6 +1797,7 @@ header h1{
 #ecranConfirmerAccueil button,
 #ecranChoixPseudo button,
 #ecranCaster button,
+#ecranBug button,
 #enLigne button{
   background-color: #ffcc00;
   color: #ffffff;
@@ -1822,6 +1826,7 @@ header h1{
   #ecranConfirmerAccueil button:hover,
   #ecranChoixPseudo button:hover,
   #ecranCaster button:hover,
+  #ecranBug button:hover,
   #enLigne button:hover{
     background-color: #ffea70;
     transform: scale(1.05);
@@ -1835,6 +1840,7 @@ header h1{
 #ecranConfirmerAccueil button:active,
 #ecranChoixPseudo button:active,
 #ecranCaster button:active,
+#ecranBug button:active,
 #enLigne button:active{
   transform: scale(0.98);
 }
@@ -1979,7 +1985,8 @@ html[data-theme="givre"] #enLigne .iconeBouton{ filter: none; }
 #ecranNouvellePartie .btnRetour,
 #ecranNouvellePartie .btnAccueil,
 #enLigne .btnRetour,
-#ecranCaster .btnRetour{
+#ecranCaster .btnRetour,
+#ecranBug .btnRetour{
   position: absolute;
   top: 20px;
   left: 20px;
@@ -2006,7 +2013,8 @@ html[data-theme="givre"] #enLigne .iconeBouton{ filter: none; }
 #ecranConfirmerRetrait .texteConfirmation,
 #ecranConfirmerAccueil .texteConfirmation,
 #ecranChoixPseudo .texteConfirmation,
-#ecranCaster .texteConfirmation{
+#ecranCaster .texteConfirmation,
+#ecranBug .texteConfirmation{
   margin: 0;
   max-width: min(460px, 88vw);
   color: #ffffff;
@@ -3290,7 +3298,8 @@ html.accessibilite #ecranConfirmerHote button,
 html.accessibilite #ecranConfirmerRetrait button,
 html.accessibilite #ecranConfirmerAccueil button,
 html.accessibilite #ecranChoixPseudo button,
-html.accessibilite #ecranCaster button:not(.btnRetour){
+html.accessibilite #ecranCaster button:not(.btnRetour),
+html.accessibilite #ecranBug button:not(.btnRetour){
   font-size: clamp(22px, 4.8vw, 29px);
 }
 
@@ -3703,7 +3712,8 @@ html.nav-retour{
 /* Mode en ligne et fenêtre Caster : l'en-tête du jeu (titre ALCUNO) reste derrière l'écran ; caché pour
    qu'il n'apparaisse jamais au bord (ex. quand l'iPhone décale la page avec le clavier ouvert) */
 html:has(#enLigne:not([style*="none"])) body > header,
-html:has(#ecranCaster:not([style*="none"])) body > header{
+html:has(#ecranCaster:not([style*="none"])) body > header,
+html:has(#ecranBug:not([style*="none"])) body > header{
   visibility: hidden;
 }
 
@@ -3711,7 +3721,8 @@ html:has(#ecranCaster:not([style*="none"])) body > header{
    douceur sur la partie visible au-dessus du clavier (--haut-visible / --bas-cache, js/en-ligne.js) et
    jamais sous « ← Retour » (avant : l'écran sautait et le champ passait derrière le clavier).
    Centré quand il y a la place, défilable sinon. */
-#ecranCaster{
+#ecranCaster,
+#ecranBug{
   justify-content: flex-start;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -3720,19 +3731,23 @@ html:has(#ecranCaster:not([style*="none"])) body > header{
   transition: padding-top 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), padding-bottom 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 #ecranCaster::before,
-#ecranCaster::after{
+#ecranBug::before,
+#ecranCaster::after,
+#ecranBug::after{
   content: "";
   margin-block: auto;
 }
-html.clavier-ouvert #ecranCaster{
+html.clavier-ouvert #ecranCaster,
+html.clavier-ouvert #ecranBug{
   padding-top: calc(var(--haut-visible, 0px) + 72px);
 }
-#ecranCaster .btnRetour{
+#ecranCaster .btnRetour,
+#ecranBug .btnRetour{
   top: calc(var(--haut-visible, 0px) + 20px);
   transition: top 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 @media (prefers-reduced-motion: reduce){
-  #ecranCaster, #ecranCaster .btnRetour{ transition: none; }
+  #ecranCaster, #ecranCaster .btnRetour, #ecranBug, #ecranBug .btnRetour{ transition: none; }
 }
 
 /* Clavier ouvert : jamais de contenu sous « ← Retour » (il défile s'il ne tient pas) */
@@ -4313,6 +4328,7 @@ html[data-theme="givre"] #ecranConfirmerRetrait h2,
 html[data-theme="givre"] #ecranConfirmerAccueil h2,
 html[data-theme="givre"] #ecranChoixPseudo h2,
 html[data-theme="givre"] #ecranCaster h2,
+html[data-theme="givre"] #ecranBug h2,
 html[data-theme="givre"] #enLigne h2,
 html[data-theme="givre"] #enLigne h3,
 html[data-theme="givre"] #ecranReglages h2,
@@ -4324,7 +4340,8 @@ html[data-theme="givre"] #ecranConfirmerHote .texteConfirmation,
 html[data-theme="givre"] #ecranConfirmerRetrait .texteConfirmation,
 html[data-theme="givre"] #ecranConfirmerAccueil .texteConfirmation,
 html[data-theme="givre"] #ecranChoixPseudo .texteConfirmation,
-html[data-theme="givre"] #ecranCaster .texteConfirmation{
+html[data-theme="givre"] #ecranCaster .texteConfirmation,
+html[data-theme="givre"] #ecranBug .texteConfirmation{
   color: var(--givre-texte);
   text-shadow: none;
 }
@@ -4337,6 +4354,7 @@ html[data-theme="givre"] #ecranConfirmerRetrait button,
 html[data-theme="givre"] #ecranConfirmerAccueil button,
 html[data-theme="givre"] #ecranChoixPseudo button,
 html[data-theme="givre"] #ecranCaster button,
+html[data-theme="givre"] #ecranBug button,
 html[data-theme="givre"] #enLigne button:not(.btnAccueilTexte):not(.btnExclure),
 html[data-theme="givre"] .menu button,
 html[data-theme="givre"] .suppression button,
@@ -5938,3 +5956,47 @@ html[data-theme="givre"] #ecranTele .tele-prepa-joueur{
   box-shadow: 0 0.8vh 2vh rgba(13,53,80,0.1);
 }
 html[data-theme="givre"] #ecranTele .tele-pied{ color: rgba(13,53,80,0.45); }
+
+/* ===== Réglages > Signaler un bug ===== */
+#ecranReglages #btnSignalerBug{
+  width: min(320px, 80vw);
+  padding: 14px 20px;
+  font-size: clamp(16px, 4vw, 19px);
+  font-weight: 900;
+  color: #fff;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  border-radius: 14px;
+  box-shadow: 0 0 0 1px rgba(255,215,0,0.45) inset;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+html[data-theme="givre"] #ecranReglages #btnSignalerBug{
+  background: rgba(26,155,224,0.1);
+  color: var(--givre-accent);
+  box-shadow: 0 0 0 1px var(--givre-bord) inset;
+}
+/* Fenêtre (par-dessus les Réglages) */
+#ecranBug{
+  z-index: 10003;
+}
+#ecranBug textarea{
+  flex-shrink: 0; /* (clavier ouvert sur un petit téléphone : l'écran défile, la zone de texte garde sa taille) */
+  width: min(420px, 88vw);
+  box-sizing: border-box;
+  padding: 14px 16px;
+  font: 600 17px/1.4 Arial, sans-serif;
+  color: #fff;
+  background: rgba(0,0,0,0.34);
+  border: 1px solid rgba(255,215,0,0.35);
+  border-radius: 12px;
+  resize: none;
+}
+#ecranBug textarea::placeholder{ color: rgba(255,255,255,0.55); }
+html[data-theme="givre"] #ecranBug textarea{
+  color: var(--givre-texte);
+  background: #fff;
+  border-color: var(--givre-bord);
+}
+html[data-theme="givre"] #ecranBug textarea::placeholder{ color: #7a98ad; }
+#ecranBug #btnEnvoyerBug:disabled{ opacity: 0.6; }
