@@ -511,6 +511,7 @@ function faireClignoterTourTele(ecran){
   void tour.offsetWidth; // relance l'animation si elle était déjà là
   tour.classList.add("tele-rappel-tour");
   tour.addEventListener("animationend", () => tour.classList.remove("tele-rappel-tour"), { once: true });
+  faireBrillerBordsEcran(); // halo tout autour de l'écran, comme sur le téléphone
 }
 
 // Même animation que sur le téléphone : la carte part de sa case vers le +1 du joueur, qui grossit
