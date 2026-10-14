@@ -133,7 +133,7 @@ const PSEUDO_INVALIDE = /[.#$\[\]\/]/;
 // Easter egg : couronne 👑 à côté du nom des créateurs du jeu
 // (majuscules/minuscules ignorées : « TrIs », « ROSA »… comptent aussi)
 const PSEUDOS_CREATEURS = [
-  "tris", "tristanus", "origamy",
+  "tris", "tristan", "tristanus", "origamy",
   "yla", "nana", "ylana",
   "celien", "célien", "chouchou",
   "ro", "rosa", "rosy", "roseanna"

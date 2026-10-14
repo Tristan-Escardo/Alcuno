@@ -97,8 +97,8 @@ let joueurs = [];
 let annulations = {}; // { "Alice": 3, "Bob": 0, ... }
 let paquet = [];
 
-// Easter egg : environ 1 partie sur 50, une des cases du plateau cache la carte dorée (à la place d'une carte normale)
-const CHANCE_CARTE_DOREE = 1 / 50;
+// Easter egg : environ 1 partie sur 12, une des cases du plateau cache la carte dorée (à la place d'une carte normale)
+const CHANCE_CARTE_DOREE = 1 / 12;
 
 let indexCaseDoree = -1; // -1 = pas de carte dorée dans cette partie
 let carteDoreeEnJeu = false; // présente et pas encore retournée
