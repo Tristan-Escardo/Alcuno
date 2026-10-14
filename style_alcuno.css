@@ -3945,6 +3945,38 @@ html[data-theme="cerisier"] #petalesCerisier{
   text-shadow: 0 1px 0 rgba(255, 250, 215, 0.85); /* effet gravé dans l'or */
 }
 
+/* Variante sobre (mode télé : « Télé connectée »…) : panneau sombre du jeu et petite pastille dorée,
+   comme la bannière « Tour de » */
+#notifHaut.notifHaut-sobre{
+  padding: 14px 18px;
+  background: linear-gradient(180deg, rgba(62, 0, 43, 0.97), rgba(22, 0, 16, 0.96));
+  box-shadow: 0 12px 28px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(255, 215, 0, 0.35),
+              inset 0 1px 0 rgba(255,255,255,0.08);
+}
+#notifHaut.notifHaut-sobre::before{
+  content: "";
+  flex: 0 0 auto;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff6bf 0%, #FFD700 45%, #d6a900 100%);
+  box-shadow: 0 0 10px rgba(255,215,0,0.35);
+}
+#notifHaut.notifHaut-sobre .notifHaut-texte strong{
+  color: #FFE36B;
+  text-shadow: none;
+}
+html[data-theme="givre"] #notifHaut.notifHaut-sobre{
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 8px 22px rgba(13, 53, 80, 0.15), inset 0 0 0 1px var(--givre-bord);
+}
+html[data-theme="givre"] #notifHaut.notifHaut-sobre::before{
+  background: radial-gradient(circle at 35% 35%, #c9ecff 0%, #1a9be0 50%, #0b5a8c 100%);
+  box-shadow: 0 0 10px rgba(26, 155, 224, 0.3);
+}
+html[data-theme="givre"] #notifHaut.notifHaut-sobre .notifHaut-texte strong{
+  color: var(--givre-accent);
+}
 @keyframes notifHautArrive{
   from { opacity: 0; transform: translate(-50%, -120%); }
   to   { opacity: 1; transform: translate(-50%, 0); }
@@ -5446,13 +5478,8 @@ html.tele-ecran-ouvert #refletPrestige{
   background: #FFD700; color: #3a2000; font-weight: 900; font-size: 3.3vh;
   display: flex; align-items: center; justify-content: center;
 }
-#ecranTele .tele-boutons{
-  display: flex;
-  gap: 2vh;
+#ecranTele .tele-plein-ecran{
   margin-top: 4vh;
-}
-#ecranTele .tele-plein-ecran,
-#ecranTele .tele-activer-son{
   padding: 1.6vh 3.4vh;
   font-size: 2.6vh;
   font-weight: 900;
@@ -5754,8 +5781,7 @@ html[data-theme="givre"] #ecranTele .tele-prepa-info,
 html[data-theme="givre"] #ecranTele .tele-code{ color: var(--givre-accent); }
 html[data-theme="givre"] #ecranTele .tele-etape{ color: var(--givre-texte); }
 html[data-theme="givre"] #ecranTele .tele-etape .tele-num,
-html[data-theme="givre"] #ecranTele .tele-plein-ecran,
-html[data-theme="givre"] #ecranTele .tele-activer-son{
+html[data-theme="givre"] #ecranTele .tele-plein-ecran{
   background: var(--givre-bouton);
   color: #fff;
   box-shadow: 0 0.6vh 1.4vh rgba(26,146,214,0.28);

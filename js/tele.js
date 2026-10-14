@@ -104,7 +104,7 @@ function relierTele(code){
   });
   majBoutonCaster();
   fermerEcranCaster();
-  afficherToast("Télé connectée", 2500);
+  afficherNotificationHaut("", "Télé connectée", true);
 }
 
 function arreterTele(){
@@ -120,7 +120,7 @@ function arreterTele(){
   }
   majBoutonCaster();
   fermerEcranCaster();
-  afficherToast("Télé déconnectée");
+  afficherNotificationHaut("", "Télé déconnectée", true);
 }
 
 // Classe de la face d'une carte parmi ses autres classes : « trois_rouge1 », « plus_4_3 », « couleur2 »,
@@ -239,7 +239,7 @@ function envoyerEtatTele(){
       pauseTeleJusqua = Date.now() + 5000; // (pas en boucle)
       if (!erreurTeleSignalee) {
         erreurTeleSignalee = true;
-        afficherToast("La télé ne reçoit pas la partie (réseau ?)", 3500);
+        afficherNotificationHaut("", "La télé ne reçoit pas la partie (réseau ?)", true);
       }
     });
 }
@@ -340,10 +340,7 @@ function demarrerPageTele(){
         <div class="tele-etape"><span class="tele-num">1</span><span>Sur le téléphone de la partie (mode classique) : bouton <b>Caster</b></span></div>
         <div class="tele-etape"><span class="tele-num">2</span><span>Scanne ce QR code avec l'appli</span></div>
         <div class="tele-etape"><span class="tele-num">3</span><span>La partie s'affiche ici en grand</span></div>
-        <div class="tele-boutons">
-          <button type="button" class="tele-plein-ecran">Plein écran</button>
-          <button type="button" class="tele-activer-son">Activer le son</button>
-        </div>
+        <button type="button" class="tele-plein-ecran">Plein écran</button>
       </div>
       <div class="tele-attente-qr">
         <div class="tele-qr"></div>
@@ -381,18 +378,30 @@ function demarrerPageTele(){
   qr.make();
   ecran.querySelector(".tele-qr").innerHTML = qr.createSvgTag({ scalable: true, margin: 0 });
 
-  ecran.querySelector(".tele-plein-ecran").addEventListener("click", () => {
+  // « Plein écran » : caché quand la télé y est déjà (ou quand son navigateur ne sait pas le faire)
+  const btnPleinEcran = ecran.querySelector(".tele-plein-ecran");
+  btnPleinEcran.addEventListener("click", () => {
     const el = document.documentElement;
     (el.requestFullscreen || el.webkitRequestFullscreen || (() => {})).call(el);
   });
+  const majPleinEcran = () => {
+    const possible = document.fullscreenEnabled || document.webkitFullscreenEnabled;
+    const dejaPleinEcran = document.fullscreenElement || document.webkitFullscreenElement ||
+      (window.innerWidth >= screen.width && window.innerHeight >= screen.height); // (navigateur déjà en plein écran)
+    btnPleinEcran.hidden = !possible || !!dejaPleinEcran;
+  };
+  ["fullscreenchange", "webkitfullscreenchange", "resize"].forEach(type => window.addEventListener(type, majPleinEcran));
+  majPleinEcran();
 
-  // Son : le navigateur de la télé ne le permet qu'après un geste (bouton, ou n'importe quelle touche de
-  // la télécommande) ; tant qu'il est coupé, un rappel discret s'affiche pendant la partie
+  // Son : toujours activé sur la télé, au volume du jeu maximum (on règle le volume ou on coupe le son
+  // avec la télécommande). Il démarre tout de suite si le navigateur de la télé le permet ; sinon à la
+  // première touche de la télécommande, et d'ici là un rappel discret s'affiche pendant la partie.
+  caseSons.checked = true;
+  volumeSons = 100;
   document.addEventListener("keydown", debloquerSon, { capture: true });
+  chargerSons();
   const majSonTele = () => {
-    const actif = !caseSons.checked || (contexteSon && contexteSon.state === "running");
-    ecran.querySelector(".tele-son-coupe").hidden = !!actif;
-    ecran.querySelector(".tele-activer-son").innerText = actif ? "Son activé ✓" : "Activer le son";
+    ecran.querySelector(".tele-son-coupe").hidden = !!(contexteSon && contexteSon.state === "running");
   };
   setInterval(majSonTele, 1000);
   majSonTele();
