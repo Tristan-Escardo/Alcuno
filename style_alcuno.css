@@ -963,7 +963,7 @@ body.no-scroll{
   box-shadow: 0 2px 6px rgba(0,0,0,0.45);
 }
 
-/* « Révéler la dernière carte » / « Retour » : place toujours gardée (les cartes ne bougent pas) */
+/* « Valider » (révèle la dernière carte) / « Retour » : place toujours gardée (les cartes ne bougent pas) */
 .fin-choix-actions{
   display: flex;
   justify-content: center;
@@ -977,7 +977,7 @@ body.no-scroll{
   font-size: clamp(16px, 4.2vw, 21px);
 }
 /* « Retour » garde toujours sa place (invisible avant le premier choix) : les cartes ne bougent pas.
-   « Révéler » n'apparaît qu'une fois que tout le monde a choisi (les cartes sont alors bloquées). */
+   « Valider » n'apparaît qu'une fois que tout le monde a choisi (les cartes sont alors bloquées). */
 .fin-choix-actions .fin-choix-retour.cache{
   visibility: hidden;
 }
