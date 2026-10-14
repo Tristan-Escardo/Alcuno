@@ -495,7 +495,7 @@ function lireSon(nom, son){
   }
 }
 
-// ===== Rappel « Bois de l'eau 💧 » : toutes les 30 minutes de partie (désactivé par défaut) =====
+// ===== Rappel « Bois de l'eau 💧 » : toutes les 20 minutes de partie (désactivé par défaut) =====
 // Petit bandeau en haut de l'écran, qui ne bloque rien et se ferme au tap ou tout seul.
 // (Chaque téléphone le gère de son côté : rien n'est envoyé aux autres joueurs.)
 const CLE_RAPPEL_EAU = "alcuno_rappel_eau";
@@ -503,7 +503,7 @@ const caseRappelEau = document.getElementById("optionRappelEau");
 caseRappelEau.checked = lireReglage(CLE_RAPPEL_EAU, false);
 caseRappelEau.addEventListener("change", () => ecrireReglage(CLE_RAPPEL_EAU, caseRappelEau.checked));
 
-const MINUTES_RAPPEL_EAU = 30;
+const MINUTES_RAPPEL_EAU = 20;
 let tempsDeJeuSansEau = 0; // ms de partie (écran allumé) depuis le dernier rappel
 
 setInterval(() => {
@@ -525,7 +525,7 @@ function afficherRappelEau(){
   bandeau.innerHTML =
     '<span class="rappelEau-icone" aria-hidden="true">💧</span>' +
     '<span class="rappelEau-texte"><strong>MESSAGE DE TON ANGE GARDIEN</strong>' +
-    '<strong>Bois de l\'eau !</strong>' +
+    '<strong>Rappel : l\'eau aussi, ça se boit !</strong>' +
     '<span>Demain tu me diras merci 😉</span></span>';
   const fermer = () => bandeau.remove();
   bandeau.addEventListener("click", fermer);
