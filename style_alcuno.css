@@ -931,13 +931,59 @@ body.no-scroll{
 .fin-choix-recap .ligne{
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 10px;
   color: #FFD700;
-  font-size: clamp(13px, 3.5vw, 18px);
-  padding: 6px 0;
+  font-size: clamp(17px, 4.6vw, 24px);
+  padding: 6px 8px;
+  margin: 0 -8px;
+  border-radius: 10px;
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 .fin-choix-recap .ligne:last-child{ border-bottom: 0; }
+/* Celui qui choisit en ce moment */
+.fin-choix-recap .ligne.en-cours{
+  background: rgba(255, 215, 0, 0.12);
+}
+/* Son choix : mini-carte + nom du type, bien lisibles */
+.fin-choix-recap .choix{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px; /* même hauteur avec ou sans mini-carte : les cartes en dessous ne bougent pas */
+  font-weight: 900;
+  font-size: 1.1em;
+}
+.fin-choix-recap .fin-choix-mini{
+  width: auto;
+  height: 38px;
+  flex: 0 0 auto;
+  border-radius: 4px;
+  cursor: default;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.45);
+}
+
+/* « Révéler la dernière carte » / « Retour » : place toujours gardée (les cartes ne bougent pas) */
+.fin-choix-actions{
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.fin-choix-actions .bouton-pigeon{
+  width: auto;
+  min-width: 0;
+  padding: 10px 22px;
+  font-size: clamp(16px, 4.2vw, 21px);
+}
+/* « Retour » garde toujours sa place (invisible avant le premier choix) : les cartes ne bougent pas.
+   « Révéler » n'apparaît qu'une fois que tout le monde a choisi (les cartes sont alors bloquées). */
+.fin-choix-actions .fin-choix-retour.cache{
+  visibility: hidden;
+}
+.fin-choix-actions .fin-choix-reveler.cache{
+  display: none;
+}
 
 /* Grille responsive: 3 colonnes téléphone, + sur grand écran */
 .fin-choix-grid{
