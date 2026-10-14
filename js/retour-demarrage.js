@@ -25,6 +25,23 @@ function activer(id){
   bouton.click();
 }
 
+// Écrans avec un bouton « Retour » (ou équivalent) : [écran, bouton]
+const ECRANS_RETOUR = [
+  ["ecranScanner", "btnFermerScanner"],
+  ["ecranCaster", "btnCasterFermer"],
+  ["ecranConfirmerHote", "btnConfirmerHoteNon"],
+  ["ecranConfirmerRetrait", "btnConfirmerRetraitNon"],
+  ["ecranConfirmerAccueil", "btnConfirmerAccueilNon"],
+  ["ecranChoixPseudo", "btnChoixPseudoAnnuler"],
+  ["ecranNouvellePartie", "btnRetourNouvellePartie"],
+  ["suppression", "termineSuppression"],
+  ["enLigneRevenir", "btnRetourRevenir"],
+  ["enLigneCreer", "btnRetourCreer"],
+  ["enLigneRejoindre", "btnRetourRejoindre"],
+  ["salleAttente", "btnQuitterSalle"],
+  ["enLigneChoix", "btnRetourChoixMode"]
+];
+
 // Ce que fait le retour sur l'écran affiché (sans le faire), ou null sur l'écran d'accueil
 function actionRetour(){
   if(estVisible(document.getElementById("ecranRattrapage"))) return () => {};
@@ -50,22 +67,7 @@ function actionRetour(){
     };
   }
 
-  const ecrans = [
-    ["ecranScanner", "btnFermerScanner"],
-    ["ecranCaster", "btnCasterFermer"],
-    ["ecranConfirmerHote", "btnConfirmerHoteNon"],
-    ["ecranConfirmerRetrait", "btnConfirmerRetraitNon"],
-    ["ecranConfirmerAccueil", "btnConfirmerAccueilNon"],
-    ["ecranChoixPseudo", "btnChoixPseudoAnnuler"],
-    ["ecranNouvellePartie", "btnRetourNouvellePartie"],
-    ["suppression", "termineSuppression"],
-    ["enLigneRevenir", "btnRetourRevenir"],
-    ["enLigneCreer", "btnRetourCreer"],
-    ["enLigneRejoindre", "btnRetourRejoindre"],
-    ["salleAttente", "btnQuitterSalle"],
-    ["enLigneChoix", "btnRetourChoixMode"]
-  ];
-  for(const [ecran, bouton] of ecrans){
+  for(const [ecran, bouton] of ECRANS_RETOUR){
     if(estVisible(document.getElementById(ecran))) return () => activer(bouton);
   }
 
@@ -104,40 +106,102 @@ function retirerEntreesRetour(){
   history.go(-n);
 }
 
-// iPhone : pas de bouton retour, seulement le glissement depuis le bord de l'écran, que Safari permet
-// dès qu'il y a des entrées dans l'historique. À l'accueil, on n'en garde donc aucune (avant, on pouvait
-// « revenir en arrière » sur l'accueil autant de fois qu'on voulait, avec le message pour quitter, qui
-// n'a pas de sens sur iPhone) ; ailleurs, on en remet un peu après chaque tap, une fois l'écran changé
-// (Safari les accepte aussi en dehors d'un tap).
-let minuteurRetourIOS = null;
-function ajusterRetourIOS(){
-  clearTimeout(minuteurRetourIOS);
-  minuteurRetourIOS = setTimeout(() => {
-    if(actionRetour()) preparerRetour();
-    else retirerEntreesRetour();
+// ===== iPhone : glissement depuis le bord de l'écran =====
+// Pas de bouton retour sur iPhone, seulement ce glissement, que Safari permet dès qu'il y a des entrées
+// dans l'historique. Pendant le glissement, il montre une capture de l'écran tel qu'il était quand
+// l'entrée suivante a été ajoutée. On garde donc une entrée par écran ouvert (une pile), ajoutée au
+// moment du tap qui l'ouvre (l'écran d'avant est encore affiché : c'est lui que montrera le glissement),
+// et retirée si le tap n'a pas changé d'écran. L'accueil et la partie en cours n'en ont aucune : glisser
+// n'y fait rien (⌂ pour quitter une partie).
+// (Avant : des entrées ajoutées après le tap, donc des captures du mauvais écran : en glissant depuis
+// les réglages, on revoyait les réglages, puis on revenait à l'accueil.)
+const ECRANS_RACINES = new Set(["accueil", "jeu"]);
+let pileIOS = [];             // écran montré par chaque entrée, de la plus ancienne à la plus récente
+let retraitsIOS = 0;          // nos propres history.go(-n) en cours (leur popstate n'est pas un retour)
+let ecranAvantTapIOS = null;  // tap en cours : écran affiché au moment du tap (son entrée est ajoutée)
+let minuteurTapIOS = null;
+
+// Nom de l'écran affiché (pour savoir si un tap a changé d'écran)
+function nomEcran(){
+  if(estVisible(ecranCredits)) return "credits";
+  if(estVisible(ecranInstallation)) return "installation";
+  if(estVisible(ecranRegles)) return "regles";
+  if(estVisible(ecranReglages)) return "reglages";
+  for(const [ecran] of ECRANS_RETOUR){
+    if(estVisible(document.getElementById(ecran))) return ecran;
+  }
+  // Partie en cours (plateau, overlays des règles, annonces…) : un seul écran
+  if(partieLancee || estVisible(document.getElementById("ecranRattrapage")) ||
+     document.getElementById("annonceNouvellePartie") ||
+     Array.from(document.querySelectorAll('[id^="overlay"]')).some(estVisible)) return "jeu";
+  if(estVisible(menu) || estVisible(document.getElementById("jeu"))) return "menu";
+  return "accueil";
+}
+
+function retirerEntreesIOS(n){
+  n = Math.min(n, pileIOS.length);
+  if(n <= 0) return;
+  pileIOS.length -= n;
+  retraitsIOS++;
+  history.go(-n);
+}
+
+// Remet la pile d'accord avec l'écran affiché : accueil ou partie => plus aucune entrée ; écran déjà
+// dans la pile (on y est revenu par un bouton, ou un écran s'est fermé tout seul) => on retire les
+// entrées au-dessus de lui
+function reconcilierPileIOS(){
+  const ecran = nomEcran();
+  if(ECRANS_RACINES.has(ecran)) return retirerEntreesIOS(pileIOS.length);
+  const i = pileIOS.lastIndexOf(ecran);
+  if(i >= 0) retirerEntreesIOS(pileIOS.length - i);
+}
+
+function debutTapIOS(e){
+  if(!e.isTrusted || ecranAvantTapIOS !== null) return;
+  ecranAvantTapIOS = nomEcran();
+  try { history.pushState({ alcunoRetour: true }, ""); } catch (err) { ecranAvantTapIOS = null; return; }
+  pileIOS.push(ecranAvantTapIOS);
+}
+
+function finTapIOS(){
+  clearTimeout(minuteurTapIOS);
+  minuteurTapIOS = setTimeout(() => {
+    const avant = ecranAvantTapIOS;
+    ecranAvantTapIOS = null;
+    if(avant !== null && nomEcran() === avant) retirerEntreesIOS(1); // le tap n'a pas changé d'écran
+    else reconcilierPileIOS();
   }, 400);
 }
 
 if(estIOS){
-  ["pointerup", "click"].forEach((type) => document.addEventListener(type, ajusterRetourIOS, { capture: true, passive: true }));
+  document.addEventListener("pointerdown", debutTapIOS, { capture: true, passive: true });
+  ["pointerup", "pointercancel", "click"].forEach((type) => document.addEventListener(type, finTapIOS, { capture: true, passive: true }));
 } else {
   document.addEventListener("pointerdown", preparerRetour, { capture: true, passive: true });
 }
 
 window.addEventListener("popstate", () => {
+  if(estIOS){
+    if(retraitsIOS > 0){ retraitsIOS--; return; }
+    if(pileIOS.length === 0) return;
+    pileIOS.pop();
+    const action = actionRetour();
+    if(action) action();
+    setTimeout(reconcilierPileIOS, 400);
+    return;
+  }
+
   if(entreesRetour === 0) return;
   entreesRetour--;
 
   if(retourDansLAppli()){
-    if(estIOS) ajusterRetourIOS();
-    else if(navigator.userActivation && navigator.userActivation.isActive) preparerRetour();
+    if(navigator.userActivation && navigator.userActivation.isActive) preparerRetour();
     return;
   }
 
-  // Écran d'accueil : on retire nos entrées, le prochain retour quitte l'appli (iPhone : rien, on ne
-  // quitte pas une appli en revenant en arrière)
+  // Écran d'accueil : on retire nos entrées, le prochain retour quitte l'appli
   retirerEntreesRetour();
-  if(!estIOS) afficherToast("Appuie encore une fois sur retour pour quitter");
+  afficherToast("Appuie encore une fois sur retour pour quitter");
 });
 
 /* ===== INIT ===== */
