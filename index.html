@@ -7,8 +7,11 @@
          Un paramètre différent à chaque chargement force toujours la dernière version. -->
     <script>
         window.ANTI_CACHE = Date.now();
-        // Page de la télé (…/Alcuno/tele ou …/Alcuno/?tele) : seulement l'affichage de la partie, voir js/tele.js
-        if (/[?&]tele(=|&|$)/.test(location.search)) document.documentElement.classList.add("mode-tele");
+        // Page de la télé (…/Alcuno/tele ou …/Alcuno/?tele) : seulement l'affichage de la partie, voir js/tele.js.
+        // Ouverte aussi toute seule sur un navigateur de télé reconnu (Samsung, LG, Sony, Philips, Fire TV…) :
+        // l'adresse normale du jeu suffit (sinon : Réglages > « Afficher l'écran télé »)
+        window.NAVIGATEUR_TELE = /SMART-?TV|SmartTV|Tizen|Web0S|webOS[. ]TV|NetCast|HbbTV|BRAVIA|Viera|NETTV|VIDAA|\bAFT[A-Z0-9]{1,5}\b|CrKey|GoogleTV|Android ?TV|Opera TV|OMI\/|Roku|PlayStation|Xbox/i.test(navigator.userAgent);
+        if (/[?&]tele(=|&|$)/.test(location.search) || window.NAVIGATEUR_TELE) document.documentElement.classList.add("mode-tele");
         // Fichiers du jeu, dans l'ordre (aussi dans sw.js, pour le hors connexion). Téléchargés tout de suite
         // et en parallèle : en bas de la page, ils s'exécutent d'affilée, sans attente entre deux fichiers
         // (aucun bouton ni minuteur ne peut se déclencher avant que tout le jeu soit là).
@@ -237,6 +240,15 @@
                     <button type="button" id="btnOublierPartie">Oublier</button>
                 </div>
 
+                <!-- Mode télé : pour une télé que le jeu n'a pas reconnue toute seule (voir le début de cette page) -->
+                <button type="button" class="optionReglage optionLien" id="btnAfficherEcranTele">
+                    <span class="optionTexte">
+                        <span class="optionTitre">Afficher l'écran télé</span>
+                        <span class="optionNote">Sur une télé, si l'écran télé ne s'est pas affiché tout seul.</span>
+                    </span>
+                    <svg class="optionChevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+                </button>
+
                 <div class="blocPartage">
                     <div class="aProposTitre">Partager le jeu</div>
                     <img src="icones/qr_alcuno.svg" alt="QR code du jeu Alcuno" class="qrJeu" width="180" height="180">
@@ -317,7 +329,7 @@
             <button type="button" id="btnCasterFermer" class="btnRetour">← Retour</button>
             <h2 id="titreCaster">Caster sur la télé</h2>
             <div id="casterRelier">
-                <p class="texteConfirmation">1. Sur la télé, ouvre :<br><b class="adresseTele">tristan-escardo.github.io/Alcuno/tele</b></p>
+                <p class="texteConfirmation">1. Sur la télé, ouvre :<br><b class="adresseTele">tristan-escardo.github.io/Alcuno</b></p>
                 <p class="texteConfirmation">2. Scanne le QR code affiché sur la télé</p>
                 <button type="button" id="btnCasterScanner"><svg class="iconeBouton" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3.2"/></svg>Scanner la télé</button>
                 <div class="casterCode">
