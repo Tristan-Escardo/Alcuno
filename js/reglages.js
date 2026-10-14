@@ -165,16 +165,23 @@ function afficherNotificationHaut(icone, titre, sobre = false){
   document.body.appendChild(notif);
 }
 
-function appliquerTheme(nom){
-  if (!THEMES[nom] || (nom === "prestige" && !prestigeDebloque())) nom = "bordeaux";
-  document.documentElement.dataset.theme = nom;
-  // Barre du téléphone en haut : on remplace la balise au lieu de la modifier (sinon Chrome sur
-  // Android ne repeint parfois la barre qu'au premier changement de thème)
+// Barre du téléphone en haut, à la couleur du thème affiché : on remplace la balise au lieu de la
+// modifier (sinon Chrome sur Android ne repeint parfois la barre qu'au premier changement de thème).
+// Remise aussi après la caméra (scanner) et au retour dans l'appli : l'iPhone pouvait repeindre la barre
+// en noir à ce moment-là (vu en castant, après « Scanner la télé »)
+function peindreBarreTelephone(){
+  const nom = document.documentElement.dataset.theme;
   document.querySelectorAll('meta[name="theme-color"]').forEach((ancienne) => ancienne.remove());
   const barre = document.createElement("meta");
   barre.name = "theme-color";
-  barre.content = THEMES[nom];
+  barre.content = THEMES[nom] || THEMES.bordeaux;
   document.head.appendChild(barre);
+}
+
+function appliquerTheme(nom){
+  if (!THEMES[nom] || (nom === "prestige" && !prestigeDebloque())) nom = "bordeaux";
+  document.documentElement.dataset.theme = nom;
+  peindreBarreTelephone();
   document.querySelectorAll(".pastilleTheme").forEach((b) => {
     b.setAttribute("aria-pressed", b.dataset.theme === nom ? "true" : "false");
   });
@@ -403,11 +410,11 @@ function repartirSonApresCamera(){
   try { contexteSon.close(); } catch (e) {}
   contexteSon = null;
 }
-// Retour dans l'appli : on relance le son tout de suite
+// Retour dans l'appli : on relance le son tout de suite, et la barre du haut reprend la couleur du thème
 document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "visible" && contexteSon && contexteSon.state !== "running") {
-    contexteSon.resume().catch(() => {});
-  }
+  if (document.visibilityState !== "visible") return;
+  if (contexteSon && contexteSon.state !== "running") contexteSon.resume().catch(() => {});
+  peindreBarreTelephone();
 });
 
 // Fichiers des sons : dossier Sons/, un MP3 par moment du jeu. Pour changer un son, il suffit de
