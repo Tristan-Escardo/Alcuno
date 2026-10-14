@@ -3727,9 +3727,9 @@ html:has(#ecranCaster:not([style*="none"])) body > header{
 html.clavier-ouvert #ecranCaster{
   padding-top: calc(var(--haut-visible, 0px) + 72px);
 }
-/* (suit la zone visible sans animation : glissé par l'iPhone avec le clavier, il ne doit pas traîner) */
 #ecranCaster .btnRetour{
   top: calc(var(--haut-visible, 0px) + 20px);
+  transition: top 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 @media (prefers-reduced-motion: reduce){
   #ecranCaster, #ecranCaster .btnRetour{ transition: none; }
