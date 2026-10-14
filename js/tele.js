@@ -62,7 +62,7 @@ function fermerEcranCaster(){
 }
 
 // Appli fermée, téléphone éteint ou réseau coupé pendant qu'on caste : Firebase efface tout seul
-// tele/CODE et la télé revient sur son QR code (on peut la rescanner). Le téléphone revenu, il renvoie
+// tele/CODE et la télé revient sur son QR code au bout de 5 s (on peut la rescanner). Le téléphone revenu, il renvoie
 // la partie, et aussi si le résumé a été effacé alors qu'il caste toujours (ancienne connexion)
 function suivreConnexionTele(code){
   if (arreterSuiviTele) arreterSuiviTele();
@@ -83,12 +83,23 @@ function suivreConnexionTele(code){
   };
 }
 
-function relierTele(code){
+// Télé rendue (cast arrêté, ou relié à une autre télé) : un résumé « arrêt » la renvoie tout de suite sur
+// son QR code (sans attendre, voir demarrerPageTele), puis il est effacé, sauf si on s'y est relié entre-temps
+function rendreTele(code){
+  if (!code || !window.firebaseDB) return;
+  const ref = window.fbRef(window.firebaseDB, `tele/${code}`);
+  window.fbSet(ref, { etat: JSON.stringify({ arret: true }), maj: window.fbServerTimestamp() }).catch(() => {});
+  setTimeout(() => { if (codeTele !== code) window.fbSet(ref, null).catch(() => {}); }, 3000);
+}
+
+// silencieux : page rechargée en plein cast (par exemple après un changement de thème sur iPhone) : on se
+// relie sans afficher « Télé connectée »
+function relierTele(code, silencieux = false){
   const ancienCode = codeTele;
-  if (ancienCode && ancienCode !== code && window.firebaseDB) {
+  if (ancienCode && ancienCode !== code) {
     // autre télé : l'ancienne revient sur son QR code
     if (arreterSuiviTele) arreterSuiviTele();
-    window.fbSet(window.fbRef(window.firebaseDB, `tele/${ancienCode}`), null).catch(() => {});
+    rendreTele(ancienCode);
   }
   codeTele = code;
   try { sessionStorage.setItem(CLE_CODE_TELE, code); } catch (e) {}
@@ -104,7 +115,7 @@ function relierTele(code){
   });
   majBoutonCaster();
   fermerEcranCaster();
-  afficherNotificationHaut("", "Télé connectée", true);
+  if (!silencieux) afficherNotificationHaut("", "Télé connectée", true);
 }
 
 function arreterTele(){
@@ -114,10 +125,7 @@ function arreterTele(){
   minuteurTele = null;
   try { sessionStorage.removeItem(CLE_CODE_TELE); } catch (e) {}
   if (arreterSuiviTele) arreterSuiviTele();
-  // La télé revient sur son écran d'attente (QR code)
-  if (code && window.firebaseDB) {
-    window.fbSet(window.fbRef(window.firebaseDB, `tele/${code}`), null).catch(() => {});
-  }
+  rendreTele(code); // la télé revient sur son écran d'attente (QR code)
   majBoutonCaster();
   fermerEcranCaster();
   afficherNotificationHaut("", "Télé déconnectée", true);
@@ -296,14 +304,16 @@ if (!estPageTele) {
   });
 
   // QR code de la télé scanné avec l'appareil photo (lien …/?caster=CODE), ou page rechargée en cours
-  // de partie : on relie (ou on garde) la télé
+  // de partie (sans notification) : on relie (ou on garde) la télé
   let codeDepart = "";
+  let depuisLien = false;
   try {
     codeDepart = codeTeleDepuisTexte(new URLSearchParams(location.search).get("caster") || "");
+    depuisLien = !!codeDepart;
     if (codeDepart) history.replaceState(null, "", location.pathname);
     else codeDepart = codeTeleDepuisTexte(sessionStorage.getItem(CLE_CODE_TELE) || "");
   } catch (e) {}
-  if (codeDepart) relierTele(codeDepart);
+  if (codeDepart) relierTele(codeDepart, !depuisLien);
   majBoutonCaster();
 }
 // #endregion
@@ -418,12 +428,21 @@ function demarrerPageTele(){
   garderAllume();
   document.addEventListener("visibilitychange", garderAllume);
 
+  // Résumé effacé (téléphone parti) : retour au QR code au bout de 5 s seulement, le temps qu'un téléphone
+  // qui recharge sa page (par exemple après un changement de thème sur iPhone) revienne. Cast arrêté
+  // (résumé « arrêt », voir rendreTele) : tout de suite.
+  let minuteurRetourAttente = null;
   attendreFirebase(() => {
     window.fbOnValue(window.fbRef(window.firebaseDB, `tele/${code}`), (snapshot) => {
       const valeur = snapshot.val();
       let etat = null;
       try { etat = valeur && valeur.etat ? JSON.parse(valeur.etat) : null; } catch (e) { etat = null; }
-      dessinerTele(ecran, etat);
+      clearTimeout(minuteurRetourAttente);
+      if (!etat) {
+        minuteurRetourAttente = setTimeout(() => dessinerTele(ecran, null), 5000);
+        return;
+      }
+      dessinerTele(ecran, etat.arret ? null : etat);
     });
   });
 }
