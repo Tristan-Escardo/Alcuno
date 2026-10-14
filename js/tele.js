@@ -177,7 +177,7 @@ function texteSansBoutons(racine){
   return lignes.join("\n").slice(0, 700);
 }
 
-const BOUTONS_ACTION_TELE = ".plus4-action-btn, .fin-choix-reveler, .fin-choix-retour";
+const BOUTONS_ACTION_TELE = ".plus4-action-btn, .fin-choix-reveler, .fin-choix-retour, .fin-revanche";
 
 // L'écran par-dessus le plateau en ce moment (annonce, annulation, duel, +4, pari…), ou null
 function ecranPourTele(){
