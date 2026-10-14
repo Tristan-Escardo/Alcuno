@@ -39,6 +39,7 @@ let dernierEtatTele = "";     // dernier résumé envoyé (on n'envoie que les c
 let minuteurTele = null;
 let pauseTeleJusqua = 0;      // après un refus de Firebase : on attend un peu avant de réessayer
 let erreurTeleSignalee = false;
+let arreterSuiviTele = null;  // fin du suivi de la connexion (voir suivreConnexionTele)
 
 function majBoutonCaster(){
   btnCaster.innerText = codeTele ? "Caster ✓" : "Caster";
@@ -60,7 +61,35 @@ function fermerEcranCaster(){
   ecranCaster.style.display = "none";
 }
 
+// Appli fermée, téléphone éteint ou réseau coupé pendant qu'on caste : Firebase efface tout seul
+// tele/CODE et la télé revient sur son QR code (on peut la rescanner). Le téléphone revenu, il renvoie
+// la partie, et aussi si le résumé a été effacé alors qu'il caste toujours (ancienne connexion)
+function suivreConnexionTele(code){
+  if (arreterSuiviTele) arreterSuiviTele();
+  const ref = window.fbRef(window.firebaseDB, `tele/${code}`);
+  const finConnexion = window.fbOnValue(window.fbRef(window.firebaseDB, ".info/connected"), (snapshot) => {
+    if (snapshot.val() !== true || codeTele !== code) return;
+    window.fbOnDisconnect(ref).remove().catch(() => {});
+    dernierEtatTele = ""; // (à renvoyer)
+  });
+  const finResume = window.fbOnValue(ref, (snapshot) => {
+    if (snapshot.val() === null && codeTele === code) dernierEtatTele = "";
+  });
+  arreterSuiviTele = () => {
+    arreterSuiviTele = null;
+    finConnexion();
+    finResume();
+    window.fbOnDisconnect(ref).cancel().catch(() => {});
+  };
+}
+
 function relierTele(code){
+  const ancienCode = codeTele;
+  if (ancienCode && ancienCode !== code && window.firebaseDB) {
+    // autre télé : l'ancienne revient sur son QR code
+    if (arreterSuiviTele) arreterSuiviTele();
+    window.fbSet(window.fbRef(window.firebaseDB, `tele/${ancienCode}`), null).catch(() => {});
+  }
   codeTele = code;
   try { sessionStorage.setItem(CLE_CODE_TELE, code); } catch (e) {}
   dernierEtatTele = "";
@@ -68,7 +97,11 @@ function relierTele(code){
   erreurTeleSignalee = false;
   clearInterval(minuteurTele);
   minuteurTele = setInterval(envoyerEtatTele, 400);
-  attendreFirebase(envoyerEtatTele);
+  attendreFirebase(() => {
+    if (codeTele !== code) return;
+    suivreConnexionTele(code);
+    envoyerEtatTele();
+  });
   majBoutonCaster();
   fermerEcranCaster();
   afficherToast("Télé connectée", 2500);
@@ -80,6 +113,7 @@ function arreterTele(){
   clearInterval(minuteurTele);
   minuteurTele = null;
   try { sessionStorage.removeItem(CLE_CODE_TELE); } catch (e) {}
+  if (arreterSuiviTele) arreterSuiviTele();
   // La télé revient sur son écran d'attente (QR code)
   if (code && window.firebaseDB) {
     window.fbSet(window.fbRef(window.firebaseDB, `tele/${code}`), null).catch(() => {});
@@ -183,7 +217,9 @@ function etatPourTele(){
 }
 
 function envoyerEtatTele(){
-  if (!codeTele || !window.firebaseDB || enLigneActif) return; // (mode classique seulement)
+  if (!codeTele || !window.firebaseDB) return;
+  // Le mode télé est pour le mode classique : partie en ligne lancée => on arrête, la télé revient sur son QR code
+  if (enLigneActif) { arreterTele(); return; }
   if (Date.now() < pauseTeleJusqua) return;
   let etat;
   try { etat = JSON.stringify(etatPourTele()); } catch (e) { return; }
