@@ -473,7 +473,7 @@ function lancerOverlayPrediction(startIndex){
     surAction(cardWrap, "pred:" + t.id, {
       owner: () => curPos < ordre.length ? joueurs[ordre[curPos]] : null,
       pret: () => !cardWrap.classList.contains("disabled"),
-      valide: () => curPos < ordre.length // tout le monde a déjà choisi (en attente de « Révéler »)
+      valide: () => curPos < ordre.length // tout le monde a déjà choisi (en attente de « Valider »)
     }, () => {
       if(cardWrap.classList.contains("disabled")) return;
       const typeId = cardWrap.dataset.typeId;
@@ -492,9 +492,9 @@ function lancerOverlayPrediction(startIndex){
     ordre.push((startIndex + (sensHoraire ? k : -k) + joueurs.length) % joueurs.length);
   }
   let curPos = 0;
-  let revele = false; // la dernière carte n'est révélée qu'avec « Révéler » (on peut encore revenir en arrière)
+  let revele = false; // la dernière carte n'est révélée qu'avec « Valider » (on peut encore revenir en arrière)
 
-  // « Révéler » (quand tout le monde a choisi) et « Retour » (annule le dernier choix, s'il s'est planté).
+  // « Valider » (quand tout le monde a choisi : révèle la carte) et « Retour » (annule le dernier choix, s'il s'est planté).
   // Place toujours gardée sous le récap : les cartes ne bougent pas quand les boutons apparaissent.
   const actionsPari = document.createElement("div");
   actionsPari.className = "fin-choix-actions";
@@ -502,7 +502,7 @@ function lancerOverlayPrediction(startIndex){
   const btnReveler = document.createElement("button");
   btnReveler.type = "button";
   btnReveler.className = "bouton-pigeon fin-choix-reveler";
-  btnReveler.innerText = "Révéler la dernière carte";
+  btnReveler.innerText = "Valider";
   surAction(btnReveler, "pred:reveler", {
     once: true,
     unique: true,
