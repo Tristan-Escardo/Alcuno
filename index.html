@@ -331,13 +331,23 @@
             </div>
         </section>
 
-        <!-- Réglages > Signaler un bug : le message part tout de suite au développeur (voir js/reglages.js) -->
+        <!-- Réglages > Signaler un bug : demi-page qui monte du bas, par-dessus les Réglages ; le rapport part
+             tout de suite au développeur (voir js/reglages.js) -->
         <section class="ecranBug" id="ecranBug" style="display:none;">
-            <button type="button" id="btnBugRetour" class="btnRetour">← Retour</button>
-            <h2>Signaler un bug</h2>
-            <p class="texteConfirmation">Explique ce qui s'est passé. Les infos du téléphone (version, modèle…) sont jointes toutes seules.</p>
-            <textarea id="texteBug" maxlength="1500" rows="5" placeholder="Ex. : quand je tape sur…, ça…"></textarea>
-            <button type="button" id="btnEnvoyerBug">Envoyer</button>
+            <div class="bugFond"></div>
+            <div class="bugFeuille" data-defile role="dialog" aria-modal="true" aria-labelledby="titreBug">
+                <div class="bugEntete">
+                    <div class="bugPoignee" aria-hidden="true"></div>
+                    <h2 id="titreBug">Signaler un bug</h2>
+                    <button type="button" id="btnBugRetour" class="bugFermer" aria-label="Fermer">✕</button>
+                </div>
+                <p class="bugExplication">Explique ce qui s'est passé. Les infos du téléphone (version, modèle…) et le diagnostic sont joints tout seuls.</p>
+                <textarea id="texteBug" maxlength="1500" rows="4" placeholder="Ex. : plus de son après un duel" data-avec="btnEnvoyerBug"></textarea>
+                <div class="bugCaptures" id="bugCaptures" hidden></div>
+                <button type="button" id="btnAjouterCaptureBug" class="bugAjouterCapture"><svg class="iconeBouton" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="8.5" cy="9.5" r="1.8"/><path d="M21 16l-5.5-5.5L6 20"/></svg>Ajouter des captures d'écran</button>
+                <input type="file" id="fichiersBug" accept="image/*" multiple hidden>
+                <button type="button" id="btnEnvoyerBug">📤 Envoyer le rapport</button>
+            </div>
         </section>
 
         <section class="ecranConfirmerAccueil" id="ecranConfirmerAccueil" style="display:none;">

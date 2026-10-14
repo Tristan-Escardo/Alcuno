@@ -1740,8 +1740,7 @@ header h1{
 #ecranConfirmerRetrait,
 #ecranConfirmerAccueil,
 #ecranChoixPseudo,
-#ecranCaster,
-#ecranBug{
+#ecranCaster{
   position: fixed;
   inset: 0;
   z-index: 9999;
@@ -1768,8 +1767,7 @@ header h1{
 #ecranConfirmerRetrait > *,
 #ecranConfirmerAccueil > *,
 #ecranChoixPseudo > *,
-#ecranCaster > *,
-#ecranBug > *{
+#ecranCaster > *{
   animation: fadeIn 0.25s ease forwards;
 }
 
@@ -1780,7 +1778,6 @@ header h1{
 #ecranConfirmerAccueil h2,
 #ecranChoixPseudo h2,
 #ecranCaster h2,
-#ecranBug h2,
 #enLigne h2,
 #enLigne h3{
   margin: 0;
@@ -1797,7 +1794,6 @@ header h1{
 #ecranConfirmerAccueil button,
 #ecranChoixPseudo button,
 #ecranCaster button,
-#ecranBug button,
 #enLigne button{
   background-color: #ffcc00;
   color: #ffffff;
@@ -1826,7 +1822,6 @@ header h1{
   #ecranConfirmerAccueil button:hover,
   #ecranChoixPseudo button:hover,
   #ecranCaster button:hover,
-  #ecranBug button:hover,
   #enLigne button:hover{
     background-color: #ffea70;
     transform: scale(1.05);
@@ -1840,7 +1835,6 @@ header h1{
 #ecranConfirmerAccueil button:active,
 #ecranChoixPseudo button:active,
 #ecranCaster button:active,
-#ecranBug button:active,
 #enLigne button:active{
   transform: scale(0.98);
 }
@@ -1985,8 +1979,7 @@ html[data-theme="givre"] #enLigne .iconeBouton{ filter: none; }
 #ecranNouvellePartie .btnRetour,
 #ecranNouvellePartie .btnAccueil,
 #enLigne .btnRetour,
-#ecranCaster .btnRetour,
-#ecranBug .btnRetour{
+#ecranCaster .btnRetour{
   position: absolute;
   top: 20px;
   left: 20px;
@@ -2013,8 +2006,7 @@ html[data-theme="givre"] #enLigne .iconeBouton{ filter: none; }
 #ecranConfirmerRetrait .texteConfirmation,
 #ecranConfirmerAccueil .texteConfirmation,
 #ecranChoixPseudo .texteConfirmation,
-#ecranCaster .texteConfirmation,
-#ecranBug .texteConfirmation{
+#ecranCaster .texteConfirmation{
   margin: 0;
   max-width: min(460px, 88vw);
   color: #ffffff;
@@ -3298,8 +3290,7 @@ html.accessibilite #ecranConfirmerHote button,
 html.accessibilite #ecranConfirmerRetrait button,
 html.accessibilite #ecranConfirmerAccueil button,
 html.accessibilite #ecranChoixPseudo button,
-html.accessibilite #ecranCaster button:not(.btnRetour),
-html.accessibilite #ecranBug button:not(.btnRetour){
+html.accessibilite #ecranCaster button:not(.btnRetour){
   font-size: clamp(22px, 4.8vw, 29px);
 }
 
@@ -3712,8 +3703,7 @@ html.nav-retour{
 /* Mode en ligne et fenêtre Caster : l'en-tête du jeu (titre ALCUNO) reste derrière l'écran ; caché pour
    qu'il n'apparaisse jamais au bord (ex. quand l'iPhone décale la page avec le clavier ouvert) */
 html:has(#enLigne:not([style*="none"])) body > header,
-html:has(#ecranCaster:not([style*="none"])) body > header,
-html:has(#ecranBug:not([style*="none"])) body > header{
+html:has(#ecranCaster:not([style*="none"])) body > header{
   visibility: hidden;
 }
 
@@ -3721,8 +3711,7 @@ html:has(#ecranBug:not([style*="none"])) body > header{
    douceur sur la partie visible au-dessus du clavier (--haut-visible / --bas-cache, js/en-ligne.js) et
    jamais sous « ← Retour » (avant : l'écran sautait et le champ passait derrière le clavier).
    Centré quand il y a la place, défilable sinon. */
-#ecranCaster,
-#ecranBug{
+#ecranCaster{
   justify-content: flex-start;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -3731,23 +3720,19 @@ html:has(#ecranBug:not([style*="none"])) body > header{
   transition: padding-top 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), padding-bottom 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 #ecranCaster::before,
-#ecranBug::before,
-#ecranCaster::after,
-#ecranBug::after{
+#ecranCaster::after{
   content: "";
   margin-block: auto;
 }
-html.clavier-ouvert #ecranCaster,
-html.clavier-ouvert #ecranBug{
+html.clavier-ouvert #ecranCaster{
   padding-top: calc(var(--haut-visible, 0px) + 72px);
 }
-#ecranCaster .btnRetour,
-#ecranBug .btnRetour{
+#ecranCaster .btnRetour{
   top: calc(var(--haut-visible, 0px) + 20px);
   transition: top 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 @media (prefers-reduced-motion: reduce){
-  #ecranCaster, #ecranCaster .btnRetour, #ecranBug, #ecranBug .btnRetour{ transition: none; }
+  #ecranCaster, #ecranCaster .btnRetour{ transition: none; }
 }
 
 /* Clavier ouvert : jamais de contenu sous « ← Retour » (il défile s'il ne tient pas) */
@@ -4328,7 +4313,6 @@ html[data-theme="givre"] #ecranConfirmerRetrait h2,
 html[data-theme="givre"] #ecranConfirmerAccueil h2,
 html[data-theme="givre"] #ecranChoixPseudo h2,
 html[data-theme="givre"] #ecranCaster h2,
-html[data-theme="givre"] #ecranBug h2,
 html[data-theme="givre"] #enLigne h2,
 html[data-theme="givre"] #enLigne h3,
 html[data-theme="givre"] #ecranReglages h2,
@@ -4340,8 +4324,7 @@ html[data-theme="givre"] #ecranConfirmerHote .texteConfirmation,
 html[data-theme="givre"] #ecranConfirmerRetrait .texteConfirmation,
 html[data-theme="givre"] #ecranConfirmerAccueil .texteConfirmation,
 html[data-theme="givre"] #ecranChoixPseudo .texteConfirmation,
-html[data-theme="givre"] #ecranCaster .texteConfirmation,
-html[data-theme="givre"] #ecranBug .texteConfirmation{
+html[data-theme="givre"] #ecranCaster .texteConfirmation{
   color: var(--givre-texte);
   text-shadow: none;
 }
@@ -4354,7 +4337,6 @@ html[data-theme="givre"] #ecranConfirmerRetrait button,
 html[data-theme="givre"] #ecranConfirmerAccueil button,
 html[data-theme="givre"] #ecranChoixPseudo button,
 html[data-theme="givre"] #ecranCaster button,
-html[data-theme="givre"] #ecranBug button,
 html[data-theme="givre"] #enLigne button:not(.btnAccueilTexte):not(.btnExclure),
 html[data-theme="givre"] .menu button,
 html[data-theme="givre"] .suppression button,
@@ -5979,13 +5961,95 @@ html[data-theme="givre"] #ecranTele .tele-pied{ color: rgba(13,53,80,0.45); }
 }
 html[data-theme="givre"] #ecranReglages .lienBug{ color: var(--givre-doux); }
 html[data-theme="givre"] #ecranReglages #btnSignalerBug{ color: var(--givre-accent); }
-/* Fenêtre (par-dessus les Réglages) */
+/* Demi-page qui monte du bas, par-dessus les Réglages (assombris derrière) ; avec le clavier ouvert, elle
+   se pose juste au-dessus (--bas-cache, js/en-ligne.js) et défile si elle ne tient pas */
 #ecranBug{
+  position: fixed;
+  inset: 0;
   z-index: 10003;
 }
+#ecranBug .bugFond{
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  opacity: 0;
+  transition: opacity 0.28s ease;
+}
+#ecranBug.ouvert .bugFond{ opacity: 1; }
+#ecranBug .bugFeuille{
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: var(--bas-cache, 0px);
+  max-height: calc(100% - var(--haut-visible, 0px) - var(--bas-cache, 0px) - 16px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 20px calc(20px + env(safe-area-inset-bottom, 0px));
+  border-radius: 22px 22px 0 0;
+  background: var(--deco-theme, none), var(--fond-theme);
+  box-shadow: 0 -12px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,215,0,0.4);
+  color: #fff;
+  text-align: center;
+  transform: translateY(100%);
+  transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), bottom 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+#ecranBug.ouvert .bugFeuille{ transform: none; }
+#ecranBug .bugFeuille > *{ flex-shrink: 0; }
+@media (prefers-reduced-motion: reduce){
+  #ecranBug .bugFond, #ecranBug .bugFeuille{ transition: none; }
+}
+/* Haut de la demi-page : poignée + titre (on le glisse vers le bas pour fermer) et ✕ */
+#ecranBug .bugEntete{
+  position: relative;
+  width: 100%;
+  padding-top: 2px;
+  touch-action: none;
+  cursor: grab;
+}
+#ecranBug .bugPoignee{
+  width: 42px;
+  height: 5px;
+  margin: 0 auto 12px;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.35);
+}
+#ecranBug h2{
+  margin: 0;
+  color: #FFD700;
+  font-size: 23px;
+  font-weight: 900;
+  text-shadow: 2px 2px 5px #000;
+}
+#ecranBug .bugFermer{
+  position: absolute;
+  top: 14px;
+  right: -6px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  font-size: 16px;
+  font-weight: 900;
+  color: #fff;
+  background: rgba(255,255,255,0.12);
+  cursor: pointer;
+}
+#ecranBug .bugExplication{
+  margin: 0;
+  max-width: 460px;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: rgba(255,255,255,0.85);
+}
 #ecranBug textarea{
-  flex-shrink: 0; /* (clavier ouvert sur un petit téléphone : l'écran défile, la zone de texte garde sa taille) */
-  width: min(420px, 88vw);
+  width: 100%;
+  max-width: 460px;
   box-sizing: border-box;
   padding: 14px 16px;
   font: 600 17px/1.4 Arial, sans-serif;
@@ -5996,10 +6060,95 @@ html[data-theme="givre"] #ecranReglages #btnSignalerBug{ color: var(--givre-acce
   resize: none;
 }
 #ecranBug textarea::placeholder{ color: rgba(255,255,255,0.55); }
+/* Captures d'écran : aperçus (✕ pour en retirer une) et bouton pour en ajouter */
+#ecranBug .bugCaptures{
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  padding-top: 6px;
+}
+#ecranBug .bugCaptures[hidden]{ display: none; }
+#ecranBug .bugVignette{
+  position: relative;
+  width: 64px;
+  height: 64px;
+}
+#ecranBug .bugVignette img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid rgba(255,215,0,0.4);
+}
+#ecranBug .bugRetirer{
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-radius: 50%;
+  border: none;
+  font-size: 12px;
+  font-weight: 900;
+  color: #fff;
+  background: #3a0d24;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.4);
+  cursor: pointer;
+}
+#ecranBug .bugAjouterCapture{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  font-size: 15px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.9);
+  background: none;
+  border: 1px dashed rgba(255,215,0,0.5);
+  border-radius: 12px;
+  cursor: pointer;
+}
+#ecranBug .bugAjouterCapture[hidden]{ display: none; }
+#ecranBug .iconeBouton{
+  width: 1.2em;
+  height: 1.2em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* « Envoyer le rapport » : rouge profond (pas fluo), un peu plus fin que les gros boutons */
+#ecranBug #btnEnvoyerBug{
+  width: 100%;
+  max-width: 460px;
+  padding: 11px 18px;
+  font-size: 17px;
+  font-weight: 900;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #d9443b, #ad2721);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+  box-shadow: inset 0 -2px 0 rgba(0,0,0,0.2), 0 6px 14px rgba(120,20,15,0.35);
+  cursor: pointer;
+}
+#ecranBug #btnEnvoyerBug:disabled{ opacity: 0.65; }
+/* Givre : demi-page claire */
+html[data-theme="givre"] #ecranBug .bugFeuille{
+  color: var(--givre-texte);
+  box-shadow: 0 -12px 32px rgba(13,53,80,0.25), inset 0 1px 0 var(--givre-bord);
+}
+html[data-theme="givre"] #ecranBug .bugPoignee{ background: rgba(13,53,80,0.25); }
+html[data-theme="givre"] #ecranBug h2{ color: var(--givre-accent); text-shadow: 0 2px 8px rgba(255,255,255,0.9); }
+html[data-theme="givre"] #ecranBug .bugFermer{ color: var(--givre-texte); background: rgba(13,53,80,0.08); }
+html[data-theme="givre"] #ecranBug .bugExplication{ color: var(--givre-texte); }
 html[data-theme="givre"] #ecranBug textarea{
   color: var(--givre-texte);
   background: #fff;
   border-color: var(--givre-bord);
 }
 html[data-theme="givre"] #ecranBug textarea::placeholder{ color: #7a98ad; }
-#ecranBug #btnEnvoyerBug:disabled{ opacity: 0.6; }
+html[data-theme="givre"] #ecranBug .bugAjouterCapture{ color: var(--givre-accent); border-color: var(--givre-bord); }
+html[data-theme="givre"] #ecranBug .bugVignette img{ border-color: var(--givre-bord); }
