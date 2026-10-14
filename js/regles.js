@@ -1626,8 +1626,14 @@ function lancerPartie(){
   paquetDuel = [...duelCartes];
   melangerPaquet(paquetDuel);
 
-  // Tirée avec « aleatoire » : en ligne, tous les téléphones ont la même carte dorée au même endroit
-  const avecCarteDoree = aleatoire() < CHANCE_CARTE_DOREE;
+  // Tirée avec « aleatoire » : en ligne, tous les téléphones ont la même carte dorée au même endroit.
+  // Jamais dans la première partie (de ce téléphone en classique, de l'hôte en ligne : voir
+  // GRAINE_SANS_CARTE_DOREE)
+  const sansCarteDoree = enLigneActif
+    ? !!dernierEtatManche && dernierEtatManche.seed >= GRAINE_SANS_CARTE_DOREE
+    : !premierePartieJouee();
+  const avecCarteDoree = aleatoire() < CHANCE_CARTE_DOREE && !sansCarteDoree;
+  noterPremierePartieJouee();
   // La carte dorée REMPLACE une carte normale (n'importe laquelle : la dernière du paquet mélangé),
   // pour garder 52 cases : sinon une carte se retrouvait seule sur la dernière rangée
   if(avecCarteDoree) paquet.pop();

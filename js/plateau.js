@@ -100,6 +100,21 @@ let paquet = [];
 // Easter egg : environ 1 partie sur 12, une des cases du plateau cache la carte dorée (à la place d'une carte normale)
 const CHANCE_CARTE_DOREE = 1 / 12;
 
+// Jamais de carte dorée dans la toute première partie jouée sur ce téléphone (quelqu'un qui découvre le
+// jeu). En ligne, c'est la première partie de l'hôte qui compte : il le dit aux autres par la graine du
+// mélange, augmentée de GRAINE_SANS_CARTE_DOREE (le générateur n'en garde que les 32 bits du bas : même
+// mélange ; tous les joueurs d'une partie ont la même version du jeu, voir versionCompatible)
+const CLE_PREMIERE_PARTIE_JOUEE = "alcuno_premiere_partie_jouee";
+const GRAINE_SANS_CARTE_DOREE = 4294967296; // 2^32
+
+function premierePartieJouee(){
+  try { return localStorage.getItem(CLE_PREMIERE_PARTIE_JOUEE) === "1"; } catch (e) { return true; }
+}
+
+function noterPremierePartieJouee(){
+  try { localStorage.setItem(CLE_PREMIERE_PARTIE_JOUEE, "1"); } catch (e) {}
+}
+
 let indexCaseDoree = -1; // -1 = pas de carte dorée dans cette partie
 let carteDoreeEnJeu = false; // présente et pas encore retournée
 
@@ -802,8 +817,8 @@ function relancerRappelClassique(){
   if(!enLigneActif && partieLancee) programmerRappelTour(null);
 }
 
-// Halo lumineux tout autour de l'écran, qui pulse 3 fois au rythme du bandeau « À toi » (voir
-// haloRappel dans le CSS ; aussi sur la télé)
+// Halo lumineux tout autour de l'écran du téléphone, qui pulse 3 fois au rythme du bandeau « À toi »
+// (voir haloRappel dans le CSS ; pas sur la télé)
 function faireBrillerBordsEcran(){
   let halo = document.getElementById("haloRappel");
   if(!halo){

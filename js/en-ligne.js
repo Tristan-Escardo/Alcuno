@@ -839,7 +839,8 @@ function lancerMancheEnLigne(listeJoueurs, depuisSalle){
     return {
       demarree: true,
       manche: (e.manche || 0) + 1,
-      seed: Math.floor(Math.random() * 4294967296),
+      // (+ GRAINE_SANS_CARTE_DOREE : première partie de l'hôte, sans carte dorée pour personne)
+      seed: Math.floor(Math.random() * 4294967296) + (premierePartieJouee() ? 0 : GRAINE_SANS_CARTE_DOREE),
       joueurs: listeJoueurs,
       hote: e.hote || pseudoActuel
     };
