@@ -766,26 +766,37 @@ function creerUIJoueurActifSticky(){
   repositionnerStickyJoueurActif();
 }
 
-// Son « À toi » (sifflet) et bandeau qui clignote : si le joueur dont c'est le tour n'a toujours pas joué
-// son tour (retourné sa carte) 1 min 10 après que c'est devenu son tour, puis toutes les 1 min 10 tant
-// qu'il ne l'a pas joué. Regarder les règles, faire défiler, etc. ne compte pas : seul le tour joué (ou
-// passé à un autre) l'arrête. En ligne : seulement sur le téléphone du joueur dont c'est le tour ; en
-// classique : sur le téléphone de la partie (et sur la télé en mode télé, voir tele.js).
+// Son « À toi » (sifflet) et bandeau qui clignote : quand le jeu attend depuis 50 s que le joueur joue
+// (retourne sa carte, ou fasse son choix : pigeon, duel, +4, annulation, couleur…), puis toutes les 50 s
+// tant qu'il ne joue pas. Regarder les règles, faire défiler le plateau, etc. ne compte pas.
+//  - classique : le compteur repart de zéro à chaque action du jeu, quand un choix est proposé (voir
+//    surAction) et quand le tour passe au joueur suivant ; sur le téléphone de la partie (et sur la télé
+//    en mode télé, voir tele.js)
+//  - en ligne : seulement sur le téléphone du joueur dont c'est le tour, 50 s après le début de son tour
 // Pas pendant le pari de la dernière carte ni à la fin de la partie.
-const DELAI_RAPPEL_TOUR = 70 * 1000;
+const DELAI_RAPPEL_TOUR = 50 * 1000;
 let minuteurRappelTour = null;
-let dernierTourRappel = null; // classique : tour dont le rappel est déjà programmé
+let dernierTourRappel = null; // classique : tour pour lequel le compteur est déjà reparti
 
+// tour : en ligne, le tour à jouer (le rappel s'arrête s'il est joué) ; en classique, null
 function programmerRappelTour(tour){
   clearTimeout(minuteurRappelTour);
   minuteurRappelTour = setTimeout(() => {
     if(!partieLancee || joueurs.length === 0 || predictionEnCours || finUnOverlayAffiche) return;
-    if(`${mancheCourante}:${cartesRestantes()}` !== tour) return; // tour joué entre-temps
-    if(enLigneActif && joueurs[indexJoueur % joueurs.length] !== pseudoActuel) return; // plus son tour
+    if(enLigneActif){
+      if(`${mancheCourante}:${cartesRestantes()}` !== tour) return; // tour joué entre-temps
+      if(joueurs[indexJoueur % joueurs.length] !== pseudoActuel) return; // plus son tour
+    } else if(tour !== null) return; // (rappel d'une partie en ligne)
     jouerSon("tour");
     faireClignoterBandeauTour(); // même sans le son (sons coupés, musique forte…)
-    programmerRappelTour(tour); // et encore dans 1 min 10 s'il ne joue toujours pas
+    programmerRappelTour(tour); // et encore dans 50 s s'il ne joue toujours pas
   }, DELAI_RAPPEL_TOUR);
+}
+
+// Classique : le compteur du rappel repart de zéro (action du jeu, nouveau choix proposé, ou tour passé
+// au joueur suivant)
+function relancerRappelClassique(){
+  if(!enLigneActif && partieLancee) programmerRappelTour(null);
 }
 
 // Le bandeau « À toi » clignote 3 fois (voir rappel-tour dans le CSS)
@@ -833,10 +844,11 @@ function majStickyJoueurActif(){
       if(plateau.querySelector(".retournee")) vibrer([70, 60, 70]);
       programmerRappelTour(tour);
     }
-  } else if(!enLigneActif && tour !== dernierTourRappel){
-    // Classique (un seul téléphone) : rappel pour le joueur dont c'est le tour, sans vibrer
-    dernierTourRappel = tour;
-    programmerRappelTour(tour);
+  } else if(!enLigneActif && `${lancementPartieA}:${cartesRestantes()}:${idx}` !== dernierTourRappel){
+    // Classique (un seul téléphone) : tour passé au joueur suivant => le compteur du rappel repart de
+    // zéro, sans vibrer
+    dernierTourRappel = `${lancementPartieA}:${cartesRestantes()}:${idx}`;
+    relancerRappelClassique();
   }
 
   stickyJoueurActif.classList.toggle("is-pigeon", estPigeon);

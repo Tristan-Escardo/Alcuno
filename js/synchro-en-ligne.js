@@ -16,6 +16,7 @@
 function surAction(el, id, options, handler){
   el.dataset.netId = id;
   el._net = Object.assign({ owner: null, pret: null, valide: null, once: false, unique: false }, options, { handler });
+  relancerRappelClassique(); // nouveau choix proposé : le compteur du rappel « À toi » part de maintenant
 
   el.addEventListener(options.evenement || "pointerdown", (e) => {
     // Tap sur le plateau ou les menus alors qu'un overlay (ou le voile entre deux) est affiché : ignoré.
@@ -23,6 +24,7 @@ function surAction(el, id, options, handler){
     if(el.closest("main") && (overlayOuvert() || voileOverlays.classList.contains("visible"))) return;
     if(!enLigneActif){
       handler(e);
+      relancerRappelClassique(); // le joueur a joué : le compteur du rappel « À toi » repart de zéro
       return;
     }
     envoyerAction(el);
