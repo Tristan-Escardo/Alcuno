@@ -67,11 +67,13 @@ function debloquerPrestige(){
 // Notification qui arrive du haut de l'écran, en or avec des étincelles. Comme sur un téléphone :
 // on la glisse vers le haut pour la fermer, on la retient au doigt (elle ne part pas tant qu'on
 // la tient), un simple tap la ferme, sinon elle s'en va toute seule après 5 s.
-function afficherNotificationHaut(icone, titre){
+// sobre : panneau sombre du jeu, sans étincelles (mode télé : « Télé connectée »…) ; icone "" : sans icône
+function afficherNotificationHaut(icone, titre, sobre = false){
   const ancienne = document.getElementById("notifHaut");
   if (ancienne) ancienne.remove();
   const notif = document.createElement("div");
   notif.id = "notifHaut";
+  if (sobre) notif.classList.add("notifHaut-sobre");
   notif.setAttribute("role", "status");
   const eclats = document.createElement("span");
   eclats.className = "notifHaut-eclats";
@@ -96,7 +98,9 @@ function afficherNotificationHaut(icone, titre){
   const fort = document.createElement("strong");
   fort.textContent = titre;
   bloc.append(fort);
-  notif.append(eclats, ligneIcone, bloc);
+  if (!sobre) notif.append(eclats);
+  if (icone) notif.append(ligneIcone);
+  notif.append(bloc);
 
   let partie = false;
   let minuteur = null;
