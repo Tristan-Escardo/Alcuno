@@ -380,7 +380,7 @@ function demarrerPageTele(){
         <div class="tele-sous-titre">Mode télé</div>
         <div class="tele-etape"><span class="tele-num">1</span><span>Sur le téléphone de la partie (mode classique) : bouton <b>Caster</b></span></div>
         <div class="tele-etape"><span class="tele-num">2</span><span>Scanne ce QR code avec l'appli</span></div>
-        <div class="tele-etape"><span class="tele-num">3</span><span>La partie s'affiche ici en grand</span></div>
+        <div class="tele-etape"><span class="tele-num">3</span><span>La partie s'affiche ici</span></div>
         <button type="button" class="tele-plein-ecran">Plein écran</button>
       </div>
       <div class="tele-attente-qr">
