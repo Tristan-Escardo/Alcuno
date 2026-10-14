@@ -317,18 +317,18 @@ function creerCarteTele(valeur){
   return el;
 }
 
-// Thème de la télé : celui du téléphone relié (Réglages > Thème), gardé pour l'écran d'attente suivant
-const CLE_THEME_TELE = "alcuno_theme_tele";
+// Thème de la télé : celui du téléphone relié (Réglages > Thème) ; sans téléphone (écran d'attente),
+// le thème de base, Bordeaux
+const THEME_TELE_ATTENTE = "bordeaux";
 function appliquerThemeTele(nom){
   if (!nom || !THEMES[nom] || document.documentElement.dataset.theme === nom) return;
   document.documentElement.dataset.theme = nom;
-  try { localStorage.setItem(CLE_THEME_TELE, nom); } catch (e) {}
 }
 
 function demarrerPageTele(){
   const code = genererCodeTele();
   const lien = `${ADRESSE_SITE_TELE}?caster=${code}`;
-  try { appliquerThemeTele(localStorage.getItem(CLE_THEME_TELE)); } catch (e) {}
+  appliquerThemeTele(THEME_TELE_ATTENTE);
 
   const ecran = document.createElement("div");
   ecran.id = "ecranTele";
@@ -482,6 +482,7 @@ function dessinerTele(ecran, etat){
   if (!etat) {
     attente.hidden = false; jeu.hidden = true; surEcran.hidden = true;
     document.documentElement.classList.remove("tele-ecran-ouvert");
+    appliquerThemeTele(THEME_TELE_ATTENTE);
     dernierSonTele = null;
     dernierEnvolTele = null;
     return;
