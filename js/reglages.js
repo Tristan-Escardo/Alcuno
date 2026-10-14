@@ -617,21 +617,24 @@ document.getElementById("btnDiagnostic").addEventListener("click", () => {
 
 // ===== Signaler un bug (Réglages) : le rapport arrive tout de suite en notification sur le téléphone du
 // développeur (appli ntfy, abonnée au canal CANAL_BUGS du service gratuit ntfy.sh), avec le diagnostic
-// de ce téléphone, puis une notification par capture d'écran (l'image en pièce jointe : une seule par
-// message chez ntfy). (Le nom du canal est dans ce fichier : quelqu'un qui le lit pourrait y écrire aussi.)
+// de ce téléphone, puis une notification par photo ou vidéo jointe (une seule pièce jointe par message
+// chez ntfy, 15 Mo au plus : les photos sont réduites, les vidéos trop lourdes refusées au choix).
+// (Le nom du canal est dans ce fichier : quelqu'un qui le lit pourrait y écrire aussi.)
 // La fenêtre est une demi-page qui monte du bas, par-dessus les Réglages : le clavier ne s'ouvre qu'en
 // touchant la zone de texte ; on la ferme avec ✕, en touchant le fond ou en la glissant vers le bas.
 const CANAL_BUGS = "alcuno-bugs-7cy7edx1ee25";
-const MAX_CAPTURES_BUG = 3;
-const TEXTE_BOUTON_BUG = "📤 Envoyer le rapport";
+const MAX_PIECES_BUG = 3;
+const TAILLE_MAX_VIDEO_BUG = 15 * 1024 * 1024; // (limite des pièces jointes de ntfy.sh)
+const TEXTE_BOUTON_BUG = "Envoyer le rapport";
 const ecranBug = document.getElementById("ecranBug");
 const feuilleBug = ecranBug.querySelector(".bugFeuille");
 const champBug = document.getElementById("texteBug");
 const btnEnvoyerBug = document.getElementById("btnEnvoyerBug");
-const btnAjouterCaptureBug = document.getElementById("btnAjouterCaptureBug");
-const champCapturesBug = document.getElementById("fichiersBug");
-const zoneCapturesBug = document.getElementById("bugCaptures");
-let capturesBug = []; // { fichier, url } (url : aperçu)
+const libelleEnvoyerBug = btnEnvoyerBug.querySelector(".libelle");
+const btnAjouterPieceBug = document.getElementById("btnAjouterPieceBug");
+const champPiecesBug = document.getElementById("fichiersBug");
+const zonePiecesBug = document.getElementById("bugPieces");
+let piecesBug = []; // { fichier, url, video } (url : aperçu)
 let dernierEnvoiBug = 0;
 let minuteurFermetureBug = null;
 
@@ -677,43 +680,56 @@ function lacherGlisseBug(e){
 enteteBug.addEventListener("pointerup", lacherGlisseBug);
 enteteBug.addEventListener("pointercancel", lacherGlisseBug);
 
-// Captures d'écran (photos du téléphone) : aperçus, MAX_CAPTURES_BUG au plus
-function afficherCapturesBug(){
-  zoneCapturesBug.innerHTML = "";
-  capturesBug.forEach((capture, i) => {
+// Pièces jointes (photos ou vidéos du téléphone) : aperçus, MAX_PIECES_BUG au plus
+function afficherPiecesBug(){
+  zonePiecesBug.innerHTML = "";
+  piecesBug.forEach((piece, i) => {
     const vignette = document.createElement("div");
-    vignette.className = "bugVignette";
-    const image = document.createElement("img");
-    image.src = capture.url;
-    image.alt = `Capture ${i + 1}`;
+    vignette.className = "bugVignette" + (piece.video ? " bugVignetteVideo" : "");
+    let apercu;
+    if (piece.video) {
+      apercu = document.createElement("video");
+      apercu.src = piece.url + "#t=0.1"; // (première image affichée, sans lecture)
+      apercu.muted = true;
+      apercu.playsInline = true;
+      apercu.preload = "metadata";
+    } else {
+      apercu = document.createElement("img");
+      apercu.src = piece.url;
+    }
+    apercu.setAttribute("aria-label", `Pièce jointe ${i + 1}`);
     const retirer = document.createElement("button");
     retirer.type = "button";
     retirer.className = "bugRetirer";
-    retirer.setAttribute("aria-label", "Retirer la capture");
+    retirer.setAttribute("aria-label", "Retirer la pièce jointe");
     retirer.innerText = "✕";
     retirer.addEventListener("click", () => {
-      URL.revokeObjectURL(capture.url);
-      capturesBug = capturesBug.filter(c => c !== capture);
-      afficherCapturesBug();
+      URL.revokeObjectURL(piece.url);
+      piecesBug = piecesBug.filter(p => p !== piece);
+      afficherPiecesBug();
     });
-    vignette.append(image, retirer);
-    zoneCapturesBug.appendChild(vignette);
+    vignette.append(apercu, retirer);
+    zonePiecesBug.appendChild(vignette);
   });
-  zoneCapturesBug.hidden = capturesBug.length === 0;
-  btnAjouterCaptureBug.hidden = capturesBug.length >= MAX_CAPTURES_BUG;
+  zonePiecesBug.hidden = piecesBug.length === 0;
+  btnAjouterPieceBug.hidden = piecesBug.length >= MAX_PIECES_BUG;
 }
 
-champCapturesBug.addEventListener("change", () => {
-  const fichiers = Array.from(champCapturesBug.files || []).filter(f => f.type.startsWith("image/"));
-  champCapturesBug.value = "";
-  const place = MAX_CAPTURES_BUG - capturesBug.length;
-  if (fichiers.length > place) afficherToast(`${MAX_CAPTURES_BUG} captures au plus`);
-  fichiers.slice(0, place).forEach(f => capturesBug.push({ fichier: f, url: URL.createObjectURL(f) }));
-  afficherCapturesBug();
+champPiecesBug.addEventListener("change", () => {
+  let fichiers = Array.from(champPiecesBug.files || [])
+    .filter(f => f.type.startsWith("image/") || f.type.startsWith("video/"));
+  champPiecesBug.value = "";
+  const tropLourdes = fichiers.filter(f => f.type.startsWith("video/") && f.size > TAILLE_MAX_VIDEO_BUG);
+  if (tropLourdes.length) afficherToast("Vidéo trop lourde (15 Mo au plus) : prends-en une plus courte", 3500);
+  fichiers = fichiers.filter(f => !tropLourdes.includes(f));
+  const place = MAX_PIECES_BUG - piecesBug.length;
+  if (fichiers.length > place) afficherToast(`${MAX_PIECES_BUG} pièces jointes au plus`);
+  fichiers.slice(0, place).forEach(f => piecesBug.push({ fichier: f, url: URL.createObjectURL(f), video: f.type.startsWith("video/") }));
+  afficherPiecesBug();
 });
 
 // Image réduite (1 600 px au plus) en JPEG : elle part vite, même en 4G
-function compresserCaptureBug(fichier){
+function compresserPhotoBug(fichier){
   return new Promise((ok, ko) => {
     const url = URL.createObjectURL(fichier);
     const image = new Image();
@@ -742,7 +758,14 @@ function publierNtfy(titre, corps, nomFichier){
 
 function remettreBoutonBug(){
   btnEnvoyerBug.disabled = false;
-  btnEnvoyerBug.innerText = TEXTE_BOUTON_BUG;
+  libelleEnvoyerBug.innerText = TEXTE_BOUTON_BUG;
+}
+
+// Extension du fichier envoyé (ntfy en déduit le type de la pièce jointe)
+function extensionPieceBug(fichier){
+  const nom = (fichier.name || "").match(/\.([a-z0-9]{2,4})$/i);
+  if (nom) return nom[1].toLowerCase();
+  return fichier.type === "video/quicktime" ? "mov" : (fichier.type.split("/")[1] || "bin");
 }
 
 async function envoyerBug(){
@@ -750,13 +773,13 @@ async function envoyerBug(){
   if (!texte) { afficherToast("Écris d'abord ce qui s'est passé"); return; }
   if (Date.now() - dernierEnvoiBug < 30000) { afficherToast("Attends un peu avant d'en renvoyer un"); return; }
   const titre = `Bug Alcuno ${VERSION_AFFICHEE}`;
-  const captures = capturesBug.slice();
-  const annonceCaptures = captures.length
-    ? `\n\n(${captures.length} capture${captures.length > 1 ? "s" : ""} d'écran juste après)` : "";
+  const pieces = piecesBug.slice();
+  const annoncePieces = pieces.length
+    ? `\n\n(${pieces.length} pièce${pieces.length > 1 ? "s" : ""} jointe${pieces.length > 1 ? "s" : ""} juste après)` : "";
   // ntfy : 4 096 octets au plus (au-delà, le message devient une pièce jointe) => texte + diagnostic coupés
-  const message = (texte.slice(0, 1500) + annonceCaptures + "\n\n" + texteDiagnostic()).slice(0, 3000);
+  const message = (texte.slice(0, 1500) + annoncePieces + "\n\n" + texteDiagnostic()).slice(0, 3000);
   btnEnvoyerBug.disabled = true;
-  btnEnvoyerBug.innerText = "Envoi…";
+  libelleEnvoyerBug.innerText = "Envoi…";
   try {
     await publierNtfy(titre, message);
   } catch (e) {
@@ -765,29 +788,31 @@ async function envoyerBug(){
     return;
   }
   dernierEnvoiBug = Date.now();
-  let capturesRatees = 0;
-  for (let i = 0; i < captures.length; i++) {
-    btnEnvoyerBug.innerText = `Envoi de la capture ${i + 1}/${captures.length}…`;
+  let piecesRatees = 0;
+  for (let i = 0; i < pieces.length; i++) {
+    libelleEnvoyerBug.innerText = `Envoi de la pièce jointe ${i + 1}/${pieces.length}…`;
     try {
-      const image = await compresserCaptureBug(captures[i].fichier);
-      await publierNtfy(`${titre} : capture ${i + 1}/${captures.length}`, new Blob([image]), `capture-${i + 1}.jpg`);
+      const { fichier, video } = pieces[i];
+      const contenu = video ? fichier : await compresserPhotoBug(fichier); // (vidéo telle quelle)
+      await publierNtfy(`${titre} : pièce jointe ${i + 1}/${pieces.length}`, new Blob([contenu]),
+        `piece-jointe-${i + 1}.${video ? extensionPieceBug(fichier) : "jpg"}`);
     } catch (e) {
-      capturesRatees++;
+      piecesRatees++;
     }
   }
   champBug.value = "";
-  capturesBug.forEach(c => URL.revokeObjectURL(c.url));
-  capturesBug = [];
-  afficherCapturesBug();
+  piecesBug.forEach(p => URL.revokeObjectURL(p.url));
+  piecesBug = [];
+  afficherPiecesBug();
   remettreBoutonBug();
   fermerEcranBug();
-  afficherNotificationHaut("", capturesRatees ? "Rapport envoyé, mais pas toutes les captures" : "Merci ! Le rapport est envoyé", true);
+  afficherNotificationHaut("", piecesRatees ? "Rapport envoyé, mais pas toutes les pièces jointes" : "Merci ! Le rapport est envoyé", true);
 }
 
 document.getElementById("btnSignalerBug").addEventListener("click", ouvrirEcranBug);
 document.getElementById("btnBugRetour").addEventListener("click", fermerEcranBug);
 ecranBug.querySelector(".bugFond").addEventListener("click", fermerEcranBug);
-btnAjouterCaptureBug.addEventListener("click", () => champCapturesBug.click());
+btnAjouterPieceBug.addEventListener("click", () => champPiecesBug.click());
 btnEnvoyerBug.addEventListener("click", envoyerBug);
 
 // ===== Partie en mémoire : la partie en ligne dont ce téléphone se souvient (« Revenir ») =====
