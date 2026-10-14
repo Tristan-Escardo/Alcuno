@@ -7,11 +7,13 @@
          Un paramètre différent à chaque chargement force toujours la dernière version. -->
     <script>
         window.ANTI_CACHE = Date.now();
+        // Page de la télé (…/Alcuno/tele ou …/Alcuno/?tele) : seulement l'affichage de la partie, voir js/tele.js
+        if (/[?&]tele(=|&|$)/.test(location.search)) document.documentElement.classList.add("mode-tele");
         // Fichiers du jeu, dans l'ordre (aussi dans sw.js, pour le hors connexion). Téléchargés tout de suite
         // et en parallèle : en bas de la page, ils s'exécutent d'affilée, sans attente entre deux fichiers
         // (aucun bouton ni minuteur ne peut se déclencher avant que tout le jeu soit là).
         window.FICHIERS_JEU = ["script.js", "js/qrcode.js", "js/reglages.js", "js/en-ligne.js", "js/plateau.js", "js/regles.js",
-                               "js/synchro-en-ligne.js", "js/retour-demarrage.js"];
+                               "js/synchro-en-ligne.js", "js/retour-demarrage.js", "js/tele.js"];
         window.FICHIERS_JEU.forEach(function (f) {
             document.write('<link rel="preload" as="script" href="' + f + '?t=' + window.ANTI_CACHE + '">');
         });
@@ -309,6 +311,25 @@
             <button type="button" id="btnChoixPseudoAnnuler">Annuler</button>
         </section>
 
+        <!-- Mode classique : afficher la partie sur une télé (voir js/tele.js) -->
+        <section class="ecranCaster" id="ecranCaster" style="display:none;">
+            <h2 id="titreCaster">Caster sur la télé</h2>
+            <div id="casterRelier">
+                <p class="texteConfirmation">1. Sur la télé, ouvre :<br><b class="adresseTele">tristan-escardo.github.io/Alcuno/tele</b></p>
+                <p class="texteConfirmation">2. Scanne le QR code affiché sur la télé</p>
+                <button type="button" id="btnCasterScanner"><svg class="iconeBouton" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3.2"/></svg>Scanner la télé</button>
+                <div class="casterCode">
+                    <input type="text" id="codeCaster" placeholder="ou son code" maxlength="5" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="go" />
+                    <button type="button" id="btnCasterCode">OK</button>
+                </div>
+            </div>
+            <div id="casterConnecte" style="display:none;">
+                <p class="texteConfirmation" id="texteCasterConnecte"></p>
+                <button type="button" id="btnCasterArreter">Arrêter de caster</button>
+            </div>
+            <button type="button" id="btnCasterFermer">Fermer</button>
+        </section>
+
         <section class="ecranConfirmerAccueil" id="ecranConfirmerAccueil" style="display:none;">
             <h2>Retourner à l'accueil ?</h2>
             <p class="texteConfirmation">La partie en cours sera perdue.</p>
@@ -328,6 +349,7 @@
             <input type="text" id="nomJoueur" placeholder="Entrez un nom de joueur" autocomplete="off" enterkeyhint="done" />
             <button type="button" id="ajouterJoueur">Ajouter un joueur</button>
             <button type="button" id="jouer" style="display:none;">Jouer</button>
+            <button type="button" id="btnCaster">Caster</button>
             <button type="button" id="supprimerJoueur">Supprimer un joueur</button>
             <button type="button" id="nouvellePartie" style="display:none;">Nouvelle partie</button>
         </section>

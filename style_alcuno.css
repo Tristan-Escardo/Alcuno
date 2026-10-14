@@ -1739,7 +1739,8 @@ header h1{
 #ecranConfirmerHote,
 #ecranConfirmerRetrait,
 #ecranConfirmerAccueil,
-#ecranChoixPseudo{
+#ecranChoixPseudo,
+#ecranCaster{
   position: fixed;
   inset: 0;
   z-index: 9999;
@@ -1765,7 +1766,8 @@ header h1{
 #ecranConfirmerHote > *,
 #ecranConfirmerRetrait > *,
 #ecranConfirmerAccueil > *,
-#ecranChoixPseudo > *{
+#ecranChoixPseudo > *,
+#ecranCaster > *{
   animation: fadeIn 0.25s ease forwards;
 }
 
@@ -1775,6 +1777,7 @@ header h1{
 #ecranConfirmerRetrait h2,
 #ecranConfirmerAccueil h2,
 #ecranChoixPseudo h2,
+#ecranCaster h2,
 #enLigne h2,
 #enLigne h3{
   margin: 0;
@@ -1790,6 +1793,7 @@ header h1{
 #ecranConfirmerRetrait button,
 #ecranConfirmerAccueil button,
 #ecranChoixPseudo button,
+#ecranCaster button,
 #enLigne button{
   background-color: #ffcc00;
   color: #ffffff;
@@ -1817,6 +1821,7 @@ header h1{
   #ecranConfirmerRetrait button:hover,
   #ecranConfirmerAccueil button:hover,
   #ecranChoixPseudo button:hover,
+  #ecranCaster button:hover,
   #enLigne button:hover{
     background-color: #ffea70;
     transform: scale(1.05);
@@ -1829,6 +1834,7 @@ header h1{
 #ecranConfirmerRetrait button:active,
 #ecranConfirmerAccueil button:active,
 #ecranChoixPseudo button:active,
+#ecranCaster button:active,
 #enLigne button:active{
   transform: scale(0.98);
 }
@@ -1998,7 +2004,8 @@ html[data-theme="givre"] #enLigne .iconeBouton{ filter: none; }
 #ecranConfirmerHote .texteConfirmation,
 #ecranConfirmerRetrait .texteConfirmation,
 #ecranConfirmerAccueil .texteConfirmation,
-#ecranChoixPseudo .texteConfirmation{
+#ecranChoixPseudo .texteConfirmation,
+#ecranCaster .texteConfirmation{
   margin: 0;
   max-width: min(460px, 88vw);
   color: #ffffff;
@@ -3261,7 +3268,8 @@ html.accessibilite #ecranNouvellePartie button:not(.btnAccueilTexte):not(.btnRet
 html.accessibilite #ecranConfirmerHote button,
 html.accessibilite #ecranConfirmerRetrait button,
 html.accessibilite #ecranConfirmerAccueil button,
-html.accessibilite #ecranChoixPseudo button{
+html.accessibilite #ecranChoixPseudo button,
+html.accessibilite #ecranCaster button{
   font-size: clamp(22px, 4.8vw, 29px);
 }
 
@@ -4222,6 +4230,7 @@ html[data-theme="givre"] #ecranConfirmerHote h2,
 html[data-theme="givre"] #ecranConfirmerRetrait h2,
 html[data-theme="givre"] #ecranConfirmerAccueil h2,
 html[data-theme="givre"] #ecranChoixPseudo h2,
+html[data-theme="givre"] #ecranCaster h2,
 html[data-theme="givre"] #enLigne h2,
 html[data-theme="givre"] #enLigne h3,
 html[data-theme="givre"] #ecranReglages h2,
@@ -4232,7 +4241,8 @@ html[data-theme="givre"] #suppression h2{
 html[data-theme="givre"] #ecranConfirmerHote .texteConfirmation,
 html[data-theme="givre"] #ecranConfirmerRetrait .texteConfirmation,
 html[data-theme="givre"] #ecranConfirmerAccueil .texteConfirmation,
-html[data-theme="givre"] #ecranChoixPseudo .texteConfirmation{
+html[data-theme="givre"] #ecranChoixPseudo .texteConfirmation,
+html[data-theme="givre"] #ecranCaster .texteConfirmation{
   color: var(--givre-texte);
   text-shadow: none;
 }
@@ -4244,6 +4254,7 @@ html[data-theme="givre"] #ecranConfirmerHote button,
 html[data-theme="givre"] #ecranConfirmerRetrait button,
 html[data-theme="givre"] #ecranConfirmerAccueil button,
 html[data-theme="givre"] #ecranChoixPseudo button,
+html[data-theme="givre"] #ecranCaster button,
 html[data-theme="givre"] #enLigne button:not(.btnAccueilTexte):not(.btnExclure),
 html[data-theme="givre"] .menu button,
 html[data-theme="givre"] .suppression button,
@@ -5283,3 +5294,345 @@ html[data-theme="givre"] #overlayDuel .duel-boutons button:disabled{
   background: #bfe6f8 !important;
   color: var(--givre-texte) !important;
 }
+
+
+/* =============================================================================================
+   MODE TÉLÉ (« Caster », js/tele.js)
+   ============================================================================================= */
+/* Téléphone : bouton « Caster » du menu du mode classique, plus discret que « Jouer » */
+#menu #btnCaster{
+  background: rgba(255,255,255,0.1);
+  background-image: none;
+  color: #fff;
+  box-shadow: 0 0 0 1px rgba(255,215,0,0.45) inset;
+}
+#menu #btnCaster.caster-actif{
+  box-shadow: 0 0 0 2px #FFD700 inset, 0 0 14px rgba(255,215,0,0.35);
+}
+html[data-theme="givre"] #menu #btnCaster{
+  background: rgba(26,155,224,0.1);
+  color: var(--givre-accent);
+  box-shadow: 0 0 0 1px var(--givre-bord) inset;
+}
+/* En partie (« Nouvelle partie » affiché) : « Caster » passe en dernier, après les boutons du jeu */
+#menu:has(#nouvellePartie:not([style*="none"])) #btnCaster{
+  order: 1;
+}
+body.mode-en-ligne #btnCaster{
+  display: none !important; /* le mode télé est pour le mode classique */
+}
+
+/* Fenêtre « Caster sur la télé » */
+#ecranCaster{
+  z-index: 10002;
+}
+#ecranCaster .adresseTele{
+  color: #FFD700;
+  word-break: break-all;
+}
+html[data-theme="givre"] #ecranCaster .adresseTele{ color: var(--givre-accent); }
+#ecranCaster #casterRelier,
+#ecranCaster #casterConnecte{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+#ecranCaster .casterCode{
+  display: flex;
+  gap: 10px;
+  width: min(320px, 80vw);
+}
+#ecranCaster .casterCode input{
+  flex: 1;
+  min-width: 0;
+  padding: 14px 16px;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 1px solid rgba(255,215,0,0.35);
+  border-radius: 12px;
+  background: rgba(0,0,0,0.34);
+  color: #fff;
+}
+#ecranCaster .casterCode input::placeholder{
+  color: rgba(255,255,255,0.65);
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 600;
+}
+#ecranCaster .casterCode button{
+  width: auto;
+  padding-left: 22px;
+  padding-right: 22px;
+}
+#ecranCaster #btnCasterFermer,
+#ecranCaster #btnCasterArreter{
+  background: rgba(255,255,255,0.1);
+  box-shadow: 0 0 0 1px rgba(255,215,0,0.45) inset;
+}
+#ecranCaster .iconeBouton{
+  width: 1.1em;
+  height: 1.1em;
+  margin-right: 0.4em;
+  vertical-align: -0.2em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Télé : rien d'autre que l'écran de la télé */
+html.mode-tele{
+  overflow: hidden;
+  scrollbar-gutter: auto; /* (le jeu réserve la place de la barre de défilement : inutile sur la télé) */
+}
+html.mode-tele body{
+  padding: 0;
+  overflow: hidden;
+  background: var(--fond-theme);
+}
+html.mode-tele body > *:not(#ecranTele){
+  display: none !important;
+}
+#ecranTele{
+  position: fixed;
+  inset: 0;
+  color: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(circle at top center, rgba(255,215,0,0.10) 0%, rgba(255,215,0,0) 30%) no-repeat,
+    var(--fond-theme);
+  overflow: hidden;
+}
+#ecranTele [hidden]{ display: none !important; }
+#ecranTele .Carte{
+  width: 100%;
+  max-width: none;
+  cursor: default;
+  box-shadow: 0 0.3vh 0.8vh rgba(0,0,0,0.4);
+}
+#ecranTele .tele-titre{
+  font-weight: 900;
+  color: #FFD700;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0.4vh 0 rgba(120,70,0,0.95), 0 0.6vh 1.4vh rgba(0,0,0,0.5);
+}
+
+/* Attente : QR code à scanner */
+#ecranTele .tele-attente{
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7vw;
+}
+#ecranTele .tele-attente-texte{ max-width: 42vw; }
+#ecranTele .tele-attente .tele-titre{ font-size: 10.5vh; margin-bottom: 1vh; }
+#ecranTele .tele-sous-titre{ font-size: 4.2vh; color: #ffe680; font-weight: 900; margin-bottom: 4.5vh; }
+#ecranTele .tele-etape{ display: flex; align-items: center; gap: 2vh; font-size: 3.6vh; margin: 2.2vh 0; color: #f3e3b0; }
+#ecranTele .tele-etape .tele-num{
+  flex: 0 0 6.4vh; height: 6.4vh; border-radius: 50%;
+  background: #FFD700; color: #3a2000; font-weight: 900; font-size: 3.3vh;
+  display: flex; align-items: center; justify-content: center;
+}
+#ecranTele .tele-plein-ecran{
+  margin-top: 4vh;
+  padding: 1.6vh 3.4vh;
+  font-size: 2.6vh;
+  font-weight: 900;
+  border: 0;
+  border-radius: 1.6vh;
+  color: #fff;
+  background: rgba(255,255,255,0.12);
+  box-shadow: 0 0 0 1px rgba(255,215,0,0.45) inset;
+  cursor: pointer;
+}
+#ecranTele .tele-qr{
+  width: 52vh;
+  height: 52vh;
+  padding: 3vh;
+  box-sizing: border-box;
+  background: #fff;
+  border-radius: 3vh;
+  box-shadow: 0 0 0 0.7vh rgba(255,215,0,0.6), 0 2.6vh 7vh rgba(0,0,0,0.5);
+}
+#ecranTele .tele-qr svg{ width: 100%; height: 100%; display: block; }
+#ecranTele .tele-code{
+  margin-top: 3vh;
+  text-align: center;
+  font-size: 4.8vh;
+  font-weight: 900;
+  color: #FFD700;
+  letter-spacing: 0.12em;
+}
+#ecranTele .tele-code small{
+  display: block;
+  font-size: 2.4vh;
+  letter-spacing: 0;
+  color: #d9c38a;
+  font-weight: 700;
+  margin-bottom: 0.6vh;
+}
+
+/* Partie : plateau à gauche, tour / joueurs / règles à droite */
+#ecranTele .tele-jeu{
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 27vw;
+  grid-template-rows: auto 1fr;
+  gap: 2.4vh 2vw;
+  padding: 3vh 2.4vw 4.5vh;
+  box-sizing: border-box;
+}
+#ecranTele .tele-entete{
+  grid-column: 1 / -1;
+  height: 9vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2.2vh;
+  border: 1px solid rgba(255,215,0,0.25);
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(0,0,0,0.25));
+  position: relative;
+}
+#ecranTele .tele-entete .tele-titre{ font-size: 6vh; }
+#ecranTele .tele-entete::after{
+  content: "";
+  position: absolute;
+  left: 2vw; right: 2vw; bottom: 0.8vh;
+  height: 0.5vh;
+  border-radius: 0.3vh;
+  background: linear-gradient(90deg, #ff5e5e, #ffb84d, #ffd700, #7dde4f, #4fc3f7);
+}
+#ecranTele .tele-gauche{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+#ecranTele .tele-plateau{
+  width: 100%;
+  max-width: calc(66vh * 13 / 4 * 50 / 78); /* 4 rangées qui tiennent dans la hauteur */
+  display: grid;
+  grid-template-columns: repeat(13, 1fr);
+  gap: 1.1vh;
+}
+#ecranTele .tele-case-vide{
+  aspect-ratio: 50 / 78;
+  border-radius: 8px;
+  border: 2px dashed rgba(255,215,0,0.22);
+  box-sizing: border-box;
+}
+#ecranTele .tele-preparation{
+  font-size: 5vh;
+  font-weight: 900;
+  color: #ffe680;
+}
+#ecranTele .tele-restantes{
+  margin-top: 2vh;
+  font-size: 2.4vh;
+  color: #d9c38a;
+}
+#ecranTele .tele-droite{
+  display: flex;
+  flex-direction: column;
+  gap: 2vh;
+  min-height: 0;
+  overflow: hidden;
+}
+#ecranTele .tele-bloc{
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 2vh;
+  padding: 1.8vh 2.2vh;
+  background: rgba(0,0,0,0.2);
+}
+#ecranTele .tele-bloc-titre{ font-size: 2.4vh; font-weight: 700; color: #ddd; margin-bottom: 1.2vh; }
+#ecranTele .tele-tour{
+  text-align: center;
+  border-color: rgba(255,215,0,0.5);
+  background: linear-gradient(180deg, rgba(62,0,43,0.95), rgba(22,0,16,0.9));
+}
+#ecranTele .tele-tour.tele-avec-couleur{
+  border-color: var(--couleur-tele);
+  box-shadow: 0 0 2.4vh color-mix(in srgb, var(--couleur-tele) 45%, transparent);
+}
+#ecranTele .tele-tour-label{ font-size: 2.2vh; letter-spacing: 0.15em; color: #e9d9a8; font-weight: 900; }
+#ecranTele .tele-tour-nom{ font-size: 5.4vh; font-weight: 900; color: #FFD700; text-shadow: 0 0.4vh 0 rgba(120,70,0,0.9); }
+#ecranTele .tele-tour.tele-pigeon .tele-tour-nom{ color: #40E0D0; }
+#ecranTele .tele-joueur{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 3vh;
+  font-weight: 700;
+  color: #40E0D0;
+  padding: 0.6vh 0;
+}
+#ecranTele .tele-joueur-actif{ color: #FFD700; }
+#ecranTele .tele-badge{
+  background: #FFD700;
+  color: #3a2000;
+  border-radius: 999px;
+  padding: 0.2vh 1.2vh;
+  font-size: 2.3vh;
+  font-weight: 900;
+}
+#ecranTele .tele-regles{
+  font-size: 2.7vh;
+  font-weight: 800;
+  color: #FFD700;
+  line-height: 1.35;
+  white-space: pre-line;
+  /* règle très longue (pigeon…) : coupée proprement au lieu de déborder du bloc */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 7;
+  overflow: hidden;
+}
+#ecranTele .tele-pied{
+  position: absolute;
+  right: 2.4vw;
+  bottom: 1.2vh;
+  font-size: 1.8vh;
+  color: rgba(255,255,255,0.4);
+}
+
+/* Écran en cours sur le téléphone (annonce, duel, +4, pari…) : en grand, par-dessus */
+#ecranTele .tele-ecran{
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.92);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3.4vh;
+  padding: 4vh 6vw;
+  box-sizing: border-box;
+  text-align: center;
+  animation: fadeIn 0.25s ease;
+}
+#ecranTele .tele-ecran-cartes{ display: flex; gap: 3vh; justify-content: center; }
+#ecranTele .tele-ecran-cartes:empty{ display: none; }
+#ecranTele .tele-ecran-cartes .Carte,
+#ecranTele .tele-ecran-cartes .tele-case-vide{ width: 22vh; }
+#ecranTele .tele-ecran-titre{ font-size: 7vh; font-weight: 900; color: #FFD700; text-shadow: 0.3vh 0.3vh 0.8vh #000; line-height: 1.15; }
+#ecranTele .tele-ecran-detail{ font-size: 3.6vh; font-weight: 800; color: #ffe680; margin-top: 1.2vh; line-height: 1.3; }
+#ecranTele .tele-ecran-choix{ display: flex; flex-wrap: wrap; gap: 1.4vh; justify-content: center; max-width: 80vw; }
+#ecranTele .tele-ecran-choix:empty{ display: none; }
+#ecranTele .tele-puce{
+  padding: 1vh 2.2vh;
+  border-radius: 1.4vh;
+  background: rgba(255,215,0,0.16);
+  border: 1px solid rgba(255,215,0,0.5);
+  color: #FFD700;
+  font-size: 2.8vh;
+  font-weight: 800;
+}
+#ecranTele .tele-puce-prise{ opacity: 0.45; }

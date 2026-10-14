@@ -51,6 +51,7 @@ function retourDansLAppli(){
 
   const ecrans = [
     ["ecranScanner", "btnFermerScanner"],
+    ["ecranCaster", "btnCasterFermer"],
     ["ecranConfirmerHote", "btnConfirmerHoteNon"],
     ["ecranConfirmerRetrait", "btnConfirmerRetraitNon"],
     ["ecranConfirmerAccueil", "btnConfirmerAccueilNon"],

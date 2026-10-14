@@ -21,6 +21,7 @@ const A_PRECHARGER = [
   "./js/regles.js",
   "./js/synchro-en-ligne.js",
   "./js/retour-demarrage.js",
+  "./js/tele.js",
   "./style_alcuno.css",
   "./manifest.json",
   "./icones/icone-192.png",

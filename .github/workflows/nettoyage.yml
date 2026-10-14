@@ -55,3 +55,28 @@ jobs:
             curl -sf -X PATCH -d @suppressions.json "$DB_URL/parties.json?auth=$FIREBASE_SECRET" > /dev/null
             echo "Suppression effectuée."
           fi
+
+      - name: Supprimer les télés (mode « Caster ») abandonnées depuis 6 h
+        env:
+          FIREBASE_SECRET: ${{ secrets.FIREBASE_SECRET }}
+          DB_URL: https://alcuno-default-rtdb.europe-west1.firebasedatabase.app
+          HEURES_TELE: 6
+        run: |
+          set -euo pipefail
+          maintenant=$(( $(date +%s) * 1000 ))
+          limite=$(( maintenant - HEURES_TELE * 3600 * 1000 ))
+
+          curl -sf "$DB_URL/tele.json?auth=$FIREBASE_SECRET" > tele.json
+
+          jq -c --argjson limite "$limite" '
+            (. // {})
+            | with_entries(select((.value.maj // 0) < $limite))
+            | map_values(null)
+          ' tele.json > suppressions_tele.json
+
+          nombre=$(jq 'length' suppressions_tele.json)
+          echo "Télés à supprimer : $nombre"
+          if [ "$nombre" -gt 0 ]; then
+            curl -sf -X PATCH -d @suppressions_tele.json "$DB_URL/tele.json?auth=$FIREBASE_SECRET" > /dev/null
+            echo "Suppression effectuée."
+          fi

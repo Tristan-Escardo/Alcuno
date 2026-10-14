@@ -364,7 +364,15 @@ function fermerScanner(){
   fermerPage(ecranScanner);
 }
 
-async function ouvrirScanner(){
+// Ce que le scan sait lire et ce qu'on en fait : par défaut, le code d'une partie à rejoindre
+// (le mode télé, js/tele.js, s'en sert aussi pour lire le QR code de la télé)
+function remplirCodePartieScanne(code){
+  document.getElementById("codeRejoindre").value = code;
+  const champPseudo = document.getElementById("pseudoRejoindre");
+  if (!champPseudo.value.trim()) ouvrirClavier(champPseudo);
+}
+
+async function ouvrirScanner({ lireCode = codeDepuisQR, quandCode = remplirCodePartieScanne } = {}){
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     alert("Ce téléphone ne permet pas de scanner ici : entre le code à la main.");
     return;
@@ -385,13 +393,11 @@ async function ouvrirScanner(){
       let texte = "";
       try { texte = await lire(); } catch (e) {}
       if (numero !== numeroScanner) return;
-      const code = codeDepuisQR(texte);
+      const code = lireCode(texte);
       if (!code) { setTimeout(lireEncore, 150); return; } // ~7 essais par seconde
       fermerScanner();
       vibrer(40);
-      document.getElementById("codeRejoindre").value = code;
-      const champPseudo = document.getElementById("pseudoRejoindre");
-      if (!champPseudo.value.trim()) ouvrirClavier(champPseudo);
+      quandCode(code);
     };
     lireEncore();
   } catch (e) {
@@ -403,7 +409,7 @@ async function ouvrirScanner(){
   }
 }
 
-document.getElementById("btnScannerQR").addEventListener("click", ouvrirScanner);
+document.getElementById("btnScannerQR").addEventListener("click", () => ouvrirScanner());
 document.getElementById("btnFermerScanner").addEventListener("click", fermerScanner);
 // Appli mise en arrière-plan : la caméra est coupée par le téléphone, on referme le scan
 document.addEventListener("visibilitychange", () => {
