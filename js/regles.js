@@ -832,6 +832,7 @@ function afficherOverlayTiensGueule(victime){
   }
 
   vibrer([400, 100, 400]); // c'est lui (ou, en classique, le téléphone de la table) qui prend
+  jouerSon("tiens_gueule");
 
 
   // En classique, un seul téléphone pour tous : on précise qui prend le cul sec
