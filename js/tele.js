@@ -477,9 +477,80 @@ function demarrerPageTele(){
         return;
       }
       dessinerTele(ecran, etat.arret ? null : etat);
+      dernierEtatNotifTele = etat.arret ? null : etat;
     });
   });
+  setInterval(() => avancerNotifsTele(ecran), PAS_NOTIFS_TELE);
 }
+
+// #region Télé : petites notifs qui chambrent (façon notification d'iPhone, au-dessus du plateau)
+// Une de temps en temps pendant la partie : à un moment au hasard entre 10 et 15 minutes de jeu, et
+// seulement quand rien n'est affiché en grand (choix, annonce). Phrase tirée au sort parmi celles qui
+// vont avec la partie (pigeon, joueurs), jamais deux fois la même d'affilée. Seulement sur la télé.
+const PHRASES_TELE = [
+  { pigeon: true, texte: n => `Quelqu’un a pensé à donner des graines à <b>${n}</b> ?` },
+  { pigeon: true, texte: n => `<b>${n}</b> picore ses gorgées.` },
+  { texte: n => `<b>${n}</b> n’a pas bu depuis un moment… c’est louche.` },
+  { texte: n => `<b>${n}</b> ? Toujours vivant ?` },
+  { sansCreateur: true, texte: n => `<b>${n}</b> fait semblant de comprendre les règles depuis le début.` },
+  { sansNom: true, texte: () => `Y’en a certains qui ont dit « je bois pas trop ce soir » ? Mdr.` }
+];
+const PAS_NOTIFS_TELE = 5000;
+const DUREE_NOTIF_TELE = 7000;
+let dernierEtatNotifTele = null;
+let tempsJeuNotifTele = 0;
+let prochaineNotifTele = delaiNotifTele();
+let dernierePhraseTele = -1;
+
+function delaiNotifTele(){
+  return (10 + Math.random() * 5) * 60000;
+}
+
+function avancerNotifsTele(ecran){
+  const etat = dernierEtatNotifTele;
+  if (!etat || !etat.partie || !(etat.cartes || []).length || document.visibilityState !== "visible") return;
+  tempsJeuNotifTele += PAS_NOTIFS_TELE;
+  if (tempsJeuNotifTele < prochaineNotifTele || etat.ecran) return; // (choix ou annonce à l'écran : on attend)
+  const texte = phraseNotifTele(etat);
+  if (!texte) return;
+  tempsJeuNotifTele = 0;
+  prochaineNotifTele = delaiNotifTele();
+  montrerNotifTele(ecran, texte);
+}
+
+function phraseNotifTele(etat){
+  const joueurs = (etat.joueurs || []).map(j => ({ nom: String(j.n || ""), pigeon: !!j.p })).filter(j => j.nom);
+  if (!joueurs.length) return "";
+  const pigeon = joueurs.find(j => j.pigeon);
+  const possibles = PHRASES_TELE
+    .map((phrase, i) => ({ phrase, i }))
+    .filter(({ phrase, i }) => i !== dernierePhraseTele && (!phrase.pigeon || pigeon));
+  const { phrase, i } = possibles[Math.floor(Math.random() * possibles.length)];
+  dernierePhraseTele = i;
+  let candidats = phrase.pigeon ? [pigeon] : joueurs;
+  if (phrase.sansCreateur) candidats = candidats.filter(j => !j.nom.includes("👑"));
+  if (!phrase.sansNom && !candidats.length) return "";
+  const nom = phrase.sansNom ? "" : candidats[Math.floor(Math.random() * candidats.length)].nom;
+  return phrase.texte(echapperHtml(nom));
+}
+
+function montrerNotifTele(ecran, texte){
+  const ancienne = ecran.querySelector(".tele-notif");
+  if (ancienne) ancienne.remove();
+  const notif = document.createElement("div");
+  notif.className = "tele-notif";
+  notif.innerHTML = `<img src="icones/icone-192.png" alt=""><div><div class="tele-notif-haut">` +
+    `<span>ALCUNO</span><span class="tele-notif-heure">maintenant</span></div><div class="tele-notif-texte">${texte}</div></div>`;
+  // centrée au-dessus du plateau, juste sous le titre ALCUNO
+  const zone = ecran.querySelector(".tele-gauche").getBoundingClientRect();
+  const entete = ecran.querySelector(".tele-entete").getBoundingClientRect();
+  notif.style.left = `${zone.left + zone.width / 2}px`;
+  notif.style.top = `${entete.bottom + 12}px`;
+  ecran.appendChild(notif);
+  setTimeout(() => notif.classList.add("tele-notif-depart"), DUREE_NOTIF_TELE);
+  setTimeout(() => notif.remove(), DUREE_NOTIF_TELE + 600);
+}
+// #endregion
 
 // Sons du téléphone joués par la télé : seulement ceux arrivés depuis le dernier résumé (pas les
 // anciens quand la télé vient de se relier)
