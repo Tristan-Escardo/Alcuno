@@ -64,7 +64,7 @@ function afficherOverlayFinUnRestants(){
 
   surAction(btnTerminer, "fin:terminer", { once: true, unique: true }, () => {
     // ils boivent leurs "1 restants" => on remet les compteurs à 0
-    restants.forEach(x => { annulations[x.nom] = 0; });
+    restants.forEach(x => { annulations[x.nom] = 0; noterGorgees(x.nom, x.n); });
     afficherJoueurs();
 
     overlay.remove();
@@ -77,7 +77,7 @@ function afficherOverlayFinUnRestants(){
   btnRevanche.className = "bouton-pigeon fin-revanche";
   btnRevanche.innerText = "Revanche";
   btnRevanche.addEventListener("click", () => {
-    restants.forEach(x => { annulations[x.nom] = 0; });
+    restants.forEach(x => { annulations[x.nom] = 0; noterGorgees(x.nom, x.n); });
     overlay.remove();
     unlockScroll();
     document.getElementById("btnRejouerMemes").click();
@@ -435,6 +435,7 @@ function afficherOverlayAnnulation(joueurIndex, nbGorgees, onDone = null, afterC
         : `Tu n’annules rien. \nTu bois ${texteGorgees(reste)}.`;
 
       annulations[nom] = Math.max(0, dispo - utilise);
+      noterGorgees(nom, reste);
       afficherJoueurs();
       afficherJoueurActif();
 
@@ -490,8 +491,9 @@ function annoncerBoireAvecAnnulation(joueurIndex, nbGorgees, classeCarte = "", p
             null,
             () => { if(typeof onFinish === "function") onFinish(); }
           );
-        } else if(typeof onFinish === "function"){
-          onFinish();
+        } else {
+          noterGorgees(nom, nbGorgees);
+          if(typeof onFinish === "function") onFinish();
         }
       };
       executerApresOverlayRegleUnique(ensuite);
@@ -512,8 +514,9 @@ function annoncerBoireAvecAnnulation(joueurIndex, nbGorgees, classeCarte = "", p
         null,
         () => { if(typeof onFinish === "function") onFinish(); }
       );
-    } else if(typeof onFinish === "function"){
-      onFinish();
+    } else {
+      noterGorgees(nom, nbGorgees);
+      if(typeof onFinish === "function") onFinish();
     }
   };
 
@@ -834,6 +837,7 @@ function afficherOverlayCarteDoree(joueurActuel){
 
 // En ligne : seul le téléphone de la victime affiche « TIENS DANS TA GUEULE. »
 function afficherOverlayTiensGueule(victime){
+  noterGorgees(victime, estModeSoft() ? 3 : GORGEES_CUL_SEC);
   if(enLigneActif && victime !== pseudoActuel){
     const message = estModeSoft()
       ? `${victime} boit les 3 gorgées de la carte dorée !`
@@ -1341,8 +1345,9 @@ function demanderAnnulationPlus4(joueurIndex, nbGorgees, classeCartePlus4, onFin
         (utilise, reste) => { if(typeof onAnnulation === "function") onAnnulation(joueurIndex, reste); },
         () => { if(typeof onFinish === "function") onFinish(); }
       );
-    } else if(typeof onFinish === "function"){
-      onFinish();
+    } else {
+      noterGorgees(nom, nbGorgees);
+      if(typeof onFinish === "function") onFinish();
     }
   });
 }
@@ -1353,6 +1358,7 @@ function demanderAnnulationPlus4(joueurIndex, nbGorgees, classeCartePlus4, onFin
 // ===== Annulations pour pénalités multi-joueurs (SOCIAL / ZERO) =====
 function demanderAnnulationSimple(joueurIndex, nbGorgees, onFinish){
   if(!joueurPeutAnnuler(joueurIndex, nbGorgees)){
+    noterGorgees(joueurs[joueurIndex], nbGorgees);
     if(typeof onFinish === "function") onFinish();
     return;
   }
@@ -1369,6 +1375,7 @@ function demarrerAnnulationsMulti(victimes, classeCarte, messageEntete, onComple
   montrerOverlayRegle(messageEntete, classeCarte);
 
   const file = victimes.filter(idx => Number(annulations[joueurs[idx]] || 0) > 0);
+  victimes.filter(idx => !file.includes(idx)).forEach(idx => noterGorgees(joueurs[idx], 1)); // (rien à annuler)
 
   function next(){
     if(file.length === 0){
@@ -1654,6 +1661,7 @@ function lancerPartie(){
   const nbCases = paquet.length + (avecCarteDoree ? 1 : 0);
   indexCaseDoree = avecCarteDoree ? Math.floor(aleatoire() * nbCases) : -1;
   carteDoreeEnJeu = avecCarteDoree;
+  reinitialiserGorgees();
 
   indexJoueur = 0;
   partieLancee = true;

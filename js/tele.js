@@ -223,7 +223,9 @@ function etatPourTele(){
       n: avecCouronne(nom),
       a: Number(annulations[nom] || 0),
       t: i === idx,
-      p: i === indexPigeon
+      p: i === indexPigeon,
+      g: Number(gorgeesBues[nom] || 0), // gorgées bues depuis le début de la partie
+      s: cartesSansBoire(nom)           // cartes tirées depuis sa dernière gorgée
     })),
     tour: idx >= 0 ? avecCouronne(joueurs[idx]) : "",
     pigeon: idx >= 0 && idx === indexPigeon,
@@ -490,12 +492,13 @@ function demarrerPageTele(){
 const PHRASES_TELE = [
   { pigeon: true, texte: n => `Quelqu’un a pensé à donner des graines à <b>${n}</b> ?` },
   { pigeon: true, texte: n => `<b>${n}</b> picore ses gorgées.` },
-  { texte: n => `<b>${n}</b> n’a pas bu depuis un moment… c’est louche.` },
+  { aSec: true, texte: n => `<b>${n}</b> n’a pas bu depuis un moment… c’est louche.` },
   { texte: n => `<b>${n}</b> ? Toujours vivant ?` },
   { sansCreateur: true, texte: n => `<b>${n}</b> fait semblant de comprendre les règles depuis le début.` },
   { sansNom: true, texte: () => `Y’en a certains qui ont dit « je bois pas trop ce soir » ? Mdr.` }
 ];
 const PAS_NOTIFS_TELE = 5000;
+const CARTES_A_SEC_TELE = 8; // « n'a pas bu depuis un moment » : au moins 8 cartes tirées sans boire
 const DUREE_NOTIF_TELE = 7000;
 let dernierEtatNotifTele = null;
 let tempsJeuNotifTele = 0;
@@ -519,15 +522,19 @@ function avancerNotifsTele(ecran){
 }
 
 function phraseNotifTele(etat){
-  const joueurs = (etat.joueurs || []).map(j => ({ nom: String(j.n || ""), pigeon: !!j.p })).filter(j => j.nom);
+  const joueurs = (etat.joueurs || []).map(j => ({ nom: String(j.n || ""), pigeon: !!j.p, sansBoire: Number(j.s) || 0 }))
+    .filter(j => j.nom);
   if (!joueurs.length) return "";
   const pigeon = joueurs.find(j => j.pigeon);
+  // celui qui n'a rien bu depuis le plus de cartes (s'il y en a un vraiment à sec)
+  const aSec = joueurs.reduce((max, j) => (j.sansBoire > (max ? max.sansBoire : 0) ? j : max), null);
+  const aSecVraiment = aSec && aSec.sansBoire >= CARTES_A_SEC_TELE ? aSec : null;
   const possibles = PHRASES_TELE
     .map((phrase, i) => ({ phrase, i }))
-    .filter(({ phrase, i }) => i !== dernierePhraseTele && (!phrase.pigeon || pigeon));
+    .filter(({ phrase, i }) => i !== dernierePhraseTele && (!phrase.pigeon || pigeon) && (!phrase.aSec || aSecVraiment));
   const { phrase, i } = possibles[Math.floor(Math.random() * possibles.length)];
   dernierePhraseTele = i;
-  let candidats = phrase.pigeon ? [pigeon] : joueurs;
+  let candidats = phrase.pigeon ? [pigeon] : phrase.aSec ? [aSecVraiment] : joueurs;
   if (phrase.sansCreateur) candidats = candidats.filter(j => !j.nom.includes("👑"));
   if (!phrase.sansNom && !candidats.length) return "";
   const nom = phrase.sansNom ? "" : candidats[Math.floor(Math.random() * candidats.length)].nom;

@@ -95,6 +95,31 @@ window.addEventListener("load", () => setTimeout(prechargerImagesCartes, 300));
 
 let joueurs = [];
 let annulations = {}; // { "Alice": 3, "Bob": 0, ... }
+// Compteur de gorgées de la partie : bues (annulations déduites ; un cul sec compte pour GORGEES_CUL_SEC)
+// et nombre de cartes restantes la dernière fois que chacun a bu (« n'a pas bu depuis un moment »)
+let gorgeesBues = {};       // { "Alice": 12, ... }
+let derniereGorgeeA = {};   // { "Alice": 31, ... } (cartes restantes à ce moment-là)
+const GORGEES_CUL_SEC = 5;
+
+function reinitialiserGorgees(){
+  gorgeesBues = {};
+  derniereGorgeeA = {};
+  const restantes = cartesRestantes();
+  joueurs.forEach(nom => { gorgeesBues[nom] = 0; derniereGorgeeA[nom] = restantes; });
+}
+
+function noterGorgees(nom, n){
+  n = Number(n) || 0;
+  if(!nom || n <= 0) return;
+  gorgeesBues[nom] = (gorgeesBues[nom] || 0) + n;
+  derniereGorgeeA[nom] = cartesRestantes();
+}
+
+// Cartes tirées depuis la dernière gorgée de ce joueur
+function cartesSansBoire(nom){
+  const depuis = derniereGorgeeA[nom];
+  return depuis === undefined ? 0 : Math.max(0, depuis - cartesRestantes());
+}
 let paquet = [];
 
 // Easter egg : environ 1 partie sur 12, une des cases du plateau cache la carte dorée (à la place d'une carte normale)
@@ -235,6 +260,7 @@ function appliquerBonusCouleurSiBesoin(carteTiree, options = {}){
   // (sinon, après « Le PIGEON boit 1 gorgée », on croyait que c'était le pigeon)
   const nom = joueurs[options.joueur];
   const msgCouleur = (nom ? `${nom} boit` : "Et boit") + " 1 gorgée pour la couleur (" + couleur + ")";
+  noterGorgees(nom, 1);
 
   const afficher = () => {
     if(!preserveRuleMessage){
@@ -1195,6 +1221,7 @@ function finDePartie(){
   }
 
   carteDoreeEnJeu = false;
+  joueurs.forEach(nom => noterGorgees(nom, estModeSoft() ? 2 : GORGEES_CUL_SEC));
   const caseDoree = plateau.children[indexCaseDoree];
   if(caseDoree){
     caseDoree.classList.remove("dos_dore");
