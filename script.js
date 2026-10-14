@@ -206,8 +206,8 @@ const BOUTONS_AVEC_POP = "#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPa
   "#btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, " +
   "#lancerPartieEnLigne, #btnRejouerMemes, #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui, " +
   "#btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, " +
-  "#ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression, #btnInstallationInstaller, " +
-  "#btnOublierPartie, #listeSuppression button, " +
+  "#ajouterJoueur, #jouer, #btnCaster, #supprimerJoueur, #nouvellePartie, #termineSuppression, #btnInstallationInstaller, " +
+  "#btnOublierPartie, #listeSuppression button, #ecranCaster button, " +
   "#overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayDuel button, " +
   "#overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation, " +
   "#overlayAnnulation button, #overlayCarteDoree .bouton-doree";

@@ -1,5 +1,15 @@
 {
   "rules": {
+    "tele": {
+      "$code": {
+        ".read": true,
+        ".write": true,
+        ".validate": "$code.matches(/^[A-Z2-9]{5}$/) && newData.hasChildren(['etat', 'maj'])",
+        "etat": { ".validate": "newData.isString() && newData.val().length <= 20000" },
+        "maj": { ".validate": "newData.isNumber()" },
+        "$autre": { ".validate": false }
+      }
+    },
     "parties": {
       "$code": {
         ".read": true,
