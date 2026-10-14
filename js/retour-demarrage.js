@@ -122,7 +122,8 @@ function retirerEntreesRetour(){
 // les réglages, on revoyait les réglages, puis on revenait à l'accueil.)
 const ECRANS_RACINES = new Set(["accueil", "jeu"]);
 let pileIOS = [];             // écran montré par chaque entrée, de la plus ancienne à la plus récente
-let retraitsIOS = 0;          // nos propres history.go(-n) en cours (leur popstate n'est pas un retour)
+let retraitEnCoursIOS = false; // un de nos history.go(-n) n'a pas encore abouti
+let minuteurRetraitIOS = null;
 let ecranAvantTapIOS = null;  // tap en cours : écran affiché au moment du tap (son entrée est ajoutée)
 let toucherEnCoursIOS = null; // doigt posé sur un élément qui peut changer d'écran : { ecran, x, y }
 const ELEMENTS_NAVIGATION_IOS = 'button, a, [role="button"], #titreAccueil, header h1';
@@ -152,12 +153,23 @@ function profondeurIOS(){
   return (history.state && history.state.profondeur) || 0;
 }
 
-function retirerEntreesIOS(n){
-  n = Math.min(n, pileIOS.length, profondeurIOS()); // (jamais plus loin que l'entrée de départ)
-  if(n <= 0) return;
-  pileIOS.length -= n;
-  retraitsIOS++;
+// On recule dans l'historique jusqu'à la profondeur de la pile, calculé depuis l'entrée réellement
+// affichée (history.state), jamais d'après un compte de nos reculs : l'iPhone en ignore parfois un (pendant
+// un glissement), et un compte décalé faisait ignorer les vrais glissements suivants, qui défilaient
+// alors à vide sur l'accueil. Un seul recul à la fois ; s'il n'aboutit pas, on revérifie.
+function rejoindrePileIOS(){
+  const n = profondeurIOS() - pileIOS.length;
+  if(n <= 0 || retraitEnCoursIOS) return;
+  retraitEnCoursIOS = true;
+  clearTimeout(minuteurRetraitIOS);
+  minuteurRetraitIOS = setTimeout(() => { retraitEnCoursIOS = false; rejoindrePileIOS(); }, 1000);
   history.go(-n);
+}
+
+function retirerEntreesIOS(n){
+  n = Math.min(n, pileIOS.length);
+  if(n > 0) pileIOS.length -= n;
+  rejoindrePileIOS();
 }
 
 // Remet la pile d'accord avec l'écran affiché : accueil ou partie => plus aucune entrée ; écran déjà
@@ -183,7 +195,8 @@ function leverDoigtIOS(e){
   toucherEnCoursIOS = null;
   if(Math.hypot(e.clientX - toucher.x, e.clientY - toucher.y) > DEPLACEMENT_MAX_TAP_IOS) return; // a glissé
   const avant = toucher.ecran;
-  if(ecranAvantTapIOS === null){
+  // (historique pas encore d'accord avec la pile, un recul en cours : pas d'entrée cette fois)
+  if(ecranAvantTapIOS === null && !retraitEnCoursIOS && profondeurIOS() === pileIOS.length){
     try { history.pushState({ alcunoRetour: true, profondeur: pileIOS.length + 1 }, ""); } catch (err) { return; }
     ecranAvantTapIOS = avant;
     pileIOS.push(avant);
@@ -213,18 +226,17 @@ if(estIOS){
 
 window.addEventListener("popstate", () => {
   if(estIOS){
-    if(retraitsIOS > 0){ retraitsIOS--; return; }
-    // En avant, sur une ancienne entrée (glissement depuis le bord droit après un retour : nos entrées
-    // retirées restent « en avant » dans l'historique) : on y revient tout de suite, sinon on pouvait
-    // glisser en avant puis en arrière sans fin sur l'accueil
+    retraitEnCoursIOS = false;
+    clearTimeout(minuteurRetraitIOS);
     const profondeur = profondeurIOS();
-    if(profondeur > pileIOS.length){
-      retraitsIOS++;
-      history.go(pileIOS.length - profondeur);
-      return;
-    }
-    if(pileIOS.length === 0) return;
-    pileIOS.length = Math.min(pileIOS.length - 1, profondeur);
+    // Plus loin que la pile : en avant sur une ancienne entrée (glissement depuis le bord droit après un
+    // retour : nos entrées retirées restent « en avant » dans l'historique), ou recul pas encore fini :
+    // on revient tout de suite à la bonne entrée (sinon on glissait sans fin sur l'accueil)
+    if(profondeur > pileIOS.length){ rejoindrePileIOS(); return; }
+    // À la profondeur de la pile : c'est notre recul qui vient d'aboutir
+    if(profondeur === pileIOS.length) return;
+    // Moins loin : un vrai glissement retour
+    pileIOS.length = profondeur;
     const action = actionRetour();
     if(action) action();
     setTimeout(reconcilierPileIOS, 400);

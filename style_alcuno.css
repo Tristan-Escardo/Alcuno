@@ -3729,7 +3729,13 @@ html.clavier-ouvert #ecranCaster{
 }
 #ecranCaster .btnRetour{
   top: calc(var(--haut-visible, 0px) + 20px);
-  transition: top 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: filter 0.15s ease;
+}
+/* iPhone : effacé pendant que le clavier fait glisser la page (js/en-ligne.js) ; filter et pas opacity,
+   tenue par l'animation d'apparition de l'écran */
+#ecranCaster.clavier-en-mouvement .btnRetour{
+  filter: opacity(0);
+  pointer-events: none;
 }
 @media (prefers-reduced-motion: reduce){
   #ecranCaster, #ecranCaster .btnRetour{ transition: none; }
