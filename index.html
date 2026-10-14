@@ -244,6 +244,11 @@
                     <button type="button" id="btnPartagerJeu">📤 Partager le lien</button>
                 </div>
 
+                <div class="blocPartage blocBug">
+                    <div class="aProposTitre">Un problème ?</div>
+                    <button type="button" id="btnSignalerBug">Signaler un bug</button>
+                </div>
+
                 <div class="aPropos">
                     <div class="aProposTitre">À propos</div>
                     <p id="versionJeu" class="versionJeu"></p>
@@ -328,6 +333,15 @@
                 <p class="texteConfirmation" id="texteCasterConnecte"></p>
                 <button type="button" id="btnCasterArreter">Arrêter de caster</button>
             </div>
+        </section>
+
+        <!-- Réglages > Signaler un bug : le message part tout de suite au développeur (voir js/reglages.js) -->
+        <section class="ecranBug" id="ecranBug" style="display:none;">
+            <button type="button" id="btnBugRetour" class="btnRetour">← Retour</button>
+            <h2>Signaler un bug</h2>
+            <p class="texteConfirmation">Explique ce qui s'est passé. Les infos du téléphone (version, modèle…) sont jointes toutes seules.</p>
+            <textarea id="texteBug" maxlength="1500" rows="5" placeholder="Ex. : quand je tape sur…, ça…"></textarea>
+            <button type="button" id="btnEnvoyerBug">Envoyer</button>
         </section>
 
         <section class="ecranConfirmerAccueil" id="ecranConfirmerAccueil" style="display:none;">

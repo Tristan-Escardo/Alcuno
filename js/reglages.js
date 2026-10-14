@@ -615,6 +615,54 @@ document.getElementById("btnDiagnostic").addEventListener("click", () => {
     });
 });
 
+// ===== Signaler un bug (Réglages) : le message arrive tout de suite en notification sur le téléphone du
+// développeur (appli ntfy, abonnée au canal CANAL_BUGS du service gratuit ntfy.sh), avec le diagnostic
+// de ce téléphone. (Le nom du canal est dans ce fichier : quelqu'un qui le lit pourrait y écrire aussi.)
+const CANAL_BUGS = "alcuno-bugs-7cy7edx1ee25";
+const ecranBug = document.getElementById("ecranBug");
+const champBug = document.getElementById("texteBug");
+const btnEnvoyerBug = document.getElementById("btnEnvoyerBug");
+let dernierEnvoiBug = 0;
+
+function ouvrirEcranBug(){
+  ecranBug.style.display = "";
+  ouvrirClavier(champBug); // (pendant le tap : sinon l'iPhone n'ouvre pas le clavier)
+}
+
+function fermerEcranBug(){
+  champBug.blur();
+  ecranBug.style.display = "none";
+}
+
+async function envoyerBug(){
+  const texte = champBug.value.trim();
+  if (!texte) { afficherToast("Écris d'abord ce qui s'est passé"); return; }
+  if (Date.now() - dernierEnvoiBug < 30000) { afficherToast("Attends un peu avant d'en renvoyer un"); return; }
+  // ntfy : 4 096 octets au plus (au-delà, le message devient une pièce jointe) => texte + diagnostic coupés
+  const message = (texte.slice(0, 1500) + "\n\n" + texteDiagnostic()).slice(0, 3000);
+  btnEnvoyerBug.disabled = true;
+  btnEnvoyerBug.innerText = "Envoi…";
+  try {
+    // (corps en texte simple et titre dans l'adresse : pas de requête préalable du navigateur)
+    const titre = encodeURIComponent(`Bug Alcuno ${VERSION_AFFICHEE}`);
+    const reponse = await fetch(`https://ntfy.sh/${CANAL_BUGS}?title=${titre}&tags=beetle`, { method: "POST", body: message });
+    if (!reponse.ok) throw new Error("ntfy " + reponse.status);
+    dernierEnvoiBug = Date.now();
+    champBug.value = "";
+    fermerEcranBug();
+    afficherNotificationHaut("", "Merci ! Le bug est envoyé", true);
+  } catch (e) {
+    afficherToast(navigator.onLine === false ? "Pas de réseau : réessaie plus tard" : "L'envoi n'a pas marché, réessaie", 3000);
+  } finally {
+    btnEnvoyerBug.disabled = false;
+    btnEnvoyerBug.innerText = "Envoyer";
+  }
+}
+
+document.getElementById("btnSignalerBug").addEventListener("click", ouvrirEcranBug);
+document.getElementById("btnBugRetour").addEventListener("click", fermerEcranBug);
+btnEnvoyerBug.addEventListener("click", envoyerBug);
+
 // ===== Partie en mémoire : la partie en ligne dont ce téléphone se souvient (« Revenir ») =====
 function majLignePartieMemoire(){
   const memoire = lirePartieLocale();
