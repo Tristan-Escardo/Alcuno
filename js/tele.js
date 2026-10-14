@@ -176,9 +176,14 @@ function ecranPourTele(){
   const o = overlays[overlays.length - 1];
   if (!o) return null;
   // Cartes montrées : au plus 4 (le pari n'envoie que la carte révélée, pas sa grille de choix)
-  const cartes = o.id === "overlayPredictionFin"
+  let cartes = o.id === "overlayPredictionFin"
     ? Array.from(o.querySelectorAll(".fin-choix-reveal .Carte"))
     : Array.from(o.querySelectorAll(".Carte")).filter(c => !c.closest(".fin-choix-recap"));
+  // Duel : une fois ses 2 cartes sorties, plus la carte qui l'a lancé (à côté d'elles, elle avait l'air
+  // d'une 3e carte à choisir)
+  if (o.id === "overlayDuel" && cartes.some(c => !c.classList.contains("carte-vedette"))) {
+    cartes = cartes.filter(c => !c.classList.contains("carte-vedette"));
+  }
   // Boutons visibles (joueurs du +4 avec leurs gorgées, « Annuler 1 »…) : affichés en petites étiquettes,
   // sauf les boutons d'action, qui ne servent à rien sur la télé (Retour / Annuler / Valider / Terminer)
   const choix = Array.from(o.querySelectorAll("button"))
