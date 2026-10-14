@@ -6047,9 +6047,10 @@ html[data-theme="givre"] #ecranReglages #btnSignalerBug{ color: var(--givre-acce
   line-height: 1.4;
   color: rgba(255,255,255,0.85);
 }
+/* Zone de texte et les deux boutons : même largeur */
+#ecranBug{ --bug-largeur: min(440px, calc(100% - 16px)); }
 #ecranBug textarea{
-  width: 100%;
-  max-width: 460px;
+  width: var(--bug-largeur);
   box-sizing: border-box;
   padding: 14px 16px;
   font: 600 17px/1.4 Arial, sans-serif;
@@ -6117,7 +6118,7 @@ html[data-theme="givre"] #ecranReglages #btnSignalerBug{ color: var(--givre-acce
   align-items: center;
   justify-content: center;
   gap: 9px;
-  width: min(300px, 100%);
+  width: var(--bug-largeur);
   min-height: 48px;
   box-sizing: border-box;
   padding: 0 16px;
