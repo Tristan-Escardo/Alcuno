@@ -3700,10 +3700,39 @@ html.nav-retour{
 /* (Clavier ouvert : le contenu reste centré, entre « ← Retour » et le clavier, voir les marges de #enLigne :
    le caler d'un coup en bas faisait sauter tout l'écran à l'ouverture du clavier) */
 
-/* Mode en ligne : l'en-tête du jeu (titre ALCUNO) reste derrière l'écran ; caché pour qu'il
-   n'apparaisse jamais au bord (ex. quand l'iPhone décale la page avec le clavier ouvert) */
-html:has(#enLigne:not([style*="none"])) body > header{
+/* Mode en ligne et fenêtre Caster : l'en-tête du jeu (titre ALCUNO) reste derrière l'écran ; caché pour
+   qu'il n'apparaisse jamais au bord (ex. quand l'iPhone décale la page avec le clavier ouvert) */
+html:has(#enLigne:not([style*="none"])) body > header,
+html:has(#ecranCaster:not([style*="none"])) body > header{
   visibility: hidden;
+}
+
+/* Fenêtre Caster, clavier ouvert pour le code de la télé : comme le mode en ligne, le contenu se cale en
+   douceur sur la partie visible au-dessus du clavier (--haut-visible / --bas-cache, js/en-ligne.js) et
+   jamais sous « ← Retour » (avant : l'écran sautait et le champ passait derrière le clavier).
+   Centré quand il y a la place, défilable sinon. */
+#ecranCaster{
+  justify-content: flex-start;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-top: calc(var(--haut-visible, 0px) + 24px);
+  padding-bottom: calc(var(--bas-cache, 0px) + 24px);
+  transition: padding-top 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), padding-bottom 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+#ecranCaster::before,
+#ecranCaster::after{
+  content: "";
+  margin-block: auto;
+}
+html.clavier-ouvert #ecranCaster{
+  padding-top: calc(var(--haut-visible, 0px) + 72px);
+}
+#ecranCaster .btnRetour{
+  top: calc(var(--haut-visible, 0px) + 20px);
+  transition: top 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+@media (prefers-reduced-motion: reduce){
+  #ecranCaster, #ecranCaster .btnRetour{ transition: none; }
 }
 
 /* Clavier ouvert : jamais de contenu sous « ← Retour » (il défile s'il ne tient pas) */

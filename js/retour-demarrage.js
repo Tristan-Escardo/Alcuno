@@ -110,15 +110,19 @@ function retirerEntreesRetour(){
 // Pas de bouton retour sur iPhone, seulement ce glissement, que Safari permet dès qu'il y a des entrées
 // dans l'historique. Pendant le glissement, il montre une capture de l'écran tel qu'il était quand
 // l'entrée suivante a été ajoutée. On garde donc une entrée par écran ouvert (une pile), ajoutée au
-// moment du tap qui l'ouvre (l'écran d'avant est encore affiché : c'est lui que montrera le glissement),
-// et retirée si le tap n'a pas changé d'écran. L'accueil et la partie en cours n'en ont aucune : glisser
-// n'y fait rien (⌂ pour quitter une partie).
+// moment du tap qui l'ouvre, quand le doigt se lève (l'écran d'avant est encore affiché : c'est lui que
+// montrera le glissement ; les boutons changent d'écran au clic, juste après), et retirée si le tap n'a
+// pas changé d'écran. Pas quand le doigt touche l'écran : le glissement depuis le bord commence lui
+// aussi par un toucher, il ajoutait l'entrée qu'il retirait aussitôt (on glissait sans fin sur
+// l'accueil) ; quand l'iPhone prend le geste, la page reçoit « pointercancel », pas « pointerup ».
+// L'accueil et la partie en cours n'en ont aucune : glisser n'y fait rien (⌂ pour quitter une partie).
 // (Avant : des entrées ajoutées après le tap, donc des captures du mauvais écran : en glissant depuis
 // les réglages, on revoyait les réglages, puis on revenait à l'accueil.)
 const ECRANS_RACINES = new Set(["accueil", "jeu"]);
 let pileIOS = [];             // écran montré par chaque entrée, de la plus ancienne à la plus récente
 let retraitsIOS = 0;          // nos propres history.go(-n) en cours (leur popstate n'est pas un retour)
 let ecranAvantTapIOS = null;  // tap en cours : écran affiché au moment du tap (son entrée est ajoutée)
+let ecranAuToucherIOS = null; // doigt posé : écran affiché à ce moment-là
 let minuteurTapIOS = null;
 
 // Nom de l'écran affiché (pour savoir si un tap a changé d'écran)
@@ -156,11 +160,21 @@ function reconcilierPileIOS(){
   if(i >= 0) retirerEntreesIOS(pileIOS.length - i);
 }
 
-function debutTapIOS(e){
-  if(!e.isTrusted || ecranAvantTapIOS !== null) return;
-  ecranAvantTapIOS = nomEcran();
-  try { history.pushState({ alcunoRetour: true }, ""); } catch (err) { ecranAvantTapIOS = null; return; }
-  pileIOS.push(ecranAvantTapIOS);
+function toucherIOS(e){
+  if(e.isTrusted) ecranAuToucherIOS = nomEcran();
+}
+
+// Doigt levé (un vrai tap) : entrée ajoutée maintenant, avant le clic qui change d'écran
+function leverDoigtIOS(e){
+  if(!e.isTrusted || ecranAuToucherIOS === null) return;
+  const avant = ecranAuToucherIOS;
+  ecranAuToucherIOS = null;
+  if(ecranAvantTapIOS === null){
+    try { history.pushState({ alcunoRetour: true }, ""); } catch (err) { return; }
+    ecranAvantTapIOS = avant;
+    pileIOS.push(avant);
+  }
+  finTapIOS();
 }
 
 function finTapIOS(){
@@ -174,8 +188,11 @@ function finTapIOS(){
 }
 
 if(estIOS){
-  document.addEventListener("pointerdown", debutTapIOS, { capture: true, passive: true });
-  ["pointerup", "pointercancel", "click"].forEach((type) => document.addEventListener(type, finTapIOS, { capture: true, passive: true }));
+  document.addEventListener("pointerdown", toucherIOS, { capture: true, passive: true });
+  document.addEventListener("pointerup", leverDoigtIOS, { capture: true, passive: true });
+  // geste repris par l'iPhone (glissement depuis le bord, défilement) : pas un tap
+  document.addEventListener("pointercancel", () => { ecranAuToucherIOS = null; }, { capture: true, passive: true });
+  document.addEventListener("click", finTapIOS, { capture: true, passive: true });
 } else {
   document.addEventListener("pointerdown", preparerRetour, { capture: true, passive: true });
 }
