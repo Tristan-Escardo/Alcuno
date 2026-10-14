@@ -1002,7 +1002,9 @@ function afficherOverlayTirageDuel(overlay, j1, j2, carteDuel = ""){
     }
 
     const perdant = (v1 < v2) ? j1 : j2;
+    // Sa carte du dernier tirage (après une égalité, ce sont les nouvelles cartes qui comptent)
     const vPerdant = (v1 < v2) ? v1 : v2;
+    const cartePerdant = (v1 < v2) ? carteJ1 : carteJ2;
     const gorg = gorgeesDuel(vPerdant, duelMultiplicateur);
     const msg = joueurs[perdant] + " boit " + texteGorgees(gorg);
 
@@ -1025,7 +1027,8 @@ function afficherOverlayTirageDuel(overlay, j1, j2, carteDuel = ""){
 
       // L'annonce « X boit N gorgées » apparaît en fondu PAR-DESSUS le duel, et le duel n'est
       // retiré dessous qu'une fois l'annonce affichée (avant : le plateau apparaissait entre les deux)
-      annoncerBoireAvecAnnulation(perdant, gorg, carteDuel, msg);
+      // (avec la carte du perdant, celle qui fixe ses gorgées, plutôt que le 4 qui a lancé le duel)
+      annoncerBoireAvecAnnulation(perdant, gorg, cartePerdant, msg);
       setTimeout(() => {
         overlay.remove();
         unlockScroll();
