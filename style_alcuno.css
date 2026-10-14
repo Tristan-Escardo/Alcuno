@@ -5957,25 +5957,28 @@ html[data-theme="givre"] #ecranTele .tele-prepa-joueur{
 }
 html[data-theme="givre"] #ecranTele .tele-pied{ color: rgba(13,53,80,0.45); }
 
-/* ===== Réglages > Signaler un bug ===== */
+/* ===== Réglages > Signaler un bug : petit lien discret sous « Partager le lien » ===== */
+#ecranReglages .lienBug{
+  margin: 6px 0 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.55);
+}
 #ecranReglages #btnSignalerBug{
-  width: min(320px, 80vw);
-  padding: 14px 20px;
-  font-size: clamp(16px, 4vw, 19px);
-  font-weight: 900;
-  color: #fff;
-  background: rgba(255,255,255,0.1);
+  /* zone de toucher plus grande que le texte (sans le décaler) */
+  padding: 10px 6px;
+  margin: -10px -6px;
+  font: inherit;
+  color: #FFD700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  background: none;
   border: none;
-  border-radius: 14px;
-  box-shadow: 0 0 0 1px rgba(255,215,0,0.45) inset;
   cursor: pointer;
   touch-action: manipulation;
 }
-html[data-theme="givre"] #ecranReglages #btnSignalerBug{
-  background: rgba(26,155,224,0.1);
-  color: var(--givre-accent);
-  box-shadow: 0 0 0 1px var(--givre-bord) inset;
-}
+html[data-theme="givre"] #ecranReglages .lienBug{ color: var(--givre-doux); }
+html[data-theme="givre"] #ecranReglages #btnSignalerBug{ color: var(--givre-accent); }
 /* Fenêtre (par-dessus les Réglages) */
 #ecranBug{
   z-index: 10003;
