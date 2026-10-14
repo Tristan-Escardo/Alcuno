@@ -387,6 +387,7 @@ function fermerScanner(){
   fluxScanner = null;
   videoScanner.srcObject = null;
   fermerPage(ecranScanner);
+  setTimeout(peindreBarreTelephone, 300); // (l'iPhone pouvait laisser la barre du haut en noir après la caméra)
 }
 
 // Ce que le scan sait lire et ce qu'on en fait : par défaut, le code d'une partie à rejoindre
