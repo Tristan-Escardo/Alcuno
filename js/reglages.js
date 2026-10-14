@@ -102,6 +102,14 @@ function afficherNotificationHaut(icone, titre, sobre = false){
   if (icone) notif.append(ligneIcone);
   notif.append(bloc);
 
+  rendreNotifGlissable(notif, 5000);
+  document.body.appendChild(notif);
+}
+
+// Notification en haut (« Télé connectée », rappel « Bois de l'eau »…) qui se comporte comme une vraie :
+// elle part toute seule au bout de « duree » ms, se ferme d'un tap ou jetée vers le haut, et reste tant
+// qu'on la tient du doigt (élastique vers le bas). Centrée par translate(-50%, …) dans le CSS.
+function rendreNotifGlissable(notif, duree){
   let partie = false;
   let minuteur = null;
   const placer = (decalage, transition) => {
@@ -161,8 +169,7 @@ function afficherNotificationHaut(icone, titre, sobre = false){
   notif.addEventListener("pointerup", lacher);
   notif.addEventListener("pointercancel", lacher);
 
-  programmerDepart(5000);
-  document.body.appendChild(notif);
+  programmerDepart(duree);
 }
 
 // Barre du téléphone en haut, à la couleur du thème affiché : on remplace la balise au lieu de la
@@ -525,11 +532,9 @@ function afficherRappelEau(){
   bandeau.innerHTML =
     '<span class="rappelEau-icone" aria-hidden="true">💧</span>' +
     '<span class="rappelEau-texte"><strong>MESSAGE DE TON ANGE GARDIEN</strong>' +
-    '<strong>Rappel : l\'eau aussi, ça se boit !</strong>' +
-    '<span>Demain tu me diras merci 😉</span></span>';
-  const fermer = () => bandeau.remove();
-  bandeau.addEventListener("click", fermer);
-  setTimeout(fermer, 9000);
+    '<strong>L\'eau aussi, ça se boit 😉</strong></span>' +
+    '<span class="rappelEau-languette" aria-hidden="true"></span>'; // (on peut la glisser, comme une vraie)
+  rendreNotifGlissable(bandeau, 9000);
   document.body.appendChild(bandeau);
   jouerSon("eau");
   vibrer([60, 80, 60]);
