@@ -3727,15 +3727,9 @@ html:has(#ecranCaster:not([style*="none"])) body > header{
 html.clavier-ouvert #ecranCaster{
   padding-top: calc(var(--haut-visible, 0px) + 72px);
 }
+/* (suit la zone visible sans animation : glissé par l'iPhone avec le clavier, il ne doit pas traîner) */
 #ecranCaster .btnRetour{
   top: calc(var(--haut-visible, 0px) + 20px);
-  transition: filter 0.15s ease;
-}
-/* iPhone : effacé pendant que le clavier fait glisser la page (js/en-ligne.js) ; filter et pas opacity,
-   tenue par l'animation d'apparition de l'écran */
-#ecranCaster.clavier-en-mouvement .btnRetour{
-  filter: opacity(0);
-  pointer-events: none;
 }
 @media (prefers-reduced-motion: reduce){
   #ecranCaster, #ecranCaster .btnRetour{ transition: none; }

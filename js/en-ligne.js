@@ -115,28 +115,9 @@ function remonterChampAuDessusDuClavier(){
   if (depasse > 0) defilant.scrollBy({ top: depasse, behavior: mouvementReduit.matches ? "auto" : "smooth" });
 }
 
-// iPhone, clavier qui s'ouvre ou se ferme sur la fenêtre Caster : l'iPhone fait glisser toute la page
-// puis on recale « ← Retour » en haut de la zone visible ; on le voyait monter puis redescendre. Il
-// s'efface pendant ce mouvement et réapparaît à sa place quand la zone visible ne bouge plus.
-let minuteurRetourCaster = null;
-function effacerRetourCasterPendantClavier(duree){
-  if (!estIOS || ecranCasterClavier.style.display === "none") return;
-  ecranCasterClavier.classList.add("clavier-en-mouvement");
-  clearTimeout(minuteurRetourCaster);
-  minuteurRetourCaster = setTimeout(() => ecranCasterClavier.classList.remove("clavier-en-mouvement"), duree);
-}
-const champCodeTeleClavier = document.getElementById("codeCaster");
-champCodeTeleClavier.addEventListener("pointerdown", () => {
-  if (document.activeElement !== champCodeTeleClavier) effacerRetourCasterPendantClavier(900);
-});
-champCodeTeleClavier.addEventListener("focus", () => effacerRetourCasterPendantClavier(900));
-champCodeTeleClavier.addEventListener("blur", () => effacerRetourCasterPendantClavier(700));
-
 if (window.visualViewport) {
   const majZoneVisible = () => {
     const zone = window.visualViewport;
-    // (la page bouge encore : « ← Retour » reste effacé jusqu'à 350 ms après le dernier mouvement)
-    if (ecranCasterClavier.classList.contains("clavier-en-mouvement")) effacerRetourCasterPendantClavier(350);
     // Hauteur de l'écran affiché (tout l'écran, clavier compris) ; avant son affichage, la fenêtre
     const hauteurEcran = (ecranSaisieAffiche() || ecranEnLigne).clientHeight || window.innerHeight;
     document.documentElement.style.setProperty("--haut-visible", `${zone.offsetTop}px`);

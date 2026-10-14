@@ -156,13 +156,20 @@ function profondeurIOS(){
 // On recule dans l'historique jusqu'à la profondeur de la pile, calculé depuis l'entrée réellement
 // affichée (history.state), jamais d'après un compte de nos reculs : l'iPhone en ignore parfois un (pendant
 // un glissement), et un compte décalé faisait ignorer les vrais glissements suivants, qui défilaient
-// alors à vide sur l'accueil. Un seul recul à la fois ; s'il n'aboutit pas, on revérifie.
+// alors à vide sur l'accueil. Un seul recul à la fois. S'il n'aboutit pas (ignoré par l'iPhone), on
+// n'insiste pas : l'entrée affichée prend la profondeur de la pile, pour que tout reste d'accord (avant :
+// on réessayait sans fin, et plus aucune entrée n'était ajoutée => plus de glissement nulle part).
 function rejoindrePileIOS(){
   const n = profondeurIOS() - pileIOS.length;
   if(n <= 0 || retraitEnCoursIOS) return;
   retraitEnCoursIOS = true;
   clearTimeout(minuteurRetraitIOS);
-  minuteurRetraitIOS = setTimeout(() => { retraitEnCoursIOS = false; rejoindrePileIOS(); }, 1000);
+  minuteurRetraitIOS = setTimeout(() => {
+    retraitEnCoursIOS = false;
+    if(profondeurIOS() > pileIOS.length){
+      try { history.replaceState({ alcunoRetour: true, profondeur: pileIOS.length }, ""); } catch (err) {}
+    }
+  }, 300);
   history.go(-n);
 }
 
@@ -195,8 +202,8 @@ function leverDoigtIOS(e){
   toucherEnCoursIOS = null;
   if(Math.hypot(e.clientX - toucher.x, e.clientY - toucher.y) > DEPLACEMENT_MAX_TAP_IOS) return; // a glissé
   const avant = toucher.ecran;
-  // (historique pas encore d'accord avec la pile, un recul en cours : pas d'entrée cette fois)
-  if(ecranAvantTapIOS === null && !retraitEnCoursIOS && profondeurIOS() === pileIOS.length){
+  // (un recul en cours, quelques centièmes de seconde : pas d'entrée cette fois)
+  if(ecranAvantTapIOS === null && !retraitEnCoursIOS){
     try { history.pushState({ alcunoRetour: true, profondeur: pileIOS.length + 1 }, ""); } catch (err) { return; }
     ecranAvantTapIOS = avant;
     pileIOS.push(avant);
@@ -215,6 +222,11 @@ function finTapIOS(){
 }
 
 if(estIOS){
+  // Au démarrage la pile est vide : l'entrée affichée est la base (une profondeur gardée d'avant un
+  // rechargement de l'appli la mettrait en désaccord avec la pile)
+  if(profondeurIOS() > 0){
+    try { history.replaceState({ alcunoRetour: true, profondeur: 0 }, ""); } catch (err) {}
+  }
   document.addEventListener("pointerdown", toucherIOS, { capture: true, passive: true });
   document.addEventListener("pointerup", leverDoigtIOS, { capture: true, passive: true });
   // geste repris par l'iPhone (glissement depuis le bord, défilement) : pas un tap
