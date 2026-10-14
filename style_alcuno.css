@@ -6060,20 +6060,22 @@ html[data-theme="givre"] #ecranReglages #btnSignalerBug{ color: var(--givre-acce
   resize: none;
 }
 #ecranBug textarea::placeholder{ color: rgba(255,255,255,0.55); }
-/* Captures d'écran : aperçus (✕ pour en retirer une) et bouton pour en ajouter */
-#ecranBug .bugCaptures{
+/* Pièces jointes (photos, vidéos) : aperçus (✕ pour en retirer une) et bouton pour en ajouter */
+#ecranBug .bugPieces{
   display: flex;
   gap: 12px;
   justify-content: center;
   padding-top: 6px;
 }
-#ecranBug .bugCaptures[hidden]{ display: none; }
+#ecranBug .bugPieces[hidden]{ display: none; }
 #ecranBug .bugVignette{
   position: relative;
   width: 64px;
   height: 64px;
 }
-#ecranBug .bugVignette img{
+#ecranBug .bugVignette img,
+#ecranBug .bugVignette video{
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -6096,20 +6098,39 @@ html[data-theme="givre"] #ecranReglages #btnSignalerBug{ color: var(--givre-acce
   box-shadow: 0 0 0 1px rgba(255,255,255,0.4);
   cursor: pointer;
 }
-#ecranBug .bugAjouterCapture{
+/* Vidéo : petit ▶ par-dessus l'aperçu */
+#ecranBug .bugVignetteVideo::after{
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.55) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 7l9 5-9 5z' fill='%23fff'/%3E%3C/svg%3E") center / 18px no-repeat;
+  pointer-events: none;
+}
+/* « Importer une photo/vidéo » et « Envoyer le rapport » : exactement la même taille */
+#ecranBug .bugBouton{
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  font-size: 15px;
-  font-weight: 800;
+  justify-content: center;
+  gap: 9px;
+  width: min(300px, 100%);
+  min-height: 48px;
+  box-sizing: border-box;
+  padding: 0 16px;
+  border-radius: 14px;
+  font: 800 16px/1.2 Arial, sans-serif;
+  cursor: pointer;
+}
+#ecranBug .bugBouton[hidden]{ display: none; }
+#ecranBug .bugAjouterPiece{
   color: rgba(255,255,255,0.9);
   background: none;
   border: 1px dashed rgba(255,215,0,0.5);
-  border-radius: 12px;
-  cursor: pointer;
 }
-#ecranBug .bugAjouterCapture[hidden]{ display: none; }
 #ecranBug .iconeBouton{
   width: 1.2em;
   height: 1.2em;
@@ -6121,14 +6142,9 @@ html[data-theme="givre"] #ecranReglages #btnSignalerBug{ color: var(--givre-acce
 }
 /* « Envoyer le rapport » : rouge profond (pas fluo), un peu plus fin que les gros boutons */
 #ecranBug #btnEnvoyerBug{
-  width: 100%;
-  max-width: 460px;
-  padding: 11px 18px;
-  font-size: 17px;
   font-weight: 900;
   color: #fff;
   border: none;
-  border-radius: 14px;
   background: linear-gradient(180deg, #d9443b, #ad2721);
   text-shadow: 0 1px 2px rgba(0,0,0,0.35);
   box-shadow: inset 0 -2px 0 rgba(0,0,0,0.2), 0 6px 14px rgba(120,20,15,0.35);
@@ -6150,5 +6166,6 @@ html[data-theme="givre"] #ecranBug textarea{
   border-color: var(--givre-bord);
 }
 html[data-theme="givre"] #ecranBug textarea::placeholder{ color: #7a98ad; }
-html[data-theme="givre"] #ecranBug .bugAjouterCapture{ color: var(--givre-accent); border-color: var(--givre-bord); }
-html[data-theme="givre"] #ecranBug .bugVignette img{ border-color: var(--givre-bord); }
+html[data-theme="givre"] #ecranBug .bugAjouterPiece{ color: var(--givre-accent); border-color: var(--givre-bord); }
+html[data-theme="givre"] #ecranBug .bugVignette img,
+html[data-theme="givre"] #ecranBug .bugVignette video{ border-color: var(--givre-bord); }
