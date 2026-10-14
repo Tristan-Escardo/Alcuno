@@ -5677,7 +5677,11 @@ html.tele-ecran-ouvert #refletPrestige{
 #ecranTele .tele-tour{
   text-align: center;
   border-color: rgba(255,215,0,0.5);
-  background: linear-gradient(180deg, rgba(62,0,43,0.95), rgba(22,0,16,0.9));
+  background: linear-gradient(180deg, rgba(62,0,43,0.95), rgba(22,0,16,0.9)); /* (navigateur sans color-mix) */
+  /* couleur du thème, de plus en plus sombre vers le bas */
+  background: linear-gradient(180deg, color-mix(in srgb, var(--fond-theme) 92%, #fff),
+                                      color-mix(in srgb, var(--fond-theme) 50%, #000));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 1vh 2.6vh rgba(0,0,0,0.3);
 }
 #ecranTele .tele-tour.tele-avec-couleur{
   border-color: var(--couleur-tele);
