@@ -177,6 +177,7 @@ function etatPourTele(){
     pigeon: idx >= 0 && idx === indexPigeon,
     couleur: couleurChoisie || "",
     regles,
+    theme: document.documentElement.dataset.theme || "bordeaux",
     ecran: ecranPourTele()
   };
 }
@@ -246,9 +247,18 @@ function creerCarteTele(valeur){
   return el;
 }
 
+// Thème de la télé : celui du téléphone relié (Réglages > Thème), gardé pour l'écran d'attente suivant
+const CLE_THEME_TELE = "alcuno_theme_tele";
+function appliquerThemeTele(nom){
+  if (!nom || !THEMES[nom] || document.documentElement.dataset.theme === nom) return;
+  document.documentElement.dataset.theme = nom;
+  try { localStorage.setItem(CLE_THEME_TELE, nom); } catch (e) {}
+}
+
 function demarrerPageTele(){
   const code = genererCodeTele();
   const lien = `${ADRESSE_SITE_TELE}?caster=${code}`;
+  try { appliquerThemeTele(localStorage.getItem(CLE_THEME_TELE)); } catch (e) {}
 
   const ecran = document.createElement("div");
   ecran.id = "ecranTele";
@@ -269,15 +279,19 @@ function demarrerPageTele(){
     </div>
     <div class="tele-jeu" hidden>
       <div class="tele-entete"><div class="tele-titre">ALCUNO</div></div>
+      <div class="tele-prepa" hidden>
+        <div class="tele-prepa-titre">Joueurs</div>
+        <div class="tele-prepa-joueurs"></div>
+        <div class="tele-prepa-info"></div>
+      </div>
       <div class="tele-gauche">
         <div class="tele-plateau"></div>
-        <div class="tele-preparation" hidden>Partie en préparation…</div>
         <div class="tele-restantes"></div>
       </div>
       <div class="tele-droite">
-        <div class="tele-bloc tele-tour"><div class="tele-tour-label">TOUR DE</div><div class="tele-tour-nom"></div></div>
-        <div class="tele-bloc"><div class="tele-bloc-titre">Joueurs</div><div class="tele-joueurs"></div></div>
-        <div class="tele-bloc tele-bloc-regles"><div class="tele-bloc-titre">Règles</div><div class="tele-regles"></div></div>
+        <div class="tele-bloc tele-tour"><div class="tele-tour-label">Tour de</div><div class="tele-tour-nom"></div></div>
+        <div class="tele-bloc tele-bloc-joueurs"><div class="tele-bloc-titre">Joueurs</div><div class="tele-joueurs"></div></div>
+        <div class="tele-bloc tele-bloc-regles"><div class="tele-bloc-titre">Règles</div><div class="tele-couleur" hidden></div><div class="tele-regles"></div></div>
       </div>
       <div class="tele-pied">Télé ${code}</div>
     </div>
@@ -322,12 +336,35 @@ function dessinerTele(ecran, etat){
   if (!etat) { attente.hidden = false; jeu.hidden = true; surEcran.hidden = true; return; }
   attente.hidden = true;
   jeu.hidden = false;
+  appliquerThemeTele(etat.theme);
+
+  // Avant la partie (joueurs en cours d'ajout) : les joueurs en grand, au milieu
+  const cartes = Array.isArray(etat.cartes) ? etat.cartes : [];
+  const enPreparation = cartes.length === 0;
+  ecran.querySelector(".tele-prepa").hidden = !enPreparation;
+  ecran.querySelector(".tele-gauche").hidden = enPreparation;
+  ecran.querySelector(".tele-droite").hidden = enPreparation;
+  if (enPreparation) {
+    const noms = (etat.joueurs || []).map(j => j.n);
+    const zone = ecran.querySelector(".tele-prepa-joueurs");
+    if (zone.dataset.noms !== noms.join("\n")) { // (seulement si la liste a changé : pas de clignotement)
+      zone.dataset.noms = noms.join("\n");
+      zone.innerHTML = "";
+      noms.forEach((nom) => {
+        const puce = document.createElement("div");
+        puce.className = "tele-prepa-joueur";
+        puce.innerText = nom;
+        zone.appendChild(puce);
+      });
+    }
+    zone.classList.toggle("tele-prepa-nombreux", noms.length > 8);
+    ecran.querySelector(".tele-prepa-info").innerText = noms.length >= 2
+      ? "La partie va commencer…"
+      : "Ajoute les joueurs sur le téléphone";
+  }
 
   // Plateau : on ne recrée que les cartes qui ont changé (pas de clignotement)
   const plateauTele = ecran.querySelector(".tele-plateau");
-  const cartes = Array.isArray(etat.cartes) ? etat.cartes : [];
-  plateauTele.hidden = cartes.length === 0;
-  ecran.querySelector(".tele-preparation").hidden = cartes.length > 0;
   while (plateauTele.children.length > cartes.length) plateauTele.lastChild.remove();
   cartes.forEach((valeur, i) => {
     const actuelle = plateauTele.children[i];
@@ -354,6 +391,7 @@ function dessinerTele(ecran, etat){
   // Joueurs
   const liste = ecran.querySelector(".tele-joueurs");
   liste.innerHTML = "";
+  liste.classList.toggle("tele-joueurs-2col", (etat.joueurs || []).length > 7); // (le bloc Règles garde sa place)
   (etat.joueurs || []).forEach((j) => {
     const ligne = document.createElement("div");
     ligne.className = "tele-joueur" + (j.t ? " tele-joueur-actif" : "");
@@ -369,9 +407,13 @@ function dessinerTele(ecran, etat){
     liste.appendChild(ligne);
   });
 
-  // Règles
+  // Règles (toujours affiché, comme sur le téléphone) : couleur à boire en cours, puis la règle
+  const hexCouleur = COULEURS_JEU[etat.couleur];
+  const elCouleur = ecran.querySelector(".tele-couleur");
+  elCouleur.hidden = !hexCouleur;
+  elCouleur.innerText = hexCouleur ? etat.couleur.toUpperCase() : "";
+  elCouleur.style.color = hexCouleur || "";
   ecran.querySelector(".tele-regles").innerText = etat.regles || "";
-  ecran.querySelector(".tele-bloc-regles").hidden = !etat.regles;
 
   // Écran en cours sur le téléphone (annonce, duel, +4, pari…)
   const e = etat.ecran;
