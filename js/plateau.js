@@ -787,8 +787,11 @@ function programmerRappelTour(tour){
       if(`${mancheCourante}:${cartesRestantes()}` !== tour) return; // tour joué entre-temps
       if(joueurs[indexJoueur % joueurs.length] !== pseudoActuel) return; // plus son tour
     } else if(tour !== null) return; // (rappel d'une partie en ligne)
-    jouerSon("tour");
-    faireClignoterBandeauTour(); // même sans le son (sons coupés, musique forte…)
+    // (mode télé : un peu plus tard, en même temps que la télé, voir rappelPourTele dans tele.js)
+    setTimeout(() => {
+      jouerSon("tour");
+      faireClignoterBandeauTour(); // même sans le son (sons coupés, musique forte…)
+    }, rappelPourTele());
     programmerRappelTour(tour); // et encore dans 50 s s'il ne joue toujours pas
   }, DELAI_RAPPEL_TOUR);
 }
