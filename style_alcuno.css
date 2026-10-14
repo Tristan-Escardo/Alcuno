@@ -5415,6 +5415,9 @@ html.tele-ecran-ouvert #refletPrestige{
 #ecranTele .Carte{
   width: 100%;
   max-width: none;
+  /* coins arrondis comme ceux du dessin de la carte (7,8 % de sa largeur) : les 8 px du téléphone
+     arrondissaient trop les petites cartes du plateau de la télé et mangeaient leurs coins */
+  border-radius: 7.8% / 5%;
   cursor: default;
   box-shadow: 0 0.3vh 0.8vh rgba(0,0,0,0.4);
 }
@@ -5586,10 +5589,19 @@ html.tele-ecran-ouvert #refletPrestige{
   gap: 1.1vh;
 }
 #ecranTele .tele-case-vide{
-  aspect-ratio: 50 / 78;
-  border-radius: 8px;
-  border: 2px dashed rgba(255,215,0,0.22);
-  box-sizing: border-box;
+  aspect-ratio: 50 / 78; /* (trou de la carte partie : vide, comme sur le téléphone) */
+}
+/* Carte « 1 » qui s'envole vers le +1 du joueur (même animation que sur le téléphone) */
+#ecranTele .Carte.tele-envol{
+  position: fixed;
+  margin: 0;
+  z-index: 5; /* sous l'écran des annonces */
+  pointer-events: none;
+  box-shadow: 0 1.4vh 3.4vh rgba(0,0,0,0.55);
+  will-change: transform, opacity;
+}
+#ecranTele .tele-badge.tele-badge-pulse{
+  animation: pulseBonus 0.6s ease-out;
 }
 #ecranTele .tele-restantes{
   margin-top: 2vh;
@@ -5699,6 +5711,7 @@ html[data-theme="givre"] #ecranTele .tele-son-coupe{ color: var(--givre-accent);
 #ecranTele .tele-ecran{
   position: absolute;
   inset: 0;
+  z-index: 10;
   background: rgba(0,0,0,0.92);
   display: flex;
   flex-direction: column;
@@ -5776,7 +5789,6 @@ html[data-theme="givre"] #ecranTele .tele-regles{ color: var(--givre-accent); }
 html[data-theme="givre"] #ecranTele .tele-couleur{
   text-shadow: 0 0 2px #0d3550, 0 1px 2px #0d3550, 0 0 1px #0d3550;
 }
-html[data-theme="givre"] #ecranTele .tele-plateau .tele-case-vide{ border-color: var(--givre-bord); }
 html[data-theme="givre"] #ecranTele .tele-prepa-joueur{
   background: #fff;
   border-color: var(--givre-bord);

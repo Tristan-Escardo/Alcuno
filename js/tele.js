@@ -217,6 +217,7 @@ function etatPourTele(){
     regles,
     theme: document.documentElement.dataset.theme || "bordeaux",
     sons: sonsTele,
+    envols: envolsTele,
     ecran: ecranPourTele()
   };
 }
@@ -246,13 +247,29 @@ function envoyerEtatTele(){
 // Sons du jeu : la télé les joue aussi (pas ceux propres au téléphone : réglages, rappels…).
 // Appelé par jouerSon (reglages.js), même si le son du téléphone est coupé.
 const SONS_TELE = new Set(["cartes", "doree", "pigeon", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees"]);
-let sonsTele = [];      // 4 derniers sons : { i: numéro (croissant, même après un rechargement), n: nom }
-let numeroSonTele = 0;
+let sonsTele = [];      // 4 derniers sons : { i: numéro, n: nom }
+let dernierNumeroTele = 0;
+// Numéro d'un son ou d'un envol : toujours croissant, même après un rechargement de la page (la télé ne
+// rejoue que ceux qu'elle n'a pas encore vus)
+function numeroTele(){
+  dernierNumeroTele = Math.max(dernierNumeroTele + 1, Date.now());
+  return dernierNumeroTele;
+}
 function sonPourTele(nom){
   if (!codeTele || enLigneActif || !SONS_TELE.has(nom)) return;
-  numeroSonTele = Math.max(numeroSonTele + 1, Date.now());
-  sonsTele = sonsTele.concat({ i: numeroSonTele, n: nom }).slice(-4);
+  sonsTele = sonsTele.concat({ i: numeroTele(), n: nom }).slice(-4);
   setTimeout(envoyerEtatTele, 60); // tout de suite (avec ce que montre l'écran à ce moment-là)
+}
+
+// Carte « 1 » qui s'envole vers le nom du joueur qui la garde (envolerCarteVersJoueur, regles.js) :
+// la télé fait la même animation
+let envolsTele = [];    // 4 derniers envols : { i: numéro, k: case du plateau, f: face, n: joueur }
+function envolPourTele(carteElement, classeCarte, nom){
+  if (!codeTele || enLigneActif) return;
+  const k = Array.prototype.indexOf.call(plateau.children, carteElement);
+  if (k < 0) return;
+  envolsTele = envolsTele.concat({ i: numeroTele(), k, f: classeCarte, n: avecCouronne(nom) }).slice(-4);
+  setTimeout(envoyerEtatTele, 0);
 }
 
 function relierTeleDepuisCode(texte){
@@ -400,6 +417,7 @@ function demarrerPageTele(){
 // Sons du téléphone joués par la télé : seulement ceux arrivés depuis le dernier résumé (pas les
 // anciens quand la télé vient de se relier)
 let dernierSonTele = null;
+let dernierEnvolTele = null;
 function jouerSonsTele(sons){
   sons = Array.isArray(sons) ? sons : [];
   const plusRecent = sons.reduce((max, son) => Math.max(max, Number(son.i) || 0), 0);
@@ -407,6 +425,54 @@ function jouerSonsTele(sons){
     sons.filter(son => son.i > dernierSonTele && SONS_TELE.has(son.n)).forEach(son => jouerSon(son.n));
   }
   dernierSonTele = Math.max(dernierSonTele || 0, plusRecent);
+}
+
+// Même animation que sur le téléphone : la carte part de sa case vers le +1 du joueur, qui grossit
+// un instant à son arrivée (seulement les envols nouveaux, comme les sons)
+function envolerCartesTele(ecran, envols){
+  envols = Array.isArray(envols) ? envols : [];
+  const plusRecent = envols.reduce((max, envol) => Math.max(max, Number(envol.i) || 0), 0);
+  if (dernierEnvolTele !== null) {
+    envols.filter(envol => envol.i > dernierEnvolTele).forEach(envol => envolerCarteTele(ecran, envol));
+  }
+  dernierEnvolTele = Math.max(dernierEnvolTele || 0, plusRecent);
+}
+
+function envolerCarteTele(ecran, envol){
+  const caseDepart = ecran.querySelector(".tele-plateau").children[envol.k];
+  if (!caseDepart || !FACE_CARTE.test(envol.f) || !caseDepart.animate) return;
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const depart = caseDepart.getBoundingClientRect();
+  const badgeDuJoueur = () => {
+    const ligne = Array.from(ecran.querySelectorAll(".tele-joueur")).find(l => l.dataset.nom === envol.n);
+    return ligne && (ligne.querySelector(".tele-badge") || ligne);
+  };
+  const cible = badgeDuJoueur();
+  if (!depart.width || !cible) return;
+  const zone = cible.getBoundingClientRect();
+  const dx = zone.left + zone.width / 2 - (depart.left + depart.width / 2);
+  const dy = zone.top + zone.height / 2 - (depart.top + depart.height / 2);
+
+  const vol = creerCarteTele(envol.f);
+  vol.classList.add("tele-envol");
+  Object.assign(vol.style, {
+    left: depart.left + "px", top: depart.top + "px",
+    width: depart.width + "px", height: depart.height + "px"
+  });
+  ecran.appendChild(vol);
+  const animation = vol.animate([
+    { transform: "translate(0, 0) scale(1) rotate(0deg)", opacity: 1, offset: 0 },
+    { transform: "translate(0, -1.4vh) scale(1.15) rotate(-4deg)", opacity: 1, offset: 0.25 }, // on la « prend »
+    { transform: `translate(${dx}px, ${dy}px) scale(0.22) rotate(8deg)`, opacity: 0.35, offset: 1 }
+  ], { duration: 950, easing: "ease-in-out", fill: "forwards" });
+  animation.onfinish = () => {
+    vol.remove();
+    const badge = badgeDuJoueur();
+    if (!badge || !badge.classList.contains("tele-badge")) return;
+    badge.classList.remove("tele-badge-pulse");
+    void badge.offsetWidth; // relance l'animation
+    badge.classList.add("tele-badge-pulse");
+  };
 }
 
 function dessinerTele(ecran, etat){
@@ -417,6 +483,7 @@ function dessinerTele(ecran, etat){
     attente.hidden = false; jeu.hidden = true; surEcran.hidden = true;
     document.documentElement.classList.remove("tele-ecran-ouvert");
     dernierSonTele = null;
+    dernierEnvolTele = null;
     return;
   }
   attente.hidden = true;
@@ -475,23 +542,30 @@ function dessinerTele(ecran, etat){
   elNomTour.style.fontSize = nomTour.length > 18 ? "3.4vh" : nomTour.length > 12 ? "4.2vh" : "";
 
   // Joueurs
+  // (refaite seulement si elle a changé : le +1 qui grossit à l'arrivée d'une carte n'est pas coupé)
   const liste = ecran.querySelector(".tele-joueurs");
-  liste.innerHTML = "";
-  liste.classList.toggle("tele-joueurs-2col", (etat.joueurs || []).length > 7); // (le bloc Règles garde sa place)
-  (etat.joueurs || []).forEach((j) => {
-    const ligne = document.createElement("div");
-    ligne.className = "tele-joueur" + (j.t ? " tele-joueur-actif" : "");
-    const nom = document.createElement("span");
-    nom.innerText = (j.t ? "▶ " : "") + j.n + (j.p ? " 🐦" : "");
-    ligne.appendChild(nom);
-    if (j.a > 0) {
-      const badge = document.createElement("span");
-      badge.className = "tele-badge";
-      badge.innerText = `+${j.a}`;
-      ligne.appendChild(badge);
-    }
-    liste.appendChild(ligne);
-  });
+  const cleJoueurs = JSON.stringify(etat.joueurs || []);
+  if (liste.dataset.cle !== cleJoueurs) {
+    liste.dataset.cle = cleJoueurs;
+    liste.innerHTML = "";
+    liste.classList.toggle("tele-joueurs-2col", (etat.joueurs || []).length > 7); // (le bloc Règles garde sa place)
+    (etat.joueurs || []).forEach((j) => {
+      const ligne = document.createElement("div");
+      ligne.className = "tele-joueur" + (j.t ? " tele-joueur-actif" : "");
+      ligne.dataset.nom = j.n;
+      const nom = document.createElement("span");
+      nom.innerText = (j.t ? "▶ " : "") + j.n + (j.p ? " 🐦" : "");
+      ligne.appendChild(nom);
+      if (j.a > 0) {
+        const badge = document.createElement("span");
+        badge.className = "tele-badge";
+        badge.innerText = `+${j.a}`;
+        ligne.appendChild(badge);
+      }
+      liste.appendChild(ligne);
+    });
+  }
+  envolerCartesTele(ecran, etat.envols); // (plateau et joueurs à jour : départ et arrivée en place)
 
   // Règles (toujours affiché, comme sur le téléphone) : couleur à boire en cours, puis la règle
   const hexCouleur = COULEURS_JEU[etat.couleur];

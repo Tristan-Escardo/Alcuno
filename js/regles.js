@@ -1377,6 +1377,7 @@ function couleurDeLaCarte(classeCarte){
 
 // La carte « 1 » s'envole du plateau vers le nom du joueur qui la garde, puis son +1 pulse
 function envolerCarteVersJoueur(carteElement, classeCarte, nom){
+  envolPourTele(carteElement, classeCarte, nom); // mode télé : la télé fait la même animation
   const depart = carteElement.getBoundingClientRect();
   carteElement.classList.add("carte-disparue"); // le trou reste à sa place
   const sansAnimation = rattrapageEnCours || !carteElement.animate ||
