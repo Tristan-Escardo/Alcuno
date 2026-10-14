@@ -69,17 +69,25 @@ document.getElementById("codeRejoindre").addEventListener("keydown", (e) => {
 });
 
 // Clavier ouvert : zone de l'écran encore visible (au-dessus du clavier), pour que l'écran du mode en
-// ligne s'y cale (voir #enLigne dans le CSS) : sinon le clavier cache le bouton « Créer » / « Rejoindre »
+// ligne et la fenêtre Caster (code de la télé) s'y calent (voir #enLigne et #ecranCaster dans le CSS) :
+// sinon le clavier cache le bouton « Créer » / « Rejoindre », ou le champ du code de la télé
 const ecranEnLigne = document.getElementById("enLigne");
+const ecranCasterClavier = document.getElementById("ecranCaster");
 let clavierEtaitOuvert = false;
 
+// Écran plein écran avec un champ de saisie actuellement affiché (mode en ligne ou Caster), ou null
+function ecranSaisieAffiche(){
+  return [ecranCasterClavier, ecranEnLigne].find(el => el && el.style.display !== "none") || null;
+}
+
 // Clavier ouvert : l'iPhone laisse glisser toute la page (on voyait le haut du jeu derrière, et la
-// zone visible changeait : le bouton Scanner revenait). On bloque ce glissement sur l'écran du mode en
-// ligne, sauf si son contenu ne tient pas et doit défiler. Écouteur posé seulement pendant que le
-// clavier est ouvert : le reste du temps (plateau…), le défilement n'attend jamais le jeu.
+// zone visible changeait : le bouton Scanner revenait). On bloque ce glissement sur ces écrans, sauf si
+// leur contenu ne tient pas et doit défiler. Écouteur posé seulement pendant que le clavier est
+// ouvert : le reste du temps (plateau…), le défilement n'attend jamais le jeu.
 function bloquerGlissement(e){
-  if (ecranEnLigne.style.display === "none") return;
-  if (ecranEnLigne.scrollHeight > ecranEnLigne.clientHeight + 1 && ecranEnLigne.contains(e.target)) return;
+  const ecran = ecranSaisieAffiche();
+  if (!ecran) return;
+  if (ecran.scrollHeight > ecran.clientHeight + 1 && ecran.contains(e.target)) return;
   e.preventDefault();
 }
 let glissementBloque = false;
@@ -90,11 +98,22 @@ function majBlocageGlissement(ouvert){
   else document.removeEventListener("touchmove", bloquerGlissement);
 }
 
+let minuteurChampVisible = null;
+function remonterChampAuDessusDuClavier(){
+  const ecran = ecranSaisieAffiche();
+  const champ = document.activeElement;
+  if (!ecran || !champ || champ.tagName !== "INPUT" || !ecran.contains(champ)) return;
+  const zone = window.visualViewport;
+  const bas = (champ.closest(".casterCode") || champ).getBoundingClientRect().bottom; // (avec le bouton OK)
+  const depasse = bas - (zone.offsetTop + zone.height - 12);
+  if (depasse > 0) ecran.scrollBy({ top: depasse, behavior: mouvementReduit.matches ? "auto" : "smooth" });
+}
+
 if (window.visualViewport) {
   const majZoneVisible = () => {
     const zone = window.visualViewport;
-    // Hauteur de l'écran du mode en ligne (tout l'écran, clavier compris) ; avant son affichage, la fenêtre
-    const hauteurEcran = ecranEnLigne.clientHeight || window.innerHeight;
+    // Hauteur de l'écran affiché (tout l'écran, clavier compris) ; avant son affichage, la fenêtre
+    const hauteurEcran = (ecranSaisieAffiche() || ecranEnLigne).clientHeight || window.innerHeight;
     document.documentElement.style.setProperty("--haut-visible", `${zone.offsetTop}px`);
     // Hauteur cachée sous la zone visible (le clavier) : le contenu s'arrête au-dessus
     document.documentElement.style.setProperty("--bas-cache",
@@ -108,6 +127,12 @@ if (window.visualViewport) {
     if (estAndroid && clavierEtaitOuvert && !ouvert) {
       const champ = document.activeElement;
       if (champ && champ.tagName === "INPUT" && ecranEnLigne.contains(champ)) champ.blur();
+    }
+    // Petit téléphone : le champ ne tient pas au-dessus du clavier (ex. code de la télé sur un iPhone SE) :
+    // une fois le contenu calé (fin de la transition), l'écran défile pour le remonter, avec son bouton
+    if (ouvert) {
+      clearTimeout(minuteurChampVisible);
+      minuteurChampVisible = setTimeout(remonterChampAuDessusDuClavier, 400);
     }
     clavierEtaitOuvert = ouvert;
   };
