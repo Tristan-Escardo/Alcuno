@@ -16,7 +16,7 @@ Un fichier MP3 par moment du jeu, avec exactement ces noms :
   annuler_gorgees.mp3  quelqu'un annule 1 gorgée ou plus
   annuler_0_gorgees.mp3  quelqu'un tape « Annuler 0 » (il n'annule rien)
 
-Pas de son pour le cul sec de la carte dorée (« TIENS DANS TA GUEULE »).
+  tiens_gueule.mp3  le cul sec de la carte dorée (« TIENS DANS TA GUEULE »)
 
 - Fichier absent = pas de son à ce moment-là.
 - Pour changer un son : remplace le fichier en gardant le même nom, puis commit + push.

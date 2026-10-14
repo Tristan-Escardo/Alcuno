@@ -431,8 +431,8 @@ document.addEventListener("visibilitychange", () => {
 //   distribuer_gorgees.mp3 : +4, on tape sur un joueur pour lui donner une gorgée (coupé à 0,8 s)
 //   annuler_gorgees.mp3 : quelqu'un annule 1 gorgée ou plus
 //   annuler_0_gorgees.mp3 : quelqu'un tape « Annuler 0 » (il n'annule rien)
-// (pas de son pour le cul sec de la carte dorée)
-const SONS = ["cartes", "doree", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees"];
+//   tiens_gueule.mp3 : le cul sec de la carte dorée (« TIENS DANS TA GUEULE »)
+const SONS = ["cartes", "doree", "tiens_gueule", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees"];
 // Sons coupés au bout de N secondes (avec un petit fondu), même si le fichier est plus long
 const DUREE_MAX_SONS = { doree: 3, pigeon: 2, distribuer_gorgees: 0.8 };
 const sonsCharges = {}; // nom -> son décodé (ou null si le fichier n'existe pas)

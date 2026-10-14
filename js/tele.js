@@ -262,7 +262,7 @@ function envoyerEtatTele(){
 // Sons du jeu : la télé les joue aussi (pas ceux propres au téléphone : réglages, rappels…).
 // Appelé par jouerSon (reglages.js), même si le son du téléphone est coupé.
 // (le sifflet « À toi » passe par rappelPourTele : téléphone et télé en même temps)
-const SONS_TELE = new Set(["cartes", "doree", "pigeon", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees"]);
+const SONS_TELE = new Set(["cartes", "doree", "tiens_gueule", "pigeon", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees"]);
 let sonsTele = [];      // 4 derniers sons : { i: numéro, n: nom }
 let dernierNumeroTele = 0;
 // Numéro d'un son ou d'un envol : toujours croissant, même après un rechargement de la page (la télé ne
