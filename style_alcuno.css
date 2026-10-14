@@ -2573,6 +2573,26 @@ header h1{
 #stickyJoueurActif.rappel-tour{
   animation: rappelTour 0.8s ease-in-out 3;
 }
+/* Halo lumineux tout autour de l'écran, qui pulse au rythme du bandeau (même durée, même nombre de fois) ;
+   par-dessus tout (overlays compris), sans bloquer les taps. Aussi sur la télé (bloc « Tour de ») */
+#haloRappel{
+  --halo-ecran: rgba(255, 215, 0, 0.75);
+  position: fixed;
+  inset: 0;
+  z-index: 30003;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow: inset 0 0 0 0.6vmin var(--halo-ecran), inset 0 0 7vmin 2.5vmin var(--halo-ecran);
+}
+#haloRappel.actif{
+  animation: haloRappel 0.8s ease-in-out 3;
+}
+@keyframes haloRappel{
+  0%, 100% { opacity: 0; }
+  50%      { opacity: 1; }
+}
+html[data-theme="givre"] #haloRappel{ --halo-ecran: rgba(26, 155, 224, 0.6); }
+html[data-theme="prestige"] #haloRappel{ --halo-ecran: rgba(255, 246, 200, 0.9); }
 @keyframes rappelTour{
   0%, 100% { scale: 1; filter: none; }
   50%      { scale: 1.14; filter: brightness(1.35) drop-shadow(0 0 10px rgba(255, 215, 0, 0.95)); }
@@ -5426,7 +5446,7 @@ html.mode-tele body{
   overflow: hidden;
   background: var(--fond-theme);
 }
-html.mode-tele body > *:not(#ecranTele):not(#refletPrestige){
+html.mode-tele body > *:not(#ecranTele):not(#refletPrestige):not(#haloRappel){
   display: none !important;
 }
 /* Prestige : le reflet doré passe aussi sur la télé, sauf sur l'écran noir des annonces (comme sur le téléphone) */

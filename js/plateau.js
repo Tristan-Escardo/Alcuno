@@ -802,8 +802,25 @@ function relancerRappelClassique(){
   if(!enLigneActif && partieLancee) programmerRappelTour(null);
 }
 
-// Le bandeau « À toi » clignote 3 fois (voir rappel-tour dans le CSS)
+// Halo lumineux tout autour de l'écran, qui pulse 3 fois au rythme du bandeau « À toi » (voir
+// haloRappel dans le CSS ; aussi sur la télé)
+function faireBrillerBordsEcran(){
+  let halo = document.getElementById("haloRappel");
+  if(!halo){
+    halo = document.createElement("div");
+    halo.id = "haloRappel";
+    halo.setAttribute("aria-hidden", "true");
+    document.body.appendChild(halo);
+  }
+  halo.classList.remove("actif");
+  void halo.offsetWidth; // relance l'animation si elle était déjà là
+  halo.classList.add("actif");
+  halo.addEventListener("animationend", () => halo.classList.remove("actif"), { once: true });
+}
+
+// Le bandeau « À toi » clignote 3 fois (voir rappel-tour dans le CSS), avec le halo autour de l'écran
 function faireClignoterBandeauTour(){
+  faireBrillerBordsEcran();
   if(!stickyJoueurActif) return;
   stickyJoueurActif.classList.remove("rappel-tour");
   void stickyJoueurActif.offsetWidth; // relance l'animation si elle était déjà là
