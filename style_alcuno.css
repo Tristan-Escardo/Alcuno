@@ -1978,7 +1978,8 @@ html[data-theme="givre"] #enLigne .iconeBouton{ filter: none; }
 #choixMode .btnRetour,
 #ecranNouvellePartie .btnRetour,
 #ecranNouvellePartie .btnAccueil,
-#enLigne .btnRetour{
+#enLigne .btnRetour,
+#ecranCaster .btnRetour{
   position: absolute;
   top: 20px;
   left: 20px;
@@ -3269,7 +3270,7 @@ html.accessibilite #ecranConfirmerHote button,
 html.accessibilite #ecranConfirmerRetrait button,
 html.accessibilite #ecranConfirmerAccueil button,
 html.accessibilite #ecranChoixPseudo button,
-html.accessibilite #ecranCaster button{
+html.accessibilite #ecranCaster button:not(.btnRetour){
   font-size: clamp(22px, 4.8vw, 29px);
 }
 
@@ -5367,7 +5368,6 @@ html[data-theme="givre"] #ecranCaster .adresseTele{ color: var(--givre-accent); 
   padding-left: 22px;
   padding-right: 22px;
 }
-#ecranCaster #btnCasterFermer,
 #ecranCaster #btnCasterArreter{
   background: rgba(255,255,255,0.1);
   box-shadow: 0 0 0 1px rgba(255,215,0,0.45) inset;
@@ -5403,7 +5403,7 @@ html.mode-tele body > *:not(#ecranTele){
   color: #fff;
   font-family: Arial, Helvetica, sans-serif;
   background:
-    radial-gradient(circle at top center, rgba(255,215,0,0.10) 0%, rgba(255,215,0,0) 30%) no-repeat,
+    var(--deco-theme, radial-gradient(circle at top center, rgba(255,215,0,0.10) 0%, rgba(255,215,0,0) 30%) no-repeat),
     var(--fond-theme);
   overflow: hidden;
 }
@@ -5509,6 +5509,59 @@ html.mode-tele body > *:not(#ecranTele){
   border-radius: 0.3vh;
   background: linear-gradient(90deg, #ff5e5e, #ffb84d, #ffd700, #7dde4f, #4fc3f7);
 }
+/* Avant la partie : les joueurs en grand, au milieu */
+#ecranTele .tele-prepa{
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4.5vh;
+  min-height: 0;
+  text-align: center;
+}
+#ecranTele .tele-prepa-titre{
+  font-size: 7.5vh;
+  font-weight: 900;
+  color: #FFD700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-shadow: 0 0.4vh 0 rgba(120,70,0,0.95), 0 0.6vh 1.4vh rgba(0,0,0,0.5);
+}
+#ecranTele .tele-prepa-joueurs{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2.2vh 2.4vh;
+  max-width: 84vw;
+}
+#ecranTele .tele-prepa-joueurs:empty{ display: none; }
+#ecranTele .tele-prepa-joueur{
+  padding: 1.6vh 3.8vh;
+  border-radius: 999px;
+  font-size: 4.4vh;
+  font-weight: 900;
+  color: #40E0D0;
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,215,0,0.4);
+  box-shadow: 0 0.8vh 2vh rgba(0,0,0,0.25);
+  animation: fadeIn 0.3s ease;
+}
+#ecranTele .tele-prepa-nombreux .tele-prepa-joueur{
+  padding: 1.1vh 2.8vh;
+  font-size: 3.2vh;
+}
+#ecranTele .tele-prepa-info{
+  font-size: 3vh;
+  font-weight: 800;
+  color: #ffe680;
+  animation: telePulse 2.4s ease-in-out infinite;
+}
+@keyframes telePulse{
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.55; }
+}
+
 #ecranTele .tele-gauche{
   display: flex;
   flex-direction: column;
@@ -5529,11 +5582,6 @@ html.mode-tele body > *:not(#ecranTele){
   border: 2px dashed rgba(255,215,0,0.22);
   box-sizing: border-box;
 }
-#ecranTele .tele-preparation{
-  font-size: 5vh;
-  font-weight: 900;
-  color: #ffe680;
-}
 #ecranTele .tele-restantes{
   margin-top: 2vh;
   font-size: 2.4vh;
@@ -5552,7 +5600,32 @@ html.mode-tele body > *:not(#ecranTele){
   padding: 1.8vh 2.2vh;
   background: rgba(0,0,0,0.2);
 }
-#ecranTele .tele-bloc-titre{ font-size: 2.4vh; font-weight: 700; color: #ddd; margin-bottom: 1.2vh; }
+#ecranTele .tele-bloc-titre{
+  font-size: 2.2vh;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #e9d9a8;
+  margin-bottom: 1.2vh;
+}
+/* Colonne de droite : le bloc Règles est toujours là et prend la place qui reste (beaucoup de
+   joueurs : la liste passe sur 2 colonnes et rétrécit avant lui) */
+#ecranTele .tele-tour{ flex: 0 0 auto; }
+#ecranTele .tele-bloc-joueurs{ flex: 0 1 auto; min-height: 0; overflow: hidden; }
+#ecranTele .tele-bloc-regles{ flex: 1 0 22vh; overflow: hidden; }
+#ecranTele .tele-joueurs-2col{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 2.2vh;
+}
+#ecranTele .tele-joueurs-2col .tele-joueur{ font-size: 2.5vh; padding: 0.4vh 0; }
+#ecranTele .tele-couleur{
+  font-size: 4.6vh;
+  font-weight: 900;
+  text-align: center;
+  text-shadow: 0.2vh 0.2vh 0.5vh #000;
+  margin-bottom: 1vh;
+}
 #ecranTele .tele-tour{
   text-align: center;
   border-color: rgba(255,215,0,0.5);
@@ -5562,7 +5635,7 @@ html.mode-tele body > *:not(#ecranTele){
   border-color: var(--couleur-tele);
   box-shadow: 0 0 2.4vh color-mix(in srgb, var(--couleur-tele) 45%, transparent);
 }
-#ecranTele .tele-tour-label{ font-size: 2.2vh; letter-spacing: 0.15em; color: #e9d9a8; font-weight: 900; }
+#ecranTele .tele-tour-label{ font-size: 2.2vh; letter-spacing: 0.15em; text-transform: uppercase; color: #e9d9a8; font-weight: 900; }
 #ecranTele .tele-tour-nom{ font-size: 5.4vh; font-weight: 900; color: #FFD700; text-shadow: 0 0.4vh 0 rgba(120,70,0,0.9); }
 #ecranTele .tele-tour.tele-pigeon .tele-tour-nom{ color: #40E0D0; }
 #ecranTele .tele-joueur{
@@ -5636,3 +5709,58 @@ html.mode-tele body > *:not(#ecranTele){
   font-weight: 800;
 }
 #ecranTele .tele-puce-prise{ opacity: 0.45; }
+
+/* Télé en thème Givre (clair) : mêmes couleurs que le jeu en Givre (l'écran par-dessus, noir, ne change pas) */
+html[data-theme="givre"] #ecranTele{ color: var(--givre-texte); }
+html[data-theme="givre"] #ecranTele .tele-titre,
+html[data-theme="givre"] #ecranTele .tele-prepa-titre{
+  color: #1a9be0;
+  text-shadow: 0 0.4vh 0 #0b5a8c, 0 0.8vh 1.8vh rgba(13,53,80,0.25), 0 0 3vh rgba(255,255,255,0.9);
+}
+html[data-theme="givre"] #ecranTele .tele-sous-titre,
+html[data-theme="givre"] #ecranTele .tele-prepa-info,
+html[data-theme="givre"] #ecranTele .tele-code{ color: var(--givre-accent); }
+html[data-theme="givre"] #ecranTele .tele-etape{ color: var(--givre-texte); }
+html[data-theme="givre"] #ecranTele .tele-etape .tele-num,
+html[data-theme="givre"] #ecranTele .tele-plein-ecran{
+  background: var(--givre-bouton);
+  color: #fff;
+  box-shadow: 0 0.6vh 1.4vh rgba(26,146,214,0.28);
+}
+html[data-theme="givre"] #ecranTele .tele-qr{
+  box-shadow: 0 0 0 0.7vh var(--givre-bord), 0 2.6vh 7vh rgba(13,53,80,0.18);
+}
+html[data-theme="givre"] #ecranTele .tele-code small,
+html[data-theme="givre"] #ecranTele .tele-restantes,
+html[data-theme="givre"] #ecranTele .tele-bloc-titre,
+html[data-theme="givre"] #ecranTele .tele-tour-label{ color: var(--givre-doux); }
+html[data-theme="givre"] #ecranTele .tele-entete,
+html[data-theme="givre"] #ecranTele .tele-bloc{
+  background: var(--givre-panneau);
+  border-color: var(--givre-bord);
+  box-shadow: 0 1vh 2.4vh rgba(13,53,80,0.08);
+}
+html[data-theme="givre"] #ecranTele .tele-entete::after{
+  background: linear-gradient(90deg, #0b5a8c, #1a9be0 50%, #0b5a8c);
+}
+html[data-theme="givre"] #ecranTele .tele-tour{ background: rgba(255,255,255,0.96); }
+html[data-theme="givre"] #ecranTele .tele-tour.tele-avec-couleur{
+  background: color-mix(in srgb, var(--couleur-tele) 16%, #fff);
+}
+html[data-theme="givre"] #ecranTele .tele-tour-nom{ color: var(--givre-accent); text-shadow: none; }
+html[data-theme="givre"] #ecranTele .tele-tour.tele-pigeon .tele-tour-nom{ color: #0a7f8a; }
+html[data-theme="givre"] #ecranTele .tele-joueur{ color: #0a7f8a; }
+html[data-theme="givre"] #ecranTele .tele-joueur-actif{ color: var(--givre-accent); }
+html[data-theme="givre"] #ecranTele .tele-badge{ background: #1a7fd0; color: #fff; }
+html[data-theme="givre"] #ecranTele .tele-regles{ color: var(--givre-accent); }
+html[data-theme="givre"] #ecranTele .tele-couleur{
+  text-shadow: 0 0 2px #0d3550, 0 1px 2px #0d3550, 0 0 1px #0d3550;
+}
+html[data-theme="givre"] #ecranTele .tele-plateau .tele-case-vide{ border-color: var(--givre-bord); }
+html[data-theme="givre"] #ecranTele .tele-prepa-joueur{
+  background: #fff;
+  border-color: var(--givre-bord);
+  color: #0a7f8a;
+  box-shadow: 0 0.8vh 2vh rgba(13,53,80,0.1);
+}
+html[data-theme="givre"] #ecranTele .tele-pied{ color: rgba(13,53,80,0.45); }
