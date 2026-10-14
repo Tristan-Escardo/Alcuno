@@ -5683,6 +5683,33 @@ html.tele-ecran-ouvert #refletPrestige{
                                       color-mix(in srgb, var(--fond-theme) 50%, #000));
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 1vh 2.6vh rgba(0,0,0,0.3);
 }
+/* Prestige : bloc « Tour de » en lingot d'or (comme la notification « Thème Prestige débloqué »), texte
+   gravé dans l'or (le brun foncé du fond du thème n'allait pas sur le décor doré) */
+html[data-theme="prestige"] #ecranTele .tele-tour{
+  background: linear-gradient(135deg, #9a6400 0%, #e9b52a 18%, #fff2a8 36%, #f3c63c 52%,
+                              #b77c06 74%, #f6d35a 100%);
+  border-color: rgba(255, 248, 200, 0.85);
+  box-shadow: 0 1vh 2.6vh rgba(0,0,0,0.35), 0 0 2.2vh rgba(255, 200, 40, 0.45),
+              inset 0 -0.3vh 0 rgba(120, 70, 0, 0.45);
+}
+html[data-theme="prestige"] #ecranTele .tele-tour.tele-avec-couleur{
+  border-color: var(--couleur-tele);
+  box-shadow: 0 1vh 2.6vh rgba(0,0,0,0.35), 0 0 2.4vh color-mix(in srgb, var(--couleur-tele) 55%, transparent),
+              inset 0 -0.3vh 0 rgba(120, 70, 0, 0.45);
+}
+html[data-theme="prestige"] #ecranTele .tele-tour-label{ color: rgba(59, 36, 0, 0.75); }
+html[data-theme="prestige"] #ecranTele .tele-tour-nom{
+  color: #3b2400;
+  text-shadow: 0 0.15vh 0 rgba(255, 250, 215, 0.85);
+}
+html[data-theme="prestige"] #ecranTele .tele-tour.tele-pigeon .tele-tour-nom{ color: #0b5e59; }
+html[data-theme="prestige"] #ecranTele .tele-tour.tele-rappel-tour{
+  --halo-bord: rgba(255, 250, 220, 0.95);
+  --halo: rgba(255, 236, 150, 0.85);
+  --halo-loin: rgba(255, 255, 255, 0.45);
+  --halo-eclat: 1.12;
+}
+
 /* Rappel « À toi » (sifflet) : le bloc s'illumine, avec un halo qui pulse 3 fois. Il grossit à peine :
    en grossissant comme la bannière du téléphone, il sortait de sa colonne (et passait sous le plateau) */
 #ecranTele .tele-tour.tele-rappel-tour{

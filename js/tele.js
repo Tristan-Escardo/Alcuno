@@ -110,6 +110,7 @@ function relierTele(code, silencieux = false){
   minuteurTele = setInterval(envoyerEtatTele, 400);
   attendreFirebase(() => {
     if (codeTele !== code) return;
+    suivreDecalageServeur();
     suivreConnexionTele(code);
     envoyerEtatTele();
   });
@@ -230,6 +231,7 @@ function etatPourTele(){
     regles,
     theme: document.documentElement.dataset.theme || "bordeaux",
     sons: sonsTele,
+    rappel: rappelTele,
     envols: envolsTele,
     ecran: ecranPourTele()
   };
@@ -259,7 +261,8 @@ function envoyerEtatTele(){
 
 // Sons du jeu : la télé les joue aussi (pas ceux propres au téléphone : réglages, rappels…).
 // Appelé par jouerSon (reglages.js), même si le son du téléphone est coupé.
-const SONS_TELE = new Set(["cartes", "doree", "pigeon", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees", "tour"]);
+// (le sifflet « À toi » passe par rappelPourTele : téléphone et télé en même temps)
+const SONS_TELE = new Set(["cartes", "doree", "pigeon", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees"]);
 let sonsTele = [];      // 4 derniers sons : { i: numéro, n: nom }
 let dernierNumeroTele = 0;
 // Numéro d'un son ou d'un envol : toujours croissant, même après un rechargement de la page (la télé ne
@@ -272,6 +275,29 @@ function sonPourTele(nom){
   if (!codeTele || enLigneActif || !SONS_TELE.has(nom)) return;
   sonsTele = sonsTele.concat({ i: numeroTele(), n: nom }).slice(-4);
   setTimeout(envoyerEtatTele, 60); // tout de suite (avec ce que montre l'écran à ce moment-là)
+}
+
+// Rappel « À toi » (sifflet + bandeau qui clignote, plateau.js) : le téléphone et la télé le font au même
+// moment (sinon la télé, qui le reçoit par le réseau, était en retard sur le téléphone). Il part un peu
+// plus tard, à une heure donnée en temps du serveur Firebase, que chacun connaît (à son décalage
+// d'horloge près : .info/serverTimeOffset), le temps que la télé le reçoive.
+// Renvoie dans combien de ms le téléphone doit le faire (0 sans télé).
+const AVANCE_RAPPEL_TELE = 700;
+let rappelTele = null;   // dernier rappel : { i: numéro, t: heure de départ en temps du serveur }
+let decalageServeur = 0; // temps du serveur Firebase - temps de cet appareil
+let decalageServeurSuivi = false;
+function suivreDecalageServeur(){
+  if (decalageServeurSuivi || !window.firebaseDB) return;
+  decalageServeurSuivi = true;
+  window.fbOnValue(window.fbRef(window.firebaseDB, ".info/serverTimeOffset"), (snapshot) => {
+    decalageServeur = Number(snapshot.val()) || 0;
+  });
+}
+function rappelPourTele(){
+  if (!codeTele || enLigneActif) return 0;
+  rappelTele = { i: numeroTele(), t: Date.now() + decalageServeur + AVANCE_RAPPEL_TELE };
+  setTimeout(envoyerEtatTele, 0);
+  return AVANCE_RAPPEL_TELE;
 }
 
 // Carte « 1 » qui s'envole vers le nom du joueur qui la garde (envolerCarteVersJoueur, regles.js) :
@@ -433,6 +459,7 @@ function demarrerPageTele(){
   // (résumé « arrêt », voir rendreTele) : tout de suite.
   let minuteurRetourAttente = null;
   attendreFirebase(() => {
+    suivreDecalageServeur();
     window.fbOnValue(window.fbRef(window.firebaseDB, `tele/${code}`), (snapshot) => {
       const valeur = snapshot.val();
       let etat = null;
@@ -451,16 +478,30 @@ function demarrerPageTele(){
 // anciens quand la télé vient de se relier)
 let dernierSonTele = null;
 let dernierEnvolTele = null;
-function jouerSonsTele(ecran, sons){
+let dernierRappelTele = null;
+function jouerSonsTele(sons){
   sons = Array.isArray(sons) ? sons : [];
   const plusRecent = sons.reduce((max, son) => Math.max(max, Number(son.i) || 0), 0);
   if (dernierSonTele !== null) {
-    sons.filter(son => son.i > dernierSonTele && SONS_TELE.has(son.n)).forEach((son) => {
-      jouerSon(son.n);
-      if (son.n === "tour") faireClignoterTourTele(ecran); // rappel « À toi » : le bloc « Tour de » clignote aussi
-    });
+    sons.filter(son => son.i > dernierSonTele && SONS_TELE.has(son.n)).forEach(son => jouerSon(son.n));
   }
   dernierSonTele = Math.max(dernierSonTele || 0, plusRecent);
+}
+
+// Rappel « À toi » : sifflet + bloc « Tour de » qui s'illumine, à l'heure donnée par le téléphone (voir
+// rappelPourTele), donc en même temps que lui ; pas s'il arrive avec plus de 1,5 s de retard
+function programmerRappelTele(ecran, rappel){
+  const i = rappel ? Number(rappel.i) || 0 : 0;
+  if (dernierRappelTele !== null && i > dernierRappelTele) {
+    const attente = Number(rappel.t) - (Date.now() + decalageServeur);
+    if (attente > -1500) {
+      setTimeout(() => {
+        jouerSon("tour");
+        faireClignoterTourTele(ecran);
+      }, Math.max(0, attente));
+    }
+  }
+  dernierRappelTele = Math.max(dernierRappelTele || 0, i);
 }
 
 // Bloc « Tour de » qui clignote 3 fois (comme la bannière du téléphone, voir rappel-tour dans le CSS)
@@ -530,12 +571,14 @@ function dessinerTele(ecran, etat){
     appliquerThemeTele(THEME_TELE_ATTENTE);
     dernierSonTele = null;
     dernierEnvolTele = null;
+    dernierRappelTele = null;
     return;
   }
   attente.hidden = true;
   jeu.hidden = false;
   appliquerThemeTele(etat.theme);
-  jouerSonsTele(ecran, etat.sons);
+  jouerSonsTele(etat.sons);
+  programmerRappelTele(ecran, etat.rappel);
 
   // Avant la partie (joueurs en cours d'ajout) : les joueurs en grand, au milieu
   const cartes = Array.isArray(etat.cartes) ? etat.cartes : [];
