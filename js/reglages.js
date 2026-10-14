@@ -615,52 +615,179 @@ document.getElementById("btnDiagnostic").addEventListener("click", () => {
     });
 });
 
-// ===== Signaler un bug (Réglages) : le message arrive tout de suite en notification sur le téléphone du
+// ===== Signaler un bug (Réglages) : le rapport arrive tout de suite en notification sur le téléphone du
 // développeur (appli ntfy, abonnée au canal CANAL_BUGS du service gratuit ntfy.sh), avec le diagnostic
-// de ce téléphone. (Le nom du canal est dans ce fichier : quelqu'un qui le lit pourrait y écrire aussi.)
+// de ce téléphone, puis une notification par capture d'écran (l'image en pièce jointe : une seule par
+// message chez ntfy). (Le nom du canal est dans ce fichier : quelqu'un qui le lit pourrait y écrire aussi.)
+// La fenêtre est une demi-page qui monte du bas, par-dessus les Réglages : le clavier ne s'ouvre qu'en
+// touchant la zone de texte ; on la ferme avec ✕, en touchant le fond ou en la glissant vers le bas.
 const CANAL_BUGS = "alcuno-bugs-7cy7edx1ee25";
+const MAX_CAPTURES_BUG = 3;
+const TEXTE_BOUTON_BUG = "📤 Envoyer le rapport";
 const ecranBug = document.getElementById("ecranBug");
+const feuilleBug = ecranBug.querySelector(".bugFeuille");
 const champBug = document.getElementById("texteBug");
 const btnEnvoyerBug = document.getElementById("btnEnvoyerBug");
+const btnAjouterCaptureBug = document.getElementById("btnAjouterCaptureBug");
+const champCapturesBug = document.getElementById("fichiersBug");
+const zoneCapturesBug = document.getElementById("bugCaptures");
+let capturesBug = []; // { fichier, url } (url : aperçu)
 let dernierEnvoiBug = 0;
+let minuteurFermetureBug = null;
 
 function ouvrirEcranBug(){
+  clearTimeout(minuteurFermetureBug);
+  feuilleBug.style.transform = "";
   ecranBug.style.display = "";
-  ouvrirClavier(champBug); // (pendant le tap : sinon l'iPhone n'ouvre pas le clavier)
+  void ecranBug.offsetWidth; // (la demi-page part d'en bas)
+  ecranBug.classList.add("ouvert");
 }
 
 function fermerEcranBug(){
   champBug.blur();
-  ecranBug.style.display = "none";
+  ecranBug.classList.remove("ouvert");
+  feuilleBug.style.transform = ""; // (redescend depuis là où le doigt l'a laissée)
+  clearTimeout(minuteurFermetureBug);
+  minuteurFermetureBug = setTimeout(() => { ecranBug.style.display = "none"; }, 280);
+}
+
+// Glisser la demi-page vers le bas depuis son haut (poignée, titre) : elle suit le doigt, et se ferme
+// si on l'a assez descendue (ou d'un geste rapide)
+let departGlisseBug = null;
+const enteteBug = ecranBug.querySelector(".bugEntete");
+enteteBug.addEventListener("pointerdown", (e) => {
+  if (e.target.closest("button")) return;
+  departGlisseBug = { y: e.clientY, t: e.timeStamp };
+  feuilleBug.style.transition = "none";
+  try { enteteBug.setPointerCapture(e.pointerId); } catch (err) {}
+});
+enteteBug.addEventListener("pointermove", (e) => {
+  if (!departGlisseBug) return;
+  feuilleBug.style.transform = `translateY(${Math.max(0, e.clientY - departGlisseBug.y)}px)`;
+});
+function lacherGlisseBug(e){
+  if (!departGlisseBug) return;
+  const descente = e.clientY - departGlisseBug.y;
+  const vitesse = descente / Math.max(1, e.timeStamp - departGlisseBug.t);
+  departGlisseBug = null;
+  feuilleBug.style.transition = "";
+  if (descente > 90 || vitesse > 0.6) fermerEcranBug();
+  else feuilleBug.style.transform = "";
+}
+enteteBug.addEventListener("pointerup", lacherGlisseBug);
+enteteBug.addEventListener("pointercancel", lacherGlisseBug);
+
+// Captures d'écran (photos du téléphone) : aperçus, MAX_CAPTURES_BUG au plus
+function afficherCapturesBug(){
+  zoneCapturesBug.innerHTML = "";
+  capturesBug.forEach((capture, i) => {
+    const vignette = document.createElement("div");
+    vignette.className = "bugVignette";
+    const image = document.createElement("img");
+    image.src = capture.url;
+    image.alt = `Capture ${i + 1}`;
+    const retirer = document.createElement("button");
+    retirer.type = "button";
+    retirer.className = "bugRetirer";
+    retirer.setAttribute("aria-label", "Retirer la capture");
+    retirer.innerText = "✕";
+    retirer.addEventListener("click", () => {
+      URL.revokeObjectURL(capture.url);
+      capturesBug = capturesBug.filter(c => c !== capture);
+      afficherCapturesBug();
+    });
+    vignette.append(image, retirer);
+    zoneCapturesBug.appendChild(vignette);
+  });
+  zoneCapturesBug.hidden = capturesBug.length === 0;
+  btnAjouterCaptureBug.hidden = capturesBug.length >= MAX_CAPTURES_BUG;
+}
+
+champCapturesBug.addEventListener("change", () => {
+  const fichiers = Array.from(champCapturesBug.files || []).filter(f => f.type.startsWith("image/"));
+  champCapturesBug.value = "";
+  const place = MAX_CAPTURES_BUG - capturesBug.length;
+  if (fichiers.length > place) afficherToast(`${MAX_CAPTURES_BUG} captures au plus`);
+  fichiers.slice(0, place).forEach(f => capturesBug.push({ fichier: f, url: URL.createObjectURL(f) }));
+  afficherCapturesBug();
+});
+
+// Image réduite (1 600 px au plus) en JPEG : elle part vite, même en 4G
+function compresserCaptureBug(fichier){
+  return new Promise((ok, ko) => {
+    const url = URL.createObjectURL(fichier);
+    const image = new Image();
+    image.onload = () => {
+      const echelle = Math.min(1, 1600 / Math.max(image.naturalWidth, image.naturalHeight));
+      const toile = document.createElement("canvas");
+      toile.width = Math.round(image.naturalWidth * echelle);
+      toile.height = Math.round(image.naturalHeight * echelle);
+      toile.getContext("2d").drawImage(image, 0, 0, toile.width, toile.height);
+      URL.revokeObjectURL(url);
+      toile.toBlob(b => b ? ok(b) : ko(new Error("image")), "image/jpeg", 0.8);
+    };
+    image.onerror = () => { URL.revokeObjectURL(url); ko(new Error("image illisible")); };
+    image.src = url;
+  });
+}
+
+// Un message ntfy : texte simple, ou fichier (Blob sans type) ; titre dans l'adresse => pas de requête
+// préalable du navigateur
+function publierNtfy(titre, corps, nomFichier){
+  const parametres = new URLSearchParams({ title: titre, tags: "beetle" });
+  if (nomFichier) parametres.set("filename", nomFichier);
+  return fetch(`https://ntfy.sh/${CANAL_BUGS}?${parametres}`, { method: "POST", body: corps })
+    .then((reponse) => { if (!reponse.ok) throw new Error("ntfy " + reponse.status); });
+}
+
+function remettreBoutonBug(){
+  btnEnvoyerBug.disabled = false;
+  btnEnvoyerBug.innerText = TEXTE_BOUTON_BUG;
 }
 
 async function envoyerBug(){
   const texte = champBug.value.trim();
   if (!texte) { afficherToast("Écris d'abord ce qui s'est passé"); return; }
   if (Date.now() - dernierEnvoiBug < 30000) { afficherToast("Attends un peu avant d'en renvoyer un"); return; }
+  const titre = `Bug Alcuno ${VERSION_AFFICHEE}`;
+  const captures = capturesBug.slice();
+  const annonceCaptures = captures.length
+    ? `\n\n(${captures.length} capture${captures.length > 1 ? "s" : ""} d'écran juste après)` : "";
   // ntfy : 4 096 octets au plus (au-delà, le message devient une pièce jointe) => texte + diagnostic coupés
-  const message = (texte.slice(0, 1500) + "\n\n" + texteDiagnostic()).slice(0, 3000);
+  const message = (texte.slice(0, 1500) + annonceCaptures + "\n\n" + texteDiagnostic()).slice(0, 3000);
   btnEnvoyerBug.disabled = true;
   btnEnvoyerBug.innerText = "Envoi…";
   try {
-    // (corps en texte simple et titre dans l'adresse : pas de requête préalable du navigateur)
-    const titre = encodeURIComponent(`Bug Alcuno ${VERSION_AFFICHEE}`);
-    const reponse = await fetch(`https://ntfy.sh/${CANAL_BUGS}?title=${titre}&tags=beetle`, { method: "POST", body: message });
-    if (!reponse.ok) throw new Error("ntfy " + reponse.status);
-    dernierEnvoiBug = Date.now();
-    champBug.value = "";
-    fermerEcranBug();
-    afficherNotificationHaut("", "Merci ! Le bug est envoyé", true);
+    await publierNtfy(titre, message);
   } catch (e) {
     afficherToast(navigator.onLine === false ? "Pas de réseau : réessaie plus tard" : "L'envoi n'a pas marché, réessaie", 3000);
-  } finally {
-    btnEnvoyerBug.disabled = false;
-    btnEnvoyerBug.innerText = "Envoyer";
+    remettreBoutonBug();
+    return;
   }
+  dernierEnvoiBug = Date.now();
+  let capturesRatees = 0;
+  for (let i = 0; i < captures.length; i++) {
+    btnEnvoyerBug.innerText = `Envoi de la capture ${i + 1}/${captures.length}…`;
+    try {
+      const image = await compresserCaptureBug(captures[i].fichier);
+      await publierNtfy(`${titre} : capture ${i + 1}/${captures.length}`, new Blob([image]), `capture-${i + 1}.jpg`);
+    } catch (e) {
+      capturesRatees++;
+    }
+  }
+  champBug.value = "";
+  capturesBug.forEach(c => URL.revokeObjectURL(c.url));
+  capturesBug = [];
+  afficherCapturesBug();
+  remettreBoutonBug();
+  fermerEcranBug();
+  afficherNotificationHaut("", capturesRatees ? "Rapport envoyé, mais pas toutes les captures" : "Merci ! Le rapport est envoyé", true);
 }
 
 document.getElementById("btnSignalerBug").addEventListener("click", ouvrirEcranBug);
 document.getElementById("btnBugRetour").addEventListener("click", fermerEcranBug);
+ecranBug.querySelector(".bugFond").addEventListener("click", fermerEcranBug);
+btnAjouterCaptureBug.addEventListener("click", () => champCapturesBug.click());
 btnEnvoyerBug.addEventListener("click", envoyerBug);
 
 // ===== Partie en mémoire : la partie en ligne dont ce téléphone se souvient (« Revenir ») =====

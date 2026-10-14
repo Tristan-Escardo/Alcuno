@@ -88,7 +88,8 @@ function ecranSaisieAffiche(){
 function bloquerGlissement(e){
   const ecran = ecranSaisieAffiche();
   if (!ecran) return;
-  if (ecran.scrollHeight > ecran.clientHeight + 1 && ecran.contains(e.target)) return;
+  const defilant = ecran.querySelector("[data-defile]") || ecran; // (Signaler un bug : la demi-page)
+  if (defilant.scrollHeight > defilant.clientHeight + 1 && defilant.contains(e.target)) return;
   e.preventDefault();
 }
 let glissementBloque = false;
@@ -105,12 +106,13 @@ function remonterChampAuDessusDuClavier(){
   const champ = document.activeElement;
   if (!ecran || !champ || !["INPUT", "TEXTAREA"].includes(champ.tagName) || !ecran.contains(champ)) return;
   const zone = window.visualViewport;
-  // (avec son bouton : OK du code de la télé, « Envoyer » sous la zone de texte d'un bug)
-  const suivant = champ.nextElementSibling;
+  // (avec son bouton : OK du code de la télé ; « Envoyer le rapport » d'un bug, voir data-avec)
+  const avec = champ.dataset.avec && document.getElementById(champ.dataset.avec);
   const bas = Math.max((champ.closest(".casterCode") || champ).getBoundingClientRect().bottom,
-    suivant && suivant.tagName === "BUTTON" ? suivant.getBoundingClientRect().bottom : 0);
+    avec ? avec.getBoundingClientRect().bottom : 0);
   const depasse = bas - (zone.offsetTop + zone.height - 12);
-  if (depasse > 0) ecran.scrollBy({ top: depasse, behavior: mouvementReduit.matches ? "auto" : "smooth" });
+  const defilant = ecran.querySelector("[data-defile]") || ecran; // (Signaler un bug : la demi-page)
+  if (depasse > 0) defilant.scrollBy({ top: depasse, behavior: mouvementReduit.matches ? "auto" : "smooth" });
 }
 
 if (window.visualViewport) {
