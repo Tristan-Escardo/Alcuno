@@ -2570,16 +2570,14 @@ header h1{
 
 /* ===== Rappel « À toi » (en ligne, toutes les 2 min sans jouer, avec le son) : le bandeau clignote
    3 fois en grossissant et en s'illuminant. scale et filter : transform sert déjà à le placer. ===== */
-#stickyJoueurActif.rappel-tour,
-#ecranTele .tele-tour.tele-rappel-tour{
+#stickyJoueurActif.rappel-tour{
   animation: rappelTour 0.8s ease-in-out 3;
 }
 @keyframes rappelTour{
   0%, 100% { scale: 1; filter: none; }
   50%      { scale: 1.14; filter: brightness(1.35) drop-shadow(0 0 10px rgba(255, 215, 0, 0.95)); }
 }
-html[data-theme="givre"] #stickyJoueurActif.rappel-tour,
-html[data-theme="givre"] #ecranTele .tele-tour.tele-rappel-tour{
+html[data-theme="givre"] #stickyJoueurActif.rappel-tour{
   animation-name: rappelTourGivre;
 }
 @keyframes rappelTourGivre{
@@ -2589,8 +2587,7 @@ html[data-theme="givre"] #ecranTele .tele-tour.tele-rappel-tour{
 @media (prefers-reduced-motion: reduce){
   /* sans grossir : seulement la lueur */
   #stickyJoueurActif.rappel-tour,
-  html[data-theme="givre"] #stickyJoueurActif.rappel-tour,
-  #ecranTele .tele-tour.tele-rappel-tour{ animation-name: rappelTourDoux; }
+  html[data-theme="givre"] #stickyJoueurActif.rappel-tour{ animation-name: rappelTourDoux; }
   @keyframes rappelTourDoux{
     0%, 100% { filter: none; }
     50%      { filter: brightness(1.35) drop-shadow(0 0 10px rgba(255, 215, 0, 0.95)); }
@@ -5643,7 +5640,7 @@ html.tele-ecran-ouvert #refletPrestige{
   flex-direction: column;
   gap: 2vh;
   min-height: 0;
-  overflow: hidden;
+  /* (pas d'overflow: hidden : le halo du rappel « À toi » déborde du bloc « Tour de ») */
 }
 #ecranTele .tele-bloc{
   border: 1px solid rgba(255,255,255,0.3);
@@ -5686,6 +5683,42 @@ html.tele-ecran-ouvert #refletPrestige{
                                       color-mix(in srgb, var(--fond-theme) 50%, #000));
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 1vh 2.6vh rgba(0,0,0,0.3);
 }
+/* Rappel « À toi » (sifflet) : le bloc s'illumine, avec un halo qui pulse 3 fois. Il grossit à peine :
+   en grossissant comme la bannière du téléphone, il sortait de sa colonne (et passait sous le plateau) */
+#ecranTele .tele-tour.tele-rappel-tour{
+  --halo-bord: rgba(255, 215, 0, 0.95);
+  --halo: rgba(255, 215, 0, 0.8);
+  --halo-loin: rgba(255, 190, 40, 0.4);
+  --halo-eclat: 1.25;
+  position: relative;
+  z-index: 1; /* halo par-dessus le plateau */
+  animation: rappelTourTele 0.8s ease-in-out 3;
+}
+html[data-theme="givre"] #ecranTele .tele-tour.tele-rappel-tour{
+  --halo-bord: rgba(26, 155, 224, 0.9);
+  --halo: rgba(26, 155, 224, 0.6);
+  --halo-loin: rgba(127, 216, 255, 0.45);
+  --halo-eclat: 1.05;
+}
+@keyframes rappelTourTele{
+  0%, 100% { scale: 1; filter: none; }
+  50%      {
+    scale: 1.04;
+    filter: brightness(var(--halo-eclat));
+    box-shadow: 0 0 0 0.4vh var(--halo-bord), 0 0 3.5vh 1vh var(--halo), 0 0 9vh 3vh var(--halo-loin);
+  }
+}
+@keyframes rappelTourTeleDoux{ /* sans grossir : seulement le halo */
+  0%, 100% { filter: none; }
+  50%      {
+    filter: brightness(var(--halo-eclat));
+    box-shadow: 0 0 0 0.4vh var(--halo-bord), 0 0 3.5vh 1vh var(--halo), 0 0 9vh 3vh var(--halo-loin);
+  }
+}
+@media (prefers-reduced-motion: reduce){
+  #ecranTele .tele-tour.tele-rappel-tour{ animation-name: rappelTourTeleDoux; }
+}
+
 #ecranTele .tele-tour.tele-avec-couleur{
   border-color: var(--couleur-tele);
   box-shadow: 0 0 2.4vh color-mix(in srgb, var(--couleur-tele) 45%, transparent);

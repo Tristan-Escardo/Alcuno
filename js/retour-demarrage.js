@@ -25,17 +25,17 @@ function activer(id){
   bouton.click();
 }
 
-// true = retour fait dans l'appli ; false = déjà sur l'écran d'accueil
-function retourDansLAppli(){
-  if(estVisible(document.getElementById("ecranRattrapage"))) return true;
+// Ce que fait le retour sur l'écran affiché (sans le faire), ou null sur l'écran d'accueil
+function actionRetour(){
+  if(estVisible(document.getElementById("ecranRattrapage"))) return () => {};
 
   const annonce = document.getElementById("annonceNouvellePartie");
-  if(annonce){ taper(annonce); return true; }
+  if(annonce) return () => taper(annonce);
 
-  if(estVisible(ecranCredits)){ activer("btnFermerCredits"); return true; }
-  if(estVisible(ecranInstallation)){ activer("btnInstallationPlusTard"); return true; }
-  if(estVisible(ecranRegles)){ activer("btnFermerRegles"); return true; }
-  if(estVisible(ecranReglages)){ activer("btnFermerReglages"); return true; }
+  if(estVisible(ecranCredits)) return () => activer("btnFermerCredits");
+  if(estVisible(ecranInstallation)) return () => activer("btnInstallationPlusTard");
+  if(estVisible(ecranRegles)) return () => activer("btnFermerRegles");
+  if(estVisible(ecranReglages)) return () => activer("btnFermerReglages");
 
   // Overlays du jeu : le plus récent se ferme comme au tap (ceux où il faut choisir ne bougent pas),
   // sauf le +4 où « Retour » enlève la dernière gorgée distribuée
@@ -44,9 +44,10 @@ function retourDansLAppli(){
     const dessus = overlays[overlays.length - 1];
     const btnRetour = Array.from(dessus.querySelectorAll("button"))
       .find(b => b.innerText.trim() === "Retour");
-    if(!btnRetour) taper(dessus);
-    else if(!btnRetour.disabled) taper(btnRetour);
-    return true;
+    return () => {
+      if(!btnRetour) taper(dessus);
+      else if(!btnRetour.disabled) taper(btnRetour);
+    };
   }
 
   const ecrans = [
@@ -65,20 +66,26 @@ function retourDansLAppli(){
     ["enLigneChoix", "btnRetourChoixMode"]
   ];
   for(const [ecran, bouton] of ecrans){
-    if(estVisible(document.getElementById(ecran))){
-      activer(bouton);
-      return true;
-    }
+    if(estVisible(document.getElementById(ecran))) return () => activer(bouton);
   }
 
   // Plateau (classique ou en ligne) : même chose que ⌂, avec confirmation si une partie est en cours
   if(estVisible(menu) || estVisible(document.getElementById("jeu"))){
-    if(partieLancee) ecranConfirmerAccueil.style.display = "";
-    else allerAccueil();
-    return true;
+    return () => {
+      if(partieLancee) ecranConfirmerAccueil.style.display = "";
+      else allerAccueil();
+    };
   }
 
-  return false;
+  return null;
+}
+
+// true = retour fait dans l'appli ; false = déjà sur l'écran d'accueil
+function retourDansLAppli(){
+  const action = actionRetour();
+  if(!action) return false;
+  action();
+  return true;
 }
 
 function preparerRetour(e){
@@ -89,24 +96,48 @@ function preparerRetour(e){
   }
 }
 
-document.addEventListener("pointerdown", preparerRetour, { capture: true, passive: true });
+// On retire nos entrées de l'historique (le retour suivant n'est plus pour l'appli)
+function retirerEntreesRetour(){
+  if(entreesRetour === 0) return;
+  const n = entreesRetour;
+  entreesRetour = 0;
+  history.go(-n);
+}
+
+// iPhone : pas de bouton retour, seulement le glissement depuis le bord de l'écran, que Safari permet
+// dès qu'il y a des entrées dans l'historique. À l'accueil, on n'en garde donc aucune (avant, on pouvait
+// « revenir en arrière » sur l'accueil autant de fois qu'on voulait, avec le message pour quitter, qui
+// n'a pas de sens sur iPhone) ; ailleurs, on en remet un peu après chaque tap, une fois l'écran changé
+// (Safari les accepte aussi en dehors d'un tap).
+let minuteurRetourIOS = null;
+function ajusterRetourIOS(){
+  clearTimeout(minuteurRetourIOS);
+  minuteurRetourIOS = setTimeout(() => {
+    if(actionRetour()) preparerRetour();
+    else retirerEntreesRetour();
+  }, 400);
+}
+
+if(estIOS){
+  ["pointerup", "click"].forEach((type) => document.addEventListener(type, ajusterRetourIOS, { capture: true, passive: true }));
+} else {
+  document.addEventListener("pointerdown", preparerRetour, { capture: true, passive: true });
+}
 
 window.addEventListener("popstate", () => {
   if(entreesRetour === 0) return;
   entreesRetour--;
 
   if(retourDansLAppli()){
-    if(navigator.userActivation && navigator.userActivation.isActive) preparerRetour();
+    if(estIOS) ajusterRetourIOS();
+    else if(navigator.userActivation && navigator.userActivation.isActive) preparerRetour();
     return;
   }
 
-  // Écran d'accueil : on retire nos entrées, le prochain retour quitte l'appli
-  if(entreesRetour > 0){
-    const n = entreesRetour;
-    entreesRetour = 0;
-    history.go(-n);
-  }
-  afficherToast("Appuie encore une fois sur retour pour quitter");
+  // Écran d'accueil : on retire nos entrées, le prochain retour quitte l'appli (iPhone : rien, on ne
+  // quitte pas une appli en revenant en arrière)
+  retirerEntreesRetour();
+  if(!estIOS) afficherToast("Appuie encore une fois sur retour pour quitter");
 });
 
 /* ===== INIT ===== */
