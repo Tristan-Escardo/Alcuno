@@ -1281,13 +1281,22 @@ function afficherOverlayPlus4(joueurActuel, classeCartePlus4){
   refreshUI();
 }
 
-// Texte du résultat d'un +4 pour « Règles » : qui boit combien, annulations comprises
+// Texte du résultat d'un +4 pour « Règles » : qui boit combien, annulations comprises. Court pour tenir
+// dans le bloc même avec beaucoup de joueurs : ceux qui boivent autant sur une même ligne (« Ylana et Paul
+// boivent 1 gorgée »), ceux qui ont tout annulé pas affichés, « Personne ne boit » si tout le monde a annulé.
 function textePlus4(choisisseur, resultats){
-  const lignes = resultats.map(r => {
-    const annulees = r.n - r.reste;
-    const detail = annulees > 0 ? ` (${annulees} annulée${annulees > 1 ? "s" : ""})` : "";
-    return r.reste > 0 ? `${r.nom} boit ${texteGorgees(r.reste)}${detail}` : `${r.nom} ne boit rien${detail}`;
+  const parQuantite = new Map(); // gorgées => noms
+  resultats.filter(r => r.reste > 0).forEach(r => {
+    if(!parQuantite.has(r.reste)) parQuantite.set(r.reste, []);
+    parQuantite.get(r.reste).push(r.nom);
   });
+  if(parQuantite.size === 0) return `+4 de ${choisisseur} :\nPersonne ne boit`;
+  const lignes = [...parQuantite.entries()]
+    .sort((a, b) => b[0] - a[0]) // ceux qui boivent le plus d'abord
+    .map(([n, noms]) => {
+      const qui = noms.length > 1 ? `${noms.slice(0, -1).join(", ")} et ${noms[noms.length - 1]}` : noms[0];
+      return `${qui} ${noms.length > 1 ? "boivent" : "boit"} ${texteGorgees(n)}`;
+    });
   return `+4 de ${choisisseur} :\n${lignes.join("\n")}`;
 }
 
