@@ -71,6 +71,20 @@ function afficherOverlayFinUnRestants(){
     unlockScroll();
   });
 
+  // « Revanche » : relance tout de suite une partie avec les mêmes joueurs (comme « Nouvelle partie >
+  // Rejouer avec les mêmes joueurs ») ; en ligne, n'importe qui peut la lancer, pour tout le monde
+  const btnRevanche = document.createElement("button");
+  btnRevanche.className = "bouton-pigeon fin-revanche";
+  btnRevanche.innerText = "Revanche";
+  btnRevanche.addEventListener("click", () => {
+    restants.forEach(x => { annulations[x.nom] = 0; });
+    overlay.remove();
+    unlockScroll();
+    document.getElementById("btnRejouerMemes").click();
+  }, { once: true });
+
+  btnTerminer.classList.add("fin-terminer");
+  overlay.appendChild(btnRevanche);
   overlay.appendChild(btnTerminer);
   document.body.appendChild(overlay);
 }

@@ -6211,3 +6211,18 @@ html[data-theme="givre"] #ecranReglages .optionLien:active{ background: #fff; }
     cursor: pointer;
   }
 }
+
+/* ===== Fin de partie : « Revanche » (bouton principal) au-dessus de « Terminer » (discret) ===== */
+html body #overlayFinUnRestants .bouton-pigeon.fin-terminer{
+  margin-top: -6px;
+  color: #FFD700 !important;
+  background: rgba(255,215,0,0.06) !important;
+  border: 2px solid rgba(255,215,0,0.65) !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
+html[data-theme="givre"] body #overlayFinUnRestants .bouton-pigeon.fin-terminer{
+  color: var(--givre-accent) !important;
+  background: #fff !important;
+  border: 2px solid var(--givre-bord) !important;
+}
