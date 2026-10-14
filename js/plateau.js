@@ -472,7 +472,8 @@ function lancerOverlayPrediction(startIndex){
 
     surAction(cardWrap, "pred:" + t.id, {
       owner: () => curPos < ordre.length ? joueurs[ordre[curPos]] : null,
-      pret: () => !cardWrap.classList.contains("disabled")
+      pret: () => !cardWrap.classList.contains("disabled"),
+      valide: () => curPos < ordre.length // tout le monde a déjà choisi (en attente de « Révéler »)
     }, () => {
       if(cardWrap.classList.contains("disabled")) return;
       const typeId = cardWrap.dataset.typeId;
@@ -491,27 +492,84 @@ function lancerOverlayPrediction(startIndex){
     ordre.push((startIndex + (sensHoraire ? k : -k) + joueurs.length) % joueurs.length);
   }
   let curPos = 0;
+  let revele = false; // la dernière carte n'est révélée qu'avec « Révéler » (on peut encore revenir en arrière)
+
+  // « Révéler » (quand tout le monde a choisi) et « Retour » (annule le dernier choix, s'il s'est planté).
+  // Place toujours gardée sous le récap : les cartes ne bougent pas quand les boutons apparaissent.
+  const actionsPari = document.createElement("div");
+  actionsPari.className = "fin-choix-actions";
+
+  const btnReveler = document.createElement("button");
+  btnReveler.type = "button";
+  btnReveler.className = "bouton-pigeon fin-choix-reveler";
+  btnReveler.innerText = "Révéler la dernière carte";
+  surAction(btnReveler, "pred:reveler", {
+    once: true,
+    unique: true,
+    valide: () => curPos >= ordre.length && !revele
+  }, () => {
+    revele = true;
+    rafraichirUI();
+  });
+
+  const btnRetourPari = document.createElement("button");
+  btnRetourPari.type = "button";
+  btnRetourPari.className = "bouton-pigeon fin-choix-retour";
+  btnRetourPari.innerText = "Retour";
+  surAction(btnRetourPari, "pred:retour", {
+    owner: () => curPos > 0 ? joueurs[ordre[curPos - 1]] : null, // celui qui vient de choisir
+    valide: () => curPos > 0 && !revele
+  }, () => {
+    curPos--;
+    predictions[ordre[curPos]].typeId = null;
+    rafraichirUI();
+  });
+  actionsPari.append(btnReveler, btnRetourPari);
+
+  function majBoutonsPari(){
+    const peutReveler = curPos >= ordre.length && !revele;
+    const peutRevenir = curPos > 0 && !revele;
+    btnReveler.disabled = !peutReveler;
+    btnReveler.classList.toggle("cache", !peutReveler);
+    btnRetourPari.disabled = !peutRevenir;
+    btnRetourPari.classList.toggle("cache", !peutRevenir);
+  }
 
   function rafraichirUI(){
-    // recap
+    // recap : le choix de chacun, en gros avec une mini-carte (avant : petit texte à droite, illisible)
     recap.innerHTML = "";
     ordre.forEach((jIdx, i) => {
       const p = predictions[jIdx];
       const ligne = document.createElement("div");
-      ligne.className = "ligne";
+      ligne.className = "ligne" + (i === curPos && !revele ? " en-cours" : "");
       const who = document.createElement("strong");
-      who.innerText = joueurs[jIdx] + (i === curPos ? " ←" : "");
+      who.innerText = joueurs[jIdx] + (i === curPos && !revele ? " ←" : "");
       const what = document.createElement("span");
-      what.innerText = p.typeId ? nomType(p.typeId) : "—";
+      what.className = "choix";
+      const type = p.typeId ? TYPES_PARIS.find(t => t.id === p.typeId) : null;
+      if(type){
+        const mini = creerCartePreview(type.rep);
+        mini.classList.add("fin-choix-mini");
+        what.append(mini, document.createTextNode(type.label));
+      } else {
+        what.innerText = "—";
+      }
       ligne.appendChild(who);
       ligne.appendChild(what);
       recap.appendChild(ligne);
     });
 
+    majBoutonsPari();
+
     if(curPos < ordre.length){
       const jIdx = ordre[curPos];
       turn.innerText = `Au tour de ${joueurs[jIdx]} : choisis un type`;
+      Array.from(grid.querySelectorAll('.fin-choix-card')).forEach(el => el.classList.remove('disabled'));
+    } else if(!revele){
+      turn.innerText = "Tout le monde a choisi !";
+      Array.from(grid.querySelectorAll('.fin-choix-card')).forEach(el => el.classList.add('disabled'));
     } else {
+      actionsPari.remove();
       // Révélation
       const lastCard = derniereEstDoree ? "carte_doree" : paquet[0];
       const vraiType = typeFromCardClass(lastCard);
@@ -589,6 +647,7 @@ function lancerOverlayPrediction(startIndex){
   panel.appendChild(header);
   panel.appendChild(turn);
   panel.appendChild(recap);
+  panel.appendChild(actionsPari);
   panel.appendChild(grid);
   overlay.appendChild(panel);
   document.body.appendChild(overlay);

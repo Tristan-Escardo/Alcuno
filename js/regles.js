@@ -350,12 +350,20 @@ function afficherOverlayAnnulation(joueurIndex, nbGorgees, onDone = null, afterC
   overlay.style.overflowY = "auto";
   overlay.style.webkitOverflowScrolling = "touch";
 
+  // Le nombre de gorgées à boire d'abord (on le voyait juste avant, puis plus du tout ici)
   const titre = document.createElement("div");
-  titre.innerText = `${nom}, tu as ${dispo} annulation${dispo > 1 ? "s" : ""}.`;
+  titre.innerText = `${nom}, tu bois ${texteGorgees(nbGorgees)}.`;
   titre.style.fontSize = "clamp(24px, 5vw, 46px)";
   titre.style.fontWeight = "900";
   titre.style.textShadow = "2px 2px 5px #000";
   overlay.appendChild(titre);
+
+  const ligneAnnulations = document.createElement("div");
+  ligneAnnulations.innerText = `Tu as ${dispo} annulation${dispo > 1 ? "s" : ""}.`;
+  ligneAnnulations.style.fontSize = "clamp(20px, 4.4vw, 34px)";
+  ligneAnnulations.style.fontWeight = "900";
+  ligneAnnulations.style.textShadow = "2px 2px 5px #000";
+  overlay.appendChild(ligneAnnulations);
 
   const sousTitre = document.createElement("div");
   sousTitre.innerText = "Combien de gorgées veux-tu annuler ?";
@@ -1251,7 +1259,20 @@ function afficherOverlayPlus4(joueurActuel, classeCartePlus4){
       .map(([k,v]) => ({ idx: Number(k), n: Number(v) }))
       .filter(x => x.n > 0);
 
-    distribuerFilePlus4(file, classeCartePlus4);
+    // Résultat affiché dans « Règles » tout de suite, puis mis à jour avec les annulations
+    const resultats = file.map(x => ({ nom: joueurs[x.idx], n: x.n, reste: x.n }));
+    const afficherResultat = () => {
+      regleZero.innerText = textePlus4(choisisseur, resultats);
+      regleZero.style.display = "block";
+      zeroEnCours = true; // effacé au prochain tirage, comme les autres règles
+    };
+    afficherResultat();
+
+    distribuerFilePlus4(file, classeCartePlus4, (idx, reste) => {
+      const r = resultats.find(x => x.nom === joueurs[idx]);
+      if(r) r.reste = reste;
+      afficherResultat();
+    });
   });
   // Ordre d'affichage : Valider, puis Retour, puis Annuler
   actions.append(btnValider, btnUndo, btnReset);
@@ -1260,16 +1281,27 @@ function afficherOverlayPlus4(joueurActuel, classeCartePlus4){
   refreshUI();
 }
 
-function distribuerFilePlus4(file, classeCartePlus4){
+// Texte du résultat d'un +4 pour « Règles » : qui boit combien, annulations comprises
+function textePlus4(choisisseur, resultats){
+  const lignes = resultats.map(r => {
+    const annulees = r.n - r.reste;
+    const detail = annulees > 0 ? ` (${annulees} annulée${annulees > 1 ? "s" : ""})` : "";
+    return r.reste > 0 ? `${r.nom} boit ${texteGorgees(r.reste)}${detail}` : `${r.nom} ne boit rien${detail}`;
+  });
+  return `+4 de ${choisisseur} :\n${lignes.join("\n")}`;
+}
+
+// onAnnulation(joueurIndex, gorgéesRestantes) : appelé quand un joueur a choisi combien il en annule
+function distribuerFilePlus4(file, classeCartePlus4, onAnnulation = null){
   if(file.length === 0) return;
 
   const item = file.shift();
   demanderAnnulationPlus4(item.idx, item.n, classeCartePlus4, () => {
-    distribuerFilePlus4(file, classeCartePlus4);
-  });
+    distribuerFilePlus4(file, classeCartePlus4, onAnnulation);
+  }, onAnnulation);
 }
 
-function demanderAnnulationPlus4(joueurIndex, nbGorgees, classeCartePlus4, onFinish){
+function demanderAnnulationPlus4(joueurIndex, nbGorgees, classeCartePlus4, onFinish, onAnnulation = null){
   const nom = joueurs[joueurIndex];
   const msg = `${nom} boit ${texteGorgees(nbGorgees)} (+4)`;
 
@@ -1280,7 +1312,7 @@ function demanderAnnulationPlus4(joueurIndex, nbGorgees, classeCartePlus4, onFin
       afficherOverlayAnnulation(
         joueurIndex,
         nbGorgees,
-        null,
+        (utilise, reste) => { if(typeof onAnnulation === "function") onAnnulation(joueurIndex, reste); },
         () => { if(typeof onFinish === "function") onFinish(); }
       );
     } else if(typeof onFinish === "function"){
