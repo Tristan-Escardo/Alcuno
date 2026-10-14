@@ -345,7 +345,11 @@ function dessinerTele(ecran, etat){
   tour.classList.toggle("tele-pigeon", !!etat.pigeon);
   tour.style.setProperty("--couleur-tele", COULEURS_JEU[etat.couleur] || "transparent");
   tour.classList.toggle("tele-avec-couleur", !!COULEURS_JEU[etat.couleur]);
-  ecran.querySelector(".tele-tour-nom").innerText = etat.pigeon ? `PIGEON (${etat.tour})` : etat.tour;
+  const nomTour = etat.pigeon ? `PIGEON (${etat.tour})` : etat.tour;
+  const elNomTour = ecran.querySelector(".tele-tour-nom");
+  elNomTour.innerText = nomTour;
+  // Nom long (« PIGEON (Maximilien 👑) ») : plus petit, pour tenir sur une ligne
+  elNomTour.style.fontSize = nomTour.length > 18 ? "3.4vh" : nomTour.length > 12 ? "4.2vh" : "";
 
   // Joueurs
   const liste = ecran.querySelector(".tele-joueurs");
