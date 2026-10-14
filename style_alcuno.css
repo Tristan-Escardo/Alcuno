@@ -6170,3 +6170,44 @@ html[data-theme="givre"] #ecranBug textarea::placeholder{ color: #7a98ad; }
 html[data-theme="givre"] #ecranBug .bugAjouterPiece{ color: var(--givre-accent); border-color: var(--givre-bord); }
 html[data-theme="givre"] #ecranBug .bugVignette img,
 html[data-theme="givre"] #ecranBug .bugVignette video{ border-color: var(--givre-bord); }
+
+/* ===== Réglages : « Afficher l'écran télé » (toute la ligne se touche, flèche › à droite) ===== */
+#ecranReglages .optionLien{
+  width: 100%;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+#ecranReglages .optionLien:active{ background: rgba(255,255,255,0.12); }
+#ecranReglages .optionChevron{
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: #FFD700;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+html[data-theme="givre"] #ecranReglages .optionChevron{ stroke: var(--givre-accent); }
+html[data-theme="givre"] #ecranReglages .optionLien:active{ background: #fff; }
+/* Écran télé ouvert sur un téléphone (par erreur ou pour voir) : « Revenir au jeu » (caché sur une télé) */
+#ecranTele .tele-revenir{ display: none; }
+@media (pointer: coarse){
+  #ecranTele .tele-revenir{
+    display: block;
+    position: fixed;
+    top: calc(env(safe-area-inset-top, 0px) + 12px);
+    left: 12px;
+    z-index: 5;
+    padding: 10px 16px;
+    font: 800 16px Arial, sans-serif;
+    color: #fff;
+    background: rgba(0,0,0,0.55);
+    border: 1px solid rgba(255,215,0,0.5);
+    border-radius: 999px;
+    cursor: pointer;
+  }
+}

@@ -321,6 +321,10 @@ if (!estPageTele) {
   btnCaster.addEventListener("click", ouvrirEcranCaster);
   document.getElementById("btnCasterFermer").addEventListener("click", fermerEcranCaster);
   document.getElementById("btnCasterArreter").addEventListener("click", arreterTele);
+  // Réglages : pour une télé que le jeu n'a pas reconnue toute seule (index.html, NAVIGATEUR_TELE)
+  document.getElementById("btnAfficherEcranTele").addEventListener("click", () => {
+    location.href = location.pathname + "?tele";
+  });
   document.getElementById("btnCasterScanner").addEventListener("click", () => {
     ouvrirScanner({ lireCode: codeTeleDepuisTexte, quandCode: relierTele });
   });
@@ -382,6 +386,7 @@ function demarrerPageTele(){
         <div class="tele-etape"><span class="tele-num">2</span><span>Scanne ce QR code avec l'appli</span></div>
         <div class="tele-etape"><span class="tele-num">3</span><span>La partie s'affiche ici</span></div>
         <button type="button" class="tele-plein-ecran">Plein écran</button>
+        <button type="button" class="tele-revenir">← Revenir au jeu</button>
       </div>
       <div class="tele-attente-qr">
         <div class="tele-qr"></div>
@@ -418,6 +423,8 @@ function demarrerPageTele(){
   qr.addData(lien);
   qr.make();
   ecran.querySelector(".tele-qr").innerHTML = qr.createSvgTag({ scalable: true, margin: 0 });
+
+  ecran.querySelector(".tele-revenir").addEventListener("click", () => { location.href = location.pathname; });
 
   // « Plein écran » : caché quand la télé y est déjà (ou quand son navigateur ne sait pas le faire)
   const btnPleinEcran = ecran.querySelector(".tele-plein-ecran");
