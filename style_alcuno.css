@@ -2570,14 +2570,16 @@ header h1{
 
 /* ===== Rappel « À toi » (en ligne, toutes les 2 min sans jouer, avec le son) : le bandeau clignote
    3 fois en grossissant et en s'illuminant. scale et filter : transform sert déjà à le placer. ===== */
-#stickyJoueurActif.rappel-tour{
+#stickyJoueurActif.rappel-tour,
+#ecranTele .tele-tour.tele-rappel-tour{
   animation: rappelTour 0.8s ease-in-out 3;
 }
 @keyframes rappelTour{
   0%, 100% { scale: 1; filter: none; }
   50%      { scale: 1.14; filter: brightness(1.35) drop-shadow(0 0 10px rgba(255, 215, 0, 0.95)); }
 }
-html[data-theme="givre"] #stickyJoueurActif.rappel-tour{
+html[data-theme="givre"] #stickyJoueurActif.rappel-tour,
+html[data-theme="givre"] #ecranTele .tele-tour.tele-rappel-tour{
   animation-name: rappelTourGivre;
 }
 @keyframes rappelTourGivre{
@@ -2587,7 +2589,8 @@ html[data-theme="givre"] #stickyJoueurActif.rappel-tour{
 @media (prefers-reduced-motion: reduce){
   /* sans grossir : seulement la lueur */
   #stickyJoueurActif.rappel-tour,
-  html[data-theme="givre"] #stickyJoueurActif.rappel-tour{ animation-name: rappelTourDoux; }
+  html[data-theme="givre"] #stickyJoueurActif.rappel-tour,
+  #ecranTele .tele-tour.tele-rappel-tour{ animation-name: rappelTourDoux; }
   @keyframes rappelTourDoux{
     0%, 100% { filter: none; }
     50%      { filter: brightness(1.35) drop-shadow(0 0 10px rgba(255, 215, 0, 0.95)); }

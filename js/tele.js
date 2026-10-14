@@ -251,7 +251,7 @@ function envoyerEtatTele(){
 
 // Sons du jeu : la télé les joue aussi (pas ceux propres au téléphone : réglages, rappels…).
 // Appelé par jouerSon (reglages.js), même si le son du téléphone est coupé.
-const SONS_TELE = new Set(["cartes", "doree", "pigeon", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees"]);
+const SONS_TELE = new Set(["cartes", "doree", "pigeon", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees", "tour"]);
 let sonsTele = [];      // 4 derniers sons : { i: numéro, n: nom }
 let dernierNumeroTele = 0;
 // Numéro d'un son ou d'un envol : toujours croissant, même après un rechargement de la page (la télé ne
@@ -432,13 +432,25 @@ function demarrerPageTele(){
 // anciens quand la télé vient de se relier)
 let dernierSonTele = null;
 let dernierEnvolTele = null;
-function jouerSonsTele(sons){
+function jouerSonsTele(ecran, sons){
   sons = Array.isArray(sons) ? sons : [];
   const plusRecent = sons.reduce((max, son) => Math.max(max, Number(son.i) || 0), 0);
   if (dernierSonTele !== null) {
-    sons.filter(son => son.i > dernierSonTele && SONS_TELE.has(son.n)).forEach(son => jouerSon(son.n));
+    sons.filter(son => son.i > dernierSonTele && SONS_TELE.has(son.n)).forEach((son) => {
+      jouerSon(son.n);
+      if (son.n === "tour") faireClignoterTourTele(ecran); // rappel « À toi » : le bloc « Tour de » clignote aussi
+    });
   }
   dernierSonTele = Math.max(dernierSonTele || 0, plusRecent);
+}
+
+// Bloc « Tour de » qui clignote 3 fois (comme la bannière du téléphone, voir rappel-tour dans le CSS)
+function faireClignoterTourTele(ecran){
+  const tour = ecran.querySelector(".tele-tour");
+  tour.classList.remove("tele-rappel-tour");
+  void tour.offsetWidth; // relance l'animation si elle était déjà là
+  tour.classList.add("tele-rappel-tour");
+  tour.addEventListener("animationend", () => tour.classList.remove("tele-rappel-tour"), { once: true });
 }
 
 // Même animation que sur le téléphone : la carte part de sa case vers le +1 du joueur, qui grossit
@@ -504,7 +516,7 @@ function dessinerTele(ecran, etat){
   attente.hidden = true;
   jeu.hidden = false;
   appliquerThemeTele(etat.theme);
-  jouerSonsTele(etat.sons);
+  jouerSonsTele(ecran, etat.sons);
 
   // Avant la partie (joueurs en cours d'ajout) : les joueurs en grand, au milieu
   const cartes = Array.isArray(etat.cartes) ? etat.cartes : [];
