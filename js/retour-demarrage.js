@@ -112,9 +112,10 @@ function retirerEntreesRetour(){
 // l'entrée suivante a été ajoutée. On garde donc une entrée par écran ouvert (une pile), ajoutée au
 // moment du tap qui l'ouvre, quand le doigt se lève (l'écran d'avant est encore affiché : c'est lui que
 // montrera le glissement ; les boutons changent d'écran au clic, juste après), et retirée si le tap n'a
-// pas changé d'écran. Pas quand le doigt touche l'écran : le glissement depuis le bord commence lui
-// aussi par un toucher, il ajoutait l'entrée qu'il retirait aussitôt (on glissait sans fin sur
-// l'accueil) ; quand l'iPhone prend le geste, la page reçoit « pointercancel », pas « pointerup ».
+// pas changé d'écran. Seulement pour un vrai tap (doigt presque immobile) sur un élément qui peut
+// changer d'écran (bouton…) : un glissement (depuis le bord, ou rapide, que l'iPhone ne prend pas
+// toujours pour le geste retour) ou un toucher dans le vide ajoutaient une entrée, que le glissement
+// suivant utilisait : en enchaînant les glissements, on glissait sans fin sur l'accueil.
 // L'accueil et la partie en cours n'en ont aucune : glisser n'y fait rien (⌂ pour quitter une partie).
 // (Avant : des entrées ajoutées après le tap, donc des captures du mauvais écran : en glissant depuis
 // les réglages, on revoyait les réglages, puis on revenait à l'accueil.)
@@ -122,7 +123,9 @@ const ECRANS_RACINES = new Set(["accueil", "jeu"]);
 let pileIOS = [];             // écran montré par chaque entrée, de la plus ancienne à la plus récente
 let retraitsIOS = 0;          // nos propres history.go(-n) en cours (leur popstate n'est pas un retour)
 let ecranAvantTapIOS = null;  // tap en cours : écran affiché au moment du tap (son entrée est ajoutée)
-let ecranAuToucherIOS = null; // doigt posé : écran affiché à ce moment-là
+let toucherEnCoursIOS = null; // doigt posé sur un élément qui peut changer d'écran : { ecran, x, y }
+const ELEMENTS_NAVIGATION_IOS = 'button, a, [role="button"], #titreAccueil, header h1';
+const DEPLACEMENT_MAX_TAP_IOS = 12; // px : au-delà, le doigt a glissé, ce n'est pas un tap
 let minuteurTapIOS = null;
 
 // Nom de l'écran affiché (pour savoir si un tap a changé d'écran)
@@ -142,8 +145,13 @@ function nomEcran(){
   return "accueil";
 }
 
+// Profondeur de l'entrée d'historique actuelle (0 : celle de l'ouverture de l'appli)
+function profondeurIOS(){
+  return (history.state && history.state.profondeur) || 0;
+}
+
 function retirerEntreesIOS(n){
-  n = Math.min(n, pileIOS.length);
+  n = Math.min(n, pileIOS.length, profondeurIOS()); // (jamais plus loin que l'entrée de départ)
   if(n <= 0) return;
   pileIOS.length -= n;
   retraitsIOS++;
@@ -161,16 +169,20 @@ function reconcilierPileIOS(){
 }
 
 function toucherIOS(e){
-  if(e.isTrusted) ecranAuToucherIOS = nomEcran();
+  if(!e.isTrusted) return;
+  const surNavigation = e.target && e.target.closest && e.target.closest(ELEMENTS_NAVIGATION_IOS);
+  toucherEnCoursIOS = surNavigation ? { ecran: nomEcran(), x: e.clientX, y: e.clientY } : null;
 }
 
 // Doigt levé (un vrai tap) : entrée ajoutée maintenant, avant le clic qui change d'écran
 function leverDoigtIOS(e){
-  if(!e.isTrusted || ecranAuToucherIOS === null) return;
-  const avant = ecranAuToucherIOS;
-  ecranAuToucherIOS = null;
+  if(!e.isTrusted || toucherEnCoursIOS === null) return;
+  const toucher = toucherEnCoursIOS;
+  toucherEnCoursIOS = null;
+  if(Math.hypot(e.clientX - toucher.x, e.clientY - toucher.y) > DEPLACEMENT_MAX_TAP_IOS) return; // a glissé
+  const avant = toucher.ecran;
   if(ecranAvantTapIOS === null){
-    try { history.pushState({ alcunoRetour: true }, ""); } catch (err) { return; }
+    try { history.pushState({ alcunoRetour: true, profondeur: pileIOS.length + 1 }, ""); } catch (err) { return; }
     ecranAvantTapIOS = avant;
     pileIOS.push(avant);
   }
@@ -191,7 +203,7 @@ if(estIOS){
   document.addEventListener("pointerdown", toucherIOS, { capture: true, passive: true });
   document.addEventListener("pointerup", leverDoigtIOS, { capture: true, passive: true });
   // geste repris par l'iPhone (glissement depuis le bord, défilement) : pas un tap
-  document.addEventListener("pointercancel", () => { ecranAuToucherIOS = null; }, { capture: true, passive: true });
+  document.addEventListener("pointercancel", () => { toucherEnCoursIOS = null; }, { capture: true, passive: true });
   document.addEventListener("click", finTapIOS, { capture: true, passive: true });
 } else {
   document.addEventListener("pointerdown", preparerRetour, { capture: true, passive: true });
@@ -200,8 +212,17 @@ if(estIOS){
 window.addEventListener("popstate", () => {
   if(estIOS){
     if(retraitsIOS > 0){ retraitsIOS--; return; }
+    // En avant, sur une ancienne entrée (glissement depuis le bord droit après un retour : nos entrées
+    // retirées restent « en avant » dans l'historique) : on y revient tout de suite, sinon on pouvait
+    // glisser en avant puis en arrière sans fin sur l'accueil
+    const profondeur = profondeurIOS();
+    if(profondeur > pileIOS.length){
+      retraitsIOS++;
+      history.go(pileIOS.length - profondeur);
+      return;
+    }
     if(pileIOS.length === 0) return;
-    pileIOS.pop();
+    pileIOS.length = Math.min(pileIOS.length - 1, profondeur);
     const action = actionRetour();
     if(action) action();
     setTimeout(reconcilierPileIOS, 400);
