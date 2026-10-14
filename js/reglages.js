@@ -451,6 +451,7 @@ function chargerSons(){
 
 // carte | doree | culsec | pigeon | tour | eau
 function jouerSon(nom){
+  sonPourTele(nom); // mode télé : la télé le joue aussi (même si le son de ce téléphone est coupé)
   if (!caseSons.checked || volumeSons <= 0) return;
   if (rattrapageEnCours) return; // reconnexion : pas de sons pour les actions déjà passées
   const ctx = contexteAudio();
