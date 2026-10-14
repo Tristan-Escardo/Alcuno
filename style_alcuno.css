@@ -5394,8 +5394,12 @@ html.mode-tele body{
   overflow: hidden;
   background: var(--fond-theme);
 }
-html.mode-tele body > *:not(#ecranTele){
+html.mode-tele body > *:not(#ecranTele):not(#refletPrestige){
   display: none !important;
+}
+/* Prestige : le reflet doré passe aussi sur la télé, sauf sur l'écran noir des annonces (comme sur le téléphone) */
+html.tele-ecran-ouvert #refletPrestige{
+  display: none;
 }
 #ecranTele{
   position: fixed;
@@ -5439,8 +5443,13 @@ html.mode-tele body > *:not(#ecranTele){
   background: #FFD700; color: #3a2000; font-weight: 900; font-size: 3.3vh;
   display: flex; align-items: center; justify-content: center;
 }
-#ecranTele .tele-plein-ecran{
+#ecranTele .tele-boutons{
+  display: flex;
+  gap: 2vh;
   margin-top: 4vh;
+}
+#ecranTele .tele-plein-ecran,
+#ecranTele .tele-activer-son{
   padding: 1.6vh 3.4vh;
   font-size: 2.6vh;
   font-weight: 900;
@@ -5668,6 +5677,16 @@ html.mode-tele body > *:not(#ecranTele){
   -webkit-line-clamp: 7;
   overflow: hidden;
 }
+#ecranTele .tele-son-coupe{
+  position: absolute;
+  left: 2.4vw;
+  bottom: 1.2vh;
+  font-size: 1.9vh;
+  font-weight: 800;
+  color: #ffe680;
+  animation: telePulse 2.4s ease-in-out infinite;
+}
+html[data-theme="givre"] #ecranTele .tele-son-coupe{ color: var(--givre-accent); }
 #ecranTele .tele-pied{
   position: absolute;
   right: 2.4vw;
@@ -5722,7 +5741,8 @@ html[data-theme="givre"] #ecranTele .tele-prepa-info,
 html[data-theme="givre"] #ecranTele .tele-code{ color: var(--givre-accent); }
 html[data-theme="givre"] #ecranTele .tele-etape{ color: var(--givre-texte); }
 html[data-theme="givre"] #ecranTele .tele-etape .tele-num,
-html[data-theme="givre"] #ecranTele .tele-plein-ecran{
+html[data-theme="givre"] #ecranTele .tele-plein-ecran,
+html[data-theme="givre"] #ecranTele .tele-activer-son{
   background: var(--givre-bouton);
   color: #fff;
   box-shadow: 0 0.6vh 1.4vh rgba(26,146,214,0.28);

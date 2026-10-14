@@ -168,6 +168,8 @@ function texteSansBoutons(racine){
   return lignes.join("\n").slice(0, 700);
 }
 
+const BOUTONS_ACTION_TELE = ".plus4-action-btn, .fin-choix-reveler, .fin-choix-retour";
+
 // L'écran par-dessus le plateau en ce moment (annonce, annulation, duel, +4, pari…), ou null
 function ecranPourTele(){
   const overlays = Array.from(document.querySelectorAll('body > [id^="overlay"]')).filter(estAffiche);
@@ -177,9 +179,11 @@ function ecranPourTele(){
   const cartes = o.id === "overlayPredictionFin"
     ? Array.from(o.querySelectorAll(".fin-choix-reveal .Carte"))
     : Array.from(o.querySelectorAll(".Carte")).filter(c => !c.closest(".fin-choix-recap"));
-  // Boutons visibles (joueurs du +4 avec leurs gorgées, « Annuler 1 »…) : affichés en petites étiquettes
+  // Boutons visibles (joueurs du +4 avec leurs gorgées, « Annuler 1 »…) : affichés en petites étiquettes,
+  // sauf les boutons d'action, qui ne servent à rien sur la télé (Retour / Annuler / Valider / Terminer)
   const choix = Array.from(o.querySelectorAll("button"))
-    .filter(b => estAffiche(b) && !b.classList.contains("cache") && b.innerText.trim())
+    .filter(b => estAffiche(b) && !b.classList.contains("cache") && b.innerText.trim() &&
+                 !b.matches(BOUTONS_ACTION_TELE) && b.innerText.trim() !== "Terminer")
     .slice(0, 12)
     .map(b => ({ t: b.innerText.replace(/\s+/g, " ").trim().slice(0, 40), pris: !!b.disabled }));
   return {
@@ -212,6 +216,7 @@ function etatPourTele(){
     couleur: couleurChoisie || "",
     regles,
     theme: document.documentElement.dataset.theme || "bordeaux",
+    sons: sonsTele,
     ecran: ecranPourTele()
   };
 }
@@ -236,6 +241,18 @@ function envoyerEtatTele(){
         afficherToast("La télé ne reçoit pas la partie (réseau ?)", 3500);
       }
     });
+}
+
+// Sons du jeu : la télé les joue aussi (pas ceux propres au téléphone : réglages, rappels…).
+// Appelé par jouerSon (reglages.js), même si le son du téléphone est coupé.
+const SONS_TELE = new Set(["cartes", "doree", "pigeon", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees"]);
+let sonsTele = [];      // 4 derniers sons : { i: numéro (croissant, même après un rechargement), n: nom }
+let numeroSonTele = 0;
+function sonPourTele(nom){
+  if (!codeTele || enLigneActif || !SONS_TELE.has(nom)) return;
+  numeroSonTele = Math.max(numeroSonTele + 1, Date.now());
+  sonsTele = sonsTele.concat({ i: numeroSonTele, n: nom }).slice(-4);
+  setTimeout(envoyerEtatTele, 60); // tout de suite (avec ce que montre l'écran à ce moment-là)
 }
 
 function relierTeleDepuisCode(texte){
@@ -306,7 +323,10 @@ function demarrerPageTele(){
         <div class="tele-etape"><span class="tele-num">1</span><span>Sur le téléphone de la partie (mode classique) : bouton <b>Caster</b></span></div>
         <div class="tele-etape"><span class="tele-num">2</span><span>Scanne ce QR code avec l'appli</span></div>
         <div class="tele-etape"><span class="tele-num">3</span><span>La partie s'affiche ici en grand</span></div>
-        <button type="button" class="tele-plein-ecran">Plein écran</button>
+        <div class="tele-boutons">
+          <button type="button" class="tele-plein-ecran">Plein écran</button>
+          <button type="button" class="tele-activer-son">Activer le son</button>
+        </div>
       </div>
       <div class="tele-attente-qr">
         <div class="tele-qr"></div>
@@ -329,6 +349,7 @@ function demarrerPageTele(){
         <div class="tele-bloc tele-bloc-joueurs"><div class="tele-bloc-titre">Joueurs</div><div class="tele-joueurs"></div></div>
         <div class="tele-bloc tele-bloc-regles"><div class="tele-bloc-titre">Règles</div><div class="tele-couleur" hidden></div><div class="tele-regles"></div></div>
       </div>
+      <div class="tele-son-coupe" hidden>Son coupé : appuie sur OK avec la télécommande</div>
       <div class="tele-pied">Télé ${code}</div>
     </div>
     <div class="tele-ecran" hidden>
@@ -348,6 +369,17 @@ function demarrerPageTele(){
     (el.requestFullscreen || el.webkitRequestFullscreen || (() => {})).call(el);
   });
 
+  // Son : le navigateur de la télé ne le permet qu'après un geste (bouton, ou n'importe quelle touche de
+  // la télécommande) ; tant qu'il est coupé, un rappel discret s'affiche pendant la partie
+  document.addEventListener("keydown", debloquerSon, { capture: true });
+  const majSonTele = () => {
+    const actif = !caseSons.checked || (contexteSon && contexteSon.state === "running");
+    ecran.querySelector(".tele-son-coupe").hidden = !!actif;
+    ecran.querySelector(".tele-activer-son").innerText = actif ? "Son activé ✓" : "Activer le son";
+  };
+  setInterval(majSonTele, 1000);
+  majSonTele();
+
   // La télé ne doit pas se mettre en veille pendant la partie
   const garderAllume = () => {
     if ("wakeLock" in navigator && document.visibilityState === "visible") navigator.wakeLock.request("screen").catch(() => {});
@@ -365,14 +397,32 @@ function demarrerPageTele(){
   });
 }
 
+// Sons du téléphone joués par la télé : seulement ceux arrivés depuis le dernier résumé (pas les
+// anciens quand la télé vient de se relier)
+let dernierSonTele = null;
+function jouerSonsTele(sons){
+  sons = Array.isArray(sons) ? sons : [];
+  const plusRecent = sons.reduce((max, son) => Math.max(max, Number(son.i) || 0), 0);
+  if (dernierSonTele !== null) {
+    sons.filter(son => son.i > dernierSonTele && SONS_TELE.has(son.n)).forEach(son => jouerSon(son.n));
+  }
+  dernierSonTele = Math.max(dernierSonTele || 0, plusRecent);
+}
+
 function dessinerTele(ecran, etat){
   const attente = ecran.querySelector(".tele-attente");
   const jeu = ecran.querySelector(".tele-jeu");
   const surEcran = ecran.querySelector(".tele-ecran");
-  if (!etat) { attente.hidden = false; jeu.hidden = true; surEcran.hidden = true; return; }
+  if (!etat) {
+    attente.hidden = false; jeu.hidden = true; surEcran.hidden = true;
+    document.documentElement.classList.remove("tele-ecran-ouvert");
+    dernierSonTele = null;
+    return;
+  }
   attente.hidden = true;
   jeu.hidden = false;
   appliquerThemeTele(etat.theme);
+  jouerSonsTele(etat.sons);
 
   // Avant la partie (joueurs en cours d'ajout) : les joueurs en grand, au milieu
   const cartes = Array.isArray(etat.cartes) ? etat.cartes : [];
@@ -454,6 +504,7 @@ function dessinerTele(ecran, etat){
   // Écran en cours sur le téléphone (annonce, duel, +4, pari…)
   const e = etat.ecran;
   surEcran.hidden = !e;
+  document.documentElement.classList.toggle("tele-ecran-ouvert", !!e); // (pas de reflet Prestige dessus)
   if (e) {
     const zoneCartes = surEcran.querySelector(".tele-ecran-cartes");
     zoneCartes.innerHTML = "";
