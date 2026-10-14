@@ -83,7 +83,6 @@ function afficherOverlayFinUnRestants(){
     document.getElementById("btnRejouerMemes").click();
   }, { once: true });
 
-  btnTerminer.classList.add("fin-terminer");
   overlay.appendChild(btnRevanche);
   overlay.appendChild(btnTerminer);
   document.body.appendChild(overlay);
