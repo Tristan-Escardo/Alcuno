@@ -6551,3 +6551,6 @@ html[data-theme="soleil"] body #ecranReglages :is(.blocPartage, .aPropos) .aProp
 html[data-theme="soleil"] #ecranReglages :is(.lienJeu, .lienBug, .versionJeu){ color: #3a1f4a !important; text-shadow: none !important; }
 html[data-theme="soleil"] #ecranReglages #btnSignalerBug{ color: #a8264f !important; text-decoration: underline; text-underline-offset: 3px; }
 html[data-theme="soleil"] #ecranReglages .btnDiagnostic{ color: #3a1f4a !important; border-color: rgba(58, 31, 74, 0.45) !important; background: rgba(255, 255, 255, 0.25) !important; }
+/* (Signaler un bug : « Importer une photo/vidéo » en bas de la demi-page, sur le pêche) */
+html[data-theme="soleil"] #ecranBug #btnAjouterPieceBug{ color: #3a1f4a !important; border-color: rgba(58, 31, 74, 0.5) !important; background: rgba(255, 255, 255, 0.25) !important; }
+html[data-theme="soleil"] #ecranBug #btnAjouterPieceBug .iconeBouton{ stroke: #3a1f4a !important; }
