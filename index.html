@@ -61,9 +61,10 @@
             }, 4000);
         });
         // Thème choisi dans les réglages : appliqué tout de suite (pas de flash de bordeaux au chargement)
-        try { var theme = localStorage.getItem("alcuno_theme"); if (theme) document.documentElement.dataset.theme = theme; } catch (e) {}
+        // (ancien thème « violet » remplacé par « soleil »)
+        try { var theme = localStorage.getItem("alcuno_theme"); if (theme === "violet") { theme = "soleil"; localStorage.setItem("alcuno_theme", theme); } if (theme) document.documentElement.dataset.theme = theme; } catch (e) {}
         // Barre du téléphone à la couleur du thème dès le premier affichage (mêmes couleurs que THEMES dans script.js)
-        var couleursBarre = { bordeaux: "#2b001d", noir: "#000000", vert: "#08301e", bleu: "#0a1634", violet: "#3d0f66",
+        var couleursBarre = { bordeaux: "#2b001d", noir: "#000000", vert: "#08301e", bleu: "#0a1634", soleil: "#1f3566",
                               cerisier: "#5a1740", givre: "#e4f5fc", prestige: "#937810" };
         document.write('<meta name="theme-color" content="' + (couleursBarre[theme] || couleursBarre.bordeaux) + '">');
         // iPhone : page rechargée après un changement de thème (voir rafraichirBarreIphone dans script.js) :
@@ -174,7 +175,7 @@
                         <button type="button" class="pastilleTheme" data-theme="noir" style="--c:#c9c9d6;--c-givre:#2a2a35"><span class="rond" style="background:#000000"></span><span class="nomTheme">Sombre</span></button>
                         <button type="button" class="pastilleTheme" data-theme="vert" style="--c:#4fe08a;--c-givre:#127a3e"><span class="rond" style="background:#08301e"></span><span class="nomTheme">Casino</span></button>
                         <button type="button" class="pastilleTheme" data-theme="bleu" style="--c:#7fa6ff;--c-givre:#1d3f9e"><span class="rond" style="background:#0a1634"></span><span class="nomTheme">Nuit</span></button>
-                        <button type="button" class="pastilleTheme" data-theme="violet" style="--c:#c08bff;--c-givre:#6a2bb8"><span class="rond" style="background:#3d0f66"></span><span class="nomTheme">Violet</span></button>
+                        <button type="button" class="pastilleTheme" data-theme="soleil" style="--c:#ff9a6b;--c-givre:#c8506a"><span class="rond" style="background:linear-gradient(180deg,#4a4f86,#e9787a,#fcc98a)"></span><span class="nomTheme">Coucher de soleil</span></button>
                         <button type="button" class="pastilleTheme" data-theme="cerisier" style="--c:#ff9cc5;--c-givre:#c2407a"><span class="rond" style="background:linear-gradient(135deg,#5a1740 35%,#ff9cc5)"></span><span class="nomTheme">Cerisier</span></button>
                         <button type="button" class="pastilleTheme" data-theme="givre" style="--c:#7fd8ff;--c-givre:#0f6aa6"><span class="rond" style="background:linear-gradient(135deg,#9fdcf7 25%,#ffffff)"></span><span class="nomTheme">Givre</span></button>
                         <!-- Thème secret : débloqué en découvrant l'écran des créateurs (4 taps sur le titre) -->

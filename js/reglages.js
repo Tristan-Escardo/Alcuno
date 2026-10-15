@@ -42,7 +42,7 @@ caseAccessibilite.addEventListener("change", () => {
 const CLE_THEME = "alcuno_theme";
 // Couleur de la barre du téléphone pour chaque thème (= --couleur-barre du CSS, le tout haut de la page).
 // Mêmes couleurs dans le script du <head> de index.html, qui la pose dès le premier affichage.
-const THEMES = { bordeaux: "#2b001d", noir: "#000000", vert: "#08301e", bleu: "#0a1634", violet: "#3d0f66",
+const THEMES = { bordeaux: "#2b001d", noir: "#000000", vert: "#08301e", bleu: "#0a1634", soleil: "#1f3566",
                  cerisier: "#5a1740", givre: "#e4f5fc", prestige: "#937810" };
 
 // Thème secret « Prestige » : débloqué en découvrant l'écran des créateurs (4 taps sur le titre)
@@ -251,6 +251,7 @@ document.documentElement.classList.remove("rouvrir-reglages");
 majPastillePrestige();
 let themeChoisi = "bordeaux";
 try { themeChoisi = localStorage.getItem(CLE_THEME) || "bordeaux"; } catch (e) {}
+if (themeChoisi === "violet") themeChoisi = "soleil"; // ancien thème, remplacé par Coucher de soleil
 appliquerTheme(themeChoisi);
 
 // Cerisier : pétales qui tombent sur l'écran d'accueil (positions, tailles et vitesses au hasard)
@@ -380,7 +381,7 @@ curseurVolume.addEventListener("input", () => {
 curseurVolume.addEventListener("change", () => jouerSon("reglage_son")); // essai au relâchement (Sons/reglage_son.mp3)
 
 // ===== Musique d'ambiance : Sons/musique_ambiance_<thème>.mp3 (givre, cerisier, prestige), sinon
-// Sons/musique_ambiance.mp3 (bordeaux, sombre, casino, nuit, violet). En boucle, à son propre volume.
+// Sons/musique_ambiance.mp3 (bordeaux, sombre, casino, nuit, coucher de soleil). En boucle, à son propre volume.
 // Quand ce téléphone caste, c'est la télé qui la joue (à ce volume, avec le thème du téléphone).
 const CLE_MUSIQUE = "alcuno_musique";
 const CLE_VOLUME_MUSIQUE = "alcuno_volume_musique";
