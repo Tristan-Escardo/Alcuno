@@ -657,7 +657,9 @@ document.addEventListener("visibilitychange", () => {
 //   annuler_gorgees.mp3 : quelqu'un annule 1 gorgée ou plus
 //   annuler_0_gorgees.mp3 : quelqu'un tape « Annuler 0 » (il n'annule rien)
 //   tiens_gueule.mp3 : le cul sec de la carte dorée (« TIENS DANS TA GUEULE »)
-const SONS = ["cartes", "doree", "tiens_gueule", "bouton", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees"];
+//   regles.mp3 : on ouvre les Règles du jeu (boutons « Règles du jeu » de l\'accueil et de la partie)
+//   regles.mp3 : on ouvre les Règles du jeu (boutons « Règles du jeu » de l'accueil et de la partie)
+const SONS = ["cartes", "doree", "tiens_gueule", "bouton", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees", "regles"];
 // Sons coupés au bout de N secondes (avec un petit fondu), même si le fichier est plus long
 const DUREE_MAX_SONS = { doree: 3, pigeon: 2, distribuer_gorgees: 0.8, bouton: 0.3 };
 const sonsCharges = {}; // nom -> son décodé (ou null si le fichier n'existe pas)
@@ -690,7 +692,7 @@ function chargerSons(){
 // (annuler des gorgées, distribuer au +4, choisir le pigeon ou la victime de la carte dorée), et sauf
 // Réglages, « Signaler un bug » et « Copier le diagnostic » (silencieux)
 const BOUTONS_AVEC_LEUR_SON = ".bouton-annulation, .plus4-joueur-btn, #overlayPigeon .bouton-pigeon, .bouton-doree, " +
-  "#btnReglages, #btnSignalerBug, #btnDiagnostic";
+  "#btnReglages, #btnSignalerBug, #btnDiagnostic, #btnRegles, #btnReglesJeu";
 document.addEventListener("click", (e) => {
   if (!e.isTrusted || document.documentElement.classList.contains("mode-tele")) return;
   if (Date.now() - sonBoutonJoueLe < 500) return; // déjà joué au doigt levé (activerMemePendantElan)
@@ -1374,6 +1376,7 @@ function remplirRegles(){
 }
 
 function ouvrirRegles(){
+  jouerSon("regles"); // (à la place du clic des boutons, voir BOUTONS_AVEC_LEUR_SON)
   remplirRegles();
   ecranRegles.scrollTop = 0;
   choixDejaEnAttente = new Set(choixEnAttentePourMoi()); // déjà là à l'ouverture : on ne referme pas pour eux

@@ -15,6 +15,7 @@ Un fichier MP3 par moment du jeu, avec exactement ces noms :
   distribuer_gorgees.mp3  +4 : on tape sur un joueur pour lui donner une gorgée (coupé à 0,8 seconde par le jeu)
   annuler_gorgees.mp3  quelqu'un annule 1 gorgée ou plus
   annuler_0_gorgees.mp3  quelqu'un tape « Annuler 0 » (il n'annule rien)
+  regles.mp3   on ouvre les Règles du jeu
 
   tiens_gueule.mp3  le cul sec de la carte dorée (« TIENS DANS TA GUEULE »)
   bouton.mp3   petit clic quand on touche un bouton (sauf ceux qui ont déjà leur son ; coupé à 0,3 seconde par le jeu)
