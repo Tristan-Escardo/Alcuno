@@ -366,7 +366,7 @@ curseurVolume.addEventListener("input", () => {
 });
 curseurVolume.addEventListener("change", () => jouerSon("reglage_son")); // essai au relâchement (Sons/reglage_son.mp3)
 
-// ===== Musique d'ambiance : Sons/musique_<thème>.mp3 (givre, cerisier, prestige), sinon
+// ===== Musique d'ambiance : Sons/musique_ambiance_<thème>.mp3 (givre, cerisier, prestige), sinon
 // Sons/musique_ambiance.mp3 (bordeaux, sombre, casino, nuit, violet). En boucle, à son propre volume.
 // Quand ce téléphone caste, c'est la télé qui la joue (à ce volume, avec le thème du téléphone).
 const CLE_MUSIQUE = "alcuno_musique";
@@ -405,7 +405,7 @@ let lecteurMusique = null; // { audio, gain, ctx, nom }
 let musiqueTele = null;    // page de la télé : { volume, theme } reçus du téléphone (null : pas de musique)
 
 function fichierMusique(theme){
-  return THEMES_AVEC_MUSIQUE.includes(theme) ? `musique_${theme}` : "musique_ambiance";
+  return THEMES_AVEC_MUSIQUE.includes(theme) ? `musique_ambiance_${theme}` : "musique_ambiance";
 }
 
 function musiqueVoulue(){
