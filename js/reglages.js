@@ -573,7 +573,7 @@ document.addEventListener("visibilitychange", () => {
 //   annuler_gorgees.mp3 : quelqu'un annule 1 gorgée ou plus
 //   annuler_0_gorgees.mp3 : quelqu'un tape « Annuler 0 » (il n'annule rien)
 //   tiens_gueule.mp3 : le cul sec de la carte dorée (« TIENS DANS TA GUEULE »)
-const SONS = ["cartes", "doree", "tiens_gueule", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees"];
+const SONS = ["cartes", "doree", "tiens_gueule", "bouton", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees"];
 // Sons coupés au bout de N secondes (avec un petit fondu), même si le fichier est plus long
 const DUREE_MAX_SONS = { doree: 3, pigeon: 2, distribuer_gorgees: 0.8 };
 const sonsCharges = {}; // nom -> son décodé (ou null si le fichier n'existe pas)
@@ -602,6 +602,16 @@ function chargerSons(){
 }
 
 // carte | doree | culsec | pigeon | tour | eau
+// Petit son de clic (Sons/bouton.mp3) sur les boutons, sauf ceux qui ont déjà leur propre son
+// (annuler des gorgées, distribuer au +4, choisir le pigeon ou la victime de la carte dorée)
+const BOUTONS_AVEC_LEUR_SON = ".bouton-annulation, .plus4-joueur-btn, #overlayPigeon .bouton-pigeon, .bouton-doree";
+document.addEventListener("click", (e) => {
+  if (!e.isTrusted || document.documentElement.classList.contains("mode-tele")) return;
+  const bouton = e.target && e.target.closest && e.target.closest("button, [role='button']");
+  if (!bouton || bouton.disabled || bouton.matches(BOUTONS_AVEC_LEUR_SON)) return;
+  jouerSon("bouton");
+}, { capture: true, passive: true });
+
 function jouerSon(nom){
   sonPourTele(nom); // mode télé : la télé le joue aussi (même si le son de ce téléphone est coupé)
   if (!caseSons.checked || volumeSons <= 0) return;
