@@ -751,7 +751,7 @@ function reprendrePartieClassique(s){
     enregistrerPartieClassique();
     afficherJoueurs();
     afficherJoueurActif();
-    afficherToast("Partie reprise !", 2500);
+    afficherNotificationHaut("", "Partie reprise !", true);
   };
   setTimeout(etape, 0);
 }
