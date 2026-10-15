@@ -232,6 +232,8 @@ function etatPourTele(){
     couleur: couleurChoisie || "",
     regles,
     theme: document.documentElement.dataset.theme || "bordeaux",
+    pause: !!pauseEnCours,
+    musique: caseMusique.checked ? volumeMusique : 0, // (la télé joue la musique d'ambiance à ce volume)
     sons: sonsTele,
     rappel: rappelTele,
     envols: envolsTele,
@@ -412,6 +414,11 @@ function demarrerPageTele(){
         <div class="tele-bloc tele-bloc-regles"><div class="tele-bloc-titre">Règles</div><div class="tele-couleur" hidden></div><div class="tele-regles"></div></div>
       </div>
       <div class="tele-son-coupe" hidden>Son coupé : appuie sur OK avec la télécommande</div>
+      <div class="tele-pause" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5.5" y="4" width="4.6" height="16" rx="1.3"/><rect x="13.9" y="4" width="4.6" height="16" rx="1.3"/></svg>
+        <div class="tele-pause-titre">PAUSE</div>
+        <div class="tele-pause-texte">Remplissez les verres, on reprend juste après</div>
+      </div>
       <div class="tele-pied">Télé ${code}</div>
     </div>
     <div class="tele-ecran" hidden>
@@ -512,6 +519,7 @@ function delaiNotifTele(){
 function avancerNotifsTele(ecran){
   const etat = dernierEtatNotifTele;
   if (!etat || !etat.partie || !(etat.cartes || []).length || document.visibilityState !== "visible") return;
+  if (etat.pause) return; // (pas de notif ni de temps de jeu compté pendant la pause)
   tempsJeuNotifTele += PAS_NOTIFS_TELE;
   if (tempsJeuNotifTele < prochaineNotifTele || etat.ecran) return; // (choix ou annonce à l'écran : on attend)
   const texte = phraseNotifTele(etat);
@@ -657,11 +665,16 @@ function dessinerTele(ecran, etat){
     dernierSonTele = null;
     dernierEnvolTele = null;
     dernierRappelTele = null;
+    musiqueTele = null; // (plus de téléphone relié : plus de musique)
+    majMusique();
     return;
   }
   attente.hidden = true;
   jeu.hidden = false;
   appliquerThemeTele(etat.theme);
+  musiqueTele = Number(etat.musique) > 0 ? { volume: Number(etat.musique), theme: etat.theme } : null;
+  majMusique();
+  ecran.querySelector(".tele-pause").hidden = !etat.pause;
   jouerSonsTele(etat.sons);
   programmerRappelTele(ecran, etat.rappel);
 

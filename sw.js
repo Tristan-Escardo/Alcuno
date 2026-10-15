@@ -115,6 +115,8 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(requete.url);
   // Firebase, polices, etc. : pas touché (le mode en ligne a de toute façon besoin du réseau)
   if (url.origin !== self.location.origin) return;
+  // Musique d'ambiance : lue en flux par morceaux (requêtes « Range »), pas gardée (fichiers lourds)
+  if (url.pathname.includes("/Sons/musique")) return;
 
   // Une seule copie par fichier : on ignore le « ?t=... » anti-cache de index.html
   const cle = url.origin + url.pathname;

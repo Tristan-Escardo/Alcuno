@@ -18,6 +18,13 @@ Un fichier MP3 par moment du jeu, avec exactement ces noms :
 
   tiens_gueule.mp3  le cul sec de la carte dorée (« TIENS DANS TA GUEULE »)
 
+MUSIQUE D'AMBIANCE (en boucle, réglage « Musique d'ambiance ») :
+  musique_ambiance.mp3  thèmes bordeaux, sombre, casino, nuit, violet (et les autres si leur musique manque)
+  musique_givre.mp3     thème givre
+  musique_cerisier.mp3  thème cerisier
+  musique_prestige.mp3  thème prestige
+  Jusqu'à 3-4 minutes, 128 kbit/s (environ 1 Mo par minute) : elle se lance plus vite.
+
 - Fichier absent = pas de son à ce moment-là.
 - Pour changer un son : remplace le fichier en gardant le même nom, puis commit + push.
 - Des sons courts et pas trop lourds (moins de 200 Ko si possible).
