@@ -6281,48 +6281,34 @@ html[data-theme="givre"] #ecranReglages .optionLien:active{ background: #fff; }
   to   { opacity: 0; transform: translate(-50%, -140%); }
 }
 
-/* ===== Pause (mode classique) : ⏸ dans le bandeau, à gauche de ⌂ ; écran « PAUSE » sur la partie floutée ===== */
-header #btnPause{
-  position: absolute;
-  top: 50%;
-  right: 54px;
-  transform: translateY(-50%);
-  z-index: 2;
+/* ===== Pause (mode classique) : ⏸ au bout de la pastille « Tour de … » ; écran « PAUSE » sur la partie floutée ===== */
+#stickyJoueurActif #btnPause{
+  flex: 0 0 auto;
   width: auto;
   min-width: 0;
-  padding: 4px;
+  margin: -6px -6px -6px 0;
+  padding: 6px;
   border: none;
-  border-radius: 0;
+  border-radius: 50%;
   background: none;
   box-shadow: none;
   line-height: 0;
-  opacity: 0.9;
+  pointer-events: auto;
   cursor: pointer;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
-header #btnPause[hidden]{ display: none; }
-header #btnPause svg,
+#stickyJoueurActif #btnPause[hidden]{ display: none; }
+#stickyJoueurActif #btnPause svg,
 #ecranPause .pauseIcone svg,
 #ecranTele .tele-pause svg{
   overflow: visible;
-  fill: var(--fond-theme);
+  fill: none;
   stroke: #FFD700;
-  stroke-width: 2.1;
+  stroke-width: 2.2;
 }
-header #btnPause svg{
-  width: 30px;
-  height: 30px;
-  filter: drop-shadow(0 2px 0 rgba(120, 70, 0, 0.95)) drop-shadow(0 3px 6px rgba(0,0,0,0.45));
-}
-@media (max-width: 520px){
-  header #btnPause{ right: 46px; }
-  header #btnPause svg{ width: 27px; height: 27px; }
-}
-html[data-theme="givre"] header #btnPause svg{
-  stroke: #1a9be0;
-  filter: drop-shadow(0 2px 0 #0b5a8c) drop-shadow(0 3px 6px rgba(13, 53, 80, 0.2));
-}
+#stickyJoueurActif #btnPause svg{ width: 22px; height: 22px; }
+html[data-theme="givre"] #stickyJoueurActif #btnPause svg{ stroke: #1a9be0; }
 
 #ecranPause{
   position: fixed;

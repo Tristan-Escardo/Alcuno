@@ -233,7 +233,7 @@ function etatPourTele(){
     regles,
     theme: document.documentElement.dataset.theme || "bordeaux",
     pause: !!pauseEnCours,
-    musique: caseMusique.checked ? volumeMusique : 0, // (la télé joue la musique d'ambiance à ce volume)
+    musique: caseMusique.checked && !pauseEnCours ? volumeMusique : 0, // (la télé la joue à ce volume ; pas en pause)
     sons: sonsTele,
     rappel: rappelTele,
     envols: envolsTele,

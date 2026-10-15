@@ -803,6 +803,10 @@ function creerUIJoueurActifSticky(){
       <span class="sticky-couleur"></span>
     `;
 
+  // ⏸ Pause (mode classique) : au bout de la pastille, toujours à portée pendant la partie
+  const btnPause = document.getElementById("btnPause");
+  if(btnPause) stickyJoueurActif.appendChild(btnPause);
+
   document.body.appendChild(stickyJoueurActif);
   repositionnerStickyJoueurActif();
 }
@@ -845,7 +849,7 @@ function relancerRappelClassique(){
 
 // ===== Pause (mode classique) : ⏸ du bandeau => écran « PAUSE » par-dessus la partie floutée. Pendant la
 // pause : pas de rappel « À toi », ni « Bois de l'eau », ni de petites notifs sur la télé (qui affiche
-// « PAUSE » aussi). La musique d'ambiance continue.
+// « PAUSE » aussi), ni de musique d'ambiance.
 let pauseEnCours = false;
 const btnPause = document.getElementById("btnPause");
 const ecranPause = document.getElementById("ecranPause");
@@ -859,6 +863,7 @@ function mettreEnPause(){
   pauseEnCours = true;
   clearTimeout(minuteurRappelTour);
   ecranPause.style.display = "";
+  majMusique(); // (la musique d'ambiance se coupe pendant la pause)
 }
 
 function reprendreApresPause(){
@@ -866,6 +871,7 @@ function reprendreApresPause(){
   pauseEnCours = false;
   ecranPause.style.display = "none";
   relancerRappelClassique();
+  majMusique(); // (et reprend en fondu)
 }
 
 btnPause.addEventListener("click", mettreEnPause);
