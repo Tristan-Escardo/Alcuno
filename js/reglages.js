@@ -403,11 +403,15 @@ curseurMusique.addEventListener("input", () => {
   majMusique();
 });
 
-// Lecture en boucle sans à-coup : deux lecteurs qui se relaient, le suivant repart du début en fondu
-// pendant que l'autre finit en fondu (avant : la boucle repartait d'un coup, avec un petit blanc)
-const FONDU_MUSIQUE = 2.5; // secondes
-let lecteurMusique = null; // { ctx, pistes: [{ audio, gain }, …], active, nom, niveau, enFondu }
-let musiqueTele = null;    // page de la télé : { volume, theme } reçus du téléphone (null : pas de musique)
+// Lecture en boucle sans à-coup : le morceau est décodé en entier (Web Audio), ses blancs de début et de
+// fin (ajoutés par l'encodage MP3) sont retirés, et chaque tour de boucle est programmé à l'échantillon
+// près, en fondu enchaîné « à puissance constante » avec le suivant (pas de creux de volume au milieu).
+// (avant : deux lecteurs audio qui se relayaient ; leur démarrage n'est pas précis et l'iPhone hachait)
+const FONDU_MUSIQUE = 2.5;   // secondes de fondu enchaîné à chaque tour de boucle
+const MONTEE_MUSIQUE = 0.8;  // secondes de fondu au démarrage (lancement, retour dans l'appli, thème)
+const musiquesDecodees = {}; // nom => { buffer, debut, fin } | null (fichier absent) | promesse en cours
+let lecteurMusique = null;   // { ctx, maitre, nom, morceau, sources: [{ src, gain }], minuteur, actif }
+let musiqueTele = null;      // page de la télé : { volume, theme } reçus du téléphone (null : pas de musique)
 
 function fichierMusique(theme){
   return THEMES_AVEC_MUSIQUE.includes(theme) ? `musique_ambiance_${theme}` : "musique_ambiance";
@@ -422,81 +426,115 @@ function musiqueVoulue(){
   return { volume: volumeMusique, theme: document.documentElement.dataset.theme || "bordeaux" };
 }
 
-function creerPisteMusique(ctx){
-  const audio = new Audio();
-  audio.preload = "auto";
-  audio.setAttribute("playsinline", "");
-  let gain = null;
-  try {
-    gain = ctx.createGain();
-    gain.gain.value = 0;
-    ctx.createMediaElementSource(audio).connect(gain);
-    gain.connect(ctx.destination);
-  } catch (e) { gain = null; audio.loop = true; } // (sans Web Audio : boucle simple)
-  audio.addEventListener("timeupdate", surveillerBoucleMusique);
-  return { audio, gain };
+// Début et fin du vrai son (sans les blancs d'encodage)
+function bornesMusique(buffer){
+  const seuil = 0.0008;
+  const canaux = [];
+  for (let c = 0; c < buffer.numberOfChannels; c++) canaux.push(buffer.getChannelData(c));
+  const fort = (i) => canaux.some(d => Math.abs(d[i]) > seuil);
+  let debut = 0;
+  while (debut < buffer.length - 1 && !fort(debut)) debut++;
+  let fin = buffer.length - 1;
+  while (fin > debut && !fort(fin)) fin--;
+  return { debut: debut / buffer.sampleRate, fin: (fin + 1) / buffer.sampleRate };
 }
 
-// Volume d'une piste, en douceur (duree en secondes)
-function reglerPisteMusique(piste, valeur, duree){
-  if (!piste.gain) { piste.audio.volume = Math.min(1, valeur); return; }
-  const g = piste.gain.gain;
-  const t = lecteurMusique.ctx.currentTime;
-  g.cancelScheduledValues(t);
-  g.setValueAtTime(g.value, t);
-  g.linearRampToValueAtTime(valeur, t + (duree || 0.05));
+function chargerMusique(ctx, nom){
+  if (musiquesDecodees[nom] !== undefined) return Promise.resolve(musiquesDecodees[nom]);
+  const promesse = fetch(`Sons/${nom}.mp3`)
+    .then((reponse) => { if (!reponse.ok) throw new Error("absent"); return reponse.arrayBuffer(); })
+    .then((donnees) => new Promise((ok, ko) => ctx.decodeAudioData(donnees, ok, ko)))
+    .then((buffer) => Object.assign({ buffer }, bornesMusique(buffer)))
+    .catch(() => null)
+    .then((morceau) => { musiquesDecodees[nom] = morceau; return morceau; });
+  musiquesDecodees[nom] = undefined;
+  return promesse;
 }
 
-function surveillerBoucleMusique(){
-  const L = lecteurMusique;
-  if (!L || L.enFondu || this !== L.pistes[L.active].audio || !L.pistes[0].gain) return;
-  const duree = this.duration;
-  if (!isFinite(duree) || duree < FONDU_MUSIQUE * 2) return;
-  if (this.currentTime < duree - FONDU_MUSIQUE - 0.3) return;
-  // Fin du morceau : le suivant repart du début pendant que celui-ci s'éteint
-  L.enFondu = true;
-  const ancienne = L.pistes[L.active];
-  L.active = 1 - L.active;
-  const nouvelle = L.pistes[L.active];
-  nouvelle.audio.currentTime = 0;
-  reglerPisteMusique(nouvelle, 0, 0.01);
-  nouvelle.audio.play().catch(() => {});
-  reglerPisteMusique(nouvelle, L.niveau, FONDU_MUSIQUE);
-  reglerPisteMusique(ancienne, 0, FONDU_MUSIQUE);
-  setTimeout(() => { ancienne.audio.pause(); L.enFondu = false; }, FONDU_MUSIQUE * 1000 + 150);
+// Courbes de fondu à puissance constante (montée sinus, descente cosinus)
+function courbeFondu(montee){
+  const n = 64, courbe = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    const x = i / (n - 1) * Math.PI / 2;
+    courbe[i] = montee ? Math.sin(x) : Math.cos(x);
+  }
+  return courbe;
+}
+const COURBE_MONTEE = courbeFondu(true);
+const COURBE_DESCENTE = courbeFondu(false);
+
+// Un tour de boucle qui commence à l'instant t (montée sur « montee » secondes), puis programme le suivant
+function jouerTourMusique(L, t, montee){
+  if (!L.actif || !L.morceau) return;
+  const { buffer, debut, fin } = L.morceau;
+  const longueur = fin - debut;
+  const fondu = Math.min(FONDU_MUSIQUE, longueur / 4);
+  const src = L.ctx.createBufferSource();
+  src.buffer = buffer;
+  const gain = L.ctx.createGain();
+  src.connect(gain);
+  gain.connect(L.maitre);
+  gain.gain.setValueAtTime(0, t);
+  gain.gain.setValueCurveAtTime(COURBE_MONTEE, t, Math.min(montee, fondu));
+  gain.gain.setValueCurveAtTime(COURBE_DESCENTE, t + longueur - fondu, fondu);
+  src.start(t, debut, longueur);
+  const piste = { src, gain };
+  L.sources.push(piste);
+  src.onended = () => { L.sources = L.sources.filter(p => p !== piste); };
+  // Le tour suivant démarre pendant la descente de celui-ci (programmé un peu à l'avance)
+  const suivant = t + longueur - fondu;
+  clearTimeout(L.minuteur);
+  L.minuteur = setTimeout(() => jouerTourMusique(L, suivant, fondu),
+    Math.max(0, (suivant - L.ctx.currentTime - 1.5) * 1000));
+}
+
+// Arrête en douceur tout ce qui joue
+function eteindreMusique(L, duree){
+  if (!L) return;
+  L.actif = false;
+  clearTimeout(L.minuteur);
+  const t = L.ctx.currentTime;
+  L.sources.forEach(({ src, gain }) => {
+    try {
+      gain.gain.cancelScheduledValues(t);
+      gain.gain.setValueAtTime(gain.gain.value, t);
+      gain.gain.linearRampToValueAtTime(0, t + duree);
+      src.stop(t + duree + 0.05);
+    } catch (e) {}
+  });
 }
 
 function majMusique(){
   const voulu = musiqueVoulue();
-  if (!voulu) { if (lecteurMusique) lecteurMusique.pistes.forEach(p => p.audio.pause()); return; }
+  if (!voulu) { if (lecteurMusique && lecteurMusique.actif) eteindreMusique(lecteurMusique, 0.4); return; }
   const ctx = contexteAudio();
   if (!ctx) return;
   if (!lecteurMusique || lecteurMusique.ctx !== ctx) {
-    if (lecteurMusique) lecteurMusique.pistes.forEach(p => p.audio.pause());
-    lecteurMusique = { ctx, pistes: [], active: 0, nom: "", niveau: 0, enFondu: false };
-    lecteurMusique.pistes = [creerPisteMusique(ctx), creerPisteMusique(ctx)];
+    if (lecteurMusique) eteindreMusique(lecteurMusique, 0.05);
+    const maitre = ctx.createGain();
+    maitre.connect(ctx.destination);
+    lecteurMusique = { ctx, maitre, nom: "", morceau: null, sources: [], minuteur: null, actif: false };
   }
   const L = lecteurMusique;
+  // Volume (en douceur)
+  const niveau = Math.pow(voulu.volume / 100, 2) * 0.35; // (bien plus doux que les sons du jeu)
+  L.maitre.gain.cancelScheduledValues(ctx.currentTime);
+  L.maitre.gain.setValueAtTime(L.maitre.gain.value, ctx.currentTime);
+  L.maitre.gain.linearRampToValueAtTime(niveau, ctx.currentTime + 0.3);
+
   const nom = fichierMusique(voulu.theme);
-  if (L.nom !== nom) {
-    L.nom = nom;
-    L.active = 0;
-    L.enFondu = false;
-    L.pistes[1].audio.pause();
-    L.pistes.forEach((p) => {
-      p.audio.onerror = () => { // pas de musique pour ce thème : celle de base
-        if (L.nom !== nom || nom === "musique_ambiance") return;
-        L.nom = "musique_ambiance";
-        L.pistes.forEach(q => { q.audio.src = "Sons/musique_ambiance.mp3"; });
-        L.pistes[L.active].audio.play().catch(() => {});
-      };
-      p.audio.src = `Sons/${nom}.mp3`;
-    });
-  }
-  L.niveau = Math.pow(voulu.volume / 100, 2) * 0.35; // (bien plus doux que les sons du jeu)
-  const piste = L.pistes[L.active];
-  if (!L.enFondu) reglerPisteMusique(piste, L.niveau, 0.3);
-  if (piste.audio.paused) piste.audio.play().catch(() => {});
+  if (L.nom === nom && L.actif) return; // (déjà en train de jouer ce morceau)
+  if (L.nom !== nom && L.actif) eteindreMusique(L, 0.8); // autre thème : l'ancien morceau s'éteint
+  L.nom = nom;
+  L.actif = true;
+  chargerMusique(ctx, nom).then((morceau) => {
+    if (!morceau && nom !== "musique_ambiance") return chargerMusique(ctx, "musique_ambiance");
+    return morceau;
+  }).then((morceau) => {
+    if (lecteurMusique !== L || L.nom !== nom || !L.actif || !morceau) return;
+    L.morceau = morceau;
+    jouerTourMusique(L, ctx.currentTime + 0.05, MONTEE_MUSIQUE);
+  });
 }
 document.addEventListener("visibilitychange", () => setTimeout(majMusique, 0));
 setInterval(majMusique, 2000); // (début ou fin du cast, changement de thème)
