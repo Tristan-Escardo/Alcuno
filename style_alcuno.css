@@ -6419,7 +6419,11 @@ html[data-theme="soleil"] header::after{
 }
 /* Boutons : dégradé soleil, texte blanc */
 html[data-theme="soleil"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu, #ajouterJoueur, #jouer, #supprimerJoueur,
-  #nouvellePartie, #btnRejouerMemes, #btnModifierJoueurs, #btnReprendrePause){
+  #nouvellePartie, #btnRejouerMemes, #btnModifierJoueurs, #btnReprendrePause,
+  #btnCreerPartie, #btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR,
+  #lancerPartieEnLigne, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui, #btnConfirmerAccueilNon,
+  #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #termineSuppression,
+  #btnInstallationInstaller){
   background: linear-gradient(180deg, #ffb35c, #f2775c) !important;
   color: #fff !important;
   text-shadow: 0 1px 0 rgba(150, 50, 40, 0.8), 0 2px 4px rgba(60,20,40,0.35) !important;
@@ -6554,3 +6558,12 @@ html[data-theme="soleil"] #ecranReglages .btnDiagnostic{ color: #3a1f4a !importa
 /* (Signaler un bug : « Importer une photo/vidéo » en bas de la demi-page, sur le pêche) */
 html[data-theme="soleil"] #ecranBug #btnAjouterPieceBug{ color: #3a1f4a !important; border-color: rgba(58, 31, 74, 0.5) !important; background: rgba(255, 255, 255, 0.25) !important; }
 html[data-theme="soleil"] #ecranBug #btnAjouterPieceBug .iconeBouton{ stroke: #3a1f4a !important; }
+/* Sunset Lover, iPhone, clavier sorti : l'écran remonte sous la barre de l'heure (--haut-visible,
+   js/en-ligne.js) et le haut bleu nuit du dégradé passait dessous (coupure nette sous la barre). Le
+   dégradé descend d'autant : le haut visible reste bleu nuit, comme la barre. */
+html[data-theme="soleil"] body::before{ transform: translateY(var(--haut-visible, 0px)); }
+html[data-theme="soleil"] :is(#choixMode, #enLigne, #ecranNouvellePartie, #ecranConfirmerHote, #ecranConfirmerRetrait,
+  #ecranReprise, #ecranConfirmerAccueil, #ecranChoixPseudo, #ecranCaster, #ecranReglages, #suppression){
+  background-position: 0 var(--haut-visible, 0px);
+  background-repeat: no-repeat;
+}
