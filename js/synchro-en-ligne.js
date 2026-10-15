@@ -30,6 +30,7 @@ function surAction(el, id, options, handler){
       if(el._net.once) el.dataset.netUtilise = "1";
       handler(e);
       noterActionClassique(id);
+      actionAppliquee(sauvegardeClassique ? sauvegardeClassique.actions.length - 1 : -1);
       relancerRappelClassique(); // le joueur a joué : le compteur du rappel « À toi » repart de zéro
       return;
     }
@@ -130,13 +131,13 @@ function actionRefusee(code, manche, seq){
   resynchroniserManche();
 }
 
-function resynchroniserManche(){
+function resynchroniserManche(retourArriere = false){
   if(!dernierEtatManche || !enLigneActif) return;
-  noterJournal("remise à jour de la manche depuis le serveur");
-  afficherToast("Connexion instable : remise à jour de la partie…", 3000);
+  noterJournal(retourArriere ? "choix annulé : manche rejouée sans lui" : "remise à jour de la manche depuis le serveur");
+  if(!retourArriere) afficherToast("Connexion instable : remise à jour de la partie…", 3000);
   repriseEnCours = true;
   mancheCourante = null; // la même manche est redémarrée, puis rejouée depuis le serveur
-  demarrerMancheEnLigne(dernierEtatManche, { resynchro: true });
+  demarrerMancheEnLigne(dernierEtatManche, { resynchro: true, retourArriere });
 }
 
 // Retrait en ligne : l'action garde le nombre de cartes restantes au moment de la demande.
@@ -316,6 +317,7 @@ function ajouterJoueurEnJeu(nom){
 function tenterAction(action){
   if(action.id.startsWith("retrait:")) return appliquerRetraitEnLigne(action);
   if(action.id.startsWith("retour:")) return appliquerRetourEnLigne(action);
+  if(action.id.startsWith("defaire:")) return appliquerDefaireEnLigne(action);
 
   // Bouton à usage unique dans la manche (ex. « Terminer ») déjà appliqué : si deux joueurs
   // ont appuyé en même temps, le 2e appui est ignoré au lieu d'attendre un bouton disparu
@@ -382,8 +384,13 @@ function traiterFile(){
     if(manche !== mancheCourante || generation !== generationFile) return;
 
     // Action refusée par le serveur pendant qu'on attendait de pouvoir l'appliquer : sautée
-    const resultat = (action.refusee || estUnDoublon(action)) ? "ignorer" : tenterAction(action);
-    if(resultat === "ok") actionsAppliquees.set(`${action.par}|${action.id}`, prochainSeq);
+    // (et sautée aussi : action retirée par un « Annuler » du choix, voir appliquerDefaireEnLigne)
+    seqEnCours = prochainSeq;
+    const resultat = (action.refusee || seqsAnnulees.has(prochainSeq) || estUnDoublon(action)) ? "ignorer" : tenterAction(action);
+    if(resultat === "ok"){
+      actionsAppliquees.set(`${action.par}|${action.id}`, prochainSeq);
+      actionAppliquee(prochainSeq);
+    }
     if(resultat !== "attendre" || !attenteNotee) noterJournal(`${prochainSeq} ${action.id} (${action.par}) => ${resultat}`);
     if(resultat === "attendre") attenteNotee = true;
     // On attend que l'overlay concerné soit affiché chez nous (max 30 s d'écran allumé)
@@ -452,14 +459,18 @@ function reinitialiserFileActions(){
   traitementEnCours = false;
   if(timerTrou){ clearTimeout(timerTrou); timerTrou = null; }
   idsUniquesUtilises = new Set();
+  toutesActionsManche = new Map();
+  seqsAnnulees = new Set();
+  masquerAnnulerChoix();
   finirRattrapage();
 }
 
 // ===== Rattrapage (reconnexion en pleine manche) =====
 // Le téléphone rejoue toutes les actions déjà faites, délais quasi nuls (delai()) ;
 // un écran « Retour dans la partie… » cache les overlays qui défilent en accéléré.
-function commencerRattrapage(cible){
+function commencerRattrapage(cible, texte = "Retour dans la partie…"){
   rattrapageEnCours = true;
+  texteRattrapage = texte;
   seqFinRattrapage = cible;
   document.body.classList.add("rattrapage");
 
@@ -476,7 +487,7 @@ function majRattrapage(){
   const ecran = document.getElementById("ecranRattrapage");
   if(!ecran) return;
   const fait = Math.min(prochainSeq - 1, seqFinRattrapage);
-  ecran.innerText = `Retour dans la partie…\n${fait} / ${seqFinRattrapage}`;
+  ecran.innerText = `${texteRattrapage}\n${fait} / ${seqFinRattrapage}`;
 }
 
 function finirRattrapage(){
@@ -503,6 +514,7 @@ function ecouterActions(){
       action.vu = Number(morceaux[2]);
     }
     fileActions.set(Number(snapshot.key), action);
+    toutesActionsManche.set(Number(snapshot.key), action);
     traiterFile();
   });
 }
@@ -532,6 +544,7 @@ function nettoyerOverlays(){
 }
 
 // options.resynchro : même manche rejouée depuis le serveur (voir resynchroniserManche)
+// options.retourArriere : … sans le choix qu'on vient d'annuler (voir appliquerDefaireEnLigne)
 function demarrerMancheEnLigne(etat, options = {}){
   const etaitEnJeu = enLigneActif;
   dernierEtatManche = etat;
@@ -579,11 +592,16 @@ function demarrerMancheEnLigne(etat, options = {}){
   repriseEnCours = false;
   const code = codePartieActuel;
   const manche = etat.manche;
-  window.fbGet(window.fbRef(window.firebaseDB, `parties/${code}/manches/${manche}/seq`))
-    .then((snapshot) => {
+  // (+ les actions déjà là : celles retirées par un « Annuler » du choix sont sautées dès le rejeu)
+  Promise.all([
+    window.fbGet(window.fbRef(window.firebaseDB, `parties/${code}/manches/${manche}/seq`)),
+    window.fbGet(window.fbRef(window.firebaseDB, `parties/${code}/manches/${manche}/actions`))
+  ])
+    .then(([snapshot, snapActions]) => {
       if(manche !== mancheCourante) return;
+      calculerAnnulations(snapActions.val());
       const cible = Number(snapshot.val() || 0);
-      if(cible > 0) commencerRattrapage(cible);
+      if(cible > 0) commencerRattrapage(cible, options.retourArriere ? "Retour en arrière…" : undefined);
       ecouterActions();
       if(cible === 0) verifierRetourDansManche();
     })
@@ -716,7 +734,12 @@ function reprendrePartieClassique(s){
   joueurs = s.joueurs.slice();
   annulations = {};
   afficherJoueurs();
+  rejouerActionsClassiques(s.actions.slice(), "Reprise de la partie…",
+    () => afficherNotificationHaut("", "Partie reprise !", true));
+}
 
+// Relance la partie (même graine) et rejoue ces taps en accéléré, derrière un écran d'attente
+function rejouerActionsClassiques(actions, texte, apres = null){
   rattrapageEnCours = true; // annonces et animations quasi instantanées (voir delai)
   document.body.classList.add("rattrapage");
   const ecran = document.createElement("div");
@@ -724,11 +747,10 @@ function reprendrePartieClassique(s){
   document.body.appendChild(ecran);
 
   lancerPartie();
-  const actions = s.actions.slice();
   let i = 0;
   let attente = 0;
   const etape = () => {
-    ecran.innerText = `Reprise de la partie…\n${i} / ${actions.length}`;
+    ecran.innerText = `${texte}\n${i} / ${actions.length}`;
     if(i >= actions.length) return terminer();
     const resultat = rejouerActionClassique(actions[i]);
     if(resultat === "attendre" && attente < 6000){
@@ -751,7 +773,7 @@ function reprendrePartieClassique(s){
     enregistrerPartieClassique();
     afficherJoueurs();
     afficherJoueurActif();
-    afficherNotificationHaut("", "Partie reprise !", true);
+    if(apres) apres();
   };
   setTimeout(etape, 0);
 }
@@ -777,5 +799,120 @@ function rejouerActionClassique(id){
   if(el._net.once) el.dataset.netUtilise = "1";
   el._net.handler();
   return "ok";
+}
+// #endregion
+
+// #region Mauvais joueur choisi : « Annuler » pendant quelques secondes
+// Après le choix du nouveau pigeon, de la victime de la carte dorée, des 2 joueurs du duel ou la
+// validation du +4, une barre « Mauvais joueur ? ↶ Annuler » reste 6 s en bas de l'écran (en ligne :
+// seulement chez celui qui a choisi). Annuler retire le choix de la liste des actions, puis la partie
+// est rejouée en accéléré jusque juste avant (comme une reprise) : on retrouve l'écran de choix.
+// Possible tant qu'aucune autre action n'a été jouée après. Jamais pour une carte retournée.
+const DUREE_ANNULER_CHOIX = 6000;
+let choixAnnulable = null;      // { debut, fin, timer } : positions des actions du choix
+let seqEnCours = 0;             // en ligne : numéro de l'action en train d'être appliquée
+let toutesActionsManche = new Map(); // en ligne : seq -> action, toute la manche (pour valider un « defaire »)
+let seqsAnnulees = new Set();   // en ligne : actions retirées par un « Annuler » (sautées au rejeu)
+let texteRattrapage = "Retour dans la partie…";
+
+// Position de l'action en train d'être appliquée : son numéro en ligne, son rang dans la sauvegarde
+// en classique (pas encore notée pendant son handler : c'est la longueur de la liste)
+function positionActionCourante(){
+  if(enLigneActif) return seqEnCours;
+  return sauvegardeClassique ? sauvegardeClassique.actions.length : -1;
+}
+
+// À appeler dans le handler du choix. debut : 1re action du choix (le 1er joueur du duel), sinon celle-ci
+function proposerAnnulerChoix(choisisseur, debut = positionActionCourante()){
+  masquerAnnulerChoix();
+  if(rattrapageEnCours || repriseClassiqueEnCours) return;
+  if(enLigneActif && choisisseur !== pseudoActuel) return;
+  const fin = positionActionCourante();
+  if(debut < 0 || fin < debut) return;
+
+  const barre = document.createElement("div");
+  barre.id = "annulerChoix";
+  barre.innerHTML = '<span class="annulerChoix-texte">Mauvais joueur ?</span>' +
+    '<button type="button" class="annulerChoix-bouton"><svg viewBox="0 0 24 24" aria-hidden="true">' +
+    '<path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>Annuler</button>' +
+    '<span class="annulerChoix-temps" aria-hidden="true"></span>';
+  barre.querySelector(".annulerChoix-temps").style.animationDuration = `${DUREE_ANNULER_CHOIX}ms`;
+  barre.querySelector("button").addEventListener("click", () => {
+    const choix = choixAnnulable;
+    masquerAnnulerChoix();
+    if(choix) defaireChoix(choix);
+  });
+  document.body.appendChild(barre);
+  choixAnnulable = { debut, fin, timer: setTimeout(masquerAnnulerChoix, DUREE_ANNULER_CHOIX) };
+}
+
+function masquerAnnulerChoix(){
+  if(choixAnnulable) clearTimeout(choixAnnulable.timer);
+  choixAnnulable = null;
+  const barre = document.getElementById("annulerChoix");
+  if(barre) barre.remove();
+}
+
+// Une autre action jouée après le choix : il est confirmé, plus d'annulation
+function actionAppliquee(position){
+  if(choixAnnulable && position > choixAnnulable.fin) masquerAnnulerChoix();
+}
+
+function defaireChoix(choix){
+  if(enLigneActif){
+    ecrireAction(`defaire:${choix.debut}`).catch(() => afficherToast("Connexion perdue, réessaie"));
+    return;
+  }
+  if(!sauvegardeClassique || sauvegardeClassique.actions.length - 1 !== choix.fin) return;
+  const s = sauvegardeClassique;
+  repriseClassiqueEnCours = true; // (retourMenu ne l'oublie pas, lancerPartie reprend sa graine)
+  nettoyerOverlays();
+  retourMenu();
+  joueurs = s.joueurs.slice();
+  annulations = {};
+  rejouerActionsClassiques(s.actions.slice(0, choix.debut), "Retour en arrière…");
+}
+
+// Valable si le choix a été fait par le même joueur et que rien d'autre n'a été joué entre-temps
+// (seulement les autres taps du même choix : les 2 joueurs du duel). Décidé avec la seule liste des
+// actions : pareil sur tous les téléphones, et pendant un rejeu.
+function annulationValide(debut, fin, par, actions){
+  const premiere = actions.get(debut);
+  if(!premiere || premiere.par !== par || debut >= fin || seqsAnnulees.has(debut)) return false;
+  const famille = (id) => String(id).replace(/:\d+$/, "");
+  for(const [seq, a] of actions){
+    if(seq > debut && seq < fin && !seqsAnnulees.has(seq) && famille(a.id) !== famille(premiere.id)) return false;
+  }
+  return true;
+}
+
+function appliquerDefaireEnLigne(action){
+  const debut = Number(action.id.slice("defaire:".length));
+  const fin = seqEnCours;
+  if(!annulationValide(debut, fin, action.par, toutesActionsManche)){
+    if(action.par === pseudoActuel) afficherToast("Trop tard pour annuler");
+    return "ignorer";
+  }
+  for(let s = debut; s <= fin; s++) seqsAnnulees.add(s);
+  // Le choix est déjà appliqué ici : la manche est rejouée depuis le serveur, sans lui
+  setTimeout(() => resynchroniserManche(true), 0);
+  return "ok";
+}
+
+// Rejeu (reconnexion, retour en arrière) : actions retirées, connues avant de rejouer la 1re
+function calculerAnnulations(brutes){
+  seqsAnnulees = new Set();
+  const actions = new Map();
+  Object.keys(brutes || {}).map(Number).sort((a, b) => a - b).forEach((seq) => {
+    const a = Object.assign({}, brutes[seq]);
+    const morceaux = /^(.*)@(\d+)$/.exec(String(a.id));
+    if(morceaux) a.id = morceaux[1];
+    actions.set(seq, a);
+  });
+  for(const [seq, a] of actions){
+    if(!String(a.id).startsWith("defaire:")) continue;
+    const debut = Number(a.id.slice("defaire:".length));
+    if(annulationValide(debut, seq, a.par, actions)) for(let s = debut; s <= seq; s++) seqsAnnulees.add(s);
+  }
 }
 // #endregion

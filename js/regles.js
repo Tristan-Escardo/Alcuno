@@ -112,6 +112,7 @@ function afficherMenuPigeon(){
       btn.className="bouton-pigeon";
       btn.innerText=j;
       surAction(btn, "pigeon:" + i, { owner: choisisseur, once: true }, ()=>{
+      proposerAnnulerChoix(choisisseur); // « Mauvais joueur ? Annuler » quelques secondes
       indexPigeon = i;
       nomPigeonOriginal = joueurs[i];
       // 1) on ferme l'overlay de choix
@@ -811,6 +812,7 @@ function afficherOverlayCarteDoree(joueurActuel){
     btn.className = "bouton-doree";
     btn.innerText = avecCouronne(nom);
     surAction(btn, "doree:" + i, { owner: choisisseur, once: true }, () => {
+      proposerAnnulerChoix(choisisseur); // « Mauvais joueur ? Annuler » quelques secondes
       overlay.remove();
       unlockScroll();
       afficherOverlayTiensGueule(nom);
@@ -892,6 +894,7 @@ function lancerOverlayChoixDuel(joueurActuel, carteDuel = ""){
   content.appendChild(containerBoutons);
 
   let picks = [];
+  let debutChoix = -1; // action du 1er joueur choisi (« Annuler » retire les 2 choix)
 
   joueurs.forEach((nom, idx)=>{
     const btn = document.createElement("button");
@@ -902,11 +905,13 @@ function lancerOverlayChoixDuel(joueurActuel, carteDuel = ""){
       if(picks.length >= 2) return;
       if(picks.includes(idx)) return;
 
+      if(picks.length === 0) debutChoix = positionActionCourante();
       picks.push(idx);
       btn.disabled = true; // (aspect « déjà choisi » : style_alcuno.css, #overlayDuel .duel-boutons button:disabled)
       btn.style.cursor = "not-allowed";
 
       if(picks.length === 2){
+        proposerAnnulerChoix(choisisseur, debutChoix); // « Mauvais joueur ? Annuler » quelques secondes
         // Le tirage remplace l'écran 0,2 s plus tard : on voit le « pop » du 2e bouton (script.js).
         // En ligne, la carte choisie ensuite attend que le tirage soit affiché (tenterAction).
         setTimeout(() => {
@@ -1271,6 +1276,7 @@ function afficherOverlayPlus4(joueurActuel, classeCartePlus4){
   btnValider.innerText = "Valider";
   surAction(btnValider, "plus4:valider", { owner: choisisseur, once: true }, ()=>{
     if(totalDistribue() !== aDistribuer) return;
+    proposerAnnulerChoix(choisisseur); // « Mauvais joueur ? Annuler » : retour à la distribution
 
     overlay.remove();
     unlockScroll();
