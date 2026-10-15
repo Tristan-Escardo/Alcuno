@@ -6554,3 +6554,10 @@ html[data-theme="soleil"] body::before{
   background-position: top, bottom, center, center;
   background-repeat: no-repeat;
 }
+
+/* Sunset Lover : bas des réglages (partager, signaler un bug, à propos) posé sur la fin claire du
+   dégradé : textes en prune foncé, lien en framboise souligné */
+html[data-theme="soleil"] body #ecranReglages :is(.blocPartage, .aPropos) .aProposTitre{ color: #5a1f45 !important; opacity: 1 !important; }
+html[data-theme="soleil"] #ecranReglages :is(.lienJeu, .lienBug, .versionJeu){ color: #3a1f4a !important; text-shadow: none !important; }
+html[data-theme="soleil"] #ecranReglages #btnSignalerBug{ color: #a8264f !important; text-decoration: underline; text-underline-offset: 3px; }
+html[data-theme="soleil"] #ecranReglages .btnDiagnostic{ color: #3a1f4a !important; border-color: rgba(58, 31, 74, 0.45) !important; background: rgba(255, 255, 255, 0.25) !important; }
