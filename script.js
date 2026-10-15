@@ -152,7 +152,7 @@ function avecCouronne(nom){
 // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
 // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
 // Numérotation : +0.0.1 à chaque mise en ligne, et après x.y.9 on passe à x.(y+1).0 (ex. 9.5.9 => 9.6.0)
-const VERSION_AFFICHEE = "9.6.3";
+const VERSION_AFFICHEE = "9.6.4";
 const VERSION_JEU = VERSION_AFFICHEE.split(".")
   .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
 // À l'écran : le numéro complet, pour voir d'un coup d'œil si un téléphone est à jour
@@ -223,6 +223,7 @@ document.addEventListener("pointerdown", (e) => {
   bouton.animate(IMAGES_POP_BOUTON, { duration: 200, easing: "ease-out" });
 }, true);
 
+let sonBoutonJoueLe = 0; // le « click » qui suit un tap déjà géré ici ne rejoue pas le son (voir reglages.js)
 function activerMemePendantElan(bouton, action){
   let depart = null;
   bouton.addEventListener("pointerdown", (e) => {
@@ -236,6 +237,8 @@ function activerMemePendantElan(bouton, action){
     clicAAvaler = true;
     clearTimeout(minuteurClicAAvaler);
     minuteurClicAAvaler = setTimeout(() => { clicAAvaler = false; }, 350);
+    jouerSon("bouton"); // ce tap n'est pas toujours suivi d'un « click » : le son du bouton se joue ici
+    sonBoutonJoueLe = Date.now();
     action();
   });
   bouton.addEventListener("pointercancel", () => { depart = null; });

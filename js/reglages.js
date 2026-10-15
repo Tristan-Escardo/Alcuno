@@ -692,6 +692,7 @@ const BOUTONS_AVEC_LEUR_SON = ".bouton-annulation, .plus4-joueur-btn, #overlayPi
   "#btnReglages, #btnSignalerBug, #btnDiagnostic";
 document.addEventListener("click", (e) => {
   if (!e.isTrusted || document.documentElement.classList.contains("mode-tele")) return;
+  if (Date.now() - sonBoutonJoueLe < 500) return; // déjà joué au doigt levé (activerMemePendantElan)
   const bouton = e.target && e.target.closest && e.target.closest("button, [role='button']");
   if (!bouton || bouton.disabled || bouton.matches(BOUTONS_AVEC_LEUR_SON)) return;
   jouerSon("bouton");
