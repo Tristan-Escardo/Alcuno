@@ -403,11 +403,12 @@ curseurMusique.addEventListener("input", () => {
   majMusique();
 });
 
-// Lecture en boucle sans à-coup : le morceau est décodé en entier (Web Audio), ses blancs de début et de
-// fin (ajoutés par l'encodage MP3) sont retirés, et chaque tour de boucle est programmé à l'échantillon
-// près, en fondu enchaîné « à puissance constante » avec le suivant (pas de creux de volume au milieu).
-// (avant : deux lecteurs audio qui se relayaient ; leur démarrage n'est pas précis et l'iPhone hachait)
-const FONDU_MUSIQUE = 2.5;   // secondes de fondu enchaîné à chaque tour de boucle
+// Lecture en boucle sans à-coup : le morceau est décodé en entier (Web Audio), les blancs ajoutés par
+// l'encodage MP3 au début et à la fin sont retirés, et chaque tour repart pile à la fin du précédent
+// (boucles faites pour s'enchaîner : un long fondu décalait le rythme), avec juste un micro-fondu pour
+// éviter un clic. Volume égalisé d'un morceau à l'autre (certains sont mixés bien plus fort).
+// Tous les morceaux sont préparés à l'avance : changer de thème ne fait pas attendre.
+const FONDU_MUSIQUE = 0.006; // secondes (micro-fondu aux raccords, contre les clics)
 const MONTEE_MUSIQUE = 0.8;  // secondes de fondu au démarrage (lancement, retour dans l'appli, thème)
 const musiquesDecodees = {}; // nom => { buffer, debut, fin } | null (fichier absent) | promesse en cours
 let lecteurMusique = null;   // { ctx, maitre, nom, morceau, sources: [{ src, gain }], minuteur, actif }
@@ -428,7 +429,7 @@ function musiqueVoulue(){
 
 // Début et fin du vrai son (sans les blancs d'encodage)
 function bornesMusique(buffer){
-  const seuil = 0.0008;
+  const seuil = 0.00005; // (vrai silence seulement : on ne rogne pas le début d'une note douce)
   const canaux = [];
   for (let c = 0; c < buffer.numberOfChannels; c++) canaux.push(buffer.getChannelData(c));
   const fort = (i) => canaux.some(d => Math.abs(d[i]) > seuil);
@@ -436,7 +437,13 @@ function bornesMusique(buffer){
   while (debut < buffer.length - 1 && !fort(debut)) debut++;
   let fin = buffer.length - 1;
   while (fin > debut && !fort(fin)) fin--;
-  return { debut: debut / buffer.sampleRate, fin: (fin + 1) / buffer.sampleRate };
+  // Volume moyen du morceau => réglage pour qu'ils sonnent tous pareil (référence : -20 dB)
+  let somme = 0, n = 0;
+  const pas = Math.max(1, Math.floor(buffer.length / 200000));
+  for (let i = debut; i <= fin; i += pas) { for (const d of canaux) { somme += d[i] * d[i]; n++; } }
+  const db = 10 * Math.log10(somme / Math.max(1, n) + 1e-12);
+  const egalisation = Math.min(2, Math.pow(10, (-20 - db) / 20));
+  return { debut: debut / buffer.sampleRate, fin: (fin + 1) / buffer.sampleRate, egalisation };
 }
 
 function chargerMusique(ctx, nom){
@@ -452,37 +459,36 @@ function chargerMusique(ctx, nom){
 }
 
 // Courbes de fondu à puissance constante (montée sinus, descente cosinus)
-function courbeFondu(montee){
+function courbeFondu(montee, max){
   const n = 64, courbe = new Float32Array(n);
   for (let i = 0; i < n; i++) {
     const x = i / (n - 1) * Math.PI / 2;
-    courbe[i] = montee ? Math.sin(x) : Math.cos(x);
+    courbe[i] = (montee ? Math.sin(x) : Math.cos(x)) * max;
   }
   return courbe;
 }
-const COURBE_MONTEE = courbeFondu(true);
-const COURBE_DESCENTE = courbeFondu(false);
 
 // Un tour de boucle qui commence à l'instant t (montée sur « montee » secondes), puis programme le suivant
 function jouerTourMusique(L, t, montee){
   if (!L.actif || !L.morceau) return;
-  const { buffer, debut, fin } = L.morceau;
+  const { buffer, debut, fin, egalisation } = L.morceau;
   const longueur = fin - debut;
   const fondu = Math.min(FONDU_MUSIQUE, longueur / 4);
+  montee = Math.max(fondu, Math.min(montee, longueur / 3));
   const src = L.ctx.createBufferSource();
   src.buffer = buffer;
   const gain = L.ctx.createGain();
   src.connect(gain);
   gain.connect(L.maitre);
   gain.gain.setValueAtTime(0, t);
-  gain.gain.setValueCurveAtTime(COURBE_MONTEE, t, Math.min(montee, fondu));
-  gain.gain.setValueCurveAtTime(COURBE_DESCENTE, t + longueur - fondu, fondu);
+  gain.gain.setValueCurveAtTime(courbeFondu(true, egalisation), t, montee);
+  gain.gain.setValueCurveAtTime(courbeFondu(false, egalisation), t + longueur - fondu, fondu);
   src.start(t, debut, longueur);
   const piste = { src, gain };
   L.sources.push(piste);
   src.onended = () => { L.sources = L.sources.filter(p => p !== piste); };
-  // Le tour suivant démarre pendant la descente de celui-ci (programmé un peu à l'avance)
-  const suivant = t + longueur - fondu;
+  // Le tour suivant démarre pile à la fin de celui-ci (programmé un peu à l'avance)
+  const suivant = t + longueur;
   clearTimeout(L.minuteur);
   L.minuteur = setTimeout(() => jouerTourMusique(L, suivant, fondu),
     Math.max(0, (suivant - L.ctx.currentTime - 1.5) * 1000));
@@ -513,28 +519,42 @@ function majMusique(){
     if (lecteurMusique) eteindreMusique(lecteurMusique, 0.05);
     const maitre = ctx.createGain();
     maitre.connect(ctx.destination);
-    lecteurMusique = { ctx, maitre, nom: "", morceau: null, sources: [], minuteur: null, actif: false };
+    lecteurMusique = { ctx, maitre, nom: "", morceau: null, sources: [], minuteur: null, actif: false, enChargement: false };
   }
   const L = lecteurMusique;
   // Volume (en douceur)
-  const niveau = Math.pow(voulu.volume / 100, 2) * 0.35; // (bien plus doux que les sons du jeu)
+  const niveau = Math.pow(voulu.volume / 100, 2) * 0.5; // (en fond : bien plus doux que les sons du jeu)
   L.maitre.gain.cancelScheduledValues(ctx.currentTime);
   L.maitre.gain.setValueAtTime(L.maitre.gain.value, ctx.currentTime);
   L.maitre.gain.linearRampToValueAtTime(niveau, ctx.currentTime + 0.3);
 
   const nom = fichierMusique(voulu.theme);
-  if (L.nom === nom && L.actif) return; // (déjà en train de jouer ce morceau)
-  if (L.nom !== nom && L.actif) eteindreMusique(L, 0.8); // autre thème : l'ancien morceau s'éteint
+  if (L.nom === nom && (L.actif || L.enChargement)) return; // (déjà en train de jouer / de préparer ce morceau)
   L.nom = nom;
-  L.actif = true;
+  L.enChargement = true;
   chargerMusique(ctx, nom).then((morceau) => {
     if (!morceau && nom !== "musique_ambiance") return chargerMusique(ctx, "musique_ambiance");
     return morceau;
   }).then((morceau) => {
-    if (lecteurMusique !== L || L.nom !== nom || !L.actif || !morceau) return;
+    if (lecteurMusique !== L || L.nom !== nom) return;
+    L.enChargement = false;
+    if (!morceau || !musiqueVoulue()) return;
+    // L'ancien morceau (autre thème) continue jusqu'ici, puis s'éteint pendant que le nouveau monte
+    if (L.actif) eteindreMusique(L, MONTEE_MUSIQUE);
+    L.actif = true;
     L.morceau = morceau;
     jouerTourMusique(L, ctx.currentTime + 0.05, MONTEE_MUSIQUE);
+    preparerToutesLesMusiques(ctx);
   });
+}
+
+// Les autres morceaux sont téléchargés et décodés en arrière-plan, l'un après l'autre
+let musiquesPreparees = false;
+function preparerToutesLesMusiques(ctx){
+  if (musiquesPreparees) return;
+  musiquesPreparees = true;
+  const noms = ["musique_ambiance"].concat(THEMES_AVEC_MUSIQUE.map(t => `musique_ambiance_${t}`));
+  noms.reduce((suite, nom) => suite.then(() => chargerMusique(ctx, nom)), Promise.resolve());
 }
 document.addEventListener("visibilitychange", () => setTimeout(majMusique, 0));
 setInterval(majMusique, 2000); // (début ou fin du cast, changement de thème)
