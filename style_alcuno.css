@@ -6539,3 +6539,18 @@ html[data-theme="soleil"][data-theme] body #overlayPlus4 .plus4-container-joueur
 }
 @keyframes annulerChoixArrive{ from{ transform: translateY(140%); opacity: 0; } to{ transform: none; opacity: 1; } }
 @keyframes annulerChoixTemps{ from{ transform: scaleX(1); } to{ transform: scaleX(0); } }
+
+/* Sunset Lover : le décor fixe déborde de l'écran en haut (bleu nuit) et en bas (pêche). Sur iPhone,
+   quand le clavier se range, le bas de l'écran se découvre avant d'être repeint : on y voyait la couleur
+   de fond de la page (le bleu nuit du haut) en barre sous le dégradé. Le décor visible ne change pas
+   (tiers du milieu = l'écran). */
+html[data-theme="soleil"] body::before{
+  inset: -100vh 0;
+  background:
+    linear-gradient(#1f3566, #1f3566),
+    linear-gradient(#fdd79a, #fdd79a),
+    var(--deco-theme);
+  background-size: 100% 33.34%;
+  background-position: top, bottom, center, center;
+  background-repeat: no-repeat;
+}
