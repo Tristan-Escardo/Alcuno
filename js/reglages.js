@@ -185,15 +185,16 @@ function peindreBarreTelephone(){
   document.head.appendChild(barre);
 }
 
-function appliquerTheme(nom){
+function appliquerTheme(nom, sansMusique = false){
   if (!THEMES[nom] || (nom === "prestige" && !prestigeDebloque())) nom = "bordeaux";
   document.documentElement.dataset.theme = nom;
   peindreBarreTelephone();
   document.querySelectorAll(".pastilleTheme").forEach((b) => {
     b.setAttribute("aria-pressed", b.dataset.theme === nom ? "true" : "false");
   });
-  // Musique du nouveau thème, tout de suite (dans le tap : sinon l'iPhone refuse de la lancer)
-  try { majMusique(); } catch (e) {} // (pas encore prête pendant le chargement de la page)
+  // Musique du nouveau thème, tout de suite (dans le tap : sinon l'iPhone refuse de la lancer). Pas si la
+  // page va se recharger juste après (voir rafraichirBarreIphone) : on entendait son début, puis plus rien
+  if (!sansMusique) { try { majMusique(); } catch (e) {} } // (pas encore prête pendant le chargement de la page)
 }
 
 // iPhone, barre du haut (sous l'heure) : quand le jeu ne passe pas dessous (appli ajoutée à l'écran
@@ -214,8 +215,12 @@ function hauteurZoneHeure(){
   return hauteur;
 }
 
+function barreIphoneARafraichir(){
+  return estIOS && estEnAppli && hauteurZoneHeure() === 0;
+}
+
 function rafraichirBarreIphone(){
-  if (!estIOS || !estEnAppli || hauteurZoneHeure() > 0) return;
+  if (!barreIphoneARafraichir()) return;
   // petit délai : on voit le nouveau thème, et plusieurs taps d'affilée ne font qu'un rechargement
   clearTimeout(rechargementTheme);
   rechargementTheme = setTimeout(() => {
@@ -279,7 +284,7 @@ for (let i = 0; i < 26; i++) {
 
 document.querySelectorAll(".pastilleTheme").forEach((pastille) => {
   pastille.addEventListener("click", () => {
-    appliquerTheme(pastille.dataset.theme);
+    appliquerTheme(pastille.dataset.theme, barreIphoneARafraichir());
     try { localStorage.setItem(CLE_THEME, pastille.dataset.theme); } catch (e) {}
     rafraichirBarreIphone();
   });
