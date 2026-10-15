@@ -382,7 +382,7 @@ const THEMES_AVEC_MUSIQUE = ["givre", "cerisier", "prestige"];
 const caseMusique = document.getElementById("optionMusique");
 const curseurMusique = document.getElementById("volumeMusique");
 const ligneVolumeMusique = document.getElementById("ligneVolumeMusique");
-caseMusique.checked = lireReglage(CLE_MUSIQUE, true);
+caseMusique.checked = lireReglage(CLE_MUSIQUE, false); // (désactivée de base)
 let volumeMusique = 30;
 try {
   const v = localStorage.getItem(CLE_VOLUME_MUSIQUE);
@@ -565,6 +565,7 @@ document.addEventListener("visibilitychange", () => setTimeout(majMusique, 0));
 setInterval(majMusique, 2000); // (début ou fin du cast, changement de thème)
 
 let contexteSon = null;
+let sonInterrompu = false; // iPhone : le son a été interrompu depuis le dernier tap (voir debloquerSon)
 let repriseRatee = false; // au tap précédent, le son était coupé et la reprise n'a pas marché
 function contexteAudio(){
   if (contexteSon && contexteSon.state === "closed") contexteSon = null;
@@ -572,6 +573,7 @@ function contexteAudio(){
     const Contexte = window.AudioContext || window.webkitAudioContext;
     if (!Contexte) return null;
     try { contexteSon = new Contexte(); } catch (e) { return null; }
+    contexteSon.onstatechange = function(){ if (this.state === "interrupted") sonInterrompu = true; };
   }
   // « suspended », ou « interrupted » sur iPhone (appli en arrière-plan, appel, autre appli qui joue
   // du son…) : on relance. Avant, seul « suspended » était relancé : le son restait coupé jusqu'au
@@ -588,6 +590,14 @@ function contexteAudio(){
 // tous les sons arrivent plus tard par Firebase : sans ça, le son n'était jamais débloqué.
 function debloquerSon(){
   if (!caseSons.checked && !caseMusique.checked) return;
+  // iPhone : après une interruption (centre de contrôle, appel, Siri…), le son repartait parfois dans
+  // l'écouteur du haut, beaucoup plus faible (la musique « baissait » toute seule). Au tap suivant, on
+  // repart d'un contexte de son neuf (la musique reprend au début, en fondu).
+  if (sonInterrompu && contexteSon) {
+    sonInterrompu = false;
+    try { contexteSon.close(); } catch (e) {}
+    contexteSon = null;
+  }
   if (contexteSon && contexteSon.state !== "running" && repriseRatee) {
     try { contexteSon.close(); } catch (e) {}
     contexteSon = null;
