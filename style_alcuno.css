@@ -6549,9 +6549,12 @@ html[data-theme="soleil"][data-theme] body #overlayPlus4 .plus4-container-joueur
    finissait en barre nette au-dessus du clavier : il se fond dans le bleu nuit juste avant lui. */
 html[data-theme="soleil"].clavier-ouvert body::before{
   background:
-    linear-gradient(180deg, rgba(31,53,102,0) 45%, #1f3566 calc(100% - var(--haut-visible, 0px))),
-    var(--deco-theme),
-    var(--fond-theme);
+    linear-gradient(180deg, rgba(31,53,102,0) 45%, #1f3566 100%),
+    var(--deco-theme);
+  background-color: #1f3566;
+  /* (il fait toute la hauteur de l'écran, clavier compris : dégradé limité à la partie visible) */
+  background-size: 100% calc(100% - var(--haut-visible, 0px) - var(--bas-cache, 0px));
+  background-repeat: no-repeat;
 }
 
 /* Sunset Lover : bas des réglages (partager, signaler un bug, à propos) posé sur la fin claire du
