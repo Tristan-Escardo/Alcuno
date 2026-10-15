@@ -1738,6 +1738,7 @@ header h1{
 #ecranNouvellePartie,
 #ecranConfirmerHote,
 #ecranConfirmerRetrait,
+#ecranReprise,
 #ecranConfirmerAccueil,
 #ecranChoixPseudo,
 #ecranCaster{
@@ -1765,6 +1766,7 @@ header h1{
 #ecranNouvellePartie > *,
 #ecranConfirmerHote > *,
 #ecranConfirmerRetrait > *,
+#ecranReprise > *,
 #ecranConfirmerAccueil > *,
 #ecranChoixPseudo > *,
 #ecranCaster > *{
@@ -1775,6 +1777,7 @@ header h1{
 #ecranNouvellePartie h2,
 #ecranConfirmerHote h2,
 #ecranConfirmerRetrait h2,
+#ecranReprise h2,
 #ecranConfirmerAccueil h2,
 #ecranChoixPseudo h2,
 #ecranCaster h2,
@@ -1791,6 +1794,7 @@ header h1{
 #ecranNouvellePartie button,
 #ecranConfirmerHote button,
 #ecranConfirmerRetrait button,
+#ecranReprise button,
 #ecranConfirmerAccueil button,
 #ecranChoixPseudo button,
 #ecranCaster button,
@@ -1819,6 +1823,7 @@ header h1{
   #ecranNouvellePartie button:hover,
   #ecranConfirmerHote button:hover,
   #ecranConfirmerRetrait button:hover,
+  #ecranReprise button:hover,
   #ecranConfirmerAccueil button:hover,
   #ecranChoixPseudo button:hover,
   #ecranCaster button:hover,
@@ -1832,6 +1837,7 @@ header h1{
 #ecranNouvellePartie button:active,
 #ecranConfirmerHote button:active,
 #ecranConfirmerRetrait button:active,
+#ecranReprise button:active,
 #ecranConfirmerAccueil button:active,
 #ecranChoixPseudo button:active,
 #ecranCaster button:active,
@@ -2004,6 +2010,7 @@ html[data-theme="givre"] #enLigne .iconeBouton{ filter: none; }
 /* Écran « Retirer l'hôte ? » */
 #ecranConfirmerHote .texteConfirmation,
 #ecranConfirmerRetrait .texteConfirmation,
+#ecranReprise .texteConfirmation,
 #ecranConfirmerAccueil .texteConfirmation,
 #ecranChoixPseudo .texteConfirmation,
 #ecranCaster .texteConfirmation{
@@ -3288,6 +3295,7 @@ html.accessibilite #enLigne button:not(.btnAccueilTexte):not(.btnRetour):not(.bt
 html.accessibilite #ecranNouvellePartie button:not(.btnAccueilTexte):not(.btnRetour),
 html.accessibilite #ecranConfirmerHote button,
 html.accessibilite #ecranConfirmerRetrait button,
+html.accessibilite #ecranReprise button,
 html.accessibilite #ecranConfirmerAccueil button,
 html.accessibilite #ecranChoixPseudo button,
 html.accessibilite #ecranCaster button:not(.btnRetour){
@@ -4325,6 +4333,7 @@ html[data-theme="givre"] #choixMode #btnReglages svg{
 html[data-theme="givre"] #ecranNouvellePartie h2,
 html[data-theme="givre"] #ecranConfirmerHote h2,
 html[data-theme="givre"] #ecranConfirmerRetrait h2,
+html[data-theme="givre"] #ecranReprise h2,
 html[data-theme="givre"] #ecranConfirmerAccueil h2,
 html[data-theme="givre"] #ecranChoixPseudo h2,
 html[data-theme="givre"] #ecranCaster h2,
@@ -4337,6 +4346,7 @@ html[data-theme="givre"] #suppression h2{
 }
 html[data-theme="givre"] #ecranConfirmerHote .texteConfirmation,
 html[data-theme="givre"] #ecranConfirmerRetrait .texteConfirmation,
+html[data-theme="givre"] #ecranReprise .texteConfirmation,
 html[data-theme="givre"] #ecranConfirmerAccueil .texteConfirmation,
 html[data-theme="givre"] #ecranChoixPseudo .texteConfirmation,
 html[data-theme="givre"] #ecranCaster .texteConfirmation{
@@ -4349,6 +4359,7 @@ html[data-theme="givre"] #choixMode button:not(#btnReglages):not(.btnAccueilText
 html[data-theme="givre"] #ecranNouvellePartie button:not(.btnAccueilTexte),
 html[data-theme="givre"] #ecranConfirmerHote button,
 html[data-theme="givre"] #ecranConfirmerRetrait button,
+html[data-theme="givre"] #ecranReprise button,
 html[data-theme="givre"] #ecranConfirmerAccueil button,
 html[data-theme="givre"] #ecranChoixPseudo button,
 html[data-theme="givre"] #ecranCaster button,
@@ -5161,7 +5172,7 @@ html:not([data-theme="givre"]) :is(#overlayPigeon .bouton-pigeon, #overlayPlus4 
    même, le haut sortait de l'écran et ne pouvait jamais être atteint (titre du duel, carte de la règle,
    ALCUNO de l'accueil coupés). !important : le JS centre certains overlays directement. ===== */
 :is(#choixMode, #enLigne, #ecranNouvellePartie, #ecranConfirmerHote, #ecranConfirmerRetrait,
-    #ecranConfirmerAccueil, #ecranChoixPseudo, #overlayRegleUnique, #overlayAnnulation,
+    #ecranConfirmerAccueil, #ecranReprise, #ecranChoixPseudo, #overlayRegleUnique, #overlayAnnulation,
     #overlayResultatAnnulation, #overlayFinUnRestants, #overlayCouleur){
   justify-content: flex-start !important;
   overflow-y: auto;
@@ -5170,13 +5181,13 @@ html:not([data-theme="givre"]) :is(#overlayPigeon .bouton-pigeon, #overlayPlus4 
 /* deux cales invisibles au début et à la fin : elles se partagent la place libre (contenu centré) et
    tombent à zéro quand le contenu est trop haut (contenu calé en haut) */
 :is(#choixMode, #enLigne, #ecranNouvellePartie, #ecranConfirmerHote, #ecranConfirmerRetrait,
-    #ecranConfirmerAccueil, #ecranChoixPseudo, #overlayRegleUnique, #overlayAnnulation,
+    #ecranConfirmerAccueil, #ecranReprise, #ecranChoixPseudo, #overlayRegleUnique, #overlayAnnulation,
     #overlayResultatAnnulation, #overlayFinUnRestants, #overlayCouleur)::before{
   content: "";
   margin-top: auto;
 }
 :is(#choixMode, #enLigne, #ecranNouvellePartie, #ecranConfirmerHote, #ecranConfirmerRetrait,
-    #ecranConfirmerAccueil, #ecranChoixPseudo, #overlayRegleUnique, #overlayAnnulation,
+    #ecranConfirmerAccueil, #ecranReprise, #ecranChoixPseudo, #overlayRegleUnique, #overlayAnnulation,
     #overlayResultatAnnulation, #overlayFinUnRestants, #overlayCouleur)::after{
   content: "";
   margin-bottom: auto;
@@ -5200,6 +5211,7 @@ html:not([data-theme="givre"]) :is(#overlayPigeon .bouton-pigeon, #overlayPlus4 
   #ecranNouvellePartie button:not(.btnAccueilTexte):not(.btnRetour),
   #ecranConfirmerHote button,
   #ecranConfirmerRetrait button,
+  #ecranReprise button,
   #ecranConfirmerAccueil button,
   #ecranChoixPseudo button{
     padding-top: 12px;

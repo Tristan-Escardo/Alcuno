@@ -373,6 +373,15 @@
             <button type="button" id="btnConfirmerAccueilNon">Non</button>
         </section>
 
+        <!-- Mode classique : partie interrompue (appli fermée en pleine partie), voir js/synchro-en-ligne.js -->
+        <section class="ecranReprise" id="ecranReprise" style="display:none;">
+            <h2>Partie en cours</h2>
+            <p class="texteConfirmation" id="texteReprise"></p>
+            <p class="texteConfirmation">On la reprend ?</p>
+            <button type="button" id="btnRepriseOui">Reprendre</button>
+            <button type="button" id="btnRepriseNon">Nouvelle partie</button>
+        </section>
+
         <section class="ecranConfirmerHote" id="ecranConfirmerHote" style="display:none;">
             <h2>Retirer l'hôte ?</h2>
             <p id="texteConfirmerHote" class="texteConfirmation"></p>
