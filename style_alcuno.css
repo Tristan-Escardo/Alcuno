@@ -6480,3 +6480,62 @@ html[data-theme="soleil"] :is(#overlayCouleur .titre-couleur, #overlayPlus4 .plu
 html[data-theme="soleil"] #overlayPlus4 :is(.plus4-actions, .plus4-container-joueurs){ background: transparent !important; box-shadow: none !important; }
 /* (+4 : la liste des joueurs défile, l'ombre portée des boutons y était coupée en rectangle) */
 html[data-theme="soleil"][data-theme] body #overlayPlus4 .plus4-container-joueurs .bouton-pigeon{ box-shadow: inset 0 0 0 1.5px rgba(255, 220, 190, 0.5) !important; }
+
+/* ===== « Mauvais joueur ? ↶ Annuler » : quelques secondes après un choix de joueur (pigeon, carte
+   dorée, duel, +4), en bas de l'écran, par-dessus les annonces. La barre du bas = temps restant. ===== */
+#annulerChoix{
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(18px + env(safe-area-inset-bottom));
+  z-index: 2147483100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: #1d0613;
+  border: 1px solid rgba(255, 215, 0, 0.45);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font: 800 16px Arial, sans-serif;
+  overflow: hidden;
+  animation: annulerChoixArrive 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+#annulerChoix .annulerChoix-texte{ flex: 1; }
+#annulerChoix .annulerChoix-bouton{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border: none;
+  border-radius: 999px;
+  background: #FFD700;
+  color: #2b001d;
+  font: 900 16px Arial, sans-serif;
+  cursor: pointer;
+}
+#annulerChoix .annulerChoix-bouton svg{
+  width: 1.1em;
+  height: 1.1em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+#annulerChoix .annulerChoix-temps{
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 4px;
+  width: 100%;
+  background: #FFD700;
+  opacity: 0.8;
+  transform-origin: left center;
+  animation: annulerChoixTemps linear both; /* durée : js (DUREE_ANNULER_CHOIX) */
+}
+@keyframes annulerChoixArrive{ from{ transform: translateY(140%); opacity: 0; } to{ transform: none; opacity: 1; } }
+@keyframes annulerChoixTemps{ from{ transform: scaleX(1); } to{ transform: scaleX(0); } }
