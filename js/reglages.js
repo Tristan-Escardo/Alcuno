@@ -686,8 +686,10 @@ function chargerSons(){
 
 // carte | doree | culsec | pigeon | tour | eau
 // Petit son de clic (Sons/bouton.mp3) sur les boutons, sauf ceux qui ont déjà leur propre son
-// (annuler des gorgées, distribuer au +4, choisir le pigeon ou la victime de la carte dorée)
-const BOUTONS_AVEC_LEUR_SON = ".bouton-annulation, .plus4-joueur-btn, #overlayPigeon .bouton-pigeon, .bouton-doree";
+// (annuler des gorgées, distribuer au +4, choisir le pigeon ou la victime de la carte dorée), et sauf
+// Réglages, « Signaler un bug » et « Copier le diagnostic » (silencieux)
+const BOUTONS_AVEC_LEUR_SON = ".bouton-annulation, .plus4-joueur-btn, #overlayPigeon .bouton-pigeon, .bouton-doree, " +
+  "#btnReglages, #btnSignalerBug, #btnDiagnostic";
 document.addEventListener("click", (e) => {
   if (!e.isTrusted || document.documentElement.classList.contains("mode-tele")) return;
   const bouton = e.target && e.target.closest && e.target.closest("button, [role='button']");
