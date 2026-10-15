@@ -6567,3 +6567,52 @@ html[data-theme="soleil"] :is(#choixMode, #enLigne, #ecranNouvellePartie, #ecran
   background-position: 0 var(--haut-visible, 0px);
   background-repeat: no-repeat;
 }
+
+/* ===== Mode télé en Sunset Lover : mêmes accords que sur le téléphone ===== */
+html[data-theme="soleil"] #ecranTele .tele-titre{
+  color: #fff;
+  text-shadow: 0 0 0.5vh #fff, 0 0 1.4vh #ff8a6b, 0 0 2.8vh #ff6b7e, 0 0 5vh #e8507a, 0 0 8vh rgba(232,80,122,0.6);
+}
+html[data-theme="soleil"] #ecranTele .tele-sous-titre{ color: #ffcf9e; }
+html[data-theme="soleil"] #ecranTele .tele-etape{ color: #fff1df; }
+html[data-theme="soleil"] #ecranTele .tele-num{ background: linear-gradient(180deg, #ffb35c, #f2775c); color: #fff; }
+html[data-theme="soleil"] #ecranTele .tele-code{ color: #2a1a44; text-shadow: none; }
+html[data-theme="soleil"] #ecranTele .tele-code small{ color: #5a1f45; }
+html[data-theme="soleil"] #ecranTele .tele-entete{
+  border-color: rgba(255,205,170,0.38);
+  background: rgba(22,32,72,0.42);
+}
+html[data-theme="soleil"] #ecranTele .tele-entete::after{ background: linear-gradient(90deg, #ffd27a, #ff8a6b 50%, #c86fb0); }
+html[data-theme="soleil"] #ecranTele .tele-bloc{
+  border-color: rgba(255,205,170,0.38);
+  background: rgba(22,32,72,0.42);
+}
+html[data-theme="soleil"] #ecranTele .tele-bloc-titre,
+html[data-theme="soleil"] #ecranTele .tele-tour-label,
+html[data-theme="soleil"] #ecranTele .tele-prepa-titre{ color: #ffcf9e; }
+html[data-theme="soleil"] #ecranTele .tele-tour{
+  border-color: rgba(255,205,170,0.5);
+  background: linear-gradient(180deg, rgba(31,53,102,0.95), rgba(60,50,110,0.93));
+}
+html[data-theme="soleil"] #ecranTele .tele-tour-nom{ color: #ffcf86; text-shadow: 0 0.4vh 0 #b8456a; }
+html[data-theme="soleil"] #ecranTele .tele-joueur{ color: #fff1df; }
+html[data-theme="soleil"] #ecranTele .tele-joueur-actif{ color: #ffcf86; }
+html[data-theme="soleil"] #ecranTele .tele-badge{ background: linear-gradient(180deg, #ffb35c, #f2775c); color: #fff; }
+html[data-theme="soleil"] #ecranTele .tele-regles{ color: #ffe0b0; }
+html[data-theme="soleil"] #ecranTele .tele-prepa-joueur{ background: rgba(22,32,72,0.5); border-color: rgba(255,205,170,0.45); color: #fff1df; }
+html[data-theme="soleil"] #ecranTele :is(.tele-restantes, .tele-pied, .tele-son-coupe, .tele-prepa-info){ color: #3a1f4a; }
+/* Annonces : « heure dorée », comme les overlays du téléphone */
+html[data-theme="soleil"] #ecranTele .tele-ecran{ background: linear-gradient(180deg, #fcc98a 0%, #f7a072 38%, #e9787a 72%, #b8657f 100%); }
+html[data-theme="soleil"] #ecranTele .tele-ecran-titre{ color: #2a1a44; text-shadow: 0 0.3vh 0 rgba(255,240,220,0.6); }
+html[data-theme="soleil"] #ecranTele .tele-ecran-detail{ color: #8a1f4a; }
+/* Pause */
+html[data-theme="soleil"] #ecranTele .tele-pause{ background: rgba(31,53,102,0.5); }
+html[data-theme="soleil"] #ecranTele .tele-pause svg{
+  fill: #fff;
+  filter: drop-shadow(0 0 0.5vh #fff) drop-shadow(0 0 1.4vh #ff8a6b) drop-shadow(0 0 2.8vh #ff6b7e) drop-shadow(0 0 5vh #e8507a);
+}
+html[data-theme="soleil"] #ecranTele .tele-pause-titre{
+  color: #fff;
+  text-shadow: 0 0 0.6vh #fff, 0 0 2vh #ff8a6b, 0 0 4vh #ff6b7e, 0 0 7vh #e8507a;
+}
+html[data-theme="soleil"] #ecranTele .tele-pause-texte{ color: #fff1df; }
