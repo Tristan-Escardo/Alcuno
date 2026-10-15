@@ -352,7 +352,7 @@ const curseurVolume = document.getElementById("volumeSons");
 const ligneVolume = document.getElementById("ligneVolume");
 caseSons.checked = lireReglage(CLE_SONS, true);
 
-let volumeSons = 100;
+let volumeSons = 30; // (30 % de base)
 try {
   const v = localStorage.getItem(CLE_VOLUME);
   if (v !== null && Number(v) >= 0 && Number(v) <= 100) volumeSons = Number(v);
@@ -432,9 +432,10 @@ function fichierMusique(theme){
 function musiqueVoulue(){
   if (document.documentElement.classList.contains("mode-tele")) return musiqueTele;
   if (!caseMusique.checked || volumeMusique === 0 || document.visibilityState !== "visible") return null;
-  let caste = false;
+  let caste = false, enPause = false;
   try { caste = !!codeTele; } catch (e) {} // (js/tele.js, chargé en dernier)
-  if (caste) return null;
+  try { enPause = !!pauseEnCours; } catch (e) {} // (js/plateau.js) : pas de musique pendant la pause
+  if (caste || enPause) return null;
   return { volume: volumeMusique, theme: document.documentElement.dataset.theme || "bordeaux" };
 }
 
