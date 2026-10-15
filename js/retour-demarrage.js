@@ -294,7 +294,11 @@ try { sessionStorage.removeItem("alcuno_rechargement_auto"); } catch (e) {} // (
 // avec le code rempli (lien scanné, ou appli lancée juste après l'avoir installée depuis ce lien)
 (function(){
   const code = lireCodeInvitation(estEnAppli);
-  if (!code) return;
+  if (!code) {
+    // Sinon : partie classique interrompue (appli fermée en pleine partie) => « Reprendre ? »
+    if (!document.documentElement.classList.contains("mode-tele")) proposerRepriseClassique();
+    return;
+  }
   document.getElementById("codeRejoindre").value = code;
   document.getElementById("btnModeEnLigne").click();
   document.getElementById("btnRejoindrePartie").click();

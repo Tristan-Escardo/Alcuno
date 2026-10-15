@@ -7,6 +7,7 @@
 function afficherOverlayFinUnRestants(){
   if(finUnOverlayAffiche) return;
   finUnOverlayAffiche = true;
+  if(!rattrapageEnCours) oublierPartieClassique(); // partie finie : plus rien à reprendre
 
   // joueurs qui ont encore des "un" stockés
   const restants = joueurs
@@ -1635,6 +1636,9 @@ function lancerPartie(){
   plateau.innerHTML = "";
   prechargerImagesCartes(); // (déjà fait à l'ouverture, en principe)
   lancementPartieA = Date.now();
+  // Classique : hasard à graine aussi, pour pouvoir rejouer la partie après un plantage (voir
+  // « Partie classique gardée en mémoire » dans js/synchro-en-ligne.js)
+  if(!enLigneActif) demarrerSauvegardeClassique();
   majTitrePJ(); // « ALCUNO PJ » dans le bandeau
   garderEcranAllume(); // pas de mise en veille pendant la partie
 
@@ -1652,7 +1656,7 @@ function lancerPartie(){
   // GRAINE_SANS_CARTE_DOREE)
   const sansCarteDoree = enLigneActif
     ? !!dernierEtatManche && dernierEtatManche.seed >= GRAINE_SANS_CARTE_DOREE
-    : !premierePartieJouee();
+    : sauvegardeClassique ? sauvegardeClassique.sansDoree : !premierePartieJouee();
   const avecCarteDoree = aleatoire() < CHANCE_CARTE_DOREE && !sansCarteDoree;
   noterPremierePartieJouee();
   // La carte dorée REMPLACE une carte normale (n'importe laquelle : la dernière du paquet mélangé),
@@ -1755,6 +1759,7 @@ function lancerPartie(){
 }
 
 function retourMenu(){
+  if(!repriseClassiqueEnCours) oublierPartieClassique(); // partie abandonnée (« Modifier les joueurs »…)
   partieLancee = false;
   majTitrePJ(); // le titre suit le réglage Mode PJ, partie ou pas
   finUnOverlayAffiche = false;
@@ -1888,6 +1893,7 @@ document.getElementById("btnModifierJoueurs").addEventListener("click", () => {
 
 function allerAccueil(){
   setTimeout(afficherBandeauMiseAJour, 0); // nouvelle version repérée pendant la partie : proposée maintenant
+  oublierPartieClassique(); // partie quittée exprès : plus rien à reprendre
   if(codePartieActuel) quitterPartie();
   reinitialiserEcransJeu();
   libererEcran();

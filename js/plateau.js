@@ -1164,6 +1164,7 @@ document.getElementById("btnConfirmerRetraitOui").addEventListener("click", () =
 
   if(!enLigneActif){
     retirerJoueurEnJeu(nom);
+    noterActionClassique(`retrait-classique:${nom}`);
     afficherToast(`${nom} a été retiré de la partie`);
     return;
   }

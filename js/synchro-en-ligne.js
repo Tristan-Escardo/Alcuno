@@ -23,7 +23,13 @@ function surAction(el, id, options, handler){
     // Seulement les taps de ce téléphone : les actions des autres sont toujours rejouées.
     if(el.closest("main") && (overlayOuvert() || voileOverlays.classList.contains("visible"))) return;
     if(!enLigneActif){
+      // Mêmes règles qu'en ligne : élément prêt, action pas sans objet, usage unique pas déjà fait
+      // (avant, un double tap rapide sur « Annuler 1 » s'appliquait deux fois). Les taps appliqués
+      // sont gardés en mémoire, pour reprendre la partie après un plantage.
+      if(!actionPrete(el) || (el._net.valide && !el._net.valide())) return;
+      if(el._net.once) el.dataset.netUtilise = "1";
       handler(e);
+      noterActionClassique(id);
       relancerRappelClassique(); // le joueur a joué : le compteur du rappel « À toi » repart de zéro
       return;
     }
@@ -625,4 +631,151 @@ function afficherToast(message, duree = 1800){
   toast._timer = setTimeout(() => toast.classList.remove("visible"), duree);
 }
 
+// #endregion
+
+// #region Partie classique gardée en mémoire (reprise après un plantage)
+// En classique aussi, le hasard vient d'une graine : la partie entière se déduit de la graine, des
+// joueurs et de la liste des taps qui ont compté (mêmes noms d'actions qu'en ligne). Le tout est gardé
+// dans le téléphone à chaque tap. Si l'appli se ferme en pleine partie (appel, batterie, plantage),
+// au lancement suivant on propose de la reprendre : elle est rejouée en accéléré, comme le rattrapage
+// en ligne. Oubliée quand la partie est finie ou quittée exprès (⌂), ou au bout de 12 h.
+const CLE_PARTIE_CLASSIQUE = "alcuno_partie_classique";
+const DUREE_PARTIE_CLASSIQUE = 12 * 60 * 60 * 1000;
+let sauvegardeClassique = null; // { v, date, seed, sansDoree, soft, joueurs, actions }
+let repriseClassiqueEnCours = false;
+
+function enregistrerPartieClassique(){
+  if(!sauvegardeClassique) return;
+  sauvegardeClassique.date = Date.now();
+  sauvegardeClassique.soft = estModeSoft();
+  try { localStorage.setItem(CLE_PARTIE_CLASSIQUE, JSON.stringify(sauvegardeClassique)); } catch (e) {}
+}
+
+// Appelé par lancerPartie (classique) : nouvelle graine, ou celle de la partie qu'on reprend
+function demarrerSauvegardeClassique(){
+  if(repriseClassiqueEnCours && sauvegardeClassique){
+    aleatoire = generateurAleatoire(sauvegardeClassique.seed);
+    return;
+  }
+  const seed = Math.floor(Math.random() * 4294967296);
+  sauvegardeClassique = {
+    v: VERSION_JEU, date: Date.now(), seed, sansDoree: !premierePartieJouee(), soft: estModeSoft(),
+    joueurs: joueurs.slice(), actions: []
+  };
+  aleatoire = generateurAleatoire(seed);
+  enregistrerPartieClassique();
+}
+
+function noterActionClassique(id){
+  if(enLigneActif || !sauvegardeClassique || repriseClassiqueEnCours || !partieLancee) return;
+  sauvegardeClassique.actions.push(id);
+  enregistrerPartieClassique();
+}
+
+function oublierPartieClassique(){
+  sauvegardeClassique = null;
+  try { localStorage.removeItem(CLE_PARTIE_CLASSIQUE); } catch (e) {}
+}
+
+function lirePartieClassique(){
+  let s = null;
+  try { s = JSON.parse(localStorage.getItem(CLE_PARTIE_CLASSIQUE) || "null"); } catch (e) { s = null; }
+  const valide = s && s.v === VERSION_JEU && Array.isArray(s.joueurs) && s.joueurs.length >= 2 &&
+    Array.isArray(s.actions) && s.actions.length > 0 && Date.now() - Number(s.date || 0) < DUREE_PARTIE_CLASSIQUE;
+  if(!valide){ oublierPartieClassique(); return null; }
+  return s;
+}
+
+// Au démarrage de l'appli : « Reprendre la partie ? » s'il y a une partie classique interrompue
+function proposerRepriseClassique(){
+  const s = lirePartieClassique();
+  if(!s) return;
+  const noms = s.joueurs.map(avecCouronne);
+  const liste = noms.length > 1 ? `${noms.slice(0, -1).join(", ")} et ${noms[noms.length - 1]}` : noms[0];
+  document.getElementById("texteReprise").innerText = `Avec ${liste}.`;
+  ecranReprise.style.display = "";
+}
+
+const ecranReprise = document.getElementById("ecranReprise");
+document.getElementById("btnRepriseNon").addEventListener("click", () => {
+  ecranReprise.style.display = "none";
+  oublierPartieClassique();
+});
+document.getElementById("btnRepriseOui").addEventListener("click", () => {
+  ecranReprise.style.display = "none";
+  const s = lirePartieClassique();
+  if(s) reprendrePartieClassique(s);
+});
+
+function reprendrePartieClassique(s){
+  sauvegardeClassique = s;
+  repriseClassiqueEnCours = true;
+  if(caseModeSoft.checked !== !!s.soft) caseModeSoft.checked = !!s.soft; // (même mode que pendant la partie)
+  document.getElementById("btnModeClassique").click();
+  document.activeElement && document.activeElement.blur && document.activeElement.blur(); // (pas de clavier)
+  joueurs = s.joueurs.slice();
+  annulations = {};
+  afficherJoueurs();
+
+  rattrapageEnCours = true; // annonces et animations quasi instantanées (voir delai)
+  document.body.classList.add("rattrapage");
+  const ecran = document.createElement("div");
+  ecran.id = "ecranRattrapage";
+  document.body.appendChild(ecran);
+
+  lancerPartie();
+  const actions = s.actions.slice();
+  let i = 0;
+  let attente = 0;
+  const etape = () => {
+    ecran.innerText = `Reprise de la partie…\n${i} / ${actions.length}`;
+    if(i >= actions.length) return terminer();
+    const resultat = rejouerActionClassique(actions[i]);
+    if(resultat === "attendre" && attente < 6000){
+      attente += 20;
+      // Annonce qui ne se ferme qu'au tap (ex. « TIENS DANS TA GUEULE ») : fermée pour continuer
+      if(attente % 200 === 0 && document.getElementById("overlayRegleUnique")) fermerOverlayRegleUnique();
+      setTimeout(etape, 20);
+      return;
+    }
+    i++;
+    attente = 0;
+    setTimeout(etape, 0);
+  };
+  const terminer = () => {
+    rattrapageEnCours = false;
+    repriseClassiqueEnCours = false;
+    document.body.classList.remove("rattrapage");
+    ecran.remove();
+    sauvegardeClassique.actions = actions;
+    enregistrerPartieClassique();
+    afficherJoueurs();
+    afficherJoueurActif();
+    afficherToast("Partie reprise !", 2500);
+  };
+  setTimeout(etape, 0);
+}
+
+// "ok" | "attendre" | "ignorer" (comme tenterAction en ligne, sans joueur ni réseau)
+function rejouerActionClassique(id){
+  if(id.startsWith("retrait-classique:")){
+    const nom = id.slice("retrait-classique:".length);
+    if(!joueurs.includes(nom) || joueurs.length <= 2) return "ignorer";
+    if(!plateauLibre()) return "attendre";
+    retirerJoueurEnJeu(nom);
+    return "ok";
+  }
+  const candidats = Array.from(document.querySelectorAll("[data-net-id]")).filter(el => el.dataset.netId === id);
+  const el = candidats.find(actionPrete);
+  if(!el){
+    if(candidats.some(c => c._net && c._net.valide && !c._net.valide())) return "ignorer";
+    return "attendre";
+  }
+  if(el._net.valide && !el._net.valide()) return "ignorer";
+  // Comme au doigt : le plateau ne se touche pas à travers une annonce (voir surAction)
+  if(el.closest("main") && (overlayOuvert() || voileOverlays.classList.contains("visible"))) return "attendre";
+  if(el._net.once) el.dataset.netUtilise = "1";
+  el._net.handler();
+  return "ok";
+}
 // #endregion
