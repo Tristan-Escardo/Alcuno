@@ -254,23 +254,6 @@ try { themeChoisi = localStorage.getItem(CLE_THEME) || "bordeaux"; } catch (e) {
 if (themeChoisi === "violet") themeChoisi = "soleil"; // ancien thème, remplacé par Sunset Lover
 appliquerTheme(themeChoisi);
 
-// Sunset Lover, iPhone : quand le clavier se range, le bas de l'écran se découvre avant d'être repeint et
-// montrait la couleur de fond de la page (le bleu nuit du haut du dégradé) en barre. Pendant une saisie et
-// 1,5 s après, le fond de la page prend la couleur du bas du dégradé (style_alcuno.css, saisie-fond-bas).
-let minuteurFondSaisie = null;
-const estChampTexte = (el) => el && (el.tagName === "TEXTAREA" ||
-  (el.tagName === "INPUT" && !["checkbox", "radio", "range", "button", "file"].includes(el.type)));
-document.addEventListener("focusin", (e) => {
-  if (!estChampTexte(e.target)) return;
-  clearTimeout(minuteurFondSaisie);
-  document.documentElement.classList.add("saisie-fond-bas");
-});
-document.addEventListener("focusout", (e) => {
-  if (!estChampTexte(e.target)) return;
-  clearTimeout(minuteurFondSaisie);
-  minuteurFondSaisie = setTimeout(() => document.documentElement.classList.remove("saisie-fond-bas"), 1500);
-});
-
 // Cerisier : pétales qui tombent sur l'écran d'accueil (positions, tailles et vitesses au hasard)
 const zonePetales = document.getElementById("petalesCerisier");
 for (let i = 0; i < 14; i++) {

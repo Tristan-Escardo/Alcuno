@@ -6544,10 +6544,15 @@ html[data-theme="soleil"][data-theme] body #overlayPlus4 .plus4-container-joueur
 @keyframes annulerChoixArrive{ from{ transform: translateY(140%); opacity: 0; } to{ transform: none; opacity: 1; } }
 @keyframes annulerChoixTemps{ from{ transform: scaleX(1); } to{ transform: scaleX(0); } }
 
-/* Sunset Lover, iPhone : quand le clavier se range, le bas de l'écran se découvre avant d'être repeint et
-   montre la couleur de fond de la page (le bleu nuit du haut du dégradé, en barre sous le pêche). Pendant
-   une saisie et un peu après (classe posée par reglages.js), le fond de la page prend la couleur du bas. */
-html[data-theme="soleil"].saisie-fond-bas:not(.overlay-ouvert):not(.credits-ouverts) body{ background: #fdd79a; }
+/* Sunset Lover, iPhone, clavier sorti : le clavier est transparent et laisse voir la couleur de fond de
+   la page, la même que la barre de l'heure (bleu nuit, le haut du dégradé). Le bas du dégradé (pêche)
+   finissait en barre nette au-dessus du clavier : il se fond dans le bleu nuit juste avant lui. */
+html[data-theme="soleil"].clavier-ouvert body::before{
+  background:
+    linear-gradient(180deg, rgba(31,53,102,0) 45%, #1f3566 calc(100% - var(--haut-visible, 0px))),
+    var(--deco-theme),
+    var(--fond-theme);
+}
 
 /* Sunset Lover : bas des réglages (partager, signaler un bug, à propos) posé sur la fin claire du
    dégradé : textes en prune foncé, lien en framboise souligné */
@@ -6565,6 +6570,18 @@ html[data-theme="soleil"] body::before{ transform: translateY(var(--haut-visible
 html[data-theme="soleil"] :is(#choixMode, #enLigne, #ecranNouvellePartie, #ecranConfirmerHote, #ecranConfirmerRetrait,
   #ecranReprise, #ecranConfirmerAccueil, #ecranChoixPseudo, #ecranCaster, #ecranReglages, #suppression){
   background-position: 0 var(--haut-visible, 0px);
+  background-repeat: no-repeat;
+}
+/* (ces écrans passent sous le clavier : dégradé limité à la partie visible, qui finit en bleu nuit) */
+html[data-theme="soleil"].clavier-ouvert :is(#choixMode, #enLigne, #ecranNouvellePartie, #ecranConfirmerHote, #ecranConfirmerRetrait,
+  #ecranReprise, #ecranConfirmerAccueil, #ecranChoixPseudo, #ecranCaster, #ecranReglages, #suppression){
+  background:
+    linear-gradient(180deg, rgba(31,53,102,0) 45%, #1f3566 100%),
+    var(--deco-theme),
+    var(--fond-theme);
+  background-color: #1f3566;
+  background-position: 0 var(--haut-visible, 0px);
+  background-size: 100% calc(100% - var(--haut-visible, 0px) - var(--bas-cache, 0px));
   background-repeat: no-repeat;
 }
 
