@@ -109,8 +109,19 @@
                 <path d="M12 6.6v13.6M6 8.6h3.6M6 11.6h3.6M14.4 8.6H18M14.4 11.6H18" />
             </svg>
         </button>
+        <button type="button" id="btnPause" class="btnAccueilTexte" title="Pause" aria-label="Mettre en pause" hidden>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5.5" y="4" width="4.6" height="16" rx="1.3"/><rect x="13.9" y="4" width="4.6" height="16" rx="1.3"/></svg>
+        </button>
         <button type="button" id="btnAccueilClassique" class="btnAccueilTexte" title="Accueil" aria-label="Accueil">⌂</button>
     </header>
+
+    <!-- Mode classique : partie en pause (⏸ du bandeau), voir js/plateau.js -->
+    <section class="ecranPause" id="ecranPause" style="display:none;">
+        <div class="pauseIcone" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5.5" y="4" width="4.6" height="16" rx="1.3"/><rect x="13.9" y="4" width="4.6" height="16" rx="1.3"/></svg></div>
+        <h2>PAUSE</h2>
+        <p>La partie vous attend.</p>
+        <button type="button" id="btnReprendrePause">Reprendre</button>
+    </section>
 
     <main>
         <section class="choixMode" id="choixMode">
@@ -174,10 +185,10 @@
                 <div class="blocReglage">
                     <div class="optionReglage">
                         <span class="optionTexte">
-                            <span class="optionTitre">Sons</span>
+                            <span class="optionTitre">Sons système</span>
                             <span class="optionNote">Carte tirée, carte dorée, pigeon, ton tour en ligne. iPhone : le mode silencieux coupe les sons.</span>
                         </span>
-                        <input type="checkbox" id="optionSons" checked aria-label="Sons">
+                        <input type="checkbox" id="optionSons" checked aria-label="Sons système">
                         <label class="interrupteur" for="optionSons" aria-hidden="true"></label>
                     </div>
                     <div class="ligneVolume" id="ligneVolume">
@@ -185,6 +196,23 @@
                         <input type="range" id="volumeSons" min="0" max="100" step="5" value="100" aria-label="Volume des sons">
                         <span class="volumeIcone" aria-hidden="true">🔊</span>
                         <span class="volumeValeur" id="volumeValeur">100 %</span>
+                    </div>
+                </div>
+
+                <div class="blocReglage">
+                    <div class="optionReglage">
+                        <span class="optionTexte">
+                            <span class="optionTitre">Musique d'ambiance</span>
+                            <span class="optionNote">En fond, selon le thème. Quand tu castes, c'est la télé qui la joue.</span>
+                        </span>
+                        <input type="checkbox" id="optionMusique" checked aria-label="Musique d'ambiance">
+                        <label class="interrupteur" for="optionMusique" aria-hidden="true"></label>
+                    </div>
+                    <div class="ligneVolume" id="ligneVolumeMusique">
+                        <span class="volumeIcone" aria-hidden="true">🔈</span>
+                        <input type="range" id="volumeMusique" min="0" max="100" step="5" value="50" aria-label="Volume de la musique">
+                        <span class="volumeIcone" aria-hidden="true">🔊</span>
+                        <span class="volumeValeur" id="volumeMusiqueValeur">50 %</span>
                     </div>
                 </div>
 

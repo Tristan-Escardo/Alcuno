@@ -32,6 +32,7 @@ const ECRANS_RETOUR = [
   ["ecranConfirmerHote", "btnConfirmerHoteNon"],
   ["ecranConfirmerRetrait", "btnConfirmerRetraitNon"],
   ["ecranConfirmerAccueil", "btnConfirmerAccueilNon"],
+  ["ecranPause", "btnReprendrePause"],
   ["ecranChoixPseudo", "btnChoixPseudoAnnuler"],
   ["ecranNouvellePartie", "btnRetourNouvellePartie"],
   ["suppression", "termineSuppression"],

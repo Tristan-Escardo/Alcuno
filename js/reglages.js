@@ -366,6 +366,96 @@ curseurVolume.addEventListener("input", () => {
 });
 curseurVolume.addEventListener("change", () => jouerSon("reglage_son")); // essai au relâchement (Sons/reglage_son.mp3)
 
+// ===== Musique d'ambiance : Sons/musique_<thème>.mp3 (givre, cerisier, prestige), sinon
+// Sons/musique_ambiance.mp3 (bordeaux, sombre, casino, nuit, violet). En boucle, à son propre volume.
+// Quand ce téléphone caste, c'est la télé qui la joue (à ce volume, avec le thème du téléphone).
+const CLE_MUSIQUE = "alcuno_musique";
+const CLE_VOLUME_MUSIQUE = "alcuno_volume_musique";
+const THEMES_AVEC_MUSIQUE = ["givre", "cerisier", "prestige"];
+const caseMusique = document.getElementById("optionMusique");
+const curseurMusique = document.getElementById("volumeMusique");
+const ligneVolumeMusique = document.getElementById("ligneVolumeMusique");
+caseMusique.checked = lireReglage(CLE_MUSIQUE, true);
+let volumeMusique = 50;
+try {
+  const v = localStorage.getItem(CLE_VOLUME_MUSIQUE);
+  if (v !== null && Number(v) >= 0 && Number(v) <= 100) volumeMusique = Number(v);
+} catch (e) {}
+curseurMusique.value = volumeMusique;
+
+function majLigneMusique(){
+  document.getElementById("volumeMusiqueValeur").innerText = volumeMusique + " %";
+  curseurMusique.disabled = !caseMusique.checked;
+  ligneVolumeMusique.classList.toggle("inactif", !caseMusique.checked);
+}
+majLigneMusique();
+caseMusique.addEventListener("change", () => {
+  ecrireReglage(CLE_MUSIQUE, caseMusique.checked);
+  majLigneMusique();
+  majMusique();
+});
+curseurMusique.addEventListener("input", () => {
+  volumeMusique = Number(curseurMusique.value);
+  try { localStorage.setItem(CLE_VOLUME_MUSIQUE, String(volumeMusique)); } catch (e) {}
+  majLigneMusique();
+  majMusique();
+});
+
+let lecteurMusique = null; // { audio, gain, ctx, nom }
+let musiqueTele = null;    // page de la télé : { volume, theme } reçus du téléphone (null : pas de musique)
+
+function fichierMusique(theme){
+  return THEMES_AVEC_MUSIQUE.includes(theme) ? `musique_${theme}` : "musique_ambiance";
+}
+
+function musiqueVoulue(){
+  if (document.documentElement.classList.contains("mode-tele")) return musiqueTele;
+  if (!caseMusique.checked || volumeMusique === 0 || document.visibilityState !== "visible") return null;
+  let caste = false;
+  try { caste = !!codeTele; } catch (e) {} // (js/tele.js, chargé en dernier)
+  if (caste) return null;
+  return { volume: volumeMusique, theme: document.documentElement.dataset.theme || "bordeaux" };
+}
+
+function majMusique(){
+  const voulu = musiqueVoulue();
+  if (!voulu) { if (lecteurMusique) lecteurMusique.audio.pause(); return; }
+  const ctx = contexteAudio();
+  if (!ctx) return;
+  if (!lecteurMusique || lecteurMusique.ctx !== ctx) {
+    if (lecteurMusique) lecteurMusique.audio.pause();
+    const audio = new Audio();
+    audio.loop = true;
+    audio.preload = "auto";
+    audio.setAttribute("playsinline", "");
+    let gain = null;
+    try {
+      gain = ctx.createGain();
+      ctx.createMediaElementSource(audio).connect(gain);
+      gain.connect(ctx.destination);
+    } catch (e) { gain = null; } // (sans Web Audio : volume de l'élément, sauf iPhone)
+    lecteurMusique = { audio, gain, ctx, nom: "" };
+  }
+  const nom = fichierMusique(voulu.theme);
+  if (lecteurMusique.nom !== nom) {
+    const lecteur = lecteurMusique;
+    lecteur.nom = nom;
+    lecteur.audio.onerror = () => { // pas de musique pour ce thème : celle de base
+      if (lecteur.nom !== nom || nom === "musique_ambiance") return;
+      lecteur.nom = "musique_ambiance";
+      lecteur.audio.src = "Sons/musique_ambiance.mp3";
+      lecteur.audio.play().catch(() => {});
+    };
+    lecteur.audio.src = `Sons/${nom}.mp3`;
+  }
+  const niveau = Math.pow(voulu.volume / 100, 2) * 0.7; // (plus doux que les sons du jeu)
+  if (lecteurMusique.gain) lecteurMusique.gain.gain.value = niveau;
+  else lecteurMusique.audio.volume = Math.min(1, niveau);
+  if (lecteurMusique.audio.paused) lecteurMusique.audio.play().catch(() => {});
+}
+document.addEventListener("visibilitychange", () => setTimeout(majMusique, 0));
+setInterval(majMusique, 2000); // (début ou fin du cast, changement de thème)
+
 let contexteSon = null;
 let repriseRatee = false; // au tap précédent, le son était coupé et la reprise n'a pas marché
 function contexteAudio(){
@@ -389,7 +479,8 @@ function contexteAudio(){
 // toucher. En classique, ça passait quand même (le son de la carte est joué dans le clic) ; en ligne,
 // tous les sons arrivent plus tard par Firebase : sans ça, le son n'était jamais débloqué.
 function debloquerSon(){
-  if (!caseSons.checked) return;
+  setTimeout(majMusique, 0); // (lancée pendant un tap : seul moment où le téléphone accepte de la jouer)
+  if (!caseSons.checked && !caseMusique.checked) return;
   if (contexteSon && contexteSon.state !== "running" && repriseRatee) {
     try { contexteSon.close(); } catch (e) {}
     contexteSon = null;
@@ -514,7 +605,7 @@ const MINUTES_RAPPEL_EAU = 20;
 let tempsDeJeuSansEau = 0; // ms de partie (écran allumé) depuis le dernier rappel
 
 setInterval(() => {
-  if (!caseRappelEau.checked || !partieLancee || document.visibilityState !== "visible") return;
+  if (!caseRappelEau.checked || !partieLancee || pauseEnCours || document.visibilityState !== "visible") return;
   tempsDeJeuSansEau += 15000;
   if (tempsDeJeuSansEau >= MINUTES_RAPPEL_EAU * 60000) {
     tempsDeJeuSansEau = 0;

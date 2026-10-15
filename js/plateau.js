@@ -823,7 +823,7 @@ let dernierTourRappel = null; // classique : tour pour lequel le compteur est d�
 function programmerRappelTour(tour){
   clearTimeout(minuteurRappelTour);
   minuteurRappelTour = setTimeout(() => {
-    if(!partieLancee || joueurs.length === 0 || predictionEnCours || finUnOverlayAffiche) return;
+    if(!partieLancee || joueurs.length === 0 || predictionEnCours || finUnOverlayAffiche || pauseEnCours) return;
     if(enLigneActif){
       if(`${mancheCourante}:${cartesRestantes()}` !== tour) return; // tour joué entre-temps
       if(joueurs[indexJoueur % joueurs.length] !== pseudoActuel) return; // plus son tour
@@ -842,6 +842,34 @@ function programmerRappelTour(tour){
 function relancerRappelClassique(){
   if(!enLigneActif && partieLancee) programmerRappelTour(null);
 }
+
+// ===== Pause (mode classique) : ⏸ du bandeau => écran « PAUSE » par-dessus la partie floutée. Pendant la
+// pause : pas de rappel « À toi », ni « Bois de l'eau », ni de petites notifs sur la télé (qui affiche
+// « PAUSE » aussi). La musique d'ambiance continue.
+let pauseEnCours = false;
+const btnPause = document.getElementById("btnPause");
+const ecranPause = document.getElementById("ecranPause");
+
+function majBoutonPause(){
+  btnPause.hidden = !(partieLancee && !enLigneActif);
+}
+
+function mettreEnPause(){
+  if(!partieLancee || enLigneActif || pauseEnCours) return;
+  pauseEnCours = true;
+  clearTimeout(minuteurRappelTour);
+  ecranPause.style.display = "";
+}
+
+function reprendreApresPause(){
+  if(!pauseEnCours) return;
+  pauseEnCours = false;
+  ecranPause.style.display = "none";
+  relancerRappelClassique();
+}
+
+btnPause.addEventListener("click", mettreEnPause);
+document.getElementById("btnReprendrePause").addEventListener("click", reprendreApresPause);
 
 // Halo lumineux tout autour de l'écran du téléphone, qui pulse 3 fois au rythme du bandeau « À toi »
 // (voir haloRappel dans le CSS ; pas sur la télé)

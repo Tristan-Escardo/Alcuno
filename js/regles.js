@@ -1666,6 +1666,8 @@ function lancerPartie(){
   indexCaseDoree = avecCarteDoree ? Math.floor(aleatoire() * nbCases) : -1;
   carteDoreeEnJeu = avecCarteDoree;
   reinitialiserGorgees();
+  pauseEnCours = false;
+  ecranPause.style.display = "none";
 
   indexJoueur = 0;
   partieLancee = true;
@@ -1681,6 +1683,7 @@ function lancerPartie(){
 
   btnNouvellePartie.style.display = "inline-block";
   majBoutonsJoueurs();
+  majBoutonPause();
   btnJouer.style.display = "none";
 
   regleZero.style.display = "none";
@@ -1822,6 +1825,9 @@ function retourMenu(){
   document.body.classList.remove("no-scroll", "overlay-open");
   document.documentElement.classList.remove("overlay-ouvert");
   document.body.style.top = "";
+  pauseEnCours = false;
+  ecranPause.style.display = "none";
+  majBoutonPause();
 }
 
 btnJouer.addEventListener("pointerdown", lancerPartie);
