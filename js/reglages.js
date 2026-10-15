@@ -658,7 +658,7 @@ document.addEventListener("visibilitychange", () => {
 //   tiens_gueule.mp3 : le cul sec de la carte dorée (« TIENS DANS TA GUEULE »)
 const SONS = ["cartes", "doree", "tiens_gueule", "bouton", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees"];
 // Sons coupés au bout de N secondes (avec un petit fondu), même si le fichier est plus long
-const DUREE_MAX_SONS = { doree: 3, pigeon: 2, distribuer_gorgees: 0.8 };
+const DUREE_MAX_SONS = { doree: 3, pigeon: 2, distribuer_gorgees: 0.8, bouton: 0.3 };
 const sonsCharges = {}; // nom -> son décodé (ou null si le fichier n'existe pas)
 const sonsDemandes = {}; // nom -> moment où il a été demandé alors qu'il n'était pas encore chargé
 let chargementSonsLance = false;

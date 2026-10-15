@@ -17,7 +17,7 @@ Un fichier MP3 par moment du jeu, avec exactement ces noms :
   annuler_0_gorgees.mp3  quelqu'un tape « Annuler 0 » (il n'annule rien)
 
   tiens_gueule.mp3  le cul sec de la carte dorée (« TIENS DANS TA GUEULE »)
-  bouton.mp3   petit clic quand on touche un bouton (sauf ceux qui ont déjà leur son) : très court (0,1-0,3 s)
+  bouton.mp3   petit clic quand on touche un bouton (sauf ceux qui ont déjà leur son ; coupé à 0,3 seconde par le jeu)
 
 MUSIQUE D'AMBIANCE (en boucle, réglage « Musique d'ambiance ») :
   musique_ambiance.mp3  thèmes bordeaux, sombre, casino, nuit, violet (et les autres si leur musique manque)
@@ -30,4 +30,4 @@ MUSIQUE D'AMBIANCE (en boucle, réglage « Musique d'ambiance ») :
 - Pour changer un son : remplace le fichier en gardant le même nom, puis commit + push.
 - Des sons courts et pas trop lourds (moins de 200 Ko si possible).
 - Le curseur de volume des réglages s'applique à tous ces sons.
-- Pour couper un son plus tôt : DUREE_MAX_SONS dans script.js (ex. { doree: 3, pigeon: 2, distribuer_gorgees: 0.8 }).
+- Pour couper un son plus tôt : DUREE_MAX_SONS dans js/reglages.js (ex. { doree: 3, pigeon: 2, distribuer_gorgees: 0.8, bouton: 0.3 }).
