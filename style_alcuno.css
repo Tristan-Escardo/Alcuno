@@ -3797,7 +3797,7 @@ html.saisie-en-ligne #enLigneRejoindre .separateurOu:not(.en-sortie){
 html[data-theme="noir"]{ --fond-theme: #000000; }   /* thème « Sombre » : noir pur */
 html[data-theme="vert"]{ --fond-theme: #08301e; }   /* vert casino */
 html[data-theme="bleu"]{ --fond-theme: #0a1634; }   /* bleu nuit */
-html[data-theme="violet"]{ --fond-theme: #3d0f66; }
+html[data-theme="soleil"]{ --fond-theme: #2c3d6b; }  /* coucher de soleil (dégradé : voir plus bas) */
 
 /* Réglages : pastilles de couleur */
 #ecranReglages .pastillesTheme{
@@ -6392,3 +6392,91 @@ html[data-theme="givre"] #ecranPause #btnReprendrePause{ background: var(--givre
   text-shadow: 0 1vh 0 rgba(120, 70, 0, 0.9);
 }
 #ecranTele .tele-pause-texte{ font: 700 3.6vh Arial, sans-serif; color: rgba(255,255,255,0.85); }
+
+/* ===== Thème « Coucher de soleil » (remplace Violet) : ciel du soir en dégradé, boutons soleil,
+   panneaux bleu crépuscule translucides, overlays « heure dorée », titre néon corail ===== */
+:root[data-theme="soleil"]{
+  --fond-theme: #2c3d6b;
+  --deco-theme: radial-gradient(ellipse 110% 30% at 50% 100%, rgba(255,230,170,0.5) 0%, rgba(255,230,170,0) 70%) no-repeat, linear-gradient(180deg, #1f3566 0%, #4a4f86 20%, #a0618a 42%, #e9787a 62%, #f7a072 80%, #fcc98a 100%);
+  --soleil-panneau: rgba(22, 32, 72, 0.42);
+  --soleil-bord: rgba(255, 205, 170, 0.38);
+  --soleil-creme: #fff1df;
+  --soleil-peche: #ffcf9e;
+  --couleur-barre: #1f3566;
+}
+html[data-theme="soleil"] body{ background-attachment: fixed; }
+/* Titre : néon corail */
+html[data-theme="soleil"] #choixMode #titreAccueil,
+html[data-theme="soleil"] header h1{
+  color: #fff !important;
+  text-shadow: 0 0 4px #fff, 0 0 12px #ff8a6b, 0 0 24px #ff6b7e, 0 0 44px #e8507a, 0 0 70px rgba(232,80,122,0.6) !important;
+  animation: none;
+}
+html[data-theme="soleil"] #choixMode .titreAccueilBarre,
+html[data-theme="soleil"] header::after{
+  background: linear-gradient(90deg, #ffd27a, #ff8a6b 50%, #c86fb0) !important;
+  box-shadow: 0 0 14px rgba(255,150,110,0.45) !important;
+}
+/* Boutons : dégradé soleil, texte blanc */
+html[data-theme="soleil"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu, #ajouterJoueur, #jouer, #supprimerJoueur,
+  #nouvellePartie, #btnRejouerMemes, #btnModifierJoueurs, #btnReprendrePause){
+  background: linear-gradient(180deg, #ffb35c, #f2775c) !important;
+  color: #fff !important;
+  text-shadow: 0 1px 0 rgba(150, 50, 40, 0.8), 0 2px 4px rgba(60,20,40,0.35) !important;
+  box-shadow: inset 0 -2px 0 rgba(120,30,40,0.25), 0 8px 18px rgba(60,20,60,0.3) !important;
+}
+html[data-theme="soleil"] #btnCaster{
+  background: var(--soleil-panneau) !important; border-color: var(--soleil-bord) !important; color: var(--soleil-creme) !important;
+}
+/* Icônes du haut */
+html[data-theme="soleil"] :is(#btnRegles, header #btnReglesJeu) path{ stroke: var(--soleil-creme) !important; }
+html[data-theme="soleil"] #btnReglages svg *, html[data-theme="soleil"] #btnAccueilClassique{ color: var(--soleil-creme) !important; -webkit-text-stroke-color: var(--soleil-creme) !important; stroke: var(--soleil-creme); }
+/* Panneaux : bleu crépuscule translucide, bord pêche */
+html[data-theme="soleil"] :is(#menu, .messages, #ecranReglages .optionReglage, #ecranReglages .blocReglage, header){
+  background: var(--soleil-panneau) !important;
+  box-shadow: inset 0 0 0 1px var(--soleil-bord) !important;
+}
+html[data-theme="soleil"] .messages::before{ background: linear-gradient(90deg, #ffd27a, #ff8a6b 50%, #c86fb0) !important; }
+html[data-theme="soleil"] .blocMessages{ background: rgba(15, 22, 55, 0.35) !important; border-color: var(--soleil-bord) !important; }
+html[data-theme="soleil"] :is(.titreBloc, #ecranReglages .optionTitre, #ecranReglages h2, .aProposTitre){ color: var(--soleil-peche) !important; }
+html[data-theme="soleil"] #stickyJoueurActif{ background: linear-gradient(180deg, rgba(31,53,102,0.95), rgba(60,50,110,0.93)) !important; border-color: var(--soleil-bord) !important; }
+html[data-theme="soleil"] #stickyJoueurActif #btnPause svg{ stroke: var(--soleil-peche); }
+/* Overlays : « heure dorée », l'inverse du fond (chaud en haut), texte et boutons bleu nuit */
+html[data-theme="soleil"] :is(#overlayCouleur, #overlayPlus4, #overlayPigeon, #overlayFinUnRestants, #overlayDuel, #overlayRegleUnique,
+  #overlayAnnulation, #overlayResultatAnnulation, #overlayPredictionFin){
+  background: linear-gradient(180deg, #fcc98a 0%, #f7a072 38%, #e9787a 72%, #b8657f 100%) !important;
+  color: #2a1a44;
+}
+html[data-theme="soleil"] :is(#overlayRegleUnique .overlay-regle-texte, .titre-pigeon, #overlayPigeon .titre-pigeon, #overlayAnnulation > div){
+  color: #2a1a44 !important;
+  text-shadow: 0 2px 0 rgba(255,240,220,0.6) !important;
+}
+html[data-theme="soleil"][data-theme] body :is(#overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayFinUnRestants .bouton-pigeon,
+  #overlayAnnulation button, #overlayRegleUnique .bouton-annulation, #overlayDuel button:not(:disabled), #overlayPredictionFin .bouton-pigeon){
+  background: linear-gradient(180deg, #2c3d6b, #1c2650) !important;
+  color: #fff1df !important;
+  text-shadow: none !important;
+  box-shadow: inset 0 0 0 1.5px rgba(255,220,190,0.5), 0 8px 18px rgba(80,30,50,0.35) !important;
+}
+/* Notification du haut : pastille soleil */
+html[data-theme="soleil"] #notifHaut{
+  background: linear-gradient(135deg, #ffcf86 0%, #ff9a6b 50%, #e86a7e 100%) !important;
+  color: #fff !important; text-shadow: 0 1px 2px rgba(120,30,50,0.5);
+  box-shadow: 0 12px 28px rgba(30,20,60,0.45), inset 0 0 0 1.5px rgba(255,240,220,0.8) !important;
+}
+html[data-theme="soleil"] #ecranPause{ background: rgba(31,53,102,0.5); }
+html[data-theme="soleil"] #ecranPause h2{ color: var(--soleil-creme); text-shadow: 0 3px 0 #c8506a, 0 0 30px rgba(255,170,110,0.4); }
+html[data-theme="soleil"] #ecranPause .pauseIcone{ background: rgba(255,180,120,0.15); border-color: var(--soleil-peche); }
+html[data-theme="soleil"] #ecranPause .pauseIcone svg{ fill: var(--soleil-peche); }
+html[data-theme="soleil"] #notifHaut :is(.notifHaut-texte, .notifHaut-icone, *){ color: #fff !important; text-shadow: 0 1px 2px rgba(120,30,50,0.6) !important; }
+html[data-theme="soleil"] #ecranReglages .optionReglage input:checked + .interrupteur{ background: linear-gradient(90deg,#ffb35c,#f2775c) !important; }
+html[data-theme="soleil"] #ecranReglages input[type=range]{ accent-color: #ff9a6b; }
+/* Coucher de soleil : textes jaunes des overlays illisibles sur le fond chaud → framboise foncé */
+html[data-theme="soleil"] :is(#overlayCouleur .titre-couleur, #overlayPlus4 .plus4-total, #overlayFinUnRestants .fin-un-ligne,
+  #overlayResultatAnnulation div, #overlayDuel :is(h1, h2, h3, [class*="titre"]), #overlayPredictionFin [class*="titre"]){
+  color: #8a1f4a !important;
+  text-shadow: 0 1px 0 rgba(255, 240, 220, 0.55) !important;
+}
+html[data-theme="soleil"] #overlayPlus4 :is(.plus4-actions, .plus4-container-joueurs){ background: transparent !important; box-shadow: none !important; }
+/* (+4 : la liste des joueurs défile, l'ombre portée des boutons y était coupée en rectangle) */
+html[data-theme="soleil"][data-theme] body #overlayPlus4 .plus4-container-joueurs .bouton-pigeon{ box-shadow: inset 0 0 0 1.5px rgba(255, 220, 190, 0.5) !important; }
