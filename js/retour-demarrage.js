@@ -14,6 +14,12 @@ function estVisible(el){
   return !!el && el.getClientRects().length > 0;
 }
 
+// Page plein écran (Réglages, Règles…) affichée et pas en train de partir : pendant son fondu de sortie,
+// c'est déjà l'écran de dessous qui compte
+function estOuverte(page){
+  return estVisible(page) && !page.classList.contains("page-sortie");
+}
+
 function taper(el){
   el.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
 }
@@ -50,11 +56,11 @@ function actionRetour(){
   const annonce = document.getElementById("annonceNouvellePartie");
   if(annonce) return () => taper(annonce);
 
-  if(estVisible(ecranCredits)) return () => activer("btnFermerCredits");
-  if(estVisible(ecranInstallation)) return () => activer("btnInstallationPlusTard");
-  if(estVisible(ecranRegles)) return () => activer("btnFermerRegles");
-  if(estVisible(ecranBug)) return () => activer("btnBugRetour"); // (par-dessus les Réglages)
-  if(estVisible(ecranReglages)) return () => activer("btnFermerReglages");
+  if(estOuverte(ecranCredits)) return () => activer("btnFermerCredits");
+  if(estOuverte(ecranInstallation)) return () => activer("btnInstallationPlusTard");
+  if(estOuverte(ecranRegles)) return () => activer("btnFermerRegles");
+  if(estOuverte(ecranBug)) return () => activer("btnBugRetour"); // (par-dessus les Réglages)
+  if(estOuverte(ecranReglages)) return () => activer("btnFermerReglages");
 
   // Overlays du jeu : le plus récent se ferme comme au tap (ceux où il faut choisir ne bougent pas),
   // sauf le +4 où « Retour » enlève la dernière gorgée distribuée
@@ -133,11 +139,11 @@ let minuteurTapIOS = null;
 
 // Nom de l'écran affiché (pour savoir si un tap a changé d'écran)
 function nomEcran(){
-  if(estVisible(ecranCredits)) return "credits";
-  if(estVisible(ecranInstallation)) return "installation";
-  if(estVisible(ecranRegles)) return "regles";
-  if(estVisible(ecranBug)) return "bug";
-  if(estVisible(ecranReglages)) return "reglages";
+  if(estOuverte(ecranCredits)) return "credits";
+  if(estOuverte(ecranInstallation)) return "installation";
+  if(estOuverte(ecranRegles)) return "regles";
+  if(estOuverte(ecranBug)) return "bug";
+  if(estOuverte(ecranReglages)) return "reglages";
   for(const [ecran] of ECRANS_RETOUR){
     if(estVisible(document.getElementById(ecran))) return ecran;
   }
@@ -192,6 +198,10 @@ function reconcilierPileIOS(){
 
 function toucherIOS(e){
   if(!e.isTrusted) return;
+  // Une page qui part encore en fondu (« ← Retour » des Réglages tapé juste avant) : finie tout de suite.
+  // Sinon, en tapant vite sur un autre bouton (Caster…), l'iPhone prenait sa capture avec les Réglages
+  // encore à l'écran, et le glissement retour suivant remontrait les Réglages.
+  document.querySelectorAll(".page-sortie").forEach(page => { if(page._finSortie) page._finSortie(); });
   const surNavigation = e.target && e.target.closest && e.target.closest(ELEMENTS_NAVIGATION_IOS);
   toucherEnCoursIOS = surNavigation ? { ecran: nomEcran(), x: e.clientX, y: e.clientY } : null;
 }

@@ -152,7 +152,7 @@ function avecCouronne(nom){
 // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
 // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
 // Numérotation : +0.0.1 à chaque mise en ligne, et après x.y.9 on passe à x.(y+1).0 (ex. 9.5.9 => 9.6.0)
-const VERSION_AFFICHEE = "9.6.12";
+const VERSION_AFFICHEE = "9.6.13";
 const VERSION_JEU = VERSION_AFFICHEE.split(".")
   .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
 // À l'écran : le numéro complet, pour voir d'un coup d'œil si un téléphone est à jour
@@ -252,6 +252,7 @@ activerMemePendantElan(document.getElementById("btnFermerCredits"), () => fermer
 function ouvrirPage(page){
   // Créateurs : la page derrière prend le fond du thème, comme cet écran (voir style_alcuno.css)
   if (page.id === "ecranCredits") document.documentElement.classList.add("credits-ouverts");
+  page._finSortie = null; // (rouverte pendant qu'elle partait : elle ne doit plus se cacher ensuite)
   page.classList.remove("page-sortie", "page-entree");
   page.style.display = "";
   void page.offsetWidth; // relance l'animation même si la page vient d'être fermée
@@ -268,10 +269,13 @@ function fermerPage(page){
     if (fini) return;
     fini = true;
     page.removeEventListener("animationend", fin);
+    if (page._finSortie !== fin) return;
+    page._finSortie = null;
     page.classList.remove("page-sortie");
     page.style.display = "none";
     if (page.id === "ecranCredits") document.documentElement.classList.remove("credits-ouverts");
   };
+  page._finSortie = fin; // (appelé aussi pour finir tout de suite, voir toucherIOS dans js/retour-demarrage.js)
   page.addEventListener("animationend", fin);
   setTimeout(() => fin(), 350); // sécurité : animations désactivées sur le téléphone
 }
