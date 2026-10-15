@@ -657,7 +657,6 @@ document.addEventListener("visibilitychange", () => {
 //   annuler_gorgees.mp3 : quelqu'un annule 1 gorgée ou plus
 //   annuler_0_gorgees.mp3 : quelqu'un tape « Annuler 0 » (il n'annule rien)
 //   tiens_gueule.mp3 : le cul sec de la carte dorée (« TIENS DANS TA GUEULE »)
-//   regles.mp3 : on ouvre les Règles du jeu (boutons « Règles du jeu » de l\'accueil et de la partie)
 //   regles.mp3 : on ouvre les Règles du jeu (boutons « Règles du jeu » de l'accueil et de la partie)
 const SONS = ["cartes", "doree", "tiens_gueule", "bouton", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees", "regles"];
 // Sons coupés au bout de N secondes (avec un petit fondu), même si le fichier est plus long
