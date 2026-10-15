@@ -192,6 +192,8 @@ function appliquerTheme(nom){
   document.querySelectorAll(".pastilleTheme").forEach((b) => {
     b.setAttribute("aria-pressed", b.dataset.theme === nom ? "true" : "false");
   });
+  // Musique du nouveau thème, tout de suite (dans le tap : sinon l'iPhone refuse de la lancer)
+  try { majMusique(); } catch (e) {} // (pas encore prête pendant le chargement de la page)
 }
 
 // iPhone, barre du haut (sous l'heure) : quand le jeu ne passe pas dessous (appli ajoutée à l'écran
@@ -522,7 +524,6 @@ function contexteAudio(){
 // toucher. En classique, ça passait quand même (le son de la carte est joué dans le clic) ; en ligne,
 // tous les sons arrivent plus tard par Firebase : sans ça, le son n'était jamais débloqué.
 function debloquerSon(){
-  setTimeout(majMusique, 0); // (lancée pendant un tap : seul moment où le téléphone accepte de la jouer)
   if (!caseSons.checked && !caseMusique.checked) return;
   if (contexteSon && contexteSon.state !== "running" && repriseRatee) {
     try { contexteSon.close(); } catch (e) {}
@@ -531,6 +532,9 @@ function debloquerSon(){
   const ctx = contexteAudio();
   chargerSons();
   repriseRatee = false;
+  // Musique lancée (ou relancée : après un rechargement de la page, l'iPhone attend un tap) pendant le
+  // geste lui-même : seul moment où l'iPhone accepte de la jouer
+  majMusique();
   if (!ctx || ctx.state === "running") return;
   // Un son muet joué pendant le geste : ce qui débloque vraiment le son sur iPhone
   try {
