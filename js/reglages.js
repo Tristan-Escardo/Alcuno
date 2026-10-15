@@ -284,6 +284,12 @@ for (let i = 0; i < 26; i++) {
 
 document.querySelectorAll(".pastilleTheme").forEach((pastille) => {
   pastille.addEventListener("click", () => {
+    // Changement de thème : la musique d'ambiance se coupe (on la réactive soi-même dans les réglages)
+    if (caseMusique.checked && pastille.dataset.theme !== document.documentElement.dataset.theme) {
+      caseMusique.checked = false;
+      ecrireReglage(CLE_MUSIQUE, false);
+      majLigneMusique();
+    }
     appliquerTheme(pastille.dataset.theme, barreIphoneARafraichir());
     try { localStorage.setItem(CLE_THEME, pastille.dataset.theme); } catch (e) {}
     rafraichirBarreIphone();
