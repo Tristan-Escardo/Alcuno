@@ -17,6 +17,7 @@ Un fichier MP3 par moment du jeu, avec exactement ces noms :
   annuler_0_gorgees.mp3  quelqu'un tape « Annuler 0 » (il n'annule rien)
 
   tiens_gueule.mp3  le cul sec de la carte dorée (« TIENS DANS TA GUEULE »)
+  bouton.mp3   petit clic quand on touche un bouton (sauf ceux qui ont déjà leur son) : très court (0,1-0,3 s)
 
 MUSIQUE D'AMBIANCE (en boucle, réglage « Musique d'ambiance ») :
   musique_ambiance.mp3  thèmes bordeaux, sombre, casino, nuit, violet (et les autres si leur musique manque)
