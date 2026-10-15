@@ -376,7 +376,7 @@ const caseMusique = document.getElementById("optionMusique");
 const curseurMusique = document.getElementById("volumeMusique");
 const ligneVolumeMusique = document.getElementById("ligneVolumeMusique");
 caseMusique.checked = lireReglage(CLE_MUSIQUE, true);
-let volumeMusique = 50;
+let volumeMusique = 30;
 try {
   const v = localStorage.getItem(CLE_VOLUME_MUSIQUE);
   if (v !== null && Number(v) >= 0 && Number(v) <= 100) volumeMusique = Number(v);
@@ -401,7 +401,10 @@ curseurMusique.addEventListener("input", () => {
   majMusique();
 });
 
-let lecteurMusique = null; // { audio, gain, ctx, nom }
+// Lecture en boucle sans à-coup : deux lecteurs qui se relaient, le suivant repart du début en fondu
+// pendant que l'autre finit en fondu (avant : la boucle repartait d'un coup, avec un petit blanc)
+const FONDU_MUSIQUE = 2.5; // secondes
+let lecteurMusique = null; // { ctx, pistes: [{ audio, gain }, …], active, nom, niveau, enFondu }
 let musiqueTele = null;    // page de la télé : { volume, theme } reçus du téléphone (null : pas de musique)
 
 function fichierMusique(theme){
@@ -417,41 +420,81 @@ function musiqueVoulue(){
   return { volume: volumeMusique, theme: document.documentElement.dataset.theme || "bordeaux" };
 }
 
+function creerPisteMusique(ctx){
+  const audio = new Audio();
+  audio.preload = "auto";
+  audio.setAttribute("playsinline", "");
+  let gain = null;
+  try {
+    gain = ctx.createGain();
+    gain.gain.value = 0;
+    ctx.createMediaElementSource(audio).connect(gain);
+    gain.connect(ctx.destination);
+  } catch (e) { gain = null; audio.loop = true; } // (sans Web Audio : boucle simple)
+  audio.addEventListener("timeupdate", surveillerBoucleMusique);
+  return { audio, gain };
+}
+
+// Volume d'une piste, en douceur (duree en secondes)
+function reglerPisteMusique(piste, valeur, duree){
+  if (!piste.gain) { piste.audio.volume = Math.min(1, valeur); return; }
+  const g = piste.gain.gain;
+  const t = lecteurMusique.ctx.currentTime;
+  g.cancelScheduledValues(t);
+  g.setValueAtTime(g.value, t);
+  g.linearRampToValueAtTime(valeur, t + (duree || 0.05));
+}
+
+function surveillerBoucleMusique(){
+  const L = lecteurMusique;
+  if (!L || L.enFondu || this !== L.pistes[L.active].audio || !L.pistes[0].gain) return;
+  const duree = this.duration;
+  if (!isFinite(duree) || duree < FONDU_MUSIQUE * 2) return;
+  if (this.currentTime < duree - FONDU_MUSIQUE - 0.3) return;
+  // Fin du morceau : le suivant repart du début pendant que celui-ci s'éteint
+  L.enFondu = true;
+  const ancienne = L.pistes[L.active];
+  L.active = 1 - L.active;
+  const nouvelle = L.pistes[L.active];
+  nouvelle.audio.currentTime = 0;
+  reglerPisteMusique(nouvelle, 0, 0.01);
+  nouvelle.audio.play().catch(() => {});
+  reglerPisteMusique(nouvelle, L.niveau, FONDU_MUSIQUE);
+  reglerPisteMusique(ancienne, 0, FONDU_MUSIQUE);
+  setTimeout(() => { ancienne.audio.pause(); L.enFondu = false; }, FONDU_MUSIQUE * 1000 + 150);
+}
+
 function majMusique(){
   const voulu = musiqueVoulue();
-  if (!voulu) { if (lecteurMusique) lecteurMusique.audio.pause(); return; }
+  if (!voulu) { if (lecteurMusique) lecteurMusique.pistes.forEach(p => p.audio.pause()); return; }
   const ctx = contexteAudio();
   if (!ctx) return;
   if (!lecteurMusique || lecteurMusique.ctx !== ctx) {
-    if (lecteurMusique) lecteurMusique.audio.pause();
-    const audio = new Audio();
-    audio.loop = true;
-    audio.preload = "auto";
-    audio.setAttribute("playsinline", "");
-    let gain = null;
-    try {
-      gain = ctx.createGain();
-      ctx.createMediaElementSource(audio).connect(gain);
-      gain.connect(ctx.destination);
-    } catch (e) { gain = null; } // (sans Web Audio : volume de l'élément, sauf iPhone)
-    lecteurMusique = { audio, gain, ctx, nom: "" };
+    if (lecteurMusique) lecteurMusique.pistes.forEach(p => p.audio.pause());
+    lecteurMusique = { ctx, pistes: [], active: 0, nom: "", niveau: 0, enFondu: false };
+    lecteurMusique.pistes = [creerPisteMusique(ctx), creerPisteMusique(ctx)];
   }
+  const L = lecteurMusique;
   const nom = fichierMusique(voulu.theme);
-  if (lecteurMusique.nom !== nom) {
-    const lecteur = lecteurMusique;
-    lecteur.nom = nom;
-    lecteur.audio.onerror = () => { // pas de musique pour ce thème : celle de base
-      if (lecteur.nom !== nom || nom === "musique_ambiance") return;
-      lecteur.nom = "musique_ambiance";
-      lecteur.audio.src = "Sons/musique_ambiance.mp3";
-      lecteur.audio.play().catch(() => {});
-    };
-    lecteur.audio.src = `Sons/${nom}.mp3`;
+  if (L.nom !== nom) {
+    L.nom = nom;
+    L.active = 0;
+    L.enFondu = false;
+    L.pistes[1].audio.pause();
+    L.pistes.forEach((p) => {
+      p.audio.onerror = () => { // pas de musique pour ce thème : celle de base
+        if (L.nom !== nom || nom === "musique_ambiance") return;
+        L.nom = "musique_ambiance";
+        L.pistes.forEach(q => { q.audio.src = "Sons/musique_ambiance.mp3"; });
+        L.pistes[L.active].audio.play().catch(() => {});
+      };
+      p.audio.src = `Sons/${nom}.mp3`;
+    });
   }
-  const niveau = Math.pow(voulu.volume / 100, 2) * 0.7; // (plus doux que les sons du jeu)
-  if (lecteurMusique.gain) lecteurMusique.gain.gain.value = niveau;
-  else lecteurMusique.audio.volume = Math.min(1, niveau);
-  if (lecteurMusique.audio.paused) lecteurMusique.audio.play().catch(() => {});
+  L.niveau = Math.pow(voulu.volume / 100, 2) * 0.35; // (bien plus doux que les sons du jeu)
+  const piste = L.pistes[L.active];
+  if (!L.enFondu) reglerPisteMusique(piste, L.niveau, 0.3);
+  if (piste.audio.paused) piste.audio.play().catch(() => {});
 }
 document.addEventListener("visibilitychange", () => setTimeout(majMusique, 0));
 setInterval(majMusique, 2000); // (début ou fin du cast, changement de thème)
