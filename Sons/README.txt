@@ -22,7 +22,7 @@ Un fichier MP3 par moment du jeu, avec exactement ces noms :
 
 MUSIQUE D'AMBIANCE (en boucle, réglage « Musique d'ambiance ») :
   musique_ambiance.mp3  thèmes bordeaux, sombre, casino, nuit (et les autres si leur musique manque)
-  musique_ambiance_givre.mp3     thème givre (pas encore de fichier : musique de base en attendant)
+  musique_ambiance_givre.mp3     thème givre
   musique_ambiance_cerisier.mp3  thème cerisier
   musique_ambiance_prestige.mp3  thème prestige
   musique_ambiance_soleil.mp3    thème Sunset Lover
