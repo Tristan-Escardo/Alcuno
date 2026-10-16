@@ -101,7 +101,7 @@ try {
   Write-Output "2) Après 3 taps d'affilée : $(Eval $O $etat)"
 
   # 3) Tap sur un thème puis Retour tout de suite : rechargement sur l'accueil, Réglages fermés
-  Eval $O "document.querySelector('.pastilleTheme[data-theme=violet]').click(); document.getElementById('btnFermerReglages').dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })); document.getElementById('btnFermerReglages').click(); 'ok'" | Out-Null
+  Eval $O "document.querySelector('.pastilleTheme[data-theme=soleil]').click(); document.getElementById('btnFermerReglages').dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })); document.getElementById('btnFermerReglages').click(); 'ok'" | Out-Null
   Start-Sleep -Seconds 3; Attendre $O $pret 30 | Out-Null; Start-Sleep -Milliseconds 500
   Write-Output "3) Thème puis Retour : $(Eval $O $etat)"
 

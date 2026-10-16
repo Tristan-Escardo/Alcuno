@@ -6,7 +6,7 @@ Un fichier MP3 par moment du jeu, avec exactement ces noms :
   cartes.mp3   une carte est retournée sur le plateau
   doree.mp3    quelqu'un tire la carte dorée (coupé à 3 secondes par le jeu)
   pigeon.mp3   quelqu'un devient pigeon (premier pigeon ou nouveau pigeon ; coupé à 2 secondes par le jeu)
-  tour.mp3     en ligne, c'est ton tour
+  tour.mp3     c'est ton tour et tu n'as toujours pas joué (toutes les 50 s, en ligne et en classique)
   eau.mp3      rappel « Bois de l'eau »
   sons_on.mp3  on active les sons dans les réglages
   credits.mp3  4 taps sur le titre ALCUNO (écran des créateurs)

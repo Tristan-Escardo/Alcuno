@@ -2,7 +2,7 @@
 #   powershell -File test_contraste.ps1                 compare à contraste_reference.txt
 #   powershell -File test_contraste.ps1 -enregistrer    la situation actuelle devient la référence
 #   powershell -File test_contraste.ps1 -themes givre   un seul thème
-param([string[]]$themes = @("bordeaux", "noir", "vert", "bleu", "violet", "cerisier", "givre", "prestige"),
+param([string[]]$themes = @("bordeaux", "noir", "vert", "bleu", "soleil", "cerisier", "givre", "prestige"),
       [switch]$enregistrer, [double]$seuil = 3)
 $themes = $themes -split ","  # (-themes givre,bordeaux arrive en un seul texte avec -File)
 $ErrorActionPreference = "Stop"

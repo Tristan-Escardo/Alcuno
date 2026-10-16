@@ -459,15 +459,24 @@ function bornesMusique(buffer){
   return { debut: debut / buffer.sampleRate, fin: (fin + 1) / buffer.sampleRate, egalisation };
 }
 
+// Téléchargement raté (réseau) : pas retenu comme « absent », réessayé 10 s plus tard au plus tôt (comme
+// les sons, voir chargerSon). Seul un fichier qui n'existe pas (404) est retenu comme absent.
+const musiquesRateesA = {}; // nom => moment du dernier téléchargement raté
 function chargerMusique(ctx, nom){
+  // (morceau déjà prêt, null, ou téléchargement en cours : pas de 2e téléchargement du même fichier)
   if (musiquesDecodees[nom] !== undefined) return Promise.resolve(musiquesDecodees[nom]);
+  if (musiquesRateesA[nom] && Date.now() - musiquesRateesA[nom] < 10000) return Promise.resolve(null);
   const promesse = fetch(`Sons/${nom}.mp3`)
-    .then((reponse) => { if (!reponse.ok) throw new Error("absent"); return reponse.arrayBuffer(); })
-    .then((donnees) => new Promise((ok, ko) => ctx.decodeAudioData(donnees, ok, ko)))
-    .then((buffer) => Object.assign({ buffer }, bornesMusique(buffer)))
-    .catch(() => null)
-    .then((morceau) => { musiquesDecodees[nom] = morceau; return morceau; });
-  musiquesDecodees[nom] = undefined;
+    .then((reponse) => {
+      if (reponse.status === 404) return null;
+      if (!reponse.ok) throw new Error("réseau");
+      return reponse.arrayBuffer()
+        .then((donnees) => new Promise((ok, ko) => ctx.decodeAudioData(donnees, ok, ko)))
+        .then((buffer) => Object.assign({ buffer }, bornesMusique(buffer)));
+    })
+    .then((morceau) => { musiquesDecodees[nom] = morceau; return morceau; },
+          () => { delete musiquesDecodees[nom]; musiquesRateesA[nom] = Date.now(); return null; });
+  musiquesDecodees[nom] = promesse;
   return promesse;
 }
 
@@ -569,7 +578,12 @@ function preparerToutesLesMusiques(ctx){
   const noms = ["musique_ambiance"].concat(THEMES_AVEC_MUSIQUE.map(t => `musique_ambiance_${t}`));
   noms.reduce((suite, nom) => suite.then(() => chargerMusique(ctx, nom)), Promise.resolve());
 }
-document.addEventListener("visibilitychange", () => setTimeout(majMusique, 0));
+document.addEventListener("visibilitychange", () => {
+  // Appli quittée : le téléphone suspend le son presque aussitôt. Le fondu de 0,4 s de majMusique était
+  // coupé net en plein volume (petit « bip » en quittant) : on éteint tout de suite, en 40 ms
+  if (document.visibilityState !== "visible" && lecteurMusique && lecteurMusique.actif) eteindreMusique(lecteurMusique, 0.04);
+  setTimeout(majMusique, 0);
+});
 setInterval(majMusique, 2000); // (début ou fin du cast, changement de thème)
 
 let contexteSon = null;
@@ -664,27 +678,39 @@ const SONS = ["cartes", "doree", "tiens_gueule", "bouton", "pigeon", "tour", "ea
 const DUREE_MAX_SONS = { doree: 3, pigeon: 2, distribuer_gorgees: 0.8, bouton: 0.3 };
 const sonsCharges = {}; // nom -> son décodé (ou null si le fichier n'existe pas)
 const sonsDemandes = {}; // nom -> moment où il a été demandé alors qu'il n'était pas encore chargé
-let chargementSonsLance = false;
+const sonsEnChargement = new Set();
+const sonsRatesA = {}; // nom -> moment du dernier téléchargement raté (réseau)
 
-function chargerSons(){
-  const ctx = contexteAudio();
-  if (!ctx || chargementSonsLance) return;
-  chargementSonsLance = true;
-  SONS.forEach((nom) => {
-    fetch(`Sons/${nom}.mp3?t=${window.ANTI_CACHE || Date.now()}`)
-      .then((reponse) => {
-        if (!reponse.ok) throw new Error("absent");
-        return reponse.arrayBuffer();
-      })
-      .then((donnees) => new Promise((ok, ko) => ctx.decodeAudioData(donnees, ok, ko)))
-      .then((son) => {
+// Téléchargement raté (réseau qui coupe, serveur qui ne répond pas) : réessayé au prochain son, 10 s plus
+// tard au plus tôt. Avant, le son était marqué absent : il ne se jouait plus jusqu'au redémarrage de l'appli.
+// Seul un fichier qui n'existe pas (404) est abandonné.
+function chargerSon(ctx, nom){
+  if (sonsCharges[nom] !== undefined || sonsEnChargement.has(nom)) return;
+  if (sonsRatesA[nom] && Date.now() - sonsRatesA[nom] < 10000) return;
+  sonsEnChargement.add(nom);
+  fetch(`Sons/${nom}.mp3?t=${window.ANTI_CACHE || Date.now()}`)
+    .then((reponse) => {
+      if (reponse.status === 404) { sonsCharges[nom] = null; return null; } // (pas de son à ce moment-là)
+      if (!reponse.ok) throw new Error("réseau");
+      return reponse.arrayBuffer();
+    })
+    .then((donnees) => {
+      if (!donnees) return;
+      return new Promise((ok, ko) => ctx.decodeAudioData(donnees, ok, ko)).then((son) => {
         sonsCharges[nom] = son;
         // Demandé juste avant d'être chargé (tout premier tap) : joué maintenant, si c'était il y a < 1,5 s
         if (sonsDemandes[nom] && Date.now() - sonsDemandes[nom] < 1500) lireSon(nom, son);
         delete sonsDemandes[nom];
-      })
-      .catch(() => { sonsCharges[nom] = null; });
-  });
+      }, () => { sonsRatesA[nom] = Date.now(); }); // (décodage raté, ex. moteur du son recréé entre-temps)
+    })
+    .catch(() => { sonsRatesA[nom] = Date.now(); })
+    .finally(() => { sonsEnChargement.delete(nom); });
+}
+
+function chargerSons(){
+  const ctx = contexteAudio();
+  if (!ctx) return;
+  SONS.forEach((nom) => chargerSon(ctx, nom));
 }
 
 // carte | doree | culsec | pigeon | tour | eau

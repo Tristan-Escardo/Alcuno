@@ -11,8 +11,10 @@ $banc = Split-Path -Parent $MyInvocation.MyCommand.Path
 $jeuDossier = Split-Path -Parent $banc
 $dossierResultats = Join-Path $banc "resultats"
 New-Item -ItemType Directory -Force $dossierResultats | Out-Null
-$bash = (Get-Command bash -ErrorAction SilentlyContinue).Source
-if (-not $bash) { $bash = "C:\Program Files\Git\bin\bash.exe" }
+# Le bash de Git d'abord : le « bash » de Windows (C:\Windows\System32\bash.exe) est celui de WSL, qui
+# échoue sans distribution Linux installée (le test de la partie classique ratait en 8 s)
+$bash = "C:\Program Files\Git\bin\bash.exe"
+if (-not (Test-Path $bash)) { $bash = (Get-Command bash -ErrorAction SilentlyContinue).Source }
 
 $bilan = New-Object System.Collections.Generic.List[object]
 
@@ -61,7 +63,7 @@ $erreurJs = 'Erreurs JS[^\r\n]*: \[[^\]\r\n]'
 
 Push-Location $banc
 try {
-  $themes = if ($rapide) { "givre,bordeaux" } else { "bordeaux,noir,vert,bleu,violet,cerisier,givre,prestige" }
+  $themes = if ($rapide) { "givre,bordeaux" } else { "bordeaux,noir,vert,bleu,soleil,cerisier,givre,prestige" }
   Tester "Partie classique" { & $bash (Join-Path $banc "generer.sh") } @('"fin": "ok"', '"erreurs": \[\]')
 
   Tester "Lisibilité des thèmes" { powershell -ExecutionPolicy Bypass -File (Join-Path $banc "test_contraste.ps1") -themes $themes } @('RÉSULTAT : OK') @() 12
@@ -71,7 +73,7 @@ try {
   Tester "Changement de thème (iPhone)" { powershell -ExecutionPolicy Bypass -File (Join-Path $banc "test_rechargement_theme.ps1") } @(
     '1\)[^\r\n]*"theme":"bleu","reglages":"block"',
     '2\)[^\r\n]*"theme":"prestige","reglages":"block"',
-    '3\)[^\r\n]*"theme":"violet","reglages":"none"',
+    '3\)[^\r\n]*"theme":"soleil","reglages":"none"',
     '4\)[^\r\n]*"theme":"cerisier","reglages":"none"',
     '5\)[^\r\n]*"reglages":"block"') @('"erreurs":\[[^\]]', 'EXCEPTION')
 
