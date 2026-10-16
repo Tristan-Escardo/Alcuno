@@ -554,7 +554,7 @@ function versionCompatible(partie){
   if (versionPartie > VERSION_JEU) {
     // C'est nous qui sommes en retard : rechargement sur une adresse neuve (contourne le cache)
     alert("Ton jeu n'est pas à jour : la page va se recharger.\nEntre ensuite à nouveau le code.");
-    location.replace(location.pathname + "?v=" + versionPartie);
+    rechargerPage(location.pathname + "?v=" + versionPartie); // (js/retour-demarrage.js)
   } else {
     alert("Le téléphone qui a créé la partie a une ancienne version du jeu.\n" +
           "Il doit recharger la page (ou l'ouvrir en navigation privée), puis recréer la partie.");

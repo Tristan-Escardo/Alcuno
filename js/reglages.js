@@ -228,7 +228,7 @@ function rafraichirBarreIphone(){
     try {
       if (reglagesOuverts) sessionStorage.setItem(CLE_ROUVRIR_REGLAGES, String(ecranReglages.scrollTop));
     } catch (e) {}
-    location.reload();
+    rechargerPage(); // (js/retour-demarrage.js)
   }, 400);
 }
 
@@ -1183,7 +1183,7 @@ function afficherBandeauMiseAJour(){
     `<button type="button" class="plusTard" aria-label="Plus tard">✕</button>`;
   // Adresse neuve (?v=...) : contourne le cache et recharge toute l'appli
   bandeau.querySelector(".maj").addEventListener("click", () => {
-    location.replace(location.pathname + "?v=" + encodeURIComponent(versionEnLigne));
+    rechargerPage(location.pathname + "?v=" + encodeURIComponent(versionEnLigne)); // (js/retour-demarrage.js)
   });
   bandeau.querySelector(".plusTard").addEventListener("click", () => bandeau.remove());
   document.body.appendChild(bandeau);

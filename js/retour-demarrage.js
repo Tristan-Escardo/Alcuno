@@ -168,7 +168,7 @@ function profondeurIOS(){
 // on réessayait sans fin, et plus aucune entrée n'était ajoutée => plus de glissement nulle part).
 function rejoindrePileIOS(){
   const n = profondeurIOS() - pileIOS.length;
-  if(n <= 0 || retraitEnCoursIOS) return;
+  if(n <= 0 || retraitEnCoursIOS || rechargementEnCours) return;
   retraitEnCoursIOS = true;
   clearTimeout(minuteurRetraitIOS);
   minuteurRetraitIOS = setTimeout(() => {
@@ -247,7 +247,28 @@ if(estIOS){
   document.addEventListener("pointerdown", preparerRetour, { capture: true, passive: true });
 }
 
+// Rechargement de l'appli (mise à jour, changement de thème…) : on revient d'abord à la première entrée
+// de l'historique, puis on recharge. Sinon le rechargement ne remplaçait que l'entrée affichée (celle
+// ajoutée par le tap sur « Mettre à jour », par ex.) : les entrées d'avant restaient derrière, et un
+// glissement retour sur l'accueil y retournait => page vierge le temps de recharger l'ancienne page.
+let rechargementEnCours = false;
+function rechargerPage(adresse){
+  const recharger = () => {
+    if(recharger.fait) return;
+    recharger.fait = true;
+    if(adresse) location.replace(adresse);
+    else location.reload();
+  };
+  const n = estIOS ? profondeurIOS() : entreesRetour;
+  if(n <= 0) return recharger();
+  rechargementEnCours = true;
+  window.addEventListener("popstate", recharger, { once: true });
+  setTimeout(recharger, 500); // (recul ignoré par le téléphone : on recharge quand même)
+  history.go(-n);
+}
+
 window.addEventListener("popstate", () => {
+  if(rechargementEnCours) return; // (voir rechargerPage : la page va être rechargée)
   if(estIOS){
     retraitEnCoursIOS = false;
     clearTimeout(minuteurRetraitIOS);
