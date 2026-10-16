@@ -6405,6 +6405,22 @@ html[data-theme="givre"] #ecranPause #btnReprendrePause{ background: var(--givre
   --couleur-barre: #1f3566;
 }
 html[data-theme="soleil"] body{ background-attachment: fixed; }
+/* iPhone, clavier sorti (ex. ajout des joueurs) : on peut faire descendre la page plus bas que l'écran.
+   Cette zone n'est pas couverte par le décor fixe (body::before) : on y voyait le fond de la page, bleu
+   nuit (couleur de la barre de l'heure) => barre bleue sous le pêche. Bande pêche posée juste sous
+   l'écran, dans la continuité du bas du dégradé (invisible le reste du temps). */
+html[data-theme="soleil"] body::after{
+  content: "";
+  position: fixed;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse 110% 30% at 50% 0%, rgba(255,230,170,0.5) 0%, rgba(255,230,170,0) 70%) no-repeat, #fcc98a;
+}
+html[data-theme="soleil"]:is(.credits-ouverts, .overlay-ouvert) body::after{ display: none; }
 /* Titre : néon corail */
 html[data-theme="soleil"] #choixMode #titreAccueil,
 html[data-theme="soleil"] header h1{
