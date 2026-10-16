@@ -113,7 +113,7 @@
         <form id="formPorte" autocomplete="off">
             <h1>ALCUNO</h1>
             <div class="sous">Accès privé</div>
-            <input id="codePorte" type="password" inputmode="text" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="CODE">
+            <input id="codePorte" type="password" inputmode="numeric" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="CODE">
             <button type="submit">Entrer</button>
             <div id="erreurPorte"></div>
         </form>
@@ -159,7 +159,7 @@
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
 
         // Empreinte (SHA-256) du code d'accès : le code lui-même n'est écrit nulle part
-        const EMPREINTE_CODE = "__EMPREINTE_CODE__";
+        const EMPREINTE_CODE = "2c8125d3adc62dac73f3ae036a86e00ba51b12b0dfb38fec2184e76441ed6826";
         const CLE_ACCES = "alcuno_stats_acces";
 
         const NOMS_THEMES = {
