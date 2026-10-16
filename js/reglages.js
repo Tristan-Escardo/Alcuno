@@ -254,28 +254,6 @@ try { themeChoisi = localStorage.getItem(CLE_THEME) || "bordeaux"; } catch (e) {
 if (themeChoisi === "violet") themeChoisi = "soleil"; // ancien thème, remplacé par Sunset Lover
 appliquerTheme(themeChoisi);
 
-// Partie de l'écran vraiment visible (clavier sorti sur iPhone), mesurée sur un élément fixe plein écran
-// comme le fond et les écrans : --fond-haut (où elle commence dans l'élément) et --fond-h (sa hauteur).
-// Sunset Lover y cale son dégradé (style_alcuno.css) : selon l'iPhone, un élément fixe garde la taille de
-// tout l'écran ou rétrécit au-dessus du clavier, le calcul ne doit pas le deviner.
-if (window.visualViewport) {
-  const sondeFond = document.createElement("div");
-  sondeFond.style.cssText = "position:fixed;inset:0;visibility:hidden;pointer-events:none;z-index:-1";
-  document.body.appendChild(sondeFond);
-  const majFondVisible = () => {
-    const zone = window.visualViewport;
-    const cadre = sondeFond.getBoundingClientRect();
-    const racine = document.documentElement.style;
-    racine.setProperty("--fond-haut", `${Math.max(0, Math.round(zone.offsetTop - cadre.top))}px`);
-    racine.setProperty("--fond-h", `${Math.round(Math.min(zone.height, cadre.height))}px`);
-  };
-  window.visualViewport.addEventListener("resize", majFondVisible);
-  window.visualViewport.addEventListener("scroll", majFondVisible);
-  window.addEventListener("scroll", majFondVisible, { passive: true });
-  window.addEventListener("resize", majFondVisible);
-  majFondVisible();
-}
-
 // Cerisier : pétales qui tombent sur l'écran d'accueil (positions, tailles et vitesses au hasard)
 const zonePetales = document.getElementById("petalesCerisier");
 for (let i = 0; i < 14; i++) {
