@@ -251,7 +251,7 @@ document.documentElement.classList.remove("rouvrir-reglages");
 majPastillePrestige();
 let themeChoisi = "bordeaux";
 try { themeChoisi = localStorage.getItem(CLE_THEME) || "bordeaux"; } catch (e) {}
-if (themeChoisi === "violet") themeChoisi = "soleil"; // ancien thème, remplacé par Sunset Lover
+if (themeChoisi === "violet") themeChoisi = "soleil"; // ancien thème, remplacé par Soleil couchant
 appliquerTheme(themeChoisi);
 
 // Cerisier : pétales qui tombent sur l'écran d'accueil (positions, tailles et vitesses au hasard)
