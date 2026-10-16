@@ -6489,22 +6489,20 @@ html[data-theme="soleil"] #overlayPlus4 :is(.plus4-actions, .plus4-container-jou
 html[data-theme="soleil"][data-theme] body #overlayPlus4 .plus4-container-joueurs .bouton-pigeon{ box-shadow: inset 0 0 0 1.5px rgba(255, 220, 190, 0.5) !important; }
 
 /* ===== Bordeaux, Casino, Nuit : overlays à la couleur du thème (au lieu du noir pur) =====
-   Halo plus clair au centre, bords sombres. Textes et boutons dorés inchangés : ils vont sur les trois.
-   --overlay-bord : la couleur des bords, reprise par la page derrière et le voile entre deux overlays
-   (sinon on voit du noir pendant les enchaînements). La pastille « Tour de » et l'écran pause suivent
-   aussi le thème (avant : bordeaux partout). Sombre garde ses overlays noirs. */
-html[data-theme="bordeaux"]{
-  --overlay-fond: radial-gradient(ellipse 130% 75% at 50% 42%, #4f0a37 0%, #2a001d 55%, #120009 100%);
-  --overlay-bord: #120009;
+   Halo plus clair au centre, sur la couleur du plateau. Le halo s'arrête avant les bords : en haut et
+   en bas, l'overlay a exactement la couleur du plateau, celle de la barre de l'heure de l'iPhone (dans
+   l'appli installée, il ne la peint qu'au chargement : elle ne peut pas suivre l'overlay).
+   Textes et boutons dorés inchangés : ils vont sur les trois. --overlay-bord : la couleur des bords,
+   reprise par la page derrière et le voile entre deux overlays (sinon on voit du noir pendant les
+   enchaînements). La pastille « Tour de » et l'écran pause suivent aussi le thème (avant : bordeaux
+   partout). Sombre garde ses overlays noirs. */
+html:is([data-theme="bordeaux"], [data-theme="vert"], [data-theme="bleu"]){
+  --overlay-fond: radial-gradient(ellipse 115% 42% at 50% 45%, var(--overlay-halo) 0%, transparent 100%), var(--fond-theme);
+  --overlay-bord: var(--fond-theme);
 }
-html[data-theme="vert"]{
-  --overlay-fond: radial-gradient(ellipse 130% 75% at 50% 42%, #146b41 0%, #0a3f26 55%, #031a0e 100%);
-  --overlay-bord: #031a0e;
-}
-html[data-theme="bleu"]{
-  --overlay-fond: radial-gradient(ellipse 130% 75% at 50% 42%, #1f3a7a 0%, #0f1d47 55%, #040a1c 100%);
-  --overlay-bord: #040a1c;
-}
+html[data-theme="bordeaux"]{ --overlay-halo: #5a0c40; }
+html[data-theme="vert"]{ --overlay-halo: #177a4b; }
+html[data-theme="bleu"]{ --overlay-halo: #24438f; }
 html:is([data-theme="bordeaux"], [data-theme="vert"], [data-theme="bleu"]) :is(#overlayCouleur, #overlayPlus4, #overlayPigeon,
   #overlayCarteDoree, #overlayFinUnRestants, #overlayDuel, #overlayRegleUnique, #overlayAnnulation, #overlayResultatAnnulation,
   #overlayPredictionFin, .overlay-opaque){
