@@ -6544,20 +6544,6 @@ html[data-theme="soleil"][data-theme] body #overlayPlus4 .plus4-container-joueur
 @keyframes annulerChoixArrive{ from{ transform: translateY(140%); opacity: 0; } to{ transform: none; opacity: 1; } }
 @keyframes annulerChoixTemps{ from{ transform: scaleX(1); } to{ transform: scaleX(0); } }
 
-/* Sunset Lover, iPhone, clavier sorti : le clavier est transparent et laisse voir la couleur de fond de
-   la page, la même que la barre de l'heure (bleu nuit, le haut du dégradé). Le bas du dégradé (pêche)
-   finissait en barre nette au-dessus du clavier : il se fond dans le bleu nuit juste avant lui. */
-html[data-theme="soleil"].clavier-ouvert body::before{
-  background:
-    linear-gradient(180deg, rgba(31,53,102,0) 45%, #1f3566 100%),
-    var(--deco-theme);
-  background-color: #1f3566;
-  /* dégradé posé sur la partie visible seulement (mesurée par reglages.js : --fond-haut / --fond-h) */
-  background-position: 0 var(--fond-haut, 0px);
-  background-size: 100% var(--fond-h, 100%);
-  background-repeat: no-repeat;
-}
-
 /* Sunset Lover : bas des réglages (partager, signaler un bug, à propos) posé sur la fin claire du
    dégradé : textes en prune foncé, lien en framboise souligné */
 html[data-theme="soleil"] body #ecranReglages :is(.blocPartage, .aPropos) .aProposTitre{ color: #5a1f45 !important; opacity: 1 !important; }
@@ -6567,25 +6553,6 @@ html[data-theme="soleil"] #ecranReglages .btnDiagnostic{ color: #3a1f4a !importa
 /* (Signaler un bug : « Importer une photo/vidéo » en bas de la demi-page, sur le pêche) */
 html[data-theme="soleil"] #ecranBug #btnAjouterPieceBug{ color: #3a1f4a !important; border-color: rgba(58, 31, 74, 0.5) !important; background: rgba(255, 255, 255, 0.25) !important; }
 html[data-theme="soleil"] #ecranBug #btnAjouterPieceBug .iconeBouton{ stroke: #3a1f4a !important; }
-/* Sunset Lover, iPhone, clavier sorti : l'écran peut remonter sous la barre de l'heure (le haut bleu
-   nuit du dégradé passait dessous : coupure nette sous la barre). Le dégradé suit la partie visible. */
-html[data-theme="soleil"] :is(#choixMode, #enLigne, #ecranNouvellePartie, #ecranConfirmerHote, #ecranConfirmerRetrait,
-  #ecranReprise, #ecranConfirmerAccueil, #ecranChoixPseudo, #ecranCaster, #ecranReglages, #suppression){
-  background-position: 0 var(--fond-haut, 0px);
-  background-repeat: no-repeat;
-}
-/* (ces écrans passent sous le clavier : dégradé limité à la partie visible, qui finit en bleu nuit) */
-html[data-theme="soleil"].clavier-ouvert :is(#choixMode, #enLigne, #ecranNouvellePartie, #ecranConfirmerHote, #ecranConfirmerRetrait,
-  #ecranReprise, #ecranConfirmerAccueil, #ecranChoixPseudo, #ecranCaster, #ecranReglages, #suppression){
-  background:
-    linear-gradient(180deg, rgba(31,53,102,0) 45%, #1f3566 100%),
-    var(--deco-theme),
-    var(--fond-theme);
-  background-color: #1f3566;
-  background-position: 0 var(--fond-haut, 0px);
-  background-size: 100% var(--fond-h, 100%);
-  background-repeat: no-repeat;
-}
 
 /* ===== Mode télé en Sunset Lover : mêmes accords que sur le téléphone ===== */
 html[data-theme="soleil"] #ecranTele .tele-titre{
