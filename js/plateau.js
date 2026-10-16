@@ -828,6 +828,8 @@ function programmerRappelTour(tour){
   clearTimeout(minuteurRappelTour);
   minuteurRappelTour = setTimeout(() => {
     if(!partieLancee || joueurs.length === 0 || predictionEnCours || finUnOverlayAffiche || pauseEnCours) return;
+    // écran « Nouvelle partie » ouvert : pas de sifflet, on réessaie dans 50 s (et à sa fermeture, voir regles.js)
+    if(ecranNouvellePartieOuvert()) return programmerRappelTour(tour);
     if(enLigneActif){
       if(`${mancheCourante}:${cartesRestantes()}` !== tour) return; // tour joué entre-temps
       if(joueurs[indexJoueur % joueurs.length] !== pseudoActuel) return; // plus son tour

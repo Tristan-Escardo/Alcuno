@@ -437,13 +437,16 @@ function musiqueVoulue(){
   try { caste = !!codeTele; } catch (e) {} // (js/tele.js, chargé en dernier)
   try { enPause = !!pauseEnCours; } catch (e) {} // (js/plateau.js) : pas de musique pendant la pause
   if (caste || enPause) return null;
-  let enPartie = false;
+  let enPartie = false, menuNouvellePartie = false;
   try { enPartie = !!partieLancee; } catch (e) {} // (js/plateau.js)
-  return { volume: volumeMusique, theme: document.documentElement.dataset.theme || "bordeaux", enPartie };
+  try { menuNouvellePartie = enPartie && ecranNouvellePartieOuvert(); } catch (e) {} // (js/regles.js)
+  return { volume: volumeMusique, theme: document.documentElement.dataset.theme || "bordeaux", enPartie, menuNouvellePartie };
 }
 
-// Pendant une partie, la musique est à 45 % de son niveau des menus
+// Pendant une partie, la musique est à 45 % de son niveau des menus ; sur l'écran « Nouvelle partie »
+// (pendant une partie), encore un peu plus bas
 const VOLUME_MUSIQUE_EN_PARTIE = 0.45;
+const VOLUME_MUSIQUE_NOUVELLE_PARTIE = 0.6;
 
 // Sons forts (carte dorée, pigeon, « TIENS DANS TA GUEULE ») : la musique descend à 25 % pendant le son,
 // puis remonte en 1 s : ces moments ressortent au lieu d'être couverts par la musique
@@ -569,7 +572,8 @@ function majMusique(){
   // Volume (en douceur). Pleine musique dans les menus (accueil, réglages, salle d'attente, ajout des
   // joueurs) ; pendant la partie, juste un fond (on parle, et les sons du jeu doivent ressortir).
   // Passage menu <=> partie en un fondu plus long.
-  const niveau = Math.pow(voulu.volume / 100, 2) * 0.5 * (voulu.enPartie ? VOLUME_MUSIQUE_EN_PARTIE : 1);
+  const niveau = Math.pow(voulu.volume / 100, 2) * 0.5 * (voulu.enPartie ? VOLUME_MUSIQUE_EN_PARTIE : 1) *
+    (voulu.menuNouvellePartie ? VOLUME_MUSIQUE_NOUVELLE_PARTIE : 1);
   const rampe = L.enPartie !== voulu.enPartie ? 1.5 : 0.3;
   L.enPartie = voulu.enPartie;
   L.maitre.gain.cancelScheduledValues(ctx.currentTime);
@@ -801,6 +805,7 @@ let tempsDeJeuSansEau = 0; // ms de partie (écran allumé) depuis le dernier ra
 
 setInterval(() => {
   if (!caseRappelEau.checked || !partieLancee || pauseEnCours || document.visibilityState !== "visible") return;
+  if (ecranNouvellePartieOuvert()) return; // (js/regles.js) : ce temps-là ne compte pas
   tempsDeJeuSansEau += 15000;
   if (tempsDeJeuSansEau >= MINUTES_RAPPEL_EAU * 60000) {
     tempsDeJeuSansEau = 0;

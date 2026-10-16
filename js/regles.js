@@ -1848,9 +1848,26 @@ btnJouer.addEventListener("pointerdown", lancerPartie);
 /* ===== ÉCRAN « NOUVELLE PARTIE » (classique et en ligne) ===== */
 const ecranNouvellePartie = document.getElementById("ecranNouvellePartie");
 
-function fermerEcranNouvellePartie(){
-  ecranNouvellePartie.style.display = "none";
+// Ouvert : pas de sifflet « À toi » ni de rappel « Bois de l'eau », et la musique baisse un peu
+function ecranNouvellePartieOuvert(){
+  return ecranNouvellePartie.style.display !== "none";
 }
+
+function fermerEcranNouvellePartie(){
+  if(!ecranNouvellePartieOuvert()) return;
+  ecranNouvellePartie.style.display = "none";
+  relancerRappelClassique(); // (le compteur du sifflet repart de la fermeture)
+  majMusique();
+}
+
+// Écrans fixes ouverts par-dessus la partie, sans défilement à eux : le doigt (ou la molette) faisait
+// défiler le plateau derrière
+["ecranNouvellePartie", "ecranConfirmerAccueil", "ecranConfirmerRetrait"].forEach((id) => {
+  const ecran = document.getElementById(id);
+  const bloquer = (e) => { if(e.cancelable) e.preventDefault(); };
+  ecran.addEventListener("touchmove", bloquer, { passive: false });
+  ecran.addEventListener("wheel", bloquer, { passive: false });
+});
 
 // "click" (et pas pointerdown) : évite que le relâchement du doigt active un bouton du nouvel écran
 btnNouvellePartie.addEventListener("click", () => {
@@ -1858,6 +1875,7 @@ btnNouvellePartie.addEventListener("click", () => {
   // y envoient le clic du doigt relevé, qui ouvrirait cet écran juste après le lancement
   if(Date.now() - lancementPartieA < 700) return;
   ecranNouvellePartie.style.display = "";
+  majMusique();
 });
 
 document.getElementById("btnRetourNouvellePartie").addEventListener("click", fermerEcranNouvellePartie);
