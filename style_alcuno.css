@@ -2219,11 +2219,14 @@ header h1{
   box-sizing: border-box;
   text-align: center;
   color: #fff;
+  /* Halos qui s'arrêtent avant le haut et le bas, sur le décor du thème (comme les menus) : le haut de
+     l'écran a la couleur de la barre de l'iPhone (avant, le halo doré l'éclaircissait : bande en haut) */
   background:
-    radial-gradient(circle at 50% 18%, rgba(255,215,0,0.16), transparent 58%),
-    radial-gradient(circle at 15% 85%, rgba(255,77,77,0.10), transparent 45%),
-    radial-gradient(circle at 85% 85%, rgba(66,183,255,0.10), transparent 45%),
-    var(--fond-theme);
+    radial-gradient(ellipse 85% 28% at 50% 30%, rgba(255,215,0,0.16), transparent 100%),
+    radial-gradient(ellipse 45% 22% at 15% 72%, rgba(255,77,77,0.10), transparent 100%),
+    radial-gradient(ellipse 45% 22% at 85% 72%, rgba(66,183,255,0.10), transparent 100%),
+    var(--deco-theme, none),
+    linear-gradient(var(--fond-theme), var(--fond-theme)) var(--couleur-barre);
 }
 
 #ecranCredits .credits-contenu{
@@ -4265,7 +4268,7 @@ body::before{
 }
 
 /* Créateurs : la page derrière prend le fond du thème, comme cet écran */
-html.credits-ouverts body{ background: var(--fond-theme); }
+html.credits-ouverts body{ background: var(--couleur-barre); }
 html.credits-ouverts body::before{ display: none; }
 
 /* Overlay ouvert (fond noir) : la page derrière passe en noir aussi (sinon bandes dorées en Prestige) */
@@ -6673,6 +6676,9 @@ html[data-theme="soleil"] #ecranTele .tele-ecran{ background: linear-gradient(18
 html[data-theme="soleil"] #ecranTele .tele-ecran-titre{ color: #2a1a44; text-shadow: 0 0.3vh 0 rgba(255,240,220,0.6); }
 html[data-theme="soleil"] #ecranTele .tele-ecran-detail{ color: #8a1f4a; }
 /* Pause */
+/* Créateurs : ciel du soir sombre (le bas clair du dégradé rendait les noms jaunes illisibles), qui part
+   de la couleur de la barre de l'iPhone */
+html[data-theme="soleil"] #ecranCredits{ --deco-theme: linear-gradient(180deg, #1f3566 0%, #2c3d6b 45%, #3b3f78 100%); }
 html[data-theme="soleil"] #ecranTele .tele-pause{ background: rgba(31,53,102,0.5); }
 html[data-theme="soleil"] #ecranTele .tele-pause svg{
   fill: #fff;

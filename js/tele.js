@@ -666,6 +666,7 @@ function dessinerTele(ecran, etat){
     dernierEnvolTele = null;
     dernierRappelTele = null;
     musiqueTele = null; // (plus de téléphone relié : plus de musique)
+    pauseMusiqueTele = false;
     majMusique();
     return;
   }
@@ -673,6 +674,7 @@ function dessinerTele(ecran, etat){
   jeu.hidden = false;
   appliquerThemeTele(etat.theme);
   musiqueTele = Number(etat.musique) > 0 ? { volume: Number(etat.musique), theme: etat.theme, enPartie: !!etat.partie } : null;
+  pauseMusiqueTele = !!etat.pause; // (la musique reprendra au même endroit après la pause)
   majMusique();
   ecran.querySelector(".tele-pause").hidden = !etat.pause;
   jouerSonsTele(etat.sons);

@@ -434,6 +434,13 @@ const FONDU_BOUCLE_EXACTE = 0.03;
 const musiquesDecodees = {}; // nom => { buffer, debut, fin } | null (fichier absent) | promesse en cours
 let lecteurMusique = null;   // { ctx, maitre, nom, morceau, sources: [{ src, gain }], minuteur, actif }
 let musiqueTele = null;      // page de la télé : { volume, theme, enPartie } reçus du téléphone (null : pas de musique)
+let pauseMusiqueTele = false; // page de la télé : la partie est en pause sur le téléphone (js/tele.js)
+
+// Musique coupée par la pause de la partie : elle reprendra au même endroit (voir majMusique)
+function musiqueMiseEnPause(){
+  if (document.documentElement.classList.contains("mode-tele")) return pauseMusiqueTele;
+  try { return !!pauseEnCours; } catch (e) { return false; } // (js/plateau.js)
+}
 
 function fichierMusique(theme){
   return THEMES_AVEC_MUSIQUE.includes(theme) ? `musique_ambiance_${theme}` : "musique_ambiance";
@@ -521,8 +528,9 @@ function courbeFondu(montee, max){
   return courbe;
 }
 
-// Un tour de boucle qui commence à l'instant t (montée sur « montee » secondes), puis programme le suivant
-function jouerTourMusique(L, t, montee){
+// Un tour de boucle qui commence à l'instant t (montée sur « montee » secondes), puis programme le suivant.
+// decalage : on démarre ce tour-là à cet endroit de la boucle (reprise après la pause)
+function jouerTourMusique(L, t, montee, decalage = 0){
   if (!L.actif || !L.morceau) return;
   const { buffer, egalisation, exacte } = L.morceau;
   const src = L.ctx.createBufferSource();
@@ -535,27 +543,34 @@ function jouerTourMusique(L, t, montee){
     // Boucle exacte : ce tour déborde de « fondu » sur la suite (le début de la boucle, copié dans le
     // fichier) en descendant pendant que le suivant monte : même son des deux côtés, somme constante
     longueur = exacte.longueur;
+    if (!(decalage >= 0 && decalage < longueur - 0.5)) decalage = 0;
+    const reste = longueur - decalage;
     fondu = FONDU_BOUCLE_EXACTE;
     gain.gain.setValueAtTime(0, t);
-    if (montee > fondu) gain.gain.setValueCurveAtTime(courbeFondu(true, egalisation), t, Math.min(montee, longueur / 3));
+    if (montee > fondu) gain.gain.setValueCurveAtTime(courbeFondu(true, egalisation), t, Math.min(montee, reste / 3));
     else gain.gain.linearRampToValueAtTime(egalisation, t + fondu);
-    gain.gain.setValueAtTime(egalisation, t + longueur);
-    gain.gain.linearRampToValueAtTime(0, t + longueur + fondu);
-    src.start(t, exacte.avant, longueur + fondu);
+    gain.gain.setValueAtTime(egalisation, t + reste);
+    gain.gain.linearRampToValueAtTime(0, t + reste + fondu);
+    src.start(t, exacte.avant + decalage, reste + fondu);
   } else {
     longueur = L.morceau.fin - L.morceau.debut;
+    if (!(decalage >= 0 && decalage < longueur - 0.5)) decalage = 0;
+    const reste = longueur - decalage;
     fondu = Math.min(FONDU_MUSIQUE, longueur / 4);
-    montee = Math.max(fondu, Math.min(montee, longueur / 3));
+    montee = Math.max(fondu, Math.min(montee, reste / 3));
     gain.gain.setValueAtTime(0, t);
     gain.gain.setValueCurveAtTime(courbeFondu(true, egalisation), t, montee);
-    gain.gain.setValueCurveAtTime(courbeFondu(false, egalisation), t + longueur - fondu, fondu);
-    src.start(t, L.morceau.debut, longueur);
+    gain.gain.setValueCurveAtTime(courbeFondu(false, egalisation), t + reste - fondu, fondu);
+    src.start(t, L.morceau.debut + decalage, reste);
   }
+  // (début de la boucle en cours, pour savoir où on en est à la pause)
+  L.tourDebut = t - decalage;
+  L.tourLongueur = longueur;
   const piste = { src, gain };
   L.sources.push(piste);
   src.onended = () => { L.sources = L.sources.filter(p => p !== piste); };
   // Le tour suivant démarre pile à la fin de celui-ci (programmé un peu à l'avance)
-  const suivant = t + longueur;
+  const suivant = t + longueur - decalage;
   clearTimeout(L.minuteur);
   L.minuteur = setTimeout(() => jouerTourMusique(L, suivant, fondu),
     Math.max(0, (suivant - L.ctx.currentTime - 1.5) * 1000));
@@ -579,7 +594,16 @@ function eteindreMusique(L, duree){
 
 function majMusique(){
   const voulu = musiqueVoulue();
-  if (!voulu) { if (lecteurMusique && lecteurMusique.actif) eteindreMusique(lecteurMusique, 0.4); return; }
+  if (!voulu) {
+    const L = lecteurMusique;
+    if (L && L.actif) {
+      // Pause de la partie : on retient où en est la boucle, la reprise repartira de là
+      const position = L.tourLongueur ? (((L.ctx.currentTime - L.tourDebut) % L.tourLongueur) + L.tourLongueur) % L.tourLongueur : 0;
+      L.reprise = musiqueMiseEnPause() ? { nom: L.nom, position } : null;
+      eteindreMusique(L, 0.4);
+    }
+    return;
+  }
   const ctx = contexteAudio();
   if (!ctx) return;
   if (!lecteurMusique || lecteurMusique.ctx !== ctx) {
@@ -618,7 +642,10 @@ function majMusique(){
     if (L.actif) eteindreMusique(L, MONTEE_MUSIQUE);
     L.actif = true;
     L.morceau = morceau;
-    jouerTourMusique(L, ctx.currentTime + 0.05, MONTEE_MUSIQUE);
+    // après une pause : on reprend la même musique là où elle s'était arrêtée
+    const reprise = L.reprise && L.reprise.nom === nom ? L.reprise.position : 0;
+    L.reprise = null;
+    jouerTourMusique(L, ctx.currentTime + 0.05, MONTEE_MUSIQUE, reprise);
     preparerToutesLesMusiques(ctx);
   });
 }
