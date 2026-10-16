@@ -422,6 +422,15 @@ curseurMusique.addEventListener("input", () => {
 // Tous les morceaux sont préparés à l'avance : changer de thème ne fait pas attendre.
 const FONDU_MUSIQUE = 0.006; // secondes (micro-fondu aux raccords, contre les clics)
 const MONTEE_MUSIQUE = 0.8;  // secondes de fondu au démarrage (lancement, retour dans l'appli, thème)
+// Boucles « exactes » : le fichier contient la boucle, précédée de sa fin et suivie de son début (avant :
+// secondes de pré-roulé). On joue pile « longueur » secondes à partir de « avant », et chaque raccord est
+// un court fondu linéaire entre deux copies du même son : aucun creux, aucun saut. Ne dépend pas des
+// blancs ajoutés par l'encodage MP3 (l'iPhone ne les retire pas toujours) : un départ décalé de quelques
+// ms tombe encore dans le pré-roulé, qui est la suite exacte de la boucle.
+const BOUCLES_EXACTES = {
+  musique_ambiance_soleil: { avant: 0.3, longueur: 903552 / 44100 }, // 8 mesures à 93,7 BPM
+};
+const FONDU_BOUCLE_EXACTE = 0.03;
 const musiquesDecodees = {}; // nom => { buffer, debut, fin } | null (fichier absent) | promesse en cours
 let lecteurMusique = null;   // { ctx, maitre, nom, morceau, sources: [{ src, gain }], minuteur, actif }
 let musiqueTele = null;      // page de la télé : { volume, theme, enPartie } reçus du téléphone (null : pas de musique)
@@ -494,7 +503,7 @@ function chargerMusique(ctx, nom){
       if (!reponse.ok) throw new Error("réseau");
       return reponse.arrayBuffer()
         .then((donnees) => new Promise((ok, ko) => ctx.decodeAudioData(donnees, ok, ko)))
-        .then((buffer) => Object.assign({ buffer }, bornesMusique(buffer)));
+        .then((buffer) => Object.assign({ buffer, exacte: BOUCLES_EXACTES[nom] || null }, bornesMusique(buffer)));
     })
     .then((morceau) => { musiquesDecodees[nom] = morceau; return morceau; },
           () => { delete musiquesDecodees[nom]; musiquesRateesA[nom] = Date.now(); return null; });
@@ -515,19 +524,33 @@ function courbeFondu(montee, max){
 // Un tour de boucle qui commence à l'instant t (montée sur « montee » secondes), puis programme le suivant
 function jouerTourMusique(L, t, montee){
   if (!L.actif || !L.morceau) return;
-  const { buffer, debut, fin, egalisation } = L.morceau;
-  const longueur = fin - debut;
-  const fondu = Math.min(FONDU_MUSIQUE, longueur / 4);
-  montee = Math.max(fondu, Math.min(montee, longueur / 3));
+  const { buffer, egalisation, exacte } = L.morceau;
   const src = L.ctx.createBufferSource();
   src.buffer = buffer;
   const gain = L.ctx.createGain();
   src.connect(gain);
   gain.connect(L.maitre);
-  gain.gain.setValueAtTime(0, t);
-  gain.gain.setValueCurveAtTime(courbeFondu(true, egalisation), t, montee);
-  gain.gain.setValueCurveAtTime(courbeFondu(false, egalisation), t + longueur - fondu, fondu);
-  src.start(t, debut, longueur);
+  let longueur, fondu;
+  if (exacte) {
+    // Boucle exacte : ce tour déborde de « fondu » sur la suite (le début de la boucle, copié dans le
+    // fichier) en descendant pendant que le suivant monte : même son des deux côtés, somme constante
+    longueur = exacte.longueur;
+    fondu = FONDU_BOUCLE_EXACTE;
+    gain.gain.setValueAtTime(0, t);
+    if (montee > fondu) gain.gain.setValueCurveAtTime(courbeFondu(true, egalisation), t, Math.min(montee, longueur / 3));
+    else gain.gain.linearRampToValueAtTime(egalisation, t + fondu);
+    gain.gain.setValueAtTime(egalisation, t + longueur);
+    gain.gain.linearRampToValueAtTime(0, t + longueur + fondu);
+    src.start(t, exacte.avant, longueur + fondu);
+  } else {
+    longueur = L.morceau.fin - L.morceau.debut;
+    fondu = Math.min(FONDU_MUSIQUE, longueur / 4);
+    montee = Math.max(fondu, Math.min(montee, longueur / 3));
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.setValueCurveAtTime(courbeFondu(true, egalisation), t, montee);
+    gain.gain.setValueCurveAtTime(courbeFondu(false, egalisation), t + longueur - fondu, fondu);
+    src.start(t, L.morceau.debut, longueur);
+  }
   const piste = { src, gain };
   L.sources.push(piste);
   src.onended = () => { L.sources = L.sources.filter(p => p !== piste); };
