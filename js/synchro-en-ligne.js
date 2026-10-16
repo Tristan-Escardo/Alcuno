@@ -820,7 +820,7 @@ function rejouerActionClassique(id){
 // seulement chez celui qui a choisi). Annuler retire le choix de la liste des actions, puis la partie
 // est rejouée en accéléré jusque juste avant (comme une reprise) : on retrouve l'écran de choix.
 // Possible tant qu'aucune autre action n'a été jouée après. Jamais pour une carte retournée.
-const DUREE_ANNULER_CHOIX = 6000;
+const DUREE_ANNULER_CHOIX = 4500;
 let choixAnnulable = null;      // { debut, fin, timer } : positions des actions du choix
 let seqEnCours = 0;             // en ligne : numéro de l'action en train d'être appliquée
 let toutesActionsManche = new Map(); // en ligne : seq -> action, toute la manche (pour valider un « defaire »)
@@ -854,8 +854,52 @@ function proposerAnnulerChoix(choisisseur, debut = positionActionCourante()){
     masquerAnnulerChoix();
     if(choix) defaireChoix(choix);
   });
+  rendreAnnulerChoixGlissable(barre);
   document.body.appendChild(barre);
   choixAnnulable = { debut, fin, timer: setTimeout(masquerAnnulerChoix, DUREE_ANNULER_CHOIX) };
+}
+
+// Comme les notifications du haut : on le jette vers le bas pour le faire partir (vers le haut il
+// résiste, élastique). Le bouton Annuler garde son tap normal (le glissement ne part pas de lui).
+function rendreAnnulerChoixGlissable(barre){
+  let departY = null, decalage = 0, dernierY = 0, dernierT = 0, vitesse = 0;
+  const placer = (dy, transition) => {
+    barre.style.animation = "none"; // l'animation d'arrivée ne doit plus imposer sa position
+    barre.style.transition = transition || "none";
+    barre.style.transform = `translateY(${dy}px)`;
+  };
+  barre.addEventListener("pointerdown", (e) => {
+    if(e.target.closest("button")) return;
+    departY = dernierY = e.clientY;
+    dernierT = e.timeStamp;
+    decalage = vitesse = 0;
+    try { barre.setPointerCapture(e.pointerId); } catch (err) {}
+    placer(0);
+  });
+  barre.addEventListener("pointermove", (e) => {
+    if(departY === null) return;
+    const dy = e.clientY - departY;
+    decalage = dy > 0 ? dy : dy * 0.3;
+    if(e.timeStamp > dernierT) vitesse = (e.clientY - dernierY) / (e.timeStamp - dernierT);
+    dernierY = e.clientY;
+    dernierT = e.timeStamp;
+    placer(decalage);
+  });
+  const lacher = () => {
+    if(departY === null) return;
+    departY = null;
+    if(decalage > barre.offsetHeight * 0.35 || vitesse > 0.5){ // jeté vers le bas
+      if(choixAnnulable) clearTimeout(choixAnnulable.timer);
+      choixAnnulable = null;
+      placer(barre.offsetHeight + 40, "transform 0.25s ease-in, opacity 0.25s ease-in");
+      barre.style.opacity = "0";
+      setTimeout(() => barre.remove(), 260);
+      return;
+    }
+    placer(0, "transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)"); // revient à sa place
+  };
+  barre.addEventListener("pointerup", lacher);
+  barre.addEventListener("pointercancel", lacher);
 }
 
 function masquerAnnulerChoix(){

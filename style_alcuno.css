@@ -1286,7 +1286,7 @@ body.no-scroll{
   border-radius: 999px;
   /* Fond plus opaque à la place du flou d'arrière-plan : le flou était recalculé à chaque image
      pendant le défilement (saccades sur téléphone) */
-  background: linear-gradient(180deg, rgba(62, 0, 43, 0.93), rgba(22, 0, 16, 0.91));
+  background: linear-gradient(180deg, var(--pastille-haut), var(--pastille-bas));
   box-shadow: 0 8px 22px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.08);
   display: flex;
   align-items: center;
@@ -2631,8 +2631,8 @@ html[data-theme="givre"] #stickyJoueurActif.rappel-tour{
   border-color: var(--couleur-jeu);
   border-color: color-mix(in srgb, var(--couleur-jeu) 75%, transparent);
   background: linear-gradient(180deg,
-    color-mix(in srgb, var(--couleur-jeu) 32%, rgba(62, 0, 43, 0.93)),
-    rgba(22, 0, 16, 0.91));
+    color-mix(in srgb, var(--couleur-jeu) 32%, var(--pastille-haut)),
+    var(--pastille-bas));
   box-shadow:
     0 8px 22px rgba(0,0,0,0.18),
     inset 0 1px 0 rgba(255,255,255,0.08),
@@ -3794,6 +3794,8 @@ html.saisie-en-ligne #enLigneRejoindre .separateurOu:not(.en-sortie){
    Tout le fond (jeu, menus, réglages…) utilise --fond-theme ; les cartes, le doré et les
    écrans d'annonce noirs ne changent pas. */
 :root{ --fond-theme: rgb(43, 0, 29); }              /* Bordeaux (par défaut) */
+/* Pastille « Tour de », notification sobre : dégradé sombre du thème (voir Casino, Nuit, Sombre plus bas) */
+:root{ --pastille-haut: rgba(62, 0, 43, 0.93); --pastille-bas: rgba(22, 0, 16, 0.91); }
 html[data-theme="noir"]{ --fond-theme: #000000; }   /* thème « Sombre » : noir pur */
 html[data-theme="vert"]{ --fond-theme: #08301e; }   /* vert casino */
 html[data-theme="bleu"]{ --fond-theme: #0a1634; }   /* bleu nuit */
@@ -4021,7 +4023,7 @@ html[data-theme="cerisier"] #petalesCerisier{
    comme la bannière « Tour de » */
 #notifHaut.notifHaut-sobre{
   padding: 14px 18px;
-  background: linear-gradient(180deg, rgba(62, 0, 43, 0.97), rgba(22, 0, 16, 0.96));
+  background: linear-gradient(180deg, var(--pastille-haut), var(--pastille-bas));
   box-shadow: 0 12px 28px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(255, 215, 0, 0.35),
               inset 0 1px 0 rgba(255,255,255,0.08);
 }
@@ -6517,14 +6519,34 @@ html:is([data-theme="bordeaux"], [data-theme="vert"], [data-theme="bleu"]) #voil
 html:is([data-theme="bordeaux"], [data-theme="vert"], [data-theme="bleu"]) .plus4-actions{ background: transparent; }
 
 /* Pastille « Tour de » et écran pause */
-html[data-theme="vert"] #stickyJoueurActif{ background: linear-gradient(180deg, rgba(14, 82, 50, 0.93), rgba(4, 30, 17, 0.91)); }
-html[data-theme="bleu"] #stickyJoueurActif{ background: linear-gradient(180deg, rgba(30, 54, 112, 0.93), rgba(7, 15, 40, 0.91)); }
-html[data-theme="vert"] #ecranPause{ background: rgba(2, 20, 11, 0.6); }
-html[data-theme="bleu"] #ecranPause{ background: rgba(3, 8, 26, 0.6); }
+html[data-theme="vert"]{ --pastille-haut: rgba(14, 82, 50, 0.93); --pastille-bas: rgba(4, 30, 17, 0.91); }
+html[data-theme="bleu"]{ --pastille-haut: rgba(30, 54, 112, 0.93); --pastille-bas: rgba(7, 15, 40, 0.91); }
+html[data-theme="vert"] :is(#ecranPause, #ecranTele .tele-pause){ background: rgba(2, 20, 11, 0.6); }
+html[data-theme="bleu"] :is(#ecranPause, #ecranTele .tele-pause){ background: rgba(3, 8, 26, 0.6); }
+/* Carte dorée (choix du cul sec, annonce, « tiens dans ta gueule ») : son halo doré, posé sur le fond du
+   thème (au lieu du noir avec une lueur rouge du bas). Le halo s'arrête avant le haut (barre de l'iPhone). */
+html:is([data-theme="bordeaux"], [data-theme="vert"], [data-theme="bleu"]) :is(#overlayCarteDoree, #overlayRegleUnique.overlay-doree){
+  background: radial-gradient(ellipse 95% 34% at 50% 33%, rgba(255, 215, 0, 0.2), transparent 100%), var(--overlay-fond) !important;
+  box-shadow: none; /* (son liseré et sa lueur dorés teintaient le haut : bande sous la barre de l'iPhone) */
+}
+
+/* ===== Sombre : plus de restes de bordeaux, tout en noir et gris neutres ===== */
+html[data-theme="noir"]{ --pastille-haut: rgba(40, 40, 40, 0.94); --pastille-bas: rgba(10, 10, 10, 0.92); }
+html[data-theme="noir"] :is(#ecranPause, #ecranTele .tele-pause){ background: rgba(0, 0, 0, 0.6); }
+html[data-theme="noir"] :is(#overlayCarteDoree, #overlayRegleUnique.overlay-doree){
+  background: radial-gradient(ellipse 95% 34% at 50% 33%, rgba(255, 215, 0, 0.2), transparent 100%), #000 !important;
+  box-shadow: none;
+}
 
 /* ===== « Mauvais joueur ? ↶ Annuler » : quelques secondes après un choix de joueur (pigeon, carte
-   dorée, duel, +4), en bas de l'écran, par-dessus les annonces. La barre du bas = temps restant. ===== */
+   dorée, duel, +4), en bas de l'écran, par-dessus les annonces. La barre du bas = temps restant.
+   Se jette vers le bas (js : rendreAnnulerChoixGlissable). Couleurs : variables --annuler-*, par thème. ===== */
 #annulerChoix{
+  --annuler-fond: #1d0613;
+  --annuler-bord: rgba(255, 215, 0, 0.45);
+  --annuler-texte: #fff;
+  --annuler-bouton: #FFD700;
+  --annuler-bouton-texte: #2b001d;
   position: fixed;
   left: 12px;
   right: 12px;
@@ -6537,12 +6559,15 @@ html[data-theme="bleu"] #ecranPause{ background: rgba(3, 8, 26, 0.6); }
   margin: 0 auto;
   padding: 14px 16px;
   border-radius: 16px;
-  background: #1d0613;
-  border: 1px solid rgba(255, 215, 0, 0.45);
+  background: var(--annuler-fond);
+  border: 1px solid var(--annuler-bord);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-  color: #fff;
+  color: var(--annuler-texte);
   font: 800 16px Arial, sans-serif;
   overflow: hidden;
+  touch-action: none; /* le glissement du doigt ne fait pas défiler la page */
+  user-select: none;
+  -webkit-user-select: none;
   animation: annulerChoixArrive 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 #annulerChoix .annulerChoix-texte{ flex: 1; }
@@ -6553,8 +6578,8 @@ html[data-theme="bleu"] #ecranPause{ background: rgba(3, 8, 26, 0.6); }
   padding: 9px 16px;
   border: none;
   border-radius: 999px;
-  background: #FFD700;
-  color: #2b001d;
+  background: var(--annuler-bouton);
+  color: var(--annuler-bouton-texte);
   font: 900 16px Arial, sans-serif;
   cursor: pointer;
 }
@@ -6573,13 +6598,32 @@ html[data-theme="bleu"] #ecranPause{ background: rgba(3, 8, 26, 0.6); }
   bottom: 0;
   height: 4px;
   width: 100%;
-  background: #FFD700;
+  background: var(--annuler-bouton);
   opacity: 0.8;
   transform-origin: left center;
   animation: annulerChoixTemps linear both; /* durée : js (DUREE_ANNULER_CHOIX) */
 }
 @keyframes annulerChoixArrive{ from{ transform: translateY(140%); opacity: 0; } to{ transform: none; opacity: 1; } }
 @keyframes annulerChoixTemps{ from{ transform: scaleX(1); } to{ transform: scaleX(0); } }
+/* Couleurs par thème (Bordeaux : celles du dessus) */
+html[data-theme="noir"] #annulerChoix{ --annuler-fond: #141414; --annuler-bord: rgba(255, 255, 255, 0.22); --annuler-bouton-texte: #111; }
+html[data-theme="vert"] #annulerChoix{ --annuler-fond: #04200f; --annuler-bouton-texte: #08301e; }
+html[data-theme="bleu"] #annulerChoix{ --annuler-fond: #070f28; --annuler-bouton-texte: #0a1634; }
+html[data-theme="soleil"] #annulerChoix{
+  --annuler-fond: #1f3566; --annuler-bord: rgba(255, 205, 170, 0.5); --annuler-texte: #fff1df;
+  --annuler-bouton: linear-gradient(180deg, #ffb35c, #f2775c); --annuler-bouton-texte: #fff;
+}
+html[data-theme="soleil"] #annulerChoix .annulerChoix-bouton{ text-shadow: 0 1px 0 rgba(150, 50, 40, 0.8); }
+html[data-theme="cerisier"] #annulerChoix{
+  --annuler-fond: #3c0a2a; --annuler-bord: rgba(255, 156, 197, 0.55);
+  --annuler-bouton: #ff9cc5; --annuler-bouton-texte: #3c0a2a;
+}
+html[data-theme="givre"] #annulerChoix{
+  --annuler-fond: #ffffff; --annuler-bord: rgba(20, 121, 184, 0.35); --annuler-texte: #0d3550;
+  --annuler-bouton: linear-gradient(180deg, #27aee8, #1474b8); --annuler-bouton-texte: #fff;
+  box-shadow: 0 10px 30px rgba(13, 53, 80, 0.25);
+}
+html[data-theme="prestige"] #annulerChoix{ --annuler-fond: #2a1d03; --annuler-bord: rgba(255, 223, 90, 0.6); --annuler-bouton-texte: #3a2806; }
 
 /* Soleil couchant : bas des réglages (partager, signaler un bug, à propos) posé sur la fin claire du
    dégradé : textes en prune foncé, lien en framboise souligné */
