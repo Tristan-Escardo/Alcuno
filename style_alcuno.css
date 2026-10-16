@@ -6435,6 +6435,9 @@ html[data-theme="soleil"] #btnCaster{
 /* Icônes du haut */
 html[data-theme="soleil"] :is(#btnRegles, header #btnReglesJeu) path{ stroke: var(--soleil-creme) !important; }
 html[data-theme="soleil"] #btnReglages svg *, html[data-theme="soleil"] #btnAccueilClassique{ color: var(--soleil-creme) !important; -webkit-text-stroke-color: var(--soleil-creme) !important; stroke: var(--soleil-creme); }
+/* Bouton Réglages de l'accueil : crème avec la même ombre que le livre des règles (la règle générale
+   #choixMode #btnReglages, plus précise que celle du dessus, le laissait en jaune doré) */
+html[data-theme="soleil"] #choixMode #btnReglages :is(path, circle){ stroke: var(--soleil-creme); }
 /* Panneaux : bleu crépuscule translucide, bord pêche */
 html[data-theme="soleil"] :is(#menu, .messages, #ecranReglages .optionReglage, #ecranReglages .blocReglage, header){
   background: var(--soleil-panneau) !important;
