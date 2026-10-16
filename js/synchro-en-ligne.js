@@ -329,6 +329,13 @@ function tenterAction(action){
   const el = candidats.find(actionPrete);
   if(!el){
     if(candidats.some(c => c._net && c._net.valide && !c._net.valide())) return "ignorer";
+    // Bouton d'un écran de choix déjà fermé (ou passé à la suite) au moment où l'expéditeur a tapé :
+    // tap périmé (ex. 3e joueur tapé au duel, double tap sur le pigeon), ignoré partout pareil.
+    // Avant, il attendait un bouton disparu : 30 s de blocage sur un écran allumé, pour toujours sur
+    // un écran éteint (partie bloquée). Un écran pas encore affiché ici (action en avance) attend
+    // toujours : l'expéditeur, lui, avait vu l'action qui l'a ouvert, donc après la fermeture.
+    const fermeA = idsFermes.get(action.id);
+    if(fermeA !== undefined && typeof action.vu === "number" && action.vu < fermeA) return "ignorer";
     return "attendre";
   }
 
@@ -341,6 +348,9 @@ function tenterAction(action){
 
   if(el._net.once) el.dataset.netUtilise = "1";
   if(el._net.unique) idsUniquesUtilises.add(action.id);
+  // Boutons de l'écran de choix où l'action a lieu : notés comme « dépassés » à ce numéro d'action
+  const ecranChoix = el.closest('[id^="overlay"]');
+  if(ecranChoix) ecranChoix.querySelectorAll("[data-net-id]").forEach(b => idsFermes.set(b.dataset.netId, seqEnCours));
   el._net.handler();
   return "ok";
 }
@@ -442,6 +452,7 @@ function apresActionTraitee(){
 // un écran allumé, attendu pour toujours sur un écran éteint => téléphones décalés).
 // Exceptions : les boutons qu'on tape exprès plusieurs fois de suite (+1 et Retour du +4).
 let actionsAppliquees = new Map(); // "joueur|action" -> numéro de la dernière fois appliquée
+let idsFermes = new Map(); // bouton d'un écran de choix -> dernière action appliquée sur cet écran (voir tenterAction)
 const ACTIONS_REPETABLES = ["plus4:joueur:", "plus4:annuler", "plus4:reset"];
 
 function estUnDoublon(action){
@@ -454,6 +465,7 @@ function estUnDoublon(action){
 function reinitialiserFileActions(){
   generationFile++; // une action de l'ancienne file encore en attente s'arrête
   actionsAppliquees = new Map();
+  idsFermes = new Map();
   fileActions = new Map();
   prochainSeq = 1;
   traitementEnCours = false;

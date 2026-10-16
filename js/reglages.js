@@ -424,7 +424,7 @@ const FONDU_MUSIQUE = 0.006; // secondes (micro-fondu aux raccords, contre les c
 const MONTEE_MUSIQUE = 0.8;  // secondes de fondu au démarrage (lancement, retour dans l'appli, thème)
 const musiquesDecodees = {}; // nom => { buffer, debut, fin } | null (fichier absent) | promesse en cours
 let lecteurMusique = null;   // { ctx, maitre, nom, morceau, sources: [{ src, gain }], minuteur, actif }
-let musiqueTele = null;      // page de la télé : { volume, theme } reçus du téléphone (null : pas de musique)
+let musiqueTele = null;      // page de la télé : { volume, theme, enPartie } reçus du téléphone (null : pas de musique)
 
 function fichierMusique(theme){
   return THEMES_AVEC_MUSIQUE.includes(theme) ? `musique_ambiance_${theme}` : "musique_ambiance";
@@ -437,7 +437,26 @@ function musiqueVoulue(){
   try { caste = !!codeTele; } catch (e) {} // (js/tele.js, chargé en dernier)
   try { enPause = !!pauseEnCours; } catch (e) {} // (js/plateau.js) : pas de musique pendant la pause
   if (caste || enPause) return null;
-  return { volume: volumeMusique, theme: document.documentElement.dataset.theme || "bordeaux" };
+  let enPartie = false;
+  try { enPartie = !!partieLancee; } catch (e) {} // (js/plateau.js)
+  return { volume: volumeMusique, theme: document.documentElement.dataset.theme || "bordeaux", enPartie };
+}
+
+// Pendant une partie, la musique est à 45 % de son niveau des menus
+const VOLUME_MUSIQUE_EN_PARTIE = 0.45;
+
+// Sons forts (carte dorée, pigeon, « TIENS DANS TA GUEULE ») : la musique descend à 25 % pendant le son,
+// puis remonte en 1 s : ces moments ressortent au lieu d'être couverts par la musique
+const SONS_QUI_BAISSENT_LA_MUSIQUE = ["doree", "pigeon", "tiens_gueule"];
+function attenuerMusique(duree){
+  const L = lecteurMusique;
+  if (!L || !L.actif) return;
+  const g = L.attenuation.gain, t = L.ctx.currentTime;
+  g.cancelScheduledValues(t);
+  g.setValueAtTime(g.value, t);
+  g.linearRampToValueAtTime(0.25, t + 0.15);
+  g.setValueAtTime(0.25, t + 0.15 + duree);
+  g.linearRampToValueAtTime(1, t + 1.15 + duree);
 }
 
 // Début et fin du vrai son (sans les blancs d'encodage)
@@ -540,15 +559,22 @@ function majMusique(){
   if (!lecteurMusique || lecteurMusique.ctx !== ctx) {
     if (lecteurMusique) eteindreMusique(lecteurMusique, 0.05);
     const maitre = ctx.createGain();
-    maitre.connect(ctx.destination);
-    lecteurMusique = { ctx, maitre, nom: "", morceau: null, sources: [], minuteur: null, actif: false, enChargement: false };
+    const attenuation = ctx.createGain(); // baisse le temps des sons forts (voir attenuerMusique)
+    maitre.connect(attenuation);
+    attenuation.connect(ctx.destination);
+    lecteurMusique = { ctx, maitre, attenuation, nom: "", morceau: null, sources: [], minuteur: null, actif: false,
+                       enChargement: false, enPartie: false };
   }
   const L = lecteurMusique;
-  // Volume (en douceur)
-  const niveau = Math.pow(voulu.volume / 100, 2) * 0.5; // (en fond : bien plus doux que les sons du jeu)
+  // Volume (en douceur). Pleine musique dans les menus (accueil, réglages, salle d'attente, ajout des
+  // joueurs) ; pendant la partie, juste un fond (on parle, et les sons du jeu doivent ressortir).
+  // Passage menu <=> partie en un fondu plus long.
+  const niveau = Math.pow(voulu.volume / 100, 2) * 0.5 * (voulu.enPartie ? VOLUME_MUSIQUE_EN_PARTIE : 1);
+  const rampe = L.enPartie !== voulu.enPartie ? 1.5 : 0.3;
+  L.enPartie = voulu.enPartie;
   L.maitre.gain.cancelScheduledValues(ctx.currentTime);
   L.maitre.gain.setValueAtTime(L.maitre.gain.value, ctx.currentTime);
-  L.maitre.gain.linearRampToValueAtTime(niveau, ctx.currentTime + 0.3);
+  L.maitre.gain.linearRampToValueAtTime(niveau, ctx.currentTime + rampe);
 
   const nom = fichierMusique(voulu.theme);
   if (L.nom === nom && (L.actif || L.enChargement)) return; // (déjà en train de jouer / de préparer ce morceau)
@@ -754,6 +780,7 @@ function lireSon(nom, son){
   lecture.start(debut);
 
   const dureeMax = DUREE_MAX_SONS[nom];
+  if (SONS_QUI_BAISSENT_LA_MUSIQUE.includes(nom)) attenuerMusique(Math.min(son.duration, dureeMax || son.duration));
   if (dureeMax && son.duration > dureeMax) {
     sortie.gain.setValueAtTime(volume, debut + dureeMax - 0.3);
     sortie.gain.linearRampToValueAtTime(0.0001, debut + dureeMax);

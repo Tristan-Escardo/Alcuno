@@ -672,7 +672,7 @@ function dessinerTele(ecran, etat){
   attente.hidden = true;
   jeu.hidden = false;
   appliquerThemeTele(etat.theme);
-  musiqueTele = Number(etat.musique) > 0 ? { volume: Number(etat.musique), theme: etat.theme } : null;
+  musiqueTele = Number(etat.musique) > 0 ? { volume: Number(etat.musique), theme: etat.theme, enPartie: !!etat.partie } : null;
   majMusique();
   ecran.querySelector(".tele-pause").hidden = !etat.pause;
   jouerSonsTele(etat.sons);

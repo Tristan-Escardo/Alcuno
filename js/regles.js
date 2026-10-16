@@ -911,6 +911,8 @@ function lancerOverlayChoixDuel(joueurActuel, carteDuel = ""){
       btn.style.cursor = "not-allowed";
 
       if(picks.length === 2){
+        // Les autres joueurs ne réagissent plus (même aspect) : un 3e tap rapide n'envoie plus d'action
+        containerBoutons.style.pointerEvents = "none";
         proposerAnnulerChoix(choisisseur, debutChoix); // « Mauvais joueur ? Annuler » quelques secondes
         // Le tirage remplace l'écran 0,2 s plus tard : on voit le « pop » du 2e bouton (script.js).
         // En ligne, la carte choisie ensuite attend que le tirage soit affiché (tenterAction).
@@ -1677,6 +1679,7 @@ function lancerPartie(){
 
   indexJoueur = 0;
   partieLancee = true;
+  majMusique(); // musique de la partie : plus basse que dans les menus
   zeroEnCours = false;
   switchEnCours = false;
   sensHoraire = true;
@@ -1771,6 +1774,7 @@ function retourMenu(){
   if(!repriseClassiqueEnCours) oublierPartieClassique(); // partie abandonnée (« Modifier les joueurs »…)
   partieLancee = false;
   majTitrePJ(); // le titre suit le réglage Mode PJ, partie ou pas
+  majMusique(); // retour aux menus : la musique remonte
   finUnOverlayAffiche = false;
 
   // Écrans du retrait en cours de partie (nouvelle manche, départ, partie fermée...)
