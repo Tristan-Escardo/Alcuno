@@ -1647,6 +1647,8 @@ function lancerPartie(){
   // Classique : hasard à graine aussi, pour pouvoir rejouer la partie après un plantage (voir
   // « Partie classique gardée en mémoire » dans js/synchro-en-ligne.js)
   if(!enLigneActif) demarrerSauvegardeClassique();
+  // Statistiques : partie classique lancée (pas une reprise ni un retour en arrière rejoués)
+  if(!enLigneActif && !repriseClassiqueEnCours && !rattrapageEnCours) noterPartieStats(false);
   majTitrePJ(); // « ALCUNO PJ » dans le bandeau
   garderEcranAllume(); // pas de mise en veille pendant la partie
 

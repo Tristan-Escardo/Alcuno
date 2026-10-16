@@ -1,5 +1,42 @@
 {
   "rules": {
+    "stats": {
+      ".read": true,
+      "jours": {
+        "$jour": {
+          ".validate": "$jour.matches(/^20[0-9][0-9]-[01][0-9]-[0-3][0-9]$/)",
+          "visites": { ".write": true, ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" },
+          "installs": { ".write": true, ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" },
+          "parties": { ".write": true, ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" },
+          "partiesEnLigne": { ".write": true, ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" },
+          "visiteurs": {
+            "$id": { ".write": true, ".validate": "$id.matches(/^[a-z0-9]{12}$/) && newData.val() === true" }
+          },
+          "$autre": { ".validate": false }
+        }
+      },
+      "appareils": {
+        "$id": {
+          ".write": true,
+          ".validate": "$id.matches(/^[a-z0-9]{12}$/) && newData.hasChildren(['os', 'vu'])",
+          "os": { ".validate": "newData.isString() && newData.val().matches(/^(ios|android|ordi)$/)" },
+          "theme": { ".validate": "newData.isString() && newData.val().length <= 12" },
+          "version": { ".validate": "newData.isString() && newData.val().length <= 12" },
+          "vu": { ".validate": "newData.isNumber()" },
+          "$autre": { ".validate": false }
+        }
+      }
+    },
+    "presence": {
+      ".read": true,
+      "$id": {
+        ".write": true,
+        ".validate": "$id.matches(/^[a-z0-9]{12}$/) && newData.hasChildren(['etat', 'maj'])",
+        "etat": { ".validate": "newData.isString() && newData.val().matches(/^(menu|classique|enligne|tele)$/)" },
+        "maj": { ".validate": "newData.isNumber()" },
+        "$autre": { ".validate": false }
+      }
+    },
     "tele": {
       "$code": {
         ".read": true,

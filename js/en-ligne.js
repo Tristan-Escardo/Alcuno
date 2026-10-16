@@ -876,7 +876,10 @@ function lancerMancheEnLigne(listeJoueurs, depuisSalle){
       joueurs: listeJoueurs,
       hote: e.hote || pseudoActuel
     };
-  }).then(() => marquerActivite(codePartieActuel)).catch(erreurFirebase);
+  }).then((resultat) => {
+    if (resultat && resultat.committed) noterPartieStats(true); // statistiques : une fois par manche (l'hôte)
+    marquerActivite(codePartieActuel);
+  }).catch(erreurFirebase);
 }
 
 // Date de dernière activité (heure du serveur) : une partie sans activité depuis 3 h

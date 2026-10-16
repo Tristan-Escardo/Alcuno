@@ -293,6 +293,7 @@ document.querySelectorAll(".pastilleTheme").forEach((pastille) => {
     }
     appliquerTheme(pastille.dataset.theme, barreIphoneARafraichir());
     try { localStorage.setItem(CLE_THEME, pastille.dataset.theme); } catch (e) {}
+    try { noterAppareilStats(); } catch (e) {} // statistiques : thème choisi
     rafraichirBarreIphone();
   });
 });

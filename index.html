@@ -7,6 +7,8 @@
          Un paramètre différent à chaque chargement force toujours la dernière version. -->
     <script>
         window.ANTI_CACHE = Date.now();
+        // Page privée des statistiques : …/Alcuno/?stats (ou tinyurl.com/alcuno?stats) => stats.html
+        if (/[?&]stats(=|&|$)/.test(location.search)) location.replace("stats.html");
         // Page de la télé (…/Alcuno/tele ou …/Alcuno/?tele) : seulement l'affichage de la partie, voir js/tele.js.
         // Ouverte aussi toute seule sur un navigateur de télé reconnu (Samsung, LG, Sony, Philips, Fire TV…) :
         // l'adresse normale du jeu suffit (sinon : Réglages > « Afficher l'écran télé »)
@@ -16,7 +18,7 @@
         // et en parallèle : en bas de la page, ils s'exécutent d'affilée, sans attente entre deux fichiers
         // (aucun bouton ni minuteur ne peut se déclencher avant que tout le jeu soit là).
         window.FICHIERS_JEU = ["script.js", "js/qrcode.js", "js/reglages.js", "js/en-ligne.js", "js/plateau.js", "js/regles.js",
-                               "js/synchro-en-ligne.js", "js/retour-demarrage.js", "js/tele.js"];
+                               "js/synchro-en-ligne.js", "js/retour-demarrage.js", "js/tele.js", "js/stats.js"];
         window.FICHIERS_JEU.forEach(function (f) {
             document.write('<link rel="preload" as="script" href="' + f + '?t=' + window.ANTI_CACHE + '">');
         });
