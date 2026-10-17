@@ -6778,3 +6778,36 @@ html[data-theme="noir"] #ecranReglages .blocReglage .optionReglage{ background: 
 @media (prefers-reduced-motion: reduce){
   #fenetrePrestige, .fenetrePrestige-carte, .fenetrePrestige-rond{ animation: none; }
 }
+
+/* Thème Prestige débloqué, pas encore vu : point rouge sur l'icône des Réglages, « NOUVEAU » sur la pastille */
+html.prestige-nouveau #choixMode #btnReglages::after{
+  content: "";
+  position: absolute;
+  top: 0;
+  right: -2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ff3b5c;
+  box-shadow: 0 0 0 2px var(--fond-theme), 0 0 10px #ff3b5c;
+  animation: pointNouveau 1.6s ease-in-out infinite;
+}
+#pastillePrestige{ position: relative; }
+html.prestige-nouveau #pastillePrestige::after{
+  content: "NOUVEAU";
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #ff3b5c;
+  color: #fff;
+  font: 900 9px Arial, sans-serif;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  box-shadow: 0 0 8px #ff3b5c;
+  pointer-events: none;
+}
+@keyframes pointNouveau{ 50%{ transform: scale(1.25); } }
+@media (prefers-reduced-motion: reduce){ html.prestige-nouveau #choixMode #btnReglages::after{ animation: none; } }
