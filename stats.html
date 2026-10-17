@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#020713">
+    <title>Alcuno Stats</title>
+    <!-- Installable à part (sa propre icône sur l'écran d'accueil, « Alcuno Stats ») -->
+    <link rel="manifest" href="manifest-stats.json">
+    <link rel="icon" type="image/png" href="icones/icone-stats-192.png">
+    <link rel="apple-touch-icon" href="icones/icone-stats-180.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Alcuno Stats">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- Page privée des statistiques (anonymes) du jeu : écrites par js/stats.js, lues ici en direct.
+         Ouverte par …/Alcuno/?stats (redirection dans index.html). Un code la protège des curieux. -->
+    <style>
+        :root{ --cyan: #00e5ff; --cyan-clair: #e6fbff; --cyan-doux: #9fdcf5; --cyan-titre: #5fd8ff; }
+        html{ background: #020713; }
+        body{
+            margin: 0;
+            min-height: 100vh;
+            background: #020713;
+            color: #cfefff;
+            font-family: "Rajdhani", Arial, sans-serif;
+            padding: 16px 16px calc(40px + env(safe-area-inset-bottom));
+            box-sizing: border-box;
+        }
+        main{ max-width: 520px; margin: 0 auto; }
+        h1{
+            font-family: "Orbitron", Arial, sans-serif;
+            font-size: 30px;
+            letter-spacing: .22em;
+            color: var(--cyan-clair);
+            text-align: center;
+            margin: 8px 0 2px;
+            text-shadow: 0 0 6px var(--cyan), 0 0 18px #00b8ff, 0 0 36px rgba(0, 140, 255, .7);
+        }
+        .sous{ text-align: center; color: var(--cyan-titre); font-size: 13px; letter-spacing: .3em; text-transform: uppercase; margin-bottom: 18px; }
+        .bloc{
+            background: linear-gradient(180deg, rgba(0, 40, 70, .55), rgba(0, 12, 28, .75));
+            border: 1px solid rgba(0, 229, 255, .45);
+            border-radius: 6px;
+            padding: 14px;
+            margin-bottom: 14px;
+            box-shadow: 0 0 14px rgba(0, 229, 255, .18), inset 0 0 18px rgba(0, 229, 255, .06);
+            clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+        }
+        .titre{
+            font-family: "Orbitron", Arial, sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .24em;
+            text-transform: uppercase;
+            color: var(--cyan);
+            margin-bottom: 12px;
+            text-shadow: 0 0 8px rgba(0, 229, 255, .6);
+        }
+        .chiffre{ font-family: "Inter", Arial, sans-serif; font-variant-numeric: tabular-nums; }
+        .direct{ text-align: center; }
+        .gros{ font-size: 64px; font-weight: 700; letter-spacing: -.02em; color: var(--cyan-clair); line-height: 1; text-shadow: 0 0 10px var(--cyan), 0 0 26px rgba(0, 180, 255, .6); }
+        .point{ display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: var(--cyan); margin-right: 10px; vertical-align: middle; box-shadow: 0 0 10px var(--cyan); animation: pulse 1.6s infinite; }
+        @keyframes pulse{ 70%{ box-shadow: 0 0 0 10px rgba(0, 229, 255, 0); } 100%{ box-shadow: 0 0 0 0 rgba(0, 229, 255, 0); } }
+        .legende{ color: var(--cyan-doux); font-size: 16px; margin-top: 6px; letter-spacing: .05em; }
+        .cases{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; }
+        .case{ border: 1px solid rgba(0, 229, 255, .3); background: rgba(0, 229, 255, .05); border-radius: 4px; padding: 10px 6px; text-align: center; }
+        .case b{ display: block; font-size: 24px; font-weight: 700; color: var(--cyan-clair); text-shadow: 0 0 8px var(--cyan); }
+        .case span{ font-size: 13px; color: #7cc9e6; line-height: 1.2; display: block; margin-top: 2px; }
+        table{ width: 100%; border-collapse: collapse; font-size: 16px; }
+        td, th{ padding: 7px 4px; text-align: right; }
+        th{ color: var(--cyan-titre); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; font-family: "Inter", Arial, sans-serif; font-weight: 700; }
+        td:first-child, th:first-child{ text-align: left; color: var(--cyan-doux); }
+        td{ color: #cfefff; font-weight: 600; }
+        td + td{ font-family: "Inter", Arial, sans-serif; font-variant-numeric: tabular-nums; font-size: 15px; }
+        td b{ color: var(--cyan-clair); text-shadow: 0 0 8px var(--cyan); }
+        tr + tr td{ border-top: 1px solid rgba(0, 229, 255, .14); }
+        .barre{ display: flex; align-items: center; gap: 8px; font-size: 15px; margin: 8px 0; }
+        .nom{ width: 120px; color: var(--cyan-doux); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .piste{ flex: 1; height: 6px; background: rgba(0, 229, 255, .1); border-radius: 1px; overflow: hidden; }
+        .rempli{ display: block; height: 100%; background: var(--cyan); box-shadow: 0 0 8px var(--cyan); border-radius: 1px; transition: width .4s ease; }
+        .pc{ font-family: "Inter", Arial, sans-serif; font-variant-numeric: tabular-nums; font-size: 14px; width: 48px; text-align: right; color: var(--cyan-clair); font-weight: 700; }
+        .vide{ color: #4f8aa3; font-size: 14px; }
+        svg text{ fill: var(--cyan-titre); font-size: 10px; font-family: "Rajdhani", Arial, sans-serif; }
+        .note{ text-align: center; color: #3f7088; font-size: 12px; margin-top: 18px; }
+
+        /* Code d'accès */
+        #porte{ position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #020713; padding: 20px; }
+        #porte[hidden]{ display: none; }
+        #porte form{ width: min(340px, 100%); text-align: center; }
+        #porte input{
+            width: 100%; box-sizing: border-box; margin: 22px 0 12px; padding: 14px; border-radius: 4px;
+            border: 1px solid rgba(0, 229, 255, .5); background: rgba(0, 229, 255, .06); color: var(--cyan-clair);
+            font: 600 20px "Inter", Arial, sans-serif; letter-spacing: .3em; text-align: center; outline: none;
+            box-shadow: 0 0 12px rgba(0, 229, 255, .2);
+        }
+        #porte input:focus{ border-color: var(--cyan); box-shadow: 0 0 16px rgba(0, 229, 255, .45); }
+        #porte button{
+            width: 100%; padding: 13px; border-radius: 4px; border: 1px solid var(--cyan); background: rgba(0, 229, 255, .14);
+            color: var(--cyan-clair); font: 700 13px "Orbitron", Arial, sans-serif; letter-spacing: .24em; cursor: pointer;
+            text-shadow: 0 0 8px var(--cyan);
+        }
+        #erreurPorte{ min-height: 20px; margin-top: 12px; color: #ff7b9c; font-size: 15px; }
+        #contenu[hidden]{ display: none; }
+    </style>
+</head>
+<body>
+    <div id="porte">
+        <form id="formPorte" autocomplete="off">
+            <h1>ALCUNO</h1>
+            <div class="sous">Accès privé</div>
+            <input id="codePorte" type="password" inputmode="numeric" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="CODE">
+            <button type="submit">Entrer</button>
+            <div id="erreurPorte"></div>
+        </form>
+    </div>
+
+    <main id="contenu" hidden>
+        <h1>ALCUNO</h1>
+        <div class="sous">Statistiques · en direct</div>
+
+        <section class="bloc direct">
+            <div class="titre">En ce moment</div>
+            <div class="gros chiffre"><span class="point"></span><span id="enLigneTotal">–</span></div>
+            <div class="legende" id="legendeDirect">personnes ont le jeu ouvert</div>
+            <div class="cases">
+                <div class="case"><b class="chiffre" id="enClassique">–</b><span>en partie classique</span></div>
+                <div class="case"><b class="chiffre" id="enLigneJeu">–</b><span>en partie en ligne</span></div>
+                <div class="case"><b class="chiffre" id="enTele">–</b><span>télé castée</span></div>
+            </div>
+        </section>
+
+        <section class="bloc">
+            <div class="titre">Fréquentation</div>
+            <table>
+                <thead><tr><th></th><th>Aujourd'hui</th><th>7 jours</th><th>Total</th></tr></thead>
+                <tbody id="tableau"></tbody>
+            </table>
+        </section>
+
+        <section class="bloc">
+            <div class="titre">Visites · 30 derniers jours</div>
+            <div id="courbe"></div>
+        </section>
+
+        <section class="bloc"><div class="titre">Téléphones</div><div id="barresOs"></div></section>
+        <section class="bloc"><div class="titre">Thèmes choisis</div><div id="barresThemes"></div></section>
+        <section class="bloc"><div class="titre">Versions en circulation</div><div id="barresVersions"></div></section>
+
+        <p class="note">Appareils vus ces 30 derniers jours · aucune donnée personnelle</p>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
+
+        // Empreinte (SHA-256) du code d'accès : le code lui-même n'est écrit nulle part
+        const EMPREINTE_CODE = "2c8125d3adc62dac73f3ae036a86e00ba51b12b0dfb38fec2184e76441ed6826";
+        const CLE_ACCES = "alcuno_stats_acces";
+
+        const NOMS_THEMES = {
+            bordeaux: "Bordeaux", noir: "Sombre", vert: "Casino", bleu: "Nuit", soleil: "Soleil couchant",
+            cerisier: "Cerisier", givre: "Givre", prestige: "Prestige"
+        };
+        const NOMS_OS = { ios: "iPhone", android: "Android", ordi: "Ordinateur" };
+        const PRESENCE_VALABLE = 3 * 60 * 1000; // présence pas rafraîchie depuis 3 min : téléphone parti
+        const APPAREILS_VUS_DEPUIS = 30 * 24 * 3600 * 1000;
+
+        async function empreinte(texte){
+            const octets = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(texte.trim().toUpperCase()));
+            return Array.from(new Uint8Array(octets)).map(o => o.toString(16).padStart(2, "0")).join("");
+        }
+
+        const porte = document.getElementById("porte");
+        const contenu = document.getElementById("contenu");
+        let ouvert = false;
+
+        function ouvrir(){
+            if (ouvert) return;
+            ouvert = true;
+            porte.hidden = true;
+            contenu.hidden = false;
+            demarrer();
+        }
+
+        try { if (localStorage.getItem(CLE_ACCES) === EMPREINTE_CODE) ouvrir(); } catch (e) {}
+        if (!ouvert) document.getElementById("codePorte").focus();
+
+        document.getElementById("formPorte").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const saisi = document.getElementById("codePorte").value;
+            if (await empreinte(saisi) === EMPREINTE_CODE) {
+                try { localStorage.setItem(CLE_ACCES, EMPREINTE_CODE); } catch (e) {}
+                ouvrir();
+            } else {
+                document.getElementById("erreurPorte").textContent = "Code incorrect";
+                document.getElementById("codePorte").select();
+            }
+        });
+
+        // ===== Données =====
+        const nombre = (n) => n.toLocaleString("fr-FR");
+        const jourDe = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+        function joursPasses(n){ // [aujourd'hui, hier, …] (n jours)
+            const liste = [];
+            const d = new Date();
+            for (let i = 0; i < n; i++) { liste.push(jourDe(d)); d.setDate(d.getDate() - 1); }
+            return liste;
+        }
+
+        function barres(idZone, compte, noms = {}, max = 8){
+            const zone = document.getElementById(idZone);
+            const total = Object.values(compte).reduce((a, b) => a + b, 0);
+            if (!total) { zone.innerHTML = '<div class="vide">Pas encore de données</div>'; return; }
+            let lignes = Object.entries(compte).sort((a, b) => b[1] - a[1]);
+            if (lignes.length > max) {
+                const reste = lignes.slice(max - 1).reduce((a, l) => a + l[1], 0);
+                lignes = lignes.slice(0, max - 1).concat([["__autres", reste]]);
+            }
+            zone.innerHTML = "";
+            lignes.forEach(([cle, n]) => {
+                const pc = Math.round(n / total * 100);
+                const ligne = document.createElement("div");
+                ligne.className = "barre";
+                ligne.innerHTML = '<span class="nom"></span><span class="piste"><span class="rempli"></span></span><span class="pc"></span>';
+                ligne.querySelector(".nom").textContent = cle === "__autres" ? "autres" : (noms[cle] || cle);
+                ligne.querySelector(".rempli").style.width = `${Math.max(pc, 1)}%`;
+                ligne.querySelector(".pc").textContent = `${pc} %`;
+                zone.appendChild(ligne);
+            });
+        }
+
+        function courbe(valeurs, premierJour){
+            const L = 330, H = 120;
+            const max = Math.max(1, ...valeurs);
+            const pts = valeurs.map((v, i) => `${(i * L / (valeurs.length - 1)).toFixed(1)},${(H - v / max * (H - 10)).toFixed(1)}`).join(" ");
+            const [a, m, j] = premierJour.split("-").map(Number);
+            const debut = new Date(a, m - 1, j).toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
+            document.getElementById("courbe").innerHTML =
+                `<svg width="100%" viewBox="0 0 ${L} ${H + 16}" role="img" aria-label="Visites des 30 derniers jours">
+                    <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#00e5ff" stop-opacity=".35"/><stop offset="1" stop-color="#00e5ff" stop-opacity="0"/></linearGradient></defs>
+                    <polygon points="0,${H} ${pts} ${L},${H}" fill="url(#g)"/>
+                    <polyline points="${pts}" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linejoin="round" style="filter:drop-shadow(0 0 4px #00e5ff)"/>
+                    <text x="0" y="${H + 13}">${debut}</text><text x="${L}" y="${H + 13}" text-anchor="end">aujourd'hui · max ${max}</text>
+                </svg>`;
+        }
+
+        function demarrer(){
+            const app = initializeApp({
+                apiKey: "AIzaSyApZL1dCQLGdrZFjsGJC0y4DxLUzorum4M",
+                authDomain: "alcuno.firebaseapp.com",
+                databaseURL: "https://alcuno-default-rtdb.europe-west1.firebasedatabase.app",
+                projectId: "alcuno",
+                storageBucket: "alcuno.firebasestorage.app",
+                messagingSenderId: "481896309098",
+                appId: "1:481896309098:web:c84fe2d2ded1df80810513"
+            });
+            const db = getDatabase(app);
+
+            // Heure du serveur (les dates de présence viennent de lui)
+            let decalage = 0;
+            onValue(ref(db, ".info/serverTimeOffset"), (s) => { decalage = Number(s.val()) || 0; });
+            const maintenant = () => Date.now() + decalage;
+
+            // ----- En ce moment -----
+            let presences = {};
+            const majDirect = () => {
+                const c = { menu: 0, classique: 0, enligne: 0, tele: 0 };
+                Object.values(presences).forEach((p) => {
+                    if (p && c[p.etat] !== undefined && maintenant() - Number(p.maj || 0) < PRESENCE_VALABLE) c[p.etat]++;
+                });
+                const total = c.menu + c.classique + c.enligne;
+                document.getElementById("enLigneTotal").textContent = nombre(total);
+                document.getElementById("legendeDirect").textContent =
+                    total > 1 ? "personnes ont le jeu ouvert" : "personne a le jeu ouvert";
+                document.getElementById("enClassique").textContent = nombre(c.classique);
+                document.getElementById("enLigneJeu").textContent = nombre(c.enligne);
+                document.getElementById("enTele").textContent = nombre(c.tele);
+            };
+            onValue(ref(db, "presence"), (s) => { presences = s.val() || {}; majDirect(); });
+            setInterval(majDirect, 15000);
+
+            // ----- Fréquentation + courbe -----
+            onValue(ref(db, "stats/jours"), (s) => {
+                const jours = s.val() || {};
+                const derniers7 = joursPasses(7);
+                const derniers30 = joursPasses(30);
+                const aujourdhui = derniers7[0];
+                const somme = (nom, liste) => liste.reduce((a, j) => a + Number((jours[j] || {})[nom] || 0), 0);
+                const visiteurs = (liste) => {
+                    const ids = new Set();
+                    liste.forEach((j) => Object.keys((jours[j] || {}).visiteurs || {}).forEach((id) => ids.add(id)));
+                    return ids.size;
+                };
+                const tous = Object.keys(jours);
+                const lignes = [
+                    ["Visites", "visites"], ["Visiteurs", null], ["Installations", "installs"],
+                    ["Parties lancées", "parties"], ["Parties en ligne", "partiesEnLigne"]
+                ];
+                document.getElementById("tableau").innerHTML = lignes.map(([titre, nom]) => {
+                    const v = nom
+                        ? [somme(nom, [aujourdhui]), somme(nom, derniers7), somme(nom, tous)]
+                        : [visiteurs([aujourdhui]), visiteurs(derniers7), visiteurs(tous)];
+                    return `<tr><td>${titre}</td><td><b>${nombre(v[0])}</b></td><td>${nombre(v[1])}</td><td>${nombre(v[2])}</td></tr>`;
+                }).join("");
+                const chrono = derniers30.slice().reverse();
+                courbe(chrono.map((j) => Number((jours[j] || {}).visites || 0)), chrono[0]);
+            });
+
+            // ----- Téléphones, thèmes, versions (appareils vus ces 30 derniers jours) -----
+            onValue(ref(db, "stats/appareils"), (s) => {
+                const os = {}, themes = {}, versions = {};
+                Object.values(s.val() || {}).forEach((a) => {
+                    if (!a || maintenant() - Number(a.vu || 0) > APPAREILS_VUS_DEPUIS) return;
+                    os[a.os] = (os[a.os] || 0) + 1;
+                    if (a.theme) themes[a.theme] = (themes[a.theme] || 0) + 1;
+                    if (a.version) versions[a.version] = (versions[a.version] || 0) + 1;
+                });
+                barres("barresOs", os, NOMS_OS);
+                barres("barresThemes", themes, NOMS_THEMES, 9);
+                barres("barresVersions", versions, {}, 4);
+            });
+        }
+    </script>
+</body>
+</html>
