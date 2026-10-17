@@ -680,6 +680,12 @@ function afficherOverlayCouleur(joueurActuel){
   titre.innerText = "Choisis une couleur";
   overlay.appendChild(titre);
 
+  // Ce que fait la couleur, dit tout de suite (avant, on ne le comprenait qu'au moment de boire)
+  const explication = document.createElement("div");
+  explication.className = "explication-couleur";
+  explication.innerHTML = "Le prochain qui tire une carte de cette couleur boit <b>1 gorgée en plus</b>";
+  overlay.appendChild(explication);
+
   const container = document.createElement("div");
   container.className = "container-couleurs";
 
@@ -700,6 +706,8 @@ function afficherOverlayCouleur(joueurActuel){
       overlay.remove();
       choixPigeonEnCours = false;
       afficherJoueurActif();
+      // Annonce pour toute la table (pas seulement celui qui a choisi)
+      montrerOverlayRegle(`Couleur ${c.nom.toUpperCase()}\nLe prochain qui tire une carte ${ADJECTIFS_COULEUR[c.nom]} boit 1 gorgée en plus`, "couleur");
     });
     container.appendChild(carre);
   });
