@@ -55,6 +55,10 @@
         "version": { ".validate": "newData.isNumber()" },
         "creee": { ".validate": "newData.isNumber()" },
         "soft": { ".validate": "newData.isBoolean()" },
+        "faces": {
+          ".write": true,
+          ".validate": "newData.isBoolean()"
+        },
         "activite": {
           ".write": true,
           ".validate": "newData.isNumber()"

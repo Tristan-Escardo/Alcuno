@@ -1407,6 +1407,27 @@ function demarrerAnnulationsMulti(victimes, classeCarte, messageEntete, onComple
   executerApresOverlayRegleUnique(next);
 }
 
+// Faces fermées : la carte retournée se recache (dos grisé) une fois l'annonce fermée, avec un petit
+// retournement. La classe « recachee » est posée même en faces ouvertes : c'est le CSS (classe
+// faces-fermees sur <html>) qui décide de l'aspect, donc changer le réglage en pleine partie marche aussi.
+function programmerRecache(carte){
+  const generation = generationPartie;
+  const recacher = () => {
+    if(generation !== generationPartie || !carte.isConnected || carte.classList.contains("recachee")) return;
+    if(rattrapageEnCours || !document.documentElement.classList.contains("faces-fermees")){
+      carte.classList.add("recachee");
+      return;
+    }
+    carte.classList.add("recache-anim"); // elle se referme…
+    setTimeout(() => {
+      carte.classList.add("recachee");    // … et revient de dos
+      carte.classList.remove("recache-anim");
+    }, 200);
+  };
+  if(rattrapageEnCours){ recacher(); return; }
+  setTimeout(() => executerApresOverlayRegleUnique(() => setTimeout(recacher, 450)), 300);
+}
+
 function couleurDeLaCarte(classeCarte){
   // Ex: "un_vert1" => "vert", "interdit_rouge" => "rouge"
   const m = classeCarte.match(/_(vert|jaune|rouge|bleu)/);
@@ -1658,6 +1679,7 @@ function lancerPartie(){
   // Statistiques : partie classique lancée (pas une reprise ni un retour en arrière rejoués)
   if(!enLigneActif && !repriseClassiqueEnCours && !rattrapageEnCours) noterPartieStats(false);
   majTitrePJ(); // « ALCUNO PJ » dans le bandeau
+  majFacesFermees(); // faces ouvertes / fermées (réglage, ou celui de l'hôte en ligne)
   garderEcranAllume(); // pas de mise en veille pendant la partie
 
   // Plateau principal = toutes les cartes SAUF 2/5/6/7/8/9 (paquet duel)
@@ -1737,6 +1759,7 @@ function lancerPartie(){
       }
       carte.classList.add(carteTiree, "retournee");
       if(!estCaseDoree) jouerSon("cartes");
+      programmerRecache(carte); // faces fermées : la carte se recache une fois son annonce passée
 
       const joueurActuel = indexJoueur % joueurs.length;
       appliquerRegle(carteTiree, joueurActuel, carte);
