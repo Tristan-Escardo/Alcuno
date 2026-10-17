@@ -8,6 +8,7 @@
 const ecranReglages = document.getElementById("ecranReglages");
 
 document.getElementById("btnReglages").addEventListener("click", () => {
+  vuNouveauPrestige();
   majLignePartieMemoire();
   ecranReglages.scrollTop = 0;
   ouvrirPage(ecranReglages);
@@ -61,8 +62,19 @@ function debloquerPrestige(){
   if (prestigeDebloque()) return;
   try { localStorage.setItem(CLE_PRESTIGE, "1"); } catch (e) {}
   majPastillePrestige();
+  // Rappel tant qu'on n'est pas allé le voir : point rouge sur l'icône des Réglages, « NOUVEAU » sur la pastille
+  try { localStorage.setItem(CLE_PRESTIGE_NOUVEAU, "1"); } catch (e) {}
+  document.documentElement.classList.add("prestige-nouveau");
   // (un peu après l'ouverture de l'écran des créateurs : on le voit d'abord, puis le secret)
   setTimeout(afficherFenetrePrestige, 1100);
+}
+
+// Rappel « nouveau thème » : point rouge sur l'icône des Réglages et « NOUVEAU » sur la pastille Prestige,
+// jusqu'à ce qu'on ouvre les Réglages (le « NOUVEAU » reste affiché tant qu'on y est, retiré à la fermeture)
+const CLE_PRESTIGE_NOUVEAU = "alcuno_prestige_nouveau";
+try { if (localStorage.getItem(CLE_PRESTIGE_NOUVEAU) && prestigeDebloque()) document.documentElement.classList.add("prestige-nouveau"); } catch (e) {}
+function vuNouveauPrestige(){
+  try { localStorage.removeItem(CLE_PRESTIGE_NOUVEAU); } catch (e) {}
 }
 
 // Thème Prestige débloqué : fenêtre dorée au milieu de l'écran (avant : petite notif en haut que
