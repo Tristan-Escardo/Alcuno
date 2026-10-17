@@ -395,19 +395,16 @@ function estFacesFermees(){
 function majFacesFermees(){
   const fermees = estFacesFermees();
   document.documentElement.classList.toggle("faces-fermees", fermees);
-  document.querySelectorAll(".choixFaces button").forEach((b) => {
-    b.setAttribute("aria-checked", (b.dataset.faces === "fermees") === lireReglage(CLE_FACES_FERMEES, false) ? "true" : "false");
-  });
 }
 function choisirFacesEnLigne(fermees){
   facesPartieEnLigne = !!fermees;
   majFacesFermees();
 }
-document.querySelectorAll(".choixFaces button").forEach((b) => {
-  b.addEventListener("click", () => {
-    ecrireReglage(CLE_FACES_FERMEES, b.dataset.faces === "fermees");
-    majFacesFermees();
-  });
+const caseFacesFermees = document.getElementById("optionFacesFermees");
+caseFacesFermees.checked = lireReglage(CLE_FACES_FERMEES, false);
+caseFacesFermees.addEventListener("change", () => {
+  ecrireReglage(CLE_FACES_FERMEES, caseFacesFermees.checked);
+  majFacesFermees();
 });
 majFacesFermees();
 
