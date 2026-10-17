@@ -61,7 +61,39 @@ function debloquerPrestige(){
   if (prestigeDebloque()) return;
   try { localStorage.setItem(CLE_PRESTIGE, "1"); } catch (e) {}
   majPastillePrestige();
-  afficherNotificationHaut("✨", "Thème Prestige débloqué !");
+  // (un peu après l'ouverture de l'écran des créateurs : on le voit d'abord, puis le secret)
+  setTimeout(afficherFenetrePrestige, 1100);
+}
+
+// Thème Prestige débloqué : fenêtre dorée au milieu de l'écran (avant : petite notif en haut que
+// personne ne voyait). « L'essayer maintenant » met le thème tout de suite, « Plus tard » ferme.
+function afficherFenetrePrestige(){
+  if (document.getElementById("fenetrePrestige")) return;
+  const voile = document.createElement("div");
+  voile.id = "fenetrePrestige";
+  voile.setAttribute("role", "dialog");
+  voile.setAttribute("aria-label", "Thème Prestige débloqué");
+  voile.innerHTML = `
+    <div class="fenetrePrestige-carte">
+      <div class="fenetrePrestige-secret">✦ Secret trouvé ✦</div>
+      <span class="fenetrePrestige-rond" aria-hidden="true"></span>
+      <div class="fenetrePrestige-titre">Thème Prestige<br>débloqué !</div>
+      <div class="fenetrePrestige-texte">Il est maintenant dans<br>Réglages › Thèmes</div>
+      <button type="button" class="fenetrePrestige-essayer">L'essayer maintenant</button>
+      <button type="button" class="fenetrePrestige-plusTard">Plus tard</button>
+    </div>`;
+  const fermer = () => {
+    voile.classList.add("fenetrePrestige-sortie");
+    setTimeout(() => voile.remove(), 250);
+  };
+  voile.querySelector(".fenetrePrestige-essayer").addEventListener("click", () => {
+    fermer();
+    const pastille = document.getElementById("pastillePrestige");
+    if (pastille) pastille.click(); // comme dans les réglages (musique coupée, thème gardé…)
+  });
+  voile.querySelector(".fenetrePrestige-plusTard").addEventListener("click", fermer);
+  vibrer([60, 40, 60]);
+  document.body.appendChild(voile);
 }
 
 // Notification qui arrive du haut de l'écran, en or avec des étincelles. Comme sur un téléphone :
