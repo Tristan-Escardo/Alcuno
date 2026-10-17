@@ -42,24 +42,13 @@
             text-shadow: 0 0 6px var(--cyan), 0 0 18px #00b8ff, 0 0 36px rgba(0, 140, 255, .7);
         }
         .sous{ text-align: center; color: var(--cyan-titre); font-size: 13px; letter-spacing: .3em; text-transform: uppercase; margin-bottom: 18px; }
-        /* Blocs à coins coupés : la bordure (fond cyan du bloc) fait tout le tour, diagonales comprises ;
-           l'intérieur sombre est posé 1 px plus loin, avec la même découpe */
         .bloc{
-            position: relative;
-            isolation: isolate;
-            padding: 14px;
+            padding: 16px;
             margin-bottom: 14px;
-            background: rgba(0, 229, 255, .55);
-            clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
-        }
-        .bloc::before{
-            content: "";
-            position: absolute;
-            inset: 1px;
-            z-index: -1;
-            background: linear-gradient(180deg, #03243c, #020b18);
-            box-shadow: inset 0 0 22px rgba(0, 229, 255, .10);
-            clip-path: polygon(0 0, calc(100% - 15.6px) 0, 100% 15.6px, 100% 100%, 15.6px 100%, 0 calc(100% - 15.6px));
+            border-radius: 14px;
+            border: 1px solid rgba(0, 229, 255, .45);
+            background: linear-gradient(180deg, rgba(3, 36, 60, .85), rgba(2, 11, 24, .9));
+            box-shadow: 0 0 18px rgba(0, 229, 255, .16), inset 0 0 22px rgba(0, 229, 255, .07);
         }
         .titre{
             font-family: "Orbitron", Arial, sans-serif;
@@ -78,7 +67,7 @@
         @keyframes pulse{ 70%{ box-shadow: 0 0 0 10px rgba(0, 229, 255, 0); } 100%{ box-shadow: 0 0 0 0 rgba(0, 229, 255, 0); } }
         .legende{ color: var(--cyan-doux); font-size: 16px; margin-top: 6px; letter-spacing: .05em; }
         .cases{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; }
-        .case{ border: 1px solid rgba(0, 229, 255, .3); background: rgba(0, 229, 255, .05); border-radius: 4px; padding: 10px 6px; text-align: center; }
+        .case{ border: 1px solid rgba(0, 229, 255, .3); background: rgba(0, 229, 255, .05); border-radius: 10px; padding: 10px 6px; text-align: center; }
         .case b{ display: block; font-size: 24px; font-weight: 700; color: var(--cyan-clair); text-shadow: 0 0 8px var(--cyan); }
         .case span{ font-size: 13px; color: #7cc9e6; line-height: 1.2; display: block; margin-top: 2px; }
         table{ width: 100%; border-collapse: collapse; font-size: 16px; }
@@ -91,8 +80,8 @@
         tr + tr td{ border-top: 1px solid rgba(0, 229, 255, .14); }
         .barre{ display: flex; align-items: center; gap: 8px; font-size: 15px; margin: 8px 0; }
         .nom{ width: 120px; color: var(--cyan-doux); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .piste{ flex: 1; height: 6px; background: rgba(0, 229, 255, .1); border-radius: 1px; overflow: hidden; }
-        .rempli{ display: block; height: 100%; background: var(--cyan); box-shadow: 0 0 8px var(--cyan); border-radius: 1px; transition: width .4s ease; }
+        .piste{ flex: 1; height: 7px; background: rgba(0, 229, 255, .1); border-radius: 4px; overflow: hidden; }
+        .rempli{ display: block; height: 100%; background: var(--cyan); box-shadow: 0 0 8px var(--cyan); border-radius: 4px; transition: width .4s ease; }
         .pc{ font-family: "Inter", Arial, sans-serif; font-variant-numeric: tabular-nums; font-size: 14px; width: 48px; text-align: right; color: var(--cyan-clair); font-weight: 700; }
         .vide{ color: #4f8aa3; font-size: 14px; }
         svg text{ fill: var(--cyan-titre); font-size: 10px; font-family: "Rajdhani", Arial, sans-serif; }
@@ -161,7 +150,7 @@
         <section class="bloc"><div class="titre">Thèmes choisis</div><div id="barresThemes"></div></section>
         <section class="bloc"><div class="titre">Versions en circulation</div><div id="barresVersions"></div></section>
 
-        <p class="note">Appareils vus ces 30 derniers jours · aucune donnée personnelle</p>
+        <p class="note">Appareils vus ces 30 derniers jours · aucune donnée personnelle<br>Alcuno Stats <span id="versionStats"></span></p>
     </main>
 
     <script type="module">
@@ -169,6 +158,10 @@
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
 
         // Empreinte (SHA-256) du code d'accès : le code lui-même n'est écrit nulle part
+        // Version de la page de stats (à part de celle du jeu : +0.0.1 à chaque modification de cette page)
+        const VERSION_STATS = "1.0.0";
+        document.getElementById("versionStats").textContent = VERSION_STATS;
+
         const EMPREINTE_CODE = "2c8125d3adc62dac73f3ae036a86e00ba51b12b0dfb38fec2184e76441ed6826";
         const CLE_ACCES = "alcuno_stats_acces";
 
