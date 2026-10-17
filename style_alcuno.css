@@ -4139,9 +4139,10 @@ html[data-theme="prestige"] #refletPrestige{
   display: block;
 }
 
-/* Pas de reflet sur les overlays */
+/* Pas de reflet sur les overlays. Caché sans display: none : sur iPhone, l'animation du reflet restait
+   figée à l'écran après avoir été masquée puis réaffichée (à chaque annonce d'une partie) */
 html.overlay-ouvert #refletPrestige{
-  display: none;
+  visibility: hidden;
 }
 
 #refletPrestige::before{
@@ -4155,6 +4156,7 @@ html.overlay-ouvert #refletPrestige{
                               rgba(255, 246, 200, 0.38) 50%, rgba(255, 236, 150, 0.08) 70%, transparent 100%);
   transform: translateX(-60vw) rotate(18deg);
   mix-blend-mode: screen;
+  will-change: transform;
   animation: refletLingot 7s ease-in-out infinite;
 }
 
@@ -5512,7 +5514,7 @@ html.mode-tele body > *:not(#ecranTele):not(#refletPrestige){
 }
 /* Prestige : le reflet doré passe aussi sur la télé, sauf sur l'écran noir des annonces (comme sur le téléphone) */
 html.tele-ecran-ouvert #refletPrestige{
-  display: none;
+  visibility: hidden; /* (pas display: none, voir html.overlay-ouvert #refletPrestige) */
 }
 #ecranTele{
   position: fixed;
