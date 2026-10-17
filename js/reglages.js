@@ -383,6 +383,34 @@ function texteDoreeJamaisTrouvee(){
 }
 
 // En ligne : mode de la partie qu'on rejoint / crée, affiché dans la salle d'attente
+// ===== Faces ouvertes / faces fermées =====
+// Faces fermées : une carte retournée se recache (dos grisé) une fois son annonce passée : on ne peut plus
+// compter les cartes sorties pour le pari de fin. Purement visuel (le jeu sait toujours ce qui est sorti).
+// En ligne : le réglage de l'hôte, gardé dans la partie (parties/CODE/faces).
+const CLE_FACES_FERMEES = "alcuno_faces_fermees";
+let facesPartieEnLigne = false;
+function estFacesFermees(){
+  return codePartieActuel ? facesPartieEnLigne : lireReglage(CLE_FACES_FERMEES, false);
+}
+function majFacesFermees(){
+  const fermees = estFacesFermees();
+  document.documentElement.classList.toggle("faces-fermees", fermees);
+  document.querySelectorAll(".choixFaces button").forEach((b) => {
+    b.setAttribute("aria-checked", (b.dataset.faces === "fermees") === lireReglage(CLE_FACES_FERMEES, false) ? "true" : "false");
+  });
+}
+function choisirFacesEnLigne(fermees){
+  facesPartieEnLigne = !!fermees;
+  majFacesFermees();
+}
+document.querySelectorAll(".choixFaces button").forEach((b) => {
+  b.addEventListener("click", () => {
+    ecrireReglage(CLE_FACES_FERMEES, b.dataset.faces === "fermees");
+    majFacesFermees();
+  });
+});
+majFacesFermees();
+
 function choisirModeSoftEnLigne(soft){
   softPartieEnLigne = !!soft;
   document.getElementById("infoModeSoft").style.display = softPartieEnLigne ? "" : "none";

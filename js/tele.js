@@ -143,6 +143,7 @@ function faceCarte(el){
 // "x" si elle a quitté le plateau (carte 1 partie chez un joueur)
 function carteTele(el){
   if (el.classList.contains("carte-disparue")) return "x";
+  if (el.classList.contains("recachee") && document.documentElement.classList.contains("faces-fermees")) return "r";
   if (el.classList.contains("retournee")) return faceCarte(el) || "";
   return el.classList.contains("dos_dore") ? "d" : "";
 }
@@ -362,6 +363,7 @@ function genererCodeTele(){
 function creerCarteTele(valeur){
   const el = document.createElement("div");
   if (valeur === "x") { el.className = "tele-case-vide"; return el; }
+  if (valeur === "r") { el.className = "Carte carte-recachee"; return el; } // faces fermées
   el.className = "Carte" + (valeur === "d" ? " dos_dore" : "") + (valeur && valeur !== "d" ? " retournee " + valeur : "");
   return el;
 }

@@ -598,6 +598,14 @@ document.getElementById("validerCreation").addEventListener("click", () => {
       });
     }).then(() => {
       choisirModeSoftEnLigne(soft);
+      // Faces fermées (réglage de l'hôte) : écrit à part, après la création. Règles Firebase pas encore
+      // à jour pour « faces » : refusé sans bloquer la partie, qui reste en faces ouvertes pour tous.
+      choisirFacesEnLigne(false);
+      if (lireReglage(CLE_FACES_FERMEES, false)) {
+        window.fbSet(window.fbRef(window.firebaseDB, `parties/${code}/faces`), true)
+          .then(() => { if (codePartieActuel === code) choisirFacesEnLigne(true); })
+          .catch(() => {});
+      }
       if (softRefuse) {
         alert("Le Mode PJ n'est pas encore disponible en ligne (règles Firebase à mettre à jour) : " +
               "la partie est créée en mode normal.");
@@ -681,6 +689,7 @@ document.getElementById("validerRejoindre").addEventListener("click", () => {
       const refJoueur = window.fbRef(db, `parties/${code}/joueurs/${pseudo}`);
       return window.fbSet(refJoueur, { nom: pseudo, host: false, rejoint: Date.now() }).then(() => {
         choisirModeSoftEnLigne(partie.soft === true);
+        choisirFacesEnLigne(partie.faces === true);
         marquerActivite(code);
         codePartieActuel = code;
         pseudoActuel = pseudo;
@@ -1110,6 +1119,7 @@ document.getElementById("btnChoixPseudoAnnuler").addEventListener("click", () =>
 // rejoue toutes les actions déjà faites (rattrapage accéléré) avant de reprendre en direct.
 function reprendrePlaceEnLigne(code, nom, partie){
   choisirModeSoftEnLigne(partie.soft === true);
+  choisirFacesEnLigne(partie.faces === true);
   codePartieActuel = code;
   pseudoActuel = nom;
   estHote = !!(partie.joueurs[nom] && partie.joueurs[nom].host);
