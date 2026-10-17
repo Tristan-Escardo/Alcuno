@@ -165,6 +165,7 @@ let joueurTroisPourTransfertPigeon = null; // celui qui a tiré ce 3 (pour la go
 let couleurTroisPourTransfertPigeon = null; // couleur à boire pour ce 3 (ou null)
 // Couleurs des cartes (affichage de la couleur choisie : bannière « Tour de » + bloc Règles)
 const COULEURS_JEU = { rouge: "#e53935", bleu: "#1e88e5", vert: "#43a047", jaune: "#fdd835" };
+const ADJECTIFS_COULEUR = { rouge: "rouge", bleu: "bleue", vert: "verte", jaune: "jaune" }; // (« une carte verte »)
 
 // Affiche la couleur choisie TANT QU'ELLE EST ACTIVE (jusqu'à ce qu'une carte de cette couleur tombe) :
 // bannière « Tour de » teintée + petit rond + nom de la couleur, et nom dans le bloc Règles
@@ -172,8 +173,24 @@ function majAffichageCouleur(){
   const hex = couleurChoisie ? (COULEURS_JEU[couleurChoisie] || "#FFD700") : null;
   const nomCouleur = couleurChoisie ? couleurChoisie.toUpperCase() : "";
 
-  messageTexte.innerText = nomCouleur;
-  messageTexte.style.color = hex || "#FFD700";
+  // Bloc Règles : petit encadré de la couleur, avec ce qu'elle fait (avant : juste « VERT », on ne
+  // comprenait la règle qu'au moment où quelqu'un buvait). Compact : les autres règles restent dessous.
+  messageTexte.classList.toggle("avec-couleur", !!hex);
+  messageTexte.textContent = "";
+  if(hex){
+    const encadre = document.createElement("div");
+    encadre.className = "couleurActive";
+    encadre.style.setProperty("--c", hex);
+    const carre = document.createElement("span");
+    carre.className = "couleurActive-carre";
+    const texte = document.createElement("span");
+    texte.className = "couleurActive-texte";
+    const nom = document.createElement("b");
+    nom.textContent = nomCouleur;
+    texte.append(nom, ` : 1 gorgée en plus pour le prochain qui tire une carte ${ADJECTIFS_COULEUR[couleurChoisie] || couleurChoisie}`);
+    encadre.append(carre, texte);
+    messageTexte.appendChild(encadre);
+  }
 
   if(!stickyJoueurActif) return;
   // Bannière : bleu plus foncé, pour ne pas le confondre avec le turquoise du pigeon
