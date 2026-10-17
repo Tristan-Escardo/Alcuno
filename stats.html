@@ -42,14 +42,24 @@
             text-shadow: 0 0 6px var(--cyan), 0 0 18px #00b8ff, 0 0 36px rgba(0, 140, 255, .7);
         }
         .sous{ text-align: center; color: var(--cyan-titre); font-size: 13px; letter-spacing: .3em; text-transform: uppercase; margin-bottom: 18px; }
+        /* Blocs à coins coupés : la bordure (fond cyan du bloc) fait tout le tour, diagonales comprises ;
+           l'intérieur sombre est posé 1 px plus loin, avec la même découpe */
         .bloc{
-            background: linear-gradient(180deg, rgba(0, 40, 70, .55), rgba(0, 12, 28, .75));
-            border: 1px solid rgba(0, 229, 255, .45);
-            border-radius: 6px;
+            position: relative;
+            isolation: isolate;
             padding: 14px;
             margin-bottom: 14px;
-            box-shadow: 0 0 14px rgba(0, 229, 255, .18), inset 0 0 18px rgba(0, 229, 255, .06);
+            background: rgba(0, 229, 255, .55);
             clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+        }
+        .bloc::before{
+            content: "";
+            position: absolute;
+            inset: 1px;
+            z-index: -1;
+            background: linear-gradient(180deg, #03243c, #020b18);
+            box-shadow: inset 0 0 22px rgba(0, 229, 255, .10);
+            clip-path: polygon(0 0, calc(100% - 15.6px) 0, 100% 15.6px, 100% 100%, 15.6px 100%, 0 calc(100% - 15.6px));
         }
         .titre{
             font-family: "Orbitron", Arial, sans-serif;
