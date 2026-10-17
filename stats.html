@@ -120,10 +120,10 @@
 
     <main id="contenu" hidden>
         <h1>ALCUNO</h1>
-        <div class="sous">Statistiques · en direct</div>
+        <div class="sous">Statistiques</div>
 
         <section class="bloc direct">
-            <div class="titre">En ce moment</div>
+            <div class="titre">En temps réel</div>
             <div class="gros chiffre"><span class="point"></span><span id="enLigneTotal">–</span></div>
             <div class="legende" id="legendeDirect">personnes ont le jeu ouvert</div>
             <div class="cases">
@@ -159,7 +159,7 @@
 
         // Empreinte (SHA-256) du code d'accès : le code lui-même n'est écrit nulle part
         // Version de la page de stats (à part de celle du jeu : +0.0.1 à chaque modification de cette page)
-        const VERSION_STATS = "1.5.2";
+        const VERSION_STATS = "1.5.3";
         document.getElementById("versionStats").textContent = VERSION_STATS;
 
         const EMPREINTE_CODE = "2c8125d3adc62dac73f3ae036a86e00ba51b12b0dfb38fec2184e76441ed6826";
