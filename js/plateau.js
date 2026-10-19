@@ -1556,7 +1556,15 @@ function finDePartie(){
 // ===== Remonter tout en haut : petit bouton en bas à gauche pendant la partie =====
 // Visible quand on a bien descendu sur le plateau ; caché par-dessus un overlay, un volet, la barre
 // « Mauvais joueur ? » ou l'écran de pause (il passerait dessous ou les gênerait).
-const btnRemonter = document.getElementById("btnRemonter");
+// (créé ici et pas dans index.html : l'iPhone peut garder une ancienne page en cache avec le nouveau
+// code, vu au mouchard : le bouton manquait et tout plantait en boucle)
+const btnRemonter = document.createElement("button");
+btnRemonter.type = "button";
+btnRemonter.id = "btnRemonter";
+btnRemonter.tabIndex = -1;
+btnRemonter.setAttribute("aria-label", "Remonter en haut");
+btnRemonter.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>';
+document.body.appendChild(btnRemonter);
 // Mouchard (js/mouchard.js) : chaque étape de la flèche est notée, pour comprendre ce que fait l'iPhone
 const noterFleche = (texte) => { if(typeof noter === "function") noter("flèche : " + texte); };
 function majBoutonRemonter(){
