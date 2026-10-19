@@ -180,14 +180,54 @@ function rejoindrePileIOS(){
     if(profondeurIOS() > pileIOS.length){
       try { history.replaceState({ alcunoRetour: true, profondeur: pileIOS.length }, ""); } catch (err) {}
     }
+    scellementEnCoursIOS = false;
+    if(scellerApresReculIOS){ scellerApresReculIOS = false; scellerHistoriqueIOSPlusTard(); }
   }, 300);
   history.go(-n);
 }
 
-function retirerEntreesIOS(n){
+// sceller : un écran vient de se fermer (voir scellerHistoriqueIOS)
+function retirerEntreesIOS(n, sceller = false){
   n = Math.min(n, pileIOS.length);
-  if(n > 0) pileIOS.length -= n;
+  if(n > 0){
+    pileIOS.length -= n;
+    if(sceller) scellerApresReculIOS = true;
+  }
   rejoindrePileIOS();
+  // (pas de recul lancé : l'entrée affichée était déjà la bonne, on scelle sans attendre son retour)
+  if(scellerApresReculIOS && !retraitEnCoursIOS){ scellerApresReculIOS = false; scellerHistoriqueIOSPlusTard(); }
+}
+
+// Après un recul (« ← Retour », glissement retour), les entrées quittées restent « en avant » dans
+// l'historique, avec la capture de l'écran qu'on vient de fermer. Vu au mouchard : un glissement depuis
+// le bord droit remontrait ainsi les Réglages, et l'iPhone laissait cette capture affichée sur l'accueil
+// (on touchait « ← Retour » des Réglages… et c'était le livre des Règles, dessous, qui s'ouvrait).
+// On « scelle » donc l'historique une fois l'écran fermé : une entrée ajoutée (ce qui efface toutes
+// celles d'après) puis retirée aussitôt. Il ne reste en avant qu'elle, avec la capture de l'écran
+// affiché : glisser vers l'avant ne montre plus que l'écran où on est déjà.
+let minuteurScellementIOS = null;
+let scellementEnCoursIOS = false; // notre recul de scellement n'a pas encore abouti
+let scellerApresReculIOS = false; // un écran vient de se fermer : scellement quand le recul aura abouti
+
+function scellerHistoriqueIOSPlusTard(){
+  clearTimeout(minuteurScellementIOS);
+  minuteurScellementIOS = setTimeout(scellerHistoriqueIOS, 600); // (l'écran fermé a fini de partir)
+}
+
+function scellerHistoriqueIOS(){
+  // Un tap ou un recul en cours, appli en arrière-plan : un peu plus tard
+  if(retraitEnCoursIOS || ecranAvantTapIOS !== null || toucherEnCoursIOS !== null ||
+     document.visibilityState !== "visible"){ scellerHistoriqueIOSPlusTard(); return; }
+  if(rechargementEnCours || profondeurIOS() !== pileIOS.length) return;
+  try { history.pushState({ alcunoRetour: true, profondeur: pileIOS.length + 1, scelle: true }, ""); } catch (err) { return; }
+  scellementEnCoursIOS = true;
+  rejoindrePileIOS();
+}
+
+// Une entrée vient d'être ajoutée par un tap : elle a déjà effacé celles d'après, pas besoin de sceller
+function annulerScellementIOS(){
+  clearTimeout(minuteurScellementIOS);
+  scellerApresReculIOS = false;
 }
 
 // Remet la pile d'accord avec l'écran affiché : accueil ou partie => plus aucune entrée ; écran déjà
@@ -195,9 +235,9 @@ function retirerEntreesIOS(n){
 // entrées au-dessus de lui
 function reconcilierPileIOS(){
   const ecran = nomEcran();
-  if(ECRANS_RACINES.has(ecran)) return retirerEntreesIOS(pileIOS.length);
+  if(ECRANS_RACINES.has(ecran)) return retirerEntreesIOS(pileIOS.length, true);
   const i = pileIOS.lastIndexOf(ecran);
-  if(i >= 0) retirerEntreesIOS(pileIOS.length - i);
+  if(i >= 0) retirerEntreesIOS(pileIOS.length - i, true);
 }
 
 function toucherIOS(e){
@@ -220,6 +260,7 @@ function leverDoigtIOS(e){
   // (un recul en cours, quelques centièmes de seconde : pas d'entrée cette fois)
   if(ecranAvantTapIOS === null && !retraitEnCoursIOS){
     try { history.pushState({ alcunoRetour: true, profondeur: pileIOS.length + 1 }, ""); } catch (err) { return; }
+    annulerScellementIOS();
     ecranAvantTapIOS = avant;
     pileIOS.push(avant);
   }
@@ -236,6 +277,7 @@ function clicIOS(e){
      e.target && e.target.closest && e.target.closest(ELEMENTS_NAVIGATION_IOS)){
     try {
       history.pushState({ alcunoRetour: true, profondeur: pileIOS.length + 1 }, "");
+      annulerScellementIOS();
       ecranAvantTapIOS = nomEcran();
       pileIOS.push(ecranAvantTapIOS);
     } catch (err) {}
@@ -298,13 +340,19 @@ window.addEventListener("popstate", () => {
     // retour : nos entrées retirées restent « en avant » dans l'historique), ou recul pas encore fini :
     // on revient tout de suite à la bonne entrée (sinon on glissait sans fin sur l'accueil)
     if(profondeur > pileIOS.length){ rejoindrePileIOS(); return; }
-    // À la profondeur de la pile : c'est notre recul qui vient d'aboutir
-    if(profondeur === pileIOS.length) return;
+    // À la profondeur de la pile : c'est notre recul qui vient d'aboutir (puis, si un écran vient de se
+    // fermer, on scelle l'historique ; et rien de plus si c'était justement le recul du scellement)
+    if(profondeur === pileIOS.length){
+      if(scellementEnCoursIOS) scellementEnCoursIOS = false;
+      else if(scellerApresReculIOS){ scellerApresReculIOS = false; scellerHistoriqueIOSPlusTard(); }
+      return;
+    }
     // Moins loin : un vrai glissement retour
     pileIOS.length = profondeur;
     const action = actionRetour();
     if(action) action();
     setTimeout(reconcilierPileIOS, 400);
+    scellerHistoriqueIOSPlusTard(); // (l'écran quitté reste en avant dans l'historique)
     return;
   }
 
