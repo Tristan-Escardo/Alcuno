@@ -58,6 +58,7 @@ function actionRetour(){
 
   if(estOuverte(ecranCredits)) return () => activer("btnFermerCredits");
   if(document.getElementById("aideAccueil")) return fermerAideAccueil;
+  if(document.getElementById("ecranDiagnostic")) return () => document.getElementById("ecranDiagnostic").remove();
   if(document.getElementById("voletCarte")) return fermerVoletCarte;
   if(document.getElementById("voletPause")) return fermerVoletPause;
   if(estOuverte(ecranInstallation)) return () => activer("btnInstallationPlusTard");

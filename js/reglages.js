@@ -877,7 +877,7 @@ function chargerSons(){
 // carte | doree | culsec | pigeon | tour | eau
 // Petit son de clic (Sons/bouton.mp3) sur les boutons, sauf ceux qui ont déjà leur propre son
 // (annuler des gorgées, distribuer au +4, choisir le pigeon ou la victime de la carte dorée), et sauf
-// Réglages, « Signaler un bug » et « Copier le diagnostic » (silencieux)
+// Réglages, « Signaler un bug » et « Diagnostic » (silencieux)
 const BOUTONS_AVEC_LEUR_SON = ".bouton-annulation, .plus4-joueur-btn, #overlayPigeon .bouton-pigeon, .bouton-doree, " +
   "#btnReglages, #btnSignalerBug, #btnDiagnostic, #btnRegles, #btnReglesJeu, #bandeauMiseAJour .maj";
 document.addEventListener("click", (e) => {
@@ -1030,27 +1030,57 @@ function texteDiagnostic(){
   ].join("\n");
 }
 
-document.getElementById("btnDiagnostic").addEventListener("click", () => {
-  const texte = texteDiagnostic();
-  // iPhone : menu de partage (« Copier » dedans, ou envoi direct). La copie directe laissait parfois
-  // l'ancien texte dans le presse-papier, sans qu'on s'en rende compte.
-  if (estIOS && navigator.share) {
-    navigator.share({ title: `Diagnostic Alcuno ${VERSION_AFFICHEE}`, text: texte }).catch(() => {});
-    return;
-  }
-  const copie = (navigator.clipboard && navigator.clipboard.writeText)
-    ? navigator.clipboard.writeText(texte)
-    : Promise.reject(new Error("presse-papiers indisponible"));
-  copie.then(() => afficherToast("Diagnostic copié", 3000))
-    .catch(() => {
-      // Pas de presse-papiers : bouton « Partager » du téléphone, sinon le texte dans une fenêtre
-      if (navigator.share) {
-        navigator.share({ title: "Diagnostic Alcuno", text: texte }).catch(() => {});
-      } else {
-        prompt("Copie ce texte :", texte);
-      }
-    });
-});
+// « Diagnostic » : écran qui montre le texte (on voit tout de suite que c'est le bon, version et heure en
+// haut), avec « Tout copier » et « Partager ». Sur iPhone, la copie et le partage échouaient parfois sans
+// rien dire (l'ancien texte restait dans le presse-papier) : leurs erreurs s'affichent maintenant, et on
+// peut toujours sélectionner le texte au doigt et faire Copier.
+function ouvrirEcranDiagnostic(){
+  let texte;
+  try { texte = texteDiagnostic(); }
+  catch (e) { texte = `=== Diagnostic Alcuno ===\nVersion ${VERSION_AFFICHEE}\nERREUR en préparant le diagnostic : ${e && e.message}\n` + erreursRecentes.join("\n"); }
+  document.getElementById("ecranDiagnostic")?.remove();
+  const ecran = document.createElement("div");
+  ecran.id = "ecranDiagnostic";
+  ecran.innerHTML = `
+    <div class="diagnostic-haut">
+      <b>Diagnostic</b>
+      <button type="button" class="diagnostic-fermer" aria-label="Fermer">✕</button>
+    </div>
+    <textarea class="diagnostic-texte" readonly></textarea>
+    <div class="diagnostic-boutons">
+      <button type="button" class="diagnostic-copier">Tout copier</button>
+      <button type="button" class="diagnostic-partager">Partager</button>
+    </div>
+    <div class="diagnostic-etat" aria-live="polite"></div>`;
+  const zone = ecran.querySelector(".diagnostic-texte");
+  const etat = ecran.querySelector(".diagnostic-etat");
+  zone.value = texte;
+  const toutSelectionner = () => { zone.focus(); zone.setSelectionRange(0, texte.length); };
+  ecran.querySelector(".diagnostic-fermer").addEventListener("click", () => ecran.remove());
+  ecran.querySelector(".diagnostic-copier").addEventListener("click", () => {
+    const copie = (navigator.clipboard && navigator.clipboard.writeText)
+      ? navigator.clipboard.writeText(texte)
+      : Promise.reject(new Error("pas de presse-papier"));
+    copie.then(() => { etat.textContent = `✓ Copié (${texte.length} caractères). Tu peux le coller.`; })
+      .catch((e) => {
+        noterErreur(`copie du diagnostic refusée : ${e && (e.name + " " + e.message)}`);
+        etat.textContent = `✗ Copie refusée par le téléphone (${e && e.name}). Texte sélectionné : fais « Copier » dans la bulle.`;
+        toutSelectionner();
+      });
+  });
+  ecran.querySelector(".diagnostic-partager").addEventListener("click", () => {
+    if (!navigator.share) { etat.textContent = "✗ Partage indisponible sur ce téléphone"; return; }
+    navigator.share({ title: `Diagnostic Alcuno ${VERSION_AFFICHEE}`, text: texte })
+      .then(() => { etat.textContent = "✓ Partagé"; })
+      .catch((e) => {
+        if (e && e.name === "AbortError") return; // (menu fermé sans choisir)
+        noterErreur(`partage du diagnostic refusé : ${e && (e.name + " " + e.message)}`);
+        etat.textContent = `✗ Partage refusé par le téléphone (${e && e.name}).`;
+      });
+  });
+  document.body.appendChild(ecran);
+}
+document.getElementById("btnDiagnostic").addEventListener("click", ouvrirEcranDiagnostic);
 
 // ===== Signaler un bug (Réglages) : le rapport arrive tout de suite en notification sur le téléphone du
 // développeur (appli ntfy, abonnée au canal CANAL_BUGS du service gratuit ntfy.sh), avec le diagnostic

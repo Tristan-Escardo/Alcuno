@@ -7149,3 +7149,47 @@ html[data-theme="prestige"] :is(.detailRegle, #voletCarte .voletPause-texte) em{
 html[data-theme="soleil"] #ecranRegles .blocRegles{ background: var(--soleil-panneau); border-color: var(--soleil-bord); }
 html[data-theme="soleil"] .lignesRegle li::before{ background: #ffd27a; }
 html[data-theme="soleil"] :is(.detailRegle, #voletCarte .voletPause-texte) em{ color: #ffd27a; }
+
+/* Écran « Diagnostic » (Réglages > À propos, js/reglages.js) : le texte, Tout copier, Partager */
+#ecranDiagnostic{
+  position: fixed;
+  inset: 0;
+  z-index: 2147483300;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: calc(14px + env(safe-area-inset-top)) 14px calc(14px + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  background: linear-gradient(var(--fond-theme), var(--fond-theme)) var(--couleur-barre);
+  color: #fff;
+  font-family: Arial, sans-serif;
+}
+#ecranDiagnostic .diagnostic-haut{ display: flex; align-items: center; justify-content: space-between; font-size: 20px; }
+#ecranDiagnostic .diagnostic-fermer{ width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.3); background: transparent; color: #fff; font-size: 18px; cursor: pointer; }
+#ecranDiagnostic .diagnostic-texte{
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.35);
+  color: #e8e8e8;
+  font: 11px/1.35 ui-monospace, Menlo, monospace;
+  -webkit-user-select: text;
+  user-select: text;
+}
+#ecranDiagnostic .diagnostic-boutons{ display: flex; gap: 10px; }
+#ecranDiagnostic .diagnostic-boutons button{
+  flex: 1;
+  padding: 13px;
+  border-radius: 12px;
+  border: none;
+  background: #FFD700;
+  color: #2b001d;
+  font: 800 16px Arial, sans-serif;
+  cursor: pointer;
+}
+#ecranDiagnostic .diagnostic-partager{ background: transparent !important; color: #fff !important; border: 1px solid rgba(255, 255, 255, 0.4) !important; }
+#ecranDiagnostic .diagnostic-etat{ min-height: 20px; font-size: 14px; text-align: center; color: #ffe27a; }

@@ -7,7 +7,7 @@
 // Tant qu'il est actif, il note ce qui se passe vraiment sur le téléphone : doigts (touch / pointer /
 // click et ce qu'ils touchent), défilement, écrans et overlays, sons et état du moteur de son, cartes
 // tirées, appli quittée / reprise, erreurs. Le journal (400 dernières lignes) est gardé dans le téléphone
-// (il survit à un rechargement) et part avec « Copier le diagnostic » et « Signaler un bug ».
+// (il survit à un rechargement) et part avec « Diagnostic » et « Signaler un bug ».
 const CLE_MOUCHARD = "alcuno_mouchard";
 const CLE_JOURNAL_MOUCHARD = "alcuno_mouchard_journal";
 const MAX_LIGNES_MOUCHARD = 400;
@@ -70,7 +70,7 @@ ligneVersion.addEventListener("pointerup", () => {
     lignesMouchard = [];
     noter(`=== mouchard activé · ${VERSION_AFFICHEE} · ${navigator.userAgent}`);
     noter(`écran ${innerWidth}x${innerHeight} · appli installée : ${estEnAppli}`);
-    afficherToast("Mouchard activé : reproduis le bug, puis « Copier le diagnostic »", 4000);
+    afficherToast("Mouchard activé : reproduis le bug, puis « Diagnostic » (en bas des Réglages)", 4000);
   } else {
     afficherToast("Mouchard coupé", 2000);
   }
