@@ -521,6 +521,10 @@ function ouvrirVoletPause(nom, bouton){
     : "Aux toilettes, en train de vomir, en pause clope… ?<br>Son tour est sauté jusqu'à son retour.";
   volet.querySelector(".voletPause-ok").textContent = enPause ? `${nom} est de retour` : `Mettre ${nom} en pause`;
   volet.addEventListener("click", (e) => { if(e.target === volet) fermerVoletPause(); });
+  // Le doigt (ou la molette) sur le volet ou le fond assombri faisait défiler la partie derrière
+  const bloquer = (e) => { if(e.cancelable) e.preventDefault(); };
+  volet.addEventListener("touchmove", bloquer, { passive: false });
+  volet.addEventListener("wheel", bloquer, { passive: false });
   volet.querySelector(".voletPause-annuler").addEventListener("click", fermerVoletPause);
   volet.querySelector(".voletPause-ok").addEventListener("click", () => {
     fermerVoletPause();
