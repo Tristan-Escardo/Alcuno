@@ -273,7 +273,8 @@ function barreIphoneARafraichir(){
 
 function rafraichirBarreIphone(){
   if (!barreIphoneARafraichir()) return;
-  // petit délai : on voit le nouveau thème, et plusieurs taps d'affilée ne font qu'un rechargement
+  // tout petit délai (avant : 0,4 s, la barre gardait l'ancienne couleur trop longtemps) : le nouveau
+  // thème s'affiche, et deux taps très rapprochés ne font qu'un rechargement
   clearTimeout(rechargementTheme);
   rechargementTheme = setTimeout(() => {
     const reglagesOuverts = ecranReglages.style.display !== "none" && !ecranReglages.classList.contains("page-sortie");
@@ -281,7 +282,7 @@ function rafraichirBarreIphone(){
       if (reglagesOuverts) sessionStorage.setItem(CLE_ROUVRIR_REGLAGES, String(ecranReglages.scrollTop));
     } catch (e) {}
     rechargerPage(); // (js/retour-demarrage.js)
-  }, 400);
+  }, 100);
 }
 
 // Après ce rechargement : Réglages rouverts tels quels (sans animation), au même endroit
