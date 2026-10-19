@@ -225,6 +225,7 @@ function etatPourTele(){
       a: Number(annulations[nom] || 0),
       t: i === idx,
       p: i === indexPigeon,
+      z: estEnPause(nom) ? 1 : 0,       // en pause (toilettes, clope…)
       g: Number(gorgeesBues[nom] || 0), // gorgées bues depuis le début de la partie
       s: cartesSansBoire(nom)           // cartes tirées depuis sa dernière gorgée
     })),
@@ -743,10 +744,10 @@ function dessinerTele(ecran, etat){
     liste.classList.toggle("tele-joueurs-2col", (etat.joueurs || []).length > 7); // (le bloc Règles garde sa place)
     (etat.joueurs || []).forEach((j) => {
       const ligne = document.createElement("div");
-      ligne.className = "tele-joueur" + (j.t ? " tele-joueur-actif" : "");
+      ligne.className = "tele-joueur" + (j.t ? " tele-joueur-actif" : "") + (j.z ? " tele-joueur-pause" : "");
       ligne.dataset.nom = j.n;
       const nom = document.createElement("span");
-      nom.innerText = (j.t ? "▶ " : "") + j.n + (j.p ? " 🐦" : "");
+      nom.innerText = (j.t ? "▶ " : "") + j.n + (j.p ? " 🐦" : "") + (j.z ? " · en pause" : "");
       ligne.appendChild(nom);
       if (j.a > 0) {
         const badge = document.createElement("span");

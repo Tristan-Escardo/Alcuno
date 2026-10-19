@@ -6901,3 +6901,91 @@ html.faces-fermees #plateau .Carte.retournee.recachee,
 html[data-theme="givre"] #btnCaster .casterIcone{ background: linear-gradient(180deg, #4fc3f7, #1a92d6); color: #fff; }
 html[data-theme="soleil"] #btnCaster .casterIcone{ background: linear-gradient(180deg, #ffb35c, #f2775c); color: #fff; }
 html[data-theme="prestige"] #btnCaster .casterIcone{ background: linear-gradient(180deg, #fff2b0, #f5c842 45%, #c8880a); }
+
+/* ===== Joueurs en pause (toilettes, clope…) : bouton ⏸ / ▶ à droite de chaque nom, en partie ===== */
+#listeJoueurs{ grid-auto-columns: 1fr; }
+#listeJoueurs .joueur-ligne{ display: flex; align-items: center; gap: 6px; min-height: 26px; }
+.btnPauseJoueur{
+  flex: 0 0 auto;
+  margin-left: auto;
+  width: 24px;
+  height: 24px;
+  min-width: 0;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 215, 0, 0.45);
+  background: transparent;
+  box-shadow: none;
+  color: #FFD700;
+  opacity: 0.8;
+  cursor: pointer;
+}
+.btnPauseJoueur svg{ width: 12px; height: 12px; fill: currentColor; }
+.btnPauseJoueur.en-pause{ border-color: rgba(255, 215, 0, 0.9); opacity: 1; }
+.joueur-en-pause{ opacity: 0.5; }
+.joueur-en-pause .btnPauseJoueur{ opacity: 1; }
+.badge-pause{
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  font: 800 10px Arial, sans-serif;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+html[data-theme="givre"] .btnPauseJoueur{ color: var(--givre-accent); border-color: var(--givre-bord); }
+html[data-theme="soleil"] .btnPauseJoueur{ color: #ffcf9e; border-color: rgba(255, 205, 170, 0.5); }
+
+/* Volet « Mettre Léa en pause » (monte du bas) */
+#voletPause{
+  position: fixed;
+  inset: 0;
+  z-index: 2147483400;
+  display: flex;
+  align-items: flex-end;
+  background: rgba(0, 0, 0, 0.55);
+  animation: voletPauseFond 0.2s ease both;
+}
+.voletPause-feuille{
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 18px calc(22px + env(safe-area-inset-bottom));
+  border-radius: 22px 22px 0 0;
+  background: var(--fond-theme);
+  border-top: 1px solid rgba(255, 215, 0, 0.35);
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  font-family: Arial, sans-serif;
+  animation: voletPauseMonte 0.28s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+.voletPause-poignee{ width: 42px; height: 5px; border-radius: 3px; background: rgba(255, 255, 255, 0.3); margin: 0 auto 14px; }
+.voletPause-nom{ font: 900 24px Arial, sans-serif; color: #FFD700; }
+.voletPause-texte{ font: 700 15px/1.4 Arial, sans-serif; color: #ddd; margin: 8px 4px 18px; }
+.voletPause-feuille button{ display: block; width: 100%; border-radius: 14px; cursor: pointer; }
+.voletPause-ok{
+  padding: 15px;
+  border: none;
+  background: linear-gradient(180deg, #ffd426, #f6b800);
+  color: #fff;
+  font: 900 18px Arial, sans-serif;
+  text-shadow: 0 1px 0 rgba(122, 74, 0, 0.85);
+}
+.voletPause-annuler{
+  margin-top: 10px;
+  padding: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: transparent;
+  color: #fff;
+  font: 800 16px Arial, sans-serif;
+}
+html[data-theme="givre"] .voletPause-texte, html[data-theme="givre"] .voletPause-annuler{ color: #0d3550; border-color: var(--givre-bord); }
+html[data-theme="givre"] .voletPause-nom{ color: var(--givre-accent); }
+html[data-theme="givre"] .voletPause-ok{ background: #1a92d6; text-shadow: none; }
+html[data-theme="soleil"] .voletPause-feuille{ background: #2c3d6b; }
+html[data-theme="soleil"] .voletPause-ok{ background: linear-gradient(180deg, #ffb35c, #f2775c); }
+@keyframes voletPauseFond{ from{ opacity: 0; } to{ opacity: 1; } }
+@keyframes voletPauseMonte{ from{ transform: translateY(100%); } to{ transform: none; } }
+
+/* Télé : joueur en pause grisé */
+#ecranTele .tele-joueur-pause{ opacity: 0.45; }

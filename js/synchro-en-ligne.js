@@ -453,7 +453,7 @@ function apresActionTraitee(){
 // Exceptions : les boutons qu'on tape exprès plusieurs fois de suite (+1 et Retour du +4).
 let actionsAppliquees = new Map(); // "joueur|action" -> numéro de la dernière fois appliquée
 let idsFermes = new Map(); // bouton d'un écran de choix -> dernière action appliquée sur cet écran (voir tenterAction)
-const ACTIONS_REPETABLES = ["plus4:joueur:", "plus4:annuler", "plus4:reset"];
+const ACTIONS_REPETABLES = ["plus4:joueur:", "plus4:annuler", "plus4:reset", "pause:"];
 
 function estUnDoublon(action){
   if(typeof action.vu !== "number") return false;

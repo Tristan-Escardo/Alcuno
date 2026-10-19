@@ -106,8 +106,10 @@ function afficherMenuPigeon(){
   // C'est le pigeon actuel (celui qui vient de tirer le 3) qui choisit
   const choisisseur = joueurs[indexPigeon];
 
+  // (pas ceux en pause, sauf s'il ne restait personne d'autre)
+  const pigeonsPossibles = joueurs.filter((j, i) => i !== indexPigeon && !estEnPause(j)).length;
   joueurs.forEach((j,i)=>{
-    if(i!==indexPigeon){
+    if(i!==indexPigeon && (!estEnPause(j) || pigeonsPossibles === 0)){
       const btn=document.createElement("button");
       btn.className="bouton-pigeon";
       btn.innerText=j;
@@ -816,6 +818,7 @@ function afficherOverlayCarteDoree(joueurActuel){
 
   // Tout le monde, y compris celui qui a tiré la carte
   joueurs.forEach((nom, i) => {
+    if(estEnPause(nom)) return; // (en pause : pas là pour le cul sec)
     const btn = document.createElement("button");
     btn.className = "bouton-doree";
     btn.innerText = avecCouronne(nom);
@@ -905,6 +908,7 @@ function lancerOverlayChoixDuel(joueurActuel, carteDuel = ""){
   let debutChoix = -1; // action du 1er joueur choisi (« Annuler » retire les 2 choix)
 
   joueurs.forEach((nom, idx)=>{
+    if(estEnPause(nom)) return; // (en pause : pas de duel)
     const btn = document.createElement("button");
     btn.className = "bouton-pigeon";
     btn.innerText = nom;
@@ -1244,6 +1248,7 @@ function afficherOverlayPlus4(joueurActuel, classeCartePlus4){
 
   // boutons joueurs : UN CLIC = +1 (si total < aDistribuer)
   joueurs.forEach((nom, idx)=>{
+    if(estEnPause(nom)) return; // (en pause : on ne lui distribue rien)
     const btn = document.createElement("button");
     btn.className = "bouton-pigeon plus4-joueur-btn";
     btn.dataset.idx = String(idx);
@@ -1528,7 +1533,7 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
     regleZero.style.display = "block";
     zeroEnCours = true;
 
-    const victimes = joueurs.map((_, i) => i); // tout le monde
+    const victimes = joueurs.map((_, i) => i).filter(i => !estEnPause(joueurs[i])); // tout le monde (sauf ceux en pause)
     demarrerAnnulationsMulti(victimes, carteTiree, entete, () => {
       appliquerBonusCouleurSiBesoin(carteTiree, { couleur: couleurBue, joueur: joueurActuel, preserveRuleMessage: true });
     });
@@ -1543,7 +1548,7 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
     regleZero.style.display = "block";
     zeroEnCours = true;
 
-    const victimes = joueurs.map((_, i) => i).filter(i => i !== joueurActuel);
+    const victimes = joueurs.map((_, i) => i).filter(i => i !== joueurActuel && !estEnPause(joueurs[i]));
     demarrerAnnulationsMulti(victimes, carteTiree, entete, () => {
       appliquerBonusCouleurSiBesoin(carteTiree, { couleur: couleurBue, joueur: joueurActuel, preserveRuleMessage: true });
     });
@@ -1706,6 +1711,7 @@ function lancerPartie(){
   indexCaseDoree = avecCarteDoree ? Math.floor(aleatoire() * nbCases) : -1;
   carteDoreeEnJeu = avecCarteDoree;
   reinitialiserGorgees();
+  joueursEnPause = new Set(); // (personne en pause au début d'une partie)
   pauseEnCours = false;
   ecranPause.style.display = "none";
 
@@ -1730,6 +1736,7 @@ function lancerPartie(){
   regleZero.style.display = "none";
   effacerMessagePigeon();
   afficherJoueurActif();
+  afficherJoueurs(); // (boutons ⏸ des joueurs, maintenant que la partie est lancée)
 
   for(let i=0;i<nbCases;i++){
     const carte = document.createElement("div");
@@ -1791,7 +1798,12 @@ function lancerPartie(){
         });
       }
 
-      indexJoueur = (indexJoueur + (sensHoraire ? 1 : -1) + joueurs.length) % joueurs.length;
+      // Joueur suivant (ceux en pause sont sautés, voir nextPlayerIndex)
+      const sansPause = (indexJoueur + (sensHoraire ? 1 : -1) + joueurs.length) % joueurs.length;
+      indexJoueur = nextPlayerIndex(indexJoueur);
+      if(indexJoueur !== sansPause && !rattrapageEnCours){
+        afficherNotificationHaut("", `${joueurs[sansPause]} est en pause : au tour de ${joueurs[indexJoueur]}`, true);
+      }
 
       afficherJoueurActif();
       afficherJoueurs();
