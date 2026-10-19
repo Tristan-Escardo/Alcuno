@@ -1367,15 +1367,26 @@ function afficherBandeauMiseAJour(){
     `<button type="button" class="maj">Mettre à jour</button>` +
     `<button type="button" class="plusTard" aria-label="Plus tard">✕</button>`;
   // Adresse neuve (?v=...) : contourne le cache et recharge toute l'appli. Avec son propre son (celui de
-  // l'accessibilité, 1,7 s) : la page ne se recharge qu'à la fin, sinon il serait coupé net
+  // l'accessibilité, 1,7 s) : la page ne se recharge qu'à la fin, sinon il serait coupé net.
+  // Les sons ne se chargent qu'au premier tap : si c'est celui-ci (appli tout juste rouverte, bandeau
+  // déjà là), on attend que le son arrive (4 s au plus). Avant, la page se rechargeait sans l'avoir joué.
   const boutonMaj = bandeau.querySelector(".maj");
   boutonMaj.addEventListener("click", () => {
     if (boutonMaj.disabled) return;
     boutonMaj.disabled = true;
     boutonMaj.textContent = "Mise à jour…";
-    if (caseSons.checked) jouerSon("accessibilite_on");
-    setTimeout(() => rechargerPage(location.pathname + "?v=" + encodeURIComponent(versionEnLigne)), // (js/retour-demarrage.js)
-      caseSons.checked ? 1700 : 0);
+    const recharger = () => rechargerPage(location.pathname + "?v=" + encodeURIComponent(versionEnLigne)); // (js/retour-demarrage.js)
+    if (!caseSons.checked || volumeSons <= 0) { recharger(); return; }
+    const debut = Date.now();
+    const jouerPuisRecharger = () => {
+      chargerSons(); // (relance un téléchargement raté)
+      const son = sonsCharges.accessibilite_on;
+      if (son === undefined && Date.now() - debut < 4000) { setTimeout(jouerPuisRecharger, 100); return; }
+      if (!son) { recharger(); return; } // (pas de fichier, ou pas de réseau)
+      lireSon("accessibilite_on", son);
+      setTimeout(recharger, 1700);
+    };
+    jouerPuisRecharger();
   });
   bandeau.querySelector(".plusTard").addEventListener("click", () => bandeau.remove());
   document.body.appendChild(bandeau);
