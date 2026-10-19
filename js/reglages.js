@@ -1639,7 +1639,8 @@ if (!document.documentElement.classList.contains("mode-tele") && estEnAppli && !
 // Rempli à chaque ouverture : les gorgées suivent le Mode PJ. Pas de carte dorée (c'est une surprise).
 const ecranRegles = document.getElementById("ecranRegles");
 
-function remplirRegles(){
+// Règles du jeu (écran des Règles, et fiche d'une carte au doigt appuyé sur le plateau : js/plateau.js)
+function reglesDuJeu(){
   const pj = estModeSoft();
   const duel = pj
     ? "Choisis 2 joueurs. Chacun prend une carte cachée : celui qui a la plus petite boit la moitié de sa valeur (10 gorgées max). Égalité : on recommence, gorgées doublées."
@@ -1664,6 +1665,12 @@ function remplirRegles(){
       { carte: "un_jaune", nom: "Les 1 restants", texte: "Chaque 1 gardé jusqu'à la fin se transforme en gorgée à boire (1 gorgée par carte)." }
     ]}
   ];
+  return parties;
+}
+
+function remplirRegles(){
+  const pj = estModeSoft();
+  const parties = reglesDuJeu();
 
   const liste = document.getElementById("listeRegles");
   liste.innerHTML = "";

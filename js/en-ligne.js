@@ -289,7 +289,9 @@ function boutonEnAttente(id, texte){
 }
 
 // Code de la partie + QR code au-dessus : le scanner ouvre le jeu avec le code déjà rempli (voir ?code= plus bas)
+let codeAInviter = null;
 function afficherCodePartie(code){
+  codeAInviter = code;
   document.getElementById("codePartieAffiche").innerText = "Code de la partie : " + code;
   const zone = document.getElementById("qrPartie");
   try {
@@ -331,6 +333,21 @@ const ecranScanner = document.getElementById("ecranScanner");
 const videoScanner = document.getElementById("videoScanner");
 let fluxScanner = null;
 let numeroScanner = 0; // change à chaque ouverture / fermeture : une lecture en cours d'un scan fermé s'arrête
+
+// « Inviter à rejoindre la partie » : bouton « Partager » du téléphone (Messages, WhatsApp…) avec le code
+// et le lien qui ouvre le jeu avec le code déjà rempli (comme le QR code) ; sinon le message est copié
+document.getElementById("btnInviterPartie").addEventListener("click", () => {
+  if (!codeAInviter) return;
+  const lien = "https://tristan-escardo.github.io/Alcuno/?code=" + encodeURIComponent(codeAInviter);
+  const texte = `🍻 Rejoins ma partie d'Alcuno ! Code : ${codeAInviter}`;
+  if (navigator.share) {
+    navigator.share({ text: texte, url: lien }).catch(() => {});
+    return;
+  }
+  const copie = navigator.clipboard ? navigator.clipboard.writeText(texte + "\n" + lien) : Promise.reject();
+  copie.then(() => afficherToast("Invitation copiée !"))
+    .catch(() => prompt("Copie l'invitation :", texte + " " + lien));
+});
 
 // Texte du QR code => code de la partie (lien …/?code=ABC12 du jeu, ou le code tout seul)
 function codeDepuisQR(texte){

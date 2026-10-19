@@ -58,6 +58,8 @@ function actionRetour(){
 
   if(estOuverte(ecranCredits)) return () => activer("btnFermerCredits");
   if(document.getElementById("aideAccueil")) return fermerAideAccueil;
+  if(document.getElementById("voletCarte")) return fermerVoletCarte;
+  if(document.getElementById("voletPause")) return fermerVoletPause;
   if(estOuverte(ecranInstallation)) return () => activer("btnInstallationPlusTard");
   if(estOuverte(ecranRegles)) return () => activer("btnFermerRegles");
   if(estOuverte(ecranBug)) return () => activer("btnBugRetour"); // (par-dessus les Réglages)

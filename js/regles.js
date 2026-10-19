@@ -1500,6 +1500,7 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
 
 
   if (carteTiree === "carte_doree") {
+    noterDoreeStats("doreesTirees"); // statistiques (js/stats.js)
     regleZero.innerText = `CARTE DORÉE : distribue ${texteCulSec()}`;
     regleZero.style.display = "block";
     zeroEnCours = true;
@@ -1710,6 +1711,7 @@ function lancerPartie(){
   const nbCases = paquet.length + (avecCarteDoree ? 1 : 0);
   indexCaseDoree = avecCarteDoree ? Math.floor(aleatoire() * nbCases) : -1;
   carteDoreeEnJeu = avecCarteDoree;
+  if(avecCarteDoree) noterDoreeStats("doreesEnJeu"); // statistiques (js/stats.js)
   reinitialiserGorgees();
   joueursEnPause = new Set(); // (personne en pause au début d'une partie)
   pauseEnCours = false;
