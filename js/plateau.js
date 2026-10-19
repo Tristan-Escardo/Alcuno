@@ -1565,6 +1565,27 @@ function majBoutonRemonter(){
 }
 window.addEventListener("scroll", majBoutonRemonter, { passive: true });
 setInterval(majBoutonRemonter, 600); // (overlays, barres et volets qui apparaissent sans défilement)
-btnRemonter.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+// Remontée animée ici (le défilement « smooth » du navigateur s'arrêtait en route sur iPhone), et au
+// doigt levé : un tap pendant que la page file encore ne donne pas de « click » sur iPhone (il ne fait
+// qu'arrêter le défilement), la flèche ne réagissait pas. Un doigt posé ailleurs arrête la remontée.
+let remonteeEnCours = null;
+function remonterEnHaut(){
+  cancelAnimationFrame(remonteeEnCours);
+  const depart = window.scrollY;
+  if(depart <= 0) return;
+  const debut = performance.now();
+  const duree = Math.min(650, 250 + depart / 8);
+  const etape = (maintenant) => {
+    const avance = Math.min(1, (maintenant - debut) / duree);
+    const adouci = 1 - Math.pow(1 - avance, 3); // rapide au début, en douceur à l'arrivée
+    window.scrollTo(0, Math.round(depart * (1 - adouci)));
+    remonteeEnCours = avance < 1 ? requestAnimationFrame(etape) : null;
+  };
+  remonteeEnCours = requestAnimationFrame(etape);
+}
+activerMemePendantElan(btnRemonter, remonterEnHaut); // (script.js)
+window.addEventListener("touchstart", (e) => {
+  if(remonteeEnCours && !btnRemonter.contains(e.target)){ cancelAnimationFrame(remonteeEnCours); remonteeEnCours = null; }
+}, { capture: true, passive: true });
 
 // #endregion
