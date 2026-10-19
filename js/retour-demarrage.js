@@ -225,6 +225,23 @@ function leverDoigtIOS(e){
   finTapIOS();
 }
 
+// Clic sur un élément qui change d'écran alors qu'aucune entrée n'a été ajoutée pour ce tap : l'iPhone
+// corrige les taps un peu à côté d'un bouton (le doigt se pose sur le fond, le clic arrive au bouton).
+// Sans entrée, le glissement retour ne marchait plus sur l'écran ouvert (vu au mouchard : Réglages
+// ouverts par un tap au bord de l'icône). Le clic arrive avant que le bouton change d'écran : il est
+// encore temps de l'ajouter.
+function clicIOS(e){
+  if(e.isTrusted && ecranAvantTapIOS === null && !retraitEnCoursIOS &&
+     e.target && e.target.closest && e.target.closest(ELEMENTS_NAVIGATION_IOS)){
+    try {
+      history.pushState({ alcunoRetour: true, profondeur: pileIOS.length + 1 }, "");
+      ecranAvantTapIOS = nomEcran();
+      pileIOS.push(ecranAvantTapIOS);
+    } catch (err) {}
+  }
+  finTapIOS();
+}
+
 function finTapIOS(){
   clearTimeout(minuteurTapIOS);
   minuteurTapIOS = setTimeout(() => {
@@ -245,7 +262,7 @@ if(estIOS){
   document.addEventListener("pointerup", leverDoigtIOS, { capture: true, passive: true });
   // geste repris par l'iPhone (glissement depuis le bord, défilement) : pas un tap
   document.addEventListener("pointercancel", () => { toucherEnCoursIOS = null; }, { capture: true, passive: true });
-  document.addEventListener("click", finTapIOS, { capture: true, passive: true });
+  document.addEventListener("click", clicIOS, { capture: true, passive: true });
 } else {
   document.addEventListener("pointerdown", preparerRetour, { capture: true, passive: true });
 }
