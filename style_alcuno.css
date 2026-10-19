@@ -3133,10 +3133,10 @@ body.rattrapage [id^="overlay"] *{
   gap: 10px;
   padding: 8px 8px 8px 14px;
   border-radius: 14px;
-  border: 1px solid rgba(255,215,0,0.45);
-  background: rgba(20, 0, 14, 0.95);
+  border: 1px solid var(--bandeau-bord);
+  background: var(--bandeau-fond);
   box-shadow: 0 10px 24px rgba(0,0,0,0.4);
-  color: #fff;
+  color: var(--bandeau-texte);
   font-size: 14px;
   font-weight: 800;
   animation: fadeIn 0.3s ease forwards;
@@ -3147,8 +3147,8 @@ body.rattrapage [id^="overlay"] *{
   padding: 8px 12px;
   border: none;
   border-radius: 10px;
-  background: #FFD700;
-  color: var(--fond-theme);
+  background: var(--bandeau-bouton);
+  color: var(--bandeau-bouton-texte);
   font-weight: 900;
   cursor: pointer;
 }
@@ -3158,7 +3158,8 @@ body.rattrapage [id^="overlay"] *{
   padding: 6px 8px;
   border: none;
   background: none;
-  color: rgba(255,255,255,0.6);
+  color: var(--bandeau-texte);
+  opacity: 0.6;
   font-size: 15px;
   cursor: pointer;
 }
@@ -4583,9 +4584,6 @@ html[data-theme="givre"] #enLigne .aideEnLigne{
 html[data-theme="givre"] #ecranRattrapage{
   color: var(--givre-accent);
   text-shadow: none;
-}
-html[data-theme="givre"] #bandeauMiseAJour .maj{
-  color: #2b001d;
 }
 html[data-theme="givre"] input:focus{
   outline: 2px solid #1a92d6;
@@ -6545,13 +6543,15 @@ html[data-theme="noir"] :is(#overlayCarteDoree, #overlayRegleUnique.overlay-dore
 
 /* ===== « Mauvais joueur ? ↶ Annuler » : quelques secondes après un choix de joueur (pigeon, carte
    dorée, duel, +4), en bas de l'écran, par-dessus les annonces. La barre du bas = temps restant.
-   Se jette vers le bas (js : rendreAnnulerChoixGlissable). Couleurs : variables --annuler-*, par thème. ===== */
+   Se jette vers le bas (js : rendreAnnulerChoixGlissable). Couleurs : variables --bandeau-*, par thème (aussi pour le bandeau « Nouvelle version »). ===== */
+:is(#annulerChoix, #bandeauMiseAJour){
+  --bandeau-fond: #1d0613;
+  --bandeau-bord: rgba(255, 215, 0, 0.45);
+  --bandeau-texte: #fff;
+  --bandeau-bouton: #FFD700;
+  --bandeau-bouton-texte: #2b001d;
+}
 #annulerChoix{
-  --annuler-fond: #1d0613;
-  --annuler-bord: rgba(255, 215, 0, 0.45);
-  --annuler-texte: #fff;
-  --annuler-bouton: #FFD700;
-  --annuler-bouton-texte: #2b001d;
   position: fixed;
   left: 12px;
   right: 12px;
@@ -6564,10 +6564,10 @@ html[data-theme="noir"] :is(#overlayCarteDoree, #overlayRegleUnique.overlay-dore
   margin: 0 auto;
   padding: 14px 16px;
   border-radius: 16px;
-  background: var(--annuler-fond);
-  border: 1px solid var(--annuler-bord);
+  background: var(--bandeau-fond);
+  border: 1px solid var(--bandeau-bord);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-  color: var(--annuler-texte);
+  color: var(--bandeau-texte);
   font: 800 16px Arial, sans-serif;
   overflow: hidden;
   touch-action: none; /* le glissement du doigt ne fait pas défiler la page */
@@ -6583,8 +6583,8 @@ html[data-theme="noir"] :is(#overlayCarteDoree, #overlayRegleUnique.overlay-dore
   padding: 9px 16px;
   border: none;
   border-radius: 999px;
-  background: var(--annuler-bouton);
-  color: var(--annuler-bouton-texte);
+  background: var(--bandeau-bouton);
+  color: var(--bandeau-bouton-texte);
   font: 900 16px Arial, sans-serif;
   cursor: pointer;
 }
@@ -6603,7 +6603,7 @@ html[data-theme="noir"] :is(#overlayCarteDoree, #overlayRegleUnique.overlay-dore
   bottom: 0;
   height: 4px;
   width: 100%;
-  background: var(--annuler-bouton);
+  background: var(--bandeau-bouton);
   opacity: 0.8;
   transform-origin: left center;
   animation: annulerChoixTemps linear both; /* durée : js (DUREE_ANNULER_CHOIX) */
@@ -6611,24 +6611,24 @@ html[data-theme="noir"] :is(#overlayCarteDoree, #overlayRegleUnique.overlay-dore
 @keyframes annulerChoixArrive{ from{ transform: translateY(140%); opacity: 0; } to{ transform: none; opacity: 1; } }
 @keyframes annulerChoixTemps{ from{ transform: scaleX(1); } to{ transform: scaleX(0); } }
 /* Couleurs par thème (Bordeaux : celles du dessus) */
-html[data-theme="noir"] #annulerChoix{ --annuler-fond: #141414; --annuler-bord: rgba(255, 255, 255, 0.22); --annuler-bouton-texte: #111; }
-html[data-theme="vert"] #annulerChoix{ --annuler-fond: #04200f; --annuler-bouton-texte: #08301e; }
-html[data-theme="bleu"] #annulerChoix{ --annuler-fond: #070f28; --annuler-bouton-texte: #0a1634; }
-html[data-theme="soleil"] #annulerChoix{
-  --annuler-fond: #1f3566; --annuler-bord: rgba(255, 205, 170, 0.5); --annuler-texte: #fff1df;
-  --annuler-bouton: linear-gradient(180deg, #ffb35c, #f2775c); --annuler-bouton-texte: #fff;
+html[data-theme="noir"] :is(#annulerChoix, #bandeauMiseAJour){ --bandeau-fond: #141414; --bandeau-bord: rgba(255, 255, 255, 0.22); --bandeau-bouton-texte: #111; }
+html[data-theme="vert"] :is(#annulerChoix, #bandeauMiseAJour){ --bandeau-fond: #04200f; --bandeau-bouton-texte: #08301e; }
+html[data-theme="bleu"] :is(#annulerChoix, #bandeauMiseAJour){ --bandeau-fond: #070f28; --bandeau-bouton-texte: #0a1634; }
+html[data-theme="soleil"] :is(#annulerChoix, #bandeauMiseAJour){
+  --bandeau-fond: #1f3566; --bandeau-bord: rgba(255, 205, 170, 0.5); --bandeau-texte: #fff1df;
+  --bandeau-bouton: linear-gradient(180deg, #ffb35c, #f2775c); --bandeau-bouton-texte: #fff;
 }
-html[data-theme="soleil"] #annulerChoix .annulerChoix-bouton{ text-shadow: 0 1px 0 rgba(150, 50, 40, 0.8); }
-html[data-theme="cerisier"] #annulerChoix{
-  --annuler-fond: #3c0a2a; --annuler-bord: rgba(255, 156, 197, 0.55);
-  --annuler-bouton: #ff9cc5; --annuler-bouton-texte: #3c0a2a;
+html[data-theme="soleil"] :is(#annulerChoix .annulerChoix-bouton, #bandeauMiseAJour .maj){ text-shadow: 0 1px 0 rgba(150, 50, 40, 0.8); }
+html[data-theme="cerisier"] :is(#annulerChoix, #bandeauMiseAJour){
+  --bandeau-fond: #3c0a2a; --bandeau-bord: rgba(255, 156, 197, 0.55);
+  --bandeau-bouton: #ff9cc5; --bandeau-bouton-texte: #3c0a2a;
 }
-html[data-theme="givre"] #annulerChoix{
-  --annuler-fond: #ffffff; --annuler-bord: rgba(20, 121, 184, 0.35); --annuler-texte: #0d3550;
-  --annuler-bouton: linear-gradient(180deg, #27aee8, #1474b8); --annuler-bouton-texte: #fff;
+html[data-theme="givre"] :is(#annulerChoix, #bandeauMiseAJour){
+  --bandeau-fond: #ffffff; --bandeau-bord: rgba(20, 121, 184, 0.35); --bandeau-texte: #0d3550;
+  --bandeau-bouton: linear-gradient(180deg, #27aee8, #1474b8); --bandeau-bouton-texte: #fff;
   box-shadow: 0 10px 30px rgba(13, 53, 80, 0.25);
 }
-html[data-theme="prestige"] #annulerChoix{ --annuler-fond: #2a1d03; --annuler-bord: rgba(255, 223, 90, 0.6); --annuler-bouton-texte: #3a2806; }
+html[data-theme="prestige"] :is(#annulerChoix, #bandeauMiseAJour){ --bandeau-fond: #2a1d03; --bandeau-bord: rgba(255, 223, 90, 0.6); --bandeau-bouton-texte: #3a2806; }
 
 /* Soleil couchant : bas des réglages (partager, signaler un bug, à propos) posé sur la fin claire du
    dégradé : textes en prune foncé, lien en framboise souligné */
