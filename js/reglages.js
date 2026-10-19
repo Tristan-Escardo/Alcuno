@@ -36,6 +36,7 @@ document.documentElement.classList.toggle("accessibilite", caseAccessibilite.che
 caseAccessibilite.addEventListener("change", () => {
   ecrireReglage(CLE_ACCESSIBILITE, caseAccessibilite.checked);
   document.documentElement.classList.toggle("accessibilite", caseAccessibilite.checked);
+  if (caseAccessibilite.checked) jouerSon("accessibilite_on");
 });
 
 // ===== Thème : couleur du fond du jeu (réglage de ce téléphone, purement visuel) =====
@@ -823,7 +824,8 @@ document.addEventListener("visibilitychange", () => {
 //   annuler_0_gorgees.mp3 : quelqu'un tape « Annuler 0 » (il n'annule rien)
 //   tiens_gueule.mp3 : le cul sec de la carte dorée (« TIENS DANS TA GUEULE »)
 //   regles.mp3 : on ouvre les Règles du jeu (boutons « Règles du jeu » de l'accueil et de la partie)
-const SONS = ["cartes", "doree", "tiens_gueule", "bouton", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees", "regles"];
+//   accessibilite_on.mp3 : on active « Accessibilité pour les gens bourrés » dans les réglages
+const SONS = ["cartes", "doree", "tiens_gueule", "bouton", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees", "regles", "accessibilite_on"];
 // Sons coupés au bout de N secondes (avec un petit fondu), même si le fichier est plus long
 const DUREE_MAX_SONS = { doree: 3, pigeon: 2, distribuer_gorgees: 0.8, bouton: 0.3 };
 const sonsCharges = {}; // nom -> son décodé (ou null si le fichier n'existe pas)
