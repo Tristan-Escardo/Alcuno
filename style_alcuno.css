@@ -6989,3 +6989,71 @@ html[data-theme="soleil"] .voletPause-ok{ background: linear-gradient(180deg, #f
 
 /* Télé : joueur en pause grisé */
 #ecranTele .tele-joueur-pause{ opacity: 0.45; }
+
+/* ===== Aide du premier lancement (js/reglages.js) : flèches dorées vers les Règles et les Réglages ===== */
+#aideAccueil{
+  position: fixed;
+  inset: 0;
+  z-index: 2147483400;
+  font-family: Arial, sans-serif;
+  cursor: pointer;
+}
+/* (fondu sur chaque morceau et pas sur #aideAccueil : un parent en fondu empêche le flou du voile) */
+.aideAccueil-voile,
+.aideAccueil-bas{ animation: aideAccueilEntree 0.45s ease both; }
+#aideAccueil.aideAccueil-sortie > *{ animation: aideAccueilEntree 0.3s ease reverse both; }
+/* Voile flouté avec deux trous ronds : les icônes restent nettes */
+.aideAccueil-voile{
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 0, 13, 0.8);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  -webkit-mask: radial-gradient(circle at var(--x1) var(--y1), transparent 0 24px, #000 25px),
+                radial-gradient(circle at var(--x2) var(--y2), transparent 0 24px, #000 25px);
+  -webkit-mask-composite: source-in;
+  mask: radial-gradient(circle at var(--x1) var(--y1), transparent 0 24px, #000 25px),
+        radial-gradient(circle at var(--x2) var(--y2), transparent 0 24px, #000 25px);
+  mask-composite: intersect;
+}
+.aideAccueil-fleches{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  animation: aideAccueilFleches 0.6s 0.15s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+.aideAccueil-ombre{ fill: rgba(120, 70, 0, 0.9); transform: translateY(2px); }
+.aideAccueil-repere{
+  position: absolute;
+  width: 200px;
+  font: 700 15px/1.35 Arial, sans-serif;
+  color: #fff;
+  animation: aideAccueilEntree 0.45s 0.3s ease both;
+}
+.aideAccueil-gauche{ left: 28px; text-align: left; }
+.aideAccueil-droite{ right: 28px; text-align: right; }
+.aideAccueil-repere b,
+.aideAccueil-bas b{
+  display: block;
+  font-weight: 900;
+  color: #FFD700;
+  text-shadow: 0 2px 0 rgba(120, 70, 0, 0.9);
+}
+.aideAccueil-repere b{ font-size: 24px; margin-bottom: 4px; }
+.aideAccueil-bas{
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: calc(60px + env(safe-area-inset-bottom));
+  text-align: center;
+  font: 700 15px Arial, sans-serif;
+  color: rgba(255, 255, 255, 0.75);
+}
+.aideAccueil-bas b{ font-size: min(24px, 6.2vw); letter-spacing: 0.02em; white-space: nowrap; margin-bottom: 8px; text-shadow: 0 3px 0 rgba(120, 70, 0, 0.9); }
+@keyframes aideAccueilEntree{ from{ opacity: 0; } to{ opacity: 1; } }
+@keyframes aideAccueilFleches{ from{ opacity: 0; transform: translateY(14px); } to{ opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce){
+  #aideAccueil > *{ animation-duration: 0.01s !important; animation-delay: 0s !important; }
+}
