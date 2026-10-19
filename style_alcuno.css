@@ -6950,7 +6950,7 @@ html[data-theme="givre"] .btnPauseJoueur{ color: var(--givre-accent); border-col
 html[data-theme="soleil"] .btnPauseJoueur{ color: #ffcf9e; border-color: rgba(255, 205, 170, 0.5); }
 
 /* Volet « Mettre Léa en pause » (monte du bas) */
-#voletPause{
+#voletPause, #voletCarte{
   position: fixed;
   inset: 0;
   z-index: 2147483400;
@@ -7069,3 +7069,38 @@ html[data-theme="soleil"] .voletPause-ok{ background: linear-gradient(180deg, #f
 @media (prefers-reduced-motion: reduce){
   #aideAccueil > *{ animation-duration: 0.01s !important; animation-delay: 0s !important; }
 }
+
+/* Règle d'une carte : doigt appuyé sur une carte retournée du plateau (js/plateau.js) */
+.astuceRegles{ font-size: 12px; font-weight: 700; color: rgba(255, 255, 255, 0.5); margin-left: 6px; }
+html[data-theme="givre"] .astuceRegles{ color: rgba(13, 53, 80, 0.55); }
+#plateau .Carte{ -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+#plateau .Carte.carte-appuyee{
+  position: relative;
+  z-index: 5;
+  transform: scale(1.08);
+  box-shadow: 0 0 0 3px #FFD700, 0 0 22px rgba(255, 215, 0, 0.7);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.voletCarte-contenu{ display: flex; gap: 16px; align-items: center; text-align: left; }
+.voletCarte-contenu .voletPause-nom{ font-size: 22px; }
+.voletCarte-contenu .voletPause-texte{ margin: 6px 0 0; }
+.voletCarte-carte{ width: 92px; flex: none; margin: 0; cursor: default; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5); }
+#voletCarte .voletPause-feuille{ padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
+
+/* Salle d'attente : « Inviter à rejoindre la partie » (js/en-ligne.js) */
+#enLigne #btnInviterPartie{
+  display: block;
+  margin: 4px auto 16px;
+  padding: 12px 22px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(255, 215, 0, 0.7);
+  background: rgba(255, 215, 0, 0.08);
+  color: #FFD700;
+  font: 800 16px Arial, sans-serif;
+  width: auto;
+  text-shadow: none;
+  box-shadow: none;
+  cursor: pointer;
+}
+html[data-theme="givre"] #enLigne #btnInviterPartie{ color: var(--givre-accent); border-color: var(--givre-accent); background: rgba(255, 255, 255, 0.5); }
+html[data-theme="soleil"] #enLigne #btnInviterPartie{ color: #fff; border-color: rgba(255, 255, 255, 0.75); background: rgba(31, 53, 102, 0.35); }

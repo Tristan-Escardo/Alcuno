@@ -6,7 +6,9 @@
 // Rien de personnel : un identifiant tiré au hasard et gardé dans ce téléphone (pour compter les
 // visiteurs différents), le type d'appareil, le thème et la version du jeu. Pas de pseudo, pas d'IP.
 // Dans Firebase :
-// - stats/jours/AAAA-MM-JJ : visites, installs, parties, partiesEnLigne (compteurs) et visiteurs/{id} ;
+// - stats/jours/AAAA-MM-JJ : visites, installs, parties, partiesEnLigne, doreesEnJeu, doreesTirees
+//   (compteurs), heures/{HH} (parties
+//   lancées à chaque heure) et visiteurs/{id} ;
 // - stats/appareils/{id} : os, thème, version, dernière visite (répartitions de la page stats) ;
 // - presence/{id} : ce que fait ce téléphone en ce moment (menu, classique, enligne, tele), retiré
 //   par Firebase dès que le téléphone se déconnecte (« en ce moment » de la page stats).
@@ -54,10 +56,21 @@ function noterAppareilStats(){
   });
 }
 
-// Partie lancée (classique : ce téléphone ; en ligne : seulement l'hôte, une fois par manche)
+// Partie lancée (classique : ce téléphone ; en ligne : seulement l'hôte, une fois par manche), et son
+// heure (heure du téléphone, « 00 » à « 23 » : « À quelle heure on joue » de la page stats)
 function noterPartieStats(enLigne){
   if (estPageTele) return;
   compterStats(enLigne ? "partiesEnLigne" : "parties");
+  compterStats(`heures/${String(new Date().getHours()).padStart(2, "0")}`);
+}
+
+// Carte dorée : partie où elle est cachée sur le plateau (« doreesEnJeu »), et quelqu'un qui la tire
+// (« doreesTirees »). Classique : ce téléphone ; en ligne : seulement l'hôte (sinon comptée par chaque
+// téléphone). Pas pendant une reprise ou un rattrapage (actions déjà comptées).
+function noterDoreeStats(nom){
+  if (estPageTele || rattrapageEnCours || repriseClassiqueEnCours) return;
+  if (enLigneActif && !estHote) return;
+  compterStats(nom);
 }
 
 // Installation : premier lancement depuis l'icône de l'écran d'accueil (iPhone et Android), ou

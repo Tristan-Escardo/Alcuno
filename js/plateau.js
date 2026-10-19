@@ -498,31 +498,10 @@ function basculerPauseJoueur(nom){
   afficherJoueurActif();
 }
 
-// Volet « Léa » (au tap sur ⏸ / ▶) : confirmation, puis l'action de jeu (évènement « alcuno-pause »)
-function ouvrirVoletPause(nom, bouton){
-  fermerVoletPause();
-  const enPause = estEnPause(nom);
-  if(!enPause && indexJoueursActifs().length <= 2){
-    afficherNotificationHaut("", "Il faut au moins 2 joueurs qui ne sont pas en pause", true);
-    return;
-  }
-  const volet = document.createElement("div");
-  volet.id = "voletPause";
-  volet.innerHTML = `<div class="voletPause-feuille" role="dialog">
-      <div class="voletPause-poignee"></div>
-      <div class="voletPause-nom"></div>
-      <div class="voletPause-texte"></div>
-      <button type="button" class="voletPause-ok"></button>
-      <button type="button" class="voletPause-annuler">Annuler</button>
-    </div>`;
-  volet.querySelector(".voletPause-nom").textContent = avecCouronne(nom);
-  volet.querySelector(".voletPause-texte").innerHTML = enPause
-    ? "De retour parmi nous ?"
-    : "En pause clope ? Aux toilettes en train de vomir ?<br>Son tour sera sauté jusqu'à ce qu'il revienne.";
-  volet.querySelector(".voletPause-ok").textContent = enPause ? `${nom} est de retour` : `Mettre ${nom} en pause`;
-  // Le doigt (ou la molette) sur le volet ou le fond assombri ne fait pas défiler la partie derrière :
-  // glisser vers le bas (n'importe où) descend la feuille, qui se ferme si on la lâche assez bas ou
-  // d'un coup sec, sinon elle remonte
+// Volet du bas (pause d'un joueur, règle d'une carte) : le doigt (ou la molette) sur le volet ou le fond
+// assombri ne fait pas défiler la partie derrière ; glisser vers le bas (n'importe où) descend la feuille,
+// qui se ferme si on la lâche assez bas ou d'un coup sec, sinon elle remonte
+function rendreVoletGlissable(volet){
   const feuille = volet.querySelector(".voletPause-feuille");
   let depart = null, decalage = 0, aGlisse = false, vitesse = 0, dernier = null;
   const placer = (y, duree) => {
@@ -566,6 +545,31 @@ function ouvrirVoletPause(nom, bouton){
   volet.addEventListener("click", (e) => {
     if(aGlisse){ e.stopImmediatePropagation(); e.preventDefault(); aGlisse = false; }
   }, true);
+}
+
+// Volet « Léa » (au tap sur ⏸ / ▶) : confirmation, puis l'action de jeu (évènement « alcuno-pause »)
+function ouvrirVoletPause(nom, bouton){
+  fermerVoletPause();
+  const enPause = estEnPause(nom);
+  if(!enPause && indexJoueursActifs().length <= 2){
+    afficherNotificationHaut("", "Il faut au moins 2 joueurs qui ne sont pas en pause", true);
+    return;
+  }
+  const volet = document.createElement("div");
+  volet.id = "voletPause";
+  volet.innerHTML = `<div class="voletPause-feuille" role="dialog">
+      <div class="voletPause-poignee"></div>
+      <div class="voletPause-nom"></div>
+      <div class="voletPause-texte"></div>
+      <button type="button" class="voletPause-ok"></button>
+      <button type="button" class="voletPause-annuler">Annuler</button>
+    </div>`;
+  volet.querySelector(".voletPause-nom").textContent = avecCouronne(nom);
+  volet.querySelector(".voletPause-texte").innerHTML = enPause
+    ? "De retour parmi nous ?"
+    : "En pause clope ? Aux toilettes en train de vomir ?<br>Son tour sera sauté jusqu'à ce qu'il revienne.";
+  volet.querySelector(".voletPause-ok").textContent = enPause ? `${nom} est de retour` : `Mettre ${nom} en pause`;
+  rendreVoletGlissable(volet);
   volet.addEventListener("click", (e) => { if(e.target === volet) fermerVoletPause(); });
   volet.querySelector(".voletPause-annuler").addEventListener("click", fermerVoletPause);
   volet.querySelector(".voletPause-ok").addEventListener("click", () => {
@@ -578,6 +582,115 @@ function fermerVoletPause(){
   const volet = document.getElementById("voletPause");
   if(volet) volet.remove();
 }
+
+// ===== Revoir la règle d'une carte : doigt appuyé 0,5 s sur une carte retournée du plateau =====
+// Volet du bas (comme la pause) avec la carte en grand et sa règle (celle de l'écran des Règles).
+// Rien d'envoyé aux autres téléphones. Faces cachées : rien sur une carte recachée (sinon on pourrait
+// recompter les cartes sorties avec).
+const DUREE_APPUI_LONG = 500;
+
+// "plus_2_jaune1" => "plus_2", "couleur2" => "couleur", "un_rouge" => "un"
+function typeDeCarte(classe){
+  if(classe.startsWith("plus_2")) return "plus_2";
+  if(classe.startsWith("plus_4")) return "plus_4";
+  return classe.split("_")[0].replace(/\d+$/, "");
+}
+
+function regleDeCarte(classe){
+  if(classe === "carte_doree"){
+    return { nom: "Carte dorée", texte: estModeSoft()
+      ? "Distribue 3 gorgées de la part du développeur 😘"
+      : "Distribue un CUL SEC de la part du développeur, et obligation de se servir un vrai verre avant 😘" };
+  }
+  const cartes = reglesDuJeu().find(partie => partie.titre === "Les cartes").regles;
+  return cartes.find(r => typeDeCarte(r.carte) === typeDeCarte(classe)) || null;
+}
+
+// Classe de la face d'une carte du plateau (« trois_vert », « carte_doree »…), ou null
+function faceDeCarte(carte){
+  return [...carte.classList].find(c => c === "carte_doree" || classes.includes(c)) || null;
+}
+
+function ouvrirVoletCarte(classe){
+  const regle = regleDeCarte(classe);
+  if(!regle) return;
+  fermerVoletCarte();
+  const volet = document.createElement("div");
+  volet.id = "voletCarte";
+  volet.innerHTML = `<div class="voletPause-feuille" role="dialog">
+      <div class="voletPause-poignee"></div>
+      <div class="voletCarte-contenu">
+        <div class="Carte retournee voletCarte-carte"></div>
+        <div>
+          <div class="voletPause-nom"></div>
+          <div class="voletPause-texte"></div>
+        </div>
+      </div>
+    </div>`;
+  volet.querySelector(".voletCarte-carte").classList.add(classe);
+  volet.querySelector(".voletPause-nom").textContent = regle.nom;
+  volet.querySelector(".voletPause-texte").textContent = regle.texte;
+  volet.querySelector(".voletPause-feuille").setAttribute("aria-label", regle.nom);
+  rendreVoletGlissable(volet);
+  volet.addEventListener("click", (e) => { if(e.target === volet) fermerVoletCarte(); });
+  document.body.appendChild(volet);
+}
+function fermerVoletCarte(){
+  const volet = document.getElementById("voletCarte");
+  if(volet) volet.remove();
+}
+
+let appuiCarte = null; // { carte, x, y, minuteur, minuteurVisuel }
+// Le clic qui suit l'appui long (doigt levé) ne compte pas : il tomberait sur le fond du volet, qui se
+// refermerait aussitôt
+let appuiLongFait = false;
+
+function annulerAppuiCarte(){
+  if(!appuiCarte) return;
+  clearTimeout(appuiCarte.minuteur);
+  clearTimeout(appuiCarte.minuteurVisuel);
+  appuiCarte.carte.classList.remove("carte-appuyee");
+  appuiCarte = null;
+}
+
+// Carte retournée sous le doigt (elles ignorent le doigt, pour ne pas être rejouées : on la cherche par
+// sa position)
+function carteRetourneeSous(x, y){
+  return [...plateau.querySelectorAll(".Carte.retournee")].find((carte) => {
+    const r = carte.getBoundingClientRect();
+    return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+  }) || null;
+}
+
+plateau.addEventListener("pointerdown", (e) => {
+  annulerAppuiCarte();
+  const carte = carteRetourneeSous(e.clientX, e.clientY);
+  if(!carte || carte.classList.contains("carte-disparue")) return;
+  if(document.documentElement.classList.contains("faces-fermees") && carte.classList.contains("recachee")) return;
+  const classe = faceDeCarte(carte);
+  if(!classe) return;
+  appuiCarte = { carte, x: e.clientX, y: e.clientY };
+  // (un peu après : un doigt qui fait juste défiler le plateau ne fait pas briller la carte)
+  appuiCarte.minuteurVisuel = setTimeout(() => carte.classList.add("carte-appuyee"), 120);
+  appuiCarte.minuteur = setTimeout(() => {
+    annulerAppuiCarte();
+    appuiLongFait = true;
+    vibrer(20);
+    ouvrirVoletCarte(classe);
+  }, DUREE_APPUI_LONG);
+});
+plateau.addEventListener("pointermove", (e) => {
+  if(appuiCarte && Math.hypot(e.clientX - appuiCarte.x, e.clientY - appuiCarte.y) > 10) annulerAppuiCarte();
+});
+["pointerup", "pointercancel", "pointerleave"].forEach((type) => plateau.addEventListener(type, annulerAppuiCarte));
+window.addEventListener("scroll", annulerAppuiCarte, { passive: true });
+document.addEventListener("pointerup", () => {
+  if(appuiLongFait) setTimeout(() => { appuiLongFait = false; }, 400); // (au cas où aucun clic ne suit)
+}, true);
+document.addEventListener("click", (e) => {
+  if(appuiLongFait){ e.stopImmediatePropagation(); e.preventDefault(); appuiLongFait = false; }
+}, true);
+plateau.addEventListener("contextmenu", (e) => { if(carteRetourneeSous(e.clientX, e.clientY)) e.preventDefault(); });
 
 const ICONE_PAUSE_JOUEUR = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1.2"/><rect x="14" y="5" width="4" height="14" rx="1.2"/></svg>';
 const ICONE_RETOUR_JOUEUR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';

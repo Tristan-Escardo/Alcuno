@@ -20,7 +20,7 @@
     <!-- Page privée des statistiques (anonymes) du jeu : écrites par js/stats.js, lues ici en direct.
          Ouverte par …/Alcuno/?stats (redirection dans index.html). Un code la protège des curieux. -->
     <style>
-        :root{ --cyan: #00e5ff; --cyan-clair: #e6fbff; --cyan-doux: #9fdcf5; --cyan-titre: #5fd8ff; }
+        :root{ --cyan: #00e5ff; --cyan-clair: #e6fbff; --cyan-doux: #9fdcf5; --cyan-titre: #5fd8ff; --rose: #ff4fd8; }
         html{ background: #020713; }
         body{
             margin: 0;
@@ -85,6 +85,12 @@
         .pc{ font-family: "Inter", Arial, sans-serif; font-variant-numeric: tabular-nums; font-size: 14px; width: 48px; text-align: right; color: var(--cyan-clair); font-weight: 700; }
         .vide{ color: #4f8aa3; font-size: 14px; }
         svg text{ fill: var(--cyan-titre); font-size: 10px; font-family: "Rajdhani", Arial, sans-serif; }
+        .legendeCouleurs{ display: flex; gap: 16px; justify-content: center; margin-top: 8px; font-size: 14px; color: var(--cyan-doux); }
+        .pastille{ display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; background: var(--cyan); box-shadow: 0 0 6px var(--cyan); }
+        .pastille.rose{ background: var(--rose); box-shadow: 0 0 6px var(--rose); }
+        .pointe{ display: flex; align-items: baseline; gap: 10px; margin: -2px 0 10px; }
+        .pointe b{ font-size: 30px; font-weight: 700; color: var(--cyan-clair); text-shadow: 0 0 10px var(--cyan); white-space: nowrap; }
+        .pointe span{ color: var(--cyan-doux); font-size: 15px; }
         .note{ text-align: center; color: #3f7088; font-size: 12px; margin-top: 18px; }
 
         /* Code d'accès */
@@ -142,13 +148,26 @@
         </section>
 
         <section class="bloc">
+            <div class="titre">Parties · 30 derniers jours</div>
+            <div id="barresParties"></div>
+            <div class="legendeCouleurs"><span><b class="pastille"></b>Classique</span><span><b class="pastille rose"></b>En ligne</span></div>
+        </section>
+
+        <section class="bloc">
             <div class="titre">Visites · 30 derniers jours</div>
             <div id="courbe"></div>
         </section>
 
+        <section class="bloc">
+            <div class="titre">Heures de jeu · 30 jours</div>
+            <div class="pointe"><b class="chiffre" id="heurePointe">–</b><span id="legendePointe">heure de pointe</span></div>
+            <div id="barresHeures"></div>
+        </section>
+
+        <section class="bloc"><div class="titre">Jours de la semaine</div><div id="barresJours"></div></section>
         <section class="bloc"><div class="titre">Téléphones</div><div id="barresOs"></div></section>
-        <section class="bloc"><div class="titre">Thèmes choisis</div><div id="barresThemes"></div></section>
         <section class="bloc"><div class="titre">Versions en circulation</div><div id="barresVersions"></div></section>
+        <section class="bloc"><div class="titre">Thèmes choisis</div><div id="barresThemes"></div></section>
 
         <p class="note">Appareils vus ces 30 derniers jours · aucune donnée personnelle<br>Alcuno Stats <span id="versionStats"></span></p>
     </main>
@@ -159,7 +178,7 @@
 
         // Empreinte (SHA-256) du code d'accès : le code lui-même n'est écrit nulle part
         // Version de la page de stats (à part de celle du jeu : +0.0.1 à chaque modification de cette page)
-        const VERSION_STATS = "1.5.3";
+        const VERSION_STATS = "1.5.4";
         document.getElementById("versionStats").textContent = VERSION_STATS;
 
         const EMPREINTE_CODE = "2c8125d3adc62dac73f3ae036a86e00ba51b12b0dfb38fec2184e76441ed6826";
@@ -252,6 +271,67 @@
                 </svg>`;
         }
 
+        const dateCourte = (jour) => {
+            const [a, m, j] = jour.split("-").map(Number);
+            return new Date(a, m - 1, j).toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
+        };
+
+        // Parties par jour (classique en cyan, en ligne en rose par-dessus), du plus ancien à aujourd'hui
+        function barresParties(chrono, jours){
+            const L = 330, H = 110, w = L / chrono.length;
+            const cl = chrono.map((j) => Number((jours[j] || {}).parties || 0));
+            const el = chrono.map((j) => Number((jours[j] || {}).partiesEnLigne || 0));
+            const max = Math.max(1, ...cl.map((v, i) => v + el[i]));
+            let rects = "";
+            chrono.forEach((j, i) => {
+                const h1 = cl[i] / max * (H - 6), h2 = el[i] / max * (H - 6), x = (i * w + 1.5).toFixed(1), l = (w - 3).toFixed(1);
+                if (h1) rects += `<rect x="${x}" y="${(H - h1).toFixed(1)}" width="${l}" height="${h1.toFixed(1)}" rx="1.5" fill="#00e5ff" style="filter:drop-shadow(0 0 3px #00e5ff)"/>`;
+                if (h2) rects += `<rect x="${x}" y="${(H - h1 - h2).toFixed(1)}" width="${l}" height="${h2.toFixed(1)}" rx="1.5" fill="#ff4fd8" style="filter:drop-shadow(0 0 3px #ff4fd8)"/>`;
+            });
+            document.getElementById("barresParties").innerHTML =
+                `<svg width="100%" viewBox="0 0 ${L} ${H + 16}" role="img" aria-label="Parties des 30 derniers jours">${rects}
+                    <line x1="0" y1="${H}" x2="${L}" y2="${H}" stroke="rgba(0,229,255,.25)"/>
+                    <text x="0" y="${H + 13}">${dateCourte(chrono[0])}</text><text x="${L}" y="${H + 13}" text-anchor="end">aujourd'hui · max ${max}</text>
+                </svg>`;
+        }
+
+        // Parties lancées à chaque heure (30 derniers jours) : 24 barres, l'heure de pointe en blanc
+        function barresHeures(liste, jours){
+            const heures = Array(24).fill(0);
+            liste.forEach((j) => Object.entries((jours[j] || {}).heures || {}).forEach(([h, n]) => { heures[Number(h)] += Number(n) || 0; }));
+            const max = Math.max(...heures);
+            const zone = document.getElementById("barresHeures");
+            if (!max) {
+                document.getElementById("heurePointe").textContent = "–";
+                zone.innerHTML = '<div class="vide">Pas encore de données (comptées depuis Alcuno 9.11.7)</div>';
+                return;
+            }
+            const pic = heures.indexOf(max);
+            document.getElementById("heurePointe").textContent = `${pic}h – ${(pic + 1) % 24}h`;
+            const L = 330, H = 110, w = L / 24;
+            let svg = "";
+            heures.forEach((n, h) => {
+                const hh = Math.max(1.5, n / max * (H - 6)), lui = h === pic;
+                svg += `<rect x="${(h * w + 1.5).toFixed(1)}" y="${(H - hh).toFixed(1)}" width="${(w - 3).toFixed(1)}" height="${hh.toFixed(1)}" rx="1.5" fill="${lui ? "#e6fbff" : "#00e5ff"}" opacity="${lui ? 1 : .75}" style="filter:drop-shadow(0 0 ${lui ? 6 : 3}px #00e5ff)"/>`;
+            });
+            [0, 6, 12, 18, 23].forEach((h) => { svg += `<text x="${(h * w + w / 2).toFixed(1)}" y="${H + 13}" text-anchor="middle">${h}h</text>`; });
+            zone.innerHTML = `<svg width="100%" viewBox="0 0 ${L} ${H + 16}" role="img" aria-label="Parties par heure">${svg}</svg>`;
+        }
+
+        // Jours de la semaine : parties (classiques + en ligne) de tous les jours connus
+        const NOMS_JOURS = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+        function barresJours(jours){
+            const compte = {};
+            Object.entries(jours).forEach(([jour, d]) => {
+                const n = Number((d || {}).parties || 0) + Number((d || {}).partiesEnLigne || 0);
+                if (!n) return;
+                const [a, m, j] = jour.split("-").map(Number);
+                const nom = NOMS_JOURS[new Date(a, m - 1, j).getDay()];
+                compte[nom] = (compte[nom] || 0) + n;
+            });
+            barres("barresJours", compte, {}, 7);
+        }
+
         function demarrer(){
             const app = initializeApp({
                 apiKey: "AIzaSyApZL1dCQLGdrZFjsGJC0y4DxLUzorum4M",
@@ -302,7 +382,8 @@
                 const tous = Object.keys(jours);
                 const lignes = [
                     ["Visites", "visites"], ["Visiteurs", null], ["Installations", "installs"],
-                    ["Parties lancées", "parties"], ["Parties en ligne", "partiesEnLigne"]
+                    ["Parties lancées", "parties"], ["Parties en ligne", "partiesEnLigne"],
+                    ["Dorée en jeu", "doreesEnJeu"], ["Dorée tirée", "doreesTirees"]
                 ];
                 document.getElementById("tableau").innerHTML = lignes.map(([titre, nom]) => {
                     const v = nom
@@ -312,6 +393,9 @@
                 }).join("");
                 const chrono = derniers30.slice().reverse();
                 courbe(chrono.map((j) => Number((jours[j] || {}).visites || 0)), chrono[0]);
+                barresParties(chrono, jours);
+                barresHeures(derniers30, jours);
+                barresJours(jours);
             });
 
             // ----- Téléphones, thèmes, versions (appareils vus ces 30 derniers jours) -----

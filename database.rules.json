@@ -9,8 +9,13 @@
           "installs": { ".write": true, ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" },
           "parties": { ".write": true, ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" },
           "partiesEnLigne": { ".write": true, ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" },
+          "doreesEnJeu": { ".write": true, ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" },
+          "doreesTirees": { ".write": true, ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" },
           "visiteurs": {
             "$id": { ".write": true, ".validate": "$id.matches(/^[a-z0-9]{12}$/) && newData.val() === true" }
+          },
+          "heures": {
+            "$h": { ".write": true, ".validate": "$h.matches(/^([01][0-9]|2[0-3])$/) && newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" }
           },
           "$autre": { ".validate": false }
         }
