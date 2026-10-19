@@ -675,6 +675,7 @@ plateau.addEventListener("pointerdown", (e) => {
   appuiCarte.minuteur = setTimeout(() => {
     annulerAppuiCarte();
     appuiLongFait = true;
+    try { window.getSelection().removeAllRanges(); } catch (err) {}
     vibrer(20);
     ouvrirVoletCarte(classe);
   }, DUREE_APPUI_LONG);
@@ -691,6 +692,8 @@ document.addEventListener("click", (e) => {
   if(appuiLongFait){ e.stopImmediatePropagation(); e.preventDefault(); appuiLongFait = false; }
 }, true);
 plateau.addEventListener("contextmenu", (e) => { if(carteRetourneeSous(e.clientX, e.clientY)) e.preventDefault(); });
+// iPhone : pendant l'appui, pas de sélection de texte (il en sélectionnait autour de la carte)
+document.addEventListener("selectstart", (e) => { if(appuiCarte || appuiLongFait) e.preventDefault(); });
 
 const ICONE_PAUSE_JOUEUR = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1.2"/><rect x="14" y="5" width="4" height="14" rx="1.2"/></svg>';
 const ICONE_RETOUR_JOUEUR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
