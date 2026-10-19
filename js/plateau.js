@@ -1552,4 +1552,72 @@ function finDePartie(){
   executerApresOverlayRegleUnique(afficherOverlayFinUnRestants);
 }
 
+
+// ===== Remonter tout en haut : petit bouton en bas à gauche pendant la partie =====
+// Visible quand on a bien descendu sur le plateau ; caché par-dessus un overlay, un volet, la barre
+// « Mauvais joueur ? » ou l'écran de pause (il passerait dessous ou les gênerait).
+const btnRemonter = document.getElementById("btnRemonter");
+// Mouchard (js/mouchard.js) : chaque étape de la flèche est notée, pour comprendre ce que fait l'iPhone
+const noterFleche = (texte) => { if(typeof noter === "function") noter("flèche : " + texte); };
+function majBoutonRemonter(){
+  const visible = partieLancee && window.scrollY > 500 &&
+    !document.documentElement.classList.contains("overlay-ouvert") &&
+    !document.querySelector("#annulerChoix, #voletPause, #voletCarte") &&
+    document.getElementById("ecranPause").style.display === "none";
+  if(visible !== btnRemonter.classList.contains("visible")) noterFleche(`${visible ? "affichée" : "cachée"} (y=${Math.round(window.scrollY)})`);
+  btnRemonter.classList.toggle("visible", visible);
+}
+window.addEventListener("scroll", majBoutonRemonter, { passive: true });
+setInterval(majBoutonRemonter, 600); // (overlays, barres et volets qui apparaissent sans défilement)
+// Remontée animée ici (le défilement « smooth » du navigateur s'arrêtait en route sur iPhone), lancée
+// dès que le doigt touche la flèche : sur iPhone, tant que la page file encore (élan), un tap ne donne ni
+// « click » ni même un doigt levé utilisable, il ne fait qu'arrêter le défilement. La barre « Tour de »
+// est recalée à chaque image (sinon elle sautait en arrivant en haut). Un doigt posé ailleurs arrête tout.
+let remonteeEnCours = null;
+let remonteeAuDoigtA = 0;
+function remonterEnHaut(){
+  cancelAnimationFrame(remonteeEnCours);
+  const depart = window.scrollY;
+  if(depart <= 0){ noterFleche(`rien à faire (y=${Math.round(depart)})`); return; }
+  const debut = performance.now();
+  const duree = Math.min(650, 250 + depart / 8);
+  noterFleche(`remontée : départ y=${Math.round(depart)}, durée ${Math.round(duree)} ms, hauteur page ${document.documentElement.scrollHeight}`);
+  let image = 0;
+  const etape = (maintenant) => {
+    const avance = Math.min(1, (maintenant - debut) / duree);
+    const adouci = 1 - Math.pow(1 - avance, 3); // rapide au début, en douceur à l'arrivée
+    const voulu = Math.round(depart * (1 - adouci));
+    window.scrollTo(0, voulu);
+    const obtenu = Math.round(window.scrollY);
+    image++;
+    if(Math.abs(obtenu - voulu) > 2 || image % 6 === 1 || avance >= 1) noterFleche(`image ${image} : voulu y=${voulu}, obtenu y=${obtenu}${Math.abs(obtenu - voulu) > 2 ? " (REFUSÉ)" : ""}`);
+    repositionnerStickyJoueurActif();
+    remonteeEnCours = avance < 1 ? requestAnimationFrame(etape) : null;
+    if(!remonteeEnCours){
+      noterFleche(`remontée finie en ${image} images, y=${obtenu}`);
+      setTimeout(() => noterFleche(`0,4 s après : y=${Math.round(window.scrollY)}`), 400);
+    }
+  };
+  remonteeEnCours = requestAnimationFrame(etape);
+}
+btnRemonter.addEventListener("touchstart", (e) => {
+  noterFleche(`touchée (y=${Math.round(window.scrollY)}, annulable : ${e.cancelable})`);
+  if(e.cancelable) e.preventDefault(); // (pas de défilement ni de « click » derrière)
+  remonteeAuDoigtA = Date.now();
+  jouerSon("bouton");
+  remonterEnHaut();
+}, { passive: false });
+btnRemonter.addEventListener("click", () => { // souris, clavier
+  if(Date.now() - remonteeAuDoigtA < 800) return;
+  noterFleche("clic (souris ou clavier)");
+  remonterEnHaut();
+});
+window.addEventListener("touchstart", (e) => {
+  if(remonteeEnCours && !btnRemonter.contains(e.target)){
+    cancelAnimationFrame(remonteeEnCours);
+    remonteeEnCours = null;
+    noterFleche(`remontée arrêtée : doigt posé ailleurs (y=${Math.round(window.scrollY)})`);
+  }
+}, { capture: true, passive: true });
+
 // #endregion
