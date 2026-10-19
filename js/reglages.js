@@ -1025,7 +1025,8 @@ function texteDiagnostic(){
     "--- Journal des actions en ligne ---",
     ...(journal.length ? journal : ["(vide)"]),
     "--- Erreurs récentes ---",
-    ...(erreursRecentes.length ? erreursRecentes : ["aucune"])
+    ...(erreursRecentes.length ? erreursRecentes : ["aucune"]),
+    ...(typeof journalMouchard === "function" ? journalMouchard() : []) // (js/mouchard.js)
   ].join("\n");
 }
 
@@ -1208,6 +1209,8 @@ async function envoyerBug(){
     ? `\n\n(${pieces.length} pièce${pieces.length > 1 ? "s" : ""} jointe${pieces.length > 1 ? "s" : ""} juste après)` : "";
   // ntfy : 4 096 octets au plus (au-delà, le message devient une pièce jointe) => texte + diagnostic coupés
   const message = (texte.slice(0, 1500) + annoncePieces + "\n\n" + texteDiagnostic()).slice(0, 3000);
+  // Mouchard actif : le diagnostic complet (avec tout son journal) part aussi en fichier, juste après
+  const diagnosticComplet = (typeof mouchardActif !== "undefined" && mouchardActif) ? texteDiagnostic() : null;
   btnEnvoyerBug.disabled = true;
   libelleEnvoyerBug.innerText = "Envoi…";
   try {
@@ -1219,6 +1222,10 @@ async function envoyerBug(){
   }
   dernierEnvoiBug = Date.now();
   let piecesRatees = 0;
+  if (diagnosticComplet) {
+    libelleEnvoyerBug.innerText = "Envoi du mouchard…";
+    try { await publierNtfy(`${titre} : mouchard`, new Blob([diagnosticComplet]), "mouchard.txt"); } catch (e) { piecesRatees++; }
+  }
   for (let i = 0; i < pieces.length; i++) {
     libelleEnvoyerBug.innerText = `Envoi de la pièce jointe ${i + 1}/${pieces.length}…`;
     try {
