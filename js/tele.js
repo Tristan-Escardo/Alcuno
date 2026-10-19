@@ -779,7 +779,7 @@ function dessinerTele(ecran, etat){
   elCouleur.hidden = !hexCouleur;
   elCouleur.innerText = hexCouleur ? etat.couleur.toUpperCase() : "";
   elCouleur.style.color = hexCouleur || "";
-  ecran.querySelector(".tele-regles").innerText = etat.regles || "";
+  afficherRegleBloc(ecran.querySelector(".tele-regles"), etat.regles); // (js/plateau.js)
 
   // Écran en cours sur le téléphone (annonce, duel, +4, pari…)
   const e = etat.ecran;
