@@ -223,7 +223,13 @@ function scellerHistoriqueIOS(){
   if(rechargementEnCours || profondeurIOS() !== pileIOS.length) return;
   try { history.pushState({ alcunoRetour: true, profondeur: pileIOS.length + 1, scelle: true }, ""); } catch (err) { return; }
   scellementEnCoursIOS = true;
-  rejoindrePileIOS();
+  // On reste un instant sur l'entrée ajoutée avant d'en repartir : l'iPhone ne prend sa capture qu'une
+  // fois l'entrée affichée (vu en vidéo : glisser vers l'avant montrait une page blanche, puis l'accueil
+  // une fois l'entrée passée à l'écran). Un tap entre-temps a pu ajouter une entrée : on ne recule alors pas.
+  requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(() => {
+    if(history.state && history.state.scelle) rejoindrePileIOS();
+    else scellementEnCoursIOS = false;
+  }, 60)));
 }
 
 // Filet de sécurité : après un glissement, l'iPhone garde sa capture affichée tant que la page ne se
