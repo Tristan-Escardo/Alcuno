@@ -328,7 +328,8 @@ if (!estPageTele) {
   document.getElementById("btnCasterArreter").addEventListener("click", arreterTele);
   // Réglages : pour une télé que le jeu n'a pas reconnue toute seule (index.html, NAVIGATEUR_TELE)
   document.getElementById("btnAfficherEcranTele").addEventListener("click", () => {
-    location.href = location.pathname + "?tele";
+    // (un peu plus tard : le clic des boutons a le temps de jouer, il était coupé par le changement de page)
+    setTimeout(() => { location.href = location.pathname + "?tele"; }, 300);
   });
   document.getElementById("btnCasterScanner").addEventListener("click", () => {
     ouvrirScanner({ lireCode: codeTeleDepuisTexte, quandCode: relierTele });

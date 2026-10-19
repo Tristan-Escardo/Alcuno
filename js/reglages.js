@@ -353,6 +353,7 @@ caseModeSoft.checked = lireReglage(CLE_MODE_SOFT, false);
 caseModeSoft.addEventListener("change", () => {
   ecrireReglage(CLE_MODE_SOFT, caseModeSoft.checked);
   majTitrePJ();
+  if (caseModeSoft.checked) jouerSon("sons_on");
 });
 
 let softPartieEnLigne = false;
@@ -406,6 +407,7 @@ caseFacesFermees.checked = lireReglage(CLE_FACES_FERMEES, false);
 caseFacesFermees.addEventListener("change", () => {
   ecrireReglage(CLE_FACES_FERMEES, caseFacesFermees.checked);
   majFacesFermees();
+  if (caseFacesFermees.checked) jouerSon("sons_on");
 });
 majFacesFermees();
 
