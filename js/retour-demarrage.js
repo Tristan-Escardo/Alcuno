@@ -137,6 +137,8 @@ let minuteurRetraitIOS = null;
 let ecranAvantTapIOS = null;  // tap en cours : écran affiché au moment du tap (son entrée est ajoutée)
 let toucherEnCoursIOS = null; // doigt posé sur un élément qui peut changer d'écran : { ecran, x, y }
 const ELEMENTS_NAVIGATION_IOS = 'button, a, [role="button"], #titreAccueil, header h1';
+// (la flèche « remonter » ne change pas d'écran : pas d'entrée, voir plus bas)
+const ELEMENTS_SANS_ENTREE_IOS = "#btnRemonter";
 const DEPLACEMENT_MAX_TAP_IOS = 12; // px : au-delà, le doigt a glissé, ce n'est pas un tap
 let minuteurTapIOS = null;
 
@@ -269,7 +271,8 @@ function toucherIOS(e){
   // Sinon, en tapant vite sur un autre bouton (Caster…), l'iPhone prenait sa capture avec les Réglages
   // encore à l'écran, et le glissement retour suivant remontrait les Réglages.
   document.querySelectorAll(".page-sortie").forEach(page => { if(page._finSortie) page._finSortie(); });
-  const surNavigation = e.target && e.target.closest && e.target.closest(ELEMENTS_NAVIGATION_IOS);
+  const surNavigation = e.target && e.target.closest && e.target.closest(ELEMENTS_NAVIGATION_IOS) &&
+    !e.target.closest(ELEMENTS_SANS_ENTREE_IOS);
   toucherEnCoursIOS = surNavigation ? { ecran: nomEcran(), x: e.clientX, y: e.clientY } : null;
 }
 
@@ -297,7 +300,7 @@ function leverDoigtIOS(e){
 // encore temps de l'ajouter.
 function clicIOS(e){
   if(e.isTrusted && ecranAvantTapIOS === null && !retraitEnCoursIOS &&
-     e.target && e.target.closest && e.target.closest(ELEMENTS_NAVIGATION_IOS)){
+     e.target && e.target.closest && e.target.closest(ELEMENTS_NAVIGATION_IOS) && !e.target.closest(ELEMENTS_SANS_ENTREE_IOS)){
     try {
       history.pushState({ alcunoRetour: true, profondeur: pileIOS.length + 1 }, "");
       annulerScellementIOS();
@@ -317,6 +320,11 @@ function finTapIOS(){
     else reconcilierPileIOS();
   }, 400);
 }
+
+// Nos allers-retours dans l'historique ne doivent jamais déplacer la page : l'iPhone remettait la position
+// qu'elle avait quand l'entrée a été ajoutée (vu au mouchard : la flèche remontait tout en haut, puis la
+// page redescendait d'un coup). Le jeu gère lui-même la position (overlays, écrans).
+try { history.scrollRestoration = "manual"; } catch (err) {}
 
 if(estIOS){
   // Au démarrage la pile est vide : l'entrée affichée est la base (une profondeur gardée d'avant un

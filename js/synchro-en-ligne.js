@@ -654,11 +654,57 @@ function afficherToast(message, duree = 1800){
     toast = document.createElement("div");
     toast.id = "toastEnLigne";
     document.body.appendChild(toast);
+    rendreToastGlissable(toast);
   }
   toast.innerText = message;
+  toast.style.transition = toast.style.transform = toast.style.opacity = "";
   toast.classList.add("visible");
   clearTimeout(toast._timer);
   toast._timer = setTimeout(() => toast.classList.remove("visible"), duree);
+}
+
+// Le message du bas se jette vers le bas avec le doigt (ou se ferme d'un tap) ; tenu au doigt, il reste
+function rendreToastGlissable(toast){
+  let departY = null, decalage = 0, dernierY = 0, dernierT = 0, vitesse = 0;
+  const placer = (dy, transition) => {
+    toast.style.transition = transition || "none";
+    toast.style.transform = `translate(-50%, ${dy}px)`;
+  };
+  const cacher = () => {
+    clearTimeout(toast._timer);
+    placer(toast.offsetHeight + 40, "transform 0.22s ease-in, opacity 0.22s ease-in");
+    toast.style.opacity = "0";
+    setTimeout(() => { toast.classList.remove("visible"); toast.style.transition = toast.style.transform = toast.style.opacity = ""; }, 240);
+  };
+  toast.addEventListener("pointerdown", (e) => {
+    if(!toast.classList.contains("visible")) return;
+    clearTimeout(toast._timer);
+    departY = dernierY = e.clientY;
+    dernierT = e.timeStamp;
+    decalage = vitesse = 0;
+    try { toast.setPointerCapture(e.pointerId); } catch (err) {}
+    placer(0);
+  });
+  toast.addEventListener("pointermove", (e) => {
+    if(departY === null) return;
+    const dy = e.clientY - departY;
+    decalage = dy > 0 ? dy : dy * 0.3; // vers le haut il résiste
+    if(e.timeStamp > dernierT) vitesse = (e.clientY - dernierY) / (e.timeStamp - dernierT);
+    dernierY = e.clientY;
+    dernierT = e.timeStamp;
+    placer(decalage);
+  });
+  const lacher = (e) => {
+    if(departY === null) return;
+    const bouge = Math.abs(e.clientY - departY);
+    departY = null;
+    if(e.type === "pointerup" && bouge < 8) return cacher();                  // simple tap
+    if(decalage > toast.offsetHeight * 0.4 || vitesse > 0.5) return cacher(); // jeté vers le bas
+    placer(0, "transform 0.22s ease");                                        // revient à sa place
+    toast._timer = setTimeout(() => toast.classList.remove("visible"), 2500);
+  };
+  toast.addEventListener("pointerup", lacher);
+  toast.addEventListener("pointercancel", lacher);
 }
 
 // #endregion
