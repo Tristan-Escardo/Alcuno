@@ -7141,6 +7141,7 @@ html[data-theme="soleil"] #enLigne #btnInviterPartie{ color: #fff; border-color:
   transform: translateY(8px);
   transition: opacity 0.25s ease, transform 0.25s ease, visibility 0s linear 0.25s;
   -webkit-tap-highlight-color: transparent;
+  touch-action: none; /* le doigt sur la flèche ne fait jamais défiler la page */
 }
 #btnRemonter.visible{
   opacity: 1;
@@ -7152,3 +7153,32 @@ html[data-theme="soleil"] #enLigne #btnInviterPartie{ color: #fff; border-color:
 #btnRemonter svg{ width: 22px; height: 22px; fill: none; stroke: rgba(255, 255, 255, 0.85); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 html[data-theme="givre"] #btnRemonter{ background: rgba(255, 255, 255, 0.45); border-color: rgba(13, 53, 80, 0.2); }
 html[data-theme="givre"] #btnRemonter svg{ stroke: rgba(13, 53, 80, 0.8); }
+
+/* Règles (écran des Règles et fiche d'une carte) : lignes à puces dorées, gorgées en doré */
+.lignesRegle{ list-style: none; margin: 0; padding: 0; }
+.lignesRegle li{ position: relative; padding-left: 15px; }
+.lignesRegle li + li{ margin-top: 7px; }
+.lignesRegle li::before{
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #FFD700;
+}
+:is(.detailRegle, #voletCarte .voletPause-texte) em{ font-style: normal; font-weight: 800; color: #FFD700; white-space: nowrap; }
+:is(.detailRegle, #voletCarte .voletPause-texte) b{ color: #fff; }
+.detailRegle .lignesRegle{ margin-top: 4px; }
+html[data-theme="givre"] .lignesRegle li::before{ background: var(--givre-accent); }
+html[data-theme="givre"] :is(.detailRegle, #voletCarte .voletPause-texte) em{ color: var(--givre-accent); }
+html[data-theme="givre"] :is(.detailRegle, #voletCarte .voletPause-texte) b{ color: var(--givre-texte); }
+/* Prestige : le doré se perdait sur le fond doré => crème avec l'ombre brune des titres */
+html[data-theme="prestige"] .lignesRegle li::before{ background: #fff2b0; box-shadow: 0 1px 0 rgba(122, 75, 0, 0.8); }
+html[data-theme="prestige"] :is(.detailRegle, #voletCarte .voletPause-texte) em{ color: #fff2b0; text-shadow: 0 1px 0 rgba(122, 75, 0, 0.9); }
+/* Soleil couchant : le bas de l'écran des Règles est clair (texte blanc peu lisible) => panneaux bleu
+   crépuscule comme les Réglages, gorgées en doré chaud */
+html[data-theme="soleil"] #ecranRegles .blocRegles{ background: var(--soleil-panneau); border-color: var(--soleil-bord); }
+html[data-theme="soleil"] .lignesRegle li::before{ background: #ffd27a; }
+html[data-theme="soleil"] :is(.detailRegle, #voletCarte .voletPause-texte) em{ color: #ffd27a; }

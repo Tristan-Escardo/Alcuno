@@ -599,8 +599,8 @@ function typeDeCarte(classe){
 function regleDeCarte(classe){
   if(classe === "carte_doree"){
     return { nom: "Carte dorée", texte: estModeSoft()
-      ? "Distribue 3 gorgées de la part du développeur 😘"
-      : "Distribue un CUL SEC de la part du développeur, et obligation de se servir un vrai verre avant 😘" };
+      ? "Distribue <em>3 gorgées</em> de la part du développeur 😘"
+      : "Distribue <em>un CUL SEC</em> de la part du développeur, et obligation de se servir un vrai verre avant 😘" };
   }
   const cartes = reglesDuJeu().find(partie => partie.titre === "Les cartes").regles;
   return cartes.find(r => typeDeCarte(r.carte) === typeDeCarte(classe)) || null;
@@ -629,7 +629,7 @@ function ouvrirVoletCarte(classe){
     </div>`;
   volet.querySelector(".voletCarte-carte").classList.add(classe);
   volet.querySelector(".voletPause-nom").textContent = regle.nom;
-  volet.querySelector(".voletPause-texte").textContent = regle.texte;
+  volet.querySelector(".voletPause-texte").innerHTML = htmlRegle(regle.texte); // (texte du jeu, voir reglesDuJeu)
   volet.querySelector(".voletPause-feuille").setAttribute("aria-label", regle.nom);
   rendreVoletGlissable(volet);
   volet.addEventListener("click", (e) => { if(e.target === volet) fermerVoletCarte(); });
@@ -1566,10 +1566,12 @@ function majBoutonRemonter(){
 }
 window.addEventListener("scroll", majBoutonRemonter, { passive: true });
 setInterval(majBoutonRemonter, 600); // (overlays, barres et volets qui apparaissent sans défilement)
-// Remontée animée ici (le défilement « smooth » du navigateur s'arrêtait en route sur iPhone), et au
-// doigt levé : un tap pendant que la page file encore ne donne pas de « click » sur iPhone (il ne fait
-// qu'arrêter le défilement), la flèche ne réagissait pas. Un doigt posé ailleurs arrête la remontée.
+// Remontée animée ici (le défilement « smooth » du navigateur s'arrêtait en route sur iPhone), lancée
+// dès que le doigt touche la flèche : sur iPhone, tant que la page file encore (élan), un tap ne donne ni
+// « click » ni même un doigt levé utilisable, il ne fait qu'arrêter le défilement. La barre « Tour de »
+// est recalée à chaque image (sinon elle sautait en arrivant en haut). Un doigt posé ailleurs arrête tout.
 let remonteeEnCours = null;
+let remonteeAuDoigtA = 0;
 function remonterEnHaut(){
   cancelAnimationFrame(remonteeEnCours);
   const depart = window.scrollY;
@@ -1580,11 +1582,21 @@ function remonterEnHaut(){
     const avance = Math.min(1, (maintenant - debut) / duree);
     const adouci = 1 - Math.pow(1 - avance, 3); // rapide au début, en douceur à l'arrivée
     window.scrollTo(0, Math.round(depart * (1 - adouci)));
+    repositionnerStickyJoueurActif();
     remonteeEnCours = avance < 1 ? requestAnimationFrame(etape) : null;
   };
   remonteeEnCours = requestAnimationFrame(etape);
 }
-activerMemePendantElan(btnRemonter, remonterEnHaut); // (script.js)
+btnRemonter.addEventListener("touchstart", (e) => {
+  if(e.cancelable) e.preventDefault(); // (pas de défilement ni de « click » derrière)
+  remonteeAuDoigtA = Date.now();
+  jouerSon("bouton");
+  remonterEnHaut();
+}, { passive: false });
+btnRemonter.addEventListener("click", () => { // souris, clavier
+  if(Date.now() - remonteeAuDoigtA < 800) return;
+  remonterEnHaut();
+});
 window.addEventListener("touchstart", (e) => {
   if(remonteeEnCours && !btnRemonter.contains(e.target)){ cancelAnimationFrame(remonteeEnCours); remonteeEnCours = null; }
 }, { capture: true, passive: true });

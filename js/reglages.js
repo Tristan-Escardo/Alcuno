@@ -1646,33 +1646,55 @@ if (!document.documentElement.classList.contains("mode-tele") && estEnAppli && !
 // Rempli à chaque ouverture : les gorgées suivent le Mode PJ. Pas de carte dorée (c'est une surprise).
 const ecranRegles = document.getElementById("ecranRegles");
 
-// Règles du jeu (écran des Règles, et fiche d'une carte au doigt appuyé sur le plateau : js/plateau.js)
+// Règles du jeu (écran des Règles, et fiche d'une carte au doigt appuyé sur le plateau : js/plateau.js).
+// texte : une phrase, ou une liste de lignes (règles longues : plus facile à lire qu'un pavé). Petit HTML
+// écrit ici (rien qui vient d'un joueur) : <b> le mot important, <em> les gorgées (en doré).
 function reglesDuJeu(){
   const pj = estModeSoft();
-  const duel = pj
-    ? "Choisis 2 joueurs. Chacun prend une carte cachée : celui qui a la plus petite boit la moitié de sa valeur (10 gorgées max). Égalité : on recommence, gorgées doublées."
-    : "Choisis 2 joueurs. Chacun prend une carte cachée : celui qui a la plus petite boit sa valeur en gorgées. Égalité : on recommence, gorgées doublées.";
+  const g = (n) => `<em>${texteGorgees(n)}</em>`;
   const parties = [
     { titre: "Comment on joue", regles: [
-      { carte: "", nom: "À ton tour", texte: "Toutes les cartes sont posées face cachée. Quand c'est ton tour, retourne la carte de ton choix et applique sa règle. Ensuite, c'est au joueur suivant." }
+      { carte: "", nom: "À ton tour", texte: [
+        "Toutes les cartes sont posées <b>face cachée</b>",
+        "À ton tour, retourne celle de ton choix et applique sa règle",
+        "Puis c'est au joueur suivant"
+      ]}
     ]},
     { titre: "Les cartes", regles: [
-      { carte: "zero_bleu", nom: "0", texte: "Tout le monde boit 1 gorgée, sauf toi." },
-      { carte: "un_rouge", nom: "1 : annulation", texte: "Tu gardes la carte : quand tu dois boire, tu peux t'en servir pour annuler 1 gorgée." },
-      { carte: "plus_2_jaune", nom: "+2", texte: `Tu bois ${texteGorgees(gorgeesPlus2())}.` },
-      { carte: "plus_4", nom: "+4", texte: `Tu distribues ${texteGorgees(gorgeesPlus4())} comme tu veux.` },
-      { carte: "trois_vert", nom: "3 : le Pigeon", texte: `Le premier qui tire un 3 devient le Pigeon et boit ${texteGorgees(gorgeesPigeon())}. À chaque 3 tiré par un autre, le Pigeon boit 1 gorgée. Si le Pigeon tire un 3, il choisit le nouveau Pigeon, qui boit ${texteGorgees(gorgeesPigeon())}.` },
-      { carte: "quatre_bleu", nom: "4 : duel", texte: duel },
-      { carte: "interdit_rouge", nom: "Sociale", texte: "Tout le monde boit 1 gorgée." },
+      { carte: "zero_bleu", nom: "0", texte: `Tout le monde boit ${g(1)}, sauf toi.` },
+      { carte: "un_rouge", nom: "1 : annulation", texte: `Tu gardes la carte : quand tu dois boire, tu peux t'en servir pour annuler ${g(1)}.` },
+      { carte: "plus_2_jaune", nom: "+2", texte: `Tu bois ${g(gorgeesPlus2())}.` },
+      { carte: "plus_4", nom: "+4", texte: `Tu distribues ${g(gorgeesPlus4())} comme tu veux.` },
+      { carte: "trois_vert", nom: "3 : le Pigeon", texte: [
+        `Le premier qui tire un 3 devient le <b>Pigeon</b> : ${g(gorgeesPigeon())}`,
+        `Un autre tire un 3 : le Pigeon boit ${g(1)}`,
+        `Le Pigeon tire un 3 : il choisit le <b>nouveau Pigeon</b>, qui boit ${g(gorgeesPigeon())}`
+      ]},
+      { carte: "quatre_bleu", nom: "4 : duel", texte: [
+        "Choisis <b>2 joueurs</b> : chacun prend une carte cachée",
+        pj ? "La plus petite carte boit <em>la moitié de sa valeur</em> (10 gorgées max)"
+           : "La plus petite carte boit <em>sa valeur en gorgées</em>",
+        "Égalité : on recommence, <em>gorgées doublées</em>"
+      ]},
+      { carte: "interdit_rouge", nom: "Sociale", texte: `Tout le monde boit ${g(1)}.` },
       { carte: "switch_vert", nom: "Changement de sens", texte: "Le sens du jeu est inversé." },
-      { carte: "couleur", nom: "Couleur", texte: "Choisis une couleur : le prochain qui tire une carte de cette couleur boit 1 gorgée en plus." }
+      { carte: "couleur", nom: "Couleur", texte: `Choisis une couleur : le prochain qui tire une carte de cette couleur boit ${g(1)} en plus.` }
     ]},
     { titre: "Fin de la partie", regles: [
-      { carte: "", nom: "Pari sur la dernière carte", texte: `Quand il ne reste qu'une carte, chacun parie sur son type. Ceux qui trouvent distribuent ${texteCulSec()}.` },
-      { carte: "un_jaune", nom: "Les 1 restants", texte: "Chaque 1 gardé jusqu'à la fin se transforme en gorgée à boire (1 gorgée par carte)." }
+      { carte: "", nom: "Pari sur la dernière carte", texte: [
+        "Quand il ne reste qu'<b>une carte</b>, chacun parie sur son type",
+        `Ceux qui trouvent distribuent <em>${texteCulSec()}</em>`
+      ]},
+      { carte: "un_jaune", nom: "Les 1 restants", texte: `Chaque 1 gardé jusqu'à la fin se transforme en gorgée à boire (${g(1)} par carte).` }
     ]}
   ];
   return parties;
+}
+
+// Texte d'une règle en HTML : la phrase telle quelle, ou les lignes en liste à puces dorées
+function htmlRegle(texte){
+  if (!Array.isArray(texte)) return texte;
+  return `<ul class="lignesRegle">${texte.map((ligne) => `<li>${ligne}</li>`).join("")}</ul>`;
 }
 
 function remplirRegles(){
@@ -1706,7 +1728,7 @@ function remplirRegles(){
       nom.innerText = r.nom;
       const detail = document.createElement("span");
       detail.className = "detailRegle";
-      detail.innerText = r.texte;
+      detail.innerHTML = htmlRegle(r.texte);
       texte.append(nom, detail);
       ligne.append(carte, texte);
       bloc.appendChild(ligne);
