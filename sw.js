@@ -23,6 +23,7 @@ const A_PRECHARGER = [
   "./js/retour-demarrage.js",
   "./js/tele.js",
   "./js/stats.js",
+  "./js/mouchard.js",
   "./style_alcuno.css",
   "./manifest.json",
   "./icones/icone-192.png",

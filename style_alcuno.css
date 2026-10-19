@@ -3641,6 +3641,9 @@ html.accessibilite #enLigne .infoModeSoft{
 
 /* ===== Réglages > À propos : version centrée sous le titre ===== */
 #ecranReglages .versionJeu{
+  touch-action: manipulation; /* (5 taps rapides : le mouchard, js/mouchard.js) */
+  -webkit-user-select: none;
+  user-select: none;
   margin: 6px 0 0;
   font-size: 14px;
   color: rgba(255,255,255,0.55);
