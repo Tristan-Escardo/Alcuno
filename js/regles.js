@@ -1887,7 +1887,13 @@ function retourMenu(){
   majBoutonPause();
 }
 
-btnJouer.addEventListener("pointerdown", lancerPartie);
+// (au doigt posé : le bouton disparaît aussitôt, le « click » qui joue le son des boutons ne tombait plus
+// dessus => pas de son ; on le joue ici)
+btnJouer.addEventListener("pointerdown", () => {
+  jouerSon("bouton");
+  sonBoutonJoueLe = Date.now();
+  lancerPartie();
+});
 
 // #endregion
 
