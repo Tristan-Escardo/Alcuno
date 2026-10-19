@@ -55,7 +55,7 @@ const rond = (n) => Math.round(n);
 // ===== Activation : 5 taps sur la version =====
 const ligneVersion = document.getElementById("versionJeu");
 function majLigneVersionMouchard(){
-  ligneVersion.innerText = "Alcuno — version " + VERSION_AFFICHEE + (mouchardActif ? " · mouchard actif 🔴" : "");
+  ligneVersion.innerText = "Alcuno — version " + VERSION_AFFICHEE + (mouchardActif ? " · mouchard actif" : "");
 }
 let tapsVersion = [];
 // (doigt levé et pas « click » : des taps rapides sur un texte ne donnent pas tous un click)
@@ -70,9 +70,9 @@ ligneVersion.addEventListener("pointerup", () => {
     lignesMouchard = [];
     noter(`=== mouchard activé · ${VERSION_AFFICHEE} · ${navigator.userAgent}`);
     noter(`écran ${innerWidth}x${innerHeight} · appli installée : ${estEnAppli}`);
-    afficherToast("Mouchard activé : reproduis le bug, puis « Copier le diagnostic »", 4000);
+    afficherNotificationHaut("", "Mouchard activé : reproduis le bug, puis « Copier le diagnostic »", true);
   } else {
-    afficherToast("Mouchard coupé", 2000);
+    afficherNotificationHaut("", "Mouchard coupé", true);
   }
   sauverMouchard();
   majLigneVersionMouchard();
