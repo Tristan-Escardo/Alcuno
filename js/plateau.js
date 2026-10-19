@@ -677,6 +677,7 @@ plateau.addEventListener("pointerdown", (e) => {
     appuiLongFait = true;
     try { window.getSelection().removeAllRanges(); } catch (err) {}
     vibrer(20);
+    jouerSon("regles"); // (le son du livre des Règles)
     ouvrirVoletCarte(classe);
   }, DUREE_APPUI_LONG);
 });
