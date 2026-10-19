@@ -73,11 +73,12 @@
         table{ width: 100%; border-collapse: collapse; font-size: 16px; }
         td, th{ padding: 7px 4px; text-align: right; }
         th{ color: var(--cyan-titre); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; font-family: "Inter", Arial, sans-serif; font-weight: 700; }
-        td:first-child, th:first-child{ text-align: left; color: var(--cyan-doux); }
+        td:first-child, th:first-child{ text-align: left; color: var(--cyan-doux); white-space: nowrap; }
         td{ color: #cfefff; font-weight: 600; }
         td + td{ font-family: "Inter", Arial, sans-serif; font-variant-numeric: tabular-nums; font-size: 15px; }
         td b{ color: var(--cyan-clair); text-shadow: 0 0 8px var(--cyan); }
         tr + tr td{ border-top: 1px solid rgba(0, 229, 255, .14); }
+        @media (max-width: 380px){ td, th{ padding: 7px 2px; } td:first-child{ font-size: 15px; } }
         .barre{ display: flex; align-items: center; gap: 8px; font-size: 15px; margin: 8px 0; }
         .nom{ width: 120px; color: var(--cyan-doux); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .piste{ flex: 1; height: 7px; background: rgba(0, 229, 255, .1); border-radius: 4px; overflow: hidden; }
@@ -178,7 +179,7 @@
 
         // Empreinte (SHA-256) du code d'accès : le code lui-même n'est écrit nulle part
         // Version de la page de stats (à part de celle du jeu : +0.0.1 à chaque modification de cette page)
-        const VERSION_STATS = "1.5.4";
+        const VERSION_STATS = "1.5.5";
         document.getElementById("versionStats").textContent = VERSION_STATS;
 
         const EMPREINTE_CODE = "2c8125d3adc62dac73f3ae036a86e00ba51b12b0dfb38fec2184e76441ed6826";
@@ -383,7 +384,7 @@
                 const lignes = [
                     ["Visites", "visites"], ["Visiteurs", null], ["Installations", "installs"],
                     ["Parties lancées", "parties"], ["Parties en ligne", "partiesEnLigne"],
-                    ["Dorée en jeu", "doreesEnJeu"], ["Dorée tirée", "doreesTirees"]
+                    ["Carte dorée en jeu", "doreesEnJeu"], ["Carte dorée tirée", "doreesTirees"]
                 ];
                 document.getElementById("tableau").innerHTML = lignes.map(([titre, nom]) => {
                     const v = nom
