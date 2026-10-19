@@ -6865,3 +6865,39 @@ html.faces-fermees #plateau .Carte.retournee.recachee,
 #plateau .Carte.retournee{ transition: transform 0.2s ease-out, filter 0.3s ease; }
 #plateau .Carte.recache-anim{ transform: scaleX(0); transition: transform 0.2s ease-in; }
 @media (prefers-reduced-motion: reduce){ #plateau .Carte.recache-anim{ transform: none; } }
+
+/* ===== Bouton « Caster sur la télé » : icône dans un carré doré à gauche, texte centré ===== */
+#menu #btnCaster{
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 60px;
+  padding-right: 60px;
+}
+#btnCaster .casterIcone{
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, #ffd426, #f6b800);
+  color: #3a2000;
+}
+#btnCaster .casterIcone svg{
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+#btnCaster .casterIcone circle{ fill: currentColor; }
+html[data-theme="givre"] #btnCaster .casterIcone{ background: linear-gradient(180deg, #4fc3f7, #1a92d6); color: #fff; }
+html[data-theme="soleil"] #btnCaster .casterIcone{ background: linear-gradient(180deg, #ffb35c, #f2775c); color: #fff; }
+html[data-theme="prestige"] #btnCaster .casterIcone{ background: linear-gradient(180deg, #fff2b0, #f5c842 45%, #c8880a); }
