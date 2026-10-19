@@ -2199,6 +2199,10 @@ body.mode-en-ligne #jouer{
 #toastEnLigne.visible{
   opacity: 1;
   transform: translate(-50%, 0);
+  pointer-events: auto; /* on peut le jeter vers le bas (js/synchro-en-ligne.js) */
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 /* ===== EASTER EGG : écran des créateurs (4 taps sur le titre ALCUNO) ===== */

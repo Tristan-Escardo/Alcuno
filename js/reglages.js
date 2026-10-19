@@ -1043,11 +1043,11 @@ document.getElementById("btnDiagnostic").addEventListener("click", () => {
   const copie = (navigator.clipboard && navigator.clipboard.writeText)
     ? navigator.clipboard.writeText(texte)
     : Promise.reject(new Error("presse-papiers indisponible"));
-  copie.then(() => afficherNotificationHaut("", "Diagnostic copié", true))
+  copie.then(() => afficherToast("Diagnostic copié", 3000))
     .catch((e) => {
       // Refus du téléphone : on le dit (avant, rien : l'ancien texte restait dans le presse-papier)
       noterErreur(`copie du diagnostic refusée : ${e && (e.name + " " + e.message)}`);
-      afficherNotificationHaut("", `Copie refusée par le téléphone (${(e && e.name) || "erreur"})`, true);
+      afficherToast(`Copie refusée par le téléphone (${(e && e.name) || "erreur"})`, 4000);
     });
 });
 
