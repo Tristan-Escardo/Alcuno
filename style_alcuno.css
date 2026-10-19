@@ -7071,9 +7071,8 @@ html[data-theme="soleil"] .voletPause-ok{ background: linear-gradient(180deg, #f
 }
 
 /* Règle d'une carte : doigt appuyé sur une carte retournée du plateau (js/plateau.js) */
-.astuceRegles{ font-size: 12px; font-weight: 700; color: rgba(255, 255, 255, 0.5); margin-left: 6px; }
-html[data-theme="givre"] .astuceRegles{ color: rgba(13, 53, 80, 0.55); }
-#plateau .Carte{ -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+/* (iPhone : le doigt appuyé longtemps sélectionnait du texte et ouvrait la loupe) */
+#plateau, #plateau *{ -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
 #plateau .Carte.carte-appuyee{
   position: relative;
   z-index: 5;
