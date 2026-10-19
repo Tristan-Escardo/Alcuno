@@ -57,6 +57,7 @@ function actionRetour(){
   if(annonce) return () => taper(annonce);
 
   if(estOuverte(ecranCredits)) return () => activer("btnFermerCredits");
+  if(document.getElementById("aideAccueil")) return fermerAideAccueil;
   if(estOuverte(ecranInstallation)) return () => activer("btnInstallationPlusTard");
   if(estOuverte(ecranRegles)) return () => activer("btnFermerRegles");
   if(estOuverte(ecranBug)) return () => activer("btnBugRetour"); // (par-dessus les Réglages)

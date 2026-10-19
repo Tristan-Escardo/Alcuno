@@ -1499,6 +1499,116 @@ if (estTelephone && !estEnAppli) {
   }
 }
 
+
+// ===== Aide du premier lancement : où sont les Règles et les Réglages =====
+// Une seule fois par téléphone, sur l'accueil quand rien d'autre n'est ouvert (écran « Installer
+// Alcuno », Réglages…). L'accueil est flouté sauf les deux icônes, montrées par des flèches dorées
+// « coup de pinceau » (courbes, épaisses au milieu, fines aux deux bouts). Un tap n'importe où la ferme.
+const CLE_AIDE_VUE = "alcuno_aide_vue";
+
+function aideDejaVue(){
+  try { return localStorage.getItem(CLE_AIDE_VUE) === "1"; } catch (e) { return true; }
+}
+
+// Contour de la flèche : bézier cubique de la queue (P0) à la pointe (P3), élargie de part et d'autre
+// (épaisseur max au milieu), puis la pointe en chevron (deux petits traits effilés)
+function cheminFlecheAide(P0, P1, P2, P3, epaisseur){
+  const point = (t) => { const u = 1 - t; return {
+    x: u*u*u*P0.x + 3*u*u*t*P1.x + 3*u*t*t*P2.x + t*t*t*P3.x,
+    y: u*u*u*P0.y + 3*u*u*t*P1.y + 3*u*t*t*P2.y + t*t*t*P3.y }; };
+  const direction = (t) => { const u = 1 - t; const d = {
+    x: 3*u*u*(P1.x-P0.x) + 6*u*t*(P2.x-P1.x) + 3*t*t*(P3.x-P2.x),
+    y: 3*u*u*(P1.y-P0.y) + 6*u*t*(P2.y-P1.y) + 3*t*t*(P3.y-P2.y) };
+    const l = Math.hypot(d.x, d.y) || 1; return { x: d.x / l, y: d.y / l }; };
+  const f = (n) => n.toFixed(1);
+  const gauche = [], droite = [];
+  for (let i = 0; i <= 60; i++) {
+    const t = i / 60, q = point(t), d = direction(t);
+    const demi = Math.max(0.8, epaisseur * Math.pow(Math.sin(Math.PI * t), 0.75)) / 2;
+    gauche.push(`${f(q.x - d.y * demi)} ${f(q.y + d.x * demi)}`);
+    droite.unshift(`${f(q.x + d.y * demi)} ${f(q.y - d.x * demi)}`);
+  }
+  let chemin = `M${gauche.join("L")}L${droite.join("L")}Z`;
+  const d = direction(1), pointe = { x: P3.x + d.x * 3, y: P3.y + d.y * 3 };
+  for (const cote of [1, -1]) {
+    const bout = { x: pointe.x - d.x * 17 - d.y * 11 * cote, y: pointe.y - d.y * 17 + d.x * 11 * cote };
+    const milieu = { x: (pointe.x + bout.x) / 2, y: (pointe.y + bout.y) / 2 };
+    const l = Math.hypot(bout.x - pointe.x, bout.y - pointe.y);
+    const px = -(bout.y - pointe.y) / l, py = (bout.x - pointe.x) / l;
+    chemin += `M${f(pointe.x - px*1.2)} ${f(pointe.y - py*1.2)}Q${f(milieu.x - px*2.6)} ${f(milieu.y - py*2.6)} ${f(bout.x)} ${f(bout.y)}` +
+      `Q${f(milieu.x + px*2.6)} ${f(milieu.y + py*2.6)} ${f(pointe.x + px*1.2)} ${f(pointe.y + py*1.2)}Z`;
+  }
+  return chemin;
+}
+
+// Place les trous du voile, les flèches et les textes d'après la position réelle des deux icônes
+function placerAideAccueil(aide){
+  const r1 = document.getElementById("btnRegles").getBoundingClientRect();
+  const r2 = document.getElementById("btnReglages").getBoundingClientRect();
+  const a = { x: r1.left + r1.width / 2, y: r1.top + r1.height / 2 };
+  const c = { x: r2.left + r2.width / 2, y: r2.top + r2.height / 2 };
+  const largeur = window.innerWidth;
+  const hautTextes = Math.max(a.y, c.y) + 196;
+  aide.querySelector(".aideAccueil-voile").style.cssText =
+    `--x1:${a.x}px;--y1:${a.y}px;--x2:${c.x}px;--y2:${c.y}px`;
+  aide.querySelector(".aideAccueil-fleches").setAttribute("viewBox", `0 0 ${largeur} ${window.innerHeight}`);
+  const queueG = largeur * 0.3, queueD = largeur * 0.7;
+  const fleches = [
+    cheminFlecheAide({ x: queueG, y: hautTextes - 14 }, { x: queueG + 4, y: hautTextes - 90 },
+      { x: a.x + 60, y: a.y + 70 }, { x: a.x + 22, y: a.y + 34 }, 11),
+    cheminFlecheAide({ x: queueD, y: hautTextes - 14 }, { x: queueD - 4, y: hautTextes - 90 },
+      { x: c.x - 60, y: c.y + 70 }, { x: c.x - 22, y: c.y + 34 }, 11)
+  ].join("");
+  aide.querySelectorAll(".aideAccueil-fleches path").forEach((chemin) => chemin.setAttribute("d", fleches));
+  aide.querySelectorAll(".aideAccueil-repere").forEach((repere) => { repere.style.top = hautTextes + "px"; });
+}
+
+function fermerAideAccueil(){
+  const aide = document.getElementById("aideAccueil");
+  if (!aide || aide.classList.contains("aideAccueil-sortie")) return;
+  try { localStorage.setItem(CLE_AIDE_VUE, "1"); } catch (e) {}
+  aide.classList.add("aideAccueil-sortie");
+  window.removeEventListener("resize", aide._replacer);
+  setTimeout(() => aide.remove(), 300);
+}
+
+function afficherAideAccueil(){
+  if (document.getElementById("aideAccueil")) return;
+  const aide = document.createElement("div");
+  aide.id = "aideAccueil";
+  aide.setAttribute("role", "dialog");
+  aide.setAttribute("aria-label", "Où sont les règles et les réglages");
+  aide.innerHTML = `
+    <div class="aideAccueil-voile"></div>
+    <svg class="aideAccueil-fleches" aria-hidden="true">
+      <defs><linearGradient id="orAideAccueil" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#E6A800"/><stop offset="1" stop-color="#FFE34D"/></linearGradient></defs>
+      <path class="aideAccueil-ombre"/><path fill="url(#orAideAccueil)"/>
+    </svg>
+    <div class="aideAccueil-repere aideAccueil-gauche"><b>Règles</b>Toutes les cartes<br>expliquées.</div>
+    <div class="aideAccueil-repere aideAccueil-droite"><b>Réglages</b>Thèmes, sons,<br>Mode PJ…</div>
+    <div class="aideAccueil-bas"><b>QUE LA FÊTE COMMENCE !</b>Touche l'écran pour jouer</div>`;
+  placerAideAccueil(aide);
+  aide._replacer = () => placerAideAccueil(aide);
+  window.addEventListener("resize", aide._replacer);
+  aide.addEventListener("click", fermerAideAccueil);
+  document.body.appendChild(aide);
+}
+
+// On attend que l'accueil soit libre : l'écran d'installation passe d'abord (sur Android il arrive
+// jusqu'à 1,5 s après l'ouverture, d'où les 2 s), une partie en cours ou une invitation par QR code
+// aussi (l'aide viendra au prochain passage sur l'accueil)
+if (!document.documentElement.classList.contains("mode-tele") && !aideDejaVue()) setTimeout(() => { // (pas sur la télé)
+  const surveillance = setInterval(() => {
+    if (aideDejaVue()) { clearInterval(surveillance); return; }
+    const accueilLibre = !partieLancee &&
+      document.getElementById("choixMode").style.display !== "none" &&
+      [ecranInstallation, ecranReglages, ecranRegles, ecranCredits].every((page) => page.style.display === "none") &&
+      !document.getElementById("fenetrePrestige");
+    if (!accueilLibre) return;
+    clearInterval(surveillance);
+    afficherAideAccueil();
+  }, 700);
+}, 2000);
 // #endregion
 
 // #region Écran des règles du jeu (bouton livre de l'accueil et du bandeau de la partie)
