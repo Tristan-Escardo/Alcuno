@@ -1551,4 +1551,20 @@ function finDePartie(){
   executerApresOverlayRegleUnique(afficherOverlayFinUnRestants);
 }
 
+
+// ===== Remonter tout en haut : petit bouton en bas à gauche pendant la partie =====
+// Visible quand on a bien descendu sur le plateau ; caché par-dessus un overlay, un volet, la barre
+// « Mauvais joueur ? » ou l'écran de pause (il passerait dessous ou les gênerait).
+const btnRemonter = document.getElementById("btnRemonter");
+function majBoutonRemonter(){
+  const visible = partieLancee && window.scrollY > 500 &&
+    !document.documentElement.classList.contains("overlay-ouvert") &&
+    !document.querySelector("#annulerChoix, #voletPause, #voletCarte") &&
+    document.getElementById("ecranPause").style.display === "none";
+  btnRemonter.classList.toggle("visible", visible);
+}
+window.addEventListener("scroll", majBoutonRemonter, { passive: true });
+setInterval(majBoutonRemonter, 600); // (overlays, barres et volets qui apparaissent sans défilement)
+btnRemonter.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+
 // #endregion
