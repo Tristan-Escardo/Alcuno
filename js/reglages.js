@@ -162,13 +162,17 @@ function rendreNotifGlissable(notif, duree){
     notif.style.transition = transition || "none";
     notif.style.transform = `translate(-50%, ${decalage}px)`;
   };
+  // Elle ne monte jamais jusqu'au bord du haut : en la glissant vers le haut, elle montait sous l'heure,
+  // et l'iPhone reprenait sa couleur pour la barre du haut (qui la gardait ensuite). Elle s'efface donc
+  // en fondu en montant à peine, et la barre reprend la couleur du thème une fois la notification partie.
+  const montee = () => -Math.max(0, notif.offsetTop - 8);
   const fermer = () => {
     if (partie) return;
     partie = true;
     clearTimeout(minuteur);
-    placer(-(notif.offsetHeight + notif.offsetTop + 20), "transform 0.28s ease-in, opacity 0.28s ease-in");
+    placer(montee(), "transform 0.28s ease-in, opacity 0.28s ease-in");
     notif.style.opacity = "0";
-    setTimeout(() => notif.remove(), 300);
+    setTimeout(() => { notif.remove(); peindreBarreTelephone(); }, 300);
   };
   const programmerDepart = (delai) => {
     clearTimeout(minuteur);
@@ -195,12 +199,14 @@ function rendreNotifGlissable(notif, duree){
   notif.addEventListener("pointermove", (e) => {
     if (departY === null || partie) return;
     const dy = e.clientY - departY;
-    // vers le haut elle suit le doigt ; vers le bas elle résiste (élastique)
+    // vers le haut elle s'efface en suivant le doigt (sans toucher le bord du haut) ; vers le bas elle
+    // résiste (élastique)
     decalage = dy < 0 ? dy : dy * 0.3;
+    notif.style.opacity = dy < 0 ? String(Math.max(0.15, 1 + dy / (notif.offsetHeight * 1.2))) : "";
     if (e.timeStamp > dernierT) vitesse = (e.clientY - dernierY) / (e.timeStamp - dernierT);
     dernierY = e.clientY;
     dernierT = e.timeStamp;
-    placer(decalage);
+    placer(Math.max(decalage, montee()));
   });
   const lacher = (e) => {
     if (departY === null || partie) return;
@@ -208,7 +214,8 @@ function rendreNotifGlissable(notif, duree){
     departY = null;
     if (e.type === "pointerup" && bouge < 8) return fermer();                 // simple tap
     if (decalage < -notif.offsetHeight * 0.35 || vitesse < -0.5) return fermer(); // jetée vers le haut
-    placer(0, "transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)");                // revient à sa place
+    placer(0, "transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.25s ease"); // revient à sa place
+    notif.style.opacity = "";
     programmerDepart(3000);
   };
   notif.addEventListener("pointerup", lacher);
@@ -1035,11 +1042,11 @@ document.getElementById("btnDiagnostic").addEventListener("click", () => {
   const copie = (navigator.clipboard && navigator.clipboard.writeText)
     ? navigator.clipboard.writeText(texte)
     : Promise.reject(new Error("presse-papiers indisponible"));
-  copie.then(() => afficherToast("Diagnostic copié", 3000))
+  copie.then(() => afficherNotificationHaut("", "Diagnostic copié", true))
     .catch((e) => {
       // Refus du téléphone : on le dit (avant, rien : l'ancien texte restait dans le presse-papier)
       noterErreur(`copie du diagnostic refusée : ${e && (e.name + " " + e.message)}`);
-      afficherToast(`Copie refusée par le téléphone (${(e && e.name) || "erreur"})`, 4000);
+      afficherNotificationHaut("", `Copie refusée par le téléphone (${(e && e.name) || "erreur"})`, true);
     });
 });
 
