@@ -458,8 +458,83 @@ function nomType(typeId){
 
 function nextPlayerIndex(fromIdx){
   if(joueurs.length === 0) return 0;
-  return (fromIdx + (sensHoraire ? 1 : -1) + joueurs.length) % joueurs.length;
+  const n = joueurs.length;
+  // Joueur en pause (toilettes, clope…) : son tour est sauté
+  let i = fromIdx;
+  for(let k = 0; k < n; k++){
+    i = (i + (sensHoraire ? 1 : -1) + n) % n;
+    if(!estEnPause(joueurs[i])) return i;
+  }
+  return (fromIdx + (sensHoraire ? 1 : -1) + n) % n;
 }
+
+// ===== Joueurs en pause (aux toilettes, en pause clope…) =====
+// Bouton ⏸ à droite de chaque nom (bloc Joueurs) : son tour est sauté et on ne peut plus le choisir
+// (pigeon, duel, +4, carte dorée, sociale, 0, pari de fin) jusqu'à son retour (▶). Action de jeu comme
+// une autre (« pause:NOM ») : en ligne, appliquée pareil sur tous les téléphones ; en classique, gardée
+// pour la reprise après un plantage. Il reste toujours au moins 2 joueurs pas en pause.
+let joueursEnPause = new Set();
+function estEnPause(nom){ return joueursEnPause.has(nom); }
+function indexJoueursActifs(){ return joueurs.map((_, i) => i).filter(i => !estEnPause(joueurs[i])); }
+
+function basculerPauseJoueur(nom){
+  if(!joueurs.includes(nom)) return;
+  const discret = rattrapageEnCours; // (rejeu accéléré : pas de notif)
+  if(estEnPause(nom)){
+    joueursEnPause.delete(nom);
+    if(!discret) afficherNotificationHaut("", `${nom} est de retour !`, true);
+  } else {
+    if(indexJoueursActifs().length <= 2) return;
+    joueursEnPause.add(nom);
+    const courant = indexJoueur % joueurs.length;
+    if(joueurs[courant] === nom){
+      indexJoueur = nextPlayerIndex(courant); // c'était son tour : au suivant
+      if(!discret) afficherNotificationHaut("", `${nom} est en pause : au tour de ${joueurs[indexJoueur]}`, true);
+    } else if(!discret){
+      afficherNotificationHaut("", `${nom} est en pause`, true);
+    }
+  }
+  afficherJoueurs();
+  afficherJoueurActif();
+}
+
+// Volet « Léa » (au tap sur ⏸ / ▶) : confirmation, puis l'action de jeu (évènement « alcuno-pause »)
+function ouvrirVoletPause(nom, bouton){
+  fermerVoletPause();
+  const enPause = estEnPause(nom);
+  if(!enPause && indexJoueursActifs().length <= 2){
+    afficherNotificationHaut("", "Il faut au moins 2 joueurs qui ne sont pas en pause", true);
+    return;
+  }
+  const volet = document.createElement("div");
+  volet.id = "voletPause";
+  volet.innerHTML = `<div class="voletPause-feuille" role="dialog">
+      <div class="voletPause-poignee"></div>
+      <div class="voletPause-nom"></div>
+      <div class="voletPause-texte"></div>
+      <button type="button" class="voletPause-ok"></button>
+      <button type="button" class="voletPause-annuler">Annuler</button>
+    </div>`;
+  volet.querySelector(".voletPause-nom").textContent = avecCouronne(nom);
+  volet.querySelector(".voletPause-texte").innerHTML = enPause
+    ? "De retour parmi nous ?"
+    : "Aux toilettes, en train de vomir, en pause clope… ?<br>Son tour est sauté jusqu'à son retour.";
+  volet.querySelector(".voletPause-ok").textContent = enPause ? `${nom} est de retour` : `Mettre ${nom} en pause`;
+  volet.addEventListener("click", (e) => { if(e.target === volet) fermerVoletPause(); });
+  volet.querySelector(".voletPause-annuler").addEventListener("click", fermerVoletPause);
+  volet.querySelector(".voletPause-ok").addEventListener("click", () => {
+    fermerVoletPause();
+    if(bouton.isConnected) bouton.dispatchEvent(new Event("alcuno-pause"));
+  });
+  document.body.appendChild(volet);
+}
+function fermerVoletPause(){
+  const volet = document.getElementById("voletPause");
+  if(volet) volet.remove();
+}
+
+const ICONE_PAUSE_JOUEUR = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1.2"/><rect x="14" y="5" width="4" height="14" rx="1.2"/></svg>';
+const ICONE_RETOUR_JOUEUR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
 
 function creerCartePreview(className){
   const wrap = document.createElement("div");
@@ -547,7 +622,8 @@ function lancerOverlayPrediction(startIndex){
   // Ordre de jeu pour la sélection
   const ordre = [];
   for(let k = 0; k < joueurs.length; k++){
-    ordre.push((startIndex + (sensHoraire ? k : -k) + joueurs.length) % joueurs.length);
+    const idx = (startIndex + (sensHoraire ? k : -k) + joueurs.length) % joueurs.length;
+    if(!estEnPause(joueurs[idx])) ordre.push(idx); // (joueur en pause : ne parie pas)
   }
   let curPos = 0;
   let revele = false; // la dernière carte n'est révélée qu'avec « Valider » (on peut encore revenir en arrière)
@@ -1004,12 +1080,33 @@ function afficherJoueurs(){
     const n = Number(annulations[j] || 0);
     const bonus = n > 0 ? ` <span class="bonus-annulation">+${n}</span>` : "";
 
+    const pause = estEnPause(j) ? ` <span class="badge-pause">EN PAUSE</span>` : "";
+    const classePause = estEnPause(j) ? " joueur-en-pause" : "";
     if(i === indexPigeon){
-      return `<div class="joueur-ligne joueur-ligne-pigeon"><strong>PIGEON</strong> (${echapperHtml(avecCouronne(nomPigeonOriginal))})${bonus}${badgeDeconnecte(j)}</div>`;
+      return `<div class="joueur-ligne joueur-ligne-pigeon${classePause}"><strong>PIGEON</strong> (${echapperHtml(avecCouronne(nomPigeonOriginal))})${bonus}${pause}${badgeDeconnecte(j)}</div>`;
     }
 
-    return `<div class="joueur-ligne">${echapperHtml(avecCouronne(j))}${bonus}${badgeDeconnecte(j)}</div>`;
+    return `<div class="joueur-ligne${classePause}">${echapperHtml(avecCouronne(j))}${bonus}${pause}${badgeDeconnecte(j)}</div>`;
   }).join("");
+
+  // En partie : bouton ⏸ (ou ▶ s'il est en pause) à droite de chaque nom
+  if(partieLancee){
+    listeJoueurs.querySelectorAll(".joueur-ligne").forEach((ligne, i) => {
+      const nom = joueurs[i];
+      const bouton = document.createElement("button");
+      bouton.type = "button";
+      bouton.className = "btnPauseJoueur" + (estEnPause(nom) ? " en-pause" : "");
+      bouton.setAttribute("aria-label", estEnPause(nom) ? `${nom} est de retour` : `Mettre ${nom} en pause`);
+      bouton.innerHTML = estEnPause(nom) ? ICONE_RETOUR_JOUEUR : ICONE_PAUSE_JOUEUR;
+      surAction(bouton, "pause:" + nom, {
+        evenement: "alcuno-pause",
+        pret: () => partieLancee && !predictionEnCours,
+        valide: () => joueurs.includes(nom) && (estEnPause(nom) || indexJoueursActifs().length > 2)
+      }, () => basculerPauseJoueur(nom));
+      bouton.addEventListener("click", () => ouvrirVoletPause(nom, bouton));
+      ligne.appendChild(bouton);
+    });
+  }
 
   if(!partieLancee){
     btnJouer.style.display = joueurs.length >= 2 ? "inline-block" : "none";
@@ -1242,6 +1339,7 @@ function retirerJoueurEnJeu(nom){
   const courant = indexJoueur % joueurs.length;
   joueurs.splice(idx, 1);
   delete annulations[nom];
+  joueursEnPause.delete(nom);
   const n = joueurs.length;
 
   if(indexPigeon !== null){
