@@ -520,11 +520,53 @@ function ouvrirVoletPause(nom, bouton){
     ? "De retour parmi nous ?"
     : "Aux toilettes, en train de vomir, en pause clope… ?<br>Son tour est sauté jusqu'à son retour.";
   volet.querySelector(".voletPause-ok").textContent = enPause ? `${nom} est de retour` : `Mettre ${nom} en pause`;
+  // Le doigt (ou la molette) sur le volet ou le fond assombri ne fait pas défiler la partie derrière :
+  // glisser vers le bas (n'importe où) descend la feuille, qui se ferme si on la lâche assez bas ou
+  // d'un coup sec, sinon elle remonte
+  const feuille = volet.querySelector(".voletPause-feuille");
+  let depart = null, decalage = 0, aGlisse = false, vitesse = 0, dernier = null;
+  const placer = (y, duree) => {
+    feuille.style.transition = volet.style.transition = duree ? `transform ${duree}s ease, background-color ${duree}s ease` : "none";
+    feuille.style.transform = `translateY(${y}px)`;
+    volet.style.backgroundColor = `rgba(0, 0, 0, ${(0.55 * (1 - Math.min(1, y / feuille.offsetHeight))).toFixed(3)})`;
+  };
+  volet.addEventListener("touchstart", (e) => {
+    if(e.touches.length !== 1) return;
+    depart = { y: e.touches[0].clientY, moment: Date.now() };
+    dernier = depart;
+    decalage = 0;
+    vitesse = 0;
+    aGlisse = false;
+    feuille.style.animation = "none"; // (l'animation d'arrivée garderait la main sur la position)
+  }, { passive: true });
+  volet.addEventListener("touchmove", (e) => {
+    if(e.cancelable) e.preventDefault();
+    if(!depart) return;
+    decalage = Math.max(0, e.touches[0].clientY - depart.y);
+    const maintenant = { y: e.touches[0].clientY, moment: Date.now() };
+    vitesse = (maintenant.y - dernier.y) / Math.max(1, maintenant.moment - dernier.moment); // px par ms, au dernier mouvement
+    dernier = maintenant;
+    if(decalage > 8) aGlisse = true;
+    placer(decalage, 0);
+  }, { passive: false });
+  const lacher = () => {
+    if(!depart) return;
+    depart = null;
+    if(decalage > feuille.offsetHeight * 0.3 || (decalage > 30 && vitesse > 0.5)){
+      placer(feuille.offsetHeight, 0.2);
+      setTimeout(() => { if(volet.isConnected) volet.remove(); }, 200);
+    } else if(decalage > 0){
+      placer(0, 0.2);
+    }
+  };
+  volet.addEventListener("touchend", lacher);
+  volet.addEventListener("touchcancel", lacher);
+  volet.addEventListener("wheel", (e) => { if(e.cancelable) e.preventDefault(); }, { passive: false });
+  // Doigt levé après un glissement : pas de clic sur le bouton ou le fond en dessous
+  volet.addEventListener("click", (e) => {
+    if(aGlisse){ e.stopImmediatePropagation(); e.preventDefault(); aGlisse = false; }
+  }, true);
   volet.addEventListener("click", (e) => { if(e.target === volet) fermerVoletPause(); });
-  // Le doigt (ou la molette) sur le volet ou le fond assombri faisait défiler la partie derrière
-  const bloquer = (e) => { if(e.cancelable) e.preventDefault(); };
-  volet.addEventListener("touchmove", bloquer, { passive: false });
-  volet.addEventListener("wheel", bloquer, { passive: false });
   volet.querySelector(".voletPause-annuler").addEventListener("click", fermerVoletPause);
   volet.querySelector(".voletPause-ok").addEventListener("click", () => {
     fermerVoletPause();
