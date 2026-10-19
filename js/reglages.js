@@ -1032,6 +1032,12 @@ function texteDiagnostic(){
 
 document.getElementById("btnDiagnostic").addEventListener("click", () => {
   const texte = texteDiagnostic();
+  // iPhone : menu de partage (« Copier » dedans, ou envoi direct). La copie directe laissait parfois
+  // l'ancien texte dans le presse-papier, sans qu'on s'en rende compte.
+  if (estIOS && navigator.share) {
+    navigator.share({ title: `Diagnostic Alcuno ${VERSION_AFFICHEE}`, text: texte }).catch(() => {});
+    return;
+  }
   const copie = (navigator.clipboard && navigator.clipboard.writeText)
     ? navigator.clipboard.writeText(texte)
     : Promise.reject(new Error("presse-papiers indisponible"));
