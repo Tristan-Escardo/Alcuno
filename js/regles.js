@@ -504,7 +504,7 @@ function annoncerBoireAvecAnnulation(joueurIndex, nbGorgees, classeCarte = "", p
     return;
   }
 
-  regleZero.innerText = msg;
+  afficherRegleBloc(regleZero, msg);
   regleZero.style.display = "block";
   zeroEnCours = true;
 
@@ -1305,7 +1305,7 @@ function afficherOverlayPlus4(joueurActuel, classeCartePlus4){
     // Résultat affiché dans « Règles » tout de suite, puis mis à jour avec les annulations
     const resultats = file.map(x => ({ nom: joueurs[x.idx], n: x.n, reste: x.n }));
     const afficherResultat = () => {
-      regleZero.innerText = textePlus4(choisisseur, resultats);
+      afficherRegleBloc(regleZero, textePlus4(choisisseur, resultats));
       regleZero.style.display = "block";
       zeroEnCours = true; // effacé au prochain tirage, comme les autres règles
     };
@@ -1501,7 +1501,7 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
 
   if (carteTiree === "carte_doree") {
     noterDoreeStats("doreesTirees"); // statistiques (js/stats.js)
-    regleZero.innerText = `CARTE DORÉE : distribue ${texteCulSec()}`;
+    afficherRegleBloc(regleZero, `CARTE DORÉE : distribue ${texteCulSec()}`);
     regleZero.style.display = "block";
     zeroEnCours = true;
 
@@ -1530,7 +1530,7 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
   if(carteTiree.startsWith("interdit")){
     const entete = "SOCIAAALE ! \nTout le monde boit 1 gorgée";
 
-    regleZero.innerText = entete;
+    afficherRegleBloc(regleZero, entete);
     regleZero.style.display = "block";
     zeroEnCours = true;
 
@@ -1545,7 +1545,7 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
   if(carteTiree.startsWith("zero")){
     const entete = "Tout le monde boit 1 gorgée sauf toi";
 
-    regleZero.innerText = entete;
+    afficherRegleBloc(regleZero, entete);
     regleZero.style.display = "block";
     zeroEnCours = true;
 
@@ -1575,7 +1575,7 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
     const msg = "+1 annulation de gorgée !";
     montrerOverlayRegle(msg, carteTiree);
     // puis message persistant jusqu'au prochain tirage (géré par zeroEnCours)
-    regleZero.innerText = msg;
+    afficherRegleBloc(regleZero, msg);
     regleZero.style.display = "block";
     zeroEnCours = true;
 
@@ -1606,7 +1606,7 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
   if(carteTiree.startsWith("switch")){
     sensHoraire = !sensHoraire;
     const msg = "Sens du jeu inversé";
-    regleZero.innerText = msg;
+    afficherRegleBloc(regleZero, msg);
     regleZero.style.display = "block";
     switchEnCours = true;
     montrerOverlayRegle("Le sens du jeu est inversé !", carteTiree);

@@ -22,6 +22,39 @@ const btnNouvellePartie = document.getElementById("nouvellePartie");
 const btnTermine = document.getElementById("termineSuppression");
 const btnAccueilClassique = document.getElementById("btnAccueilClassique");
 const messageTexte = document.getElementById("messageTexte");
+
+// Bloc Règles (et télé) : 1re ligne en titre doré, les suivantes en puces, gorgées en doré
+// (avant : tout le texte d'un bloc doré, illisible pour le pigeon ou le +4). Construit en DOM : les noms
+// des joueurs sont tapés par les joueurs. innerText redonne le texte ligne par ligne (télé, tests).
+function afficherRegleBloc(el, texte){
+  const surligner = (parent, ligne) => {
+    ligne.split(/(\d+ gorgées?|un CUL SEC)/).forEach((morceau, i) => {
+      if(!morceau) return;
+      if(i % 2){
+        const em = document.createElement("em");
+        em.textContent = morceau;
+        parent.appendChild(em);
+      } else parent.appendChild(document.createTextNode(morceau));
+    });
+  };
+  const lignes = String(texte || "").split("\n").map(l => l.trim()).filter(Boolean);
+  el.textContent = "";
+  el.classList.add("regleBloc");
+  if(!lignes.length) return;
+  const titre = document.createElement("div");
+  titre.className = "regleBloc-titre";
+  surligner(titre, lignes[0]);
+  el.appendChild(titre);
+  if(lignes.length < 2) return;
+  const liste = document.createElement("ul");
+  liste.className = "lignesRegle";
+  lignes.slice(1).forEach(l => {
+    const li = document.createElement("li");
+    surligner(li, l);
+    liste.appendChild(li);
+  });
+  el.appendChild(liste);
+}
 let stickyJoueurActif = null;
 
 
@@ -281,7 +314,7 @@ function appliquerBonusCouleurSiBesoin(carteTiree, options = {}){
 
   const afficher = () => {
     if(!preserveRuleMessage){
-      regleZero.innerText = msgCouleur;
+      afficherRegleBloc(regleZero, msgCouleur);
       regleZero.style.display = "block";
       zeroEnCours = true;
     }

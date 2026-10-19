@@ -7191,3 +7191,24 @@ html[data-theme="soleil"] :is(.detailRegle, #voletCarte .voletPause-texte) em{ c
 #btnRemonter svg{ width: 22px; height: 22px; fill: none; stroke: rgba(255, 255, 255, 0.85); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 html[data-theme="givre"] #btnRemonter{ background: rgba(255, 255, 255, 0.45); border-color: rgba(13, 53, 80, 0.2); }
 html[data-theme="givre"] #btnRemonter svg{ stroke: rgba(13, 53, 80, 0.8); }
+
+/* Bloc Règles en partie (et télé) : titre doré, puces, gorgées en doré (afficherRegleBloc, js/plateau.js) */
+.regleBloc{ white-space: normal; }
+.regleZero.regleBloc, .reglePigeon.regleBloc{ color: #fff; font-weight: 700; font-size: 15px; line-height: 1.35; }
+.regleBloc-titre{ color: #FFD700; font-weight: 900; font-size: 17px; }
+.regleBloc-titre + .lignesRegle{ margin-top: 6px; }
+.regleBloc .lignesRegle li + li{ margin-top: 5px; }
+.regleBloc em{ font-style: normal; color: #FFD700; font-weight: 900; white-space: nowrap; }
+html[data-theme="givre"] .regleZero.regleBloc, html[data-theme="givre"] .reglePigeon.regleBloc{ color: var(--givre-texte); }
+html[data-theme="givre"] .regleBloc :is(.regleBloc-titre, em){ color: var(--givre-accent); }
+html[data-theme="prestige"] .regleBloc :is(.regleBloc-titre, em){ color: #fff2b0; text-shadow: 0 1px 0 rgba(122, 75, 0, 0.9); }
+html[data-theme="soleil"] .regleBloc :is(.regleBloc-titre, em){ color: #ffd27a; }
+html.accessibilite .regleBloc-titre{ font-size: 18px; }
+/* Télé : mêmes proportions, en vh ; règle très longue coupée proprement au lieu de déborder */
+#ecranTele .tele-regles.regleBloc{ color: #fff; display: block; max-height: 11.5em; }
+#ecranTele .tele-regles .regleBloc-titre{ font-size: 3vh; }
+#ecranTele .tele-regles .lignesRegle li{ padding-left: 2.2vh; }
+#ecranTele .tele-regles .lignesRegle li::before{ width: 1vh; height: 1vh; }
+#ecranTele .tele-regles .lignesRegle li + li{ margin-top: 0.6vh; }
+html[data-theme="givre"] #ecranTele .tele-regles.regleBloc{ color: var(--givre-texte); }
+html[data-theme="soleil"] #ecranTele .tele-regles.regleBloc{ color: #fff1df; }
