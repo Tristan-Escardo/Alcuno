@@ -209,19 +209,37 @@ let minuteurScellementIOS = null;
 let scellementEnCoursIOS = false; // notre recul de scellement n'a pas encore abouti
 let scellerApresReculIOS = false; // un écran vient de se fermer : scellement quand le recul aura abouti
 
-function scellerHistoriqueIOSPlusTard(){
+// Au plus vite (vu au mouchard : en glissant vers l'avant moins d'une seconde après un retour, on tombait
+// encore sur l'ancienne capture), mais une fois l'écran fermé disparu de l'affichage : la capture que
+// l'iPhone prend au scellement doit être celle de l'écran affiché
+function scellerHistoriqueIOSPlusTard(delai = 40){
   clearTimeout(minuteurScellementIOS);
-  minuteurScellementIOS = setTimeout(scellerHistoriqueIOS, 600); // (l'écran fermé a fini de partir)
+  minuteurScellementIOS = setTimeout(() => requestAnimationFrame(() => requestAnimationFrame(scellerHistoriqueIOS)), delai);
 }
 
 function scellerHistoriqueIOS(){
   // Un tap ou un recul en cours, appli en arrière-plan : un peu plus tard
   if(retraitEnCoursIOS || ecranAvantTapIOS !== null || toucherEnCoursIOS !== null ||
-     document.visibilityState !== "visible"){ scellerHistoriqueIOSPlusTard(); return; }
+     document.visibilityState !== "visible"){ scellerHistoriqueIOSPlusTard(150); return; }
   if(rechargementEnCours || profondeurIOS() !== pileIOS.length) return;
   try { history.pushState({ alcunoRetour: true, profondeur: pileIOS.length + 1, scelle: true }, ""); } catch (err) { return; }
   scellementEnCoursIOS = true;
   rejoindrePileIOS();
+}
+
+// Filet de sécurité : après un glissement, l'iPhone garde sa capture affichée tant que la page ne se
+// redessine pas (vu au mouchard : une capture des Réglages restée par-dessus l'accueil). Un point
+// invisible change de teinte : la page se redessine.
+let temoinRepeintIOS = null;
+function forcerRepeintIOS(){
+  if(!temoinRepeintIOS){
+    temoinRepeintIOS = document.createElement("div");
+    temoinRepeintIOS.setAttribute("aria-hidden", "true");
+    temoinRepeintIOS.style.cssText = "position:fixed;left:0;bottom:0;width:2px;height:2px;pointer-events:none;z-index:2147483647";
+    document.body.appendChild(temoinRepeintIOS);
+  }
+  temoinRepeintIOS.dataset.teinte = temoinRepeintIOS.dataset.teinte === "1" ? "2" : "1";
+  temoinRepeintIOS.style.background = `rgba(0, 0, 0, 0.0${temoinRepeintIOS.dataset.teinte})`;
 }
 
 // Une entrée vient d'être ajoutée par un tap : elle a déjà effacé celles d'après, pas besoin de sceller
@@ -335,6 +353,8 @@ window.addEventListener("popstate", () => {
   if(estIOS){
     retraitEnCoursIOS = false;
     clearTimeout(minuteurRetraitIOS);
+    forcerRepeintIOS();
+    requestAnimationFrame(forcerRepeintIOS);
     const profondeur = profondeurIOS();
     // Plus loin que la pile : en avant sur une ancienne entrée (glissement depuis le bord droit après un
     // retour : nos entrées retirées restent « en avant » dans l'historique), ou recul pas encore fini :
@@ -351,8 +371,11 @@ window.addEventListener("popstate", () => {
     pileIOS.length = profondeur;
     const action = actionRetour();
     if(action) action();
+    // L'iPhone a déjà fait glisser l'écran : celui qu'on quitte disparaît tout de suite (pas de 2e
+    // animation), et l'historique est scellé sans attendre (l'écran quitté y reste en avant)
+    document.querySelectorAll(".page-sortie").forEach(page => { if(page._finSortie) page._finSortie(); });
     setTimeout(reconcilierPileIOS, 400);
-    scellerHistoriqueIOSPlusTard(); // (l'écran quitté reste en avant dans l'historique)
+    scellerHistoriqueIOSPlusTard();
     return;
   }
 
