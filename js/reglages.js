@@ -803,9 +803,16 @@ function repartirSonApresCamera(){
   try { contexteSon.close(); } catch (e) {}
   contexteSon = null;
 }
-// Retour dans l'appli : on relance le son tout de suite, et la barre du haut reprend la couleur du thème
+// Retour dans l'appli : on relance le son tout de suite, et la barre du haut reprend la couleur du thème.
+// Après plus de 20 s ailleurs, on repart aussi d'un contexte de son neuf au premier tap (comme après une
+// interruption, voir debloquerSon) : l'iPhone rendait parfois un son « en marche » mais muet, et le jeu
+// restait sans son jusqu'à son redémarrage.
+const RETOUR_SON_NEUF = 20 * 1000;
+let appliQuitteeA = null;
 document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState !== "visible") return;
+  if (document.visibilityState !== "visible") { appliQuitteeA = Date.now(); return; }
+  if (appliQuitteeA && Date.now() - appliQuitteeA > RETOUR_SON_NEUF && contexteSon) sonInterrompu = true;
+  appliQuitteeA = null;
   if (contexteSon && contexteSon.state !== "running") contexteSon.resume().catch(() => {});
   peindreBarreTelephone();
 });
