@@ -437,7 +437,11 @@ function demarrerPageTele(){
   qr.make();
   ecran.querySelector(".tele-qr").innerHTML = qr.createSvgTag({ scalable: true, margin: 0 });
 
-  ecran.querySelector(".tele-revenir").addEventListener("click", () => { location.href = location.pathname; });
+  // Clic des boutons (coupé en mode télé) pour celui-ci : on l'entend avant de quitter l'écran télé
+  ecran.querySelector(".tele-revenir").addEventListener("click", () => {
+    jouerSon("bouton");
+    setTimeout(() => { location.href = location.pathname; }, 300);
+  });
 
   // « Plein écran » : caché quand la télé y est déjà (ou quand son navigateur ne sait pas le faire)
   const btnPleinEcran = ecran.querySelector(".tele-plein-ecran");

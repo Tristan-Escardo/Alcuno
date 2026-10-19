@@ -407,7 +407,7 @@ caseFacesFermees.checked = lireReglage(CLE_FACES_FERMEES, false);
 caseFacesFermees.addEventListener("change", () => {
   ecrireReglage(CLE_FACES_FERMEES, caseFacesFermees.checked);
   majFacesFermees();
-  if (caseFacesFermees.checked) jouerSon("sons_on");
+  if (caseFacesFermees.checked) jouerSon("cartes"); // le son des cartes qui se retournent
 });
 majFacesFermees();
 
@@ -1501,8 +1501,8 @@ if (estTelephone && !estEnAppli) {
 
 
 // ===== Aide du premier lancement : où sont les Règles et les Réglages =====
-// Une seule fois par téléphone, sur l'accueil quand rien d'autre n'est ouvert (écran « Installer
-// Alcuno », Réglages…). L'accueil est flouté sauf les deux icônes, montrées par des flèches dorées
+// Seulement pour les nouveaux, à la première ouverture de l'appli tout juste installée (pas dans le
+// navigateur, pas pour ceux qui jouaient déjà), sur l'accueil quand rien d'autre n'est ouvert. L'accueil est flouté sauf les deux icônes, montrées par des flèches dorées
 // « coup de pinceau » (courbes, épaisses au milieu, fines aux deux bouts). Un tap n'importe où la ferme.
 const CLE_AIDE_VUE = "alcuno_aide_vue";
 
@@ -1594,10 +1594,23 @@ function afficherAideAccueil(){
   document.body.appendChild(aide);
 }
 
+// Nouveau : premier lancement depuis l'icône (installation pas encore comptée par js/stats.js) et rien
+// d'un joueur d'avant dans ce téléphone (réglages, partie gardée…). Les autres ne la verront jamais.
+function nouveauQuiVientDInstaller(){
+  try {
+    if (localStorage.getItem("alcuno_install_comptee")) return false;
+    const clesNeuves = ["alcuno_id_stats", "alcuno_code_invitation", CLE_AIDE_VUE];
+    return !Object.keys(localStorage).some((cle) => cle.startsWith("alcuno_") && !clesNeuves.includes(cle));
+  } catch (e) { return false; }
+}
+if (estEnAppli && !aideDejaVue() && !nouveauQuiVientDInstaller()) {
+  try { localStorage.setItem(CLE_AIDE_VUE, "1"); } catch (e) {}
+}
+
 // On attend que l'accueil soit libre : l'écran d'installation passe d'abord (sur Android il arrive
 // jusqu'à 1,5 s après l'ouverture, d'où les 2 s), une partie en cours ou une invitation par QR code
 // aussi (l'aide viendra au prochain passage sur l'accueil)
-if (!document.documentElement.classList.contains("mode-tele") && !aideDejaVue()) setTimeout(() => { // (pas sur la télé)
+if (!document.documentElement.classList.contains("mode-tele") && estEnAppli && !aideDejaVue()) setTimeout(() => { // (pas sur la télé)
   const surveillance = setInterval(() => {
     if (aideDejaVue()) { clearInterval(surveillance); return; }
     const accueilLibre = !partieLancee &&
