@@ -125,6 +125,16 @@ window.scrollTo = function(...args){
   return scrollToOriginal(...args);
 };
 
+// ===== Historique (glissement retour de l'iPhone, bouton retour d'Android) =====
+["pushState", "replaceState", "go", "back"].forEach((nom) => {
+  const original = history[nom].bind(history);
+  history[nom] = function(...args){
+    if (mouchardActif) noter(`history.${nom}(${nom === "go" ? args[0] : JSON.stringify(args[0])}) · état ${JSON.stringify(history.state)}`);
+    return original(...args);
+  };
+});
+window.addEventListener("popstate", () => noter(`popstate (glissement / retour) · état ${JSON.stringify(history.state)}`));
+
 // ===== Appli quittée / reprise, taille de l'écran, clavier =====
 document.addEventListener("visibilitychange", () => {
   noter(`appli ${document.visibilityState === "visible" ? "reprise" : "quittée"}`);
