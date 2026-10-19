@@ -920,7 +920,10 @@ function lireSon(nom, son){
 const CLE_RAPPEL_EAU = "alcuno_rappel_eau";
 const caseRappelEau = document.getElementById("optionRappelEau");
 caseRappelEau.checked = lireReglage(CLE_RAPPEL_EAU, false);
-caseRappelEau.addEventListener("change", () => ecrireReglage(CLE_RAPPEL_EAU, caseRappelEau.checked));
+caseRappelEau.addEventListener("change", () => {
+  ecrireReglage(CLE_RAPPEL_EAU, caseRappelEau.checked);
+  if (caseRappelEau.checked) jouerSon("eau"); // on entend le son du rappel en l'activant
+});
 
 const MINUTES_RAPPEL_EAU = 20;
 let tempsDeJeuSansEau = 0; // ms de partie (écran allumé) depuis le dernier rappel
