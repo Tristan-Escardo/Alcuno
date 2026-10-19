@@ -323,6 +323,8 @@ function relierTeleDepuisCode(texte){
   relierTele(code);
 }
 
+const CLE_POSITION_REGLAGES_TELE = "alcuno_position_reglages_tele";
+
 if (!estPageTele) {
   btnCaster.addEventListener("click", ouvrirEcranCaster);
   document.getElementById("btnCasterFermer").addEventListener("click", fermerEcranCaster);
@@ -330,6 +332,8 @@ if (!estPageTele) {
   // Réglages : pour une télé que le jeu n'a pas reconnue toute seule (index.html, NAVIGATEUR_TELE)
   document.getElementById("btnAfficherEcranTele").addEventListener("click", () => {
     // (un peu plus tard : le clic des boutons a le temps de jouer, il était coupé par le changement de page)
+    // « Retour » de l'écran télé rouvrira les Réglages à cet endroit
+    try { sessionStorage.setItem(CLE_POSITION_REGLAGES_TELE, String(ecranReglages.scrollTop)); } catch (e) {}
     setTimeout(() => { location.href = location.pathname + "?tele"; }, 300);
   });
   document.getElementById("btnCasterScanner").addEventListener("click", () => {
@@ -394,7 +398,7 @@ function demarrerPageTele(){
         <div class="tele-etape"><span class="tele-num">2</span><span>Scanne ce QR code avec l'appli</span></div>
         <div class="tele-etape"><span class="tele-num">3</span><span>La partie s'affiche ici</span></div>
         <button type="button" class="tele-plein-ecran">Plein écran</button>
-        <button type="button" class="tele-revenir">← Revenir au jeu</button>
+        <button type="button" class="tele-revenir">← Retour</button>
       </div>
       <div class="tele-attente-qr">
         <div class="tele-qr"></div>
@@ -437,9 +441,14 @@ function demarrerPageTele(){
   qr.make();
   ecran.querySelector(".tele-qr").innerHTML = qr.createSvgTag({ scalable: true, margin: 0 });
 
-  // Clic des boutons (coupé en mode télé) pour celui-ci : on l'entend avant de quitter l'écran télé
+  // « Retour » : revient aux Réglages (là où était « Afficher l'écran télé »), avec le clic des boutons
+  // (coupé en mode télé) qu'on entend avant de quitter l'écran télé
   ecran.querySelector(".tele-revenir").addEventListener("click", () => {
     jouerSon("bouton");
+    try {
+      const position = sessionStorage.getItem(CLE_POSITION_REGLAGES_TELE) || "0";
+      sessionStorage.setItem(CLE_ROUVRIR_REGLAGES, position);
+    } catch (e) {}
     setTimeout(() => { location.href = location.pathname; }, 300);
   });
 
