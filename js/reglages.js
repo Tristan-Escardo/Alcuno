@@ -872,7 +872,7 @@ function chargerSons(){
 // (annuler des gorgées, distribuer au +4, choisir le pigeon ou la victime de la carte dorée), et sauf
 // Réglages, « Signaler un bug » et « Copier le diagnostic » (silencieux)
 const BOUTONS_AVEC_LEUR_SON = ".bouton-annulation, .plus4-joueur-btn, #overlayPigeon .bouton-pigeon, .bouton-doree, " +
-  "#btnReglages, #btnSignalerBug, #btnDiagnostic, #btnRegles, #btnReglesJeu";
+  "#btnReglages, #btnSignalerBug, #btnDiagnostic, #btnRegles, #btnReglesJeu, #bandeauMiseAJour .maj";
 document.addEventListener("click", (e) => {
   if (!e.isTrusted || document.documentElement.classList.contains("mode-tele")) return;
   if (Date.now() - sonBoutonJoueLe < 500) return; // déjà joué au doigt levé (activerMemePendantElan)
@@ -1366,9 +1366,16 @@ function afficherBandeauMiseAJour(){
     `<span class="texte">Nouvelle version disponible (${echapperHtml(versionEnLigne)})</span>` +
     `<button type="button" class="maj">Mettre à jour</button>` +
     `<button type="button" class="plusTard" aria-label="Plus tard">✕</button>`;
-  // Adresse neuve (?v=...) : contourne le cache et recharge toute l'appli
-  bandeau.querySelector(".maj").addEventListener("click", () => {
-    rechargerPage(location.pathname + "?v=" + encodeURIComponent(versionEnLigne)); // (js/retour-demarrage.js)
+  // Adresse neuve (?v=...) : contourne le cache et recharge toute l'appli. Avec son propre son (celui de
+  // l'accessibilité, 1,7 s) : la page ne se recharge qu'à la fin, sinon il serait coupé net
+  const boutonMaj = bandeau.querySelector(".maj");
+  boutonMaj.addEventListener("click", () => {
+    if (boutonMaj.disabled) return;
+    boutonMaj.disabled = true;
+    boutonMaj.textContent = "Mise à jour…";
+    if (caseSons.checked) jouerSon("accessibilite_on");
+    setTimeout(() => rechargerPage(location.pathname + "?v=" + encodeURIComponent(versionEnLigne)), // (js/retour-demarrage.js)
+      caseSons.checked ? 1700 : 0);
   });
   bandeau.querySelector(".plusTard").addEventListener("click", () => bandeau.remove());
   document.body.appendChild(bandeau);
