@@ -6457,6 +6457,9 @@ html[data-theme="soleil"] :is(#menu, .messages, #ecranReglages .optionReglage, #
   background: var(--soleil-panneau) !important;
   box-shadow: inset 0 0 0 1px var(--soleil-bord) !important;
 }
+/* (une ligne dans un bloc, comme Sons ou le rappel d'eau : c'est le bloc qui fait le panneau, sinon il était
+   peint deux fois, plus sombre que les autres) */
+html[data-theme="soleil"] #ecranReglages .blocReglage .optionReglage{ background: transparent !important; box-shadow: none !important; }
 html[data-theme="soleil"] .messages::before{ background: linear-gradient(90deg, #ffd27a, #ff8a6b 50%, #c86fb0) !important; }
 html[data-theme="soleil"] .blocMessages{ background: rgba(15, 22, 55, 0.35) !important; border-color: var(--soleil-bord) !important; }
 html[data-theme="soleil"] :is(.titreBloc, #ecranReglages .optionTitre, #ecranReglages h2, .aProposTitre){ color: var(--soleil-peche) !important; }
