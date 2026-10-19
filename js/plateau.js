@@ -518,7 +518,7 @@ function ouvrirVoletPause(nom, bouton){
   volet.querySelector(".voletPause-nom").textContent = avecCouronne(nom);
   volet.querySelector(".voletPause-texte").innerHTML = enPause
     ? "De retour parmi nous ?"
-    : "Aux toilettes, en train de vomir, en pause clope… ?<br>Son tour est sauté jusqu'à son retour.";
+    : "En pause clope ? Aux toilettes en train de vomir ?<br>Son tour sera sauté jusqu'à ce qu'il revienne.";
   volet.querySelector(".voletPause-ok").textContent = enPause ? `${nom} est de retour` : `Mettre ${nom} en pause`;
   // Le doigt (ou la molette) sur le volet ou le fond assombri ne fait pas défiler la partie derrière :
   // glisser vers le bas (n'importe où) descend la feuille, qui se ferme si on la lâche assez bas ou
