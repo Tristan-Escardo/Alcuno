@@ -181,10 +181,23 @@ function texteSansBoutons(racine){
 const BOUTONS_ACTION_TELE = ".plus4-action-btn, .fin-choix-reveler, .fin-choix-retour, .fin-revanche";
 
 // L'écran par-dessus le plateau en ce moment (annonce, annulation, duel, +4, pari…), ou null
+// Volets du téléphone montrés en grand sur la télé : règle d'une carte (appui long) et dernières cartes
+function voletPourTele(){
+  const carte = document.getElementById("voletCarte");
+  if (carte) {
+    const face = faceCarte(carte.querySelector(".voletCarte-carte"));
+    const nom = carte.querySelector(".voletPause-nom").innerText.trim();
+    const regle = carte.querySelector(".voletPause-texte").innerText.trim();
+    return { id: "voletCarte", texte: `${nom}\n${regle}`, cartes: face ? [face] : [], choix: [] };
+  }
+  if (document.getElementById("voletHistorique")) return { id: "voletHistorique", texte: "", cartes: [], choix: [] };
+  return null;
+}
+
 function ecranPourTele(){
   const overlays = Array.from(document.querySelectorAll('body > [id^="overlay"]')).filter(estAffiche);
   const o = overlays[overlays.length - 1];
-  if (!o) return null;
+  if (!o) return voletPourTele();
   // Cartes montrées : au plus 4 (le pari n'envoie que la carte révélée, pas sa grille de choix)
   let cartes = o.id === "overlayPredictionFin"
     ? Array.from(o.querySelectorAll(".fin-choix-reveal .Carte"))
@@ -239,6 +252,8 @@ function etatPourTele(){
     sons: sonsTele,
     rappel: rappelTele,
     envols: envolsTele,
+    // dernières cartes (pas en faces cachées : elles redonneraient les cartes déjà sorties)
+    h: estFacesFermees() ? [] : historiqueCartes.map(e => ({ c: e.carte, n: avecCouronne(e.nom), l: lignesHistorique(e) })),
     ecran: ecranPourTele()
   };
 }
@@ -523,6 +538,20 @@ const PHRASES_TELE = [
   { sansNom: true, texte: () => `Vous pouvez AUSSI prendre vos propres gorgées.` }
 ];
 const PAS_NOTIFS_TELE = 5000;
+// Quelqu'un qui traîne à jouer : une fois par tour, au bout de 1 min 20 (temps sans choix ni annonce à
+// l'écran, hors pause)
+const DELAI_LENTEUR = 80000;
+let cleTourLenteur = "";
+let tempsTourLenteur = 0;
+let lenteurDite = false;
+function phraseLenteur(etat){
+  const cle = `${etat.tour}|${etat.restantes}`;
+  if (cle !== cleTourLenteur) { cleTourLenteur = cle; tempsTourLenteur = 0; lenteurDite = false; return ""; }
+  if (etat.ecran || etat.pause || lenteurDite || !etat.tour) return "";
+  tempsTourLenteur += PAS_NOTIFS_TELE;
+  if (tempsTourLenteur < DELAI_LENTEUR) return "";
+  return `<b>${echapperHtml(etat.tour)}</b> réfléchit depuis plus d’une minute… c’est pas une partie d’échecs ♟️`;
+}
 const CARTES_A_SEC_TELE = 8; // « n'a pas bu depuis un moment » : au moins 8 cartes tirées sans boire
 const DUREE_NOTIF_TELE = 7000;
 let dernierEtatNotifTele = null;
@@ -538,6 +567,8 @@ function avancerNotifsTele(ecran){
   const etat = dernierEtatNotifTele;
   if (!etat || !etat.partie || !(etat.cartes || []).length || document.visibilityState !== "visible") return;
   if (etat.pause) return; // (pas de notif ni de temps de jeu compté pendant la pause)
+  const lenteur = phraseLenteur(etat);
+  if (lenteur) { lenteurDite = true; montrerNotifTele(ecran, lenteur); return; }
   tempsJeuNotifTele += PAS_NOTIFS_TELE;
   if (tempsJeuNotifTele < prochaineNotifTele || etat.ecran) return; // (choix ou annonce à l'écran : on attend)
   const texte = phraseNotifTele(etat);
@@ -591,11 +622,15 @@ let prochaineNotifTel = delaiNotifTele();
 setInterval(() => {
   if (!partieLancee || pauseEnCours || codeTele || document.visibilityState !== "visible") return;
   if (ecranNouvellePartieOuvert()) return; // (js/regles.js) : ce temps-là ne compte pas
+  const etat = etatPourTele();
+  const libre = !etat.ecran && etat.cartes.length &&
+    !document.querySelector("#rappelEau, #notifChambrage, #voletPause, #voletCarte, #voletHistorique");
+  const lenteur = phraseLenteur(etat);
+  if (lenteur && libre) { lenteurDite = true; afficherNotifChambrage(lenteur); return; }
   tempsJeuNotifTel += PAS_NOTIFS_TELE;
   if (tempsJeuNotifTel < prochaineNotifTel) return;
-  const etat = etatPourTele();
   // (choix ou annonce à l'écran, volet ouvert, autre notification : on attend)
-  if (etat.ecran || !etat.cartes.length || document.querySelector("#rappelEau, #notifChambrage, #voletPause, #voletCarte, #voletHistorique")) return;
+  if (!libre) return;
   const texte = phraseNotifTele(etat);
   if (!texte) return;
   tempsJeuNotifTel = 0;
@@ -766,8 +801,7 @@ function dessinerTele(ecran, etat){
     nouvelle.dataset.valeur = valeur;
     if (actuelle) actuelle.replaceWith(nouvelle); else plateauTele.appendChild(nouvelle);
   });
-  ecran.querySelector(".tele-restantes").innerText = etat.partie && etat.restantes
-    ? `${etat.restantes} carte${etat.restantes > 1 ? "s" : ""} restante${etat.restantes > 1 ? "s" : ""}` : "";
+  dessinerDernieresTele(ecran.querySelector(".tele-restantes"), etat.partie ? etat.h : []);
 
   // Tour de…
   const tour = ecran.querySelector(".tele-tour");
@@ -819,7 +853,12 @@ function dessinerTele(ecran, etat){
   const e = etat.ecran;
   surEcran.hidden = !e;
   document.documentElement.classList.toggle("tele-ecran-ouvert", !!e); // (pas de reflet Prestige dessus)
-  if (e) {
+  surEcran.classList.toggle("tele-ecran-historique", !!e && e.id === "voletHistorique");
+  if (e && e.id === "voletHistorique") {
+    surEcran.querySelector(".tele-ecran-cartes").innerHTML = "";
+    surEcran.querySelector(".tele-ecran-choix").innerHTML = "";
+    dessinerHistoriqueTele(surEcran.querySelector(".tele-ecran-texte"), etat.h || []);
+  } else if (e) {
     const zoneCartes = surEcran.querySelector(".tele-ecran-cartes");
     zoneCartes.innerHTML = "";
     (e.cartes || []).forEach(valeur => zoneCartes.appendChild(creerCarteTele(valeur)));
@@ -840,6 +879,52 @@ function dessinerTele(ecran, etat){
       zoneChoix.appendChild(puce);
     });
   }
+}
+
+// Sous le plateau : « Dernières cartes tirées », en petit avec le prénom (la plus récente entourée)
+function dessinerDernieresTele(zone, historique){
+  historique = Array.isArray(historique) ? historique : [];
+  const cle = JSON.stringify(historique.map(h => [h.c, h.n]));
+  if (zone.dataset.cle === cle) return;
+  zone.dataset.cle = cle;
+  zone.innerHTML = "";
+  zone.classList.toggle("tele-dernieres", historique.length > 0);
+  if (!historique.length) return;
+  const titre = document.createElement("span");
+  titre.className = "tele-dernieres-titre";
+  titre.innerText = "Dernières cartes tirées";
+  zone.appendChild(titre);
+  historique.forEach((h) => {
+    const item = document.createElement("div");
+    item.className = "tele-dernieres-item";
+    const nom = document.createElement("span");
+    nom.innerText = h.n;
+    item.append(creerCarteTele(h.c), nom);
+    zone.appendChild(item);
+  });
+}
+
+// En grand, quand le téléphone ouvre ses dernières cartes : la liste avec ce qui s'est passé
+function dessinerHistoriqueTele(zone, historique){
+  zone.innerHTML = "";
+  const titre = document.createElement("div");
+  titre.className = "tele-ecran-titre";
+  titre.innerText = "Dernières cartes";
+  zone.appendChild(titre);
+  historique.forEach((h) => {
+    const ligne = document.createElement("div");
+    ligne.className = "tele-historique-ligne";
+    const texte = document.createElement("div");
+    const nom = document.createElement("b");
+    nom.innerText = h.n;
+    texte.appendChild(nom);
+    const quoi = document.createElement("div");
+    quoi.className = "tele-historique-quoi";
+    remplirAvecGorgees(quoi, (h.l || []).join(" · ")); // (js/plateau.js)
+    texte.appendChild(quoi);
+    ligne.append(creerCarteTele(h.c), texte);
+    zone.appendChild(ligne);
+  });
 }
 
 if (estPageTele) demarrerPageTele();
