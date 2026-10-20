@@ -7213,5 +7213,10 @@ html.accessibilite .regleBloc-titre{ font-size: 18px; }
 html[data-theme="givre"] #ecranTele .tele-regles.regleBloc{ color: var(--givre-texte); }
 html[data-theme="soleil"] #ecranTele .tele-regles.regleBloc{ color: #fff1df; }
 
-/* Mode gaucher (Réglages, js/reglages.js) : flèche pour remonter en bas à droite */
+/* Mode gaucher (Réglages, js/reglages.js) : ce qui se touche au pouce passe de l'autre côté */
+.mainGauche{ display: inline-block; transform: scaleX(-1); } /* (l'emoji 🤚 est une main droite) */
 html.gaucher #btnRemonter{ left: auto; right: 16px; }
+html.gaucher #annulerChoix{ flex-direction: row-reverse; }
+html.gaucher #annulerChoix .annulerChoix-texte{ text-align: right; }
+html.gaucher #stickyJoueurActif #btnPause{ order: -1; margin: -6px 0 -6px -6px; }
+html.gaucher #ecranReglages .optionReglage:not(.optionLien){ flex-direction: row-reverse; }
