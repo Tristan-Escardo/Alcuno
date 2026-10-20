@@ -492,7 +492,9 @@ for (let i = 0; i < 26; i++) {
 }
 
 document.querySelectorAll(".pastilleTheme").forEach((pastille) => {
-  pastille.addEventListener("click", () => {
+  pastille.addEventListener("click", (e) => {
+    // Star Wars : le clic part avant le changement de thème, donc le sabre se joue ici (après) ; en quittant Star Wars, il se joue déjà
+    const versGalaxie = pastille.id === "pastilleGalaxie" && e.isTrusted;
     // Changement de thème : la musique d'ambiance se coupe (on la réactive soi-même dans les réglages)
     if (caseMusique.checked && pastille.dataset.theme !== document.documentElement.dataset.theme) {
       caseMusique.checked = false;
@@ -500,6 +502,7 @@ document.querySelectorAll(".pastilleTheme").forEach((pastille) => {
       majLigneMusique();
     }
     appliquerTheme(pastille.dataset.theme, barreIphoneARafraichir());
+    if (versGalaxie) jouerSon("bouton");
     try { localStorage.setItem(CLE_THEME, pastille.dataset.theme); } catch (e) {}
     try { noterAppareilStats(); } catch (e) {} // statistiques : thème choisi
     rafraichirBarreIphone();
@@ -1049,7 +1052,7 @@ function chargerSons(){
 // (annuler des gorgées, distribuer au +4, choisir le pigeon ou la victime de la carte dorée), et sauf
 // Réglages, « Signaler un bug » et « Copier le diagnostic » (silencieux)
 const BOUTONS_AVEC_LEUR_SON = ".bouton-annulation, .plus4-joueur-btn, #overlayPigeon .bouton-pigeon, .bouton-doree, " +
-  "#btnReglages, #btnSignalerBug, #btnDiagnostic, #btnRegles, #btnReglesJeu, #bandeauMiseAJour .maj";
+  "#btnReglages, #btnSignalerBug, #btnDiagnostic, #btnRegles, #btnReglesJeu, #bandeauMiseAJour .maj, #pastilleGalaxie";
 document.addEventListener("click", (e) => {
   if (!e.isTrusted || document.documentElement.classList.contains("mode-tele")) return;
   if (Date.now() - sonBoutonJoueLe < 500) return; // déjà joué au doigt levé (activerMemePendantElan)
