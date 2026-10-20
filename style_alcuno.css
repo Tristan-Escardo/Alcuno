@@ -7389,14 +7389,9 @@ html[data-theme="galaxie"] :is(#jouer, #btnModeEnLigne){
 }
 /* Blocs : écrans de vaisseau, coins marqués */
 html[data-theme="galaxie"] :is(#menu, .blocMessages, header, .messages){
-  background:
-    linear-gradient(#FFE81F,#FFE81F) top left/14px 2px no-repeat, linear-gradient(#FFE81F,#FFE81F) top left/2px 14px no-repeat,
-    linear-gradient(#FFE81F,#FFE81F) top right/14px 2px no-repeat, linear-gradient(#FFE81F,#FFE81F) top right/2px 14px no-repeat,
-    linear-gradient(#FFE81F,#FFE81F) bottom left/14px 2px no-repeat, linear-gradient(#FFE81F,#FFE81F) bottom left/2px 14px no-repeat,
-    linear-gradient(#FFE81F,#FFE81F) bottom right/14px 2px no-repeat, linear-gradient(#FFE81F,#FFE81F) bottom right/2px 14px no-repeat,
-    rgba(4,8,20,.78) !important;
-  border: 1px solid rgba(143,208,255,.22) !important; border-radius: 6px !important; box-shadow: none !important;
-}
+  background: linear-gradient(180deg, rgba(14,22,44,.92), rgba(6,10,22,.92)) !important;
+  border: 1.5px solid #8fd0ff !important; border-radius: 16px !important;
+  box-shadow: 0 0 6px #4aa8ff, 0 0 16px rgba(40,140,255,.55), inset 0 0 10px rgba(80,170,255,.22) !important; }
 html[data-theme="galaxie"] .messages::before{ display:none !important; }
 html[data-theme="galaxie"] :is(.titreBloc, .regleBloc-titre){ color:#FFE81F !important; letter-spacing:.12em; text-transform: uppercase; font-size: 15px !important; }
 html[data-theme="galaxie"] .joueurActif{ color:#FFE81F !important; }
@@ -7419,10 +7414,9 @@ html[data-theme="galaxie"] .voletPause-nom{ color:#FFE81F !important; }
 html[data-theme="galaxie"] .voletPause-ok{ background: linear-gradient(180deg,#1a2b55,#0a1430) !important; }
 html[data-theme="galaxie"] :is(#ecranReglages, #ecranRegles){ background: linear-gradient(#02030a,#02030a) #eef6ff !important; }
 html[data-theme="galaxie"] #ecranRegles .blocRegles{
-  background:
-    linear-gradient(#FFE81F,#FFE81F) top left/12px 2px no-repeat, linear-gradient(#FFE81F,#FFE81F) top left/2px 12px no-repeat,
-    linear-gradient(#FFE81F,#FFE81F) bottom right/12px 2px no-repeat, linear-gradient(#FFE81F,#FFE81F) bottom right/2px 12px no-repeat,
-    rgba(6,12,30,.85) !important; border: 1px solid rgba(143,208,255,.22) !important; border-radius: 6px !important; box-shadow:none !important; }
+  background: linear-gradient(180deg, rgba(14,22,44,.92), rgba(6,10,22,.92)) !important;
+  border: 1.5px solid #8fd0ff !important; border-radius: 16px !important;
+  box-shadow: 0 0 6px #4aa8ff, 0 0 16px rgba(40,140,255,.55), inset 0 0 10px rgba(80,170,255,.22) !important; }
 /* Réglages : chaque bloc comme un bouton, bord bleu qui brille comme une lame de sabre */
 html[data-theme="galaxie"] :is(#ecranReglages .blocReglage, #ecranReglages .optionReglage:not(.blocReglage .optionReglage)){
   background: linear-gradient(180deg, rgba(14,22,44,.92), rgba(6,10,22,.92)) !important;
