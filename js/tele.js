@@ -550,7 +550,7 @@ function phraseLenteur(etat){
   if (etat.ecran || etat.pause || lenteurDite || !etat.tour) return "";
   tempsTourLenteur += PAS_NOTIFS_TELE;
   if (tempsTourLenteur < DELAI_LENTEUR) return "";
-  return `<b>${echapperHtml(etat.tour)}</b> réfléchit depuis plus d’une minute… c’est pas une partie d’échecs ♟️`;
+  return `<b>${echapperHtml(etat.tour)}</b> réfléchit depuis plus d’une minute… c’est pas une partie d’échecs.`;
 }
 const CARTES_A_SEC_TELE = 8; // « n'a pas bu depuis un moment » : au moins 8 cartes tirées sans boire
 const DUREE_NOTIF_TELE = 7000;
@@ -644,9 +644,17 @@ function afficherNotifChambrage(texte){
   const notif = document.createElement("div");
   notif.id = "notifChambrage";
   notif.setAttribute("role", "status");
-  notif.innerHTML = `<img src="icones/icone-192.png" alt=""><div><div class="notifChambrage-haut">` +
-    `<span>ALCUNO</span><span>maintenant</span></div><div class="notifChambrage-texte">${texte}</div></div>` +
-    '<span class="rappelEau-languette" aria-hidden="true"></span>'; // (texte : noms déjà échappés)
+  // Comme une vraie notification du téléphone : Android ou iPhone (iPhone aussi sur ordinateur), en clair
+  // ou en sombre selon le réglage du téléphone (voir le CSS). (texte : noms déjà échappés)
+  if (systemeStats() === "android") {
+    notif.className = "notif-android";
+    notif.innerHTML = `<div class="notifChambrage-haut"><img src="icones/icone-192.png" alt="">` +
+      `<span>Alcuno</span><span>•</span><span>maintenant</span></div><div class="notifChambrage-texte">${texte}</div>`;
+  } else {
+    notif.innerHTML = `<img src="icones/icone-192.png" alt=""><div><div class="notifChambrage-haut">` +
+      `<span>ALCUNO</span><span>maintenant</span></div><div class="notifChambrage-texte">${texte}</div></div>`;
+  }
+  notif.insertAdjacentHTML("beforeend", '<span class="rappelEau-languette" aria-hidden="true"></span>');
   rendreNotifGlissable(notif, DUREE_NOTIF_TELE);
   document.body.appendChild(notif);
   vibrer([40]);
