@@ -515,9 +515,9 @@ function demarrerPageTele(){
 // vont avec la partie (pigeon, joueurs), jamais deux fois la même d'affilée. Seulement sur la télé.
 const PHRASES_TELE = [
   { pigeon: true, texte: n => `Quelqu’un a pensé à donner des graines à <b>${n}</b> ?` },
-  { pigeon: true, texte: n => `<b>${n}</b> picore ses gorgées.` },
+  { pigeon: true, texte: n => `<b>${n}</b> picore ses gorgées. 🐦` },
   { aSec: true, texte: n => `<b>${n}</b> n’a pas bu depuis un moment… c’est louche.` },
-  { texte: n => `<b>${n}</b> ? Toujours vivant ?` },
+  { texte: n => `<b>${n}</b> ? Toujours vivant(e) ?` },
   { sansCreateur: true, texte: n => `<b>${n}</b> fait semblant de comprendre les règles depuis le début.` },
   { sansNom: true, texte: () => `Y’en a certains qui ont dit « je bois pas trop ce soir » ? Mdr.` }
 ];
