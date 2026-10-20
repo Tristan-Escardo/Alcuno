@@ -519,7 +519,8 @@ const PHRASES_TELE = [
   { aSec: true, texte: n => `<b>${n}</b> n’a pas bu depuis un moment… c’est louche.` },
   { texte: n => `<b>${n}</b> ? Toujours vivant(e) ?` },
   { sansCreateur: true, texte: n => `<b>${n}</b> fait semblant de comprendre les règles depuis le début.` },
-  { sansNom: true, texte: () => `Y’en a certains qui ont dit « je bois pas trop ce soir » ? Mdr.` }
+  { sansNom: true, texte: () => `Y’en a certains qui ont dit « je bois pas trop ce soir » ? Mdr.` },
+  { sansNom: true, texte: () => `Vous pouvez AUSSI prendre vos propres gorgées.` }
 ];
 const PAS_NOTIFS_TELE = 5000;
 const CARTES_A_SEC_TELE = 8; // « n'a pas bu depuis un moment » : au moins 8 cartes tirées sans boire
