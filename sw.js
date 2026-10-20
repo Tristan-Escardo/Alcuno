@@ -90,7 +90,7 @@ const A_PRECHARGER = [
 
 // Sons (dossier Sons/) : copiés aussi, pour en avoir hors connexion. Un par un et sans bloquer :
 // un fichier absent (son pas encore ajouté) n'empêche pas l'installation du reste.
-const SONS_A_PRECHARGER = ["cartes", "doree", "tiens_gueule", "bouton", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees", "regles", "accessibilite_on"]
+const SONS_A_PRECHARGER = ["cartes", "doree", "tiens_gueule", "bouton", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees", "regles", "accessibilite_on", "lightsaber_sound"]
   .map((nom) => `./Sons/${nom}.mp3`);
 
 self.addEventListener("install", (event) => {

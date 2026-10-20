@@ -20,6 +20,7 @@ Un fichier MP3 par moment du jeu, avec exactement ces noms :
 
   tiens_gueule.mp3  le cul sec de la carte dorée (« TIENS DANS TA GUEULE »)
   bouton.mp3   petit clic quand on touche un bouton (sauf ceux qui ont déjà leur son ; coupé à 0,3 seconde par le jeu)
+  lightsaber_sound.mp3  son de sabre (45 s) : le jeu en joue un morceau de 1 s au plus, au hasard, à la place du clic des boutons (voir MORCEAUX_SABRE dans js/reglages.js)
 
 MUSIQUE D'AMBIANCE (en boucle, réglage « Musique d'ambiance ») :
   musique_ambiance.mp3  thèmes bordeaux, sombre, casino, nuit (et les autres si leur musique manque)
