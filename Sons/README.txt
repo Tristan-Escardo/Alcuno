@@ -29,6 +29,9 @@ MUSIQUE D'AMBIANCE (en boucle, réglage « Musique d'ambiance ») :
   musique_ambiance_soleil.mp3    thème Soleil couchant
   Jusqu'à 3-4 minutes, 128 kbit/s (environ 1 Mo par minute) : elle se lance plus vite.
 
+GÉNÉRIQUE DU THÈME SECRET STAR WARS (au volume des sons, la musique d'ambiance se tait pendant) :
+  debloquage_theme_galaxie.mp3  boucle exacte (voir BOUCLES_EXACTES dans js/reglages.js)
+
 - Fichier absent = pas de son à ce moment-là.
 - Pour changer un son : remplace le fichier en gardant le même nom, puis commit + push.
 - Des sons courts et pas trop lourds (moins de 200 Ko si possible).
