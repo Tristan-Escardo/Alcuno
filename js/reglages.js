@@ -952,6 +952,7 @@ if (caseGaucher) {
   caseGaucher.addEventListener("change", () => {
     ecrireReglage(CLE_GAUCHER, caseGaucher.checked);
     document.documentElement.classList.toggle("gaucher", caseGaucher.checked);
+    if (caseGaucher.checked) jouerSon("sons_on");
   });
 }
 
