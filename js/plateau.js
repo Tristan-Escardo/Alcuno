@@ -633,7 +633,7 @@ function regleDeCarte(classe){
   if(classe === "carte_doree"){
     return { nom: "Carte dorée", texte: estModeSoft()
       ? "Distribue <em>3 gorgées</em> de la part du développeur 😘"
-      : "Distribue <em>un CUL SEC</em> de la part du développeur. Et obligation de se servir un vrai verre avant 😘" };
+      : "Distribue <em>un CUL SEC</em> de la part du développeur.<br>Et obligation de se servir un vrai verre avant 😘" };
   }
   const cartes = reglesDuJeu().find(partie => partie.titre === "Les cartes").regles;
   return cartes.find(r => typeDeCarte(r.carte) === typeDeCarte(classe)) || null;
