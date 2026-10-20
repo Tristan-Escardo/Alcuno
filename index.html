@@ -67,7 +67,7 @@
         try { var theme = localStorage.getItem("alcuno_theme"); if (theme === "violet") { theme = "soleil"; localStorage.setItem("alcuno_theme", theme); } if (theme) document.documentElement.dataset.theme = theme; } catch (e) {}
         // Barre du téléphone à la couleur du thème dès le premier affichage (mêmes couleurs que THEMES dans script.js)
         var couleursBarre = { bordeaux: "#2b001d", noir: "#000000", vert: "#08301e", bleu: "#0a1634", soleil: "#1f3566",
-                              cerisier: "#5a1740", givre: "#e4f5fc", prestige: "#937810", galaxie: "#eef6ff" };
+                              cerisier: "#5a1740", givre: "#e4f5fc", prestige: "#937810", galaxie: "#02030a" };
         document.write('<meta name="theme-color" content="' + (couleursBarre[theme] || couleursBarre.bordeaux) + '">');
         // iPhone : page rechargée après un changement de thème (voir rafraichirBarreIphone dans script.js) :
         // on rouvre les Réglages dès le premier affichage
@@ -108,7 +108,6 @@
          affichage : l'iPhone choisit la couleur de sa barre de l'heure à ce moment-là (créée plus tard par
          le JS, elle arrivait trop tard et la barre restait noire) -->
     <div id="haloSabre" aria-hidden="true"></div>
-    <div id="haloSabreBas" aria-hidden="true"></div>
     <header>
         <h1>ALCUNO<span class="badgeSoft" aria-label="Mode PJ">PJ</span></h1>
         <button type="button" id="btnReglesJeu" class="btnAccueilTexte" title="Règles du jeu" aria-label="Règles du jeu">

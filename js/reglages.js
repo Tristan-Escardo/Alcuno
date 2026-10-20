@@ -45,7 +45,7 @@ const CLE_THEME = "alcuno_theme";
 // Couleur de la barre du téléphone pour chaque thème (= --couleur-barre du CSS, le tout haut de la page).
 // Mêmes couleurs dans le script du <head> de index.html, qui la pose dès le premier affichage.
 const THEMES = { bordeaux: "#2b001d", noir: "#000000", vert: "#08301e", bleu: "#0a1634", soleil: "#1f3566",
-                 cerisier: "#5a1740", givre: "#e4f5fc", prestige: "#937810", galaxie: "#eef6ff" };
+                 cerisier: "#5a1740", givre: "#e4f5fc", prestige: "#937810", galaxie: "#02030a" };
 
 // Thème secret « Prestige » : débloqué en découvrant l'écran des créateurs (4 taps sur le titre)
 const CLE_PRESTIGE = "alcuno_theme_prestige";
@@ -177,12 +177,6 @@ setTimeout(passageNyanCat, 4000);
 
 // Halo du sabre sous la barre de l'heure (thème Star Wars, voir le CSS) : dans index.html dès le premier
 // affichage ; créé ici seulement si une ancienne page gardée en cache ne l'a pas
-if (!document.getElementById("haloSabreBas")) {
-  const bas = document.createElement("div");
-  bas.id = "haloSabreBas";
-  bas.setAttribute("aria-hidden", "true");
-  document.body.appendChild(bas);
-}
 if (!document.getElementById("haloSabre")) {
   const halo = document.createElement("div");
   halo.id = "haloSabre";
