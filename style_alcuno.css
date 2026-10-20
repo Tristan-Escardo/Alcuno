@@ -7493,3 +7493,10 @@ html[data-theme="galaxie"] #haloSabre::after{ content: ""; position: absolute; l
   -webkit-mask-image: linear-gradient(to right, transparent 0, #000 55%); mask-image: linear-gradient(to right, transparent 0, #000 55%); }
 @keyframes nyanImages{ from{ background-position-y: 0; } to{ background-position-y: var(--fin); } }
 html[data-theme="galaxie"] #ecranReglages #btnSignalerBug{ color: #8fd0ff; text-shadow: 0 0 8px rgba(80,170,255,.6); }
+/* Même lame tout en bas de l'écran (cœur blanc, lueur bleue vers le haut) */
+#haloSabreBas{ display: none; }
+html[data-theme="galaxie"] #haloSabreBas{ display: block; position: fixed; left: 0; right: 0; bottom: env(safe-area-inset-bottom, 0px); height: 3px;
+  z-index: 2147483647; pointer-events: none; background-color: #eef6ff; }
+html[data-theme="galaxie"] #haloSabreBas::before{ content: ""; position: absolute; left: 0; right: 0; bottom: 3px; height: 38px;
+  background-image: linear-gradient(to top, #b9e0ff 0, #5fb4ff 3px, rgba(40,140,255,.85) 7px,
+    rgba(31,123,255,.5) 14px, rgba(31,123,255,.2) 25px, rgba(31,123,255,0) 38px); }
