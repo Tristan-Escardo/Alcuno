@@ -45,7 +45,7 @@ const CLE_THEME = "alcuno_theme";
 // Couleur de la barre du téléphone pour chaque thème (= --couleur-barre du CSS, le tout haut de la page).
 // Mêmes couleurs dans le script du <head> de index.html, qui la pose dès le premier affichage.
 const THEMES = { bordeaux: "#2b001d", noir: "#000000", vert: "#08301e", bleu: "#0a1634", soleil: "#1f3566",
-                 cerisier: "#5a1740", givre: "#e4f5fc", prestige: "#937810", galaxie: "#02030a" };
+                 cerisier: "#5a1740", givre: "#e4f5fc", prestige: "#937810", galaxie: "#1560e0" };
 
 // Thème secret « Prestige » : débloqué en découvrant l'écran des créateurs (4 taps sur le titre)
 const CLE_PRESTIGE = "alcuno_theme_prestige";
@@ -183,9 +183,12 @@ function afficherGeneriqueGalaxie(){
     <div class="generique-scene"><div class="generique-texte">
       <div class="generique-episode">ÉPISODE ∞</div>
       <div class="generique-titre">LA REVANCHE<br>DU PIGEON</div>
-      <p>Les verres sont remplis. Le PIGEON n'a toujours pas trouvé comment s'en débarrasser.</p>
-      <p>Un seul joueur a percé le secret de l'ALCUNO. Pour lui, et lui seul, s'ouvre enfin un nouveau thème…</p>
+      <p>C'est une période de guerre civile autour de la table basse. Les verres sont remplis, les cartes sont posées face cachée, et plus personne ne sait qui a commencé.</p>
+      <p>Le redoutable PIGEON n'a toujours pas trouvé comment s'en débarrasser. Les +4 pleuvent sur la galaxie, et les annulations de gorgées se font de plus en plus rares…</p>
+      <p>Pendant ce temps, quelqu'un jure qu'il ne boit pas trop ce soir. Personne ne le croit.</p>
+      <p>Mais un seul joueur a percé le secret de l'ALCUNO. Pour lui, et lui seul, s'ouvre enfin un nouveau thème…</p>
       <p class="generique-fin">THÈME STAR WARS DÉBLOQUÉ</p>
+      <p class="generique-fin">Que la gorgée soit avec toi.</p>
     </div></div>
     <div class="generique-passer">Touche l'écran pour passer</div>`;
   let fini = false;
@@ -200,7 +203,7 @@ function afficherGeneriqueGalaxie(){
     if (pastille) pastille.click(); // comme dans les réglages (thème gardé, barre du téléphone…)
     else { appliquerTheme("galaxie"); try { localStorage.setItem(CLE_THEME, "galaxie"); } catch (e) {} }
   };
-  const minuteur = setTimeout(terminer, 19000);
+  const minuteur = setTimeout(terminer, 31000);
   const son = jouerSonGenerique();
   ecran.addEventListener("click", terminer);
   document.body.appendChild(ecran);
