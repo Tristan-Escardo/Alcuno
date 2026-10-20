@@ -129,6 +129,7 @@ function estCodeGalaxie(nom){
   return EMPREINTES_GALAXIE.includes(h.toString(16).padStart(8, "0"));
 }
 function debloquerGalaxie(){
+  if (document.activeElement) document.activeElement.blur(); // (le clavier du nom de joueur se ferme)
   try { localStorage.setItem(CLE_GALAXIE, "1"); } catch (e) {}
   majPastilleGalaxie();
   afficherGeneriqueGalaxie();
