@@ -1184,7 +1184,24 @@ function infosEcranDiagnostic(){
     ` | bas des écrans fixes ${basFixe("bottom:0")} | 100vh ${basFixe("height:100vh")} | 100dvh ${basFixe("height:100dvh")}` +
     ` | 100lvh ${basFixe("height:100lvh")} | html ${document.documentElement.clientHeight}` +
     ` | zone visible ${zoneVisible ? Math.round(zoneVisible.height) + " décalée de " + Math.round(zoneVisible.offsetTop) : "-"}` +
-    ` | accueil ${Math.round(accueil.top)}→${Math.round(accueil.bottom)} | pixels ×${window.devicePixelRatio}`;
+    ` | accueil ${Math.round(accueil.top)}→${Math.round(accueil.bottom)} | pixels ×${window.devicePixelRatio}` +
+    ` | barre demandée ${(document.querySelector('meta[name="theme-color"]') || {}).content || "-"}` +
+    ` | tout en haut ${hautDePage()}`;
+}
+
+// Ce qu'il y a tout en haut de la page, sous l'heure (l'iPhone peint sa barre de la couleur de fond de ce
+// qu'il y trouve) : l'élément touché à 1 px du haut, et le premier fond non transparent en remontant
+function hautDePage(){
+  const el = document.elementFromPoint(window.innerWidth / 2, 1);
+  if (!el) return "rien";
+  let fond = "transparent", e = el;
+  while (e && e.nodeType === 1) {
+    const c = getComputedStyle(e).backgroundColor;
+    if (c && c !== "transparent" && !/rgba\(.*,\s*0\)$/.test(c)) { fond = c; break; }
+    e = e.parentElement;
+  }
+  const nom = (n) => n.tagName.toLowerCase() + (n.id ? "#" + n.id : "");
+  return `${nom(el)} (fond ${fond}${e && e !== el ? " de " + nom(e) : ""})`;
 }
 
 function texteDiagnostic(){
