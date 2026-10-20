@@ -7475,13 +7475,14 @@ html[data-theme="galaxie"] #ecranTele :is(.tele-bloc-titre, .tele-dernieres-titr
 @keyframes generiqueDefile{ from{ transform: rotateX(28deg) translateY(0); } to{ transform: rotateX(28deg) translateY(-150%); } }
 html[data-theme="galaxie"] #ecranTele .tele-entete::after{ background: #eaf6ff !important; box-shadow: 0 0 0.5vh #fff, 0 0 1.4vh #39a0ff, 0 0 3vh #1f7bff; }
 html[data-theme="galaxie"] #ecranTele .tele-entete{ background: rgba(4,8,20,.78) !important; border-color: rgba(143,208,255,.3) !important; }
-/* Sous la barre de l'heure (peinte en bleu sabre par l'iPhone, couleur unie) : le cœur clair de la lame
-   et son halo bleu, en haut de tous les écrans (js/reglages.js crée #haloSabre). Pas de background-color :
+/* Barre de l'heure peinte en blanc bleuté par l'iPhone (couleur unie) : c'est le cœur de la lame ; juste
+   dessous, sa lueur bleue, en haut de tous les écrans (js/reglages.js crée #haloSabre). Pas de background-color :
    l'iPhone reprend la couleur d'un élément collé en haut pour sa barre */
 #haloSabre{ display: none; }
-html[data-theme="galaxie"] #haloSabre{ display: block; position: fixed; left: 0; right: 0; top: env(safe-area-inset-top, 0px); height: 30px;
+html[data-theme="galaxie"] #haloSabre{ display: block; position: fixed; left: 0; right: 0; top: env(safe-area-inset-top, 0px); height: 40px;
   z-index: 2147483647; pointer-events: none; background-color: transparent;
-  background-image: linear-gradient(to bottom, #e8f4ff 0, #e8f4ff 2px, rgba(120,190,255,.9) 3px, rgba(50,140,255,.55) 8px, rgba(30,110,255,.22) 16px, rgba(30,110,255,0) 30px); }
+  background-image: linear-gradient(to bottom, #eef6ff 0, #eef6ff 2px, #b9e0ff 4px, #5fb4ff 7px, rgba(40,140,255,.85) 11px,
+    rgba(31,123,255,.5) 18px, rgba(31,123,255,.2) 28px, rgba(31,123,255,0) 40px); }
 /* Nyan Cat qui traverse l'accueil du thème Star Wars (js/reglages.js), derrière les boutons ; la zone coupe
    ce qui dépasse (sinon l'écran défilerait de côté pendant son passage). Feuille de 12 images (70 ms
    chacune) ; l'arrière de l'arc-en-ciel s'efface en fondu */
