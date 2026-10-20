@@ -177,6 +177,12 @@ setTimeout(passageNyanCat, 4000);
 
 // Halo du sabre sous la barre de l'heure (thème Star Wars, voir le CSS) : dans index.html dès le premier
 // affichage ; créé ici seulement si une ancienne page gardée en cache ne l'a pas
+if (!document.getElementById("haloSabreBas")) {
+  const bas = document.createElement("div");
+  bas.id = "haloSabreBas";
+  bas.setAttribute("aria-hidden", "true");
+  document.body.appendChild(bas);
+}
 if (!document.getElementById("haloSabre")) {
   const halo = document.createElement("div");
   halo.id = "haloSabre";
