@@ -7472,8 +7472,10 @@ html[data-theme="galaxie"] #ecranTele .tele-entete::after{ background: #eaf6ff !
 html[data-theme="galaxie"] #ecranTele .tele-entete{ background: rgba(4,8,20,.78) !important; border-color: rgba(143,208,255,.3) !important; }
 html[data-theme="galaxie"] #choixMode{ box-shadow: inset 0 3px 0 #cfe9ff, inset 0 16px 14px -14px rgba(40,140,255,.95) !important; }
 /* Nyan Cat qui traverse l'accueil du thème Star Wars (js/reglages.js), derrière les boutons ; la zone coupe
-   ce qui dépasse (sinon l'écran défilerait de côté pendant son passage) */
+   ce qui dépasse (sinon l'écran défilerait de côté pendant son passage). Feuille de 12 images (70 ms
+   chacune) ; l'arrière de l'arc-en-ciel s'efface en fondu */
 #choixMode .nyanCat{ position: absolute; left: 0; right: 0; z-index: -1; pointer-events: none; overflow: hidden; }
-#choixMode .nyanArc{ position: absolute; left: 0; width: 0; background-repeat: repeat-x; animation: nyanVague 0.28s steps(2) infinite; }
-#choixMode .nyanChat{ position: absolute; left: 0; top: 0; image-rendering: pixelated; }
-@keyframes nyanVague{ from{ background-position-x: 0; } to{ background-position-x: var(--tuile); } }
+#choixMode .nyanChat{ position: absolute; left: 0; top: 0; background: url("icones/nyan_cat.png") 0 0 no-repeat;
+  image-rendering: pixelated; animation: nyanImages 0.84s steps(12) infinite;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 55%); mask-image: linear-gradient(to right, transparent 0, #000 55%); }
+@keyframes nyanImages{ from{ background-position-y: 0; } to{ background-position-y: var(--fin); } }
