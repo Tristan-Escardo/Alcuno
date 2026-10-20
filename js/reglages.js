@@ -174,6 +174,15 @@ function passageNyanCat(){
 }
 setTimeout(passageNyanCat, 4000);
 
+// Halo du sabre sous la barre de l'heure (thème Star Wars, voir le CSS) : créé ici (une ancienne page
+// gardée en cache ne l'aurait pas)
+if (!document.getElementById("haloSabre")) {
+  const halo = document.createElement("div");
+  halo.id = "haloSabre";
+  halo.setAttribute("aria-hidden", "true");
+  document.body.appendChild(halo);
+}
+
 // Musique du générique (Sons/debloquage_theme_galaxie.mp3, boucle exacte) : au volume des sons du jeu
 // (pas si les sons sont coupés), la musique d'ambiance se tait pendant ce temps. Lue par le lecteur de la
 // musique d'ambiance (jouerTourMusique), dans son propre circuit.
