@@ -133,6 +133,43 @@ function debloquerGalaxie(){
   majPastilleGalaxie();
   afficherGeneriqueGalaxie();
 }
+// Musique du générique (Sons/debloquage_theme_galaxie.mp3, boucle exacte) : au volume des sons du jeu
+// (pas si les sons sont coupés), la musique d'ambiance se tait pendant ce temps. Lue par le lecteur de la
+// musique d'ambiance (jouerTourMusique), dans son propre circuit.
+function jouerSonGenerique(){
+  if (!caseSons.checked || volumeSons <= 0) return null;
+  const ctx = contexteAudio();
+  if (!ctx) return null;
+  const maitre = ctx.createGain();
+  maitre.gain.value = Math.pow(volumeSons / 100, 2);
+  maitre.connect(ctx.destination);
+  const L = { ctx, maitre, nom: "debloquage_theme_galaxie", morceau: null, sources: [], minuteur: null, actif: true };
+  const ambiance = lecteurMusique;
+  if (ambiance && ambiance.actif) {
+    const g = ambiance.attenuation.gain, t = ctx.currentTime;
+    g.cancelScheduledValues(t);
+    g.setValueAtTime(g.value, t);
+    g.linearRampToValueAtTime(0, t + 0.8);
+  }
+  chargerMusique(ctx, L.nom).then((morceau) => {
+    if (!morceau || !L.actif) return;
+    L.morceau = morceau;
+    jouerTourMusique(L, ctx.currentTime + 0.05, 0.4);
+  });
+  return L;
+}
+function arreterSonGenerique(L){
+  if (!L) return;
+  eteindreMusique(L, 1.5);
+  const ambiance = lecteurMusique;
+  if (ambiance && ambiance.ctx === L.ctx) {
+    const g = ambiance.attenuation.gain, t = L.ctx.currentTime;
+    g.cancelScheduledValues(t);
+    g.setValueAtTime(g.value, t);
+    g.linearRampToValueAtTime(1, t + 2);
+  }
+}
+
 // Générique : texte jaune qui défile en perspective dans les étoiles. Un tap le passe ; à la fin (ou au
 // tap), le thème est mis comme dans les Réglages
 function afficherGeneriqueGalaxie(){
@@ -156,6 +193,7 @@ function afficherGeneriqueGalaxie(){
     if (fini) return;
     fini = true;
     clearTimeout(minuteur);
+    arreterSonGenerique(son);
     ecran.classList.add("generique-sortie");
     setTimeout(() => ecran.remove(), 400);
     const pastille = document.getElementById("pastilleGalaxie");
@@ -163,6 +201,7 @@ function afficherGeneriqueGalaxie(){
     else { appliquerTheme("galaxie"); try { localStorage.setItem(CLE_THEME, "galaxie"); } catch (e) {} }
   };
   const minuteur = setTimeout(terminer, 19000);
+  const son = jouerSonGenerique();
   ecran.addEventListener("click", terminer);
   document.body.appendChild(ecran);
   vibrer([80, 60, 80, 60, 200]);
@@ -570,6 +609,7 @@ const MONTEE_MUSIQUE = 0.8;  // secondes de fondu au démarrage (lancement, reto
 // ms tombe encore dans le pré-roulé, qui est la suite exacte de la boucle.
 const BOUCLES_EXACTES = {
   musique_ambiance_soleil: { avant: 0.3, longueur: 903552 / 44100 }, // 8 mesures à 93,7 BPM
+  debloquage_theme_galaxie: { avant: 0.3, longueur: 4201001 / 44100 }, // 95,26 s (générique du thème Star Wars)
 };
 const FONDU_BOUCLE_EXACTE = 0.03;
 const musiquesDecodees = {}; // nom => { buffer, debut, fin } | null (fichier absent) | promesse en cours
