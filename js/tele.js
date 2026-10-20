@@ -582,6 +582,39 @@ function montrerNotifTele(ecran, texte){
   setTimeout(() => notif.classList.add("tele-notif-depart"), DUREE_NOTIF_TELE);
   setTimeout(() => notif.remove(), DUREE_NOTIF_TELE + 600);
 }
+
+// Sans télé reliée : les mêmes petites notifs sur le téléphone (classique et en ligne : en ligne, chaque
+// téléphone a les siennes, à son propre moment), en haut comme le rappel « Bois de l'eau », glissables
+let tempsJeuNotifTel = 0;
+let prochaineNotifTel = delaiNotifTele();
+setInterval(() => {
+  if (!partieLancee || pauseEnCours || codeTele || document.visibilityState !== "visible") return;
+  if (ecranNouvellePartieOuvert()) return; // (js/regles.js) : ce temps-là ne compte pas
+  tempsJeuNotifTel += PAS_NOTIFS_TELE;
+  if (tempsJeuNotifTel < prochaineNotifTel) return;
+  const etat = etatPourTele();
+  // (choix ou annonce à l'écran, volet ouvert, autre notification : on attend)
+  if (etat.ecran || !etat.cartes.length || document.querySelector("#rappelEau, #notifChambrage, #voletPause, #voletCarte, #voletHistorique")) return;
+  const texte = phraseNotifTele(etat);
+  if (!texte) return;
+  tempsJeuNotifTel = 0;
+  prochaineNotifTel = delaiNotifTele();
+  afficherNotifChambrage(texte);
+}, PAS_NOTIFS_TELE);
+
+function afficherNotifChambrage(texte){
+  const ancienne = document.getElementById("notifChambrage");
+  if (ancienne) ancienne.remove();
+  const notif = document.createElement("div");
+  notif.id = "notifChambrage";
+  notif.setAttribute("role", "status");
+  notif.innerHTML = `<img src="icones/icone-192.png" alt=""><div><div class="notifChambrage-haut">` +
+    `<span>ALCUNO</span><span>maintenant</span></div><div class="notifChambrage-texte">${texte}</div></div>` +
+    '<span class="rappelEau-languette" aria-hidden="true"></span>'; // (texte : noms déjà échappés)
+  rendreNotifGlissable(notif, DUREE_NOTIF_TELE);
+  document.body.appendChild(notif);
+  vibrer([40]);
+}
 // #endregion
 
 // Sons du téléphone joués par la télé : seulement ceux arrivés depuis le dernier résumé (pas les

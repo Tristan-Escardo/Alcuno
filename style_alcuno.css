@@ -6303,7 +6303,7 @@ html[data-theme="givre"] #ecranReglages .optionLien:active{ background: #fff; }
 }
 
 /* ===== Pause (mode classique) : ⏸ au bout de la pastille « Tour de … » ; écran « PAUSE » sur la partie floutée ===== */
-#stickyJoueurActif #btnPause{
+#stickyJoueurActif :is(#btnPause, #btnHistorique){
   flex: 0 0 auto;
   width: auto;
   min-width: 0;
@@ -6321,6 +6321,7 @@ html[data-theme="givre"] #ecranReglages .optionLien:active{ background: #fff; }
 }
 #stickyJoueurActif #btnPause[hidden]{ display: none; }
 #stickyJoueurActif #btnPause svg,
+#stickyJoueurActif #btnHistorique svg,
 #ecranPause .pauseIcone svg,
 #ecranTele .tele-pause svg{
   overflow: visible;
@@ -6328,8 +6329,8 @@ html[data-theme="givre"] #ecranReglages .optionLien:active{ background: #fff; }
   stroke: #FFD700;
   stroke-width: 2.2;
 }
-#stickyJoueurActif #btnPause svg{ width: 22px; height: 22px; }
-html[data-theme="givre"] #stickyJoueurActif #btnPause svg{ stroke: #1a9be0; }
+#stickyJoueurActif :is(#btnPause, #btnHistorique) svg{ width: 22px; height: 22px; }
+html[data-theme="givre"] #stickyJoueurActif :is(#btnPause, #btnHistorique) svg{ stroke: #1a9be0; }
 
 #ecranPause{
   position: fixed;
@@ -6471,7 +6472,7 @@ html[data-theme="soleil"] .messages::before{ background: linear-gradient(90deg, 
 html[data-theme="soleil"] .blocMessages{ background: rgba(15, 22, 55, 0.35) !important; border-color: var(--soleil-bord) !important; }
 html[data-theme="soleil"] :is(.titreBloc, #ecranReglages .optionTitre, #ecranReglages h2, .aProposTitre){ color: var(--soleil-peche) !important; }
 html[data-theme="soleil"] #stickyJoueurActif{ background: linear-gradient(180deg, rgba(31,53,102,0.95), rgba(60,50,110,0.93)) !important; border-color: var(--soleil-bord) !important; }
-html[data-theme="soleil"] #stickyJoueurActif #btnPause svg{ stroke: var(--soleil-peche); }
+html[data-theme="soleil"] #stickyJoueurActif :is(#btnPause, #btnHistorique) svg{ stroke: var(--soleil-peche); }
 /* Overlays : « heure dorée », l'inverse du fond (chaud en haut), texte et boutons bleu nuit */
 html[data-theme="soleil"] :is(#overlayCouleur, #overlayPlus4, #overlayPigeon, #overlayFinUnRestants, #overlayDuel, #overlayRegleUnique,
   #overlayAnnulation, #overlayResultatAnnulation, #overlayPredictionFin){
@@ -6970,7 +6971,7 @@ html[data-theme="givre"] .btnPauseJoueur{ color: var(--givre-accent); border-col
 html[data-theme="soleil"] .btnPauseJoueur{ color: #ffcf9e; border-color: rgba(255, 205, 170, 0.5); }
 
 /* Volet « Mettre Léa en pause » (monte du bas) */
-#voletPause, #voletCarte{
+#voletPause, #voletCarte, #voletHistorique{
   position: fixed;
   inset: 0;
   z-index: 2147483400;
@@ -7218,4 +7219,59 @@ html[data-theme="soleil"] #ecranTele .tele-regles.regleBloc{ color: #fff1df; }
 html.gaucher #btnRemonter{ left: auto; right: 16px; }
 html.gaucher #annulerChoix{ flex-direction: row-reverse; }
 html.gaucher #annulerChoix .annulerChoix-texte{ text-align: right; }
-html.gaucher #stickyJoueurActif #btnPause{ order: -1; margin: -6px 0 -6px -6px; }
+html.gaucher #stickyJoueurActif :is(#btnPause, #btnHistorique){ order: -1; margin: -6px 0 -6px -6px; }
+
+/* Dernières cartes (bouton 🕘 du bandeau « Tour de », js/plateau.js) */
+#stickyJoueurActif #btnHistorique{ margin-left: 2px; }
+html.gaucher #stickyJoueurActif #btnHistorique{ margin-left: -6px; margin-right: 2px; }
+#voletHistorique .voletPause-nom{ text-align: left; margin-bottom: 8px; }
+.historique-liste{ text-align: left; }
+.historique-vide{ font: 700 15px Arial, sans-serif; color: #ddd; padding: 10px 0 6px; }
+.historique-ligne{ display: flex; align-items: center; gap: 12px; padding: 8px 0; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+.historique-ligne:first-child{ border-top: none; }
+.historique-carte{ width: 36px; flex: none; margin: 0; cursor: default; pointer-events: none; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5); }
+.historique-texte{ min-width: 0; }
+.historique-nom{ font: 900 15px Arial, sans-serif; color: #fff; }
+.historique-recente{ margin-left: 6px; padding: 2px 7px; border-radius: 999px; background: #FFD700; color: #2b001d; font: 800 11px Arial, sans-serif; vertical-align: 1px; }
+.historique-quoi{ margin-top: 2px; font: 600 13px/1.3 Arial, sans-serif; color: rgba(255, 255, 255, 0.72); }
+.historique-quoi em{ font-style: normal; font-weight: 800; color: #FFD700; white-space: nowrap; }
+html[data-theme="givre"] .historique-nom{ color: var(--givre-texte); }
+html[data-theme="givre"] .historique-quoi{ color: rgba(13, 53, 80, 0.75); }
+html[data-theme="givre"] .historique-quoi em{ color: var(--givre-accent); }
+html[data-theme="givre"] .historique-recente{ background: var(--givre-accent); color: #fff; }
+html[data-theme="givre"] .historique-ligne{ border-color: rgba(13, 53, 80, 0.12); }
+html[data-theme="prestige"] .historique-quoi em{ color: #fff2b0; }
+html[data-theme="soleil"] .historique-quoi em{ color: #ffd27a; }
+
+/* Petites notifs qui chambrent sur le téléphone, sans télé (js/tele.js) : comme celles de la télé */
+#notifChambrage{
+  position: fixed;
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  z-index: 30003;
+  width: min(420px, calc(100% - 24px));
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px 20px;
+  border-radius: 18px;
+  background: rgba(245, 240, 245, 0.96);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+  color: #1a1a1a;
+  font: 600 15px/1.3 Arial, sans-serif;
+  text-align: left;
+  cursor: pointer;
+  touch-action: none; /* glissée au doigt (js/reglages.js, rendreNotifGlissable) */
+  -webkit-user-select: none;
+  user-select: none;
+  animation: rappelEauArrive 0.4s ease-out both;
+  transform: translateX(-50%);
+}
+#notifChambrage img{ width: 40px; height: 40px; border-radius: 10px; flex: none; }
+#notifChambrage > div{ flex: 1; min-width: 0; }
+#notifChambrage .notifChambrage-haut{ display: flex; justify-content: space-between; margin-bottom: 2px; font: 800 11px Arial, sans-serif; letter-spacing: 0.06em; color: #666; }
+#notifChambrage .notifChambrage-haut span + span{ font-weight: 600; letter-spacing: 0; }
+#notifChambrage .notifChambrage-texte b{ color: #a0005f; }
+#notifChambrage .rappelEau-languette{ position: absolute; left: 50%; bottom: 7px; width: 38px; height: 5px; margin-left: -19px; border-radius: 3px; background: rgba(0, 0, 0, 0.18); }
+html.accessibilite #notifChambrage > div{ zoom: 1.2; }
