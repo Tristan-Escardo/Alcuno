@@ -1425,6 +1425,13 @@ function ajouterJoueur(){
   nom = nom.replace(/\s+/g, " ").trim();
   if(!nom) return;
 
+  // Mot de passe du thème secret Galaxie (js/reglages.js) : pas un joueur
+  if(estCodeGalaxie(nom)){
+    nomJoueurInput.value = "";
+    debloquerGalaxie();
+    return;
+  }
+
   const key = nom.toLocaleLowerCase("fr-FR");
 
   if (joueurs.some(j => (j || "").replace(/\s+/g, " ").trim().toLocaleLowerCase("fr-FR") === key)) {

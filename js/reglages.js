@@ -45,7 +45,7 @@ const CLE_THEME = "alcuno_theme";
 // Couleur de la barre du téléphone pour chaque thème (= --couleur-barre du CSS, le tout haut de la page).
 // Mêmes couleurs dans le script du <head> de index.html, qui la pose dès le premier affichage.
 const THEMES = { bordeaux: "#2b001d", noir: "#000000", vert: "#08301e", bleu: "#0a1634", soleil: "#1f3566",
-                 cerisier: "#5a1740", givre: "#e4f5fc", prestige: "#937810" };
+                 cerisier: "#5a1740", givre: "#e4f5fc", prestige: "#937810", galaxie: "#02030a" };
 
 // Thème secret « Prestige » : débloqué en découvrant l'écran des créateurs (4 taps sur le titre)
 const CLE_PRESTIGE = "alcuno_theme_prestige";
@@ -107,6 +107,65 @@ function afficherFenetrePrestige(){
   voile.querySelector(".fenetrePrestige-plusTard").addEventListener("click", fermer);
   vibrer([60, 40, 60]);
   document.body.appendChild(voile);
+}
+
+// ===== Thème secret « Galaxie » : un mot de passe tapé comme nom de joueur (mode classique) =====
+// Le mot n'est pas écrit ici (le code du jeu est public) : seulement son empreinte (FNV-1a sur le mot en
+// minuscules, sans accents, espaces ni ponctuation). Le nom n'est pas ajouté : générique qui défile,
+// puis le thème est mis.
+const CLE_GALAXIE = "alcuno_theme_galaxie";
+const EMPREINTES_GALAXIE = ["ff6221f9", "1684d6ef", "d711e3bb"];
+function galaxieDebloquee(){
+  try { return localStorage.getItem(CLE_GALAXIE) === "1"; } catch (e) { return false; }
+}
+function majPastilleGalaxie(){
+  const pastille = document.getElementById("pastilleGalaxie");
+  if (pastille) pastille.hidden = !galaxieDebloquee();
+}
+function estCodeGalaxie(nom){
+  const mot = String(nom).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  let h = 0x811c9dc5;
+  for (const c of mot) { h ^= c.charCodeAt(0); h = Math.imul(h, 0x01000193) >>> 0; }
+  return EMPREINTES_GALAXIE.includes(h.toString(16).padStart(8, "0"));
+}
+function debloquerGalaxie(){
+  try { localStorage.setItem(CLE_GALAXIE, "1"); } catch (e) {}
+  majPastilleGalaxie();
+  afficherGeneriqueGalaxie();
+}
+// Générique : texte jaune qui défile en perspective dans les étoiles. Un tap le passe ; à la fin (ou au
+// tap), le thème est mis comme dans les Réglages
+function afficherGeneriqueGalaxie(){
+  if (document.getElementById("generiqueGalaxie")) return;
+  const ecran = document.createElement("div");
+  ecran.id = "generiqueGalaxie";
+  ecran.setAttribute("role", "dialog");
+  ecran.setAttribute("aria-label", "Thème Galaxie débloqué");
+  ecran.innerHTML = `
+    <div class="generique-intro">Il y a bien longtemps, dans une soirée lointaine, très lointaine…</div>
+    <div class="generique-scene"><div class="generique-texte">
+      <div class="generique-episode">ÉPISODE ∞</div>
+      <div class="generique-titre">LA REVANCHE<br>DU PIGEON</div>
+      <p>Les verres sont remplis. Le PIGEON n'a toujours pas trouvé comment s'en débarrasser.</p>
+      <p>Un seul joueur a percé le secret de l'ALCUNO. Pour lui, et lui seul, s'ouvre enfin un nouveau thème…</p>
+      <p class="generique-fin">THÈME GALAXIE DÉBLOQUÉ</p>
+    </div></div>
+    <div class="generique-passer">Touche l'écran pour passer</div>`;
+  let fini = false;
+  const terminer = () => {
+    if (fini) return;
+    fini = true;
+    clearTimeout(minuteur);
+    ecran.classList.add("generique-sortie");
+    setTimeout(() => ecran.remove(), 400);
+    const pastille = document.getElementById("pastilleGalaxie");
+    if (pastille) pastille.click(); // comme dans les réglages (thème gardé, barre du téléphone…)
+    else { appliquerTheme("galaxie"); try { localStorage.setItem(CLE_THEME, "galaxie"); } catch (e) {} }
+  };
+  const minuteur = setTimeout(terminer, 19000);
+  ecran.addEventListener("click", terminer);
+  document.body.appendChild(ecran);
+  vibrer([80, 60, 80, 60, 200]);
 }
 
 // Notification qui arrive du haut de l'écran, en or avec des étincelles. Comme sur un téléphone :
@@ -238,7 +297,7 @@ function peindreBarreTelephone(){
 }
 
 function appliquerTheme(nom, sansMusique = false){
-  if (!THEMES[nom] || (nom === "prestige" && !prestigeDebloque())) nom = "bordeaux";
+  if (!THEMES[nom] || (nom === "prestige" && !prestigeDebloque()) || (nom === "galaxie" && !galaxieDebloquee())) nom = "bordeaux";
   document.documentElement.dataset.theme = nom;
   peindreBarreTelephone();
   document.querySelectorAll(".pastilleTheme").forEach((b) => {
@@ -302,6 +361,7 @@ if (positionReglages !== null) {
 document.documentElement.classList.remove("rouvrir-reglages");
 
 majPastillePrestige();
+majPastilleGalaxie();
 let themeChoisi = "bordeaux";
 try { themeChoisi = localStorage.getItem(CLE_THEME) || "bordeaux"; } catch (e) {}
 if (themeChoisi === "violet") themeChoisi = "soleil"; // ancien thème, remplacé par Soleil couchant

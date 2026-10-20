@@ -67,7 +67,7 @@
         try { var theme = localStorage.getItem("alcuno_theme"); if (theme === "violet") { theme = "soleil"; localStorage.setItem("alcuno_theme", theme); } if (theme) document.documentElement.dataset.theme = theme; } catch (e) {}
         // Barre du téléphone à la couleur du thème dès le premier affichage (mêmes couleurs que THEMES dans script.js)
         var couleursBarre = { bordeaux: "#2b001d", noir: "#000000", vert: "#08301e", bleu: "#0a1634", soleil: "#1f3566",
-                              cerisier: "#5a1740", givre: "#e4f5fc", prestige: "#937810" };
+                              cerisier: "#5a1740", givre: "#e4f5fc", prestige: "#937810", galaxie: "#02030a" };
         document.write('<meta name="theme-color" content="' + (couleursBarre[theme] || couleursBarre.bordeaux) + '">');
         // iPhone : page rechargée après un changement de thème (voir rafraichirBarreIphone dans script.js) :
         // on rouvre les Réglages dès le premier affichage
@@ -182,6 +182,7 @@
                         <button type="button" class="pastilleTheme" data-theme="givre" style="--c:#7fd8ff;--c-givre:#0f6aa6"><span class="rond" style="background:linear-gradient(135deg,#9fdcf7 25%,#ffffff)"></span><span class="nomTheme">Givre</span></button>
                         <!-- Thème secret : débloqué en découvrant l'écran des créateurs (4 taps sur le titre) -->
                         <button type="button" class="pastilleTheme" data-theme="prestige" style="--c:#f5c842;--c-givre:#9a7400" id="pastillePrestige" hidden><span class="rond" style="background:linear-gradient(135deg,#3a2806 15%,#d4a017 60%,#fff2b0)"></span><span class="nomTheme">Prestige</span></button>
+                        <button type="button" class="pastilleTheme" data-theme="galaxie" style="--c:#FFE81F;--c-givre:#1a3f8a" id="pastilleGalaxie" hidden><span class="rond rondGalaxie"></span><span class="nomTheme">Galaxie</span></button>
                     </div>
                 </div>
 
