@@ -7275,10 +7275,36 @@ html[data-theme="soleil"] .historique-quoi em{ color: #ffd27a; }
 #notifChambrage .notifChambrage-texte b{ color: #a0005f; }
 #notifChambrage .rappelEau-languette{ position: absolute; left: 50%; bottom: 7px; width: 38px; height: 5px; margin-left: -19px; border-radius: 3px; background: rgba(0, 0, 0, 0.18); }
 html.accessibilite #notifChambrage > div{ zoom: 1.2; }
+#notifChambrage{ font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
+/* Android : notification Material (petite icône ronde, « Alcuno • maintenant », texte dessous) */
+#notifChambrage.notif-android{
+  display: block;
+  border-radius: 24px;
+  padding: 14px 18px 22px;
+  background: #f3edf7;
+  color: #1d1b20;
+  font-family: Roboto, "Google Sans", system-ui, Arial, sans-serif;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+}
+#notifChambrage.notif-android .notifChambrage-haut{ justify-content: flex-start; align-items: center; gap: 6px; margin-bottom: 6px; font: 500 12px Roboto, system-ui, Arial, sans-serif; letter-spacing: 0; color: #49454f; }
+#notifChambrage.notif-android .notifChambrage-haut img{ width: 18px; height: 18px; border-radius: 50%; }
+#notifChambrage.notif-android .notifChambrage-haut span{ font-weight: 500; }
+#notifChambrage.notif-android .notifChambrage-texte{ font-size: 15px; line-height: 1.35; font-weight: 400; }
+#notifChambrage.notif-android .notifChambrage-texte b{ font-weight: 700; color: #6750a4; }
+/* Téléphone en mode sombre */
+@media (prefers-color-scheme: dark){
+  #notifChambrage{ background: rgba(44, 44, 46, 0.96); color: #fff; box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6); }
+  #notifChambrage .notifChambrage-haut{ color: #a1a1a6; }
+  #notifChambrage .notifChambrage-texte b{ color: #ff7ab8; }
+  #notifChambrage .rappelEau-languette{ background: rgba(255, 255, 255, 0.25); }
+  #notifChambrage.notif-android{ background: #2b2930; color: #e6e0e9; }
+  #notifChambrage.notif-android .notifChambrage-haut{ color: #cac4d0; }
+  #notifChambrage.notif-android .notifChambrage-texte b{ color: #d0bcff; }
+}
 
 /* Télé : « Dernières cartes tirées » sous le plateau (à la place du nombre de cartes restantes, js/tele.js) */
-#ecranTele .tele-restantes.tele-dernieres{ display: flex; align-items: flex-end; justify-content: center; gap: 1.4vh; margin-top: 2.2vh; }
-#ecranTele .tele-dernieres-titre{ align-self: center; margin-right: 0.8vh; font: 900 1.9vh Arial, sans-serif; letter-spacing: 0.15em; text-transform: uppercase; color: #e9d9a8; }
+#ecranTele .tele-restantes.tele-dernieres{ display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: center; gap: 1vh 1.4vh; margin-top: 2vh; }
+#ecranTele .tele-dernieres-titre{ flex: 0 0 100%; text-align: center; font: 900 1.9vh Arial, sans-serif; letter-spacing: 0.15em; text-transform: uppercase; color: #e9d9a8; }
 #ecranTele .tele-dernieres-item{ display: flex; flex-direction: column; align-items: center; gap: 0.5vh; max-width: 9vh; font: 800 1.7vh Arial, sans-serif; color: rgba(255, 255, 255, 0.8); }
 #ecranTele .tele-dernieres-item span{ max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #ecranTele .tele-dernieres-item .Carte{ width: 5vh; margin: 0; }
