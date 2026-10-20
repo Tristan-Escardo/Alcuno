@@ -7325,8 +7325,8 @@ html[data-theme="soleil"] #ecranTele .tele-dernieres-titre{ color: #3a1f4a; }
 html.faces-fermees #stickyJoueurActif #btnHistorique{ display: none; }
 
 /* ===== Thème secret « Galaxie » (débloqué par un mot de passe en nom de joueur, js/reglages.js) ===== */
-html[data-theme="galaxie"]{ --fond-theme:#02030a; background:#02030a !important; }
-html[data-theme="galaxie"] body{ background:transparent !important; }
+html[data-theme="galaxie"]{ --fond-theme:#02030a; background: linear-gradient(#02030a,#02030a) #eef6ff !important; }
+html[data-theme="galaxie"] body{ background: linear-gradient(#02030a,#02030a) #eef6ff !important; }
 html[data-theme="galaxie"] :is(main, .jeu, #jeu){ background-color: transparent !important; background-image:none !important; }
 html[data-theme="galaxie"] body::before{ content:""; position:fixed; inset:0; z-index:-2; pointer-events:none;
   background-image:
@@ -7351,7 +7351,7 @@ html[data-theme="galaxie"] body::after{ content:""; position:fixed; inset:0; z-i
     #02030a;
 }
 /* Accueil : hyperespace */
-html[data-theme="galaxie"] #choixMode{ background-color:#02030a !important; background-image:
+html[data-theme="galaxie"] #choixMode{ background-color:#eef6ff !important; background-image:
     radial-gradient(1.6px 1.6px at 23px 41px, #fff 60%, transparent 61%), radial-gradient(1px 1px at 87px 133px, #fff 60%, transparent 61%),
     radial-gradient(2.2px 2.2px at 151px 67px, #fff 60%, transparent 61%), radial-gradient(1.4px 1.4px at 302px 92px, #fff 60%, transparent 61%),
     radial-gradient(2px 2px at 343px 205px, #ffeeb0 60%, transparent 61%), radial-gradient(1px 1px at 52px 222px, #fff 60%, transparent 61%),
@@ -7361,9 +7361,11 @@ html[data-theme="galaxie"] #choixMode{ background-color:#02030a !important; back
     radial-gradient(circle at 88% 94%, #c9b28a 0, #8c6b3e 10%, #3b2a17 17%, transparent 17.5%),
     radial-gradient(circle at 50% 37%, #02030a 0 6%, transparent 24%, transparent 46%, #02030a 78%),
     repeating-conic-gradient(from 0deg at 50% 37%, transparent 0deg 2.6deg, rgba(190,215,255,.32) 2.6deg 2.8deg, transparent 2.8deg 5.1deg, rgba(255,255,255,.18) 5.1deg 5.2deg),
-    radial-gradient(ellipse at 80% 10%, rgba(60,90,200,.35), transparent 50%) !important;
-  background-size: 370px 250px, 370px 250px, 370px 250px, 370px 250px, 370px 250px, 370px 250px, 370px 250px, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100% !important;
-  background-repeat: repeat, repeat, repeat, repeat, repeat, repeat, repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat !important; }
+    radial-gradient(ellipse at 80% 10%, rgba(60,90,200,.35), transparent 50%), linear-gradient(#02030a,#02030a) !important;
+  background-size: 370px 250px, 370px 250px, 370px 250px, 370px 250px, 370px 250px, 370px 250px, 370px 250px, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100% !important;
+  background-repeat: repeat, repeat, repeat, repeat, repeat, repeat, repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat !important; }
+/* (fonds noirs peints en image par-dessus une couleur de fond blanche : l'iPhone peint sa barre de l'heure de la
+   COULEUR de fond de la page, comme en Givre, sans que le blanc se voie) */
 html[data-theme="galaxie"] :is(#titreAccueil, header h1){
   font-family: "Arial Black", Impact, Arial, sans-serif !important; color: #000 !important;
   -webkit-text-stroke: 2.4px #FFE81F; paint-order: stroke fill; letter-spacing: .06em !important;
@@ -7415,7 +7417,7 @@ html[data-theme="galaxie"] :is(#ecranPause){ background: rgba(2,3,10,.75) !impor
 html[data-theme="galaxie"] .voletPause-feuille{ background: #050a1a !important; border-top: 2px solid #4aa8ff !important; box-shadow: 0 -4px 22px rgba(40,140,255,.45) !important; }
 html[data-theme="galaxie"] .voletPause-nom{ color:#FFE81F !important; }
 html[data-theme="galaxie"] .voletPause-ok{ background: linear-gradient(180deg,#1a2b55,#0a1430) !important; }
-html[data-theme="galaxie"] :is(#ecranReglages, #ecranRegles){ background: #02030a !important; }
+html[data-theme="galaxie"] :is(#ecranReglages, #ecranRegles){ background: linear-gradient(#02030a,#02030a) #eef6ff !important; }
 html[data-theme="galaxie"] #ecranRegles .blocRegles{
   background:
     linear-gradient(#FFE81F,#FFE81F) top left/12px 2px no-repeat, linear-gradient(#FFE81F,#FFE81F) top left/2px 12px no-repeat,
