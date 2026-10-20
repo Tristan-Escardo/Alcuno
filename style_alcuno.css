@@ -7442,7 +7442,7 @@ html[data-theme="galaxie"] :is(#overlayRegleUnique.overlay-doree, #overlayCarteD
 html[data-theme="galaxie"] :is(#overlayRegleUnique.overlay-doree, #overlayCarteDoree) .doree-texte{ color:#d8f1ff !important; }
 @keyframes hologramme{ 0%, 100%{ opacity: .92; } 47%{ opacity: .75; } 49%{ opacity: .95; } 51%{ opacity: .6; } 53%{ opacity: .92; } }
 /* Pastille du thème dans les Réglages */
-#ecranReglages .pastilleTheme .rondGalaxie{ background: radial-gradient(1.5px 1.5px at 30% 30%, #fff 60%, transparent 61%), radial-gradient(1px 1px at 70% 55%, #fff 60%, transparent 61%), radial-gradient(1px 1px at 45% 75%, #fff 60%, transparent 61%), linear-gradient(135deg, transparent 44%, #ff3b3b 45% 52%, transparent 53%), radial-gradient(circle at 70% 25%, #1b2f6e, #02030a 70%); }
+#ecranReglages .pastilleTheme .rondGalaxie{ background: url("icones/casque_star_wars.png") center 55% / 74% no-repeat, radial-gradient(circle at 70% 25%, #1b2f6e, #02030a 75%); }
 /* Télé */
 html[data-theme="galaxie"] #ecranTele{ background: radial-gradient(1.4px 1.4px at 40px 60px, #fff 60%, transparent 61%) 0 0/300px 200px, radial-gradient(1px 1px at 160px 140px, #fff 60%, transparent 61%) 0 0/300px 200px, radial-gradient(ellipse at 80% 10%, rgba(60,90,200,.35), transparent 50%), #02030a !important; }
 html[data-theme="galaxie"] #ecranTele :is(.tele-titre){ color:#000 !important; -webkit-text-stroke: 0.25vh #FFE81F; paint-order: stroke fill; text-shadow: 0 0 2vh rgba(255,232,31,.35) !important; }
