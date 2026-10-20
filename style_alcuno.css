@@ -7356,13 +7356,14 @@ html[data-theme="galaxie"] #choixMode{ background-color:#02030a !important; back
     radial-gradient(2.2px 2.2px at 151px 67px, #fff 60%, transparent 61%), radial-gradient(1.4px 1.4px at 302px 92px, #fff 60%, transparent 61%),
     radial-gradient(2px 2px at 343px 205px, #ffeeb0 60%, transparent 61%), radial-gradient(1px 1px at 52px 222px, #fff 60%, transparent 61%),
     radial-gradient(1.6px 1.6px at 262px 18px, #fff 60%, transparent 61%),
+    radial-gradient(circle at 66% 76%, #fff6d0 0 9px, rgba(255,210,120,.55) 10px, transparent 24px),
+    radial-gradient(circle at 74% 78.5%, #ffe3a0 0 6px, rgba(255,170,90,.5) 7px, transparent 18px),
     radial-gradient(circle at 88% 94%, #c9b28a 0, #8c6b3e 10%, #3b2a17 17%, transparent 17.5%),
+    radial-gradient(circle at 50% 37%, #02030a 0 6%, transparent 24%, transparent 46%, #02030a 78%),
+    repeating-conic-gradient(from 0deg at 50% 37%, transparent 0deg 2.6deg, rgba(190,215,255,.32) 2.6deg 2.8deg, transparent 2.8deg 5.1deg, rgba(255,255,255,.18) 5.1deg 5.2deg),
     radial-gradient(ellipse at 80% 10%, rgba(60,90,200,.35), transparent 50%) !important;
-  background-size: 370px 250px, 370px 250px, 370px 250px, 370px 250px, 370px 250px, 370px 250px, 370px 250px, 100% 100%, 100% 100% !important; overflow:hidden; }
-html[data-theme="galaxie"] #choixMode::before{ content:""; position:absolute; inset:-20% -40%; z-index:-1; pointer-events:none;
-  background: repeating-conic-gradient(from 0deg at 50% 38%, transparent 0deg 2.6deg, rgba(190,215,255,.32) 2.6deg 2.8deg, transparent 2.8deg 5.1deg, rgba(255,255,255,.18) 5.1deg 5.2deg);
-  -webkit-mask: radial-gradient(circle at 50% 38%, transparent 0 8%, #000 30%, transparent 75%); mask: radial-gradient(circle at 50% 38%, transparent 0 8%, #000 30%, transparent 75%);
-}
+  background-size: 370px 250px, 370px 250px, 370px 250px, 370px 250px, 370px 250px, 370px 250px, 370px 250px, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100% !important;
+  background-repeat: repeat, repeat, repeat, repeat, repeat, repeat, repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat !important; }
 html[data-theme="galaxie"] :is(#titreAccueil, header h1){
   font-family: "Arial Black", Impact, Arial, sans-serif !important; color: #000 !important;
   -webkit-text-stroke: 2.4px #FFE81F; paint-order: stroke fill; letter-spacing: .06em !important;
@@ -7402,11 +7403,9 @@ html[data-theme="galaxie"] #nomJoueur{ background:#02040c !important; border:1.5
 html[data-theme="galaxie"] #stickyJoueurActif{ background: rgba(4,8,20,.92) !important; border-color: rgba(143,208,255,.45) !important; box-shadow: 0 0 12px rgba(40,140,255,.4) !important; }
 html[data-theme="galaxie"] :is(.btnLivre, #btnReglages, .btnAccueilTexte) svg{ filter: drop-shadow(0 0 4px rgba(255,232,31,.6)); }
 
-html[data-theme="galaxie"] #choixMode #titreAccueil{ font-size: min(15.5vw, 20vh) !important; margin-top: 46px !important; }
+html[data-theme="galaxie"] #choixMode #titreAccueil{ font-size: min(15.5vw, 20vh) !important; }
 html[data-theme="galaxie"] header::after{ height: 3px !important; }
 /* Deux soleils sur la planète de l'accueil */
-html[data-theme="galaxie"] #choixMode::after{ content:""; position:absolute; right:22%; bottom:21%; width:120px; height:60px; pointer-events:none; z-index:-1;
-  background: radial-gradient(circle at 30% 50%, #fff6d0 0 9px, rgba(255,210,120,.55) 10px, transparent 24px), radial-gradient(circle at 72% 62%, #ffe3a0 0 6px, rgba(255,170,90,.5) 7px, transparent 18px); }
 /* Fenêtres du jeu (annonces, choix) */
 html[data-theme="galaxie"] [id^="overlay"]{ background: radial-gradient(ellipse at 50% 40%, rgba(30,70,170,.45), rgba(2,3,10,.97) 70%) !important; }
 html[data-theme="galaxie"] :is(.overlay-regle-texte, .titre-pigeon, #overlayAnnulation > div){ color:#FFE81F !important; text-shadow: 0 0 12px rgba(255,232,31,.35) !important; }
@@ -7437,9 +7436,8 @@ html[data-theme="galaxie"] .Carte:not(.retournee):not([class*="_"]):not([class*=
 html.faces-fermees[data-theme="galaxie"] #plateau .Carte.retournee.recachee,
 html[data-theme="galaxie"] .tele-plateau .Carte.carte-recachee{ background-image: url("Cartes/dos_galaxie.svg") !important; }
 /* Carte dorée en hologramme */
-html[data-theme="galaxie"] :is(#overlayRegleUnique.overlay-doree, #overlayCarteDoree){ background: radial-gradient(ellipse at 50% 45%, rgba(40,120,255,.3), rgba(2,3,10,.97) 65%) !important; }
+html[data-theme="galaxie"] :is(#overlayRegleUnique.overlay-doree, #overlayCarteDoree){ background: repeating-linear-gradient(0deg, rgba(120,200,255,.08) 0 2px, transparent 2px 5px), radial-gradient(ellipse at 50% 45%, rgba(40,120,255,.3), rgba(2,3,10,.97) 65%) !important; }
 html[data-theme="galaxie"] :is(#overlayRegleUnique.overlay-doree .Carte, #overlayCarteDoree .doree-carte-vedette){ filter: sepia(1) hue-rotate(170deg) saturate(2.2) brightness(1.15) drop-shadow(0 0 14px #49b4ff) !important; animation: hologramme 2.6s steps(1) infinite; }
-html[data-theme="galaxie"] #overlayRegleUnique.overlay-doree::after{ content:""; position:fixed; inset:0; pointer-events:none; background: repeating-linear-gradient(0deg, rgba(120,200,255,.10) 0 2px, transparent 2px 5px); }
 html[data-theme="galaxie"] :is(#overlayRegleUnique.overlay-doree, #overlayCarteDoree) .doree-titre{ color:#9fe0ff !important; text-shadow: 0 0 12px #2fa0ff !important; -webkit-text-stroke: 0 !important; }
 html[data-theme="galaxie"] :is(#overlayRegleUnique.overlay-doree, #overlayCarteDoree) .doree-texte{ color:#d8f1ff !important; }
 @keyframes hologramme{ 0%, 100%{ opacity: .92; } 47%{ opacity: .75; } 49%{ opacity: .95; } 51%{ opacity: .6; } 53%{ opacity: .92; } }
@@ -7461,7 +7459,7 @@ html[data-theme="galaxie"] #ecranTele :is(.tele-bloc-titre, .tele-dernieres-titr
 .generique-intro{ position: absolute; top: calc(70px + env(safe-area-inset-top)); left: 30px; right: 30px; color: #4bd5ee; font: 600 18px/1.4 Arial, sans-serif; opacity: 0; animation: generiqueIntro 4.5s ease both; }
 .generique-scene{ position: absolute; left: 0; right: 0; bottom: 0; height: 100%; perspective: 320px; overflow: hidden;
   -webkit-mask: linear-gradient(transparent 8%, #000 40%); mask: linear-gradient(transparent 8%, #000 40%); }
-.generique-texte{ position: absolute; left: 50%; width: min(320px, 82vw); margin-left: calc(min(320px, 82vw) / -2); top: 100%; transform-origin: 50% 0; color: #FFE81F; text-align: center; font-family: "Arial Black", Arial, sans-serif; animation: generiqueDefile 15s linear 3.5s both; }
+.generique-texte{ position: absolute; left: 50%; width: min(320px, 82vw); margin-left: calc(min(320px, 82vw) / -2); top: 100%; transform-origin: 50% 0; color: #FFE81F; text-align: center; font-family: "Arial Black", Arial, sans-serif; animation: generiqueDefile 27s linear 3.5s both; }
 .generique-episode{ font-size: 15px; letter-spacing: 0.2em; margin-bottom: 8px; }
 .generique-titre{ font-size: 28px; letter-spacing: 0.05em; margin-bottom: 22px; }
 .generique-texte p{ font: 700 19px/1.45 Arial, sans-serif; text-align: justify; margin: 0 0 18px; }
@@ -7469,6 +7467,7 @@ html[data-theme="galaxie"] #ecranTele :is(.tele-bloc-titre, .tele-dernieres-titr
 .generique-passer{ position: absolute; bottom: calc(18px + env(safe-area-inset-bottom)); left: 0; right: 0; text-align: center; color: rgba(255,255,255,.4); font: 600 12px Arial, sans-serif; }
 @keyframes generiqueArrive{ from{ opacity: 0; } to{ opacity: 1; } }
 @keyframes generiqueIntro{ 0%{ opacity: 0; } 15%, 70%{ opacity: 1; } 100%{ opacity: 0; } }
-@keyframes generiqueDefile{ from{ transform: rotateX(28deg) translateY(0); } to{ transform: rotateX(28deg) translateY(-210%); } }
+@keyframes generiqueDefile{ from{ transform: rotateX(28deg) translateY(0); } to{ transform: rotateX(28deg) translateY(-150%); } }
 html[data-theme="galaxie"] #ecranTele .tele-entete::after{ background: #eaf6ff !important; box-shadow: 0 0 0.5vh #fff, 0 0 1.4vh #39a0ff, 0 0 3vh #1f7bff; }
 html[data-theme="galaxie"] #ecranTele .tele-entete{ background: rgba(4,8,20,.78) !important; border-color: rgba(143,208,255,.3) !important; }
+html[data-theme="galaxie"] #choixMode{ box-shadow: inset 0 3px 0 #cfe9ff, inset 0 16px 14px -14px rgba(40,140,255,.95) !important; }
