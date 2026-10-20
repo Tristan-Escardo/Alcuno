@@ -109,7 +109,7 @@ function afficherFenetrePrestige(){
   document.body.appendChild(voile);
 }
 
-// ===== Thème secret « Galaxie » : un mot de passe tapé comme nom de joueur (mode classique) =====
+// ===== Thème secret « Star Wars » (nom interne : galaxie) : un mot de passe tapé comme nom de joueur (mode classique) =====
 // Le mot n'est pas écrit ici (le code du jeu est public) : seulement son empreinte (FNV-1a sur le mot en
 // minuscules, sans accents, espaces ni ponctuation). Le nom n'est pas ajouté : générique qui défile,
 // puis le thème est mis.
@@ -140,7 +140,7 @@ function afficherGeneriqueGalaxie(){
   const ecran = document.createElement("div");
   ecran.id = "generiqueGalaxie";
   ecran.setAttribute("role", "dialog");
-  ecran.setAttribute("aria-label", "Thème Galaxie débloqué");
+  ecran.setAttribute("aria-label", "Thème Star Wars débloqué");
   ecran.innerHTML = `
     <div class="generique-intro">Il y a bien longtemps, dans une soirée lointaine, très lointaine…</div>
     <div class="generique-scene"><div class="generique-texte">
@@ -148,7 +148,7 @@ function afficherGeneriqueGalaxie(){
       <div class="generique-titre">LA REVANCHE<br>DU PIGEON</div>
       <p>Les verres sont remplis. Le PIGEON n'a toujours pas trouvé comment s'en débarrasser.</p>
       <p>Un seul joueur a percé le secret de l'ALCUNO. Pour lui, et lui seul, s'ouvre enfin un nouveau thème…</p>
-      <p class="generique-fin">THÈME GALAXIE DÉBLOQUÉ</p>
+      <p class="generique-fin">THÈME STAR WARS DÉBLOQUÉ</p>
     </div></div>
     <div class="generique-passer">Touche l'écran pour passer</div>`;
   let fini = false;
