@@ -133,11 +133,12 @@ function debloquerGalaxie(){
   majPastilleGalaxie();
   afficherGeneriqueGalaxie();
 }
-// Accueil du thème Star Wars : le Nyan Cat traverse l'écran de temps en temps, au-dessus du titre ou sous
-// les boutons. icones/nyan_cat.png : 12 images l'une sous l'autre (985 x 140 chacune), le chat du GIF
-// fourni et son arc-en-ciel prolongé loin derrière, qui ondule comme l'original et suit la tartine quand
-// elle monte et descend (70 ms par image). L'arrière de l'arc-en-ciel s'efface en fondu (masque).
-const NYAN_U = 0.65;                     // pixels à l'écran par pixel de l'image
+// Accueil du thème Star Wars : le Nyan Cat traverse l'écran en diagonale de temps en temps (d'en bas à
+// gauche vers la droite en montant), sous les boutons. icones/nyan_cat.png : 12 images l'une sous l'autre
+// (985 x 140 chacune), le chat du GIF fourni et son arc-en-ciel prolongé loin derrière, qui ondule comme
+// l'original et suit la tartine quand elle monte et descend (70 ms par image). L'arrière de
+// l'arc-en-ciel s'efface en fondu (masque). Le tout est penché dans le sens du trajet.
+const NYAN_U = 0.4;                      // pixels à l'écran par pixel de l'image (chat de 80 px)
 const NYAN_L = 985, NYAN_H = 140;        // une image de la feuille
 function passageNyanCat(){
   setTimeout(passageNyanCat, 25000 + Math.random() * 20000);
@@ -145,26 +146,30 @@ function passageNyanCat(){
   if (document.documentElement.dataset.theme !== "galaxie" || document.visibilityState !== "visible" ||
       !accueil || getComputedStyle(accueil).display === "none" || accueil.querySelector(".nyanCat")) return;
   const largeur = NYAN_L * NYAN_U, hauteur = NYAN_H * NYAN_U;
-  // dans un espace libre : entre les icônes et le titre, ou sous les boutons (pas caché derrière eux)
-  const bas = document.getElementById("btnModeClassique").getBoundingClientRect().bottom;
-  const haut = document.getElementById("titreAccueil").getBoundingClientRect().top;
-  const zones = [[64, haut - hauteur - 10], [bas + 10, innerHeight - hauteur - 20]].filter(([a, b]) => b > a);
-  if (!zones.length) return;
-  const [a, b] = zones[Math.floor(Math.random() * zones.length)];
+  const W = accueil.clientWidth, H = accueil.clientHeight;
   const zone = document.createElement("div");
   zone.className = "nyanCat";
-  zone.style.top = Math.round(a + Math.random() * (b - a)) + "px";
-  zone.style.height = hauteur + "px";
   const chat = document.createElement("div");
   chat.className = "nyanChat";
   chat.style.cssText = `width:${largeur}px;height:${hauteur}px;background-size:${largeur}px ${hauteur * 12}px;--fin:${-hauteur * 12}px`;
   zone.appendChild(chat);
   accueil.appendChild(zone);
-  // de tout à gauche (arc-en-ciel compris) jusqu'à ce que la queue de l'arc-en-ciel soit sortie à droite,
-  // à 100 px par seconde
-  const trajet = accueil.clientWidth + largeur;
-  const vol = chat.animate([{ transform: `translateX(${-largeur}px)` }, { transform: `translateX(${accueil.clientWidth}px)` }],
-    { duration: trajet / 0.1, easing: "linear" });
+  // Trajet : entre par la gauche en bas de l'écran et monte vers la droite (15 à 28°), en restant sous les
+  // boutons (sinon il disparaît derrière). Le point suivi est le nez du chat (bord droit de l'image) ; on
+  // continue jusqu'à ce que la queue de l'arc-en-ciel soit sortie de l'écran, à 180 px par seconde.
+  const sousBoutons = document.getElementById("btnModeClassique").getBoundingClientRect().bottom -
+    accueil.getBoundingClientRect().top + hauteur;
+  let angle = (15 + Math.random() * 13) * Math.PI / 180;
+  const montee = (a) => W * Math.tan(a);  // de combien il monte en traversant
+  if (H - 30 - montee(angle) < sousBoutons) angle = Math.max(0.12, Math.atan(Math.max(0, H - 30 - sousBoutons) / W));
+  const dx = Math.cos(angle), dy = -Math.sin(angle);
+  const yMin = Math.min(H - 30, sousBoutons + montee(angle));
+  const x0 = -10, y0 = yMin + Math.random() * Math.max(0, H - 30 - yMin);
+  const sortie = Math.min((W + 10 - x0) / dx, (y0 + 10) / -dy);
+  const distance = sortie + largeur;
+  const position = (d) => `translate(${x0 + dx * d - largeur}px, ${y0 + dy * d - hauteur / 2}px) rotate(${-angle}rad)`;
+  const vol = chat.animate([{ transform: position(0) }, { transform: position(distance) }],
+    { duration: distance / 0.18, easing: "linear" });
   vol.onfinish = () => zone.remove();
 }
 setTimeout(passageNyanCat, 4000);

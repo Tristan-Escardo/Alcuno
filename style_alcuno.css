@@ -7377,7 +7377,7 @@ html[data-theme="galaxie"] #choixMode .titreAccueilBarre, html[data-theme="galax
   box-shadow: 0 0 4px #fff, 0 0 10px #39a0ff, 0 0 22px #1f7bff, 0 0 40px rgba(31,123,255,.6) !important; animation:none !important;
 }
 /* Boutons : lame bleue, « Jouer » et le mode classique en rouge */
-html[data-theme="galaxie"] button:not(.pastilleTheme):not(#btnRemonter):not(#btnPause):not(#btnHistorique):not(.btnPauseJoueur):not(.btnLivre):not(#btnReglages):not(.btnAccueilTexte){
+html[data-theme="galaxie"] button:not(.pastilleTheme):not(#btnRemonter):not(#btnPause):not(#btnHistorique):not(.btnPauseJoueur):not(.btnLivre):not(#btnReglages):not(.btnAccueilTexte):not(#btnSignalerBug){
   background: linear-gradient(180deg, rgba(14,22,44,.92), rgba(6,10,22,.92)) !important; color:#eaf3ff !important; text-shadow:none !important;
   border: 1.5px solid #8fd0ff !important; letter-spacing:.04em;
   box-shadow: 0 0 6px #4aa8ff, 0 0 16px rgba(40,140,255,.55), inset 0 0 10px rgba(80,170,255,.22) !important;
@@ -7416,11 +7416,16 @@ html[data-theme="galaxie"] .voletPause-feuille{ background: #050a1a !important; 
 html[data-theme="galaxie"] .voletPause-nom{ color:#FFE81F !important; }
 html[data-theme="galaxie"] .voletPause-ok{ background: linear-gradient(180deg,#1a2b55,#0a1430) !important; }
 html[data-theme="galaxie"] :is(#ecranReglages, #ecranRegles){ background: #02030a !important; }
-html[data-theme="galaxie"] :is(#ecranReglages .blocReglage, #ecranReglages .optionReglage:not(.blocReglage .optionReglage), #ecranRegles .blocRegles){
+html[data-theme="galaxie"] #ecranRegles .blocRegles{
   background:
     linear-gradient(#FFE81F,#FFE81F) top left/12px 2px no-repeat, linear-gradient(#FFE81F,#FFE81F) top left/2px 12px no-repeat,
     linear-gradient(#FFE81F,#FFE81F) bottom right/12px 2px no-repeat, linear-gradient(#FFE81F,#FFE81F) bottom right/2px 12px no-repeat,
     rgba(6,12,30,.85) !important; border: 1px solid rgba(143,208,255,.22) !important; border-radius: 6px !important; box-shadow:none !important; }
+/* Réglages : chaque bloc comme un bouton, bord bleu qui brille comme une lame de sabre */
+html[data-theme="galaxie"] :is(#ecranReglages .blocReglage, #ecranReglages .optionReglage:not(.blocReglage .optionReglage)){
+  background: linear-gradient(180deg, rgba(14,22,44,.92), rgba(6,10,22,.92)) !important;
+  border: 1.5px solid #8fd0ff !important; border-radius: 16px !important;
+  box-shadow: 0 0 6px #4aa8ff, 0 0 16px rgba(40,140,255,.55), inset 0 0 10px rgba(80,170,255,.22) !important; }
 html[data-theme="galaxie"] #ecranReglages .blocReglage .optionReglage{ background: transparent !important; border:none !important; }
 html[data-theme="galaxie"] :is(#ecranReglages .optionTitre, #ecranRegles h3, #ecranReglages h2, #ecranRegles h2){ color:#FFE81F !important; }
 html[data-theme="galaxie"] #ecranReglages .optionReglage input:checked + .interrupteur{ background:#1a7bff !important; box-shadow: 0 0 10px #39a0ff !important; }
@@ -7474,8 +7479,9 @@ html[data-theme="galaxie"] #choixMode{ box-shadow: inset 0 3px 0 #cfe9ff, inset 
 /* Nyan Cat qui traverse l'accueil du thème Star Wars (js/reglages.js), derrière les boutons ; la zone coupe
    ce qui dépasse (sinon l'écran défilerait de côté pendant son passage). Feuille de 12 images (70 ms
    chacune) ; l'arrière de l'arc-en-ciel s'efface en fondu */
-#choixMode .nyanCat{ position: absolute; left: 0; right: 0; z-index: -1; pointer-events: none; overflow: hidden; }
-#choixMode .nyanChat{ position: absolute; left: 0; top: 0; background: url("icones/nyan_cat.png") 0 0 no-repeat;
+#choixMode .nyanCat{ position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+#choixMode .nyanChat{ position: absolute; left: 0; top: 0; transform-origin: 100% 50%; background: url("icones/nyan_cat.png") 0 0 no-repeat;
   image-rendering: pixelated; animation: nyanImages 0.84s steps(12) infinite;
   -webkit-mask-image: linear-gradient(to right, transparent 0, #000 55%); mask-image: linear-gradient(to right, transparent 0, #000 55%); }
 @keyframes nyanImages{ from{ background-position-y: 0; } to{ background-position-y: var(--fin); } }
+html[data-theme="galaxie"] #ecranReglages #btnSignalerBug{ color: #8fd0ff; text-shadow: 0 0 8px rgba(80,170,255,.6); }
