@@ -133,26 +133,68 @@ function debloquerGalaxie(){
   majPastilleGalaxie();
   afficherGeneriqueGalaxie();
 }
-// Accueil du thème Star Wars : le Nyan Cat (icones/nyancat.gif, avec son arc-en-ciel et ses paillettes)
-// traverse l'écran de temps en temps, au-dessus du titre ou sous les boutons
+// Accueil du thème Star Wars : le Nyan Cat (icones/nyancat.gif, le chat seul) traverse l'écran de temps en
+// temps, au-dessus du titre ou sous les boutons. Son arc-en-ciel est dessiné ici, sur tout le trajet, et
+// s'efface en fondu par l'arrière (le plus ancien d'abord). Mesures prises sur le GIF d'origine avec
+// arc-en-ciel (unité « u ») : chat seul 2× plus grand, 6 bandes de 17 u, segments de 46 u qui ondulent de 5 u.
+const NYAN_U = 0.65;                                    // pixels à l'écran par unité
+const NYAN_BANDES = [["#ff0000", 17], ["#ff9900", 17], ["#ffff00", 17], ["#33ff00", 18], ["#0099ff", 17], ["#6633ff", 16]];
+const NYAN_TUILE = (() => {                            // 2 segments : l'un en haut, l'autre 5 u plus bas
+  let y = 0, rects = "";
+  NYAN_BANDES.forEach(([c, h]) => {
+    rects += `<rect x="0" y="${y}" width="46" height="${h}" fill="${c}"/><rect x="46" y="${y + 5}" width="46" height="${h}" fill="${c}"/>`;
+    y += h;
+  });
+  return "data:image/svg+xml," + encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 92 107" shape-rendering="crispEdges">${rects}</svg>`);
+})();
 function passageNyanCat(){
   setTimeout(passageNyanCat, 25000 + Math.random() * 20000);
   const accueil = document.getElementById("choixMode");
   if (document.documentElement.dataset.theme !== "galaxie" || document.visibilityState !== "visible" ||
       !accueil || getComputedStyle(accueil).display === "none" || accueil.querySelector(".nyanCat")) return;
-  const chat = document.createElement("img");
-  chat.className = "nyanCat";
-  chat.src = "icones/nyancat.gif";
-  chat.alt = "";
+  const u = NYAN_U;
+  const hauteur = 140 * u;
   // dans un espace libre : entre les icônes et le titre, ou sous les boutons (pas caché derrière eux)
   const bas = document.getElementById("btnModeClassique").getBoundingClientRect().bottom;
   const haut = document.getElementById("titreAccueil").getBoundingClientRect().top;
-  const zones = [[64, haut - 150], [bas + 10, innerHeight - 220]].filter(([a, b]) => b > a);
+  const zones = [[64, haut - hauteur - 10], [bas + 10, innerHeight - hauteur - 20]].filter(([a, b]) => b > a);
   if (!zones.length) return;
   const [a, b] = zones[Math.floor(Math.random() * zones.length)];
-  chat.style.top = Math.round(a + Math.random() * (b - a)) + "px";
-  chat.addEventListener("animationend", () => chat.remove());
-  accueil.appendChild(chat);
+  const zone = document.createElement("div");
+  zone.className = "nyanCat";
+  zone.style.top = Math.round(a + Math.random() * (b - a)) + "px";
+  zone.style.height = hauteur + "px";
+  const arc = document.createElement("div");
+  arc.className = "nyanArc";
+  arc.style.cssText = `top:${9.9 * u}px;height:${107 * u}px;background-image:url("${NYAN_TUILE}");` +
+    `background-size:${92 * u}px ${107 * u}px;--tuile:${92 * u}px`;
+  const chat = document.createElement("img");
+  chat.className = "nyanChat";
+  chat.src = "icones/nyancat.gif";
+  chat.alt = "";
+  chat.style.width = 199.4 * u + "px";
+  zone.append(arc, chat);
+  accueil.appendChild(zone);
+
+  const largeur = accueil.clientWidth;
+  const depart = -199.4 * u, arrivee = largeur + 10;
+  const vitesse = (arrivee - depart) / 6500;  // px par ms : 6,5 s pour traverser
+  const PLEIN = 2500, FONDU = 2500;          // ms : l'arc-en-ciel reste plein, puis s'efface
+  const t0 = performance.now();
+  const image = (maintenant) => {
+    const x = depart + vitesse * (maintenant - t0);
+    const tete = x + 46 * u;                 // bout de l'arc-en-ciel, sous la tartine
+    const plein = tete - vitesse * PLEIN, vide = plein - vitesse * FONDU;
+    if (vide > largeur || !zone.isConnected) { zone.remove(); return; }
+    chat.style.transform = `translateX(${x}px)`;
+    arc.style.width = Math.max(0, tete) + "px";
+    const masque = `linear-gradient(to right, transparent ${vide}px, #000 ${plein}px)`;
+    arc.style.webkitMaskImage = masque;
+    arc.style.maskImage = masque;
+    requestAnimationFrame(image);
+  };
+  requestAnimationFrame(image);
 }
 setTimeout(passageNyanCat, 4000);
 
