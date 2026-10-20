@@ -7471,3 +7471,9 @@ html[data-theme="galaxie"] #ecranTele :is(.tele-bloc-titre, .tele-dernieres-titr
 html[data-theme="galaxie"] #ecranTele .tele-entete::after{ background: #eaf6ff !important; box-shadow: 0 0 0.5vh #fff, 0 0 1.4vh #39a0ff, 0 0 3vh #1f7bff; }
 html[data-theme="galaxie"] #ecranTele .tele-entete{ background: rgba(4,8,20,.78) !important; border-color: rgba(143,208,255,.3) !important; }
 html[data-theme="galaxie"] #choixMode{ box-shadow: inset 0 3px 0 #cfe9ff, inset 0 16px 14px -14px rgba(40,140,255,.95) !important; }
+/* Nyan Cat qui traverse l'accueil du thème Star Wars (js/reglages.js), derrière les boutons */
+#choixMode .nyanCat{ position: absolute; left: 0; width: 210px; height: 210px; z-index: -1; pointer-events: none; image-rendering: pixelated;
+  animation: nyanTraverse 6.5s linear both; }
+@keyframes nyanTraverse{
+  0%{ transform: translate(-230px, 0); } 25%{ transform: translate(calc(25vw - 100px), -10px); } 50%{ transform: translate(calc(50vw - 40px), 6px); }
+  75%{ transform: translate(calc(75vw + 20px), -8px); } 100%{ transform: translate(calc(100vw + 30px), 0); } }

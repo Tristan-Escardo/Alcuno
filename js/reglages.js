@@ -133,6 +133,29 @@ function debloquerGalaxie(){
   majPastilleGalaxie();
   afficherGeneriqueGalaxie();
 }
+// Accueil du thème Star Wars : le Nyan Cat (icones/nyancat.gif, avec son arc-en-ciel et ses paillettes)
+// traverse l'écran de temps en temps, au-dessus du titre ou sous les boutons
+function passageNyanCat(){
+  setTimeout(passageNyanCat, 25000 + Math.random() * 20000);
+  const accueil = document.getElementById("choixMode");
+  if (document.documentElement.dataset.theme !== "galaxie" || document.visibilityState !== "visible" ||
+      !accueil || getComputedStyle(accueil).display === "none" || accueil.querySelector(".nyanCat")) return;
+  const chat = document.createElement("img");
+  chat.className = "nyanCat";
+  chat.src = "icones/nyancat.gif";
+  chat.alt = "";
+  // dans un espace libre : entre les icônes et le titre, ou sous les boutons (pas caché derrière eux)
+  const bas = document.getElementById("btnModeClassique").getBoundingClientRect().bottom;
+  const haut = document.getElementById("titreAccueil").getBoundingClientRect().top;
+  const zones = [[64, haut - 150], [bas + 10, innerHeight - 220]].filter(([a, b]) => b > a);
+  if (!zones.length) return;
+  const [a, b] = zones[Math.floor(Math.random() * zones.length)];
+  chat.style.top = Math.round(a + Math.random() * (b - a)) + "px";
+  chat.addEventListener("animationend", () => chat.remove());
+  accueil.appendChild(chat);
+}
+setTimeout(passageNyanCat, 4000);
+
 // Musique du générique (Sons/debloquage_theme_galaxie.mp3, boucle exacte) : au volume des sons du jeu
 // (pas si les sons sont coupés), la musique d'ambiance se tait pendant ce temps. Lue par le lecteur de la
 // musique d'ambiance (jouerTourMusique), dans son propre circuit.
@@ -568,7 +591,7 @@ curseurVolume.addEventListener("change", () => jouerSon("reglage_son")); // essa
 // Quand ce téléphone caste, c'est la télé qui la joue (à ce volume, avec le thème du téléphone).
 const CLE_MUSIQUE = "alcuno_musique";
 const CLE_VOLUME_MUSIQUE = "alcuno_volume_musique";
-const THEMES_AVEC_MUSIQUE = ["givre", "cerisier", "prestige", "soleil"];
+const THEMES_AVEC_MUSIQUE = ["givre", "cerisier", "prestige", "soleil", "galaxie"];
 const caseMusique = document.getElementById("optionMusique");
 const curseurMusique = document.getElementById("volumeMusique");
 const ligneVolumeMusique = document.getElementById("ligneVolumeMusique");
@@ -612,6 +635,7 @@ const MONTEE_MUSIQUE = 0.8;  // secondes de fondu au démarrage (lancement, reto
 // ms tombe encore dans le pré-roulé, qui est la suite exacte de la boucle.
 const BOUCLES_EXACTES = {
   musique_ambiance_soleil: { avant: 0.3, longueur: 903552 / 44100 }, // 8 mesures à 93,7 BPM
+  musique_ambiance_galaxie: { avant: 0.3, longueur: 7898850 / 44100 }, // 179,11 s (de 10,7 s à 3 min 10 du morceau, qui se répète)
   debloquage_theme_galaxie: { avant: 0.3, longueur: 4201001 / 44100 }, // 95,26 s (générique du thème Star Wars)
 };
 const FONDU_BOUCLE_EXACTE = 0.03;
@@ -839,7 +863,9 @@ let musiquesPreparees = false;
 function preparerToutesLesMusiques(ctx){
   if (musiquesPreparees) return;
   musiquesPreparees = true;
-  const noms = ["musique_ambiance"].concat(THEMES_AVEC_MUSIQUE.map(t => `musique_ambiance_${t}`));
+  // (pas la musique du thème secret Star Wars tant qu'il n'est pas débloqué : 3 Mo pour rien)
+  const noms = ["musique_ambiance"].concat(THEMES_AVEC_MUSIQUE
+    .filter(t => t !== "galaxie" || galaxieDebloquee()).map(t => `musique_ambiance_${t}`));
   noms.reduce((suite, nom) => suite.then(() => chargerMusique(ctx, nom)), Promise.resolve());
 }
 document.addEventListener("visibilitychange", () => {
