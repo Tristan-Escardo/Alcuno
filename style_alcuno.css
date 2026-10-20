@@ -7219,4 +7219,3 @@ html.gaucher #btnRemonter{ left: auto; right: 16px; }
 html.gaucher #annulerChoix{ flex-direction: row-reverse; }
 html.gaucher #annulerChoix .annulerChoix-texte{ text-align: right; }
 html.gaucher #stickyJoueurActif #btnPause{ order: -1; margin: -6px 0 -6px -6px; }
-html.gaucher #ecranReglages .optionReglage:not(.optionLien){ flex-direction: row-reverse; }
