@@ -1001,10 +1001,10 @@ document.addEventListener("visibilitychange", () => {
 //   tiens_gueule.mp3 : le cul sec de la carte dorée (« TIENS DANS TA GUEULE »)
 //   regles.mp3 : on ouvre les Règles du jeu (boutons « Règles du jeu » de l'accueil et de la partie)
 //   accessibilite_on.mp3 : on active « Accessibilité pour les gens bourrés » dans les réglages
-const SONS = ["cartes", "doree", "tiens_gueule", "bouton", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees", "regles", "accessibilite_on", "lightsaber_sound"];
-// Sons de sabre (Sons/lightsaber_sound.mp3, 45 s) découpés en morceaux de 1 s au plus [début, durée] en secondes,
-// coupés aux creux du son : un morceau au hasard à la place du clic « bouton » (jouerSon("bouton"))
-const MORCEAUX_SABRE = [[0.22,0.96],[1.18,0.51],[1.69,0.47],[2.16,0.93],[3.09,0.35],[3.44,0.86],[4.3,0.93],[5.23,0.96],[6.19,0.41],[6.6,0.95],[7.55,0.36],[7.91,0.41],[8.32,0.77],[9.09,0.58],[9.67,0.72],[10.39,0.78],[11.17,0.57],[11.74,0.96],[12.7,0.87],[13.57,0.56],[14.13,0.47],[14.6,0.64],[15.24,0.97],[16.21,0.58],[16.79,0.64],[17.43,0.59],[18.02,0.56],[18.58,0.94],[19.52,0.94],[20.46,0.82],[21.28,0.58],[21.86,0.84],[22.7,0.74],[23.44,0.93],[24.37,0.35],[24.72,0.86],[25.58,0.93],[26.51,0.83],[27.34,0.37],[27.71,0.88],[28.59,0.35],[28.94,0.65],[29.59,0.78],[30.37,0.58],[30.95,0.72],[31.67,0.77],[32.44,0.59],[33.03,0.95],[33.98,0.94],[34.92,0.5],[35.42,0.46],[35.88,0.59],[36.47,0.46],[36.93,0.57],[37.5,0.57],[38.07,0.64],[38.71,0.59],[39.3,0.56],[39.86,0.94],[40.8,0.94],[41.74,0.82],[42.56,0.58],[43.14,0.85]];
+const SONS = ["cartes", "doree", "tiens_gueule", "bouton", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees", "regles", "accessibilite_on"]; // (les sons de sabre ne se chargent que dans le thème Star Wars, voir morceauSabre)
+// Sons de sabre : Sons/sabre/sabre_01.mp3 à sabre_54.mp3 (0,8 s chacun). Le clic des boutons en joue un au
+// hasard (jouerSon("bouton")). Un fichier supprimé du dossier est simplement ignoré (404 = pas de son).
+const SONS_SABRE = Array.from({ length: 54 }, (_, i) => `sabre/sabre_${String(i + 1).padStart(2, "0")}`);
 // Sons coupés au bout de N secondes (avec un petit fondu), même si le fichier est plus long
 const DUREE_MAX_SONS = { doree: 3, pigeon: 2, distribuer_gorgees: 0.8, bouton: 0.3 };
 const sonsCharges = {}; // nom -> son décodé (ou null si le fichier n'existe pas)
@@ -1058,9 +1058,19 @@ document.addEventListener("click", (e) => {
   jouerSon("bouton");
 }, { capture: true, passive: true });
 
+// Thème Star Wars seulement : un son de sabre au hasard, parmi ceux qui existent encore dans Sons/sabre/
+// (ou pas encore chargés). Dans les autres thèmes, le clic reste le son « bouton ».
+function morceauSabre(){
+  if (document.documentElement.dataset.theme !== "galaxie") return "bouton";
+  const ctx = contexteAudio();
+  if (ctx) SONS_SABRE.forEach((n) => chargerSon(ctx, n));
+  const dispo = SONS_SABRE.filter((n) => sonsCharges[n] !== null);
+  return dispo.length ? dispo[Math.floor(Math.random() * dispo.length)] : "bouton";
+}
+
 function jouerSon(nom){
   sonPourTele(nom);
-  if (nom === "bouton") nom = "lightsaber_sound"; // le clic des boutons = un morceau de sabre au hasard // mode télé : la télé le joue aussi (même si le son de ce téléphone est coupé)
+  if (nom === "bouton") nom = morceauSabre(); // le clic des boutons = un son de sabre au hasard // mode télé : la télé le joue aussi (même si le son de ce téléphone est coupé)
   if (!caseSons.checked || volumeSons <= 0) return;
   if (rattrapageEnCours) return; // reconnexion : pas de sons pour les actions déjà passées
   const ctx = contexteAudio();
@@ -1083,15 +1093,6 @@ function lireSon(nom, son){
   lecture.buffer = son;
   lecture.connect(sortie);
   const debut = ctx.currentTime;
-  if (nom === "lightsaber_sound") { // un morceau au hasard (≤ 1 s), petit fondu au début et à la fin
-    const [depart, duree] = MORCEAUX_SABRE[Math.floor(Math.random() * MORCEAUX_SABRE.length)];
-    sortie.gain.setValueAtTime(0.0001, debut);
-    sortie.gain.linearRampToValueAtTime(volume, debut + 0.01);
-    sortie.gain.setValueAtTime(volume, debut + duree - 0.03);
-    sortie.gain.linearRampToValueAtTime(0.0001, debut + duree);
-    lecture.start(debut, depart, duree);
-    return;
-  }
   lecture.start(debut);
 
   const dureeMax = DUREE_MAX_SONS[nom];
