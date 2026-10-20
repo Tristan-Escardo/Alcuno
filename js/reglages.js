@@ -145,7 +145,9 @@ function passageNyanCat(){
   setTimeout(passageNyanCat, 25000 + Math.random() * 20000);
   const accueil = document.getElementById("choixMode");
   if (document.documentElement.dataset.theme !== "galaxie" || document.visibilityState !== "visible" ||
-      !accueil || getComputedStyle(accueil).display === "none" || accueil.querySelector(".nyanCat")) return;
+      document.documentElement.classList.contains("mode-tele") || // (pas sur la page de la télé)
+      !accueil || getComputedStyle(accueil).display === "none" || !accueil.clientHeight ||
+      accueil.querySelector(".nyanCat")) return;
   const largeur = NYAN_L * NYAN_U, hauteur = NYAN_H * NYAN_U;
   const W = accueil.clientWidth, H = accueil.clientHeight;
   const zone = document.createElement("div");
