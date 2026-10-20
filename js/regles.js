@@ -704,6 +704,7 @@ function afficherOverlayCouleur(joueurActuel){
     surAction(carre, "couleur:" + c.nom, { owner: choisisseur, once: true }, ()=>{
       couleurChoisie = c.nom;
       majAffichageCouleur();
+      noterHistorique(`Choisit le ${c.nom}`);
       unlockScroll();
       overlay.remove();
       choixPigeonEnCours = false;
@@ -1485,7 +1486,23 @@ function envolerCarteVersJoueur(carteElement, classeCarte, nom){
 }
 
 /* ===== Application des règles ===== */
+// ===== Dernières cartes (volet du bandeau « Tour de », js/plateau.js) =====
+// Une entrée par carte tirée, la plus récente en premier ; ses lignes = les messages du bloc Règles qui
+// ont suivi (sans l'explication du pigeon, déjà connue)
+const MAX_HISTORIQUE = 6;
+let historiqueCartes = [];
+function noterHistorique(texte){
+  const entree = historiqueCartes[0];
+  if(!entree) return;
+  String(texte || "").split("\n").map(l => l.trim())
+    .filter(l => l && !/^(À chaque 3|Pour s'en débarrasser)/.test(l))
+    .map(l => l.replace(/ sauf toi$/, ` sauf ${entree.nom}`)) // (le 0 : « sauf toi » ne voudrait plus rien dire)
+    .forEach(l => { if(!entree.lignes.includes(l)) entree.lignes.push(l); });
+}
+
 function appliquerRegle(carteTiree, joueurActuel, carteElement){
+  historiqueCartes.unshift({ carte: carteTiree, nom: joueurs[joueurActuel] || "", lignes: [] });
+  historiqueCartes.length = Math.min(historiqueCartes.length, MAX_HISTORIQUE);
   // Gorgée pour la couleur choisie : décidée maintenant (et la couleur effacée),
   // affichée plus tard par chaque règle, après son propre message
   const couleurBue = prendreCouleurSiBesoin(carteTiree);
@@ -1678,6 +1695,8 @@ function lancerPartie(){
 
   plateau.innerHTML = "";
   prechargerImagesCartes(); // (déjà fait à l'ouverture, en principe)
+  historiqueCartes = [];
+  fermerVoletHistorique();
   lancementPartieA = Date.now();
   // Classique : hasard à graine aussi, pour pouvoir rejouer la partie après un plantage (voir
   // « Partie classique gardée en mémoire » dans js/synchro-en-ligne.js)

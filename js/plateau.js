@@ -26,31 +26,34 @@ const messageTexte = document.getElementById("messageTexte");
 // Bloc Règles (et télé) : 1re ligne en titre doré, les suivantes en puces, gorgées en doré
 // (avant : tout le texte d'un bloc doré, illisible pour le pigeon ou le +4). Construit en DOM : les noms
 // des joueurs sont tapés par les joueurs. innerText redonne le texte ligne par ligne (télé, tests).
+// Ligne de texte avec les gorgées (et le cul sec) en <em> doré, construite en DOM
+function remplirAvecGorgees(parent, ligne){
+  ligne.split(/(\d+ gorgées?|un CUL SEC)/).forEach((morceau, i) => {
+    if(!morceau) return;
+    if(i % 2){
+      const em = document.createElement("em");
+      em.textContent = morceau;
+      parent.appendChild(em);
+    } else parent.appendChild(document.createTextNode(morceau));
+  });
+}
+
 function afficherRegleBloc(el, texte){
-  const surligner = (parent, ligne) => {
-    ligne.split(/(\d+ gorgées?|un CUL SEC)/).forEach((morceau, i) => {
-      if(!morceau) return;
-      if(i % 2){
-        const em = document.createElement("em");
-        em.textContent = morceau;
-        parent.appendChild(em);
-      } else parent.appendChild(document.createTextNode(morceau));
-    });
-  };
+  if(el === regleZero) noterHistorique(texte); // (dernières cartes, js/regles.js)
   const lignes = String(texte || "").split("\n").map(l => l.trim()).filter(Boolean);
   el.textContent = "";
   el.classList.add("regleBloc");
   if(!lignes.length) return;
   const titre = document.createElement("div");
   titre.className = "regleBloc-titre";
-  surligner(titre, lignes[0]);
+  remplirAvecGorgees(titre, lignes[0]);
   el.appendChild(titre);
   if(lignes.length < 2) return;
   const liste = document.createElement("ul");
   liste.className = "lignesRegle";
   lignes.slice(1).forEach(l => {
     const li = document.createElement("li");
-    surligner(li, l);
+    remplirAvecGorgees(li, l);
     liste.appendChild(li);
   });
   el.appendChild(liste);
@@ -311,6 +314,7 @@ function appliquerBonusCouleurSiBesoin(carteTiree, options = {}){
   const nom = joueurs[options.joueur];
   const msgCouleur = (nom ? `${nom} boit` : "Et boit") + " 1 gorgée pour la couleur (" + couleur + ")";
   noterGorgees(nom, 1);
+  noterHistorique(msgCouleur);
 
   const afficher = () => {
     if(!preserveRuleMessage){
@@ -671,6 +675,65 @@ function ouvrirVoletCarte(classe){
 function fermerVoletCarte(){
   const volet = document.getElementById("voletCarte");
   if(volet) volet.remove();
+}
+
+// ===== Dernières cartes : bouton 🕘 du bandeau « Tour de » => volet du bas (comme la pause) =====
+// Qui a tiré quoi et ce qui s'est passé, la plus récente en haut (historiqueCartes, js/regles.js).
+// Pratique pour les embrouilles (« j'ai déjà bu pour celle-là ! »). Rien d'envoyé aux autres téléphones :
+// en ligne, chacun a le sien (tous les téléphones jouent les mêmes cartes).
+function ouvrirVoletHistorique(){
+  fermerVoletHistorique();
+  const volet = document.createElement("div");
+  volet.id = "voletHistorique";
+  volet.innerHTML = `<div class="voletPause-feuille" role="dialog" aria-label="Dernières cartes">
+      <div class="voletPause-poignee"></div>
+      <div class="voletPause-nom">Dernières cartes</div>
+      <div class="historique-liste"></div>
+    </div>`;
+  const liste = volet.querySelector(".historique-liste");
+  if(!historiqueCartes.length){
+    liste.innerHTML = '<div class="historique-vide">Aucune carte tirée pour l\'instant.</div>';
+  }
+  historiqueCartes.forEach((entree, i) => {
+    const ligne = document.createElement("div");
+    ligne.className = "historique-ligne";
+    const carte = document.createElement("div");
+    carte.className = "Carte retournee historique-carte " + entree.carte;
+    const texte = document.createElement("div");
+    texte.className = "historique-texte";
+    const nom = document.createElement("div");
+    nom.className = "historique-nom";
+    nom.textContent = avecCouronne(entree.nom);
+    if(i === 0){
+      const badge = document.createElement("span");
+      badge.className = "historique-recente";
+      badge.textContent = "dernière";
+      nom.appendChild(badge);
+    }
+    texte.appendChild(nom);
+    lignesHistorique(entree).forEach(l => {
+      const quoi = document.createElement("div");
+      quoi.className = "historique-quoi";
+      remplirAvecGorgees(quoi, l);
+      texte.appendChild(quoi);
+    });
+    ligne.append(carte, texte);
+    liste.appendChild(ligne);
+  });
+  rendreVoletGlissable(volet);
+  volet.addEventListener("click", (e) => { if(e.target === volet) fermerVoletHistorique(); });
+  document.body.appendChild(volet);
+}
+function fermerVoletHistorique(){
+  const volet = document.getElementById("voletHistorique");
+  if(volet) volet.remove();
+}
+// Ce qui s'est passé pour une carte : les messages du bloc Règles, sinon de quoi la reconnaître
+function lignesHistorique(entree){
+  if(entree.lignes.length) return entree.lignes;
+  if(entree.carte.startsWith("couleur")) return ["Choisit une couleur"];
+  if(entree.carte.startsWith("quatre")) return ["Duel"];
+  return ["Rien à boire"];
 }
 
 let appuiCarte = null; // { carte, x, y, minuteur, minuteurVisuel }
@@ -1095,6 +1158,15 @@ function creerUIJoueurActifSticky(){
   // ⏸ Pause (mode classique) : au bout de la pastille, toujours à portée pendant la partie
   const btnPause = document.getElementById("btnPause");
   if(btnPause) stickyJoueurActif.appendChild(btnPause);
+
+  // 🕘 Dernières cartes (aussi en ligne). Créé ici : une ancienne page gardée en cache n'a pas le bouton
+  const btnHistorique = document.createElement("button");
+  btnHistorique.type = "button";
+  btnHistorique.id = "btnHistorique";
+  btnHistorique.setAttribute("aria-label", "Dernières cartes");
+  btnHistorique.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v4h4"/><path d="M12 7v5l3 2"/></svg>';
+  btnHistorique.addEventListener("click", () => { jouerSon("bouton"); ouvrirVoletHistorique(); });
+  stickyJoueurActif.appendChild(btnHistorique);
 
   document.body.appendChild(stickyJoueurActif);
   repositionnerStickyJoueurActif();
@@ -1603,7 +1675,7 @@ const noterFleche = (texte) => { if(typeof noter === "function") noter("flèche 
 function majBoutonRemonter(){
   const visible = partieLancee && window.scrollY > 500 &&
     !document.documentElement.classList.contains("overlay-ouvert") &&
-    !document.querySelector("#annulerChoix, #voletPause, #voletCarte") &&
+    !document.querySelector("#annulerChoix, #voletPause, #voletCarte, #voletHistorique") &&
     document.getElementById("ecranPause").style.display === "none";
   if(visible !== btnRemonter.classList.contains("visible")) noterFleche(`${visible ? "affichée" : "cachée"} (y=${Math.round(window.scrollY)})`);
   btnRemonter.classList.toggle("visible", visible);
