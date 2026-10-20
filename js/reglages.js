@@ -942,6 +942,19 @@ caseRappelEau.addEventListener("change", () => {
   if (caseRappelEau.checked) jouerSon("eau"); // on entend le son du rappel en l'activant
 });
 
+// ===== Mode gaucher : les boutons pour le pouce passent de l'autre côté (html.gaucher, voir le CSS) =====
+// (case absente si le téléphone a gardé une ancienne page en cache : le réglage s'applique quand même)
+const CLE_GAUCHER = "alcuno_gaucher";
+const caseGaucher = document.getElementById("optionGaucher");
+document.documentElement.classList.toggle("gaucher", lireReglage(CLE_GAUCHER, false));
+if (caseGaucher) {
+  caseGaucher.checked = lireReglage(CLE_GAUCHER, false);
+  caseGaucher.addEventListener("change", () => {
+    ecrireReglage(CLE_GAUCHER, caseGaucher.checked);
+    document.documentElement.classList.toggle("gaucher", caseGaucher.checked);
+  });
+}
+
 const MINUTES_RAPPEL_EAU = 20;
 let tempsDeJeuSansEau = 0; // ms de partie (écran allumé) depuis le dernier rappel
 

@@ -1509,7 +1509,7 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
     choixPigeonEnCours = true;
     const texteCarteDoree = estModeSoft()
       ? "Distribue 3 gorgées de la part du développeur 😘"
-      : "Distribue un CUL SEC de la part du développeur, et obligation de se servir un vrai verre avant 😘";
+      : "Distribue un CUL SEC de la part du développeur. Et obligation de se servir un vrai verre avant 😘";
     // Le texte complet sert à calculer la durée d'affichage de l'overlay
     montrerOverlayRegle(`CARTE DORÉE\n${texteCarteDoree}`, carteTiree);
     vibrer([150, 70, 150, 70, 300]);
