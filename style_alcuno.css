@@ -7212,3 +7212,6 @@ html.accessibilite .regleBloc-titre{ font-size: 18px; }
 #ecranTele .tele-regles .lignesRegle li + li{ margin-top: 0.6vh; }
 html[data-theme="givre"] #ecranTele .tele-regles.regleBloc{ color: var(--givre-texte); }
 html[data-theme="soleil"] #ecranTele .tele-regles.regleBloc{ color: #fff1df; }
+
+/* Mode gaucher (Réglages, js/reglages.js) : flèche pour remonter en bas à droite */
+html.gaucher #btnRemonter{ left: auto; right: 16px; }
