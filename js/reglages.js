@@ -147,8 +147,8 @@ function debloquerGalaxie(){
   majPastilleGalaxie();
   afficherGeneriqueGalaxie();
 }
-// Accueil du thème Star Wars : le Nyan Cat traverse l'écran en diagonale de temps en temps (d'en bas à
-// gauche vers la droite en montant), sous les boutons. icones/nyan_cat.png : 12 images l'une sous l'autre
+// Accueil du thème Star Wars : le Nyan Cat traverse l'écran de temps en temps, d'un bord au bord d'en
+// face par un trajet au hasard, derrière les boutons. icones/nyan_cat.png : 12 images l'une sous l'autre
 // (985 x 140 chacune), le chat du GIF fourni et son arc-en-ciel prolongé loin derrière, qui ondule comme
 // l'original et suit la tartine quand elle monte et descend (70 ms par image). L'arrière de
 // l'arc-en-ciel s'efface en fondu (masque). Le tout est penché dans le sens du trajet.
@@ -170,20 +170,24 @@ function passageNyanCat(){
   chat.style.cssText = `width:${largeur}px;height:${hauteur}px;background-size:${largeur}px ${hauteur * 12}px;--fin:${-hauteur * 12}px`;
   zone.appendChild(chat);
   accueil.appendChild(zone);
-  // Trajet : entre par la gauche en bas de l'écran et monte vers la droite (15 à 28°), en restant sous les
-  // boutons (sinon il disparaît derrière). Le point suivi est le nez du chat (bord droit de l'image) ; on
-  // continue jusqu'à ce que la queue de l'arc-en-ciel soit sortie de l'écran, à 180 px par seconde.
-  const sousBoutons = document.getElementById("btnModeClassique").getBoundingClientRect().bottom -
-    accueil.getBoundingClientRect().top + hauteur;
-  let angle = (15 + Math.random() * 13) * Math.PI / 180;
-  const montee = (a) => W * Math.tan(a);  // de combien il monte en traversant
-  if (H - 30 - montee(angle) < sousBoutons) angle = Math.max(0.12, Math.atan(Math.max(0, H - 30 - sousBoutons) / W));
-  const dx = Math.cos(angle), dy = -Math.sin(angle);
-  const yMin = Math.min(H - 30, sousBoutons + montee(angle));
-  const x0 = -10, y0 = yMin + Math.random() * Math.max(0, H - 30 - yMin);
-  const sortie = Math.min((W + 10 - x0) / dx, (y0 + 10) / -dy);
-  const distance = sortie + largeur;
-  const position = (d) => `translate(${x0 + dx * d - largeur}px, ${y0 + dy * d - hauteur / 2}px) rotate(${-angle}rad)`;
+  // Trajet au hasard : entre par un bord (gauche, droite, haut ou bas) et ressort par le bord d'en face,
+  // à une hauteur / un endroit au hasard : en diagonale, ou presque droit quand il tombe du haut. Le
+  // point suivi est le nez du chat (bord droit de l'image) ; l'image est tournée dans le sens du trajet
+  // (retournée quand il va vers la gauche, pour ne pas voler sur le dos). On continue jusqu'à ce que la
+  // queue de l'arc-en-ciel soit sortie de l'écran, à 180 px par seconde.
+  const hasard = (a, b) => a + Math.random() * (b - a);
+  const bord = ["gauche", "droite", "haut", "bas"][Math.floor(Math.random() * 4)];
+  let x0, y0, x1, y1;
+  if (bord === "gauche") { x0 = -10; y0 = hasard(0.1, 0.9) * H; x1 = W + 10; y1 = hasard(0.1, 0.9) * H; }
+  else if (bord === "droite") { x0 = W + 10; y0 = hasard(0.1, 0.9) * H; x1 = -10; y1 = hasard(0.1, 0.9) * H; }
+  else if (bord === "haut") { x0 = hasard(0.1, 0.9) * W; y0 = -10; x1 = hasard(0.1, 0.9) * W; y1 = H + 10; }
+  else { x0 = hasard(0.1, 0.9) * W; y0 = H + 10; x1 = hasard(0.1, 0.9) * W; y1 = -10; }
+  const longueur = Math.hypot(x1 - x0, y1 - y0);
+  const dx = (x1 - x0) / longueur, dy = (y1 - y0) / longueur;
+  const angle = Math.atan2(dy, dx);
+  const retourne = dx < 0 ? " scaleY(-1)" : "";
+  const distance = longueur + largeur;
+  const position = (d) => `translate(${x0 + dx * d - largeur}px, ${y0 + dy * d - hauteur / 2}px) rotate(${angle}rad)${retourne}`;
   const vol = chat.animate([{ transform: position(0) }, { transform: position(distance) }],
     { duration: distance / 0.18, easing: "linear" });
   vol.onfinish = () => zone.remove();
