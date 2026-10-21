@@ -853,8 +853,18 @@ function dessinerTele(ecran, etat){
   const hexCouleur = COULEURS_JEU[etat.couleur];
   const elCouleur = ecran.querySelector(".tele-couleur");
   elCouleur.hidden = !hexCouleur;
-  elCouleur.innerText = hexCouleur ? etat.couleur.toUpperCase() : "";
-  elCouleur.style.color = hexCouleur || "";
+  elCouleur.textContent = "";
+  elCouleur.style.setProperty("--c", hexCouleur || "");
+  if (hexCouleur) {
+    // comme sur le téléphone : la couleur et ce qu'elle fait
+    const carre = document.createElement("span");
+    carre.className = "tele-couleur-carre";
+    const texte = document.createElement("span");
+    const nom = document.createElement("b");
+    nom.textContent = etat.couleur.toUpperCase();
+    texte.append(nom, ` : 1 gorgée en plus pour le prochain qui tire une carte ${ADJECTIFS_COULEUR[etat.couleur] || etat.couleur}`);
+    elCouleur.append(carre, texte);
+  }
   afficherRegleBloc(ecran.querySelector(".tele-regles"), etat.regles); // (js/plateau.js)
 
   // Écran en cours sur le téléphone (annonce, duel, +4, pari…)

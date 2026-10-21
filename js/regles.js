@@ -333,6 +333,26 @@ function afficherOverlayResultatAnnulation(message, afterClose = null){
   return true;
 }
 
+// Bloc Règles après une annulation : le nombre de gorgées de ce joueur est mis à jour (avant : le premier
+// chiffre restait affiché). « Léa boit 2 gorgées » => « Léa boit 1 gorgée (1 annulée) » ; sinon (tout le
+// monde boit…) une ligne en plus. Vu aussi par la télé, qui lit ce bloc.
+function majRegleApresAnnulation(nom, nbGorgees, utilise, reste){
+  if(utilise <= 0 || regleZero.style.display === "none") return;
+  const texte = regleZero.innerText.trim();
+  if(!texte) return;
+  const apres = `${texteGorgees(reste)} (${utilise} annulée${utilise > 1 ? "s" : ""})`;
+  let nouveau = texte;
+  for(const avant of [`${nom} boit ${texteGorgees(nbGorgees)}`, `${avant2(nom)} boit ${texteGorgees(nbGorgees)}`]){
+    if(nouveau.includes(avant)){ nouveau = nouveau.replace(avant, `${avant.split(" boit ")[0]} boit ${apres}`); break; }
+  }
+  if(nouveau === texte && texte.includes("Il/elle boit " + texteGorgees(nbGorgees))){
+    nouveau = texte.replace("Il/elle boit " + texteGorgees(nbGorgees), "Il/elle boit " + apres);
+  }
+  if(nouveau === texte) nouveau = `${texte}\n${nom} annule ${utilise} : boit ${texteGorgees(reste)}`;
+  afficherRegleBloc(regleZero, nouveau);
+}
+function avant2(nom){ return `Le PIGEON (${nom})`; }
+
 function afficherOverlayAnnulation(joueurIndex, nbGorgees, onDone = null, afterClose = null){
   const nom = joueurs[joueurIndex];
   const dispo = Number(annulations[nom] || 0);
@@ -440,6 +460,7 @@ function afficherOverlayAnnulation(joueurIndex, nbGorgees, onDone = null, afterC
 
       annulations[nom] = Math.max(0, dispo - utilise);
       noterGorgees(nom, reste);
+      majRegleApresAnnulation(nom, nbGorgees, utilise, reste);
       afficherJoueurs();
       afficherJoueurActif();
 

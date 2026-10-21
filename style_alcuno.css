@@ -5765,12 +5765,23 @@ html.tele-ecran-ouvert #refletPrestige{
 }
 #ecranTele .tele-joueurs-2col .tele-joueur{ font-size: 2.5vh; padding: 0.4vh 0; }
 #ecranTele .tele-couleur{
-  font-size: 4.6vh;
-  font-weight: 900;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 1.4vh;
+  padding: 1vh 1.4vh;
+  margin-bottom: 1.2vh;
+  border: 0.3vh solid var(--c);
+  border-radius: 1.4vh;
+  background: rgba(0,0,0,0.25);
+  font-size: 2.4vh;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: left;
   text-shadow: 0.2vh 0.2vh 0.5vh #000;
-  margin-bottom: 1vh;
 }
+#ecranTele .tele-couleur[hidden]{ display: none; }
+#ecranTele .tele-couleur-carre{ flex: none; width: 3vh; height: 3vh; border-radius: 0.6vh; background: var(--c); box-shadow: 0 0 1vh var(--c); }
+#ecranTele .tele-couleur b{ color: var(--c); font-weight: 900; }
 #ecranTele .tele-tour{
   text-align: center;
   border-color: rgba(255,215,0,0.5);
