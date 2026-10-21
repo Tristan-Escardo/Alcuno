@@ -7647,3 +7647,20 @@ html[data-theme="galaxie"] .Carte.dos_dore:not(.retournee)::after{ transform: no
 }
 @keyframes dosHoloLignes{ 0%, 88%, 94.5%, 100%{ opacity: 0; } 89%, 93.5%{ opacity: 1; } }
 @media (prefers-reduced-motion: reduce){ html[data-theme="galaxie"] .Carte.dos_dore:not(.retournee), html[data-theme="galaxie"] .Carte.dos_dore:not(.retournee)::after{ animation: none !important; } }
+/* Star Wars : rappel « À toi » (sifflet) en bleu sabre au lieu du jaune (bords de l'écran, bandeau, télé) */
+html[data-theme="galaxie"] #haloRappel{ --halo-ecran: rgba(60, 160, 255, 0.85); }
+html[data-theme="galaxie"] #stickyJoueurActif.rappel-tour{ animation-name: rappelTourSabre; }
+@keyframes rappelTourSabre{
+  0%, 100% { scale: 1; filter: none; }
+  50%      { scale: 1.14; filter: brightness(1.3) drop-shadow(0 0 4px #e8f4ff) drop-shadow(0 0 12px rgba(40, 140, 255, 0.95)); }
+}
+@media (prefers-reduced-motion: reduce){
+  html[data-theme="galaxie"] #stickyJoueurActif.rappel-tour{ animation-name: rappelTourSabreDoux; }
+  @keyframes rappelTourSabreDoux{ 0%, 100% { filter: none; } 50% { filter: drop-shadow(0 0 12px rgba(40, 140, 255, 0.95)); } }
+}
+html[data-theme="galaxie"] #ecranTele .tele-tour.tele-rappel-tour{
+  --halo-bord: rgba(200, 230, 255, 0.95);
+  --halo: rgba(40, 140, 255, 0.8);
+  --halo-loin: rgba(31, 123, 255, 0.45);
+  --halo-eclat: 1.2;
+}
