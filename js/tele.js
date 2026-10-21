@@ -198,6 +198,7 @@ function ecranPourTele(){
   const overlays = Array.from(document.querySelectorAll('body > [id^="overlay"]')).filter(estAffiche);
   const o = overlays[overlays.length - 1];
   if (!o) return voletPourTele();
+  if (o.id === "overlayFinUnRestants" && recapActuel) return { id: o.id, texte: "", cartes: [], choix: [], recap: recapActuel };
   // Cartes montrées : au plus 4 (le pari n'envoie que la carte révélée, pas sa grille de choix)
   let cartes = o.id === "overlayPredictionFin"
     ? Array.from(o.querySelectorAll(".fin-choix-reveal .Carte"))
@@ -891,6 +892,16 @@ function dessinerTele(ecran, etat){
   surEcran.hidden = !e;
   document.documentElement.classList.toggle("tele-ecran-ouvert", !!e); // (pas de reflet Prestige dessus)
   surEcran.classList.toggle("tele-ecran-historique", !!e && e.id === "voletHistorique");
+  surEcran.classList.toggle("tele-ecran-recap", !!(e && e.recap));
+  if (e && e.recap) {
+    surEcran.querySelector(".tele-ecran-cartes").innerHTML = "";
+    surEcran.querySelector(".tele-ecran-choix").innerHTML = "";
+    const zone = surEcran.querySelector(".tele-ecran-texte");
+    const cle = JSON.stringify(e.recap);
+    if (zone.dataset.recap !== cle) { zone.dataset.recap = cle; zone.innerHTML = ""; zone.appendChild(construireRecap(e.recap)); }
+    return;
+  }
+  delete surEcran.querySelector(".tele-ecran-texte").dataset.recap;
   if (e && e.id === "voletHistorique") {
     surEcran.querySelector(".tele-ecran-cartes").innerHTML = "";
     surEcran.querySelector(".tele-ecran-choix").innerHTML = "";

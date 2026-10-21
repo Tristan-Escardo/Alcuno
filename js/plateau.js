@@ -137,7 +137,143 @@ let gorgeesBues = {};       // { "Alice": 12, ... }
 let derniereGorgeeA = {};   // { "Alice": 31, ... } (cartes restantes à ce moment-là)
 const GORGEES_CUL_SEC = 5;
 
+// Récap de fin de partie (afficherOverlayFinUnRestants, js/regles.js) : ce qui s'est passé pendant la
+// partie. Tous les téléphones jouent les mêmes actions : en ligne, chacun a le même récap.
+let statsPartie = null;
+function reinitialiserStatsPartie(){
+  statsPartie = { pigeon: {}, plusGros: {}, annulees: {}, duels: {}, plus4: {}, doree: null };
+}
+reinitialiserStatsPartie();
+function compterStat(cle, nom, n = 1){
+  if(!nom || !statsPartie) return;
+  statsPartie[cle][nom] = (statsPartie[cle][nom] || 0) + n;
+}
+
+// Données du récap (envoyées telles quelles à la télé). restants : les « 1 » gardés, bus à la fin
+function calculerRecap(restants = []){
+  const gorgees = Object.assign({}, gorgeesBues);
+  restants.forEach(x => { gorgees[x.nom] = (gorgees[x.nom] || 0) + x.n; });
+  const st = statsPartie || {};
+  const classement = joueurs.map(nom => ({ nom: avecCouronne(nom), g: Number(gorgees[nom] || 0) }))
+    .sort((a, b) => b.g - a.g);
+  // le ou les meilleurs d'une stat (au moins « min »), ex. « Léa et Hugo »
+  const meilleurs = (table, min = 1, plusPetit = false) => {
+    const valeurs = joueurs.map(nom => ({ nom, v: Number((table || {})[nom] || 0) })).filter(x => plusPetit || x.v >= min);
+    if(!valeurs.length) return null;
+    const cible = plusPetit ? Math.min(...valeurs.map(x => x.v)) : Math.max(...valeurs.map(x => x.v));
+    const noms = valeurs.filter(x => x.v === cible).map(x => avecCouronne(x.nom));
+    if(noms.length > 2) return null; // (égalité à plus de 2 : pas de titre)
+    return { qui: noms.join(" et "), v: cible };
+  };
+  const pluriel = (n, mot) => `${n} ${mot}${n > 1 ? "s" : ""}`;
+  const titres = [];
+  const ajouter = (e, t, m, texte) => { if(m) titres.push({ e, t, q: `${m.qui} · ${texte(m.v)}` }); };
+  ajouter("🐦", "Pigeon de la soirée", meilleurs(st.pigeon), v => `${v} fois`);
+  ajouter("💥", "Plus gros coup", meilleurs(st.plusGros, 2), v => `${v} d'un coup`);
+  ajouter("🛡️", "Roi de l'esquive", meilleurs(st.annulees), v => pluriel(v, "annulée"));
+  ajouter("😇", "Le plus sage", meilleurs(gorgees, 0, true), v => pluriel(v, "gorgée"));
+  ajouter("⚔️", "Roi du duel", meilleurs(st.duels), v => `${v} duel${v > 1 ? "s" : ""} gagné${v > 1 ? "s" : ""}`);
+  ajouter("🎯", "Aimant à +4", meilleurs(st.plus4), v => `${pluriel(v, "gorgée")} de +4`);
+  const culSecs = !st.doree ? 0 : st.doree.personne ? joueurs.length : 1;
+  return {
+    cartes: plateau.children.length,
+    minutes: lancementPartieA ? Math.max(1, Math.round((Date.now() - lancementPartieA) / 60000)) : 0,
+    nbJoueurs: joueurs.length,
+    classement,
+    doree: st.doree ? Object.assign({}, st.doree, {
+      tireur: st.doree.tireur ? avecCouronne(st.doree.tireur) : "",
+      victime: st.doree.victime ? avecCouronne(st.doree.victime) : "",
+      soft: estModeSoft()
+    }) : null,
+    titres,
+    totaux: {
+      gorgees: classement.reduce((t, x) => t + x.g, 0),
+      annulees: Object.values(st.annulees || {}).reduce((t, n) => t + n, 0),
+      culSecs
+    },
+    restants: restants.map(x => ({ nom: avecCouronne(x.nom), n: x.n }))
+  };
+}
+
+// Récap en DOM (téléphone et télé : même construction, tailles dans le CSS). Textes en textContent : les
+// noms sont tapés par les joueurs
+function construireRecap(r){
+  const el = (tag, classe, texte) => {
+    const e = document.createElement(tag);
+    if(classe) e.className = classe;
+    if(texte !== undefined) e.textContent = texte;
+    return e;
+  };
+  const recap = el("div", "recap");
+  recap.append(el("div", "recap-titre", "🏆 Fin de partie"),
+    el("div", "recap-sous", `${r.cartes} cartes${r.minutes ? ` · ${r.minutes} min` : ""} · ${r.nbJoueurs} joueurs`));
+  const haut = el("div", "recap-gauche");
+  const podium = el("div", "recap-podium");
+  ["🥇", "🥈", "🥉"].forEach((medaille, i) => {
+    const j = r.classement[i];
+    if(!j) return;
+    const marche = el("div", `recap-marche recap-m${i + 1}`);
+    marche.append(el("div", "recap-medaille", medaille), el("div", "recap-nom", j.nom),
+      el("div", "recap-g", String(j.g)), el("div", "recap-p", j.g > 1 ? "gorgées" : "gorgée"));
+    podium.appendChild(marche);
+  });
+  haut.appendChild(podium);
+  if(r.classement.length > 3){
+    const liste = el("div", "recap-liste");
+    r.classement.slice(3).forEach((j, i) => {
+      const ligne = el("div", "recap-ligne");
+      const g = el("span");
+      g.append(el("em", "", String(j.g)), ` gorgée${j.g > 1 ? "s" : ""}`);
+      ligne.append(el("span", "", `${i + 4}. ${j.nom}`), g);
+      liste.appendChild(ligne);
+    });
+    haut.appendChild(liste);
+  }
+  if(r.doree){
+    // Carte dorée sortie pendant la partie (sinon rien : pas de spoil)
+    const bloc = el("div", "recap-doree");
+    const texte = el("div", "recap-doree-txt");
+    texte.appendChild(el("div", "recap-doree-t", "✦ Carte dorée ✦"));
+    const ligne1 = el("div", "recap-doree-q"), ligne2 = el("div", "recap-doree-q");
+    if(r.doree.personne){
+      ligne1.textContent = "Personne ne l'a trouvée.";
+      ligne2.textContent = r.doree.soft ? "Tout le monde a bu 2 gorgées 🥃" : "Tout le monde a pris le cul sec 🥃";
+    } else {
+      ligne1.append(el("b", "", r.doree.tireur), " l'a tirée.");
+      ligne2.append(el("b", "", r.doree.victime), r.doree.soft ? " a bu les 3 gorgées 🥃" : " a pris le cul sec 🥃");
+    }
+    texte.append(ligne1, ligne2);
+    bloc.append(el("div", "recap-eclats", "✦ ✦ ✦"), el("div", "Carte retournee carte_doree recap-doree-carte"), texte);
+    haut.appendChild(bloc);
+  }
+  recap.appendChild(haut);
+  const droite = el("div", "recap-droite");
+  if(r.titres.length){
+    const grille = el("div", "recap-titres");
+    r.titres.forEach(t => {
+      const b = el("div", "recap-bloc");
+      b.append(el("div", "recap-e", t.e), el("div", "recap-t", t.t), el("div", "recap-q", t.q));
+      grille.appendChild(b);
+    });
+    droite.appendChild(grille);
+  }
+  const chiffres = el("div", "recap-chiffres");
+  const chiffre = (n, texte) => { const c = el("span"); c.append(el("b", "", String(n)), texte); chiffres.appendChild(c); };
+  chiffre(r.totaux.gorgees, "gorgées au total");
+  chiffre(r.totaux.annulees, r.totaux.annulees > 1 ? "annulées" : "annulée");
+  if(r.doree && !r.doree.soft) chiffre(r.totaux.culSecs, r.totaux.culSecs > 1 ? "culs secs" : "cul sec");
+  droite.appendChild(chiffres);
+  if(r.restants.length){
+    const fin = el("div", "recap-restants");
+    r.restants.forEach(x => fin.appendChild(el("div", "", `${x.nom} boit ${texteGorgees(x.n)} pour ses 1 restants`)));
+    droite.appendChild(fin);
+  }
+  recap.appendChild(droite);
+  return recap;
+}
+
 function reinitialiserGorgees(){
+  reinitialiserStatsPartie();
   gorgeesBues = {};
   derniereGorgeeA = {};
   const restantes = cartesRestantes();
@@ -149,6 +285,7 @@ function noterGorgees(nom, n){
   if(!nom || n <= 0) return;
   gorgeesBues[nom] = (gorgeesBues[nom] || 0) + n;
   derniereGorgeeA[nom] = cartesRestantes();
+  if(statsPartie && n > (statsPartie.plusGros[nom] || 0)) statsPartie.plusGros[nom] = n;
 }
 
 // Cartes tirées depuis la dernière gorgée de ce joueur
@@ -1019,6 +1156,7 @@ function lancerOverlayPrediction(startIndex){
         if(derniereEstDoree){
           // Le cul sec collectif vient d'être annoncé : on retourne la carte dorée sur le plateau
           carteDoreeEnJeu = false;
+          if(statsPartie) statsPartie.doree = { personne: true };
           const caseDoree = plateau.children[indexCaseDoree];
           if(caseDoree){
             caseDoree.classList.remove("dos_dore");
@@ -1648,6 +1786,7 @@ function finDePartie(){
   }
 
   carteDoreeEnJeu = false;
+  if(statsPartie) statsPartie.doree = { personne: true };
   joueurs.forEach(nom => noterGorgees(nom, estModeSoft() ? 2 : GORGEES_CUL_SEC));
   const caseDoree = plateau.children[indexCaseDoree];
   if(caseDoree){
