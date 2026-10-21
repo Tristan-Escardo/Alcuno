@@ -7415,7 +7415,7 @@ html[data-theme="galaxie"] #choixMode #titreAccueil{ font-size: min(15.5vw, 20vh
 html[data-theme="galaxie"] header::after{ height: 3px !important; }
 /* Deux soleils sur la planète de l'accueil */
 /* Fenêtres du jeu (annonces, choix) */
-html[data-theme="galaxie"] [id^="overlay"]{ background: radial-gradient(ellipse at 50% 40%, rgba(30,70,170,.45), rgba(2,3,10,.97) 70%) !important; }
+html[data-theme="galaxie"] [id^="overlay"]{ background: radial-gradient(ellipse at 50% 40%, rgba(30,70,170,.45), rgba(2,3,10,.97) 70%), #02030a !important; } /* (fond plein : rien ne doit se voir derrière, ni le plateau ni une autre fenêtre) */
 html[data-theme="galaxie"] :is(.overlay-regle-texte, .titre-pigeon, #overlayAnnulation > div){ color:#FFE81F !important; text-shadow: 0 0 12px rgba(255,232,31,.35) !important; }
 html[data-theme="galaxie"] :is(.bouton-pigeon, .bouton-annulation){ border-radius: 8px !important; }
 /* Pause, volets, réglages, règles */
@@ -7448,7 +7448,7 @@ html[data-theme="galaxie"] .Carte:not(.retournee):not([class*="_"]):not([class*=
 html.faces-fermees[data-theme="galaxie"] #plateau .Carte.retournee.recachee,
 html[data-theme="galaxie"] .tele-plateau .Carte.carte-recachee{ background-image: url("Cartes/dos_galaxie.svg") !important; }
 /* Carte dorée en hologramme */
-html[data-theme="galaxie"] :is(#overlayRegleUnique.overlay-doree, #overlayCarteDoree){ background: repeating-linear-gradient(0deg, rgba(120,200,255,.08) 0 2px, transparent 2px 5px), radial-gradient(ellipse at 50% 45%, rgba(40,120,255,.3), rgba(2,3,10,.97) 65%) !important; }
+html[data-theme="galaxie"] :is(#overlayRegleUnique.overlay-doree, #overlayCarteDoree){ background: repeating-linear-gradient(0deg, rgba(120,200,255,.08) 0 2px, transparent 2px 5px), radial-gradient(ellipse at 50% 45%, rgba(40,120,255,.3), rgba(2,3,10,.97) 65%), #02030a !important; }
 html[data-theme="galaxie"] :is(#overlayRegleUnique.overlay-doree .Carte, #overlayCarteDoree .doree-carte-vedette){ filter: sepia(1) hue-rotate(170deg) saturate(2.2) brightness(1.15) drop-shadow(0 0 14px #49b4ff) !important; animation: hologramme 2.6s steps(1) infinite; }
 html[data-theme="galaxie"] :is(#overlayRegleUnique.overlay-doree, #overlayCarteDoree) .doree-titre{ color:#9fe0ff !important; text-shadow: 0 0 12px #2fa0ff !important; -webkit-text-stroke: 0 !important; }
 html[data-theme="galaxie"] :is(#overlayRegleUnique.overlay-doree, #overlayCarteDoree) .doree-texte{ color:#d8f1ff !important; }
