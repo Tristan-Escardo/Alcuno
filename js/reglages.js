@@ -177,9 +177,10 @@ function passageNyanCat(){
   // (retournée quand il va vers la gauche, pour ne pas voler sur le dos). On continue jusqu'à ce que la
   // queue de l'arc-en-ciel soit sortie de l'écran, à 180 px par seconde.
   const hasard = (a, b) => a + Math.random() * (b - a);
-  // Seulement de gauche à droite ou de droite à gauche (plus de passage par le haut ni par le bas), au
-  // hasard ; (avec deux bords, « ne jamais revenir par le bord où il est parti » le bloquait à gauche)
-  const bord = Math.random() < 0.5 ? "gauche" : "droite";
+  // Seulement de gauche à droite ou de droite à gauche (plus de passage par le haut ni par le bas). Il
+  // revient par le côté où il a disparu la fois d'avant (à une hauteur au hasard) ; au premier passage,
+  // un côté au hasard
+  const bord = dernierBordNyan || (Math.random() < 0.5 ? "gauche" : "droite");
   dernierBordNyan = bord === "gauche" ? "droite" : "gauche"; // bord de sortie
   let x0, y0, x1, y1;
   if (bord === "gauche") { x0 = -10; y0 = hasard(0.1, 0.9) * H; x1 = W + 10; y1 = hasard(0.1, 0.9) * H; }

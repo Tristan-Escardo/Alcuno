@@ -7631,12 +7631,12 @@ html[data-theme="soleil"] :is(#overlayCarteDoree, #overlayRegleUnique.overlay-do
   background: radial-gradient(ellipse 95% 34% at 50% 33%, rgba(255,215,0,.32), transparent 100%), linear-gradient(180deg, #1f3566 0%, #5a3a78 45%, #c0587a 80%, #f2905f 100%) !important; box-shadow: none; }
 /* Star Wars : la carte dorée retournée (plateau, télé, dernières cartes, récap) en hologramme comme dans sa fenêtre */
 html[data-theme="galaxie"] .Carte.retournee.carte_doree{ filter: sepia(1) hue-rotate(170deg) saturate(2.2) brightness(1.15) drop-shadow(0 0 6px #49b4ff) !important; animation: hologramme 2.6s steps(1) infinite; }
-/* Star Wars : dos de la carte dorée = le même dos aux sabres, discret ; toutes les 7 s environ, il grésille
+/* Star Wars : dos de la carte dorée = le même dos aux sabres, discret ; toutes les 5 s environ, il grésille
    une demi-seconde comme un hologramme qui capte mal (teinte bleue, lignes de balayage, petit décalage) */
-html[data-theme="galaxie"] .Carte.dos_dore:not(.retournee){ background-image: url("Cartes/dos_galaxie.svg") !important; animation: dosHoloGresille 7s linear infinite; }
+html[data-theme="galaxie"] .Carte.dos_dore:not(.retournee){ background-image: url("Cartes/dos_galaxie.svg") !important; animation: dosHoloGresille 5s linear infinite; }
 html[data-theme="galaxie"] .Carte.dos_dore:not(.retournee)::after{ transform: none !important; opacity: 0;
   background: repeating-linear-gradient(0deg, rgba(160,220,255,.35) 0 2px, transparent 2px 5px), rgba(60,160,255,.18) !important;
-  animation: dosHoloLignes 7s linear infinite !important; }
+  animation: dosHoloLignes 5s linear infinite !important; }
 @keyframes dosHoloGresille{
   0%, 88%, 100%{ filter: none; transform: none; opacity: 1; }
   89%{ filter: sepia(1) hue-rotate(170deg) saturate(2.2) brightness(1.2) drop-shadow(0 0 6px #49b4ff); transform: translateX(-2px); opacity: 1; }
