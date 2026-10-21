@@ -251,6 +251,7 @@ function etatPourTele(){
     musique: caseMusique.checked && !pauseEnCours ? volumeMusique : 0, // (la télé la joue à ce volume ; pas en pause)
     sons: sonsTele,
     rappel: rappelTele,
+    eau: eauTele,
     envols: envolsTele,
     // dernières cartes (pas en faces cachées : elles redonneraient les cartes déjà sorties)
     h: estFacesFermees() ? [] : historiqueCartes.map(e => ({ c: e.carte, n: avecCouronne(e.nom), l: lignesHistorique(e) })),
@@ -304,6 +305,13 @@ function sonPourTele(nom){
 // d'horloge près : .info/serverTimeOffset), le temps que la télé le reçoive.
 // Renvoie dans combien de ms le téléphone doit le faire (0 sans télé).
 const AVANCE_RAPPEL_TELE = 700;
+// Rappel « Bois de l'eau » (js/reglages.js) : la télé l'affiche aussi
+let eauTele = 0;
+function eauPourTele(){
+  if (!codeTele) return;
+  eauTele = numeroTele();
+  setTimeout(envoyerEtatTele, 0);
+}
 let rappelTele = null;   // dernier rappel : { i: numéro, t: heure de départ en temps du serveur }
 let decalageServeur = 0; // temps du serveur Firebase - temps de cet appareil
 let decalageServeurSuivi = false;
@@ -666,6 +674,15 @@ function afficherNotifChambrage(texte){
 let dernierSonTele = null;
 let dernierEnvolTele = null;
 let dernierRappelTele = null;
+let dernierEauTele = null;
+function montrerEauTele(ecran, eau){
+  const i = Number(eau) || 0;
+  if (dernierEauTele !== null && i > dernierEauTele) {
+    montrerNotifTele(ecran, "💧 <b>MESSAGE DE TON ANGE GARDIEN</b><br>L’eau aussi, ça se boit 😉");
+    jouerSon("eau");
+  }
+  dernierEauTele = Math.max(dernierEauTele || 0, i);
+}
 function jouerSonsTele(sons){
   sons = Array.isArray(sons) ? sons : [];
   const plusRecent = sons.reduce((max, son) => Math.max(max, Number(son.i) || 0), 0);
@@ -759,6 +776,7 @@ function dessinerTele(ecran, etat){
     dernierSonTele = null;
     dernierEnvolTele = null;
     dernierRappelTele = null;
+    dernierEauTele = null;
     musiqueTele = null; // (plus de téléphone relié : plus de musique)
     pauseMusiqueTele = false;
     majMusique();
@@ -773,6 +791,7 @@ function dessinerTele(ecran, etat){
   ecran.querySelector(".tele-pause").hidden = !etat.pause;
   jouerSonsTele(etat.sons);
   programmerRappelTele(ecran, etat.rappel);
+  montrerEauTele(ecran, etat.eau);
 
   // Avant la partie (joueurs en cours d'ajout) : les joueurs en grand, au milieu
   const cartes = Array.isArray(etat.cartes) ? etat.cartes : [];

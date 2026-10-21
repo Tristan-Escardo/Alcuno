@@ -9,6 +9,7 @@ const ecranReglages = document.getElementById("ecranReglages");
 
 document.getElementById("btnReglages").addEventListener("click", () => {
   vuNouveauPrestige();
+  vuNouveauGalaxie();
   majLignePartieMemoire();
   ecranReglages.scrollTop = 0;
   ouvrirPage(ecranReglages);
@@ -128,7 +129,16 @@ function estCodeGalaxie(nom){
   for (const c of mot) { h ^= c.charCodeAt(0); h = Math.imul(h, 0x01000193) >>> 0; }
   return EMPREINTES_GALAXIE.includes(h.toString(16).padStart(8, "0"));
 }
+// « NOUVEAU » sur la pastille Star Wars et point rouge sur les Réglages, à chaque générique, jusqu'à ce
+// qu'on ouvre les Réglages (comme Prestige)
+const CLE_GALAXIE_NOUVEAU = "alcuno_galaxie_nouveau";
+try { if (localStorage.getItem(CLE_GALAXIE_NOUVEAU) && galaxieDebloquee()) document.documentElement.classList.add("galaxie-nouveau"); } catch (e) {}
+function vuNouveauGalaxie(){
+  try { localStorage.removeItem(CLE_GALAXIE_NOUVEAU); } catch (e) {}
+}
 function debloquerGalaxie(){
+  try { localStorage.setItem(CLE_GALAXIE_NOUVEAU, "1"); } catch (e) {}
+  document.documentElement.classList.add("galaxie-nouveau");
   if (document.activeElement) document.activeElement.blur(); // (le clavier du nom de joueur se ferme)
   try { localStorage.setItem(CLE_GALAXIE, "1"); } catch (e) {}
   majPastilleGalaxie();
@@ -1160,6 +1170,7 @@ function afficherRappelEau(){
   rendreNotifGlissable(bandeau, 9000);
   document.body.appendChild(bandeau);
   jouerSon("eau");
+  try { eauPourTele(); } catch (e) {} // (js/tele.js : la télé l'affiche aussi)
   vibrer([60, 80, 60]);
 }
 
