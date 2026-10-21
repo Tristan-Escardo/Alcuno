@@ -177,7 +177,6 @@ function profondeurIOS(){
 const PHRASES_GLISSEMENT_AVANT = [
   "Oh tu vas où comme ça ? 👀 Y'a rien par là",
   "Eh oh, c'est par là le jeu 👈",
-  "Tu cherches la sortie ? Bois d'abord 🍻",
   "Rien de ce côté, retourne jouer 😏"
 ];
 let dernierChambrageAvant = 0;
@@ -190,7 +189,8 @@ function chambrerGlissementAvant(){
   if(Date.now() - dernierChambrageAvant < 4000) return;
   dernierChambrageAvant = Date.now();
   try {
-    afficherToast(PHRASES_GLISSEMENT_AVANT[Math.floor(Math.random() * PHRASES_GLISSEMENT_AVANT.length)], 2500);
+    const phrase = PHRASES_GLISSEMENT_AVANT[Math.floor(Math.random() * PHRASES_GLISSEMENT_AVANT.length)];
+    afficherToast(phrase, phrase === PHRASES_GLISSEMENT_AVANT[0] ? 3500 : 2500); // (la plus longue à lire)
   } catch (err) {}
 }
 
