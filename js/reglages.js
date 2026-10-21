@@ -129,7 +129,7 @@ function estCodeGalaxie(nom){
   for (const c of mot) { h ^= c.charCodeAt(0); h = Math.imul(h, 0x01000193) >>> 0; }
   return EMPREINTES_GALAXIE.includes(h.toString(16).padStart(8, "0"));
 }
-// « NOUVEAU » sur la pastille Star Wars et point rouge sur les Réglages, à chaque générique, jusqu'à ce
+// « NOUVEAU » sur la pastille Star Wars et point rouge sur les Réglages au premier déblocage, jusqu'à ce
 // qu'on ouvre les Réglages (comme Prestige)
 const CLE_GALAXIE_NOUVEAU = "alcuno_galaxie_nouveau";
 try { if (localStorage.getItem(CLE_GALAXIE_NOUVEAU) && galaxieDebloquee()) document.documentElement.classList.add("galaxie-nouveau"); } catch (e) {}
@@ -137,8 +137,11 @@ function vuNouveauGalaxie(){
   try { localStorage.removeItem(CLE_GALAXIE_NOUVEAU); } catch (e) {}
 }
 function debloquerGalaxie(){
-  try { localStorage.setItem(CLE_GALAXIE_NOUVEAU, "1"); } catch (e) {}
-  document.documentElement.classList.add("galaxie-nouveau");
+  // « NOUVEAU » seulement la toute première fois (revoir le générique ensuite ne le remet pas)
+  if (!galaxieDebloquee()) {
+    try { localStorage.setItem(CLE_GALAXIE_NOUVEAU, "1"); } catch (e) {}
+    document.documentElement.classList.add("galaxie-nouveau");
+  }
   if (document.activeElement) document.activeElement.blur(); // (le clavier du nom de joueur se ferme)
   try { localStorage.setItem(CLE_GALAXIE, "1"); } catch (e) {}
   majPastilleGalaxie();
