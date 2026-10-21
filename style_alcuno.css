@@ -7471,7 +7471,7 @@ html[data-theme="galaxie"] #ecranTele :is(.tele-bloc-titre, .tele-dernieres-titr
 .generique-intro{ position: absolute; top: calc(70px + env(safe-area-inset-top)); left: 30px; right: 30px; color: #4bd5ee; font: 600 18px/1.4 Arial, sans-serif; opacity: 0; animation: generiqueIntro 4.5s ease both; }
 .generique-scene{ position: absolute; left: 0; right: 0; bottom: 0; height: 100%; perspective: 320px; overflow: hidden;
   -webkit-mask: linear-gradient(transparent 8%, #000 40%); mask: linear-gradient(transparent 8%, #000 40%); }
-.generique-texte{ position: absolute; left: 50%; width: min(320px, 82vw); margin-left: calc(min(320px, 82vw) / -2); top: 100%; transform-origin: 50% 0; color: #FFE81F; text-align: center; font-family: "Arial Black", Arial, sans-serif; animation: generiqueDefile 27s linear 3.5s both; }
+.generique-texte{ position: absolute; left: 50%; width: min(320px, 82vw); margin-left: calc(min(320px, 82vw) / -2); top: 100%; transform-origin: 50% 0; color: #FFE81F; text-align: center; font-family: "Arial Black", Arial, sans-serif; animation: generiqueDefile 42s linear 3.5s both; }
 .generique-episode{ font-size: 15px; letter-spacing: 0.2em; margin-bottom: 8px; }
 .generique-titre{ font-size: 28px; letter-spacing: 0.05em; margin-bottom: 22px; }
 .generique-texte p{ font: 700 19px/1.45 Arial, sans-serif; text-align: justify; margin: 0 0 18px; }
@@ -7480,6 +7480,29 @@ html[data-theme="galaxie"] #ecranTele :is(.tele-bloc-titre, .tele-dernieres-titr
 @keyframes generiqueArrive{ from{ opacity: 0; } to{ opacity: 1; } }
 @keyframes generiqueIntro{ 0%{ opacity: 0; } 15%, 70%{ opacity: 1; } 100%{ opacity: 0; } }
 @keyframes generiqueDefile{ from{ transform: rotateX(28deg) translateY(0); } to{ transform: rotateX(28deg) translateY(-150%); } }
+
+/* Thème Star Wars débloqué : fenêtre jaune sur noir au milieu de l'écran, après le générique (js/reglages.js) */
+#fenetreGalaxie{ position: fixed; inset: 0; z-index: 2147483500; display: flex; align-items: center; justify-content: center; padding: 24px;
+  background: rgba(0, 0, 6, 0.8); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); animation: fenetrePrestigeVoile 0.3s ease both; }
+#fenetreGalaxie.fenetreGalaxie-sortie{ animation: fenetrePrestigeVoile 0.25s ease reverse both; }
+.fenetreGalaxie-carte{ width: min(340px, 100%); box-sizing: border-box; border-radius: 24px; padding: 28px 22px 22px; text-align: center;
+  background: linear-gradient(180deg, #05060f, #000); border: 2px solid #FFE81F;
+  box-shadow: 0 0 40px rgba(255, 232, 31, 0.35), inset 0 0 30px rgba(255, 232, 31, 0.08);
+  font-family: Arial, sans-serif; animation: fenetrePrestigeArrive 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+.fenetreGalaxie-secret{ font: 900 13px Arial, sans-serif; letter-spacing: 0.3em; text-transform: uppercase; color: #4bd5ee; margin-bottom: 16px; }
+.fenetreGalaxie-rond{ display: block; width: 112px; height: 112px; margin: 0 auto 18px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #4a5a9a 0, #1a2250 40%, #02030a 75%); box-shadow: 0 0 0 4px #FFE81F, 0 0 34px rgba(255, 232, 31, 0.6);
+  animation: fenetreGalaxieBrille 2.2s ease-in-out infinite; }
+.fenetreGalaxie-titre{ font: 900 28px/1.15 "Arial Black", Arial, sans-serif; color: #FFE81F; letter-spacing: 0.03em; text-shadow: 0 0 18px rgba(255, 232, 31, 0.45); }
+.fenetreGalaxie-texte{ font: 700 15px/1.4 Arial, sans-serif; color: #c9d4e8; margin: 12px 0 22px; }
+.fenetreGalaxie-ok{ display: block; width: 100%; padding: 15px; border-radius: 999px; cursor: pointer; border: none;
+  background: #FFE81F; color: #000; font: 900 16px Arial, sans-serif; box-shadow: 0 6px 18px rgba(255, 232, 31, 0.3); }
+.fenetreGalaxie-ok:active{ filter: brightness(0.9); transform: scale(0.98); }
+@keyframes fenetreGalaxieBrille{
+  0%, 100%{ box-shadow: 0 0 0 4px #FFE81F, 0 0 26px rgba(255, 232, 31, 0.45); }
+  50%{ box-shadow: 0 0 0 4px #FFE81F, 0 0 48px rgba(255, 232, 31, 0.85); }
+}
+@media (prefers-reduced-motion: reduce){ #fenetreGalaxie, .fenetreGalaxie-carte, .fenetreGalaxie-rond{ animation: none; } }
 html[data-theme="galaxie"] #ecranTele .tele-entete::after{ background: #eaf6ff !important; box-shadow: 0 0 0.5vh #fff, 0 0 1.4vh #39a0ff, 0 0 3vh #1f7bff; }
 html[data-theme="galaxie"] #ecranTele .tele-entete{ background: rgba(4,8,20,.78) !important; border-color: rgba(143,208,255,.3) !important; }
 /* Barre de l'heure : l'iPhone la peint de la couleur de FOND de ce qui est collé tout en haut de la page
