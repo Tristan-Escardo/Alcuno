@@ -229,6 +229,7 @@ function construireRecap(r){
     });
     haut.appendChild(liste);
   }
+  let blocDoree = null;
   if(r.doree){
     // Carte dorée sortie pendant la partie (sinon rien : pas de spoil)
     const bloc = el("div", "recap-doree");
@@ -244,10 +245,12 @@ function construireRecap(r){
     }
     texte.append(ligne1, ligne2);
     bloc.append(el("div", "recap-eclats", "✦ ✦ ✦"), el("div", "Carte retournee carte_doree recap-doree-carte"), texte);
-    haut.appendChild(bloc);
+    blocDoree = bloc;
   }
   recap.appendChild(haut);
   const droite = el("div", "recap-droite");
+  // (en tête de la colonne de droite : sous le classement sur le téléphone, au-dessus des titres sur la télé)
+  if(blocDoree) droite.appendChild(blocDoree);
   if(r.titres.length){
     const grille = el("div", "recap-titres");
     r.titres.forEach(t => {
