@@ -24,11 +24,12 @@ Un fichier MP3 par moment du jeu, avec exactement ces noms :
   (lightsaber_sound.mp3 = le fichier d'origine de 45 s, plus utilisé par le jeu)
 
 MUSIQUE D'AMBIANCE (en boucle, réglage « Musique d'ambiance ») :
-  musique_ambiance.mp3  thèmes bordeaux, sombre, casino, nuit (et les autres si leur musique manque)
+  musique_ambiance.mp3  thèmes bordeaux, casino, nuit (et les autres si leur musique manque)
   musique_ambiance_givre.mp3     thème givre
   musique_ambiance_cerisier.mp3  thème cerisier
   musique_ambiance_prestige.mp3  thème prestige
   musique_ambiance_soleil.mp3    thème Soleil couchant
+  musique_ambiance_sombre.mp3    thème Sombre (boucle exacte, voir BOUCLES_EXACTES dans js/reglages.js)
   musique_ambiance_galaxie.mp3   thème Star Wars (boucle exacte de 2 min 59, voir BOUCLES_EXACTES)
   Jusqu'à 3-4 minutes, 128 kbit/s (environ 1 Mo par minute) : elle se lance plus vite.
 

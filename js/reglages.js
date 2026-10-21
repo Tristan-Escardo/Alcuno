@@ -639,12 +639,13 @@ curseurVolume.addEventListener("input", () => {
 });
 curseurVolume.addEventListener("change", () => jouerSon("reglage_son")); // essai au relâchement (Sons/reglage_son.mp3)
 
-// ===== Musique d'ambiance : Sons/musique_ambiance_<thème>.mp3 (givre, cerisier, prestige, soleil), sinon
-// Sons/musique_ambiance.mp3 (bordeaux, sombre, casino, nuit). En boucle, à son propre volume.
+// ===== Musique d'ambiance : Sons/musique_ambiance_<thème>.mp3 (givre, cerisier, prestige, soleil, galaxie, sombre),
+// sinon Sons/musique_ambiance.mp3 (bordeaux, casino, nuit). En boucle, à son propre volume.
 // Quand ce téléphone caste, c'est la télé qui la joue (à ce volume, avec le thème du téléphone).
 const CLE_MUSIQUE = "alcuno_musique";
 const CLE_VOLUME_MUSIQUE = "alcuno_volume_musique";
-const THEMES_AVEC_MUSIQUE = ["givre", "cerisier", "prestige", "soleil", "galaxie"];
+const THEMES_AVEC_MUSIQUE = ["givre", "cerisier", "prestige", "soleil", "galaxie", "noir"];
+const NOM_FICHIER_MUSIQUE = { noir: "sombre" }; // thème « noir » (affiché Sombre) : musique_ambiance_sombre.mp3
 const caseMusique = document.getElementById("optionMusique");
 const curseurMusique = document.getElementById("volumeMusique");
 const ligneVolumeMusique = document.getElementById("ligneVolumeMusique");
@@ -688,6 +689,7 @@ const MONTEE_MUSIQUE = 0.8;  // secondes de fondu au démarrage (lancement, reto
 // ms tombe encore dans le pré-roulé, qui est la suite exacte de la boucle.
 const BOUCLES_EXACTES = {
   musique_ambiance_soleil: { avant: 0.3, longueur: 903552 / 44100 }, // 8 mesures à 93,7 BPM
+  musique_ambiance_sombre: { avant: 0.3, longueur: 2903870 / 44100 }, // 65,85 s (de 11 s à 1 min 17 du morceau, qui se répète)
   musique_ambiance_galaxie: { avant: 0.3, longueur: 7898850 / 44100 }, // 179,11 s (de 10,7 s à 3 min 10 du morceau, qui se répète)
   debloquage_theme_galaxie: { avant: 0.3, longueur: 4201001 / 44100 }, // 95,26 s (générique du thème Star Wars)
 };
@@ -704,7 +706,7 @@ function musiqueMiseEnPause(){
 }
 
 function fichierMusique(theme){
-  return THEMES_AVEC_MUSIQUE.includes(theme) ? `musique_ambiance_${theme}` : "musique_ambiance";
+  return THEMES_AVEC_MUSIQUE.includes(theme) ? `musique_ambiance_${NOM_FICHIER_MUSIQUE[theme] || theme}` : "musique_ambiance";
 }
 
 function musiqueVoulue(){
@@ -918,7 +920,7 @@ function preparerToutesLesMusiques(ctx){
   musiquesPreparees = true;
   // (pas la musique du thème secret Star Wars tant qu'il n'est pas débloqué : 3 Mo pour rien)
   const noms = ["musique_ambiance"].concat(THEMES_AVEC_MUSIQUE
-    .filter(t => t !== "galaxie" || galaxieDebloquee()).map(t => `musique_ambiance_${t}`));
+    .filter(t => t !== "galaxie" || galaxieDebloquee()).map(fichierMusique));
   noms.reduce((suite, nom) => suite.then(() => chargerMusique(ctx, nom)), Promise.resolve());
 }
 document.addEventListener("visibilitychange", () => {
