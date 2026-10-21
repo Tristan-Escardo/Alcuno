@@ -104,6 +104,19 @@
     <meta name="twitter:card" content="summary_large_image">
 </head>
 <body>
+    <!-- Thème Sombre : filtre du titre de l'accueil qui se corrompt (voir « #titreAccueil » sous html[data-theme="noir"] dans le CSS) -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+        <filter id="corrompu" x="-8%" y="-40%" width="116%" height="180%" color-interpolation-filters="sRGB">
+            <feTurbulence type="fractalNoise" baseFrequency="0.012 0.4" numOctaves="2" seed="3" result="vague"/>
+            <feDisplacementMap in="SourceGraphic" in2="vague" scale="0" xChannelSelector="R" yChannelSelector="G" result="deplace">
+                <animate attributeName="scale" dur="8s" repeatCount="indefinite" calcMode="discrete" keyTimes="0;.66;.67;.68;.70;.71;.93;.94;.95" values="0;14;5;22;9;0;12;4;0"/>
+            </feDisplacementMap>
+            <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="1" seed="9" result="grain"/>
+            <feColorMatrix in="grain" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  10 0 0 0 -2.5" result="masque"/>
+            <feComponentTransfer in="masque" result="trous"><feFuncA type="linear" slope="1" intercept="1"><animate attributeName="intercept" dur="8s" repeatCount="indefinite" calcMode="discrete" keyTimes="0;.66;.68;.70;.71;.93;.95" values="1;.5;.3;.45;1;.4;1"/></feFuncA></feComponentTransfer>
+            <feComposite in="deplace" in2="trous" operator="in"/>
+        </filter>
+    </defs></svg>
     <!-- Thème Star Wars : fine bande blanche tout en haut (voir #haloSabre dans le CSS). Ici dès le premier
          affichage : l'iPhone choisit la couleur de sa barre de l'heure à ce moment-là (créée plus tard par
          le JS, elle arrivait trop tard et la barre restait noire) -->

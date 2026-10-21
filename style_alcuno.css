@@ -6757,6 +6757,86 @@ html[data-theme="noir"] .messages::before{ padding: 1px; background: rgba(255, 2
 html[data-theme="noir"] #ecranReglages .optionReglage{ background: #000 !important; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12) !important; }
 html[data-theme="noir"] #ecranReglages .blocReglage .optionReglage{ background: transparent !important; box-shadow: none !important; }
 
+/* ===== Thème Sombre « Braise » : boutons presque noirs, simple liseré doré qui couve ; titre moins éclatant
+   Les boutons de partie des overlays (pigeon, duel, +4…) ne changent pas : ils restent bien lisibles en jeu. ===== */
+html[data-theme="noir"] :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu,
+  #btnCreerPartie, #btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR,
+  #lancerPartieEnLigne, #btnRejouerMemes, #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button,
+  #btnConfirmerAccueilOui, #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon,
+  #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie,
+  #termineSuppression, #btnInstallationInstaller){
+  background-image: linear-gradient(180deg, #17130a, #0a0803);
+  color: #b88a0c;
+  border: 1px solid rgba(246, 184, 0, 0.28);
+  box-shadow: inset 0 0 18px rgba(246, 184, 0, 0.07), 0 0 18px rgba(246, 184, 0, 0.06);
+  text-shadow: none;
+}
+
+/* ===== Thème Sombre : le titre de l'accueil se corrompt toutes les 8 s. Il se déforme (filtre #corrompu
+   dans index.html, ses vagues et ses grains noirs sont animés là-bas), s'étire, s'éteint par à-coups ;
+   une copie rouge sang se décale derrière (::before) et une barre noire le coupe en glissant (::after). ===== */
+html[data-theme="noir"] #choixMode #titreAccueil{
+  color: #c99a0e;
+  text-shadow: 0 0 22px rgba(255, 180, 0, 0.18), 0 2px 0 rgba(60, 40, 0, 0.8) !important;
+  filter: url(#corrompu);
+  animation: titreNoirCoupe 8s infinite steps(1) !important;
+}
+html[data-theme="noir"] #choixMode #titreAccueil::before{
+  content: "ALCUNO";
+  position: absolute;
+  inset: 0;
+  padding-left: inherit;
+  color: #5a0710;
+  text-shadow: none;
+  opacity: 0;
+  pointer-events: none;
+  animation: titreNoirOmbre 8s infinite steps(1);
+}
+html[data-theme="noir"] #choixMode #titreAccueil::after{
+  content: "";
+  position: absolute;
+  left: -8%;
+  right: -8%;
+  top: 18%;
+  height: 22%;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  animation: titreNoirBarre 8s infinite steps(1);
+}
+@keyframes titreNoirCoupe{
+  0%, 64%, 92%, 100%{ opacity: 1; transform: none; }
+  65%{ opacity: 0.15; }
+  66%{ opacity: 0.9; transform: scaleY(1.25) skewX(-10deg); }
+  67%{ opacity: 0; }
+  68%{ opacity: 0.7; transform: scaleY(0.8) translateX(8px); }
+  69%{ opacity: 0.1; }
+  70%{ opacity: 0.8; transform: none; }
+  71%{ opacity: 1; }
+  93%{ opacity: 0; }
+  94%{ opacity: 0.9; transform: skewX(6deg); }
+  95%{ opacity: 1; transform: none; }
+}
+@keyframes titreNoirOmbre{
+  0%, 65%, 71%, 92%, 100%{ opacity: 0; }
+  66%{ opacity: 0.9; transform: translate(-10px, 3px) scaleY(1.2); }
+  68%{ opacity: 0.9; transform: translate(12px, -2px); }
+  70%{ opacity: 0.8; transform: translate(-5px, 0); }
+  93%{ opacity: 0.9; transform: translate(8px, 2px); }
+}
+@keyframes titreNoirBarre{
+  0%, 65%, 71%, 92%, 100%{ opacity: 0; }
+  66%{ opacity: 1; transform: translateX(-30px); }
+  68%{ opacity: 1; transform: translateX(24px); }
+  70%{ opacity: 1; transform: translateX(-12px); }
+  93%{ opacity: 1; transform: translateX(18px); }
+}
+@media (prefers-reduced-motion: reduce){
+  html[data-theme="noir"] #choixMode #titreAccueil{ animation: none !important; filter: none; }
+  html[data-theme="noir"] #choixMode #titreAccueil::before, html[data-theme="noir"] #choixMode #titreAccueil::after{ animation: none; }
+}
+html[data-theme="noir"] #choixMode .titreAccueilBarre{ opacity: 0.35; }
+
 /* ===== Thème Prestige débloqué : fenêtre dorée au milieu de l'écran (js/reglages.js) ===== */
 #fenetrePrestige{
   position: fixed;
