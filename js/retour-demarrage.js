@@ -172,6 +172,28 @@ function profondeurIOS(){
 // alors à vide sur l'accueil. Un seul recul à la fois. S'il n'aboutit pas (ignoré par l'iPhone), on
 // n'insiste pas : l'entrée affichée prend la profondeur de la pile, pour que tout reste d'accord (avant :
 // on réessayait sans fin, et plus aucune entrée n'était ajoutée => plus de glissement nulle part).
+// Glissement depuis le bord droit (vers l'avant), sur l'écran d'accueil : il n'y a rien par là, on le dit
+// avec humour (au plus une fois toutes les 4 s). Simple message en bas : ne touche pas à l'historique
+const PHRASES_GLISSEMENT_AVANT = [
+  "Oh tu vas où comme ça ? 👀 Y'a rien par là",
+  "Eh oh, c'est par là le jeu 👈",
+  "Tu cherches la sortie ? Bois d'abord 🍻",
+  "Rien de ce côté, retourne jouer 😏"
+];
+let dernierChambrageAvant = 0;
+function chambrerGlissementAvant(){
+  // Seulement sur l'écran d'accueil, sans aucun écran ouvert par-dessus
+  const accueil = document.getElementById("choixMode");
+  if(!accueil || getComputedStyle(accueil).display === "none" || pileIOS.length > 0 ||
+     document.querySelector(".page-entree, .page-sortie, [id^='overlay']") ||
+     ["ecranReglages", "ecranRegles", "ecranBug", "ecranInstallation"].some(id => { const e = document.getElementById(id); return e && e.style.display !== "none"; })) return;
+  if(Date.now() - dernierChambrageAvant < 4000) return;
+  dernierChambrageAvant = Date.now();
+  try {
+    afficherToast(PHRASES_GLISSEMENT_AVANT[Math.floor(Math.random() * PHRASES_GLISSEMENT_AVANT.length)], 2500);
+  } catch (err) {}
+}
+
 function rejoindrePileIOS(){
   const n = profondeurIOS() - pileIOS.length;
   if(n <= 0 || retraitEnCoursIOS || rechargementEnCours) return;
@@ -373,7 +395,12 @@ window.addEventListener("popstate", () => {
     // Plus loin que la pile : en avant sur une ancienne entrée (glissement depuis le bord droit après un
     // retour : nos entrées retirées restent « en avant » dans l'historique), ou recul pas encore fini :
     // on revient tout de suite à la bonne entrée (sinon on glissait sans fin sur l'accueil)
-    if(profondeur > pileIOS.length){ rejoindrePileIOS(); return; }
+    if(profondeur > pileIOS.length){
+      // Glissement vers l'avant fait par le joueur (pas un de nos reculs) : petit mot pour le chambrer
+      if(!retraitEnCoursIOS && !scellementEnCoursIOS) chambrerGlissementAvant();
+      rejoindrePileIOS();
+      return;
+    }
     // À la profondeur de la pile : c'est notre recul qui vient d'aboutir (puis, si un écran vient de se
     // fermer, on scelle l'historique ; et rien de plus si c'était justement le recul du scellement)
     if(profondeur === pileIOS.length){
