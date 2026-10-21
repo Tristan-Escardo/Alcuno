@@ -91,7 +91,7 @@ const A_PRECHARGER = [
 // Sons (dossier Sons/) : copiés aussi, pour en avoir hors connexion. Un par un et sans bloquer :
 // un fichier absent (son pas encore ajouté) n'empêche pas l'installation du reste.
 const SONS_A_PRECHARGER = ["cartes", "doree", "tiens_gueule", "bouton", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees", "regles", "accessibilite_on"]
-  .concat(Array.from({ length: 54 }, (_, i) => `sabre/sabre_${String(i + 1).padStart(2, "0")}`))
+  .concat(["sabre/sabre_01", "sabre/sabre_02", "sabre/sabre_05", "sabre/sabre_07", "sabre/sabre_09", "sabre/sabre_11", "sabre/sabre_12", "sabre/sabre_14", "sabre/sabre_15", "sabre/sabre_18", "sabre/sabre_22", "sabre/sabre_24", "sabre/sabre_26", "sabre/sabre_31", "sabre/sabre_33", "sabre/sabre_35", "sabre/sabre_37", "sabre/sabre_38", "sabre/sabre_40", "sabre/sabre_41", "sabre/sabre_48", "sabre/sabre_54"])
   .map((nom) => `./Sons/${nom}.mp3`);
 
 self.addEventListener("install", (event) => {
