@@ -4,6 +4,7 @@
 // =============================================================================================
 // #region Overlays des règles : pigeon, annonces, annulations, carte dorée
 /* ===== PIGEON OVERLAY ===== */
+let recapActuel = null; // (récap affiché, pour la télé)
 function afficherOverlayFinUnRestants(){
   if(finUnOverlayAffiche) return;
   finUnOverlayAffiche = true;
@@ -35,29 +36,11 @@ function afficherOverlayFinUnRestants(){
   overlay.style.padding = "24px";
   overlay.style.gap = "18px";
 
-  const titre = document.createElement("div");
-  titre.className = "titre-pigeon";
-  titre.innerText = "FIN DE LA PARTIE";
-  overlay.appendChild(titre);
-
-  const bloc = document.createElement("div");
-  bloc.className = "fin-un-lignes";
-
-  if(restants.length === 0){
-    const ligne = document.createElement("div");
-    ligne.className = "fin-un-ligne";
-    ligne.innerText = "Aucun 1 restant à boire.";
-    bloc.appendChild(ligne);
-  } else {
-    restants.forEach(x => {
-      const ligne = document.createElement("div");
-      ligne.className = "fin-un-ligne";
-      ligne.innerText = `${x.nom} doit boire ${texteGorgees(x.n)} pour ses 1 restants`;
-      bloc.appendChild(ligne);
-    });
-  }
-
-  overlay.appendChild(bloc);
+  // Récap de la partie (podium, carte dorée, titres) ; aussi envoyé à la télé (js/tele.js)
+  overlay.classList.add("overlay-recap");
+  overlay.style.overflowY = "auto";
+  recapActuel = calculerRecap(restants);
+  overlay.appendChild(construireRecap(recapActuel));
 
   const btnTerminer = document.createElement("button");
   btnTerminer.className = "bouton-pigeon";
@@ -76,7 +59,7 @@ function afficherOverlayFinUnRestants(){
   // Rejouer avec les mêmes joueurs ») ; en ligne, n'importe qui peut la lancer, pour tout le monde
   const btnRevanche = document.createElement("button");
   btnRevanche.className = "bouton-pigeon fin-revanche";
-  btnRevanche.innerText = "Revanche";
+  btnRevanche.innerText = "Revanche (mêmes joueurs)";
   btnRevanche.addEventListener("click", () => {
     restants.forEach(x => { annulations[x.nom] = 0; noterGorgees(x.nom, x.n); });
     overlay.remove();
@@ -116,6 +99,7 @@ function afficherMenuPigeon(){
       surAction(btn, "pigeon:" + i, { owner: choisisseur, once: true }, ()=>{
       proposerAnnulerChoix(choisisseur); // « Mauvais joueur ? Annuler » quelques secondes
       indexPigeon = i;
+      compterStat("pigeon", joueurs[i]);
       nomPigeonOriginal = joueurs[i];
       // 1) on ferme l'overlay de choix
       unlockScroll();
@@ -460,6 +444,7 @@ function afficherOverlayAnnulation(joueurIndex, nbGorgees, onDone = null, afterC
 
       annulations[nom] = Math.max(0, dispo - utilise);
       noterGorgees(nom, reste);
+      compterStat("annulees", nom, utilise);
       majRegleApresAnnulation(nom, nbGorgees, utilise, reste);
       afficherJoueurs();
       afficherJoueurActif();
@@ -852,6 +837,7 @@ function afficherOverlayCarteDoree(joueurActuel){
       proposerAnnulerChoix(choisisseur); // « Mauvais joueur ? Annuler » quelques secondes
       overlay.remove();
       unlockScroll();
+      if(statsPartie) statsPartie.doree = { tireur: choisisseur, victime: nom };
       afficherOverlayTiensGueule(nom);
 
       // En ligne : on débloque tout de suite. L'overlay reste affiché jusqu'au tap, mais ne doit
@@ -1066,6 +1052,7 @@ function afficherOverlayTirageDuel(overlay, j1, j2, carteDuel = ""){
     }
 
     const perdant = (v1 < v2) ? j1 : j2;
+    compterStat("duels", joueurs[perdant === j1 ? j2 : j1]); // (récap de fin : duels gagnés)
     // Sa carte du dernier tirage (après une égalité, ce sont les nouvelles cartes qui comptent)
     const vPerdant = (v1 < v2) ? v1 : v2;
     const cartePerdant = (v1 < v2) ? carteJ1 : carteJ2;
@@ -1380,6 +1367,7 @@ function distribuerFilePlus4(file, classeCartePlus4, onAnnulation = null){
 }
 
 function demanderAnnulationPlus4(joueurIndex, nbGorgees, classeCartePlus4, onFinish, onAnnulation = null){
+  compterStat("plus4", joueurs[joueurIndex], nbGorgees); // (récap de fin : gorgées reçues par des +4)
   const nom = joueurs[joueurIndex];
   const msg = `${nom} boit ${texteGorgees(nbGorgees)} (+4)`;
 
@@ -1660,6 +1648,7 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
     
     if(indexPigeon===null){
       indexPigeon=joueurActuel;
+      compterStat("pigeon", joueurs[joueurActuel]);
       nomPigeonOriginal=joueurs[joueurActuel];
       const nPigeon = gorgeesPigeon();
       const msgPigeon = `${joueurs[joueurActuel]} est le PIGEON !\nIl/elle boit ${texteGorgees(nPigeon)}.\nÀ chaque 3 tiré, le PIGEON boit 1 gorgée.\nPour s'en débarrasser : tirer un 3 et choisir le prochain PIGEON.`;
