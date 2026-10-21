@@ -4617,13 +4617,12 @@ html[data-theme="givre"] #ecranReglages .pastilleTheme[aria-pressed="true"]{
 #ecranReglages .pastilleTheme[aria-pressed="true"] .nomTheme{
   opacity: 1;
 }
-/* Sombre : nom en noir cerclé d'un fin liseré blanc (le gris clair d'avant se confondait avec les autres noms) */
+/* Sombre : nom en noir, à peine cerclé de gris clair pour rester lisible sur le fond sombre (pas de halo) */
 html:not([data-theme="givre"]) #ecranReglages .pastilleTheme[data-theme="noir"] .nomTheme{
   color: #000;
   opacity: 1;
-  -webkit-text-stroke: 1.6px #fff;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.4);
   paint-order: stroke fill;
-  text-shadow: 0 0 3px rgba(255, 255, 255, 0.35);
 }
 
 /* ===== Givre : overlays des règles aussi en givre (fond glacier, textes bleus, boutons cyan) =====
