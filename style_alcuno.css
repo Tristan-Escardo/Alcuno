@@ -4617,6 +4617,13 @@ html[data-theme="givre"] #ecranReglages .pastilleTheme[aria-pressed="true"]{
 #ecranReglages .pastilleTheme[aria-pressed="true"] .nomTheme{
   opacity: 1;
 }
+/* Sombre : nom en noir, à peine cerclé de gris clair pour rester lisible sur le fond sombre (pas de halo) */
+html:not([data-theme="givre"]) #ecranReglages .pastilleTheme[data-theme="noir"] .nomTheme{
+  color: #000;
+  opacity: 1;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.4);
+  paint-order: stroke fill;
+}
 
 /* ===== Givre : overlays des règles aussi en givre (fond glacier, textes bleus, boutons cyan) =====
    !important : beaucoup de ces couleurs sont posées par le JS directement sur les éléments
@@ -6757,6 +6764,86 @@ html[data-theme="noir"] .messages::before{ padding: 1px; background: rgba(255, 2
 html[data-theme="noir"] #ecranReglages .optionReglage{ background: #000 !important; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12) !important; }
 html[data-theme="noir"] #ecranReglages .blocReglage .optionReglage{ background: transparent !important; box-shadow: none !important; }
 
+/* ===== Thème Sombre « Braise » : boutons presque noirs, simple liseré doré qui couve ; titre moins éclatant
+   Les boutons de partie des overlays (pigeon, duel, +4…) ne changent pas : ils restent bien lisibles en jeu. ===== */
+html[data-theme="noir"] :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu,
+  #btnCreerPartie, #btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR,
+  #lancerPartieEnLigne, #btnRejouerMemes, #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button,
+  #btnConfirmerAccueilOui, #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon,
+  #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie,
+  #termineSuppression, #btnInstallationInstaller){
+  background-image: linear-gradient(180deg, #110e07, #060502);
+  color: #a07a0c;
+  border: 1px solid rgba(246, 184, 0, 0.22);
+  box-shadow: inset 0 0 16px rgba(246, 184, 0, 0.05), 0 0 14px rgba(246, 184, 0, 0.045);
+  text-shadow: none;
+}
+
+/* ===== Thème Sombre : le titre de l'accueil se corrompt toutes les 8 s. Il se déforme (filtre #corrompu
+   dans index.html, ses vagues et ses grains noirs sont animés là-bas), s'étire, s'éteint par à-coups ;
+   une copie rouge sang se décale derrière (::before) et une barre noire le coupe en glissant (::after). ===== */
+html[data-theme="noir"] #choixMode #titreAccueil{
+  color: #c99a0e;
+  text-shadow: 0 0 22px rgba(255, 180, 0, 0.18), 0 2px 0 rgba(60, 40, 0, 0.8) !important;
+  filter: url(#corrompu);
+  animation: titreNoirCoupe 8s infinite steps(1) !important;
+}
+html[data-theme="noir"] #choixMode #titreAccueil::before{
+  content: "ALCUNO";
+  position: absolute;
+  inset: 0;
+  padding-left: inherit;
+  color: #5a0710;
+  text-shadow: none;
+  opacity: 0;
+  pointer-events: none;
+  animation: titreNoirOmbre 8s infinite steps(1);
+}
+html[data-theme="noir"] #choixMode #titreAccueil::after{
+  content: "";
+  position: absolute;
+  left: -8%;
+  right: -8%;
+  top: 18%;
+  height: 22%;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  animation: titreNoirBarre 8s infinite steps(1);
+}
+@keyframes titreNoirCoupe{
+  0%, 64%, 92%, 100%{ opacity: 1; transform: none; }
+  65%{ opacity: 0.15; }
+  66%{ opacity: 0.9; transform: scaleY(1.25) skewX(-10deg); }
+  67%{ opacity: 0; }
+  68%{ opacity: 0.7; transform: scaleY(0.8) translateX(8px); }
+  69%{ opacity: 0.1; }
+  70%{ opacity: 0.8; transform: none; }
+  71%{ opacity: 1; }
+  93%{ opacity: 0; }
+  94%{ opacity: 0.9; transform: skewX(6deg); }
+  95%{ opacity: 1; transform: none; }
+}
+@keyframes titreNoirOmbre{
+  0%, 65%, 71%, 92%, 100%{ opacity: 0; }
+  66%{ opacity: 0.9; transform: translate(-10px, 3px) scaleY(1.2); }
+  68%{ opacity: 0.9; transform: translate(12px, -2px); }
+  70%{ opacity: 0.8; transform: translate(-5px, 0); }
+  93%{ opacity: 0.9; transform: translate(8px, 2px); }
+}
+@keyframes titreNoirBarre{
+  0%, 65%, 71%, 92%, 100%{ opacity: 0; }
+  66%{ opacity: 1; transform: translateX(-30px); }
+  68%{ opacity: 1; transform: translateX(24px); }
+  70%{ opacity: 1; transform: translateX(-12px); }
+  93%{ opacity: 1; transform: translateX(18px); }
+}
+@media (prefers-reduced-motion: reduce){
+  html[data-theme="noir"] #choixMode #titreAccueil{ animation: none !important; filter: none; }
+  html[data-theme="noir"] #choixMode #titreAccueil::before, html[data-theme="noir"] #choixMode #titreAccueil::after{ animation: none; }
+}
+html[data-theme="noir"] #choixMode .titreAccueilBarre{ opacity: 0.35; }
+
 /* ===== Thème Prestige débloqué : fenêtre dorée au milieu de l'écran (js/reglages.js) ===== */
 #fenetrePrestige{
   position: fixed;
@@ -7471,7 +7558,7 @@ html[data-theme="galaxie"] #ecranTele :is(.tele-bloc-titre, .tele-dernieres-titr
 .generique-intro{ position: absolute; top: calc(70px + env(safe-area-inset-top)); left: 30px; right: 30px; color: #4bd5ee; font: 600 18px/1.4 Arial, sans-serif; opacity: 0; animation: generiqueIntro 4.5s ease both; }
 .generique-scene{ position: absolute; left: 0; right: 0; bottom: 0; height: 100%; perspective: 320px; overflow: hidden;
   -webkit-mask: linear-gradient(transparent 8%, #000 40%); mask: linear-gradient(transparent 8%, #000 40%); }
-.generique-texte{ position: absolute; left: 50%; width: min(320px, 82vw); margin-left: calc(min(320px, 82vw) / -2); top: 100%; transform-origin: 50% 0; color: #FFE81F; text-align: center; font-family: "Arial Black", Arial, sans-serif; animation: generiqueDefile 27s linear 3.5s both; }
+.generique-texte{ position: absolute; left: 50%; width: min(320px, 82vw); margin-left: calc(min(320px, 82vw) / -2); top: 100%; transform-origin: 50% 0; color: #FFE81F; text-align: center; font-family: "Arial Black", Arial, sans-serif; animation: generiqueDefile 42s linear 3.5s both; }
 .generique-episode{ font-size: 15px; letter-spacing: 0.2em; margin-bottom: 8px; }
 .generique-titre{ font-size: 28px; letter-spacing: 0.05em; margin-bottom: 22px; }
 .generique-texte p{ font: 700 19px/1.45 Arial, sans-serif; text-align: justify; margin: 0 0 18px; }
@@ -7480,6 +7567,29 @@ html[data-theme="galaxie"] #ecranTele :is(.tele-bloc-titre, .tele-dernieres-titr
 @keyframes generiqueArrive{ from{ opacity: 0; } to{ opacity: 1; } }
 @keyframes generiqueIntro{ 0%{ opacity: 0; } 15%, 70%{ opacity: 1; } 100%{ opacity: 0; } }
 @keyframes generiqueDefile{ from{ transform: rotateX(28deg) translateY(0); } to{ transform: rotateX(28deg) translateY(-150%); } }
+
+/* Thème Star Wars débloqué : fenêtre jaune sur noir au milieu de l'écran, après le générique (js/reglages.js) */
+#fenetreGalaxie{ position: fixed; inset: 0; z-index: 2147483500; display: flex; align-items: center; justify-content: center; padding: 24px;
+  background: rgba(0, 0, 6, 0.8); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); animation: fenetrePrestigeVoile 0.3s ease both; }
+#fenetreGalaxie.fenetreGalaxie-sortie{ animation: fenetrePrestigeVoile 0.25s ease reverse both; }
+.fenetreGalaxie-carte{ width: min(340px, 100%); box-sizing: border-box; border-radius: 24px; padding: 28px 22px 22px; text-align: center;
+  background: linear-gradient(180deg, #05060f, #000); border: 2px solid #FFE81F;
+  box-shadow: 0 0 40px rgba(255, 232, 31, 0.35), inset 0 0 30px rgba(255, 232, 31, 0.08);
+  font-family: Arial, sans-serif; animation: fenetrePrestigeArrive 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+.fenetreGalaxie-secret{ font: 900 13px Arial, sans-serif; letter-spacing: 0.3em; text-transform: uppercase; color: #4bd5ee; margin-bottom: 16px; }
+.fenetreGalaxie-rond{ display: block; width: 112px; height: 112px; margin: 0 auto 18px; border-radius: 50%;
+  background: url("icones/casque_star_wars.png") center 55% / 74% no-repeat, radial-gradient(circle at 70% 25%, #1b2f6e, #02030a 75%); box-shadow: 0 0 0 4px #FFE81F, 0 0 34px rgba(255, 232, 31, 0.6);
+  animation: fenetreGalaxieBrille 2.2s ease-in-out infinite; }
+.fenetreGalaxie-titre{ font: 900 28px/1.15 "Arial Black", Arial, sans-serif; color: #FFE81F; letter-spacing: 0.03em; text-shadow: 0 0 18px rgba(255, 232, 31, 0.45); }
+.fenetreGalaxie-texte{ font: 700 15px/1.4 Arial, sans-serif; color: #c9d4e8; margin: 12px 0 22px; }
+.fenetreGalaxie-ok{ display: block; width: 100%; padding: 15px; border-radius: 999px; cursor: pointer; border: none;
+  background: #FFE81F; color: #000; font: 900 16px Arial, sans-serif; box-shadow: 0 6px 18px rgba(255, 232, 31, 0.3); }
+.fenetreGalaxie-ok:active{ filter: brightness(0.9); transform: scale(0.98); }
+@keyframes fenetreGalaxieBrille{
+  0%, 100%{ box-shadow: 0 0 0 4px #FFE81F, 0 0 26px rgba(255, 232, 31, 0.45); }
+  50%{ box-shadow: 0 0 0 4px #FFE81F, 0 0 48px rgba(255, 232, 31, 0.85); }
+}
+@media (prefers-reduced-motion: reduce){ #fenetreGalaxie, .fenetreGalaxie-carte, .fenetreGalaxie-rond{ animation: none; } }
 html[data-theme="galaxie"] #ecranTele .tele-entete::after{ background: #eaf6ff !important; box-shadow: 0 0 0.5vh #fff, 0 0 1.4vh #39a0ff, 0 0 3vh #1f7bff; }
 html[data-theme="galaxie"] #ecranTele .tele-entete{ background: rgba(4,8,20,.78) !important; border-color: rgba(143,208,255,.3) !important; }
 /* Barre de l'heure : l'iPhone la peint de la couleur de FOND de ce qui est collé tout en haut de la page

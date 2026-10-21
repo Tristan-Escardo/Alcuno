@@ -137,15 +137,16 @@ function vuNouveauGalaxie(){
   try { localStorage.removeItem(CLE_GALAXIE_NOUVEAU); } catch (e) {}
 }
 function debloquerGalaxie(){
-  // « NOUVEAU » seulement la toute première fois (revoir le générique ensuite ne le remet pas)
-  if (!galaxieDebloquee()) {
+  // « NOUVEAU » et fenêtre « débloqué » seulement la toute première fois (revoir le générique ensuite ne les remet pas)
+  const premiere = !galaxieDebloquee();
+  if (premiere) {
     try { localStorage.setItem(CLE_GALAXIE_NOUVEAU, "1"); } catch (e) {}
     document.documentElement.classList.add("galaxie-nouveau");
   }
   if (document.activeElement) document.activeElement.blur(); // (le clavier du nom de joueur se ferme)
   try { localStorage.setItem(CLE_GALAXIE, "1"); } catch (e) {}
   majPastilleGalaxie();
-  afficherGeneriqueGalaxie();
+  afficherGeneriqueGalaxie(premiere);
 }
 // Accueil du thème Star Wars : le Nyan Cat traverse l'écran de temps en temps, d'un bord au bord d'en
 // face par un trajet au hasard, derrière les boutons. icones/nyan_cat.png : 12 images l'une sous l'autre
@@ -245,7 +246,7 @@ function arreterSonGenerique(L){
 
 // Générique : texte jaune qui défile en perspective dans les étoiles. Un tap le passe ; à la fin (ou au
 // tap), le thème est mis comme dans les Réglages
-function afficherGeneriqueGalaxie(){
+function afficherGeneriqueGalaxie(premiere){
   if (document.getElementById("generiqueGalaxie")) return;
   const ecran = document.createElement("div");
   ecran.id = "generiqueGalaxie";
@@ -275,12 +276,37 @@ function afficherGeneriqueGalaxie(){
     const pastille = document.getElementById("pastilleGalaxie");
     if (pastille) pastille.click(); // comme dans les réglages (thème gardé, barre du téléphone…)
     else { appliquerTheme("galaxie"); try { localStorage.setItem(CLE_THEME, "galaxie"); } catch (e) {} }
+    if (premiere) setTimeout(afficherFenetreGalaxie, 700); // juste après : « Thème Star Wars débloqué »
   };
-  const minuteur = setTimeout(terminer, 31000);
+  const minuteur = setTimeout(terminer, 50000); // (le texte défile en 42 s depuis 3,5 s : voir generiqueDefile dans le CSS)
   const son = jouerSonGenerique();
   ecran.addEventListener("click", terminer);
   document.body.appendChild(ecran);
   vibrer([80, 60, 80, 60, 200]);
+}
+
+// Thème Star Wars débloqué : fenêtre jaune sur noir, comme celle de Prestige, juste après le générique
+// (le thème est déjà mis par le générique : un seul bouton)
+function afficherFenetreGalaxie(){
+  if (document.getElementById("fenetreGalaxie")) return;
+  const voile = document.createElement("div");
+  voile.id = "fenetreGalaxie";
+  voile.setAttribute("role", "dialog");
+  voile.setAttribute("aria-label", "Thème Star Wars débloqué");
+  voile.innerHTML = `
+    <div class="fenetreGalaxie-carte">
+      <div class="fenetreGalaxie-secret">✦ Secret trouvé ✦</div>
+      <span class="fenetreGalaxie-rond" aria-hidden="true"></span>
+      <div class="fenetreGalaxie-titre">Thème Star Wars<br>débloqué !</div>
+      <div class="fenetreGalaxie-texte">Il est maintenant dans<br>Réglages › Thèmes</div>
+      <button type="button" class="fenetreGalaxie-ok">Que la gorgée soit avec toi</button>
+    </div>`;
+  voile.querySelector(".fenetreGalaxie-ok").addEventListener("click", () => {
+    voile.classList.add("fenetreGalaxie-sortie");
+    setTimeout(() => voile.remove(), 250);
+  });
+  vibrer([60, 40, 60]);
+  document.body.appendChild(voile);
 }
 
 // Notification qui arrive du haut de l'écran, en or avec des étincelles. Comme sur un téléphone :

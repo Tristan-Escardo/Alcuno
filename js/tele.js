@@ -544,7 +544,11 @@ const PHRASES_TELE = [
   { texte: n => `<b>${n}</b> ? Toujours vivant(e) ?` },
   { sansCreateur: true, texte: n => `<b>${n}</b> fait semblant de comprendre les règles depuis le début.` },
   { sansNom: true, texte: () => `Y’en a certains qui ont dit « je bois pas trop ce soir » ? Mdr.` },
-  { sansNom: true, texte: () => `Vous pouvez AUSSI prendre vos propres gorgées.` }
+  { sansNom: true, texte: () => `Vous pouvez AUSSI prendre vos propres gorgées.` },
+  // thème Star Wars seulement : mêlées aux autres, même rythme
+  { galaxie: true, sansNom: true, texte: () => `Obi-Wan Kenobière, tu es mon seul espoir.` },
+  { galaxie: true, sansNom: true, texte: () => `Dark Vodka.` },
+  { galaxie: true, sansNom: true, texte: () => `Luke, je suis ton verre.` }
 ];
 const PAS_NOTIFS_TELE = 5000;
 // Quelqu'un qui traîne à jouer : une fois par tour, au bout de 1 min 20 (temps sans choix ni annonce à
@@ -597,7 +601,8 @@ function phraseNotifTele(etat){
   const aSecVraiment = aSec && aSec.sansBoire >= CARTES_A_SEC_TELE ? aSec : null;
   const possibles = PHRASES_TELE
     .map((phrase, i) => ({ phrase, i }))
-    .filter(({ phrase, i }) => i !== dernierePhraseTele && (!phrase.pigeon || pigeon) && (!phrase.aSec || aSecVraiment));
+    .filter(({ phrase, i }) => i !== dernierePhraseTele && (!phrase.pigeon || pigeon) && (!phrase.aSec || aSecVraiment) &&
+      (!phrase.galaxie || document.documentElement.dataset.theme === "galaxie"));
   const { phrase, i } = possibles[Math.floor(Math.random() * possibles.length)];
   dernierePhraseTele = i;
   let candidats = phrase.pigeon ? [pigeon] : phrase.aSec ? [aSecVraiment] : joueurs;
