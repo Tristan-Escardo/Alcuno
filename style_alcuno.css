@@ -6826,7 +6826,8 @@ html[data-theme="noir"] #ecranReglages .blocReglage .optionReglage{ background: 
 }
 
 /* Thème Prestige débloqué, pas encore vu : point rouge sur l'icône des Réglages, « NOUVEAU » sur la pastille */
-html.prestige-nouveau #choixMode #btnReglages::after{
+html.prestige-nouveau #choixMode #btnReglages::after,
+html.galaxie-nouveau #choixMode #btnReglages::after{
   content: "";
   position: absolute;
   top: 0;
@@ -6838,8 +6839,9 @@ html.prestige-nouveau #choixMode #btnReglages::after{
   box-shadow: 0 0 0 2px var(--fond-theme), 0 0 10px #ff3b5c;
   animation: pointNouveau 1.6s ease-in-out infinite;
 }
-#pastillePrestige{ position: relative; }
-html.prestige-nouveau #pastillePrestige::after{
+#pastillePrestige, #pastilleGalaxie{ position: relative; }
+html.prestige-nouveau #pastillePrestige::after,
+html.galaxie-nouveau #pastilleGalaxie::after{
   content: "NOUVEAU";
   position: absolute;
   top: -8px;
@@ -6856,7 +6858,7 @@ html.prestige-nouveau #pastillePrestige::after{
   pointer-events: none;
 }
 @keyframes pointNouveau{ 50%{ transform: scale(1.25); } }
-@media (prefers-reduced-motion: reduce){ html.prestige-nouveau #choixMode #btnReglages::after{ animation: none; } }
+@media (prefers-reduced-motion: reduce){ :is(html.prestige-nouveau, html.galaxie-nouveau) #choixMode #btnReglages::after{ animation: none; } }
 
 /* ===== Carte Couleur : ce qu'elle fait, dit au choix et rappelé dans le bloc Règles ===== */
 #overlayCouleur .explication-couleur{

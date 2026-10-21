@@ -490,6 +490,10 @@ function annoncerBoireAvecAnnulation(joueurIndex, nbGorgees, classeCarte = "", p
   const msg = prefixMsg ? prefixMsg : `${nom} boit ${texteGorgees(nbGorgees)}`;
 
   if (nbGorgees > 15) {
+    // (bloc Règles rempli aussi : avant, il restait vide pour ces grosses gorgées)
+    afficherRegleBloc(regleZero, msg);
+    regleZero.style.display = "block";
+    zeroEnCours = true;
     // Easter egg : message signé Célien, mise en forme premium
     const citationCelien = "Et interdit de vomir, c'est pas fini !";
     const signatureCelien = "Signé Célien, un des créateurs du jeu";
