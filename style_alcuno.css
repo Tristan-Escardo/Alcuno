@@ -7629,3 +7629,5 @@ html[data-theme="prestige"] :is(#overlayCarteDoree, #overlayRegleUnique.overlay-
   background: radial-gradient(ellipse 95% 34% at 50% 33%, rgba(255,226,120,.38), transparent 100%), radial-gradient(ellipse 120% 60% at 50% 100%, rgba(212,160,23,.35), transparent 100%), #120d02 !important; box-shadow: none; }
 html[data-theme="soleil"] :is(#overlayCarteDoree, #overlayRegleUnique.overlay-doree){
   background: radial-gradient(ellipse 95% 34% at 50% 33%, rgba(255,215,0,.32), transparent 100%), linear-gradient(180deg, #1f3566 0%, #5a3a78 45%, #c0587a 80%, #f2905f 100%) !important; box-shadow: none; }
+/* Star Wars : la carte dorée retournée (plateau, télé, dernières cartes, récap) en hologramme comme dans sa fenêtre */
+html[data-theme="galaxie"] .Carte.retournee.carte_doree{ filter: sepia(1) hue-rotate(170deg) saturate(2.2) brightness(1.15) drop-shadow(0 0 6px #49b4ff) !important; animation: hologramme 2.6s steps(1) infinite; }
