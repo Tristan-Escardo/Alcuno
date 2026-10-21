@@ -198,24 +198,6 @@ function passageNyanCat(){
 }
 setTimeout(passageNyanCat, 4000);
 
-// Thème Star Wars seulement : de temps en temps, une notification du haut avec une réplique de la saga
-// version soirée, dans le style sobre habituel des notifications. Rares (toutes les 5 à 10 minutes), et jamais par-dessus
-// une autre notification, le rappel « Bois de l'eau », « Mauvais joueur ? », le générique ou la télé.
-const REPLIQUES_GALAXIE = ["Obi-Wan Kenobière, tu es mon seul espoir", "Dark Vodka", "Luke, je suis ton verre"];
-let derniereRepliqueGalaxie = -1;
-function notifRepliqueGalaxie(){
-  setTimeout(notifRepliqueGalaxie, 300000 + Math.random() * 300000);
-  if (document.documentElement.dataset.theme !== "galaxie" || document.visibilityState !== "visible" ||
-      document.documentElement.classList.contains("mode-tele") ||
-      document.getElementById("generiqueGalaxie") || document.getElementById("fenetreGalaxie") ||
-      document.getElementById("notifHaut") || document.getElementById("rappelEau") || document.getElementById("annulerChoix")) return;
-  let i;
-  do { i = Math.floor(Math.random() * REPLIQUES_GALAXIE.length); } while (i === derniereRepliqueGalaxie);
-  derniereRepliqueGalaxie = i;
-  afficherNotificationHaut("", REPLIQUES_GALAXIE[i], true);
-}
-setTimeout(notifRepliqueGalaxie, 120000 + Math.random() * 120000);
-
 // Halo du sabre sous la barre de l'heure (thème Star Wars, voir le CSS) : dans index.html dès le premier
 // affichage ; créé ici seulement si une ancienne page gardée en cache ne l'a pas
 if (!document.getElementById("haloSabre")) {
