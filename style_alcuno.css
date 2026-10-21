@@ -7594,3 +7594,31 @@ html[data-theme="prestige"] #ecranTele .tele-ecran-recap{ background: radial-gra
 html[data-theme="noir"] #ecranTele .tele-ecran-recap{ background: #000 !important; }
 /* (télé en Soleil couchant : fond bleu nuit, les totaux restent clairs) */
 html[data-theme="soleil"] #ecranTele :is(.recap-sous, .recap-chiffres, .recap-chiffres b, .recap-restants){ color: #fff1df; }
+
+/* ===== Fenêtres du jeu accordées au thème (audit des 9 thèmes) ===== */
+/* Cerisier et Prestige : fenêtres noires jusqu'ici => halo de la couleur du thème sur un fond très sombre
+   de sa teinte (le doré des textes et boutons reste lisible, Prestige étant doré clair) */
+html[data-theme="cerisier"]{ --overlay-fond: radial-gradient(ellipse 115% 42% at 50% 45%, rgba(190,60,130,.45) 0%, transparent 100%), #16040e; --overlay-bord: #16040e; }
+html[data-theme="prestige"]{ --overlay-fond: radial-gradient(ellipse 115% 42% at 50% 45%, rgba(212,160,23,.38) 0%, transparent 100%), #120d02; --overlay-bord: #120d02; }
+html:is([data-theme="cerisier"], [data-theme="prestige"]) :is(#overlayCouleur, #overlayPlus4, #overlayPigeon,
+  #overlayFinUnRestants, #overlayDuel, #overlayRegleUnique, #overlayAnnulation, #overlayResultatAnnulation,
+  #overlayPredictionFin, .overlay-opaque){
+  background: var(--overlay-fond) !important;
+}
+html:is([data-theme="cerisier"], [data-theme="prestige"]).overlay-ouvert,
+html:is([data-theme="cerisier"], [data-theme="prestige"]).overlay-ouvert body,
+html:is([data-theme="cerisier"], [data-theme="prestige"]) #voileOverlays{ background: var(--overlay-bord); }
+html:is([data-theme="cerisier"], [data-theme="prestige"]) .plus4-actions{ background: transparent; }
+/* Soleil couchant : carte dorée sur le ciel du soir (bleu crépuscule comme sa barre), halo doré */
+html[data-theme="soleil"] :is(#overlayCarteDoree, #overlayRegleUnique.overlay-doree){
+  background: radial-gradient(ellipse 95% 34% at 50% 33%, rgba(255,215,0,.28), transparent 100%), linear-gradient(180deg, #1f3566 0%, #3a2a5a 55%, #6b2d55 100%) !important; }
+/* Star Wars : récap et pari en écrans de vaisseau (bord bleu lumineux), plus de blocs dorés */
+html[data-theme="galaxie"] :is(.recap-marche, .recap-liste, .recap-bloc, .prediction-header, .fin-choix-recap, .fin-choix-card){
+  background: linear-gradient(180deg, rgba(14,22,44,.92), rgba(6,10,22,.92)) !important;
+  border: 1.5px solid #8fd0ff !important;
+  box-shadow: 0 0 6px #4aa8ff, 0 0 14px rgba(40,140,255,.45), inset 0 0 10px rgba(80,170,255,.18) !important; }
+html[data-theme="galaxie"] .recap-marche{ background: linear-gradient(180deg, rgba(40,90,190,.45), rgba(6,10,22,.92)) !important; }
+html[data-theme="galaxie"] .recap-m1{ border-color: #FFE81F !important; box-shadow: 0 0 6px rgba(255,232,31,.7), 0 0 16px rgba(255,232,31,.35), inset 0 0 10px rgba(255,232,31,.15) !important; }
+html[data-theme="galaxie"] .recap-titre{ color: #000; -webkit-text-stroke: 1.5px #FFE81F; paint-order: stroke fill; text-shadow: 0 0 14px rgba(255,232,31,.35); }
+html[data-theme="galaxie"] .recap-doree{ background: linear-gradient(135deg, rgba(255,232,31,.14), rgba(6,10,22,.92)) !important; border-color: rgba(255,232,31,.7) !important; }
+html[data-theme="galaxie"] #ecranTele .tele-ecran-recap{ background: radial-gradient(ellipse 110% 60% at 50% 40%, rgba(40,90,190,.35), transparent 100%), #02030a !important; }
