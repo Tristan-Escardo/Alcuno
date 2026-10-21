@@ -1917,11 +1917,11 @@ if (estEnAppli && !aideDejaVue() && !nouveauQuiVientDInstaller()) {
   try { localStorage.setItem(CLE_AIDE_VUE, "1"); } catch (e) {}
 }
 
-// On attend que l'accueil soit libre : l'écran d'installation passe d'abord (sur Android il arrive
-// jusqu'à 5 s après l'ouverture sur Chrome Android, d'où les 6 s), une partie en cours ou une invitation par QR code
-// aussi (l'aide viendra au prochain passage sur l'accueil)
-if (!document.documentElement.classList.contains("mode-tele") && estEnAppli && !aideDejaVue()) setTimeout(() => { // (pas sur la télé)
-  const surveillance = setInterval(() => {
+// On attend que l'accueil soit libre : une partie en cours ou une invitation par QR code passent d'abord
+// (l'aide viendra au prochain passage sur l'accueil). Seulement dans l'appli installée : l'écran
+// d'installation ne s'ouvre jamais là, donc plus de délai d'attente au lancement.
+if (!document.documentElement.classList.contains("mode-tele") && estEnAppli && !aideDejaVue()) { // (pas sur la télé)
+  const verifierAideAccueil = () => {
     if (aideDejaVue()) { clearInterval(surveillance); return; }
     const accueilLibre = !partieLancee &&
       document.getElementById("choixMode").style.display !== "none" &&
@@ -1930,8 +1930,10 @@ if (!document.documentElement.classList.contains("mode-tele") && estEnAppli && !
     if (!accueilLibre) return;
     clearInterval(surveillance);
     afficherAideAccueil();
-  }, 700);
-}, 6000);
+  };
+  const surveillance = setInterval(verifierAideAccueil, 300);
+  setTimeout(verifierAideAccueil, 50); // (pas tout de suite : les écrans plus bas dans le fichier ne sont pas encore créés)
+}
 // #endregion
 
 // #region Écran des règles du jeu (bouton livre de l'accueil et du bandeau de la partie)
