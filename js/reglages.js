@@ -492,7 +492,9 @@ for (let i = 0; i < 26; i++) {
 }
 
 document.querySelectorAll(".pastilleTheme").forEach((pastille) => {
-  pastille.addEventListener("click", () => {
+  pastille.addEventListener("click", (e) => {
+    // Star Wars : le clic part avant le changement de thème, donc le sabre se joue ici (après) ; en quittant Star Wars, il se joue déjà
+    const versGalaxie = pastille.id === "pastilleGalaxie" && e.isTrusted;
     // Changement de thème : la musique d'ambiance se coupe (on la réactive soi-même dans les réglages)
     if (caseMusique.checked && pastille.dataset.theme !== document.documentElement.dataset.theme) {
       caseMusique.checked = false;
@@ -500,6 +502,7 @@ document.querySelectorAll(".pastilleTheme").forEach((pastille) => {
       majLigneMusique();
     }
     appliquerTheme(pastille.dataset.theme, barreIphoneARafraichir());
+    if (versGalaxie) jouerSon("bouton");
     try { localStorage.setItem(CLE_THEME, pastille.dataset.theme); } catch (e) {}
     try { noterAppareilStats(); } catch (e) {} // statistiques : thème choisi
     rafraichirBarreIphone();
@@ -1001,7 +1004,10 @@ document.addEventListener("visibilitychange", () => {
 //   tiens_gueule.mp3 : le cul sec de la carte dorée (« TIENS DANS TA GUEULE »)
 //   regles.mp3 : on ouvre les Règles du jeu (boutons « Règles du jeu » de l'accueil et de la partie)
 //   accessibilite_on.mp3 : on active « Accessibilité pour les gens bourrés » dans les réglages
-const SONS = ["cartes", "doree", "tiens_gueule", "bouton", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees", "regles", "accessibilite_on"];
+const SONS = ["cartes", "doree", "tiens_gueule", "bouton", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees", "regles", "accessibilite_on"]; // (les sons de sabre ne se chargent que dans le thème Star Wars, voir morceauSabre)
+// Sons de sabre : Sons/sabre/sabre_01.mp3 à sabre_54.mp3 (0,8 s chacun). Le clic des boutons en joue un au
+// hasard (jouerSon("bouton")). Un fichier supprimé du dossier est simplement ignoré (404 = pas de son).
+const SONS_SABRE = Array.from({ length: 54 }, (_, i) => `sabre/sabre_${String(i + 1).padStart(2, "0")}`);
 // Sons coupés au bout de N secondes (avec un petit fondu), même si le fichier est plus long
 const DUREE_MAX_SONS = { doree: 3, pigeon: 2, distribuer_gorgees: 0.8, bouton: 0.3 };
 const sonsCharges = {}; // nom -> son décodé (ou null si le fichier n'existe pas)
@@ -1046,7 +1052,7 @@ function chargerSons(){
 // (annuler des gorgées, distribuer au +4, choisir le pigeon ou la victime de la carte dorée), et sauf
 // Réglages, « Signaler un bug » et « Copier le diagnostic » (silencieux)
 const BOUTONS_AVEC_LEUR_SON = ".bouton-annulation, .plus4-joueur-btn, #overlayPigeon .bouton-pigeon, .bouton-doree, " +
-  "#btnReglages, #btnSignalerBug, #btnDiagnostic, #btnRegles, #btnReglesJeu, #bandeauMiseAJour .maj";
+  "#btnReglages, #btnSignalerBug, #btnDiagnostic, #btnRegles, #btnReglesJeu, #bandeauMiseAJour .maj, #pastilleGalaxie";
 document.addEventListener("click", (e) => {
   if (!e.isTrusted || document.documentElement.classList.contains("mode-tele")) return;
   if (Date.now() - sonBoutonJoueLe < 500) return; // déjà joué au doigt levé (activerMemePendantElan)
@@ -1055,8 +1061,19 @@ document.addEventListener("click", (e) => {
   jouerSon("bouton");
 }, { capture: true, passive: true });
 
+// Thème Star Wars seulement : un son de sabre au hasard, parmi ceux qui existent encore dans Sons/sabre/
+// (ou pas encore chargés). Dans les autres thèmes, le clic reste le son « bouton ».
+function morceauSabre(){
+  if (document.documentElement.dataset.theme !== "galaxie") return "bouton";
+  const ctx = contexteAudio();
+  if (ctx) SONS_SABRE.forEach((n) => chargerSon(ctx, n));
+  const dispo = SONS_SABRE.filter((n) => sonsCharges[n] !== null);
+  return dispo.length ? dispo[Math.floor(Math.random() * dispo.length)] : "bouton";
+}
+
 function jouerSon(nom){
-  sonPourTele(nom); // mode télé : la télé le joue aussi (même si le son de ce téléphone est coupé)
+  sonPourTele(nom);
+  if (nom === "bouton") nom = morceauSabre(); // le clic des boutons = un son de sabre au hasard // mode télé : la télé le joue aussi (même si le son de ce téléphone est coupé)
   if (!caseSons.checked || volumeSons <= 0) return;
   if (rattrapageEnCours) return; // reconnexion : pas de sons pour les actions déjà passées
   const ctx = contexteAudio();

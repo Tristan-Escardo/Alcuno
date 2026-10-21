@@ -20,6 +20,8 @@ Un fichier MP3 par moment du jeu, avec exactement ces noms :
 
   tiens_gueule.mp3  le cul sec de la carte dorée (« TIENS DANS TA GUEULE »)
   bouton.mp3   petit clic quand on touche un bouton (sauf ceux qui ont déjà leur son ; coupé à 0,3 seconde par le jeu)
+  sabre/sabre_01.mp3 à sabre_54.mp3  sons de sabre de 0,8 s : un au hasard à la place du clic des boutons, dans le thème Star Wars seulement. Supprime ceux que tu n'aimes pas (fichier absent = ignoré).
+  (lightsaber_sound.mp3 = le fichier d'origine de 45 s, plus utilisé par le jeu)
 
 MUSIQUE D'AMBIANCE (en boucle, réglage « Musique d'ambiance ») :
   musique_ambiance.mp3  thèmes bordeaux, sombre, casino, nuit (et les autres si leur musique manque)
