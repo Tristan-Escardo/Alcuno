@@ -198,6 +198,23 @@ function passageNyanCat(){
 }
 setTimeout(passageNyanCat, 4000);
 
+// Thème Star Wars seulement : de temps en temps, une notification du haut avec une réplique de la saga
+// version soirée. Pas pendant le générique, ni sur la télé, ni si une autre notification est déjà là.
+const REPLIQUES_GALAXIE = ["Obi-Wan Kenobière, tu es mon seul espoir", "Dark Vodka", "Luke, je suis ton verre"];
+let derniereRepliqueGalaxie = -1;
+function notifRepliqueGalaxie(){
+  setTimeout(notifRepliqueGalaxie, 70000 + Math.random() * 60000);
+  if (document.documentElement.dataset.theme !== "galaxie" || document.visibilityState !== "visible" ||
+      document.documentElement.classList.contains("mode-tele") ||
+      document.getElementById("generiqueGalaxie") || document.getElementById("fenetreGalaxie") ||
+      document.getElementById("notifHaut")) return;
+  let i;
+  do { i = Math.floor(Math.random() * REPLIQUES_GALAXIE.length); } while (i === derniereRepliqueGalaxie);
+  derniereRepliqueGalaxie = i;
+  afficherNotificationHaut("✦", REPLIQUES_GALAXIE[i]);
+}
+setTimeout(notifRepliqueGalaxie, 45000 + Math.random() * 30000);
+
 // Halo du sabre sous la barre de l'heure (thème Star Wars, voir le CSS) : dans index.html dès le premier
 // affichage ; créé ici seulement si une ancienne page gardée en cache ne l'a pas
 if (!document.getElementById("haloSabre")) {
@@ -299,7 +316,7 @@ function afficherFenetreGalaxie(){
       <span class="fenetreGalaxie-rond" aria-hidden="true"></span>
       <div class="fenetreGalaxie-titre">Thème Star Wars<br>débloqué !</div>
       <div class="fenetreGalaxie-texte">Il est maintenant dans<br>Réglages › Thèmes</div>
-      <button type="button" class="fenetreGalaxie-ok">J'ai un bon pressentiment</button>
+      <button type="button" class="fenetreGalaxie-ok">Que la gorgée soit avec toi</button>
     </div>`;
   voile.querySelector(".fenetreGalaxie-ok").addEventListener("click", () => {
     voile.classList.add("fenetreGalaxie-sortie");
