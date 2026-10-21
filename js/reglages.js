@@ -1024,7 +1024,7 @@ document.addEventListener("visibilitychange", () => {
 const SONS = ["cartes", "doree", "tiens_gueule", "bouton", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees", "regles", "accessibilite_on"]; // (les sons de sabre ne se chargent que dans le thème Star Wars, voir morceauSabre)
 // Sons de sabre : Sons/sabre/sabre_01.mp3 à sabre_54.mp3 (0,8 s chacun). Le clic des boutons en joue un au
 // hasard (jouerSon("bouton")). Si tu en supprimes, retire aussi leur nom de cette liste (et de SONS_A_PRECHARGER dans sw.js) ; un nom sans fichier est simplement ignoré (404).
-const SONS_SABRE = ["sabre/sabre_01", "sabre/sabre_02", "sabre/sabre_05", "sabre/sabre_07", "sabre/sabre_09", "sabre/sabre_11", "sabre/sabre_12", "sabre/sabre_14", "sabre/sabre_15", "sabre/sabre_18", "sabre/sabre_22", "sabre/sabre_24", "sabre/sabre_26", "sabre/sabre_31", "sabre/sabre_33", "sabre/sabre_35", "sabre/sabre_37", "sabre/sabre_38", "sabre/sabre_40", "sabre/sabre_41", "sabre/sabre_48", "sabre/sabre_54"];
+const SONS_SABRE = ["sabre/sabre_01", "sabre/sabre_02", "sabre/sabre_05", "sabre/sabre_07", "sabre/sabre_09", "sabre/sabre_11", "sabre/sabre_14", "sabre/sabre_15", "sabre/sabre_18", "sabre/sabre_22", "sabre/sabre_24", "sabre/sabre_26", "sabre/sabre_31", "sabre/sabre_33", "sabre/sabre_35", "sabre/sabre_37", "sabre/sabre_38", "sabre/sabre_40", "sabre/sabre_41", "sabre/sabre_48", "sabre/sabre_54"];
 // Sons coupés au bout de N secondes (avec un petit fondu), même si le fichier est plus long
 const DUREE_MAX_SONS = { doree: 3, pigeon: 2, distribuer_gorgees: 0.8, bouton: 0.3 };
 const sonsCharges = {}; // nom -> son décodé (ou null si le fichier n'existe pas)
