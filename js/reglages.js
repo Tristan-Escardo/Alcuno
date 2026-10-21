@@ -172,19 +172,18 @@ function passageNyanCat(){
   zone.appendChild(chat);
   accueil.appendChild(zone);
   // Trajet au hasard : entre par un bord (gauche, droite ou bas) et ressort par le bord d'en face,
-  // à une hauteur / un endroit au hasard : en diagonale, ou presque droit quand il monte du bas. Le
+  // à une hauteur / un endroit au hasard : en diagonale plus ou moins penchée. Le
   // point suivi est le nez du chat (bord droit de l'image) ; l'image est tournée dans le sens du trajet
   // (retournée quand il va vers la gauche, pour ne pas voler sur le dos). On continue jusqu'à ce que la
   // queue de l'arc-en-ciel soit sortie de l'écran, à 180 px par seconde.
   const hasard = (a, b) => a + Math.random() * (b - a);
-  // Il ne revient jamais par le bord où il est parti la fois d'avant, et pas de passage venant du haut.
-  const bords = ["gauche", "droite", "bas"].filter((b) => b !== dernierBordNyan);
-  const bord = bords[Math.floor(Math.random() * bords.length)];
-  dernierBordNyan = { gauche: "droite", droite: "gauche", bas: "haut" }[bord]; // bord de sortie
+  // Seulement de gauche à droite ou de droite à gauche (plus de passage par le haut ni par le bas), au
+  // hasard ; (avec deux bords, « ne jamais revenir par le bord où il est parti » le bloquait à gauche)
+  const bord = Math.random() < 0.5 ? "gauche" : "droite";
+  dernierBordNyan = bord === "gauche" ? "droite" : "gauche"; // bord de sortie
   let x0, y0, x1, y1;
   if (bord === "gauche") { x0 = -10; y0 = hasard(0.1, 0.9) * H; x1 = W + 10; y1 = hasard(0.1, 0.9) * H; }
-  else if (bord === "droite") { x0 = W + 10; y0 = hasard(0.1, 0.9) * H; x1 = -10; y1 = hasard(0.1, 0.9) * H; }
-  else { x0 = hasard(0.1, 0.9) * W; y0 = H + 10; x1 = hasard(0.1, 0.9) * W; y1 = -10; }
+  else { x0 = W + 10; y0 = hasard(0.1, 0.9) * H; x1 = -10; y1 = hasard(0.1, 0.9) * H; }
   const longueur = Math.hypot(x1 - x0, y1 - y0);
   const dx = (x1 - x0) / longueur, dy = (y1 - y0) / longueur;
   const angle = Math.atan2(dy, dx);
