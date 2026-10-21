@@ -7491,7 +7491,7 @@ html[data-theme="galaxie"] #ecranTele :is(.tele-bloc-titre, .tele-dernieres-titr
   font-family: Arial, sans-serif; animation: fenetrePrestigeArrive 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
 .fenetreGalaxie-secret{ font: 900 13px Arial, sans-serif; letter-spacing: 0.3em; text-transform: uppercase; color: #4bd5ee; margin-bottom: 16px; }
 .fenetreGalaxie-rond{ display: block; width: 112px; height: 112px; margin: 0 auto 18px; border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #4a5a9a 0, #1a2250 40%, #02030a 75%); box-shadow: 0 0 0 4px #FFE81F, 0 0 34px rgba(255, 232, 31, 0.6);
+  background: url("icones/casque_star_wars.png") center 55% / 74% no-repeat, radial-gradient(circle at 70% 25%, #1b2f6e, #02030a 75%); box-shadow: 0 0 0 4px #FFE81F, 0 0 34px rgba(255, 232, 31, 0.6);
   animation: fenetreGalaxieBrille 2.2s ease-in-out infinite; }
 .fenetreGalaxie-titre{ font: 900 28px/1.15 "Arial Black", Arial, sans-serif; color: #FFE81F; letter-spacing: 0.03em; text-shadow: 0 0 18px rgba(255, 232, 31, 0.45); }
 .fenetreGalaxie-texte{ font: 700 15px/1.4 Arial, sans-serif; color: #c9d4e8; margin: 12px 0 22px; }

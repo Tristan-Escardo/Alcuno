@@ -299,7 +299,7 @@ function afficherFenetreGalaxie(){
       <span class="fenetreGalaxie-rond" aria-hidden="true"></span>
       <div class="fenetreGalaxie-titre">Thème Star Wars<br>débloqué !</div>
       <div class="fenetreGalaxie-texte">Il est maintenant dans<br>Réglages › Thèmes</div>
-      <button type="button" class="fenetreGalaxie-ok">Que la gorgée soit avec toi</button>
+      <button type="button" class="fenetreGalaxie-ok">J'ai un bon pressentiment</button>
     </div>`;
   voile.querySelector(".fenetreGalaxie-ok").addEventListener("click", () => {
     voile.classList.add("fenetreGalaxie-sortie");
