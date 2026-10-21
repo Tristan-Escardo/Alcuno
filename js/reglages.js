@@ -154,6 +154,7 @@ function debloquerGalaxie(){
 // l'arc-en-ciel s'efface en fondu (masque). Le tout est penché dans le sens du trajet.
 const NYAN_U = 0.4;                      // pixels à l'écran par pixel de l'image (chat de 80 px)
 const NYAN_L = 985, NYAN_H = 140;        // une image de la feuille
+let dernierBordNyan = null; // bord d'entrée du dernier passage
 function passageNyanCat(){
   setTimeout(passageNyanCat, 25000 + Math.random() * 20000);
   const accueil = document.getElementById("choixMode");
@@ -170,17 +171,18 @@ function passageNyanCat(){
   chat.style.cssText = `width:${largeur}px;height:${hauteur}px;background-size:${largeur}px ${hauteur * 12}px;--fin:${-hauteur * 12}px`;
   zone.appendChild(chat);
   accueil.appendChild(zone);
-  // Trajet au hasard : entre par un bord (gauche, droite, haut ou bas) et ressort par le bord d'en face,
-  // à une hauteur / un endroit au hasard : en diagonale, ou presque droit quand il tombe du haut. Le
+  // Trajet au hasard : entre par un bord (gauche, droite ou bas) et ressort par le bord d'en face,
+  // à une hauteur / un endroit au hasard : en diagonale, ou presque droit quand il monte du bas. Le
   // point suivi est le nez du chat (bord droit de l'image) ; l'image est tournée dans le sens du trajet
   // (retournée quand il va vers la gauche, pour ne pas voler sur le dos). On continue jusqu'à ce que la
   // queue de l'arc-en-ciel soit sortie de l'écran, à 180 px par seconde.
   const hasard = (a, b) => a + Math.random() * (b - a);
-  const bord = ["gauche", "droite", "haut", "bas"][Math.floor(Math.random() * 4)];
+  // Jamais deux fois de suite le même bord d'entrée, et pas de passage venant du haut.
+  const bords = ["gauche", "droite", "bas"].filter((b) => b !== dernierBordNyan);
+  const bord = dernierBordNyan = bords[Math.floor(Math.random() * bords.length)];
   let x0, y0, x1, y1;
   if (bord === "gauche") { x0 = -10; y0 = hasard(0.1, 0.9) * H; x1 = W + 10; y1 = hasard(0.1, 0.9) * H; }
   else if (bord === "droite") { x0 = W + 10; y0 = hasard(0.1, 0.9) * H; x1 = -10; y1 = hasard(0.1, 0.9) * H; }
-  else if (bord === "haut") { x0 = hasard(0.1, 0.9) * W; y0 = -10; x1 = hasard(0.1, 0.9) * W; y1 = H + 10; }
   else { x0 = hasard(0.1, 0.9) * W; y0 = H + 10; x1 = hasard(0.1, 0.9) * W; y1 = -10; }
   const longueur = Math.hypot(x1 - x0, y1 - y0);
   const dx = (x1 - x0) / longueur, dy = (y1 - y0) / longueur;
