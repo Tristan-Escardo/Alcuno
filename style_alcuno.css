@@ -7573,3 +7573,10 @@ html[data-theme="givre"] :is(.recap-marche, .recap-liste, .recap-bloc){ backgrou
 html[data-theme="givre"] .recap-doree{ background: linear-gradient(135deg, rgba(255,200,0,.18), rgba(255,255,255,.6)); border-color: #c9a400; }
 html[data-theme="givre"] .recap-doree-q{ color: var(--givre-texte); }
 html[data-theme="givre"] :is(.recap-doree-t, .recap-doree-q b){ color: #9a7400; }
+/* Soleil couchant : fond pêche clair => blocs en bleu crépuscule (comme les Réglages), titres foncés */
+html[data-theme="soleil"] :is(.recap-marche, .recap-liste, .recap-bloc){ background: var(--soleil-panneau); border-color: var(--soleil-bord); }
+html[data-theme="soleil"] .recap-doree{ background: linear-gradient(135deg, rgba(255,215,0,.22), rgba(255,215,0,.06)), var(--soleil-panneau); }
+html[data-theme="soleil"] .recap-titre{ color: #fff3d6; text-shadow: 0 3px 0 #b8456a, 0 0 18px rgba(184,69,106,.5); }
+html[data-theme="soleil"] :is(.recap-sous, .recap-chiffres){ color: #3a1f4a; }
+html[data-theme="soleil"] .recap-chiffres b, html[data-theme="soleil"] .recap-restants{ color: #3a1f4a; }
+html[data-theme="soleil"] .recap-p{ color: rgba(255,255,255,.75); }
