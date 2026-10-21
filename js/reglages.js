@@ -1752,6 +1752,7 @@ window.addEventListener("beforeinstallprompt", (e) => {
   demandeInstallation = e;
   blocInstaller.hidden = false;
   if (ecranInstallation.style.display !== "none") majEcranInstallation(); // les étapes deviennent un bouton
+  else if (ouvertureAutoEnAttente) ouvrirEcranInstallationAuto(); // Chrome a répondu : l'écran s'ouvre avec le bouton, sans étapes avant
 });
 
 function lancerInstallation(){
@@ -1780,18 +1781,31 @@ window.addEventListener("appinstalled", () => {
   fermerPage(ecranInstallation);
 });
 
+// Écran d'installation à l'ouverture. Android avec Chrome : Chrome dit parfois plusieurs secondes après
+// l'ouverture s'il sait installer. On attend sa réponse (écran direct avec le bouton « Installer ») au lieu
+// d'afficher d'abord les étapes puis de les remplacer par le bouton ; sans réponse au bout de 5 s, les étapes.
+// Les autres navigateurs Android ne répondront jamais : étapes après 1,5 s.
+const estChromeAndroid = estAndroid && /chrome\//i.test(navigator.userAgent) &&
+  !/edga|opr\/|samsungbrowser|firefox|fxios|duckduckgo|ucbrowser|miuibrowser|vivaldi/i.test(navigator.userAgent);
+let ouvertureAutoEnAttente = false;
+function ouvrirEcranInstallationAuto(){
+  if (!ouvertureAutoEnAttente) return;
+  ouvertureAutoEnAttente = false;
+  // (pas si on a déjà quitté l'accueil entre-temps : il surgirait par-dessus ce qu'on est en train de faire)
+  const toujoursSurAccueil = document.getElementById("choixMode").style.display !== "none" &&
+    ecranReglages.style.display === "none" && ecranRegles.style.display === "none";
+  if (!installationRemiseAPlusTard() && toujoursSurAccueil) ouvrirEcranInstallation();
+}
 if (estTelephone && !estEnAppli) {
   blocInstaller.hidden = false;
   // Arrivé par le QR code d'une partie : on va droit à la partie (le bouton « Installer l'appli » reste en bas)
   if (!installationRemiseAPlusTard() && !codeInvitationLien) {
-    // Android : on laisse un instant à Chrome pour dire s'il sait installer (bouton) ; sinon les étapes
-    // (pas si on a déjà quitté l'accueil entre-temps : il surgirait par-dessus ce qu'on est en train de faire)
-    const toujoursSurAccueil = () => document.getElementById("choixMode").style.display !== "none" &&
-      ecranReglages.style.display === "none" && ecranRegles.style.display === "none";
     if (estIOS) ouvrirEcranInstallation();
-    else setTimeout(() => {
-      if (!installationRemiseAPlusTard() && toujoursSurAccueil()) ouvrirEcranInstallation();
-    }, demandeInstallation ? 0 : 1500);
+    else {
+      ouvertureAutoEnAttente = true;
+      if (demandeInstallation) ouvrirEcranInstallationAuto();
+      else setTimeout(ouvrirEcranInstallationAuto, estChromeAndroid ? 5000 : 1500);
+    }
   }
 }
 
@@ -1904,7 +1918,7 @@ if (estEnAppli && !aideDejaVue() && !nouveauQuiVientDInstaller()) {
 }
 
 // On attend que l'accueil soit libre : l'écran d'installation passe d'abord (sur Android il arrive
-// jusqu'à 1,5 s après l'ouverture, d'où les 2 s), une partie en cours ou une invitation par QR code
+// jusqu'à 5 s après l'ouverture sur Chrome Android, d'où les 6 s), une partie en cours ou une invitation par QR code
 // aussi (l'aide viendra au prochain passage sur l'accueil)
 if (!document.documentElement.classList.contains("mode-tele") && estEnAppli && !aideDejaVue()) setTimeout(() => { // (pas sur la télé)
   const surveillance = setInterval(() => {
@@ -1917,7 +1931,7 @@ if (!document.documentElement.classList.contains("mode-tele") && estEnAppli && !
     clearInterval(surveillance);
     afficherAideAccueil();
   }, 700);
-}, 2000);
+}, 6000);
 // #endregion
 
 // #region Écran des règles du jeu (bouton livre de l'accueil et du bandeau de la partie)
