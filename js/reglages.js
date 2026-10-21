@@ -449,14 +449,22 @@ function rafraichirBarreIphone(){
   if (!barreIphoneARafraichir()) return;
   // tout petit délai (avant : 0,4 s, la barre gardait l'ancienne couleur trop longtemps) : le nouveau
   // thème s'affiche, et deux taps très rapprochés ne font qu'un rechargement
+  // Le rechargement coupe le son : on laisse d'abord le clic se jouer (0,25 s après son départ). Juste
+  // après un rechargement, le son n'est pas encore chargé : on l'attend (0,9 s au plus après le tap).
+  // Sons coupés : comme avant, 0,1 s.
   clearTimeout(rechargementTheme);
-  rechargementTheme = setTimeout(() => {
+  const tapA = Date.now();
+  const recharger = () => {
+    const attendreLeSon = caseSons.checked && volumeSons > 0 && Date.now() - tapA < 900 &&
+      !(dernierClicJoueA >= tapA - 50 && Date.now() - dernierClicJoueA >= 250);
+    if (attendreLeSon) { rechargementTheme = setTimeout(recharger, 50); return; }
     const reglagesOuverts = ecranReglages.style.display !== "none" && !ecranReglages.classList.contains("page-sortie");
     try {
       if (reglagesOuverts) sessionStorage.setItem(CLE_ROUVRIR_REGLAGES, String(ecranReglages.scrollTop));
     } catch (e) {}
     rechargerPage(); // (js/retour-demarrage.js)
-  }, 100);
+  };
+  rechargementTheme = setTimeout(recharger, 100);
 }
 
 // Après ce rechargement : Réglages rouverts tels quels (sans animation), au même endroit
@@ -1106,6 +1114,7 @@ function jouerSon(nom, clicNormal = false){
   lireSon(nom, son);
 }
 
+let dernierClicJoueA = 0; // moment où le dernier clic (bouton ou sabre) a vraiment commencé (voir rafraichirBarreIphone)
 function lireSon(nom, son){
   const ctx = contexteAudio();
   if (!ctx || !caseSons.checked || rattrapageEnCours) return;
@@ -1118,6 +1127,7 @@ function lireSon(nom, son){
   lecture.connect(sortie);
   const debut = ctx.currentTime;
   lecture.start(debut);
+  if (nom === "bouton" || nom.startsWith("sabre/")) dernierClicJoueA = Date.now();
 
   const dureeMax = DUREE_MAX_SONS[nom];
   if (SONS_QUI_BAISSENT_LA_MUSIQUE.includes(nom)) attenuerMusique(Math.min(son.duration, dureeMax || son.duration));
