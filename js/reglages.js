@@ -1220,7 +1220,8 @@ function infosEcranDiagnostic(){
     ` | zone visible ${zoneVisible ? Math.round(zoneVisible.height) + " décalée de " + Math.round(zoneVisible.offsetTop) : "-"}` +
     ` | accueil ${Math.round(accueil.top)}→${Math.round(accueil.bottom)} | pixels ×${window.devicePixelRatio}` +
     ` | barre demandée ${(document.querySelector('meta[name="theme-color"]') || {}).content || "-"}` +
-    ` | tout en haut ${hautDePage()}`;
+    ` | tout en haut ${hautDePage()}` +
+    ` | téléphone en mode ${window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "sombre" : "clair"}`;
 }
 
 // Ce qu'il y a tout en haut de la page, sous l'heure (l'iPhone peint sa barre de la couleur de fond de ce
