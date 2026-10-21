@@ -7580,3 +7580,17 @@ html[data-theme="soleil"] .recap-titre{ color: #fff3d6; text-shadow: 0 3px 0 #b8
 html[data-theme="soleil"] :is(.recap-sous, .recap-chiffres){ color: #3a1f4a; }
 html[data-theme="soleil"] .recap-chiffres b, html[data-theme="soleil"] .recap-restants{ color: #3a1f4a; }
 html[data-theme="soleil"] .recap-p{ color: rgba(255,255,255,.75); }
+/* Cerisier et Prestige : leurs fenêtres sont noires ; le récap prend la couleur du thème (halo qui
+   s'arrête avant le haut : la barre de l'heure reste de la couleur des autres fenêtres) */
+html[data-theme="cerisier"] #overlayFinUnRestants.overlay-recap{ background: radial-gradient(ellipse 110% 45% at 50% 45%, rgba(255,110,170,.34), transparent 100%), #0d0208 !important; }
+html[data-theme="cerisier"] :is(.recap-marche, .recap-liste, .recap-bloc){ background: rgba(90,23,64,.45); border-color: rgba(255,150,200,.35); }
+html[data-theme="cerisier"] .recap-marche{ background: linear-gradient(180deg, rgba(255,140,190,.25), rgba(90,23,64,.25)); }
+html[data-theme="prestige"] #overlayFinUnRestants.overlay-recap{ background: radial-gradient(ellipse 110% 45% at 50% 45%, rgba(212,160,23,.24), transparent 100%), #000 !important; }
+html[data-theme="prestige"] :is(.recap-marche, .recap-liste, .recap-bloc){ background: rgba(147,120,16,.16); border-color: rgba(255,226,120,.45); }
+html[data-theme="prestige"] .recap-marche{ background: linear-gradient(180deg, rgba(255,215,0,.32), rgba(147,120,16,.12)); }
+/* Télé : même teinte de fond que le thème */
+html[data-theme="cerisier"] #ecranTele .tele-ecran-recap{ background: radial-gradient(ellipse 110% 60% at 50% 40%, rgba(255,110,170,.22), transparent 100%), #12030c !important; }
+html[data-theme="prestige"] #ecranTele .tele-ecran-recap{ background: radial-gradient(ellipse 110% 60% at 50% 40%, rgba(212,160,23,.26), transparent 100%), #0d0a02 !important; }
+html[data-theme="noir"] #ecranTele .tele-ecran-recap{ background: #000 !important; }
+/* (télé en Soleil couchant : fond bleu nuit, les totaux restent clairs) */
+html[data-theme="soleil"] #ecranTele :is(.recap-sous, .recap-chiffres, .recap-chiffres b, .recap-restants){ color: #fff1df; }
