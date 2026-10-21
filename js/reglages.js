@@ -154,7 +154,7 @@ function debloquerGalaxie(){
 // l'arc-en-ciel s'efface en fondu (masque). Le tout est penché dans le sens du trajet.
 const NYAN_U = 0.4;                      // pixels à l'écran par pixel de l'image (chat de 80 px)
 const NYAN_L = 985, NYAN_H = 140;        // une image de la feuille
-let dernierBordNyan = null; // bord d'entrée du dernier passage
+let dernierBordNyan = null; // bord par lequel le dernier passage est reparti
 function passageNyanCat(){
   setTimeout(passageNyanCat, 25000 + Math.random() * 20000);
   const accueil = document.getElementById("choixMode");
@@ -177,9 +177,10 @@ function passageNyanCat(){
   // (retournée quand il va vers la gauche, pour ne pas voler sur le dos). On continue jusqu'à ce que la
   // queue de l'arc-en-ciel soit sortie de l'écran, à 180 px par seconde.
   const hasard = (a, b) => a + Math.random() * (b - a);
-  // Jamais deux fois de suite le même bord d'entrée, et pas de passage venant du haut.
+  // Il ne revient jamais par le bord où il est parti la fois d'avant, et pas de passage venant du haut.
   const bords = ["gauche", "droite", "bas"].filter((b) => b !== dernierBordNyan);
-  const bord = dernierBordNyan = bords[Math.floor(Math.random() * bords.length)];
+  const bord = bords[Math.floor(Math.random() * bords.length)];
+  dernierBordNyan = { gauche: "droite", droite: "gauche", bas: "haut" }[bord]; // bord de sortie
   let x0, y0, x1, y1;
   if (bord === "gauche") { x0 = -10; y0 = hasard(0.1, 0.9) * H; x1 = W + 10; y1 = hasard(0.1, 0.9) * H; }
   else if (bord === "droite") { x0 = W + 10; y0 = hasard(0.1, 0.9) * H; x1 = -10; y1 = hasard(0.1, 0.9) * H; }
