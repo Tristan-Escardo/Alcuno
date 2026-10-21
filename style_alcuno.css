@@ -6764,7 +6764,8 @@ html[data-theme="noir"] .messages::before{ padding: 1px; background: rgba(255, 2
 html[data-theme="noir"] #ecranReglages .optionReglage{ background: #000 !important; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12) !important; }
 html[data-theme="noir"] #ecranReglages .blocReglage .optionReglage{ background: transparent !important; box-shadow: none !important; }
 
-/* ===== Thème Sombre « Braise » : boutons presque noirs, simple liseré doré qui couve ; titre moins éclatant
+/* ===== Thème Sombre « Braise » : boutons noirs au texte et au liseré dorés bien nets (sombre, pas terne : un doré
+   éteint donnait l'impression que la luminosité de l'écran était basse)
    Les boutons de partie des overlays (pigeon, duel, +4…) ne changent pas : ils restent bien lisibles en jeu. ===== */
 html[data-theme="noir"] :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu,
   #btnCreerPartie, #btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR,
@@ -6772,10 +6773,10 @@ html[data-theme="noir"] :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btn
   #btnConfirmerAccueilOui, #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon,
   #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie,
   #termineSuppression, #btnInstallationInstaller){
-  background-image: linear-gradient(180deg, #110e07, #060502);
-  color: #a07a0c;
-  border: 1px solid rgba(246, 184, 0, 0.22);
-  box-shadow: inset 0 0 16px rgba(246, 184, 0, 0.05), 0 0 14px rgba(246, 184, 0, 0.045);
+  background-image: linear-gradient(180deg, #0d0b06, #030302);
+  color: #ffd426;
+  border: 1px solid rgba(255, 210, 38, 0.6);
+  box-shadow: none;
   text-shadow: none;
 }
 
@@ -6783,8 +6784,7 @@ html[data-theme="noir"] :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btn
    dans index.html, ses vagues et ses grains noirs sont animés là-bas), s'étire, s'éteint par à-coups ;
    une copie rouge sang se décale derrière (::before) et une barre noire le coupe en glissant (::after). ===== */
 html[data-theme="noir"] #choixMode #titreAccueil{
-  color: #c99a0e;
-  text-shadow: 0 0 22px rgba(255, 180, 0, 0.18), 0 2px 0 rgba(60, 40, 0, 0.8) !important;
+  color: #FFD700;
   filter: url(#corrompu);
   animation: titreNoirCoupe 8s infinite steps(1) !important;
 }
@@ -6842,7 +6842,6 @@ html[data-theme="noir"] #choixMode #titreAccueil::after{
   html[data-theme="noir"] #choixMode #titreAccueil{ animation: none !important; filter: none; }
   html[data-theme="noir"] #choixMode #titreAccueil::before, html[data-theme="noir"] #choixMode #titreAccueil::after{ animation: none; }
 }
-html[data-theme="noir"] #choixMode .titreAccueilBarre{ opacity: 0.35; }
 
 /* ===== Thème Prestige débloqué : fenêtre dorée au milieu de l'écran (js/reglages.js) ===== */
 #fenetrePrestige{
