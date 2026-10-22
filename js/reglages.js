@@ -1905,7 +1905,7 @@ function afficherAideAccueil(){
       <path class="aideAccueil-ombre"/><path fill="url(#orAideAccueil)"/>
     </svg>
     <div class="aideAccueil-repere aideAccueil-gauche"><b>Règles</b>Toutes les cartes<br>expliquées.</div>
-    <div class="aideAccueil-repere aideAccueil-droite"><b>Réglages</b>Thèmes, sons,<br>Mode PJ…</div>
+    <div class="aideAccueil-repere aideAccueil-droite"><b>Réglages</b>Thèmes, sons,<br>musiques…</div>
     <div class="aideAccueil-bas"><b>QUE LA FÊTE COMMENCE !</b>Touche l'écran pour jouer</div>`;
   placerAideAccueil(aide);
   aide._replacer = () => placerAideAccueil(aide);
