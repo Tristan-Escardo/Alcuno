@@ -42,7 +42,9 @@ let erreurTeleSignalee = false;
 let arreterSuiviTele = null;  // fin du suivi de la connexion (voir suivreConnexionTele)
 
 function majBoutonCaster(){
-  btnCaster.querySelector(".casterTexte").textContent = codeTele ? "Caster sur la télé ✓" : "Caster sur la télé";
+  // (deux versions du texte : longue, et courte quand « Caster » est à côté de « Supprimer », voir le CSS)
+  btnCaster.querySelector(".casterTexte .libelleLong").textContent = codeTele ? "Caster sur la télé ✓" : "Caster sur la télé";
+  btnCaster.querySelector(".casterTexte .libelleCourt").textContent = codeTele ? "Caster ✓" : "Caster";
   btnCaster.classList.toggle("caster-actif", !!codeTele);
 }
 
