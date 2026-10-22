@@ -1142,7 +1142,7 @@ html[data-theme="galaxie"] .fin-choix-numeros b{ background: #8fd0ff; color: #02
     }
 }
 
-@media (max-width: 520px){
+@media (max-width: 520px), (orientation: landscape) and (max-height: 520px){ /* (téléphone, debout ou en paysage : même disposition) */
     #menu{
         flex-direction: column;
         align-items: stretch;
