@@ -1153,6 +1153,17 @@ html[data-theme="galaxie"] .fin-choix-numeros b{ background: #8fd0ff; color: #02
         width: 100%;
         max-width: 100%;
     }
+
+    /* Téléphone : le champ du nom et « + Ajouter » sur la même ligne, pour que « Jouer » (qui apparaît dès 2 joueurs)
+       soit juste dessous, bien visible sans descendre */
+    #menu{
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: stretch;
+    }
+    #menu > *{ grid-column: 1 / -1; }
+    #menu #nomJoueur{ grid-column: 1; }
+    #menu #ajouterJoueur{ grid-column: 2; width: auto; padding-left: 16px; padding-right: 16px; }
 }
 @media (max-width: 520px){
   /* moins d’espace, boutons en pleine largeur */
