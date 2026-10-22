@@ -75,6 +75,21 @@ function afficherOverlayFinUnRestants(){
 
 function afficherMenuPigeon(){
   if(document.getElementById("overlayPigeon")) return;
+
+  // C'est le pigeon actuel (celui qui vient de tirer le 3) qui choisit
+  const choisisseur = joueurs[indexPigeon];
+
+  // (pas ceux en pause, sauf s'il ne restait personne d'autre)
+  const pigeonsPossibles = joueurs.filter((j, i) => i !== indexPigeon && !estEnPause(j)).length;
+  const candidats = joueurs.map((j, i) => i).filter(i => i !== indexPigeon && (!estEnPause(joueurs[i]) || pigeonsPossibles === 0));
+
+  // Un seul joueur possible (2 joueurs, ou tous les autres en pause) : pas de choix à faire, le pigeon passe tout de suite
+  // à cet autre joueur, avec seulement l'annonce « le nouveau PIGEON est… »
+  if(candidats.length === 1){
+    passerPigeonA(candidats[0], null, choisisseur, false);
+    return;
+  }
+
   choixPigeonEnCours=true;
   lockScroll();
 
@@ -87,58 +102,55 @@ function afficherMenuPigeon(){
   titre.innerText="Choisis le nouveau PIGEON";
   overlay.appendChild(titre);
 
-  // C'est le pigeon actuel (celui qui vient de tirer le 3) qui choisit
-  const choisisseur = joueurs[indexPigeon];
-
-  // (pas ceux en pause, sauf s'il ne restait personne d'autre)
-  const pigeonsPossibles = joueurs.filter((j, i) => i !== indexPigeon && !estEnPause(j)).length;
-  // Un seul joueur possible : pas de « Mauvais joueur ? » (rien d'autre à choisir)
-  const nbChoixPigeon = joueurs.filter((j, i) => i !== indexPigeon && (!estEnPause(j) || pigeonsPossibles === 0)).length;
-  joueurs.forEach((j,i)=>{
-    if(i!==indexPigeon && (!estEnPause(j) || pigeonsPossibles === 0)){
-      const btn=document.createElement("button");
-      btn.className="bouton-pigeon";
-      btn.innerText=j;
-      surAction(btn, "pigeon:" + i, { owner: choisisseur, once: true }, ()=>{
-      if(nbChoixPigeon > 1) proposerAnnulerChoix(choisisseur); // « Mauvais joueur ? Annuler » quelques secondes
-      indexPigeon = i;
-      compterStat("pigeon", joueurs[i]);
-      nomPigeonOriginal = joueurs[i];
-      // 1) on ferme l'overlay de choix
-      unlockScroll();
-      overlay.remove();
-      choixPigeonEnCours = false;
-      afficherJoueurs();
-      afficherJoueurActif();
-      // 2) message demandé (overlay + .messages)
-      const nPigeon = gorgeesPigeon();
-      const msg = `${joueurs[i]} est le nouveau PIGEON !\nIl/elle boit ${texteGorgees(nPigeon)} pour fêter ça.`;
-      // .messages : on l'affiche dans reglePigeon (et il disparaît au prochain tirage)
-      // 3) overlay + annulation si compteur (utilise la carte "trois" qui a déclenché le transfert)
-      const carteTrois = carteTroisPourTransfertPigeon || "trois_vert";
-      const joueurTrois = joueurTroisPourTransfertPigeon;
-      const couleurTrois = couleurTroisPourTransfertPigeon;
-      annoncerBoireAvecAnnulation(
-        i,
-        nPigeon,
-        carteTrois,
-        msg,
-        // puis la gorgée couleur éventuelle de celui qui a tiré le 3
-        () => appliquerBonusCouleurSiBesoin(carteTrois, { couleur: couleurTrois, joueur: joueurTrois, preserveRuleMessage: true })
-      );
-      reglerDureeOverlayRegle(msg, DUREE_ANNONCE_PIGEON); // annonce du pigeon : affichée 2 fois plus longtemps
-      jouerSon("pigeon");
-      // optionnel : on nettoie
-      carteTroisPourTransfertPigeon = "";
-      joueurTroisPourTransfertPigeon = null;
-      couleurTroisPourTransfertPigeon = null;
+  candidats.forEach(i => {
+    const btn=document.createElement("button");
+    btn.className="bouton-pigeon";
+    btn.innerText=joueurs[i];
+    surAction(btn, "pigeon:" + i, { owner: choisisseur, once: true }, ()=>{
+      passerPigeonA(i, overlay, choisisseur, true);
     });
-
-      overlay.appendChild(btn);
-    }
+    overlay.appendChild(btn);
   });
 
   document.body.appendChild(overlay);
+}
+
+// Le joueur i devient le PIGEON (annonce, gorgée) ; overlay : l'écran de choix à fermer (null : il n'y en a pas eu)
+function passerPigeonA(i, overlay, choisisseur, avecChoix){
+  if(avecChoix) proposerAnnulerChoix(choisisseur); // « Mauvais joueur ? Annuler » quelques secondes
+  indexPigeon = i;
+  compterStat("pigeon", joueurs[i]);
+  nomPigeonOriginal = joueurs[i];
+  // 1) on ferme l'overlay de choix
+  if(overlay){
+    unlockScroll();
+    overlay.remove();
+  }
+  choixPigeonEnCours = false;
+  afficherJoueurs();
+  afficherJoueurActif();
+  // 2) message demandé (overlay + .messages)
+  const nPigeon = gorgeesPigeon();
+  const msg = `${joueurs[i]} est le nouveau PIGEON !\nIl/elle boit ${texteGorgees(nPigeon)} pour fêter ça.`;
+  // .messages : on l'affiche dans reglePigeon (et il disparaît au prochain tirage)
+  // 3) overlay + annulation si compteur (utilise la carte "trois" qui a déclenché le transfert)
+  const carteTrois = carteTroisPourTransfertPigeon || "trois_vert";
+  const joueurTrois = joueurTroisPourTransfertPigeon;
+  const couleurTrois = couleurTroisPourTransfertPigeon;
+  annoncerBoireAvecAnnulation(
+    i,
+    nPigeon,
+    carteTrois,
+    msg,
+    // puis la gorgée couleur éventuelle de celui qui a tiré le 3
+    () => appliquerBonusCouleurSiBesoin(carteTrois, { couleur: couleurTrois, joueur: joueurTrois, preserveRuleMessage: true })
+  );
+  reglerDureeOverlayRegle(msg, DUREE_ANNONCE_PIGEON); // annonce du pigeon : affichée 2 fois plus longtemps
+  jouerSon("pigeon");
+  // optionnel : on nettoie
+  carteTroisPourTransfertPigeon = "";
+  joueurTroisPourTransfertPigeon = null;
+  couleurTroisPourTransfertPigeon = null;
 }
 
 function dureeOverlaySelonNbLignes(nb){

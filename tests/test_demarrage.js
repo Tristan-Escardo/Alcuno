@@ -197,9 +197,10 @@ function verifier(ok, texte){
     await page.click("#jouer"); await page.waitForTimeout(1200);
     await page.evaluate(() => { indexPigeon = 0; afficherMenuPigeon(); }); // (2 joueurs : un seul autre joueur possible)
     await page.waitForTimeout(500);
-    await (await page.$("#overlayPigeon .bouton-pigeon")).click();
-    await page.waitForTimeout(400);
+    const menu2 = await page.evaluate(() => !!document.getElementById("overlayPigeon"));
+    const annonce2 = await page.evaluate(() => ({ pigeon: joueurs[indexPigeon], texte: (document.getElementById("overlayRegleUnique") || { innerText: "" }).innerText.replace(/\s+/g, " ") }));
     const bandeau2 = await page.evaluate(() => !!document.getElementById("annulerChoix"));
+    verifier(!menu2 && annonce2.pigeon === "Lea" && /nouveau PIGEON/.test(annonce2.texte), `pigeon à 2 joueurs : pas de choix (${menu2}), pigeon = ${annonce2.pigeon}, annonce « ${annonce2.texte.slice(0, 40)} »`);
     await ctx.close();
     const t3 = await ouvrir();
     await t3.page.click("#btnModeClassique"); await t3.page.waitForTimeout(800);
