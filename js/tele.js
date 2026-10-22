@@ -547,7 +547,7 @@ const PHRASES_TELE = [
   { sansNom: true, texte: () => `Vous pouvez AUSSI prendre vos propres gorgées.` },
   // thème Star Wars seulement : mêlées aux autres, même rythme
   { galaxie: true, sansNom: true, texte: () => `Obi-Wan Kenobière, tu es mon seul espoir.` },
-  { galaxie: true, sansNom: true, texte: () => `Dark Vodka.` },
+  { galaxie: true, sansNom: true, texte: () => `Rejoins le côté obscur : on a de la Dark Vodka.` },
   { galaxie: true, sansNom: true, texte: () => `Luke, je suis ton verre.` }
 ];
 const PAS_NOTIFS_TELE = 5000;

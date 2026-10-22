@@ -1,0 +1,22 @@
+# Test rapide de démarrage (tests/test_demarrage.js) à chaque push et chaque pull request.
+name: Tests de démarrage
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  demarrage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Installer Playwright et Chromium
+        run: |
+          npm i --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Lancer le test
+        run: node tests/test_demarrage.js

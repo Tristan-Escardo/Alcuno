@@ -15,6 +15,16 @@ Tout lancer d'un coup (environ 10 minutes)
   la sortie de chacun et affiche un résumé. Résultat attendu : « TOUT EST OK ».
   La sortie complète de chaque test est gardée dans tests/resultats/ (ignoré par git).
 
+Démarrage rapide (30 secondes, Linux / macOS / Windows)
+-------------------------------------------------------
+  npm i playwright && npx playwright install chromium     (une seule fois)
+  node tests/test_demarrage.js
+
+  Vérifie que le jeu démarre sans erreur dans chaque thème, que l'aide du début arrive tout de suite,
+  que l'écran d'installation Android attend Chrome, que le déblocage Star Wars marche et que ses phrases
+  ne sortent que dans ce thème. Résultat attendu : « TOUT EST OK ». GitHub le lance aussi à chaque
+  push (onglet Actions, « Tests de démarrage »).
+
 Partie classique (le plus important, environ 1 minute)
 ------------------------------------------------------
   bash tests/generer.sh          (depuis le dossier du jeu, dans Git Bash)
