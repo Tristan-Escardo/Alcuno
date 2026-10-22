@@ -746,7 +746,7 @@ button,
 #menu input{
     min-width: 0;
 }
-#menu .libelleCourt{ display: none; } /* (téléphone, avant la partie : « Caster » et « Supprimer » en version courte, voir plus bas) */
+#menu .libelleCourt{ display: none; } /* (téléphone, avant la partie : « − » à la place de « Supprimer un joueur », voir plus bas) */
 
 #messageTexte{
   font-size: 34px;
@@ -1165,11 +1165,12 @@ html[data-theme="galaxie"] .fin-choix-numeros b{ background: #8fd0ff; color: #02
     #menu > *{ grid-column: 1 / -1; }
     #menu #nomJoueur{ grid-column: 1; }
     #menu #ajouterJoueur{ grid-column: 2; width: auto; padding-left: 16px; padding-right: 16px; }
-    /* Avant la partie : « Caster » et « Supprimer » côte à côte (en partie, « Supprimer un joueur » reste en pleine largeur) */
-    #menu:not(:has(#nouvellePartie:not([style*="none"]))):has(#supprimerJoueur:not([style*="none"])) #btnCaster{ grid-column: 1; }
-    #menu:not(:has(#nouvellePartie:not([style*="none"]))):has(#supprimerJoueur:not([style*="none"])) #supprimerJoueur{ grid-column: 2; width: auto; padding-left: 16px; padding-right: 16px; }
-    #menu:not(:has(#nouvellePartie:not([style*="none"]))):has(#supprimerJoueur:not([style*="none"])) :is(#supprimerJoueur, #btnCaster) .libelleLong{ display: none; }
-    #menu:not(:has(#nouvellePartie:not([style*="none"]))):has(#supprimerJoueur:not([style*="none"])) :is(#supprimerJoueur, #btnCaster) .libelleCourt{ display: inline; }
+    /* Avant la partie, quand il y a des joueurs : un petit « − » à droite de « + Ajouter » pour en supprimer (le gros bouton
+       « Supprimer un joueur » en dessous ne prend plus de place) */
+    #menu:not(:has(#nouvellePartie:not([style*="none"]))):has(#supprimerJoueur:not([style*="none"])){ grid-template-columns: minmax(0, 1fr) auto auto; }
+    #menu:not(:has(#nouvellePartie:not([style*="none"]))):has(#supprimerJoueur:not([style*="none"])) #supprimerJoueur{ grid-column: 3; grid-row: 1; width: auto; min-width: 44px; padding-left: 14px; padding-right: 14px; font-size: 22px; font-weight: 900; line-height: 1; }
+    #menu:not(:has(#nouvellePartie:not([style*="none"]))):has(#supprimerJoueur:not([style*="none"])) #supprimerJoueur .libelleLong{ display: none; }
+    #menu:not(:has(#nouvellePartie:not([style*="none"]))):has(#supprimerJoueur:not([style*="none"])) #supprimerJoueur .libelleCourt{ display: inline; }
 }
 @media (max-width: 520px){
   /* moins d’espace, boutons en pleine largeur */
