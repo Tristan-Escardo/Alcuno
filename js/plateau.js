@@ -979,7 +979,8 @@ function lancerOverlayPrediction(startIndex){
 
   const subtitle = document.createElement("div");
   subtitle.className = "overlay-subtitle prediction-subtitle";
-  subtitle.innerText = `Chacun choisit un type de carte. Tous ceux qui trouvent distribuent ${texteCulSec()} !`;
+  // (le 2e bout de phrase à la ligne)
+  subtitle.append("Chacun choisit un type de carte.", document.createElement("br"), `Tous ceux qui trouvent distribuent ${texteCulSec()}\u00a0!`); // (espace insécable : le « ! » ne reste pas seul à la ligne)
 
   header.appendChild(titre);
   header.appendChild(subtitle);
@@ -1003,6 +1004,7 @@ function lancerOverlayPrediction(startIndex){
     cardWrap.appendChild(preview);
 
     surAction(cardWrap, "pred:" + t.id, {
+      evenement: "click", // comme les cartes du plateau : au doigt levé, pas au doigt posé (sinon faire défiler la page choisit une carte)
       owner: () => curPos < ordre.length ? joueurs[ordre[curPos]] : null,
       pret: () => !cardWrap.classList.contains("disabled"),
       valide: () => curPos < ordre.length // tout le monde a déjà choisi (en attente de « Valider »)
@@ -1076,7 +1078,7 @@ function lancerOverlayPrediction(startIndex){
       const ligne = document.createElement("div");
       ligne.className = "ligne" + (i === curPos && !revele ? " en-cours" : "");
       const who = document.createElement("strong");
-      who.innerText = joueurs[jIdx] + (i === curPos && !revele ? " ←" : "");
+      who.innerText = `${i + 1}. ${joueurs[jIdx]}` + (i === curPos && !revele ? " ←" : "");
       const what = document.createElement("span");
       what.className = "choix";
       const type = p.typeId ? TYPES_PARIS.find(t => t.id === p.typeId) : null;
@@ -1090,6 +1092,20 @@ function lancerOverlayPrediction(startIndex){
       ligne.appendChild(who);
       ligne.appendChild(what);
       recap.appendChild(ligne);
+    });
+
+    // Petit numéro (l'ordre de passage, comme dans le récap) sur chaque carte choisie ; plusieurs si plusieurs joueurs l'ont prise
+    Array.from(grid.querySelectorAll('.fin-choix-card')).forEach(carte => {
+      const anciens = carte.querySelector('.fin-choix-numeros');
+      if(anciens) anciens.remove();
+      const numeros = [];
+      ordre.forEach((jIdx, i) => { if(predictions[jIdx].typeId === carte.dataset.typeId) numeros.push(i + 1); });
+      carte.classList.toggle('choisie', numeros.length > 0);
+      if(!numeros.length) return;
+      const pastilles = document.createElement('span');
+      pastilles.className = 'fin-choix-numeros';
+      numeros.forEach(n => { const b = document.createElement('b'); b.textContent = n; pastilles.appendChild(b); });
+      carte.appendChild(pastilles);
     });
 
     majBoutonsPari();

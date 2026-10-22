@@ -1008,10 +1008,36 @@ body.no-scroll{
 
 .fin-choix-card:active{ transform: scale(0.98); }
 
+/* Petits numéros (ordre de passage) sur les cartes choisies, en haut à droite */
+.fin-choix-card{ position: relative; }
+.fin-choix-numeros{
+  position: absolute;
+  top: -8px;
+  right: -6px;
+  display: flex;
+  gap: 3px;
+  pointer-events: none;
+}
+.fin-choix-numeros b{
+  min-width: 22px;
+  height: 22px;
+  box-sizing: border-box;
+  padding: 0 5px;
+  border-radius: 11px;
+  background: #FFD700;
+  color: #2b001d;
+  font: 900 13px/22px Arial, sans-serif;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.45);
+}
+html[data-theme="givre"] .fin-choix-numeros b{ background: #0f6aa6; color: #fff; }
+html[data-theme="galaxie"] .fin-choix-numeros b{ background: #8fd0ff; color: #02030a; box-shadow: 0 0 8px #39a0ff; }
+
 .fin-choix-card.disabled{
   opacity: 0.55;
   pointer-events: none;
 }
+.fin-choix-card.disabled.choisie{ opacity: 1; } /* (les cartes choisies restent bien lisibles avec leur numéro) */
 
 @media (max-width: 520px){
   .fin-choix-grid{ --fin-cols: 3; }

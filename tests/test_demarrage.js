@@ -163,7 +163,28 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
-  // 8. Les fenêtres de déblocage (Prestige, Star Wars) gardent leurs propres boutons dans tous les thèmes
+  // 8. Pari de la fin : une carte se choisit au doigt levé (pas en faisant défiler), avec un petit numéro dessus
+  {
+    const { ctx, page, erreurs } = await ouvrir();
+    await page.click("#btnModeClassique"); await page.waitForTimeout(800);
+    for (const nom of ["Tom", "Lea", "Max"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(250); }
+    await page.click("#jouer"); await page.waitForTimeout(1200);
+    await page.evaluate(() => { paquet.splice(1); carteDoreeEnJeu = false; lancerOverlayPrediction(0); });
+    await page.waitForSelector("#overlayPredictionFin .fin-choix-card");
+    const sousTitreSurDeuxLignes = await page.evaluate(() => !!document.querySelector("#overlayPredictionFin .prediction-subtitle br"));
+    const cartes = await page.$$("#overlayPredictionFin .fin-choix-card");
+    await cartes[0].dispatchEvent("pointerdown"); // le doigt se pose (début d'un défilement) : rien ne doit être choisi
+    await page.waitForTimeout(200);
+    const apresPose = await page.evaluate(() => document.querySelectorAll("#overlayPredictionFin .fin-choix-numeros").length);
+    await cartes[0].click(); await page.waitForTimeout(200);
+    await cartes[0].click(); await page.waitForTimeout(100); // (même carte pour le 2e joueur : deux numéros dessus)
+    const numeros = await page.evaluate(() => [...document.querySelectorAll("#overlayPredictionFin .fin-choix-card.choisie .fin-choix-numeros b")].map((b) => b.textContent).join(","));
+    verifier(sousTitreSurDeuxLignes && apresPose === 0 && numeros === "1,2" && erreurs.length === 0,
+      `pari de la fin : phrase à la ligne (${sousTitreSurDeuxLignes}), rien au doigt posé (${apresPose}), numéros sur la carte (${numeros})`);
+    await ctx.close();
+  }
+
+  // 9. Les fenêtres de déblocage (Prestige, Star Wars) gardent leurs propres boutons dans tous les thèmes
   {
     const { ctx, page } = await ouvrir();
     const themes = [...THEMES, "prestige", "galaxie"];
