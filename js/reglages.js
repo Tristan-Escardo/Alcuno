@@ -290,8 +290,13 @@ function afficherGeneriqueGalaxie(premiere){
 
 // Thème Star Wars débloqué : fenêtre jaune sur noir, comme celle de Prestige, juste après le générique.
 // « Que la gorgée soit avec toi » met le thème (comme dans les Réglages), « Plus tard » ferme.
+function jouerSabreDeblocage(){
+  jouerSon(SONS_SABRE[Math.floor(Math.random() * SONS_SABRE.length)], true); // (lu dès qu'il est chargé s'il ne l'est pas encore)
+}
 function afficherFenetreGalaxie(){
   if (document.getElementById("fenetreGalaxie")) return;
+  const ctx = contexteAudio();
+  if (ctx) SONS_SABRE.forEach((n) => chargerSon(ctx, n)); // les sabres se chargent d'avance, le bouton en joue un
   const voile = document.createElement("div");
   voile.id = "fenetreGalaxie";
   voile.setAttribute("role", "dialog");
@@ -310,6 +315,7 @@ function afficherFenetreGalaxie(){
     setTimeout(() => voile.remove(), 250);
   };
   voile.querySelector(".fenetreGalaxie-ok").addEventListener("click", () => {
+    jouerSabreDeblocage(); // (le thème n'est pas encore mis : le clic normal des boutons ne serait pas un sabre)
     fermer();
     const pastille = document.getElementById("pastilleGalaxie");
     if (pastille) pastille.click(); // comme dans les réglages (musique coupée, thème gardé, barre du téléphone…)
@@ -1115,7 +1121,7 @@ function chargerSons(){
 // (annuler des gorgées, distribuer au +4, choisir le pigeon ou la victime de la carte dorée), et sauf
 // Réglages, « Signaler un bug » et « Copier le diagnostic » (silencieux)
 const BOUTONS_AVEC_LEUR_SON = ".bouton-annulation, .plus4-joueur-btn, #overlayPigeon .bouton-pigeon, .bouton-doree, " +
-  "#btnReglages, #btnSignalerBug, #btnDiagnostic, #btnRegles, #btnReglesJeu, #bandeauMiseAJour .maj";
+  "#btnReglages, #btnSignalerBug, #btnDiagnostic, #btnRegles, #btnReglesJeu, #bandeauMiseAJour .maj, .fenetreGalaxie-ok";
 document.addEventListener("click", (e) => {
   if (!e.isTrusted || document.documentElement.classList.contains("mode-tele")) return;
   if (Date.now() - sonBoutonJoueLe < 500) return; // déjà joué au doigt levé (activerMemePendantElan)

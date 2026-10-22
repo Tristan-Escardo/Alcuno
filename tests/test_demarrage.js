@@ -101,7 +101,10 @@ function verifier(ok, texte){
     await page.waitForTimeout(1500);
     const fenetre = await page.evaluate(() => !!document.getElementById("fenetreGalaxie"));
     const themeAvant = await page.evaluate(() => document.documentElement.dataset.theme);
+    await page.evaluate(() => { window.__sons = []; const origine = jouerSon; jouerSon = (nom, ...reste) => { window.__sons.push(nom); return origine(nom, ...reste); }; });
     await page.click(".fenetreGalaxie-ok");
+    const sons = await page.evaluate(() => window.__sons);
+    verifier(sons.length === 1 && /^sabre\//.test(sons[0]), `Star Wars : le bouton de la fenêtre joue un sabre (${sons.join(", ")})`);
     await page.waitForTimeout(800);
     const themeApres = await page.evaluate(() => document.documentElement.dataset.theme);
     verifier(themeAvant !== "galaxie" && themeApres === "galaxie", `Star Wars : thème pas mis tout seul (${themeAvant}), mis par « Que la gorgée soit avec toi » (${themeApres})`);
