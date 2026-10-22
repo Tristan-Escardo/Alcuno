@@ -100,7 +100,12 @@ function verifier(ok, texte){
     await page.click("#generiqueGalaxie");
     await page.waitForTimeout(1500);
     const fenetre = await page.evaluate(() => !!document.getElementById("fenetreGalaxie"));
-    verifier(generique && duree === "42s" && fenetre && erreurs.length === 0, `Star Wars : générique (${duree}) puis fenêtre « débloqué »`);
+    const themeAvant = await page.evaluate(() => document.documentElement.dataset.theme);
+    await page.click(".fenetreGalaxie-ok");
+    await page.waitForTimeout(800);
+    const themeApres = await page.evaluate(() => document.documentElement.dataset.theme);
+    verifier(themeAvant !== "galaxie" && themeApres === "galaxie", `Star Wars : thème pas mis tout seul (${themeAvant}), mis par « L'essayer maintenant » (${themeApres})`);
+    verifier(generique && duree === "46.5s" && fenetre && erreurs.length === 0, `Star Wars : générique (${duree}) puis fenêtre « débloqué »`);
     await ctx.close();
   }
 
