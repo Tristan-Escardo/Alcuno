@@ -188,7 +188,47 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
-  // 9. Les fenêtres de déblocage (Prestige, Star Wars) gardent leurs propres boutons dans tous les thèmes
+  // 9. « Mauvais joueur ? » : pas quand il n'y avait qu'un joueur à choisir ; et le « NOUVEAU » du thème ne part
+  //    pas en ouvrant les Réglages, seulement en essayant le thème
+  {
+    const { ctx, page, erreurs } = await ouvrir();
+    await page.click("#btnModeClassique"); await page.waitForTimeout(800);
+    for (const nom of ["Tom", "Lea"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(250); }
+    await page.click("#jouer"); await page.waitForTimeout(1200);
+    await page.evaluate(() => { indexPigeon = 0; afficherMenuPigeon(); }); // (2 joueurs : un seul autre joueur possible)
+    await page.waitForTimeout(500);
+    await (await page.$("#overlayPigeon .bouton-pigeon")).click();
+    await page.waitForTimeout(400);
+    const bandeau2 = await page.evaluate(() => !!document.getElementById("annulerChoix"));
+    await ctx.close();
+    const t3 = await ouvrir();
+    await t3.page.click("#btnModeClassique"); await t3.page.waitForTimeout(800);
+    for (const nom of ["Tom", "Lea", "Max"]) { await t3.page.fill("#nomJoueur", nom); await t3.page.click("#ajouterJoueur"); await t3.page.waitForTimeout(250); }
+    await t3.page.click("#jouer"); await t3.page.waitForTimeout(1200);
+    await t3.page.evaluate(() => { indexPigeon = 0; afficherMenuPigeon(); });
+    await t3.page.waitForTimeout(500);
+    await (await t3.page.$("#overlayPigeon .bouton-pigeon")).click();
+    await t3.page.waitForTimeout(400);
+    const bandeau3 = await t3.page.evaluate(() => !!document.getElementById("annulerChoix"));
+    verifier(!bandeau2 && bandeau3 && erreurs.length === 0 && t3.erreurs.length === 0, `« Mauvais joueur ? » : absent à 2 joueurs (${bandeau2}), présent à 3 (${bandeau3})`);
+    await t3.ctx.close();
+  }
+  {
+    const { ctx, page, erreurs } = await ouvrir();
+    await page.evaluate(() => { localStorage.setItem("alcuno_theme_galaxie", "1"); localStorage.setItem("alcuno_galaxie_nouveau", "1"); });
+    await page.reload(); await page.waitForTimeout(700);
+    const avant = await page.evaluate(() => document.documentElement.classList.contains("galaxie-nouveau"));
+    await page.click("#btnReglages"); await page.waitForTimeout(700);
+    await page.click("#btnFermerReglages"); await page.waitForTimeout(700);
+    const apresReglages = await page.evaluate(() => document.documentElement.classList.contains("galaxie-nouveau"));
+    await page.click("#btnReglages"); await page.waitForTimeout(700);
+    await page.click(".pastilleTheme[data-theme='galaxie']"); await page.waitForTimeout(700);
+    const apresEssai = await page.evaluate(() => document.documentElement.classList.contains("galaxie-nouveau") || !!localStorage.getItem("alcuno_galaxie_nouveau"));
+    verifier(avant && apresReglages && !apresEssai && erreurs.length === 0, `« NOUVEAU » : là au départ (${avant}), gardé après les Réglages (${apresReglages}), parti après l'essai (${!apresEssai})`);
+    await ctx.close();
+  }
+
+  // 10. Les fenêtres de déblocage (Prestige, Star Wars) gardent leurs propres boutons dans tous les thèmes
   {
     const { ctx, page } = await ouvrir();
     const themes = [...THEMES, "prestige", "galaxie"];

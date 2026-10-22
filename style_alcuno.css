@@ -6718,6 +6718,13 @@ html[data-theme="givre"] :is(#annulerChoix, #bandeauMiseAJour){
   --bandeau-bouton: linear-gradient(180deg, #27aee8, #1474b8); --bandeau-bouton-texte: #fff;
   box-shadow: 0 10px 30px rgba(13, 53, 80, 0.25);
 }
+/* Star Wars : écran de vaisseau bleu nuit, barre de temps bleue (lame), plus de jaune ni de bordeaux */
+html[data-theme="galaxie"] :is(#annulerChoix, #bandeauMiseAJour){
+  --bandeau-fond: #050a1a; --bandeau-bord: rgba(143, 208, 255, 0.55); --bandeau-texte: #eaf3ff;
+  --bandeau-bouton: linear-gradient(180deg, #8fd0ff, #3d8fe0); --bandeau-bouton-texte: #02030a;
+  box-shadow: 0 0 14px rgba(40, 140, 255, 0.45), 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+html[data-theme="galaxie"] #annulerChoix .annulerChoix-temps{ background: #8fd0ff; opacity: 1; box-shadow: 0 0 8px #39a0ff, 0 0 16px rgba(40, 140, 255, 0.6); }
 html[data-theme="prestige"] :is(#annulerChoix, #bandeauMiseAJour){ --bandeau-fond: #2a1d03; --bandeau-bord: rgba(255, 223, 90, 0.6); --bandeau-bouton-texte: #3a2806; }
 
 /* Soleil couchant : bas des réglages (partager, signaler un bug, à propos) posé sur la fin claire du

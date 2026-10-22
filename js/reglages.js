@@ -8,8 +8,7 @@
 const ecranReglages = document.getElementById("ecranReglages");
 
 document.getElementById("btnReglages").addEventListener("click", () => {
-  vuNouveauPrestige();
-  vuNouveauGalaxie();
+  // (le « NOUVEAU » d'un thème débloqué ne part pas en ouvrant les Réglages : seulement quand on essaie ce thème, voir appliquerTheme)
   majLignePartieMemoire();
   ecranReglages.scrollTop = 0;
   ouvrirPage(ecranReglages);
@@ -72,11 +71,12 @@ function debloquerPrestige(){
 }
 
 // Rappel « nouveau thème » : point rouge sur l'icône des Réglages et « NOUVEAU » sur la pastille Prestige,
-// jusqu'à ce qu'on ouvre les Réglages (le « NOUVEAU » reste affiché tant qu'on y est, retiré à la fermeture)
+// jusqu'à ce qu'on ait essayé le thème (appliquerTheme) : ouvrir les Réglages ne les retire pas
 const CLE_PRESTIGE_NOUVEAU = "alcuno_prestige_nouveau";
 try { if (localStorage.getItem(CLE_PRESTIGE_NOUVEAU) && prestigeDebloque()) document.documentElement.classList.add("prestige-nouveau"); } catch (e) {}
 function vuNouveauPrestige(){
   try { localStorage.removeItem(CLE_PRESTIGE_NOUVEAU); } catch (e) {}
+  document.documentElement.classList.remove("prestige-nouveau");
 }
 
 // Thème Prestige débloqué : fenêtre dorée au milieu de l'écran (avant : petite notif en haut que
@@ -130,11 +130,12 @@ function estCodeGalaxie(nom){
   return EMPREINTES_GALAXIE.includes(h.toString(16).padStart(8, "0"));
 }
 // « NOUVEAU » sur la pastille Star Wars et point rouge sur les Réglages au premier déblocage, jusqu'à ce
-// qu'on ouvre les Réglages (comme Prestige)
+// qu'on ait essayé le thème (comme Prestige)
 const CLE_GALAXIE_NOUVEAU = "alcuno_galaxie_nouveau";
 try { if (localStorage.getItem(CLE_GALAXIE_NOUVEAU) && galaxieDebloquee()) document.documentElement.classList.add("galaxie-nouveau"); } catch (e) {}
 function vuNouveauGalaxie(){
   try { localStorage.removeItem(CLE_GALAXIE_NOUVEAU); } catch (e) {}
+  document.documentElement.classList.remove("galaxie-nouveau");
 }
 function debloquerGalaxie(){
   // « NOUVEAU » et fenêtre « débloqué » seulement la toute première fois (revoir le générique ensuite ne les remet pas)
@@ -456,6 +457,8 @@ function peindreBarreTelephone(){
 function appliquerTheme(nom, sansMusique = false){
   if (!THEMES[nom] || (nom === "prestige" && !prestigeDebloque()) || (nom === "galaxie" && !galaxieDebloquee())) nom = "bordeaux";
   document.documentElement.dataset.theme = nom;
+  if (nom === "prestige") vuNouveauPrestige(); // thème essayé : le rappel « NOUVEAU » s'en va
+  if (nom === "galaxie") vuNouveauGalaxie();
   peindreBarreTelephone();
   document.querySelectorAll(".pastilleTheme").forEach((b) => {
     b.setAttribute("aria-pressed", b.dataset.theme === nom ? "true" : "false");

@@ -92,13 +92,15 @@ function afficherMenuPigeon(){
 
   // (pas ceux en pause, sauf s'il ne restait personne d'autre)
   const pigeonsPossibles = joueurs.filter((j, i) => i !== indexPigeon && !estEnPause(j)).length;
+  // Un seul joueur possible : pas de « Mauvais joueur ? » (rien d'autre à choisir)
+  const nbChoixPigeon = joueurs.filter((j, i) => i !== indexPigeon && (!estEnPause(j) || pigeonsPossibles === 0)).length;
   joueurs.forEach((j,i)=>{
     if(i!==indexPigeon && (!estEnPause(j) || pigeonsPossibles === 0)){
       const btn=document.createElement("button");
       btn.className="bouton-pigeon";
       btn.innerText=j;
       surAction(btn, "pigeon:" + i, { owner: choisisseur, once: true }, ()=>{
-      proposerAnnulerChoix(choisisseur); // « Mauvais joueur ? Annuler » quelques secondes
+      if(nbChoixPigeon > 1) proposerAnnulerChoix(choisisseur); // « Mauvais joueur ? Annuler » quelques secondes
       indexPigeon = i;
       compterStat("pigeon", joueurs[i]);
       nomPigeonOriginal = joueurs[i];
@@ -829,13 +831,14 @@ function afficherOverlayCarteDoree(joueurActuel){
   overlay.appendChild(liste);
 
   // Tout le monde, y compris celui qui a tiré la carte
+  const nbChoixDoree = joueurs.filter(nom => !estEnPause(nom)).length; // (un seul : pas de « Mauvais joueur ? »)
   joueurs.forEach((nom, i) => {
     if(estEnPause(nom)) return; // (en pause : pas là pour le cul sec)
     const btn = document.createElement("button");
     btn.className = "bouton-doree";
     btn.innerText = avecCouronne(nom);
     surAction(btn, "doree:" + i, { owner: choisisseur, once: true }, () => {
-      proposerAnnulerChoix(choisisseur); // « Mauvais joueur ? Annuler » quelques secondes
+      if(nbChoixDoree > 1) proposerAnnulerChoix(choisisseur); // « Mauvais joueur ? Annuler » quelques secondes
       overlay.remove();
       unlockScroll();
       if(statsPartie) statsPartie.doree = { tireur: choisisseur, victime: nom };
@@ -919,6 +922,7 @@ function lancerOverlayChoixDuel(joueurActuel, carteDuel = ""){
 
   let picks = [];
   let debutChoix = -1; // action du 1er joueur choisi (« Annuler » retire les 2 choix)
+  const nbDuellistes = joueurs.filter(nom => !estEnPause(nom)).length; // (2 seulement : le choix est forcé, pas de « Mauvais joueur ? »)
 
   joueurs.forEach((nom, idx)=>{
     if(estEnPause(nom)) return; // (en pause : pas de duel)
@@ -938,7 +942,7 @@ function lancerOverlayChoixDuel(joueurActuel, carteDuel = ""){
       if(picks.length === 2){
         // Les autres joueurs ne réagissent plus (même aspect) : un 3e tap rapide n'envoie plus d'action
         containerBoutons.style.pointerEvents = "none";
-        proposerAnnulerChoix(choisisseur, debutChoix); // « Mauvais joueur ? Annuler » quelques secondes
+        if(nbDuellistes > 2) proposerAnnulerChoix(choisisseur, debutChoix); // « Mauvais joueur ? Annuler » quelques secondes
         // Le tirage remplace l'écran 0,2 s plus tard : on voit le « pop » du 2e bouton (script.js).
         // En ligne, la carte choisie ensuite attend que le tirage soit affiché (tenterAction).
         setTimeout(() => {
@@ -1305,7 +1309,7 @@ function afficherOverlayPlus4(joueurActuel, classeCartePlus4){
   btnValider.innerText = "Valider";
   surAction(btnValider, "plus4:valider", { owner: choisisseur, once: true }, ()=>{
     if(totalDistribue() !== aDistribuer) return;
-    proposerAnnulerChoix(choisisseur); // « Mauvais joueur ? Annuler » : retour à la distribution
+    if(joueurs.filter(nom => !estEnPause(nom)).length > 1) proposerAnnulerChoix(choisisseur); // « Mauvais joueur ? Annuler » : retour à la distribution (pas s'il n'y avait qu'un joueur à qui distribuer)
 
     overlay.remove();
     unlockScroll();
