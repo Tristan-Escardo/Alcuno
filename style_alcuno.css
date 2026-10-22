@@ -7581,28 +7581,29 @@ html[data-theme="galaxie"] #ecranTele :is(.tele-bloc-titre, .tele-dernieres-titr
 /* même vitesse qu'avant (3,6 % de la hauteur du texte par seconde), mais le texte avance jusqu'à la fermeture du générique (50 s) au lieu de s'arrêter */
 @keyframes generiqueDefile{ from{ transform: rotateX(28deg) translateY(0); } to{ transform: rotateX(28deg) translateY(-166%); } }
 
-/* Thème Star Wars débloqué : fenêtre jaune sur noir au milieu de l'écran, après le générique (js/reglages.js) */
+/* Thème Star Wars débloqué : fenêtre aux couleurs du thème (écran de vaisseau bleu, titre jaune, boutons « lame
+   bleue »), même si le thème n'est pas encore mis, après le générique (js/reglages.js) */
 #fenetreGalaxie{ position: fixed; inset: 0; z-index: 2147483500; display: flex; align-items: center; justify-content: center; padding: 24px;
   background: rgba(0, 0, 6, 0.8); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); animation: fenetrePrestigeVoile 0.3s ease both; }
 #fenetreGalaxie.fenetreGalaxie-sortie{ animation: fenetrePrestigeVoile 0.25s ease reverse both; }
-.fenetreGalaxie-carte{ width: min(340px, 100%); box-sizing: border-box; border-radius: 24px; padding: 28px 22px 22px; text-align: center;
-  background: linear-gradient(180deg, #05060f, #000); border: 2px solid #FFE81F;
-  box-shadow: 0 0 40px rgba(255, 232, 31, 0.35), inset 0 0 30px rgba(255, 232, 31, 0.08);
+.fenetreGalaxie-carte{ width: min(340px, 100%); box-sizing: border-box; border-radius: 16px; padding: 28px 22px 22px; text-align: center;
+  background: linear-gradient(180deg, rgba(14, 22, 44, 0.96), rgba(6, 10, 22, 0.98)); border: 1.5px solid #8fd0ff;
+  box-shadow: 0 0 8px #4aa8ff, 0 0 26px rgba(40, 140, 255, 0.55), inset 0 0 18px rgba(80, 170, 255, 0.18);
   font-family: Arial, sans-serif; animation: fenetrePrestigeArrive 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
-.fenetreGalaxie-secret{ font: 900 13px Arial, sans-serif; letter-spacing: 0.3em; text-transform: uppercase; color: #4bd5ee; margin-bottom: 16px; }
+.fenetreGalaxie-secret{ font: 900 13px Arial, sans-serif; letter-spacing: 0.3em; text-transform: uppercase; color: #8fd0ff; margin-bottom: 16px; }
 .fenetreGalaxie-rond{ display: block; width: 112px; height: 112px; margin: 0 auto 18px; border-radius: 50%;
-  background: url("icones/casque_star_wars.png") center 55% / 74% no-repeat, radial-gradient(circle at 70% 25%, #1b2f6e, #02030a 75%); box-shadow: 0 0 0 4px #FFE81F, 0 0 34px rgba(255, 232, 31, 0.6);
-  animation: fenetreGalaxieBrille 2.2s ease-in-out infinite; }
-.fenetreGalaxie-titre{ font: 900 28px/1.15 "Arial Black", Arial, sans-serif; color: #FFE81F; letter-spacing: 0.03em; text-shadow: 0 0 18px rgba(255, 232, 31, 0.45); }
+  background: url("icones/casque_star_wars.png") center 55% / 74% no-repeat, radial-gradient(circle at 70% 25%, #1b2f6e, #02030a 75%);
+  box-shadow: 0 0 0 3px #8fd0ff, 0 0 18px #39a0ff, 0 0 40px rgba(31, 123, 255, 0.6); animation: fenetreGalaxieBrille 2.2s ease-in-out infinite; }
+.fenetreGalaxie-titre{ font: 900 28px/1.15 "Arial Black", Arial, sans-serif; color: #FFE81F; letter-spacing: 0.03em; text-shadow: 0 0 18px rgba(255, 232, 31, 0.4); }
 .fenetreGalaxie-texte{ font: 700 15px/1.4 Arial, sans-serif; color: #c9d4e8; margin: 12px 0 22px; }
-.fenetreGalaxie-ok{ display: block; width: 100%; padding: 15px; border-radius: 999px; cursor: pointer; border: none;
-  background: #FFE81F; color: #000; font: 900 16px Arial, sans-serif; box-shadow: 0 6px 18px rgba(255, 232, 31, 0.3); }
-.fenetreGalaxie-plusTard{ display: block; width: 100%; margin-top: 10px; padding: 12px; border-radius: 999px; cursor: pointer;
-  border: 1px solid rgba(255, 232, 31, 0.5); background: transparent; color: #FFE81F; font: 800 15px Arial, sans-serif; }
+.fenetreGalaxie-ok, .fenetreGalaxie-plusTard{ display: block; width: 100%; padding: 14px; border-radius: 8px; cursor: pointer; letter-spacing: 0.04em;
+  background: linear-gradient(180deg, rgba(14, 22, 44, 0.92), rgba(6, 10, 22, 0.92)); color: #eaf3ff; border: 1.5px solid #8fd0ff;
+  box-shadow: 0 0 6px #4aa8ff, 0 0 16px rgba(40, 140, 255, 0.55), inset 0 0 10px rgba(80, 170, 255, 0.22); font: 800 16px Arial, sans-serif; }
+.fenetreGalaxie-plusTard{ margin-top: 10px; padding: 11px; font-size: 14px; color: #9fb6d8; border-color: rgba(143, 208, 255, 0.45); box-shadow: none; }
 .fenetreGalaxie-ok:active, .fenetreGalaxie-plusTard:active{ filter: brightness(0.9); transform: scale(0.98); }
 @keyframes fenetreGalaxieBrille{
-  0%, 100%{ box-shadow: 0 0 0 4px #FFE81F, 0 0 26px rgba(255, 232, 31, 0.45); }
-  50%{ box-shadow: 0 0 0 4px #FFE81F, 0 0 48px rgba(255, 232, 31, 0.85); }
+  0%, 100%{ box-shadow: 0 0 0 3px #8fd0ff, 0 0 12px #39a0ff, 0 0 28px rgba(31, 123, 255, 0.45); }
+  50%{ box-shadow: 0 0 0 3px #8fd0ff, 0 0 20px #39a0ff, 0 0 50px rgba(31, 123, 255, 0.85); }
 }
 @media (prefers-reduced-motion: reduce){ #fenetreGalaxie, .fenetreGalaxie-carte, .fenetreGalaxie-rond{ animation: none; } }
 html[data-theme="galaxie"] #ecranTele .tele-entete::after{ background: #eaf6ff !important; box-shadow: 0 0 0.5vh #fff, 0 0 1.4vh #39a0ff, 0 0 3vh #1f7bff; }
