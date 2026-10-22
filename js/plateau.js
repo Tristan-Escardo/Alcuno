@@ -980,7 +980,7 @@ function lancerOverlayPrediction(startIndex){
   const subtitle = document.createElement("div");
   subtitle.className = "overlay-subtitle prediction-subtitle";
   // (le 2e bout de phrase à la ligne)
-  subtitle.append("Chacun choisit un type de carte.", document.createElement("br"), `Tous ceux qui trouvent distribuent ${texteCulSec()}\u00a0!`); // (espace insécable : le « ! » ne reste pas seul à la ligne)
+  subtitle.append("Chacun choisit un type de carte.", document.createElement("br"), `Tous ceux qui trouvent distribuent ${texteCulSec().replace(/ /g, "\u00a0")}\u00a0!`); // (espaces insécables : « un CUL SEC ! » reste groupé, le « ! » ne passe jamais seul à la ligne)
 
   header.appendChild(titre);
   header.appendChild(subtitle);
