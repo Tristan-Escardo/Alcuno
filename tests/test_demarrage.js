@@ -249,7 +249,25 @@ function verifier(ok, texte){
     await a.ctx.close(); await b.ctx.close();
   }
 
-  // 11. Les fenêtres de déblocage (Prestige, Star Wars) gardent leurs propres boutons dans tous les thèmes
+  // 11. Thème Sombre : les boutons des fenêtres de jeu sont sombres comme ceux des menus (pas le dégradé jaune)
+  {
+    const { ctx, page, erreurs } = await ouvrir();
+    await page.click("#btnModeClassique"); await page.waitForTimeout(800);
+    for (const nom of ["Tom", "Lea", "Max"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(250); }
+    await page.click("#jouer"); await page.waitForTimeout(1200);
+    const fond = async (theme) => page.evaluate((theme) => {
+      document.documentElement.dataset.theme = theme;
+      document.getElementById("overlayPigeon")?.remove();
+      indexPigeon = 0; afficherMenuPigeon();
+      const s = getComputedStyle(document.querySelector("#overlayPigeon .bouton-pigeon"));
+      return s.backgroundImage + "|" + s.color;
+    }, theme);
+    const sombre = await fond("noir"), bordeaux = await fond("bordeaux");
+    verifier(/rgb\(13, 11, 6\)/.test(sombre) && sombre !== bordeaux && erreurs.length === 0, `thème Sombre : boutons des fenêtres de jeu sombres (${sombre.slice(0, 50)}…)`);
+    await ctx.close();
+  }
+
+  // 12. Les fenêtres de déblocage (Prestige, Star Wars) gardent leurs propres boutons dans tous les thèmes
   {
     const { ctx, page } = await ouvrir();
     const themes = [...THEMES, "prestige", "galaxie"];

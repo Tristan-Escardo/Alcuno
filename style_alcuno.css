@@ -6889,6 +6889,39 @@ html[data-theme="noir"] #choixMode #titreAccueil::after{
   html[data-theme="noir"] #choixMode #titreAccueil::before, html[data-theme="noir"] #choixMode #titreAccueil::after{ animation: none; }
 }
 
+/* ===== Thème Sombre : le reste du jeu dans le même esprit (boutons des fenêtres de jeu, écran de reprise, scanner,
+   panneaux du pari et du récap en noir pur à fine bordure, voile de l'aide noir). !important : ces boutons ont déjà
+   un dégradé jaune imposé, et le JS en colore certains directement. Carte dorée : ses boutons or métallique restent. ===== */
+html[data-theme="noir"] :is(#btnRepriseOui, #btnRepriseNon, #btnFermerScanner, #overlayPigeon .bouton-pigeon,
+  #overlayPlus4 .bouton-pigeon, #overlayDuel button:not(:disabled), #overlayFinUnRestants .bouton-pigeon,
+  #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation, #overlayAnnulation button){
+  background: linear-gradient(180deg, #0d0b06, #030302) !important;
+  color: #ffd426 !important;
+  border: 1px solid rgba(255, 210, 38, 0.6) !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+@media (hover: hover){
+  html[data-theme="noir"] body :is(#btnRepriseOui, #btnRepriseNon, #btnFermerScanner, #overlayPigeon .bouton-pigeon,
+    #overlayPlus4 .bouton-pigeon, #overlayDuel button:not(:disabled), #overlayFinUnRestants .bouton-pigeon,
+    #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation, #overlayAnnulation button):hover:not(:disabled){
+    filter: none;
+    box-shadow: 0 0 0 2px rgba(255, 210, 38, 0.7), 0 6px 18px rgba(255, 210, 38, 0.18) !important;
+  }
+}
+html[data-theme="noir"] #menu #btnCaster{
+  background: linear-gradient(180deg, #0d0b06, #030302) !important;
+  color: #ffd426 !important;
+  border: 1px solid rgba(255, 210, 38, 0.6) !important;
+}
+html[data-theme="noir"] :is(.prediction-header, .fin-choix-recap, .recap-marche, .recap-liste, .recap-bloc){
+  background: #000 !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  box-shadow: none !important;
+}
+html[data-theme="noir"] .recap-m1{ border-color: rgba(255, 215, 0, 0.6) !important; }
+html[data-theme="noir"] .aideAccueil-voile{ background: rgba(0, 0, 0, 0.82); }
+
 /* ===== Thème Prestige débloqué : fenêtre dorée au milieu de l'écran (js/reglages.js) ===== */
 #fenetrePrestige{
   position: fixed;
