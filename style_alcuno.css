@@ -1008,7 +1008,7 @@ body.no-scroll{
 
 .fin-choix-card:active{ transform: scale(0.98); }
 
-/* Petits numéros (ordre de passage) sur les cartes choisies, en haut à droite */
+/* Petit compteur de choix (1, 2, 3…) sur les cartes choisies, en haut à droite */
 .fin-choix-card{ position: relative; }
 .fin-choix-numeros{
   position: absolute;
@@ -1037,7 +1037,7 @@ html[data-theme="galaxie"] .fin-choix-numeros b{ background: #8fd0ff; color: #02
   opacity: 0.55;
   pointer-events: none;
 }
-.fin-choix-card.disabled.choisie{ opacity: 1; } /* (les cartes choisies restent bien lisibles avec leur numéro) */
+.fin-choix-card.disabled.choisie{ opacity: 1; } /* (les cartes choisies restent bien lisibles avec leur compteur) */
 
 @media (max-width: 520px){
   .fin-choix-grid{ --fin-cols: 3; }

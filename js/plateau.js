@@ -1078,7 +1078,7 @@ function lancerOverlayPrediction(startIndex){
       const ligne = document.createElement("div");
       ligne.className = "ligne" + (i === curPos && !revele ? " en-cours" : "");
       const who = document.createElement("strong");
-      who.innerText = `${i + 1}. ${joueurs[jIdx]}` + (i === curPos && !revele ? " ←" : "");
+      who.innerText = joueurs[jIdx] + (i === curPos && !revele ? " ←" : "");
       const what = document.createElement("span");
       what.className = "choix";
       const type = p.typeId ? TYPES_PARIS.find(t => t.id === p.typeId) : null;
@@ -1094,18 +1094,19 @@ function lancerOverlayPrediction(startIndex){
       recap.appendChild(ligne);
     });
 
-    // Petit numéro (l'ordre de passage, comme dans le récap) sur chaque carte choisie ; plusieurs si plusieurs joueurs l'ont prise
+    // Petit compteur sur chaque carte choisie : 1 au premier choix, 2 si un deuxième joueur prend la même carte, etc.
     Array.from(grid.querySelectorAll('.fin-choix-card')).forEach(carte => {
-      const anciens = carte.querySelector('.fin-choix-numeros');
-      if(anciens) anciens.remove();
-      const numeros = [];
-      ordre.forEach((jIdx, i) => { if(predictions[jIdx].typeId === carte.dataset.typeId) numeros.push(i + 1); });
-      carte.classList.toggle('choisie', numeros.length > 0);
-      if(!numeros.length) return;
-      const pastilles = document.createElement('span');
-      pastilles.className = 'fin-choix-numeros';
-      numeros.forEach(n => { const b = document.createElement('b'); b.textContent = n; pastilles.appendChild(b); });
-      carte.appendChild(pastilles);
+      const ancien = carte.querySelector('.fin-choix-numeros');
+      if(ancien) ancien.remove();
+      const nb = ordre.filter(jIdx => predictions[jIdx].typeId === carte.dataset.typeId).length;
+      carte.classList.toggle('choisie', nb > 0);
+      if(!nb) return;
+      const pastille = document.createElement('span');
+      pastille.className = 'fin-choix-numeros';
+      const b = document.createElement('b');
+      b.textContent = nb;
+      pastille.appendChild(b);
+      carte.appendChild(pastille);
     });
 
     majBoutonsPari();

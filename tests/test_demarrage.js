@@ -176,11 +176,15 @@ function verifier(ok, texte){
     await cartes[0].dispatchEvent("pointerdown"); // le doigt se pose (début d'un défilement) : rien ne doit être choisi
     await page.waitForTimeout(200);
     const apresPose = await page.evaluate(() => document.querySelectorAll("#overlayPredictionFin .fin-choix-numeros").length);
+    const compteur = () => page.evaluate(() => [...document.querySelectorAll("#overlayPredictionFin .fin-choix-card .fin-choix-numeros b")].map((b) => b.textContent).join(","));
     await cartes[0].click(); await page.waitForTimeout(200);
-    await cartes[0].click(); await page.waitForTimeout(100); // (même carte pour le 2e joueur : deux numéros dessus)
-    const numeros = await page.evaluate(() => [...document.querySelectorAll("#overlayPredictionFin .fin-choix-card.choisie .fin-choix-numeros b")].map((b) => b.textContent).join(","));
-    verifier(sousTitreSurDeuxLignes && apresPose === 0 && numeros === "1,2" && erreurs.length === 0,
-      `pari de la fin : phrase à la ligne (${sousTitreSurDeuxLignes}), rien au doigt posé (${apresPose}), numéros sur la carte (${numeros})`);
+    const un = await compteur();
+    await cartes[0].click(); await page.waitForTimeout(200); // (même carte pour le 2e joueur : le 1 devient 2)
+    const deux = await compteur();
+    await cartes[1].click(); await page.waitForTimeout(200); // (autre carte pour le 3e : un 1 dessus)
+    const trois = await compteur();
+    verifier(sousTitreSurDeuxLignes && apresPose === 0 && un === "1" && deux === "2" && trois === "2,1" && erreurs.length === 0,
+      `pari de la fin : phrase à la ligne (${sousTitreSurDeuxLignes}), rien au doigt posé (${apresPose}), compteur ${un} puis ${deux} puis ${trois}`);
     await ctx.close();
   }
 
