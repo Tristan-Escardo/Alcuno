@@ -228,7 +228,27 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
-  // 10. Les fenêtres de déblocage (Prestige, Star Wars) gardent leurs propres boutons dans tous les thèmes
+  // 10. Duel à 2 joueurs : pas de choix, le tirage commence directement ; à 3 joueurs : on choisit
+  {
+    const ouvrirDuel = async (noms) => {
+      const o = await ouvrir();
+      await o.page.click("#btnModeClassique"); await o.page.waitForTimeout(800);
+      for (const nom of noms) { await o.page.fill("#nomJoueur", nom); await o.page.click("#ajouterJoueur"); await o.page.waitForTimeout(250); }
+      await o.page.click("#jouer"); await o.page.waitForTimeout(1200);
+      await o.page.evaluate(() => lancerOverlayChoixDuel(0, ""));
+      await o.page.waitForTimeout(500);
+      const etat = await o.page.evaluate(() => ({ choix: document.querySelectorAll("#overlayDuel .duel-boutons button").length,
+        tirage: !!document.querySelector("#overlayDuel .duel-tirage-content") }));
+      return { ...o, etat };
+    };
+    const a = await ouvrirDuel(["Tom", "Lea"]);
+    const b = await ouvrirDuel(["Tom", "Lea", "Max"]);
+    verifier(a.etat.choix === 0 && a.etat.tirage && b.etat.choix === 3 && !b.etat.tirage && a.erreurs.length === 0 && b.erreurs.length === 0,
+      `duel : 2 joueurs ${JSON.stringify(a.etat)} (tirage direct), 3 joueurs ${JSON.stringify(b.etat)} (choix)`);
+    await a.ctx.close(); await b.ctx.close();
+  }
+
+  // 11. Les fenêtres de déblocage (Prestige, Star Wars) gardent leurs propres boutons dans tous les thèmes
   {
     const { ctx, page } = await ouvrir();
     const themes = [...THEMES, "prestige", "galaxie"];

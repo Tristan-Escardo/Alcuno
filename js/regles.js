@@ -957,6 +957,13 @@ function lancerOverlayChoixDuel(joueurActuel, carteDuel = ""){
   });
 
   document.body.appendChild(overlay);
+
+  // Seulement 2 joueurs en jeu : le choix est forcé, on passe directement au tirage (sans demander quoi que ce soit)
+  if(nbDuellistes === 2){
+    const duellistes = joueurs.map((nom, idx) => idx).filter(idx => !estEnPause(joueurs[idx]));
+    overlay.innerHTML = "";
+    afficherOverlayTirageDuel(overlay, duellistes[0], duellistes[1], carteDuel);
+  }
 }
 
 function afficherOverlayTirageDuel(overlay, j1, j2, carteDuel = ""){
