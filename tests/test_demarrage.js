@@ -153,10 +153,12 @@ function verifier(ok, texte){
     await page.click("#jouer"); await page.waitForTimeout(1200);
     await page.evaluate(() => finDePartie());
     await page.waitForSelector("#overlayFinUnRestants button.bouton-pigeon:not(.fin-revanche)");
+    const recap = await page.evaluate(() => (document.querySelector("#overlayFinUnRestants .recap-sous") || {}).innerText || "");
     await page.click("#overlayFinUnRestants button.bouton-pigeon:not(.fin-revanche)");
     await page.waitForTimeout(600);
     const etat = await page.evaluate(() => ({ accueil: getComputedStyle(document.getElementById("choixMode")).display !== "none",
       jeu: getComputedStyle(document.getElementById("jeu")).display !== "none", fin: !!document.getElementById("overlayFinUnRestants") }));
+    verifier(!/cartes/.test(recap), `fin de partie : pas de nombre de cartes dans le récap (« ${recap} »)`);
     verifier(etat.accueil && !etat.jeu && !etat.fin && erreurs.length === 0, `fin de partie : « Terminer » ramène à l'accueil (${JSON.stringify(etat)})`);
     await ctx.close();
   }

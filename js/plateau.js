@@ -206,7 +206,7 @@ function construireRecap(r){
   };
   const recap = el("div", "recap");
   recap.append(el("div", "recap-titre", "🏆 Fin de partie"),
-    el("div", "recap-sous", `${r.cartes} cartes${r.minutes ? ` · ${r.minutes} min` : ""} · ${r.nbJoueurs} joueurs`));
+    el("div", "recap-sous", `${r.minutes ? `${r.minutes} min · ` : ""}${r.nbJoueurs} joueurs`));
   const haut = el("div", "recap-gauche");
   const podium = el("div", "recap-podium");
   ["🥇", "🥈", "🥉"].forEach((medaille, i) => {
