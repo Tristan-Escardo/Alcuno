@@ -126,7 +126,26 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
-  // 6. Les fenêtres de déblocage (Prestige, Star Wars) gardent leurs propres boutons dans tous les thèmes
+  // 6. Duel : un tap sur un joueur joue UN son de bouton (sabre en Star Wars) et le joueur choisi se voit
+  {
+    const { ctx, page, erreurs } = await ouvrir();
+    await page.evaluate(() => { document.documentElement.dataset.theme = "galaxie"; });
+    await page.click("#btnModeClassique"); await page.waitForTimeout(800);
+    for (const nom of ["Tom", "Lea", "Max"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(250); }
+    await page.click("#jouer"); await page.waitForTimeout(1200);
+    await page.evaluate(() => { window.__sons = []; const origine = jouerSon; jouerSon = (nom, ...reste) => { window.__sons.push(nom); return origine(nom, ...reste); }; lancerOverlayChoixDuel(0, ""); });
+    await page.waitForTimeout(800);
+    const avant = await page.evaluate(() => getComputedStyle(document.querySelectorAll("#overlayDuel .duel-boutons button")[0]).backgroundImage);
+    await (await page.$$("#overlayDuel .duel-boutons button"))[0].click();
+    await page.waitForTimeout(300);
+    const sons = await page.evaluate(() => window.__sons);
+    const apres = await page.evaluate(() => getComputedStyle(document.querySelectorAll("#overlayDuel .duel-boutons button")[0]).backgroundImage);
+    verifier(sons.length === 1 && sons[0] === "bouton" && avant !== apres && erreurs.length === 0,
+      `duel Star Wars : un son au tap (${sons.join(", ")}), joueur choisi en holo (${avant !== apres ? "oui" : "non"})`);
+    await ctx.close();
+  }
+
+  // 7. Les fenêtres de déblocage (Prestige, Star Wars) gardent leurs propres boutons dans tous les thèmes
   {
     const { ctx, page } = await ouvrir();
     const themes = [...THEMES, "prestige", "galaxie"];

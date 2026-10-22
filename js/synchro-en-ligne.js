@@ -22,6 +22,14 @@ function surAction(el, id, options, handler){
     // Tap sur le plateau ou les menus alors qu'un overlay (ou le voile entre deux) est affiché : ignoré.
     // Seulement les taps de ce téléphone : les actions des autres sont toujours rejouées.
     if(el.closest("main") && (overlayOuvert() || voileOverlays.classList.contains("visible"))) return;
+    // Ces boutons agissent au doigt posé : le bouton est souvent désactivé ou retiré avant le « click », qui ne
+    // vient alors jamais (pas de son du tout, ni le sabre du thème Star Wars). Le son du bouton se joue donc ici,
+    // sauf pour ceux qui ont leur propre son ; le « click » qui suivrait ne le rejoue pas (voir reglages.js)
+    if(e.isTrusted && el.tagName === "BUTTON" && !el.disabled && !el.matches(BOUTONS_AVEC_LEUR_SON) &&
+       !document.documentElement.classList.contains("mode-tele")){
+      jouerSon("bouton");
+      sonBoutonJoueLe = Date.now();
+    }
     if(!enLigneActif){
       // Mêmes règles qu'en ligne : élément prêt, action pas sans objet, usage unique pas déjà fait
       // (avant, un double tap rapide sur « Annuler 1 » s'appliquait deux fois). Les taps appliqués

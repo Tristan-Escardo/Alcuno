@@ -7489,7 +7489,7 @@ html[data-theme="galaxie"] #choixMode .titreAccueilBarre, html[data-theme="galax
   box-shadow: 0 0 4px #fff, 0 0 10px #39a0ff, 0 0 22px #1f7bff, 0 0 40px rgba(31,123,255,.6) !important; animation:none !important;
 }
 /* Boutons : lame bleue, « Jouer » et le mode classique en rouge */
-html[data-theme="galaxie"] button:not(.pastilleTheme):not(#btnRemonter):not(#btnPause):not(#btnHistorique):not(.btnPauseJoueur):not(.btnLivre):not(#btnReglages):not(.btnAccueilTexte):not(#btnSignalerBug):not(.fenetrePrestige-essayer):not(.fenetrePrestige-plusTard):not(.fenetreGalaxie-ok):not(.fenetreGalaxie-plusTard){
+html[data-theme="galaxie"] button:not(.pastilleTheme):not(#btnRemonter):not(#btnPause):not(#btnHistorique):not(.btnPauseJoueur):not(.btnLivre):not(#btnReglages):not(.btnAccueilTexte):not(#btnSignalerBug):not(.fenetrePrestige-essayer):not(.fenetrePrestige-plusTard):not(.fenetreGalaxie-ok):not(.fenetreGalaxie-plusTard):not(#overlayDuel .duel-boutons button:disabled){
   background: linear-gradient(180deg, rgba(14,22,44,.92), rgba(6,10,22,.92)) !important; color:#eaf3ff !important; text-shadow:none !important;
   border: 1.5px solid #8fd0ff !important; letter-spacing:.04em;
   box-shadow: 0 0 6px #4aa8ff, 0 0 16px rgba(40,140,255,.55), inset 0 0 10px rgba(80,170,255,.22) !important;
@@ -7517,6 +7517,15 @@ html[data-theme="galaxie"] header::after{ height: 3px !important; }
 html[data-theme="galaxie"] [id^="overlay"]{ background: radial-gradient(ellipse at 50% 40%, rgba(30,70,170,.45), rgba(2,3,10,.97) 70%), #02030a !important; } /* (fond plein : rien ne doit se voir derrière, ni le plateau ni une autre fenêtre) */
 html[data-theme="galaxie"] :is(.overlay-regle-texte, .titre-pigeon, #overlayAnnulation > div){ color:#FFE81F !important; text-shadow: 0 0 12px rgba(255,232,31,.35) !important; }
 html[data-theme="galaxie"] :is(.bouton-pigeon, .bouton-annulation){ border-radius: 8px !important; }
+/* Duel : joueur déjà choisi = bouton « holo » bleu clair qui brille (le dégradé jaune des autres thèmes ne va pas au thème) */
+html[data-theme="galaxie"] #overlayDuel .duel-boutons button:disabled{
+  opacity: 1 !important;
+  background: linear-gradient(180deg, rgba(160, 220, 255, 0.55), rgba(70, 150, 255, 0.4)) !important;
+  color: #fff !important;
+  border: 1.5px solid #d6f1ff !important;
+  text-shadow: 0 0 8px #8fd0ff !important;
+  box-shadow: 0 0 10px #bfe6ff, 0 0 28px rgba(90, 180, 255, 0.85), inset 0 0 16px rgba(220, 245, 255, 0.6) !important;
+}
 /* Pause, volets, réglages, règles */
 html[data-theme="galaxie"] :is(#ecranPause){ background: rgba(2,3,10,.75) !important; }
 html[data-theme="galaxie"] .voletPause-feuille{ background: #050a1a !important; border-top: 2px solid #4aa8ff !important; box-shadow: 0 -4px 22px rgba(40,140,255,.45) !important; }
