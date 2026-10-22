@@ -119,7 +119,7 @@ function verifier(ok, texte){
       return [...vues].filter((x) => /Obi-Wan|Dark Vodka|Luke, je suis/.test(x)).length;
     }, theme);
     const sw = await compter("galaxie"), autre = await compter("bordeaux");
-    verifier(sw === 4 && autre === 0, `phrases Star Wars : ${sw}/4 dans Star Wars, ${autre} ailleurs`);
+    verifier(sw === 3 && autre === 0, `phrases Star Wars : ${sw}/3 dans Star Wars, ${autre} ailleurs`);
     await ctx.close();
   }
 
