@@ -289,7 +289,7 @@ function afficherGeneriqueGalaxie(premiere){
 }
 
 // Thème Star Wars débloqué : fenêtre jaune sur noir, comme celle de Prestige, juste après le générique.
-// « L'essayer maintenant » met le thème (comme dans les Réglages), « Plus tard » ferme.
+// « Que la gorgée soit avec toi » met le thème (comme dans les Réglages), « Plus tard » ferme.
 function afficherFenetreGalaxie(){
   if (document.getElementById("fenetreGalaxie")) return;
   const voile = document.createElement("div");
@@ -302,9 +302,8 @@ function afficherFenetreGalaxie(){
       <span class="fenetreGalaxie-rond" aria-hidden="true"></span>
       <div class="fenetreGalaxie-titre">Thème Star Wars<br>débloqué !</div>
       <div class="fenetreGalaxie-texte">Il est maintenant dans<br>Réglages › Thèmes</div>
-      <button type="button" class="fenetreGalaxie-ok">L'essayer maintenant</button>
+      <button type="button" class="fenetreGalaxie-ok">Que la gorgée soit avec toi</button>
       <button type="button" class="fenetreGalaxie-plusTard">Plus tard</button>
-      <div class="fenetreGalaxie-fin">Que la gorgée soit avec toi.</div>
     </div>`;
   const fermer = () => {
     voile.classList.add("fenetreGalaxie-sortie");

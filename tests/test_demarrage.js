@@ -104,7 +104,7 @@ function verifier(ok, texte){
     await page.click(".fenetreGalaxie-ok");
     await page.waitForTimeout(800);
     const themeApres = await page.evaluate(() => document.documentElement.dataset.theme);
-    verifier(themeAvant !== "galaxie" && themeApres === "galaxie", `Star Wars : thème pas mis tout seul (${themeAvant}), mis par « L'essayer maintenant » (${themeApres})`);
+    verifier(themeAvant !== "galaxie" && themeApres === "galaxie", `Star Wars : thème pas mis tout seul (${themeAvant}), mis par « Que la gorgée soit avec toi » (${themeApres})`);
     verifier(generique && duree === "46.5s" && fenetre && erreurs.length === 0, `Star Wars : générique (${duree}) puis fenêtre « débloqué »`);
     await ctx.close();
   }
