@@ -170,9 +170,9 @@ function calculerRecap(restants = []){
   const ajouter = (e, t, m, texte) => { if(m) titres.push({ e, t, q: `${m.qui} · ${texte(m.v)}` }); };
   ajouter("🐦", "Pigeon de la soirée", meilleurs(st.pigeon), v => `${v} fois`);
   ajouter("💥", "Plus gros coup", meilleurs(st.plusGros, 2), v => `${v} d'un coup`);
-  ajouter("🛡️", "Roi de l'esquive", meilleurs(st.annulees), v => pluriel(v, "annulée"));
+  ajouter("🛡️", "Trompe-la-mort", meilleurs(st.annulees), v => pluriel(v, "annulée"));
   ajouter("😇", "Le plus sage", meilleurs(gorgees, 0, true), v => pluriel(v, "gorgée"));
-  ajouter("⚔️", "Roi du duel", meilleurs(st.duels), v => `${v} duel${v > 1 ? "s" : ""} gagné${v > 1 ? "s" : ""}`);
+  ajouter("⚔️", "Duelliste", meilleurs(st.duels), v => `${v} duel${v > 1 ? "s" : ""} gagné${v > 1 ? "s" : ""}`);
   ajouter("🎯", "Aimant à +4", meilleurs(st.plus4), v => `${pluriel(v, "gorgée")} de +4`);
   const culSecs = !st.doree ? 0 : st.doree.personne ? joueurs.length : 1;
   return {
