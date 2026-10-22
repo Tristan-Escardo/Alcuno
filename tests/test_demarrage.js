@@ -126,6 +126,28 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
+  // 6. Les fenêtres de déblocage (Prestige, Star Wars) gardent leurs propres boutons dans tous les thèmes
+  {
+    const { ctx, page } = await ouvrir();
+    const themes = [...THEMES, "prestige", "galaxie"];
+    for (const [nom, fonction, selecteur] of [["Prestige", "afficherFenetrePrestige", ".fenetrePrestige-essayer, .fenetrePrestige-plusTard"],
+        ["Star Wars", "afficherFenetreGalaxie", ".fenetreGalaxie-ok, .fenetreGalaxie-plusTard"]]) {
+      const styles = [];
+      for (const theme of themes) {
+        styles.push(await page.evaluate(([theme, fonction, selecteur]) => {
+          document.querySelectorAll("#fenetrePrestige, #fenetreGalaxie").forEach((e) => e.remove());
+          document.documentElement.dataset.theme = theme;
+          eval(fonction + "()");
+          return [...document.querySelectorAll(selecteur)].map((b) => { const s = getComputedStyle(b);
+            return [s.backgroundImage, s.backgroundColor, s.color, s.borderTopColor, s.boxShadow].join("|"); }).join("##");
+        }, [theme, fonction, selecteur]));
+      }
+      const differents = themes.filter((_, i) => styles[i] !== styles[0]);
+      verifier(differents.length === 0, `fenêtre ${nom} : mêmes boutons dans tous les thèmes ${differents.join(", ")}`);
+    }
+    await ctx.close();
+  }
+
   await nav.close();
   serveur.close();
   console.log(echecs ? `\n${echecs} ÉCHEC(S)` : "\nTOUT EST OK");
