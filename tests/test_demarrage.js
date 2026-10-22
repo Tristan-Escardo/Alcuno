@@ -145,7 +145,23 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
-  // 7. Les fenêtres de déblocage (Prestige, Star Wars) gardent leurs propres boutons dans tous les thèmes
+  // 7. Fin de partie : « Terminer » ramène à l'accueil
+  {
+    const { ctx, page, erreurs } = await ouvrir();
+    await page.click("#btnModeClassique"); await page.waitForTimeout(800);
+    for (const nom of ["Tom", "Lea"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(250); }
+    await page.click("#jouer"); await page.waitForTimeout(1200);
+    await page.evaluate(() => finDePartie());
+    await page.waitForSelector("#overlayFinUnRestants button.bouton-pigeon:not(.fin-revanche)");
+    await page.click("#overlayFinUnRestants button.bouton-pigeon:not(.fin-revanche)");
+    await page.waitForTimeout(600);
+    const etat = await page.evaluate(() => ({ accueil: getComputedStyle(document.getElementById("choixMode")).display !== "none",
+      jeu: getComputedStyle(document.getElementById("jeu")).display !== "none", fin: !!document.getElementById("overlayFinUnRestants") }));
+    verifier(etat.accueil && !etat.jeu && !etat.fin && erreurs.length === 0, `fin de partie : « Terminer » ramène à l'accueil (${JSON.stringify(etat)})`);
+    await ctx.close();
+  }
+
+  // 8. Les fenêtres de déblocage (Prestige, Star Wars) gardent leurs propres boutons dans tous les thèmes
   {
     const { ctx, page } = await ouvrir();
     const themes = [...THEMES, "prestige", "galaxie"];

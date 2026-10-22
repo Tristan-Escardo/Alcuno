@@ -53,6 +53,7 @@ function afficherOverlayFinUnRestants(){
 
     overlay.remove();
     unlockScroll();
+    allerAccueil(); // partie terminée : retour à l'accueil (en ligne, tout le monde y retourne, l'action est partagée)
   });
 
   // « Revanche » : relance tout de suite une partie avec les mêmes joueurs (comme « Nouvelle partie >
