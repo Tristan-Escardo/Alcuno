@@ -267,6 +267,20 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
+  // 13. Préparation de partie sur téléphone : la disposition (champ + « + » + « − » sur une ligne) revient après « Supprimer »
+  {
+    const { ctx, page, erreurs } = await ouvrir();
+    await page.click("#btnModeClassique"); await page.waitForTimeout(800);
+    for (const nom of ["Tom", "Lea"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(250); }
+    const grille = () => page.evaluate(() => getComputedStyle(document.getElementById("menu")).display);
+    const avant = await grille();
+    await page.click("#supprimerJoueur"); await page.waitForTimeout(600);
+    await page.click("#termineSuppression"); await page.waitForTimeout(600);
+    const apres = await grille();
+    verifier(avant === "grid" && apres === "grid" && erreurs.length === 0, `préparation de partie : grille avant (${avant}) et après « Supprimer » (${apres})`);
+    await ctx.close();
+  }
+
   // 12. Les fenêtres de déblocage (Prestige, Star Wars) gardent leurs propres boutons dans tous les thèmes
   {
     const { ctx, page } = await ouvrir();

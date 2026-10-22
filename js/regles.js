@@ -1931,7 +1931,7 @@ function retourMenu(){
   btnNouvellePartie.style.display = "none";
   btnSupprimer.style.display = "inline-block";
   btnJouer.style.display = joueurs.length >= 2 ? "inline-block" : "none";
-  menu.style.display = "flex";
+  menu.style.display = ""; // (la disposition vient du CSS : flex, ou grille sur téléphone)
 
   afficherJoueurs();
   // Sécurité : on réactive le scroll quoi qu'il arrive

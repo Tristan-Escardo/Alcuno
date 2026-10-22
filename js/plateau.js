@@ -1659,7 +1659,7 @@ btnTermine.addEventListener("click", ()=>{
     if(name != null) delete annulations[name];
   });
   suppression.style.display="none";
-  menu.style.display="flex";
+  menu.style.display = ""; // (la disposition vient du CSS : flex, ou grille sur téléphone)
   unlockScroll();
   afficherJoueurs();
 });
@@ -1722,7 +1722,7 @@ function fermerRetraitEnJeu(){
   ecranConfirmerRetrait.style.display = "none";
   if(suppression.style.display !== "none"){
     suppression.style.display = "none";
-    menu.style.display = "flex";
+    menu.style.display = ""; // (la disposition vient du CSS : flex, ou grille sur téléphone)
     unlockScroll();
   }
 }
