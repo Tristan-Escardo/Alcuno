@@ -1173,11 +1173,11 @@ html[data-theme="galaxie"] .fin-choix-numeros b{ background: #8fd0ff; color: #02
     #menu #ajouterJoueur{ order: 2; flex: 0 0 48px; margin-top: 0; padding: 0; }
     #menu #supprimerJoueur{ order: 3; flex: 0 0 48px; margin-top: 0; padding: 0; }
     #menu::after{ content: ""; order: 4; flex: 0 0 100%; height: 0; margin: 0; }
-    #menu #jouer{ order: 5; flex: 1 1 0; min-height: 42px; font-size: 17px; }
-    #menu #nouvellePartie{ order: 5; flex: 1 1 0; min-height: 42px; font-size: 16px; }
-    #menu:has(#nouvellePartie:not([style*="none"])) #nouvellePartie{ margin-top: 0; } /* (première ligne en partie) */
+    #menu #jouer{ order: 5; flex: 1 1 0; height: 42px; padding-top: 0; padding-bottom: 0; font-size: 17px; }
+    #menu #nouvellePartie{ order: 5; flex: 1 1 0; height: 42px; padding-top: 0; padding-bottom: 0; font-size: 16px; }
+    #menu:has(#nouvellePartie:not([style*="none"])) :is(#nouvellePartie, #btnCaster){ margin-top: 0; } /* (première ligne en partie) */
     #menu:has(#nouvellePartie:not([style*="none"])) #supprimerJoueur{ order: 5; } /* (en partie : « − » à droite de « Nouvelle partie », pas seul sur sa ligne) */
-    html #menu #btnCaster{ order: 6 !important; flex: 1 1 100%; min-height: 42px; font-size: 16px; }
+    html #menu #btnCaster{ order: 6 !important; flex: 1 1 100%; height: 42px; padding-top: 0; padding-bottom: 0; font-size: 16px; }
     /* Quand « Jouer » ou « Nouvelle partie » est affiché : « Caster » n'est plus que son icône, carrée, à côté (plus de place pour le gros bouton) */
     html #menu:is(:has(#jouer:not([style*="none"])), :has(#nouvellePartie:not([style*="none"]))) #btnCaster{ flex: 0 0 48px; min-height: 42px; padding-left: 0; padding-right: 0; }
     html #menu:is(:has(#jouer:not([style*="none"])), :has(#nouvellePartie:not([style*="none"]))) #btnCaster .casterTexte{ display: none; }
