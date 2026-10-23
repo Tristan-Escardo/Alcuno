@@ -1538,6 +1538,7 @@ function afficherJoueurs(){
     btnJouer.style.display = joueurs.length >= 2 ? "inline-block" : "none";
   }
   majBoutonsJoueurs();
+  marquerJoueurActifDansListe();
   majStickyJoueurActif();
 }
 
@@ -1551,9 +1552,16 @@ function majBoutonsJoueurs(){
 }
 
 
+// Pastille du joueur dont c'est le tour, dans la liste des joueurs (aucune pendant un choix : pigeon, duel…)
+function marquerJoueurActifDansListe(){
+  const actif = partieLancee && !choixPigeonEnCours && !duelEnCours && joueurs.length > 0 ? indexJoueur % joueurs.length : -1;
+  listeJoueurs.querySelectorAll(".joueur-ligne").forEach((ligne, i) => ligne.classList.toggle("joueur-ligne-actif", i === actif));
+}
+
 function afficherJoueurActif(){
   if(!partieLancee || choixPigeonEnCours || duelEnCours || joueurs.length === 0){
     joueurActif.innerText = "";
+    marquerJoueurActifDansListe();
     majStickyJoueurActif();
     return;
   }
@@ -1563,9 +1571,10 @@ function afficherJoueurActif(){
   const n = Number(annulations[nom] || 0);
   const libelle = idx === indexPigeon ? `PIGEON (${avecCouronne(nom)})` : avecCouronne(nom);
   const bonus = n > 0 ? ` +${n}` : "";
-  joueurActif.innerText = "Joueur actif : " + libelle + bonus;
+  joueurActif.innerText = libelle + bonus; // (le titre « Joueur actif » est au-dessus / à côté, dans index.html)
   ajouterBadgeDeconnecte(joueurActif, !!texteDeconnecte(nom));
 
+  marquerJoueurActifDansListe();
   majStickyJoueurActif();
 }
 

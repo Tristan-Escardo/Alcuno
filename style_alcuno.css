@@ -1176,11 +1176,72 @@ html[data-theme="galaxie"] .fin-choix-numeros b{ background: #8fd0ff; color: #02
     #menu #jouer, #menu #nouvellePartie{ order: 5; flex: 1 1 90px; height: 42px; padding-top: 0; padding-bottom: 0; }
     #menu #nouvellePartie{ flex-basis: 130px; }
     #menu:has(#nouvellePartie:not([style*="none"])) #nouvellePartie{ margin-top: 0; } /* (première ligne en partie) */
+    #menu:has(#nouvellePartie:not([style*="none"])) #supprimerJoueur{ order: 5; } /* (en partie : « − » à droite de « Nouvelle partie », pas seul sur sa ligne) */
     html #menu #btnCaster{ order: 6 !important; flex: 2 1 190px; padding-left: 46px; padding-right: 10px; height: 42px; padding-top: 0; padding-bottom: 0; } /* (moins de marge pour tenir à côté de « Jouer » / « Nouvelle partie ») */
     #menu .libelleLong{ display: none; }
     #menu :is(#ajouterJoueur, #supprimerJoueur) .libelleCourt{ display: flex; align-items: center; justify-content: center; }
     #menu .libelleCourt svg{ width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     /* (en partie, « Supprimer un joueur » n'est pas affiché ; sinon ses deux versions de texte) */
+}
+/* ===== Téléphone, debout ou en paysage : haut de partie compact (« Une seule barre »).
+   Ligne 1 : « Joueur actif » en petit + le nom en grand ; ligne 2 : les joueurs en pastilles (la pastille du joueur dont c'est
+   le tour est mise en valeur, chacune garde son bouton pause) ; ligne 3 : « Règles ». Les emplacements gardent toujours leur
+   place (rien n'apparaît ni ne disparaît) : le plateau ne bouge pas quand une règle s'affiche. Les couleurs viennent des thèmes. ===== */
+@media (max-width: 520px), (orientation: landscape) and (max-height: 520px){
+    .messages{
+        flex-direction: column;
+        flex-wrap: nowrap;
+        gap: 6px;
+        padding: 8px;
+        margin-bottom: 10px;
+    }
+    .blocMessages{ min-height: 0; padding: 6px 10px; }
+    .blocActif, .blocJoueurs, .blocRegles{ flex: 0 0 auto; }
+
+    .blocActif{ display: flex; align-items: baseline; gap: 10px; }
+    .blocActif .titreBloc{
+        margin: 0;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #b9b2b9;
+        white-space: nowrap;
+    }
+    .blocActif .joueurActif{ font-size: 22px; line-height: 1.15; min-height: 25px; overflow-wrap: anywhere; }
+
+    .blocJoueurs{ padding: 6px 8px; }
+    .blocJoueurs .titreBloc{ display: none; } /* (les pastilles se comprennent seules ; le bloc reste nommé pour les lecteurs d'écran) */
+    html #listeJoueurs{ display: flex; flex-wrap: wrap; gap: 6px; }
+    html #listeJoueurs .joueur-ligne{
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        min-height: 30px;
+        padding: 2px 4px 2px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        background: rgba(0, 0, 0, 0.22);
+        font-size: 14px;
+        font-weight: 700;
+        max-width: 100%;
+        overflow-wrap: anywhere;
+    }
+    html #listeJoueurs .joueur-ligne:not(:has(.btnPauseJoueur)){ padding-right: 10px; } /* (avant la partie : pas de bouton pause) */
+    html #listeJoueurs .joueur-ligne-actif{ border-color: #ffff00; background: rgba(255, 255, 0, 0.12); color: #ffff00; }
+    html #listeJoueurs .btnPauseJoueur{ width: 22px; height: 22px; margin-left: 2px; }
+    html[data-theme="givre"] #listeJoueurs .joueur-ligne{ background: #fff; border-color: rgba(20, 121, 184, 0.35); }
+    html[data-theme="givre"] #listeJoueurs .joueur-ligne-actif{ background: #dff3fb; border-color: var(--givre-accent); color: var(--givre-accent); }
+
+    .blocRegles{ min-height: 52px; }
+    .blocRegles .titreBloc{
+        margin-bottom: 2px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+    }
+    .blocRegles .regleZero, .blocRegles .reglePigeon{ margin-top: 2px; font-size: 15px; line-height: 1.25; }
 }
 @media (max-width: 520px){
   /* moins d’espace, boutons en pleine largeur */

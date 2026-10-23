@@ -287,6 +287,25 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
+  // 14. Haut de partie : joueurs en pastilles, celle du joueur actif est marquée et suit le tour, le plateau est remonté
+  {
+    const { ctx, page, erreurs } = await ouvrir();
+    await page.click("#btnModeClassique"); await page.waitForTimeout(800);
+    for (const nom of ["Tom", "Lea", "Max"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(250); }
+    await page.click("#jouer"); await page.waitForTimeout(1200);
+    const etat = () => page.evaluate(() => ({
+      pastilles: document.querySelectorAll("#listeJoueurs .joueur-ligne").length,
+      actives: [...document.querySelectorAll("#listeJoueurs .joueur-ligne")].map((l, i) => l.classList.contains("joueur-ligne-actif") ? i : -1).filter((i) => i >= 0),
+      nom: document.getElementById("joueurActif").innerText,
+      plateau: Math.round(document.getElementById("plateau").getBoundingClientRect().top) }));
+    const a = await etat();
+    await page.evaluate(() => { indexJoueur = 1; afficherJoueurActif(); });
+    const b = await etat();
+    verifier(a.pastilles === 3 && a.actives.join() === "0" && a.nom === "Tom" && b.actives.join() === "1" && b.nom === "Lea" && a.plateau < 420 && erreurs.length === 0,
+      `haut de partie : ${a.pastilles} pastilles, actif ${a.nom} (${a.actives}) puis ${b.nom} (${b.actives}), plateau à ${a.plateau} px`);
+    await ctx.close();
+  }
+
   // 12. Les fenêtres de déblocage (Prestige, Star Wars) gardent leurs propres boutons dans tous les thèmes
   {
     const { ctx, page } = await ouvrir();
