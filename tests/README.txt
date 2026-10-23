@@ -25,6 +25,14 @@ Démarrage rapide (30 secondes, Linux / macOS / Windows)
   ne sortent que dans ce thème. Résultat attendu : « TOUT EST OK ». GitHub le lance aussi à chaque
   push (onglet Actions, « Tests de démarrage »).
 
+Parties complètes du robot (1 à 2 minutes, Linux / macOS / Windows)
+-------------------------------------------------------------------
+  node tests/test_partie_robot.js
+
+  Le robot (prelude.js + joueur_auto.js) joue une partie complète dans 4 configurations : téléphone debout,
+  téléphone en paysage, avec le réglage d'accessibilité, et très petit écran. Chaque partie doit arriver à
+  l'écran de fin sans erreur et sans que la page déborde. Lancé aussi par GitHub (job « partie-robot »).
+
 Partie classique (le plus important, environ 1 minute)
 ------------------------------------------------------
   bash tests/generer.sh          (depuis le dossier du jeu, dans Git Bash)

@@ -20,3 +20,18 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Lancer le test
         run: node tests/test_demarrage.js
+
+  partie-robot:
+    # Une partie complète jouée par le robot dans 4 configurations (debout, paysage, accessibilité, petit écran)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Installer Playwright et Chromium
+        run: |
+          npm i --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Lancer les parties du robot
+        run: node tests/test_partie_robot.js

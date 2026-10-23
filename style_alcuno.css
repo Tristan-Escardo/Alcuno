@@ -1175,6 +1175,8 @@ html[data-theme="galaxie"] .fin-choix-numeros b{ background: #8fd0ff; color: #02
     #menu::after{ content: ""; order: 4; flex: 0 0 100%; height: 0; margin: 0; }
     #menu #jouer{ order: 5; flex: 1 1 0; height: 42px; padding-top: 0; padding-bottom: 0; font-size: 17px; }
     #menu #nouvellePartie{ order: 5; flex: 1 1 0; height: 42px; padding-top: 0; padding-bottom: 0; font-size: 16px; }
+    #menu #jouer, #menu #nouvellePartie{ min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+    html.accessibilite #menu :is(#jouer, #nouvellePartie){ font-size: clamp(13px, 4vw, 19px); } /* (texte agrandi, mais sans pousser « Caster » à la ligne) */
     #menu:has(#nouvellePartie:not([style*="none"])) :is(#nouvellePartie, #btnCaster){ margin-top: 0; } /* (première ligne en partie) */
     #menu:has(#nouvellePartie:not([style*="none"])) #supprimerJoueur{ order: 5; } /* (en partie : « − » à droite de « Nouvelle partie », pas seul sur sa ligne) */
     html #menu #btnCaster{ order: 6 !important; flex: 1 1 100%; height: 42px; padding-top: 0; padding-bottom: 0; font-size: 16px; }
@@ -1190,7 +1192,10 @@ html[data-theme="galaxie"] .fin-choix-numeros b{ background: #8fd0ff; color: #02
     html[data-theme="noir"] #menu #btnCaster{ background-image: linear-gradient(180deg, #0d0b06, #030302) !important; color: #ffd426 !important; border: 1px solid rgba(255, 210, 38, 0.6) !important; text-shadow: none; box-shadow: none !important; }
     html[data-theme="soleil"] #menu #btnCaster{ background-image: linear-gradient(180deg, #ffb35c, #f2775c) !important; text-shadow: 0 1px 0 rgba(150, 50, 40, 0.8); }
     html[data-theme="givre"] #menu #btnCaster{ background-image: linear-gradient(180deg, #27aee8, #1474b8) !important; text-shadow: 0 1px 2px rgba(8, 60, 100, 0.55); }
-    html #menu #btnCaster.caster-actif{ box-shadow: 0 0 0 2px #fff, 0 0 12px rgba(255, 255, 255, 0.55) !important; }
+    /* télé connectée : anneau autour du bouton (outline : les styles de thème écrasent les ombres) */
+    html #menu #btnCaster.caster-actif{ outline: 2px solid #fff; outline-offset: 2px; }
+    html[data-theme="givre"] #menu #btnCaster.caster-actif{ outline-color: #0b3550; }
+    html[data-theme="galaxie"] #menu #btnCaster.caster-actif{ outline-color: #FFE81F; }
     html #menu #btnCaster .casterIcone svg{ width: 26px; height: 26px; }
     #menu .libelleLong{ display: none; }
     #menu :is(#ajouterJoueur, #supprimerJoueur) .libelleCourt{ display: flex; align-items: center; justify-content: center; }
@@ -1249,6 +1254,19 @@ html[data-theme="galaxie"] .fin-choix-numeros b{ background: #8fd0ff; color: #02
     /* Règles : emplacement toujours réservé (le plateau ne bouge pas quand une règle apparaît) */
     .blocRegles{ min-height: 82px; }
     .blocRegles .regleZero, .blocRegles .reglePigeon{ margin-top: 4px; font-size: 17px; line-height: 1.3; }
+}
+/* Téléphone en paysage : l'écran est bas, donc les trois blocs sont côte à côte (sinon le plateau commence sous le bas de l'écran) */
+@media (orientation: landscape) and (max-height: 520px){
+    .messages{ flex-direction: row; align-items: stretch; gap: 8px; padding: 8px; }
+    .blocActif{ flex: 1 1 0; flex-direction: column; align-items: flex-start; justify-content: center; gap: 2px; min-height: 0; }
+    .blocActif .joueurActif{ font-size: 22px; }
+    .blocJoueurs{ flex: 2 1 0; }
+    .blocRegles{ flex: 2 1 0; min-height: 0; }
+    html #listeJoueurs .joueur-ligne{ min-height: 34px; font-size: 16px; }
+    html #listeJoueurs .btnPauseJoueur{ width: 24px; height: 24px; }
+    .blocRegles .regleZero, .blocRegles .reglePigeon{ font-size: 15px; }
+    .messages .titreBloc{ white-space: normal; }
+    html[data-theme="galaxie"] .blocActif .titreBloc{ font-size: 12px !important; letter-spacing: 0.06em !important; }
 }
 @media (max-width: 520px){
   /* moins d’espace, boutons en pleine largeur */
