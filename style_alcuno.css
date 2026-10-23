@@ -1158,7 +1158,7 @@ html[data-theme="galaxie"] .fin-choix-numeros b{ background: #8fd0ff; color: #02
     /* Téléphone, debout ou en paysage : barre de réglages (gros boutons bien lisibles, 8 px d'écart) :
        ligne 1 : champ du nom + « personne + » (ajouter) + « personne − » (supprimer, quand il y a des joueurs) ;
        ligne 2 : « Jouer » (dès 2 joueurs) en pleine largeur, ou « Nouvelle partie » (+ le « − » à droite) en partie ;
-       ligne 3 : « Caster sur la télé » en pleine largeur. Une rupture de ligne invisible (::after) sépare les lignes 1 et 2. */
+       ligne 2 aussi : « Caster » réduit à son icône à droite (seul, sans « Jouer », il reprend sa ligne avec son texte). Une rupture de ligne invisible (::after) sépare les lignes 1 et 2. */
     #menu{
         display: flex;
         flex-direction: row;
@@ -1173,11 +1173,16 @@ html[data-theme="galaxie"] .fin-choix-numeros b{ background: #8fd0ff; color: #02
     #menu #ajouterJoueur{ order: 2; flex: 0 0 54px; margin-top: 0; padding: 0; }
     #menu #supprimerJoueur{ order: 3; flex: 0 0 54px; margin-top: 0; padding: 0; }
     #menu::after{ content: ""; order: 4; flex: 0 0 100%; height: 0; margin: 0; }
-    #menu #jouer{ order: 5; flex: 1 1 100%; min-height: 56px; font-size: 22px; }
+    #menu #jouer{ order: 5; flex: 1 1 0; min-height: 56px; font-size: 22px; }
     #menu #nouvellePartie{ order: 5; flex: 1 1 0; min-height: 56px; font-size: 20px; }
     #menu:has(#nouvellePartie:not([style*="none"])) #nouvellePartie{ margin-top: 0; } /* (première ligne en partie) */
     #menu:has(#nouvellePartie:not([style*="none"])) #supprimerJoueur{ order: 5; } /* (en partie : « − » à droite de « Nouvelle partie », pas seul sur sa ligne) */
     html #menu #btnCaster{ order: 6 !important; flex: 1 1 100%; min-height: 52px; font-size: 18px; }
+    /* Quand « Jouer » ou « Nouvelle partie » est affiché : « Caster » n'est plus que son icône, carrée, à côté (plus de place pour le gros bouton) */
+    html #menu:is(:has(#jouer:not([style*="none"])), :has(#nouvellePartie:not([style*="none"]))) #btnCaster{ flex: 0 0 58px; min-height: 56px; padding-left: 0; padding-right: 0; }
+    html #menu:is(:has(#jouer:not([style*="none"])), :has(#nouvellePartie:not([style*="none"]))) #btnCaster .casterTexte{ display: none; }
+    html #menu:is(:has(#jouer:not([style*="none"])), :has(#nouvellePartie:not([style*="none"]))) #btnCaster .casterIcone{ position: static; transform: none; width: 40px; height: 40px; }
+    html #menu:is(:has(#jouer:not([style*="none"])), :has(#nouvellePartie:not([style*="none"]))) #btnCaster .casterIcone svg{ width: 26px; height: 26px; }
     #menu .libelleLong{ display: none; }
     #menu :is(#ajouterJoueur, #supprimerJoueur) .libelleCourt{ display: flex; align-items: center; justify-content: center; }
     #menu .libelleCourt svg{ width: 30px; height: 30px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
