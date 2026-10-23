@@ -56,7 +56,7 @@
       ];
       for (const sel of choix) {
         const el = $$(sel).filter(cliquable)[sel.includes("annulation") ? 1 : 0] || $$(sel).filter(cliquable)[0];
-        if (el) { journal.push(sel.split(" ").pop() + ":" + (el.innerText || el.className).trim().slice(0, 20)); pd(el); return setTimeout(tick, 40); }
+        if (el) { journal.push(sel.split(" ").pop() + ":" + (el.innerText || el.className).trim().slice(0, 20)); if (sel.includes("fin-choix-card")) el.click(); else pd(el); /* (les cartes du pari réagissent au doigt levé, comme le plateau) */ return setTimeout(tick, 40); }
       }
 
       // Overlays de message : on les ferme au tap
