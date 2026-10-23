@@ -267,17 +267,23 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
-  // 13. Préparation de partie sur téléphone : la disposition (champ + « + » + « − » sur une ligne) revient après « Supprimer »
+  // 13. Préparation de partie sur téléphone : champ + « personne + » + « personne − » sur une ligne, « Jouer » dessous
+  //     (ou à côté de « Caster » si ça tient), et la disposition revient après « Supprimer »
   {
     const { ctx, page, erreurs } = await ouvrir();
     await page.click("#btnModeClassique"); await page.waitForTimeout(800);
     for (const nom of ["Tom", "Lea"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(250); }
-    const grille = () => page.evaluate(() => getComputedStyle(document.getElementById("menu")).display);
-    const avant = await grille();
+    const disposition = () => page.evaluate(() => {
+      const haut = (id) => Math.round(document.getElementById(id).getBoundingClientRect().top);
+      return { ligne1: haut("nomJoueur") === haut("ajouterJoueur") && haut("ajouterJoueur") === haut("supprimerJoueur") || Math.abs(haut("nomJoueur") - haut("ajouterJoueur")) < 8,
+        jouerSousLigne1: haut("jouer") > haut("nomJoueur") + 30, hauteurMenu: Math.round(document.getElementById("menu").getBoundingClientRect().height) };
+    });
+    const avant = await disposition();
     await page.click("#supprimerJoueur"); await page.waitForTimeout(600);
     await page.click("#termineSuppression"); await page.waitForTimeout(600);
-    const apres = await grille();
-    verifier(avant === "grid" && apres === "grid" && erreurs.length === 0, `préparation de partie : grille avant (${avant}) et après « Supprimer » (${apres})`);
+    const apres = await disposition();
+    verifier(avant.ligne1 && avant.jouerSousLigne1 && apres.ligne1 && apres.jouerSousLigne1 && apres.hauteurMenu < 130 && erreurs.length === 0,
+      `préparation de partie : avant ${JSON.stringify(avant)}, après « Supprimer » ${JSON.stringify(apres)}`);
     await ctx.close();
   }
 
