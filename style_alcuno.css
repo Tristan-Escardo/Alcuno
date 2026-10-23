@@ -2780,8 +2780,8 @@ html[data-theme="givre"] #stickyJoueurActif.rappel-tour{
 /* ===== Bouton Réglages : curseurs dorés, coin droit de l'écran d'accueil (seulement là) ===== */
 #choixMode #btnReglages{
   position: absolute;
-  top: 24px;
-  right: 18px;
+  top: 20px;
+  right: 14px;
   z-index: 2;
   width: auto;
   min-width: 0;
@@ -2797,8 +2797,8 @@ html[data-theme="givre"] #stickyJoueurActif.rappel-tour{
 }
 
 #choixMode #btnReglages svg{
-  width: 32px;
-  height: 32px;
+  width: 46px;
+  height: 46px;
   overflow: visible;
   filter:
     drop-shadow(0 2px 0 rgba(120, 70, 0, 0.95))
@@ -2828,8 +2828,8 @@ html[data-theme="givre"] #stickyJoueurActif.rappel-tour{
 
 @media (max-width: 520px){
   #choixMode #btnReglages svg{
-    width: 28px;
-    height: 28px;
+    width: 40px;
+    height: 40px;
   }
 }
 
@@ -4822,8 +4822,8 @@ html[data-theme="givre"] #stickyJoueurActif.has-couleur .sticky-couleur{
 /* Accueil : en haut à gauche, même style que le bouton Réglages (en haut à droite) */
 #choixMode #btnRegles{
   position: absolute;
-  top: 24px;
-  left: 18px;
+  top: 20px;
+  left: 14px;
   z-index: 2;
   width: auto;
   min-width: 0;
@@ -4871,6 +4871,7 @@ header #btnReglesJeu{
 }
 
 /* Le livre : trait doré, couverture couleur du fond, même relief que les boutons Réglages / ⌂ */
+#choixMode #btnRegles svg{ width: 46px; height: 46px; } /* (accueil : plus gros que dans le bandeau de la partie) */
 #choixMode #btnRegles svg,
 header #btnReglesJeu svg{
   width: 32px;
@@ -4892,7 +4893,7 @@ header #btnReglesJeu path.couverture{
   stroke-width: 2.4;
 }
 @media (max-width: 520px){
-  #choixMode #btnRegles svg,
+  #choixMode #btnRegles svg{ width: 40px; height: 40px; }
   header #btnReglesJeu svg{ width: 28px; height: 28px; }
   header #btnReglesJeu{ left: 10px; }
 }
@@ -7248,11 +7249,11 @@ html[data-theme="soleil"] .voletPause-ok{ background: linear-gradient(180deg, #f
   background: rgba(20, 0, 13, 0.8);
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
-  -webkit-mask: radial-gradient(circle at var(--x1) var(--y1), transparent 0 24px, #000 25px),
-                radial-gradient(circle at var(--x2) var(--y2), transparent 0 24px, #000 25px);
+  -webkit-mask: radial-gradient(circle at var(--x1) var(--y1), transparent 0 33px, #000 34px),
+                radial-gradient(circle at var(--x2) var(--y2), transparent 0 33px, #000 34px);
   -webkit-mask-composite: source-in;
-  mask: radial-gradient(circle at var(--x1) var(--y1), transparent 0 24px, #000 25px),
-        radial-gradient(circle at var(--x2) var(--y2), transparent 0 24px, #000 25px);
+  mask: radial-gradient(circle at var(--x1) var(--y1), transparent 0 33px, #000 34px),
+        radial-gradient(circle at var(--x2) var(--y2), transparent 0 33px, #000 34px);
   mask-composite: intersect;
 }
 .aideAccueil-fleches{

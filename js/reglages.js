@@ -1884,9 +1884,9 @@ function placerAideAccueil(aide){
   const queueG = largeur * 0.3, queueD = largeur * 0.7;
   const fleches = [
     cheminFlecheAide({ x: queueG, y: hautTextes - 14 }, { x: queueG + 4, y: hautTextes - 90 },
-      { x: a.x + 60, y: a.y + 70 }, { x: a.x + 22, y: a.y + 34 }, 11),
+      { x: a.x + 64, y: a.y + 76 }, { x: a.x + 28, y: a.y + 44 }, 11),
     cheminFlecheAide({ x: queueD, y: hautTextes - 14 }, { x: queueD - 4, y: hautTextes - 90 },
-      { x: c.x - 60, y: c.y + 70 }, { x: c.x - 22, y: c.y + 34 }, 11)
+      { x: c.x - 64, y: c.y + 76 }, { x: c.x - 28, y: c.y + 44 }, 11)
   ].join("");
   aide.querySelectorAll(".aideAccueil-fleches path").forEach((chemin) => chemin.setAttribute("d", fleches));
   aide.querySelectorAll(".aideAccueil-repere").forEach((repere) => { repere.style.top = hautTextes + "px"; });
