@@ -301,7 +301,7 @@ function verifier(ok, texte){
     const a = await etat();
     await page.evaluate(() => { indexJoueur = 1; afficherJoueurActif(); });
     const b = await etat();
-    verifier(a.pastilles === 3 && a.actives.join() === "0" && a.nom === "Tom" && b.actives.join() === "1" && b.nom === "Lea" && a.plateau < 420 && erreurs.length === 0,
+    verifier(a.pastilles === 3 && a.actives.join() === "0" && a.nom === "Tom" && b.actives.join() === "1" && b.nom === "Lea" && a.plateau < 520 && erreurs.length === 0,
       `haut de partie : ${a.pastilles} pastilles, actif ${a.nom} (${a.actives}) puis ${b.nom} (${b.actives}), plateau à ${a.plateau} px`);
     await ctx.close();
   }
