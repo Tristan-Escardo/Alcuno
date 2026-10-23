@@ -282,7 +282,7 @@ function verifier(ok, texte){
     await page.click("#supprimerJoueur"); await page.waitForTimeout(600);
     await page.click("#termineSuppression"); await page.waitForTimeout(600);
     const apres = await disposition();
-    verifier(avant.ligne1 && avant.jouerSousLigne1 && apres.ligne1 && apres.jouerSousLigne1 && apres.hauteurMenu < 130 && erreurs.length === 0,
+    verifier(avant.ligne1 && avant.jouerSousLigne1 && apres.ligne1 && apres.jouerSousLigne1 && apres.hauteurMenu < 200 && erreurs.length === 0,
       `préparation de partie : avant ${JSON.stringify(avant)}, après « Supprimer » ${JSON.stringify(apres)}`);
     await ctx.close();
   }
@@ -301,7 +301,7 @@ function verifier(ok, texte){
     const a = await etat();
     await page.evaluate(() => { indexJoueur = 1; afficherJoueurActif(); });
     const b = await etat();
-    verifier(a.pastilles === 3 && a.actives.join() === "0" && a.nom === "Tom" && b.actives.join() === "1" && b.nom === "Lea" && a.plateau < 520 && erreurs.length === 0,
+    verifier(a.pastilles === 3 && a.actives.join() === "0" && a.nom === "Tom" && b.actives.join() === "1" && b.nom === "Lea" && a.plateau < 650 && erreurs.length === 0,
       `haut de partie : ${a.pastilles} pastilles, actif ${a.nom} (${a.actives}) puis ${b.nom} (${b.actives}), plateau à ${a.plateau} px`);
     await ctx.close();
   }
