@@ -1181,8 +1181,11 @@ html[data-theme="galaxie"] .fin-choix-numeros b{ background: #8fd0ff; color: #02
     /* Quand « Jouer » ou « Nouvelle partie » est affiché : « Caster » n'est plus que son icône, carrée, à côté (plus de place pour le gros bouton) */
     html #menu:is(:has(#jouer:not([style*="none"])), :has(#nouvellePartie:not([style*="none"]))) #btnCaster{ flex: 0 0 48px; min-height: 46px; padding-left: 0; padding-right: 0; }
     html #menu:is(:has(#jouer:not([style*="none"])), :has(#nouvellePartie:not([style*="none"]))) #btnCaster .casterTexte{ display: none; }
-    html #menu:is(:has(#jouer:not([style*="none"])), :has(#nouvellePartie:not([style*="none"]))) #btnCaster .casterIcone{ position: static; transform: none; width: 34px; height: 34px; }
-    html #menu:is(:has(#jouer:not([style*="none"])), :has(#nouvellePartie:not([style*="none"]))) #btnCaster .casterIcone svg{ width: 22px; height: 22px; }
+    /* en version icône : pas de cadre autour (l'icône dorée est le bouton) ; connecté à une télé : anneau clair autour de l'icône */
+    html #menu:is(:has(#jouer:not([style*="none"])), :has(#nouvellePartie:not([style*="none"]))) #btnCaster{ background: none !important; border: none !important; box-shadow: none !important; }
+    html #menu:is(:has(#jouer:not([style*="none"])), :has(#nouvellePartie:not([style*="none"]))) #btnCaster .casterIcone{ position: static; transform: none; width: 48px; height: 100%; min-height: 46px; border-radius: 10px; }
+    html #menu:is(:has(#jouer:not([style*="none"])), :has(#nouvellePartie:not([style*="none"]))) #btnCaster.caster-actif .casterIcone{ box-shadow: 0 0 0 2px #fff, 0 0 12px rgba(255, 255, 255, 0.55); }
+    html #menu:is(:has(#jouer:not([style*="none"])), :has(#nouvellePartie:not([style*="none"]))) #btnCaster .casterIcone svg{ width: 26px; height: 26px; }
     #menu .libelleLong{ display: none; }
     #menu :is(#ajouterJoueur, #supprimerJoueur) .libelleCourt{ display: flex; align-items: center; justify-content: center; }
     #menu .libelleCourt svg{ width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
@@ -7643,7 +7646,7 @@ html[data-theme="galaxie"] #choixMode .titreAccueilBarre, html[data-theme="galax
   box-shadow: 0 0 4px #fff, 0 0 10px #39a0ff, 0 0 22px #1f7bff, 0 0 40px rgba(31,123,255,.6) !important; animation:none !important;
 }
 /* Boutons : lame bleue, « Jouer » et le mode classique en rouge */
-html[data-theme="galaxie"] button:not(.pastilleTheme):not(#btnRemonter):not(#btnPause):not(#btnHistorique):not(.btnPauseJoueur):not(.btnLivre):not(#btnReglages):not(.btnAccueilTexte):not(#btnSignalerBug):not(.fenetrePrestige-essayer):not(.fenetrePrestige-plusTard):not(.fenetreGalaxie-ok):not(.fenetreGalaxie-plusTard):not(#overlayDuel .duel-boutons button:disabled){
+html[data-theme="galaxie"] button:not(.pastilleTheme):not(#btnRemonter):not(#btnPause):not(#btnHistorique):not(.btnPauseJoueur):not(.btnLivre):not(#btnReglages):not(.btnAccueilTexte):not(#btnSignalerBug):not(.fenetrePrestige-essayer):not(.fenetrePrestige-plusTard):not(.fenetreGalaxie-ok):not(.fenetreGalaxie-plusTard):not(#overlayDuel .duel-boutons button:disabled):not(#menu:is(:has(#jouer:not([style*="none"])), :has(#nouvellePartie:not([style*="none"]))) #btnCaster){
   background: linear-gradient(180deg, rgba(14,22,44,.92), rgba(6,10,22,.92)) !important; color:#eaf3ff !important; text-shadow:none !important;
   border: 1.5px solid #8fd0ff !important; letter-spacing:.04em;
   box-shadow: 0 0 6px #4aa8ff, 0 0 16px rgba(40,140,255,.55), inset 0 0 10px rgba(80,170,255,.22) !important;
