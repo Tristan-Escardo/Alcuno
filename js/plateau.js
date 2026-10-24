@@ -1578,6 +1578,25 @@ function afficherJoueurActif(){
   majStickyJoueurActif();
 }
 
+// Bloc Règles vide (aucune carte spéciale en cours) : petit rappel « C'est à Léa de jouer, tire une carte. »
+// On observe les éléments du bloc plutôt que de brancher chaque endroit qui les change.
+const rappelTour = document.getElementById("rappelTour");
+function majRappelTour(){
+  const libre = partieLancee && !choixPigeonEnCours && !duelEnCours && joueurs.length > 0 && !predictionEnCours
+    && !messageTexte.firstChild && regleZero.style.display === "none" && reglePigeon.style.display === "none";
+  let texte = "";
+  if(libre){
+    const nom = joueurs[indexJoueur % joueurs.length];
+    texte = enLigneActif && nom === pseudoActuel ? "C'est à toi de jouer, tire une carte." : `C'est à ${nom} de jouer, tire une carte.`;
+  }
+  if(rappelTour.textContent !== texte) rappelTour.textContent = texte;
+  const affichage = texte ? "block" : "none";
+  if(rappelTour.style.display !== affichage) rappelTour.style.display = affichage;
+}
+new MutationObserver(majRappelTour).observe(messageTexte, { childList: true });
+[regleZero, reglePigeon].forEach(el => new MutationObserver(majRappelTour).observe(el, { attributes: true, attributeFilter: ["style"] }));
+new MutationObserver(majRappelTour).observe(joueurActif, { childList: true, characterData: true, subtree: true });
+
 function effacerMessagePigeon(){
   reglePigeon.innerText = "";
   reglePigeon.style.display = "none";
