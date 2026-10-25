@@ -725,7 +725,7 @@ function rendreToastGlissable(toast){
 // en ligne. Oubliée quand la partie est finie ou quittée exprès (⌂), ou au bout de 12 h.
 const CLE_PARTIE_CLASSIQUE = "alcuno_partie_classique";
 const DUREE_PARTIE_CLASSIQUE = 12 * 60 * 60 * 1000;
-let sauvegardeClassique = null; // { v, date, seed, sansDoree, soft, joueurs, actions }
+let sauvegardeClassique = null; // { v, date, seed, sansDoree, soft, express, joueurs, actions }
 let repriseClassiqueEnCours = false;
 
 function enregistrerPartieClassique(){
@@ -743,7 +743,7 @@ function demarrerSauvegardeClassique(){
   }
   const seed = Math.floor(Math.random() * 4294967296);
   sauvegardeClassique = {
-    v: VERSION_JEU, date: Date.now(), seed, sansDoree: !premierePartieJouee(), soft: estModeSoft(),
+    v: VERSION_JEU, date: Date.now(), seed, sansDoree: !premierePartieJouee(), soft: estModeSoft(), express: estPartieExpress(),
     joueurs: joueurs.slice(), actions: []
   };
   aleatoire = generateurAleatoire(seed);

@@ -894,11 +894,14 @@ function lancerMancheEnLigne(listeJoueurs, depuisSalle){
     const possible = depuisSalle ? !e.demarree : (e.demarree && e.manche === mancheAttendue);
     if (!possible) return; // quelqu'un a déjà relancé => abandon
 
+    // Partie express : réglage de celui qui lance depuis la salle ; « Rejouer » garde celui de la manche
+    const express = depuisSalle ? estPartieExpress() : graineExpress(e.seed || 0);
     return {
       demarree: true,
       manche: (e.manche || 0) + 1,
-      // (+ GRAINE_SANS_CARTE_DOREE : première partie de l'hôte, sans carte dorée pour personne)
-      seed: Math.floor(Math.random() * 4294967296) + (premierePartieJouee() ? 0 : GRAINE_SANS_CARTE_DOREE),
+      // (+ GRAINE_SANS_CARTE_DOREE : première partie de l'hôte, sans carte dorée pour personne ;
+      // + GRAINE_EXPRESS : partie express, voir graineExpress)
+      seed: Math.floor(Math.random() * 4294967296) + (premierePartieJouee() ? 0 : GRAINE_SANS_CARTE_DOREE) + (express ? GRAINE_EXPRESS : 0),
       joueurs: listeJoueurs,
       hote: e.hote || pseudoActuel
     };

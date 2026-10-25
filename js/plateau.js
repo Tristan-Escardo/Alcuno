@@ -307,6 +307,27 @@ const CHANCE_CARTE_DOREE = 1 / 12;
 // mélange ; tous les joueurs d'une partie ont la même version du jeu, voir versionCompatible)
 const CLE_PREMIERE_PARTIE_JOUEE = "alcuno_premiere_partie_jouee";
 const GRAINE_SANS_CARTE_DOREE = 4294967296; // 2^32
+// Partie express (réglage de js/reglages.js) : en ligne, même principe, dans le bit suivant de la graine
+const GRAINE_EXPRESS = 8589934592; // 2^33
+function graineSansCarteDoree(seed){ return Math.floor(seed / GRAINE_SANS_CARTE_DOREE) % 2 === 1; }
+function graineExpress(seed){ return Math.floor(seed / GRAINE_EXPRESS) % 2 === 1; }
+
+// Partie express : combien de cartes de chaque famille on garde (28 au lieu de 52 : 7 rangées de 4 sur téléphone)
+const CARTES_EXPRESS = { zero: 2, un: 4, trois: 4, quatre: 6, interdit: 2, couleur: 2, plus_2: 4, plus_4: 2, switch: 2 };
+function familleCarte(classe){
+  if(classe.startsWith("plus_4")) return "plus_4";
+  if(classe.startsWith("couleur")) return "couleur";
+  return classe.replace(/_(vert|jaune|rouge|bleu)\d*$/, "");
+}
+// Paquet déjà mélangé : on garde les premières cartes de chaque famille (même résultat chez tout le monde, sans tirage en plus)
+function reduirePaquetExpress(paquetMelange){
+  const gardees = {};
+  return paquetMelange.filter(c => {
+    const f = familleCarte(c);
+    gardees[f] = (gardees[f] || 0) + 1;
+    return gardees[f] <= (CARTES_EXPRESS[f] ?? 0);
+  });
+}
 
 function premierePartieJouee(){
   try { return localStorage.getItem(CLE_PREMIERE_PARTIE_JOUEE) === "1"; } catch (e) { return true; }

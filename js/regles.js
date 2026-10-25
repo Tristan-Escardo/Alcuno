@@ -1752,6 +1752,10 @@ function lancerPartie(){
   const paquetPrincipal = classes.filter(c => !duelCartes.includes(c));
   paquet = [...paquetPrincipal];
   melangerPaquet(paquet);
+  const express = enLigneActif
+    ? !!dernierEtatManche && graineExpress(dernierEtatManche.seed)
+    : sauvegardeClassique ? !!sauvegardeClassique.express : estPartieExpress();
+  if(express) paquet = reduirePaquetExpress(paquet);
 
   // Paquet duel (réutilisable à l'infini via resetPaquetDuelSiBesoin)
   paquetDuel = [...duelCartes];
@@ -1761,12 +1765,12 @@ function lancerPartie(){
   // Jamais dans la première partie (de ce téléphone en classique, de l'hôte en ligne : voir
   // GRAINE_SANS_CARTE_DOREE)
   const sansCarteDoree = enLigneActif
-    ? !!dernierEtatManche && dernierEtatManche.seed >= GRAINE_SANS_CARTE_DOREE
+    ? !!dernierEtatManche && graineSansCarteDoree(dernierEtatManche.seed)
     : sauvegardeClassique ? sauvegardeClassique.sansDoree : !premierePartieJouee();
   const avecCarteDoree = aleatoire() < CHANCE_CARTE_DOREE && !sansCarteDoree;
   noterPremierePartieJouee();
   // La carte dorée REMPLACE une carte normale (n'importe laquelle : la dernière du paquet mélangé),
-  // pour garder 52 cases : sinon une carte se retrouvait seule sur la dernière rangée
+  // pour garder le même nombre de cases (52, ou 28 en partie express) : sinon une carte se retrouvait seule sur la dernière rangée
   if(avecCarteDoree) paquet.pop();
   const nbCases = paquet.length + (avecCarteDoree ? 1 : 0);
   indexCaseDoree = avecCarteDoree ? Math.floor(aleatoire() * nbCases) : -1;

@@ -592,6 +592,18 @@ caseModeSoft.addEventListener("change", () => {
   if (caseModeSoft.checked) jouerSon("sons_on");
 });
 
+// ===== Partie express : moins de cartes (voir CARTES_EXPRESS dans js/plateau.js) =====
+// Classique : le réglage de ce téléphone, gardé avec la partie (reprise comprise). En ligne : celui de
+// la personne qui lance la manche, transmis dans la graine du mélange (voir lancerMancheEnLigne).
+const CLE_PARTIE_EXPRESS = "alcuno_partie_express";
+const casePartieExpress = document.getElementById("optionPartieExpress");
+casePartieExpress.checked = lireReglage(CLE_PARTIE_EXPRESS, false);
+casePartieExpress.addEventListener("change", () => {
+  ecrireReglage(CLE_PARTIE_EXPRESS, casePartieExpress.checked);
+  if (casePartieExpress.checked) jouerSon("sons_on");
+});
+function estPartieExpress(){ return casePartieExpress.checked; }
+
 let softPartieEnLigne = false;
 
 function estModeSoft(){

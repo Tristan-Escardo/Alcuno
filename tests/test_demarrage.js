@@ -306,6 +306,27 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
+  // 15. Partie express : 28 cartes au lieu de 52, de chaque famille ; le choix voyage dans la graine (en ligne)
+  {
+    const resultats = [];
+    for (const express of [false, true]) {
+      const { ctx, page, erreurs } = await ouvrir({}, express ? `try{localStorage.setItem("alcuno_partie_express","1")}catch(e){}` : "");
+      await page.click("#btnModeClassique"); await page.waitForTimeout(800);
+      for (const nom of ["Tom", "Lea", "Max"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(250); }
+      await page.click("#jouer"); await page.waitForTimeout(1200);
+      resultats.push(await page.evaluate(() => ({ cartes: document.querySelectorAll("#plateau .Carte").length, restantes: cartesRestantes(),
+        familles: new Set(paquet.map(familleCarte)).size, trois: paquet.filter((c) => c.startsWith("trois")).length,
+        graine: [graineExpress(5), graineExpress(5 + GRAINE_EXPRESS), graineExpress(5 + GRAINE_SANS_CARTE_DOREE + GRAINE_EXPRESS),
+          graineSansCarteDoree(5 + GRAINE_SANS_CARTE_DOREE + GRAINE_EXPRESS), graineSansCarteDoree(5 + GRAINE_EXPRESS)].join() })));
+      resultats[resultats.length - 1].erreurs = erreurs.length;
+      await ctx.close();
+    }
+    const [normal, express] = resultats;
+    verifier(normal.cartes === 52 && express.cartes === 28 && express.restantes === 28 && express.familles >= 8 && express.trois === 4 &&
+      express.graine === "false,true,true,true,false" && normal.erreurs === 0 && express.erreurs === 0,
+      `partie express : ${normal.cartes} cartes normale, ${express.cartes} en express (${express.familles} familles, ${express.trois} « 3 »), graine ${express.graine}`);
+  }
+
   // 12. Les fenêtres de déblocage (Prestige, Star Wars) gardent leurs propres boutons dans tous les thèmes
   {
     const { ctx, page } = await ouvrir();
