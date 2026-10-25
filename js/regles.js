@@ -119,6 +119,7 @@ function afficherMenuPigeon(){
 function passerPigeonA(i, overlay, choisisseur, avecChoix){
   if(avecChoix) proposerAnnulerChoix(choisisseur); // « Mauvais joueur ? Annuler » quelques secondes
   indexPigeon = i;
+  pigeonAClignoter = Date.now(); // (clignote à la fin de l'annonce, js/plateau.js)
   compterStat("pigeon", joueurs[i]);
   nomPigeonOriginal = joueurs[i];
   // 1) on ferme l'overlay de choix
@@ -244,6 +245,7 @@ function fermerOverlayRegleUnique(afterClose = null){
     if (!overlay.dataset.enFermeture) return; // une nouvelle annonce l'a réutilisé entre-temps
     overlay.remove();
     unlockScroll();
+    faireClignoterPigeon(); // (nouveau pigeon : sa ligne clignote)
     if(typeof afterClose === "function") afterClose();
   });
 }
@@ -1672,6 +1674,7 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
     
     if(indexPigeon===null){
       indexPigeon=joueurActuel;
+      pigeonAClignoter = Date.now();
       compterStat("pigeon", joueurs[joueurActuel]);
       nomPigeonOriginal=joueurs[joueurActuel];
       const nPigeon = gorgeesPigeon();

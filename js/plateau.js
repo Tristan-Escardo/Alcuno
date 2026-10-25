@@ -1598,6 +1598,21 @@ new MutationObserver(majRappelTour).observe(messageTexte, { childList: true });
 [regleZero, reglePigeon].forEach(el => new MutationObserver(majRappelTour).observe(el, { attributes: true, attributeFilter: ["style"] }));
 new MutationObserver(majRappelTour).observe(joueurActif, { childList: true, characterData: true, subtree: true });
 
+// Nouveau pigeon : sa ligne dans « Joueurs » clignote en turquoise quand l'annonce (plein écran) se ferme, pour que
+// toute la table voie qui c'est, même sans le son. pigeonAClignoter : heure du changement (jamais plus de 30 s après).
+let pigeonAClignoter = 0;
+function faireClignoterPigeon(){
+  if(!pigeonAClignoter) return;
+  const recent = Date.now() - pigeonAClignoter < 30000;
+  pigeonAClignoter = 0;
+  const ligne = recent ? listeJoueurs.querySelector(".joueur-ligne-pigeon") : null;
+  if(!ligne) return;
+  ligne.classList.remove("pigeon-flash");
+  void ligne.offsetWidth; // relance l'animation si elle était déjà là
+  ligne.classList.add("pigeon-flash");
+  ligne.addEventListener("animationend", () => ligne.classList.remove("pigeon-flash"), { once: true });
+}
+
 function effacerMessagePigeon(){
   reglePigeon.innerText = "";
   reglePigeon.style.display = "none";

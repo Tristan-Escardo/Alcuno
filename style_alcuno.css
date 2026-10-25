@@ -7982,3 +7982,19 @@ html[data-theme="galaxie"] #ecranTele .tele-tour.tele-rappel-tour{
   --halo-loin: rgba(31, 123, 255, 0.45);
   --halo-eclat: 1.2;
 }
+
+/* ===== Nouveau PIGEON : sa ligne dans « Joueurs » clignote 3 fois en turquoise (faireClignoterPigeon, js/plateau.js) ===== */
+#listeJoueurs .joueur-ligne.pigeon-flash{
+  animation: pigeonFlash 0.8s ease-in-out 3;
+}
+@keyframes pigeonFlash{
+  0%, 100% { scale: 1; filter: none; }
+  50%      { scale: 1.12; filter: brightness(1.3) drop-shadow(0 0 10px rgba(64, 224, 208, 0.95)); }
+}
+@media (prefers-reduced-motion: reduce){
+  #listeJoueurs .joueur-ligne.pigeon-flash{ animation-name: pigeonFlashDoux; }
+  @keyframes pigeonFlashDoux{
+    0%, 100% { filter: none; }
+    50%      { filter: brightness(1.3) drop-shadow(0 0 10px rgba(64, 224, 208, 0.95)); }
+  }
+}
