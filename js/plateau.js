@@ -1620,6 +1620,15 @@ function majRappelTour(){
   const affichage = texte ? "block" : "none";
   if(rappelTour.style.display !== affichage) rappelTour.style.display = affichage;
 }
+// Compteur « Il reste 18 cartes » (titre du bloc Règles). Mis à jour à chaque carte retournée ou plateau refait.
+const compteurCartes = document.getElementById("compteurCartes");
+function majCompteurCartes(){
+  const n = partieLancee ? cartesRestantes() : 0;
+  const texte = n > 0 ? `Il reste ${n} carte${n > 1 ? "s" : ""}` : "";
+  if(compteurCartes.textContent !== texte) compteurCartes.textContent = texte;
+  compteurCartes.hidden = !texte;
+}
+new MutationObserver(majCompteurCartes).observe(plateau, { childList: true, subtree: true, attributes: true, attributeFilter: ["class"] });
 new MutationObserver(majRappelTour).observe(messageTexte, { childList: true });
 [regleZero, reglePigeon].forEach(el => new MutationObserver(majRappelTour).observe(el, { attributes: true, attributeFilter: ["style"] }));
 new MutationObserver(majRappelTour).observe(joueurActif, { childList: true, characterData: true, subtree: true });

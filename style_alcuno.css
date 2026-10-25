@@ -8019,3 +8019,8 @@ html[data-theme="galaxie"] #ecranTele .tele-tour.tele-rappel-tour{
     50%      { filter: brightness(1.3) drop-shadow(0 0 1.2vh rgba(64, 224, 208, 0.95)); }
   }
 }
+
+/* Bloc Règles : « Il reste N cartes » à droite du titre (couleur du titre du thème, un peu plus petit, sans majuscules) */
+.titreRegles{ display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.compteurCartes{ font-size: 0.8em; font-weight: 600; letter-spacing: 0; text-transform: none; opacity: 0.8; white-space: nowrap; }
+.compteurCartes[hidden]{ display: none; }
