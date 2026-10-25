@@ -7235,7 +7235,8 @@ html[data-theme="prestige"] #btnCaster .casterIcone{ background: linear-gradient
 #listeJoueurs .joueur-ligne{ display: flex; align-items: center; gap: 6px; min-height: 26px; }
 /* Nom (ou « PIGEON (nom) ») en un seul bloc : sans lui, « PIGEON » et le nom étaient deux éléments du flex qui se
    cassaient chacun de leur côté (« PIGEO / N »). Un nom très long passe à la ligne, même sans espace. */
-#listeJoueurs .joueur-nom{ min-width: 0; overflow-wrap: anywhere; }
+#listeJoueurs .joueur-nom{ min-width: 0; overflow-wrap: anywhere; text-wrap: balance; } /* (balance : pas de lettre seule sur la dernière ligne) */
+#listeJoueurs .joueur-nom-long{ font-size: 0.88em; }
 .btnPauseJoueur{
   flex: 0 0 auto;
   margin-left: auto;
@@ -7999,5 +8000,22 @@ html[data-theme="galaxie"] #ecranTele .tele-tour.tele-rappel-tour{
   @keyframes pigeonFlashDoux{
     0%, 100% { filter: none; }
     50%      { filter: brightness(1.3) drop-shadow(0 0 10px rgba(64, 224, 208, 0.95)); }
+  }
+}
+
+/* Télé : nouveau PIGEON, sa ligne clignote 3 fois en turquoise (voir dessinerTele, js/tele.js) */
+#ecranTele .tele-joueur.pigeon-flash{
+  transform-origin: left center;
+  animation: pigeonFlashTele 0.8s ease-in-out 3;
+}
+@keyframes pigeonFlashTele{
+  0%, 100% { scale: 1; filter: none; }
+  50%      { scale: 1.08; filter: brightness(1.3) drop-shadow(0 0 1.2vh rgba(64, 224, 208, 0.95)); }
+}
+@media (prefers-reduced-motion: reduce){
+  #ecranTele .tele-joueur.pigeon-flash{ animation-name: pigeonFlashTeleDoux; }
+  @keyframes pigeonFlashTeleDoux{
+    0%, 100% { filter: none; }
+    50%      { filter: brightness(1.3) drop-shadow(0 0 1.2vh rgba(64, 224, 208, 0.95)); }
   }
 }

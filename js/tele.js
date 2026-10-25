@@ -784,6 +784,8 @@ function dessinerTele(ecran, etat){
     dernierEnvolTele = null;
     dernierRappelTele = null;
     dernierEauTele = null;
+    ecran._pigeonTele = undefined;
+    ecran._pigeonTeleA = 0;
     musiqueTele = null; // (plus de téléphone relié : plus de musique)
     pauseMusiqueTele = false;
     majMusique();
@@ -859,7 +861,7 @@ function dessinerTele(ecran, etat){
     liste.classList.toggle("tele-joueurs-2col", (etat.joueurs || []).length > 7); // (le bloc Règles garde sa place)
     (etat.joueurs || []).forEach((j) => {
       const ligne = document.createElement("div");
-      ligne.className = "tele-joueur" + (j.t ? " tele-joueur-actif" : "") + (j.z ? " tele-joueur-pause" : "");
+      ligne.className = "tele-joueur" + (j.t ? " tele-joueur-actif" : "") + (j.z ? " tele-joueur-pause" : "") + (j.p ? " tele-joueur-pigeon" : "");
       ligne.dataset.nom = j.n;
       const nom = document.createElement("span");
       nom.innerText = (j.t ? "▶ " : "") + j.n + (j.p ? " 🐦" : "") + (j.z ? " · en pause" : "");
@@ -872,6 +874,22 @@ function dessinerTele(ecran, etat){
       }
       liste.appendChild(ligne);
     });
+  }
+  // Nouveau pigeon : sa ligne clignote en turquoise quand l'annonce du téléphone se ferme (comme sur le téléphone,
+  // voir faireClignoterPigeon dans js/plateau.js). Pas au premier état reçu (téléphone qui se relie en pleine partie).
+  const pigeonTele = ((etat.joueurs || []).find(j => j.p) || {}).n || null;
+  if (ecran._pigeonTele !== undefined && pigeonTele && pigeonTele !== ecran._pigeonTele) ecran._pigeonTeleA = Date.now();
+  ecran._pigeonTele = pigeonTele;
+  if (ecran._pigeonTeleA && !etat.ecran) {
+    const recent = Date.now() - ecran._pigeonTeleA < 30000;
+    ecran._pigeonTeleA = 0;
+    const ligne = recent ? liste.querySelector(".tele-joueur-pigeon") : null;
+    if (ligne) {
+      ligne.classList.remove("pigeon-flash");
+      void ligne.offsetWidth; // relance l'animation si elle était déjà là
+      ligne.classList.add("pigeon-flash");
+      ligne.addEventListener("animationend", () => ligne.classList.remove("pigeon-flash"), { once: true });
+    }
   }
   envolerCartesTele(ecran, etat.envols); // (plateau et joueurs à jour : départ et arrivée en place)
 

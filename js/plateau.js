@@ -1522,6 +1522,11 @@ function ajouterBadgeDeconnecte(el, deconnecte){
   el.appendChild(badge);
 }
 
+// Nom très long (« Maximilien-Alexandre ») : un peu plus petit dans sa pastille, pour tenir sur peu de lignes
+function classeNomLong(nom){
+  return String(nom || "").length > 14 ? " joueur-nom-long" : "";
+}
+
 function afficherJoueurs(){
   listeJoueurs.innerHTML = joueurs.map((j,i)=>{
     const n = Number(annulations[j] || 0);
@@ -1530,10 +1535,10 @@ function afficherJoueurs(){
     const pause = estEnPause(j) ? ` <span class="badge-pause">EN PAUSE</span>` : "";
     const classePause = estEnPause(j) ? " joueur-en-pause" : "";
     if(i === indexPigeon){
-      return `<div class="joueur-ligne joueur-ligne-pigeon${classePause}"><span class="joueur-nom"><strong>PIGEON</strong> (${echapperHtml(avecCouronne(nomPigeonOriginal))})</span>${bonus}${pause}${badgeDeconnecte(j)}</div>`;
+      return `<div class="joueur-ligne joueur-ligne-pigeon${classePause}"><span class="joueur-nom${classeNomLong(nomPigeonOriginal)}"><strong>PIGEON</strong> (${echapperHtml(avecCouronne(nomPigeonOriginal))})</span>${bonus}${pause}${badgeDeconnecte(j)}</div>`;
     }
 
-    return `<div class="joueur-ligne${classePause}"><span class="joueur-nom">${echapperHtml(avecCouronne(j))}</span>${bonus}${pause}${badgeDeconnecte(j)}</div>`;
+    return `<div class="joueur-ligne${classePause}"><span class="joueur-nom${classeNomLong(j)}">${echapperHtml(avecCouronne(j))}</span>${bonus}${pause}${badgeDeconnecte(j)}</div>`;
   }).join("");
 
   // En partie : bouton ⏸ (ou ▶ s'il est en pause) à droite de chaque nom
