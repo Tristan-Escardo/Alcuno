@@ -228,7 +228,8 @@ function etatPourTele(){
   const enJeu = partieLancee && joueurs.length > 0;
   const idx = enJeu ? indexJoueur % joueurs.length : -1;
   const regles = [document.getElementById("regleZero"), document.getElementById("reglePigeon")]
-    .filter(estAffiche).map(el => el.innerText.trim()).filter(Boolean).join("\n");
+    .filter(estAffiche).map(el => el.innerText.trim()).filter(Boolean).join("\n")
+    || (estAffiche(document.getElementById("rappelTour")) ? document.getElementById("rappelTour").dataset.tele || "" : ""); // (rappel du tour, js/plateau.js)
   return {
     v: 1,
     partie: !!partieLancee,

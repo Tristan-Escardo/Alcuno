@@ -1588,6 +1588,7 @@ function majRappelTour(){
   if(libre){
     const nom = joueurs[indexJoueur % joueurs.length];
     texte = enLigneActif && nom === pseudoActuel ? "C'est à toi de jouer, tire une carte." : `C'est à ${nom} de jouer, tire une carte.`;
+    rappelTour.dataset.tele = `C'est à ${nom} de jouer, tire une carte.`; // (la télé dit toujours le nom : « toi » n'y voudrait rien dire)
   }
   if(rappelTour.textContent !== texte) rappelTour.textContent = texte;
   const affichage = texte ? "block" : "none";
