@@ -7233,6 +7233,9 @@ html[data-theme="prestige"] #btnCaster .casterIcone{ background: linear-gradient
 /* ===== Joueurs en pause (toilettes, clope…) : bouton ⏸ / ▶ à droite de chaque nom, en partie ===== */
 #listeJoueurs{ grid-auto-columns: 1fr; }
 #listeJoueurs .joueur-ligne{ display: flex; align-items: center; gap: 6px; min-height: 26px; }
+/* Nom (ou « PIGEON (nom) ») en un seul bloc : sans lui, « PIGEON » et le nom étaient deux éléments du flex qui se
+   cassaient chacun de leur côté (« PIGEO / N »). Un nom très long passe à la ligne, même sans espace. */
+#listeJoueurs .joueur-nom{ min-width: 0; overflow-wrap: anywhere; }
 .btnPauseJoueur{
   flex: 0 0 auto;
   margin-left: auto;

@@ -1530,10 +1530,10 @@ function afficherJoueurs(){
     const pause = estEnPause(j) ? ` <span class="badge-pause">EN PAUSE</span>` : "";
     const classePause = estEnPause(j) ? " joueur-en-pause" : "";
     if(i === indexPigeon){
-      return `<div class="joueur-ligne joueur-ligne-pigeon${classePause}"><strong>PIGEON</strong> (${echapperHtml(avecCouronne(nomPigeonOriginal))})${bonus}${pause}${badgeDeconnecte(j)}</div>`;
+      return `<div class="joueur-ligne joueur-ligne-pigeon${classePause}"><span class="joueur-nom"><strong>PIGEON</strong> (${echapperHtml(avecCouronne(nomPigeonOriginal))})</span>${bonus}${pause}${badgeDeconnecte(j)}</div>`;
     }
 
-    return `<div class="joueur-ligne${classePause}">${echapperHtml(avecCouronne(j))}${bonus}${pause}${badgeDeconnecte(j)}</div>`;
+    return `<div class="joueur-ligne${classePause}"><span class="joueur-nom">${echapperHtml(avecCouronne(j))}</span>${bonus}${pause}${badgeDeconnecte(j)}</div>`;
   }).join("");
 
   // En partie : bouton ⏸ (ou ▶ s'il est en pause) à droite de chaque nom
