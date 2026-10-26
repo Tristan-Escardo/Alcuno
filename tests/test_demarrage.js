@@ -412,7 +412,7 @@ function verifier(ok, texte){
     });
     verifier(r.avantKawaii === "false/true" && r.partie1 === "chou,cupcake,etoile,lapin,licorne,poussin,sushi" && r.kawaii7 === false &&
       r.partie1b.split(",").length === 8 && r.kawaii8 === "false/true" && r.kawaii11 === "true/false" && r.album === "11/11/Album de stickers" && r.regles === "Règles du jeu/0/false" &&
-      r.cinq === "chat,cupcake,nuage" && r.enLigneAutre === "cupcake,macaron" && r.enLigneMoi === "cupcake,etoile,macaron,poussin" && r.fenetre && erreurs.length === 0,
+      r.cinq === "chat,cupcake,nuage" && r.enLigneAutre === "cupcake,etoile,macaron" && r.enLigneMoi === "cupcake,etoile,macaron,poussin" && r.fenetre && erreurs.length === 0,
       `album de stickers : ${JSON.stringify(r)}`);
     await ctx.close();
   }
@@ -436,6 +436,27 @@ function verifier(ok, texte){
     });
     verifier(themeRefuse === "bordeaux" && k.theme === "kawaii" && k.bord === "rgb(255, 255, 255)" && k.rayon && k.stickers === "block/18" && k.pastille && k.icone && k.barre === "#ffd6ec" && erreurs.length === 0,
       `thème Kawaii : refusé tant que verrouillé (${themeRefuse}), ${JSON.stringify(k)}`);
+    await ctx.close();
+  }
+
+  // 20. Album de stickers caché : 3 taps rapides sur la barre arc-en-ciel sous le titre l'affichent (accueil + Réglages), et ça reste
+  {
+    const { ctx, page, erreurs } = await ouvrir();
+    const etat = () => page.evaluate(() => ({ accueil: !document.getElementById("albumAccueil").hidden, reglages: getComputedStyle(document.getElementById("btnAlbum")).display !== "none", garde: localStorage.getItem("alcuno_album_decouvert") }));
+    const avant = await etat();
+    await page.click("#choixMode .titreAccueilBarre"); await page.waitForTimeout(900); await page.click("#choixMode .titreAccueilBarre"); await page.waitForTimeout(900);
+    await page.click("#choixMode .titreAccueilBarre"); // 3 taps trop espacés : rien
+    const lent = await etat();
+    await page.waitForTimeout(900);
+    for (let i = 0; i < 3; i++) await page.click("#choixMode .titreAccueilBarre");
+    await page.waitForTimeout(400);
+    const apres = await etat();
+    await page.reload(); await page.waitForTimeout(900);
+    const recharge = await etat();
+    await page.click("#btnAlbumAccueil"); await page.waitForTimeout(700);
+    const ouvert = await page.evaluate(() => document.querySelector("#ecranRegles h2").textContent + "/" + document.getElementById("ecranRegles").style.display);
+    verifier(!avant.accueil && !avant.reglages && !lent.accueil && apres.accueil && apres.reglages && apres.garde === "1" && recharge.accueil && ouvert === "Album de stickers/" && erreurs.length === 0,
+      `album caché : avant ${JSON.stringify(avant)}, 3 taps lents ${lent.accueil}, 3 taps rapides ${JSON.stringify(apres)}, après rechargement ${recharge.accueil}, bouton d'accueil : ${ouvert}`);
     await ctx.close();
   }
 

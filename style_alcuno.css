@@ -8112,3 +8112,11 @@ html[data-theme="givre"] #ecranRegles .albumTexte{ color: var(--givre-doux); }
 .fenetreKawaii-plusTard{ margin-top: 12px; color: #a13a82; background: #fff; border: 3px solid #ffc1de; box-shadow: 0 4px 0 #ffc1de; }
 .fenetreKawaii-carte button:active{ filter: brightness(0.95); transform: scale(0.98); }
 @media (prefers-reduced-motion: reduce){ #fenetreKawaii, .fenetreKawaii-carte, .fenetreKawaii-stickers img{ animation: none; } }
+
+/* ===== Album de stickers sur l'accueil : caché tant qu'il n'est pas découvert (3 taps sur la barre arc-en-ciel) ===== */
+#choixMode .titreAccueilBarre{ position: relative; }
+#choixMode .titreAccueilBarre::before{ content: ""; position: absolute; inset: -18px -12px; } /* (zone de tap plus large que la barre de 5 px) */
+#choixMode .albumAccueil{ display: flex; justify-content: center; margin-top: 2px; } /* (dans la colonne, sous les boutons : jamais par-dessus) */
+#choixMode .albumAccueil[hidden]{ display: none; }
+#choixMode .albumAccueil .btnInstaller{ display: inline-flex; align-items: center; gap: 8px; }
+#choixMode .albumAccueil img{ flex: none; }

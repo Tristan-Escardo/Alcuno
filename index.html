@@ -174,6 +174,10 @@
             <button type="button" id="btnModeClassique">Mode classique<br>(Hors connexion)</button>
             <!-- Installer l'appli : petit bouton en bas (téléphone : rouvre l'écran « Installer Alcuno » ;
                  ordinateur avec Chrome : installe directement). Rien quand le jeu est déjà ouvert en appli. -->
+            <!-- Album de stickers : caché jusqu'à ce qu'on le découvre (3 taps rapides sur la barre arc-en-ciel sous le titre), voir js/stickers.js -->
+            <div class="albumAccueil" id="albumAccueil" hidden>
+                <button type="button" class="btnInstaller" id="btnAlbumAccueil"><img src="stickers/licorne.svg" alt="" width="22" height="22"> Album de stickers</button>
+            </div>
             <div class="installerAppli" id="installerAppli" hidden>
                 <button type="button" id="btnInstallerAppli" class="btnInstaller">📲 Installer l'appli</button>
             </div>
@@ -326,7 +330,7 @@
                 </div>
 
                 <!-- Album de stickers à gagner en jouant : les 11 stickers débloquent le thème Kawaii (js/stickers.js) -->
-                <button type="button" class="optionReglage optionLien" id="btnAlbum">
+                <button type="button" class="optionReglage optionLien" id="btnAlbum" style="display:none;">
                     <span class="optionTexte">
                         <span class="optionTitre">Album de stickers</span>
                         <span class="optionNote" id="albumResume"></span>

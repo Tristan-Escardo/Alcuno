@@ -76,7 +76,7 @@ function stickersFinDePartie(){
   if (a.parties >= 3) gagnes.push("chat");
   if (tableConcerne(st.annulees)) gagnes.push("lapin");
   if (tableConcerne(st.pigeon)) gagnes.push("poussin");
-  if (st.doree && (st.doree.personne || stickerConcerne(st.doree.tireur))) gagnes.push("etoile");
+  if (st.doree) gagnes.push("etoile"); // carte dorée en jeu ET tirée dans cette partie : peu importe qui l'a tirée
   if (tableConcerne(st.duels)) gagnes.push("licorne");
   if (partieExpress) gagnes.push("sushi");
   if (enLigneActif) gagnes.push("macaron");
@@ -157,9 +157,39 @@ function ouvrirAlbum(){
   ouvrirPage(page);
 }
 
+// ----- Découverte de l'album : 3 taps rapides sur la barre arc-en-ciel sous le titre de l'accueil -----
+const CLE_ALBUM_DECOUVERT = "alcuno_album_decouvert";
+function albumDecouvert(){
+  try { return localStorage.getItem(CLE_ALBUM_DECOUVERT) === "1"; } catch (e) { return false; }
+}
+function majAlbumVisible(){
+  const visible = albumDecouvert();
+  const accueil = document.getElementById("albumAccueil");
+  const ligne = document.getElementById("btnAlbum");
+  if (accueil) accueil.hidden = !visible;
+  if (ligne) ligne.style.display = visible ? "" : "none";
+}
+function decouvrirAlbum(){
+  if (albumDecouvert()) return;
+  try { localStorage.setItem(CLE_ALBUM_DECOUVERT, "1"); } catch (e) {}
+  majAlbumVisible();
+  try { vibrer([60, 40, 60]); } catch (e) {}
+  const n = nombreStickers();
+  afficherNotificationHaut("", n ? `Album de stickers découvert ! (${n} / ${STICKERS.length})` : "Album de stickers découvert !", true);
+}
+
 (function(){
-  const bouton = document.getElementById("btnAlbum");
-  if (bouton) bouton.addEventListener("click", ouvrirAlbum);
+  document.getElementById("btnAlbum").addEventListener("click", ouvrirAlbum);
+  document.getElementById("btnAlbumAccueil").addEventListener("click", ouvrirAlbum);
+  const barre = document.querySelector("#choixMode .titreAccueilBarre");
+  let taps = 0, dernier = 0;
+  if (barre) barre.addEventListener("click", () => {
+    const maintenant = Date.now();
+    taps = maintenant - dernier < 700 ? taps + 1 : 1;
+    dernier = maintenant;
+    if (taps >= 3) { taps = 0; decouvrirAlbum(); }
+  });
+  majAlbumVisible();
   majResumeAlbum();
 })();
 // #endregion
