@@ -92,7 +92,7 @@
         .pointe{ display: flex; align-items: baseline; gap: 10px; margin: -2px 0 10px; }
         .pointe b{ font-size: 30px; font-weight: 700; color: var(--cyan-clair); text-shadow: 0 0 10px var(--cyan); white-space: nowrap; }
         .pointe span{ color: var(--cyan-doux); font-size: 15px; }
-        .zoneReset{ text-align: center; }
+        .zoneReset{ text-align: center; margin: 22px 0 0; }
         .btnReset, .btnResetNon{ width: 100%; padding: 12px; border-radius: 4px; font: 700 13px "Orbitron", Arial, sans-serif; letter-spacing: .14em; cursor: pointer; }
         .btnReset{ border: 1px solid #ff4d6d; background: rgba(255, 77, 109, .1); color: #ff9fbd; text-shadow: 0 0 8px #ff4d6d; }
         .btnResetNon{ border: 1px solid rgba(0, 229, 255, .4); background: transparent; color: var(--cyan-clair); }
@@ -180,7 +180,7 @@
         <section class="bloc"><div class="titre">Versions en circulation</div><div id="barresVersions"></div></section>
         <section class="bloc"><div class="titre">Thèmes choisis</div><div id="barresThemes"></div></section>
 
-        <section class="bloc zoneReset">
+        <div class="zoneReset">
             <button type="button" id="btnReset" class="btnReset">Réinitialiser toutes les statistiques</button>
             <div id="confirmeReset" hidden>
                 <div class="texteReset">Tout effacer ?<br>Visites, parties, appareils : tout repart de zéro. C'est définitif.</div>
@@ -190,7 +190,7 @@
                 </div>
             </div>
             <div id="messageReset" class="messageReset" aria-live="polite"></div>
-        </section>
+        </div>
 
         <p class="note">Appareils vus ces 30 derniers jours · aucune donnée personnelle<br>Alcuno Stats <span id="versionStats"></span></p>
     </main>
@@ -201,7 +201,7 @@
 
         // Empreinte (SHA-256) du code d'accès : le code lui-même n'est écrit nulle part
         // Version de la page de stats (à part de celle du jeu : +0.0.1 à chaque modification de cette page)
-        const VERSION_STATS = "1.6.0";
+        const VERSION_STATS = "1.6.1";
         document.getElementById("versionStats").textContent = VERSION_STATS;
 
         const EMPREINTE_CODE = "2c8125d3adc62dac73f3ae036a86e00ba51b12b0dfb38fec2184e76441ed6826";
