@@ -391,11 +391,17 @@ function verifier(ok, texte){
       o.album = document.querySelectorAll(".albumLigne").length + "/" + document.querySelectorAll(".albumGagne").length + "/" + document.querySelector("#ecranRegles h2").textContent;
       ouvrirRegles();
       o.regles = document.querySelector("#ecranRegles h2").textContent + "/" + document.querySelectorAll(".albumLigne").length + "/" + document.getElementById("ecranRegles").classList.contains("album");
-      // 5 parties d'affilée : Chat (3 parties) et Nuage (5 en 6 h)
+      // 3 parties d'affilée : Chat (3 parties) et Nuage (3 en 6 h)
       localStorage.removeItem("alcuno_stickers"); partieExpress = false;
       statsPartie = { pigeon: {}, plusGros: {}, annulees: {}, duels: {}, plus4: {}, doree: null };
-      for (let i = 0; i < 5; i++) stickersFinDePartie();
-      o.cinq = trier();
+      stickersFinDePartie(); stickersFinDePartie();
+      o.deux = trier();
+      stickersFinDePartie();
+      o.cinq = trier(); // (3 parties de suite : Chat et Nuage)
+      // 3 parties étalées sur plus de 6 h : Chat, mais pas Nuage
+      localStorage.setItem("alcuno_stickers", JSON.stringify({ gagnes: [], parties: 2, fins: [Date.now() - 20 * 3600 * 1000, Date.now() - 19 * 3600 * 1000] }));
+      stickersFinDePartie();
+      o.etalees = trier();
       // en ligne : seulement ce qui arrive à soi
       localStorage.removeItem("alcuno_stickers");
       enLigneActif = true; pseudoActuel = "Zoe"; partieExpress = false;
@@ -412,7 +418,7 @@ function verifier(ok, texte){
     });
     verifier(r.avantKawaii === "false/true" && r.partie1 === "chou,cupcake,etoile,lapin,licorne,poussin,sushi" && r.kawaii7 === false &&
       r.partie1b.split(",").length === 8 && r.kawaii8 === "false/true" && r.kawaii11 === "true/false" && r.album === "11/11/Album de stickers" && r.regles === "Règles du jeu/0/false" &&
-      r.cinq === "chat,cupcake,nuage" && r.enLigneAutre === "cupcake,etoile,macaron" && r.enLigneMoi === "cupcake,etoile,macaron,poussin" && r.fenetre && erreurs.length === 0,
+      r.deux === "cupcake" && r.cinq === "chat,cupcake,nuage" && r.etalees === "chat,cupcake" && r.enLigneAutre === "cupcake,etoile,macaron" && r.enLigneMoi === "cupcake,etoile,macaron,poussin" && r.fenetre && erreurs.length === 0,
       `album de stickers : ${JSON.stringify(r)}`);
     await ctx.close();
   }

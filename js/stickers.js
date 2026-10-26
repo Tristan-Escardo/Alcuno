@@ -9,7 +9,7 @@
 // (statsPartie, js/plateau.js), sauf « Fraise » (mise en pause d'un joueur), comptée tout de suite.
 const CLE_STICKERS = "alcuno_stickers";
 const STICKERS_POUR_KAWAII = 11; // tout l'album
-const FENETRE_SOIREE = 6 * 60 * 60 * 1000; // « même soirée » : 5 parties finies en 6 h
+const FENETRE_SOIREE = 6 * 60 * 60 * 1000; // « même soirée » : 3 parties finies en 6 h
 const STICKERS = [
   { id: "cupcake", nom: "Cupcake",         indice: "Finir une partie" },
   { id: "chat",    nom: "Chat",            indice: "Finir 3 parties" },
@@ -21,7 +21,7 @@ const STICKERS = [
   { id: "sushi",   nom: "Sushi",           indice: "Finir une partie express" },
   { id: "macaron", nom: "Macaron",         indice: "Finir une partie en ligne" },
   { id: "chou",    nom: "Chou à la crème", indice: "Recevoir un +4" },
-  { id: "nuage",   nom: "Nuage",           indice: "Finir 5 parties dans la même soirée" }
+  { id: "nuage",   nom: "Nuage",           indice: "Finir 3 parties dans la même soirée" }
 ];
 
 function lireAlbum(){
@@ -81,7 +81,7 @@ function stickersFinDePartie(){
   if (partieExpress) gagnes.push("sushi");
   if (enLigneActif) gagnes.push("macaron");
   if (tableConcerne(st.plus4)) gagnes.push("chou");
-  if (a.fins.length >= 5 && a.fins[a.fins.length - 1] - a.fins[0] <= FENETRE_SOIREE) gagnes.push("nuage");
+  if (a.fins.length >= 3 && a.fins[a.fins.length - 1] - a.fins[a.fins.length - 3] <= FENETRE_SOIREE) gagnes.push("nuage");
   annoncerStickers(gagnerStickers(gagnes), 1800);
 }
 
