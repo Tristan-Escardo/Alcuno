@@ -8100,15 +8100,15 @@ html[data-theme="givre"] #ecranRegles .albumTexte{ color: var(--givre-doux); }
   border: 4px solid #fff; box-shadow: 0 8px 0 rgba(190, 80, 150, 0.45), 0 18px 40px rgba(60, 10, 70, 0.5);
   animation: fenetrePrestigeArrive 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
 }
-.fenetreKawaii-secret{ font: 900 12px Arial, sans-serif; letter-spacing: 0.12em; text-transform: uppercase; color: #a13a82; }
+.fenetreKawaii-secret{ font: 900 12px Arial, sans-serif; letter-spacing: 0.12em; text-transform: uppercase; color: #8f1450; }
 .fenetreKawaii-stickers{ display: flex; justify-content: center; gap: 4px; margin: 10px 0 8px; }
 .fenetreKawaii-stickers img{ filter: drop-shadow(0 3px 0 rgba(120, 50, 110, 0.3)); animation: kawaiiSaute 1.6s ease-in-out infinite; }
 .fenetreKawaii-stickers img:nth-child(2){ animation-delay: 0.2s; } .fenetreKawaii-stickers img:nth-child(3){ animation-delay: 0.4s; }
 @keyframes kawaiiSaute{ 0%, 100%{ transform: translateY(0) rotate(-4deg); } 50%{ transform: translateY(-8px) rotate(4deg); } }
-.fenetreKawaii-titre{ font: 900 28px/1.15 "Arial Rounded MT Bold", Arial, sans-serif; color: #ff4f9a; -webkit-text-stroke: 1.5px #fff; paint-order: stroke fill; text-shadow: 0 4px 0 #c2276f; }
+.fenetreKawaii-titre{ font: 900 28px/1.15 "Arial Rounded MT Bold", Arial, sans-serif; color: #d41f77; -webkit-text-stroke: 1.5px #fff; paint-order: stroke fill; text-shadow: 0 4px 0 #8f1450; }
 .fenetreKawaii-texte{ font: 700 15px/1.4 Arial, sans-serif; color: #5b2a6e; margin: 12px 0 20px; }
 .fenetreKawaii-carte button{ display: block; width: 100%; border-radius: 999px; cursor: pointer; font: 900 17px "Arial Rounded MT Bold", Arial, sans-serif; padding: 14px; }
-.fenetreKawaii-essayer{ color: #fff; border: 3px solid #fff; background: linear-gradient(180deg, #ff94c6, #ff4f9a); text-shadow: 0 2px 0 #c2276f; box-shadow: 0 5px 0 #c2276f, inset 0 3px 0 rgba(255, 255, 255, 0.55); }
+.fenetreKawaii-essayer{ color: #fff; border: 3px solid #fff; background: linear-gradient(180deg, #e24a93, #c4256f); text-shadow: 0 2px 0 #8f1450; box-shadow: 0 5px 0 #8f1450, inset 0 3px 0 rgba(255, 255, 255, 0.55); }
 .fenetreKawaii-plusTard{ margin-top: 12px; color: #a13a82; background: #fff; border: 3px solid #ffc1de; box-shadow: 0 4px 0 #ffc1de; }
 .fenetreKawaii-carte button:active{ filter: brightness(0.95); transform: scale(0.98); }
 @media (prefers-reduced-motion: reduce){ #fenetreKawaii, .fenetreKawaii-carte, .fenetreKawaii-stickers img{ animation: none; } }

@@ -653,7 +653,7 @@ html[data-theme="kawaii"]{
   --ic-chat: url("stickers/chat.svg"); --ic-fraise: url("stickers/fraise.svg"); --ic-nuage: url("stickers/nuage.svg");
   --ic-poussin: url("stickers/poussin.svg"); --ic-etoile: url("stickers/etoile.svg"); --ic-macaron: url("stickers/macaron.svg");
   --ic-chou: url("stickers/chou.svg");
-  --kawaii-prune: #5b2a6e; --kawaii-rose: #ff4f9a; --kawaii-rose-fonce: #c2276f;
+  --kawaii-prune: #5b2a6e; --kawaii-rose: #d41f77; --kawaii-rose-fonce: #8f1450;
 }
 html[data-theme="kawaii"] body{ font-family: "Arial Rounded MT Bold", "Avenir Next Rounded", "Nunito", Arial, sans-serif; }
 html[data-theme="kawaii"] :is(button, input, textarea, select){ font-family: inherit; }
@@ -698,12 +698,12 @@ html[data-theme="kawaii"] #listeJoueurs .joueur-ligne-actif{ background: linear-
 /* Boutons en gélatine */
 html[data-theme="kawaii"] :is(#btnModeEnLigne, #btnModeClassique, #jouer, #nouvellePartie, #ajouterJoueur, #supprimerJoueur, #menu #btnCaster, .voletPause-ok, .voletPause-annuler, .bouton-pigeon, .btnRetour, #btnReprendrePause, #btnRepriseOui, #btnRepriseNon){
   border: 3px solid #fff !important; border-radius: 999px !important; color: #fff !important; font-weight: 900;
-  background: linear-gradient(180deg, #ff94c6, #ff4f9a) !important; text-shadow: 0 2px 0 var(--kawaii-rose-fonce) !important;
+  background: linear-gradient(180deg, #e24a93, #c4256f) !important; text-shadow: 0 2px 0 var(--kawaii-rose-fonce) !important;
   box-shadow: 0 6px 0 var(--kawaii-rose-fonce), 0 10px 14px rgba(150, 30, 90, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.55) !important;
 }
 html[data-theme="kawaii"] :is(#btnModeEnLigne, #ajouterJoueur, #menu #btnCaster){ background: linear-gradient(180deg, #a8ecff, #4fc0ee) !important; text-shadow: 0 2px 0 #2a86b0 !important; box-shadow: 0 6px 0 #2a86b0, 0 10px 14px rgba(20, 100, 140, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.55) !important; }
-html[data-theme="kawaii"] #supprimerJoueur{ background: linear-gradient(180deg, #d9c2ff, #a97bff) !important; text-shadow: 0 2px 0 #6f45c9 !important; box-shadow: 0 6px 0 #6f45c9, 0 10px 14px rgba(90, 50, 150, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.55) !important; }
-html[data-theme="kawaii"] .voletPause-annuler{ background: #fff !important; color: #e0388c !important; text-shadow: none !important; border-color: #ffc1de !important; box-shadow: 0 4px 0 #ffc1de !important; }
+html[data-theme="kawaii"] #supprimerJoueur{ background: linear-gradient(180deg, #8a5de0, #6b3fc4) !important; text-shadow: 0 2px 0 #43238a !important; box-shadow: 0 6px 0 #43238a, 0 10px 14px rgba(90, 50, 150, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.55) !important; }
+html[data-theme="kawaii"] .voletPause-annuler{ background: #fff !important; color: #b81c68 !important; text-shadow: none !important; border-color: #ffc1de !important; box-shadow: 0 4px 0 #ffc1de !important; }
 html[data-theme="kawaii"] :is(#btnModeEnLigne, #btnModeClassique, #jouer, #nouvellePartie, .voletPause-ok)::before{ content: ""; display: inline-block; width: 1.5em; height: 1.5em; vertical-align: -0.4em; margin-right: 0.3em; background-position: center; background-size: contain; background-repeat: no-repeat; }
 html[data-theme="kawaii"] #btnModeEnLigne::before{ background-image: var(--ic-nuage); }
 html[data-theme="kawaii"] #btnModeClassique::before{ background-image: var(--ic-licorne); }
@@ -741,7 +741,7 @@ html[data-theme="kawaii"] :is(header, .menu, .blocMessages, .optionReglage, .blo
 }
 html[data-theme="kawaii"] :is(.menu, .blocMessages) :is(input){ background: #fff; }
 /* Boutons bleus : plus foncés pour que le texte blanc se lise */
-html[data-theme="kawaii"] :is(#btnModeEnLigne, #ajouterJoueur, #menu #btnCaster){ background: linear-gradient(180deg, #78d6f2, #2a9fd0) !important; text-shadow: 0 2px 0 #1b6a8e !important; box-shadow: 0 6px 0 #1b6a8e, 0 10px 14px rgba(20, 100, 140, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.5) !important; }
+html[data-theme="kawaii"] :is(#btnModeEnLigne, #ajouterJoueur, #menu #btnCaster){ background: linear-gradient(180deg, #2a95cc, #1c75a8) !important; text-shadow: 0 2px 0 #0f4f73 !important; box-shadow: 0 6px 0 #0f4f73, 0 10px 14px rgba(20, 100, 140, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.5) !important; }
 html[data-theme="kawaii"] .titreAccueilBarre{ background: linear-gradient(90deg, #ff4f9a, #ffb12e, #35c9a6, #5aa8ff, #b46bff) !important; }
 /* Annonces et carte dorée sur le fond à pois */
 html[data-theme="kawaii"] :is(#overlayCouleur, #overlayPlus4, #overlayPigeon, #overlayFinUnRestants, #overlayDuel, #overlayRegleUnique, #overlayRegleUnique.overlay-doree, #overlayCarteDoree, #overlayAnnulation, #overlayResultatAnnulation, #overlayPredictionFin){
@@ -751,3 +751,23 @@ html[data-theme="kawaii"].overlay-ouvert, html[data-theme="kawaii"].overlay-ouve
 
 /* Accessibilité (texte agrandi) : le titre de la carte dorée peut passer à la ligne */
 html.accessibilite[data-theme="kawaii"] :is(#overlayRegleUnique, #overlayCarteDoree, #overlayPredictionFin) .doree-titre{ white-space: normal; }
+
+/* Boutons des fenêtres et des écrans plein écran : aussi en gélatine rose (avant : rouge foncé hérité de Givre) */
+html[data-theme="kawaii"] :is(#ecranNouvellePartie, #ecranConfirmerAccueil, #ecranConfirmerHote, #ecranConfirmerRetrait, #ecranReprise, #ecranCaster, #ecranPause, #ecranChoixPseudo, #enLigne, #salleAttente, #suppression, #ecranBug) button:not(.bugFermer):not(.btnPauseJoueur):not(#btnBugEnvoyer):not(.btnAccueilTexte){
+  border: 3px solid #fff !important; border-radius: 999px !important; color: #fff !important; font-weight: 900;
+  background: linear-gradient(180deg, #e24a93, #c4256f) !important; text-shadow: 0 2px 0 var(--kawaii-rose-fonce) !important;
+  box-shadow: 0 6px 0 var(--kawaii-rose-fonce), 0 10px 14px rgba(150, 30, 90, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.55) !important;
+}
+html[data-theme="kawaii"] :is(#overlayAnnulation button, #overlayDuel button:not(:disabled), #overlayPlus4 button, #overlayPigeon .bouton-pigeon, #overlayCarteDoree .bouton-doree, #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation, .bouton-doree){
+  border: 3px solid #fff !important; border-radius: 999px !important; color: #fff !important; font-weight: 900;
+  background: linear-gradient(180deg, #e24a93, #c4256f) !important; text-shadow: 0 2px 0 var(--kawaii-rose-fonce) !important;
+  box-shadow: 0 6px 0 var(--kawaii-rose-fonce), 0 10px 14px rgba(150, 30, 90, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.55) !important;
+}
+html[data-theme="kawaii"] #overlayDuel button:disabled{ opacity: 0.55; }
+/* Fenêtre « Thème Kawaii débloqué » plus contrastée */
+.fenetreKawaii-titre{ color: #d41f77; text-shadow: 0 4px 0 #8f1450; }
+.fenetreKawaii-secret{ color: #8f1450; }
+.fenetreKawaii-essayer{ background: linear-gradient(180deg, #e24a93, #c4256f); text-shadow: 0 2px 0 #8f1450; box-shadow: 0 5px 0 #8f1450, inset 0 3px 0 rgba(255, 255, 255, 0.55); }
+
+/* Écran PAUSE : plein écran sur le fond à pois (et plus un grand panneau blanc) */
+html[data-theme="kawaii"][data-theme] body #ecranPause{ background: var(--overlay-fond) !important; border: none !important; border-radius: 0 !important; box-shadow: none !important; outline: none !important; }

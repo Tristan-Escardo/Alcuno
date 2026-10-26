@@ -481,6 +481,33 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
+  // 21. Thème Kawaii : lisibilité (contraste d'au moins 3) sur l'accueil, la partie et les fenêtres de jeu, boutons de fenêtres en gélatine rose
+  {
+    const { ctx, page, erreurs } = await ouvrir({}, `try{localStorage.setItem("alcuno_theme","kawaii");localStorage.setItem("alcuno_theme_kawaii","1");localStorage.setItem("alcuno_aide_vue","1")}catch(e){}`);
+    await page.addScriptTag({ path: path.join(__dirname, "contraste.js") });
+    const faibles = [];
+    const verifierEcran = async (nom) => { const bas = await page.evaluate(() => window.verifierContraste(3).map((x) => x.ratio.toFixed(1) + " " + x.cle)); if (bas.length) faibles.push(nom + " : " + bas.slice(0, 3).join(" | ")); };
+    await page.waitForTimeout(500); await verifierEcran("accueil");
+    await page.click("#btnModeClassique"); await page.waitForTimeout(800);
+    for (const nom of ["Tom", "Lea", "Max"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(200); }
+    await verifierEcran("préparation");
+    await page.click("#jouer"); await page.waitForTimeout(1200); await verifierEcran("partie");
+    const fenetres = [["pause", () => page.click("#listeJoueurs .joueur-ligne:nth-child(2) .btnPauseJoueur")],
+      ["choix du pigeon", () => page.evaluate(() => { indexPigeon = 1; afficherMenuPigeon(); })],
+      ["carte dorée", () => page.evaluate(() => afficherOverlayCarteDoree(0))],
+      ["+4", () => page.evaluate(() => afficherOverlayPlus4(0, "plus_4"))],
+      ["duel", () => page.evaluate(() => lancerOverlayChoixDuel(0, "cinq_rouge"))]];
+    for (const [nom, ouvrirFenetre] of fenetres) {
+      await ouvrirFenetre(); await page.waitForTimeout(900); await verifierEcran(nom);
+      await page.evaluate(() => { document.querySelectorAll('[id^="overlay"], #voletPause').forEach((e) => e.remove()); try { unlockScroll(); } catch (e) {} });
+    }
+    await page.evaluate(() => { document.getElementById("ecranConfirmerAccueil").style.display = ""; });
+    const gel = await page.evaluate(() => { const b = getComputedStyle(document.getElementById("btnConfirmerAccueilOui")); return b.borderTopColor + "|" + b.backgroundImage.slice(0, 29); });
+    verifier(faibles.length === 0 && gel.startsWith("rgb(255, 255, 255)|linear-gradient(rgb(226") && erreurs.length === 0,
+      `thème Kawaii : lisibilité ${faibles.length ? faibles.join(" ; ") : "bonne sur 8 écrans"}, boutons de fenêtre ${gel}`);
+    await ctx.close();
+  }
+
   // 12. Les fenêtres de déblocage (Prestige, Star Wars) gardent leurs propres boutons dans tous les thèmes
   {
     const { ctx, page } = await ouvrir();
