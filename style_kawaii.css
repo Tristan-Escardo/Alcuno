@@ -653,7 +653,8 @@ html[data-theme="kawaii"]{
   --ic-chat: url("stickers/chat.svg"); --ic-fraise: url("stickers/fraise.svg"); --ic-nuage: url("stickers/nuage.svg");
   --ic-poussin: url("stickers/poussin.svg"); --ic-etoile: url("stickers/etoile.svg"); --ic-macaron: url("stickers/macaron.svg");
   --ic-chou: url("stickers/chou.svg");
-  --kawaii-prune: #5b2a6e; --kawaii-rose: #d41f77; --kawaii-rose-fonce: #8f1450;
+  --kawaii-prune: #5b2a6e; --kawaii-rose: #d41f77; --kawaii-rose-fonce: #8f1450; --kawaii-rose-bouton: #c9578a;
+  --givre-bouton: linear-gradient(180deg, #f9a6cb, #ee70a9); --bandeau-bouton: linear-gradient(180deg, #f9a6cb, #ee70a9);
 }
 html[data-theme="kawaii"] body{ font-family: "Arial Rounded MT Bold", "Avenir Next Rounded", "Nunito", Arial, sans-serif; }
 html[data-theme="kawaii"] :is(button, input, textarea, select){ font-family: inherit; }
@@ -697,8 +698,8 @@ html[data-theme="kawaii"] #listeJoueurs .joueur-ligne-actif{ background: linear-
 /* Boutons en gélatine */
 html[data-theme="kawaii"] :is(#btnModeEnLigne, #btnModeClassique, #jouer, #nouvellePartie, #ajouterJoueur, #supprimerJoueur, #menu #btnCaster, .voletPause-ok, .voletPause-annuler, .bouton-pigeon, .btnRetour, #btnReprendrePause, #btnRepriseOui, #btnRepriseNon){
   border: 3px solid #fff !important; border-radius: 999px !important; color: #fff !important; font-weight: 900;
-  background: linear-gradient(180deg, #e24a93, #c4256f) !important; text-shadow: 0 2px 0 var(--kawaii-rose-fonce) !important;
-  box-shadow: 0 6px 0 var(--kawaii-rose-fonce), 0 10px 14px rgba(150, 30, 90, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.55) !important;
+  background: linear-gradient(180deg, #f9a6cb, #ee70a9) !important; text-shadow: 0 2px 0 var(--kawaii-rose-bouton) !important;
+  box-shadow: 0 6px 0 var(--kawaii-rose-bouton), 0 10px 14px rgba(150, 30, 90, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.55) !important;
 }
 html[data-theme="kawaii"] :is(#ajouterJoueur, #menu #btnCaster){ background: linear-gradient(180deg, #a8ecff, #4fc0ee) !important; text-shadow: 0 2px 0 #2a86b0 !important; box-shadow: 0 6px 0 #2a86b0, 0 10px 14px rgba(20, 100, 140, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.55) !important; }
 html[data-theme="kawaii"] #supprimerJoueur{ background: linear-gradient(180deg, #8a5de0, #6b3fc4) !important; text-shadow: 0 2px 0 #43238a !important; box-shadow: 0 6px 0 #43238a, 0 10px 14px rgba(90, 50, 150, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.55) !important; }
@@ -768,19 +769,19 @@ html.accessibilite[data-theme="kawaii"] :is(#overlayRegleUnique, #overlayCarteDo
 /* Boutons des fenêtres et des écrans plein écran : aussi en gélatine rose (avant : rouge foncé hérité de Givre) */
 html[data-theme="kawaii"] :is(#ecranNouvellePartie, #ecranConfirmerAccueil, #ecranConfirmerHote, #ecranConfirmerRetrait, #ecranReprise, #ecranCaster, #ecranPause, #ecranChoixPseudo, #enLigne, #salleAttente, #suppression, #ecranBug) button:not(.bugFermer):not(.btnPauseJoueur):not(#btnBugEnvoyer):not(.btnAccueilTexte){
   border: 3px solid #fff !important; border-radius: 999px !important; color: #fff !important; font-weight: 900;
-  background: linear-gradient(180deg, #e24a93, #c4256f) !important; text-shadow: 0 2px 0 var(--kawaii-rose-fonce) !important;
-  box-shadow: 0 6px 0 var(--kawaii-rose-fonce), 0 10px 14px rgba(150, 30, 90, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.55) !important;
+  background: linear-gradient(180deg, #f9a6cb, #ee70a9) !important; text-shadow: 0 2px 0 var(--kawaii-rose-bouton) !important;
+  box-shadow: 0 6px 0 var(--kawaii-rose-bouton), 0 10px 14px rgba(150, 30, 90, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.55) !important;
 }
 html[data-theme="kawaii"] :is(#overlayAnnulation button, #overlayDuel button:not(:disabled), #overlayPlus4 button, #overlayPigeon .bouton-pigeon, #overlayCarteDoree .bouton-doree, #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation, .bouton-doree){
   border: 3px solid #fff !important; border-radius: 999px !important; color: #fff !important; font-weight: 900;
-  background: linear-gradient(180deg, #e24a93, #c4256f) !important; text-shadow: 0 2px 0 var(--kawaii-rose-fonce) !important;
-  box-shadow: 0 6px 0 var(--kawaii-rose-fonce), 0 10px 14px rgba(150, 30, 90, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.55) !important;
+  background: linear-gradient(180deg, #f9a6cb, #ee70a9) !important; text-shadow: 0 2px 0 var(--kawaii-rose-bouton) !important;
+  box-shadow: 0 6px 0 var(--kawaii-rose-bouton), 0 10px 14px rgba(150, 30, 90, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.55) !important;
 }
 html[data-theme="kawaii"] #overlayDuel button:disabled{ opacity: 0.55; }
 /* Fenêtre « Thème Kawaii débloqué » plus contrastée */
 .fenetreKawaii-titre{ color: #d41f77; text-shadow: 0 4px 0 #8f1450; }
 .fenetreKawaii-secret{ color: #8f1450; }
-.fenetreKawaii-essayer{ background: linear-gradient(180deg, #e24a93, #c4256f); text-shadow: 0 2px 0 #8f1450; box-shadow: 0 5px 0 #8f1450, inset 0 3px 0 rgba(255, 255, 255, 0.55); }
+.fenetreKawaii-essayer{ background: linear-gradient(180deg, #f9a6cb, #ee70a9); text-shadow: 0 2px 0 #c9578a; box-shadow: 0 5px 0 #c9578a, inset 0 3px 0 rgba(255, 255, 255, 0.55); }
 
 /* Écran PAUSE : plein écran sur le fond à pois (et plus un grand panneau blanc) */
 html[data-theme="kawaii"][data-theme] body #ecranPause{ background: var(--overlay-fond) !important; border: none !important; border-radius: 0 !important; box-shadow: none !important; outline: none !important; }
