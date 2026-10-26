@@ -372,7 +372,13 @@ function verifier(ok, texte){
     const r = await page.evaluate(async () => {
       const o = {};
       const trier = () => lireAlbum().gagnes.slice().sort().join();
-      try { localStorage.removeItem("alcuno_stickers"); localStorage.removeItem("alcuno_theme_kawaii"); } catch (e) {}
+      try { localStorage.removeItem("alcuno_stickers"); localStorage.removeItem("alcuno_theme_kawaii"); localStorage.removeItem("alcuno_album_decouvert"); } catch (e) {}
+      // album pas encore découvert : rien ne se gagne ni ne se compte
+      enLigneActif = false; partieExpress = false;
+      statsPartie = { pigeon: { Tom: 1 }, plusGros: {}, annulees: {}, duels: {}, plus4: {}, doree: null };
+      stickersFinDePartie(); stickerPause("Tom"); gagnerStickers(["lapin"]);
+      o.sansAlbum = JSON.stringify(lireAlbum());
+      localStorage.setItem("alcuno_album_decouvert", "1");
       o.avantKawaii = kawaiiDebloque() + "/" + document.getElementById("pastilleKawaii").hidden;
       // classique : une partie express avec pigeon, duel, annulation, +4 et carte dorée
       enLigneActif = false; partieExpress = true;
@@ -416,7 +422,7 @@ function verifier(ok, texte){
       o.fenetre = !!document.getElementById("fenetreKawaii");
       return o;
     });
-    verifier(r.avantKawaii === "false/true" && r.partie1 === "chou,cupcake,etoile,lapin,licorne,poussin,sushi" && r.kawaii7 === false &&
+    verifier(r.sansAlbum === '{"gagnes":[],"parties":0,"fins":[]}' && r.avantKawaii === "false/true" && r.partie1 === "chou,cupcake,etoile,lapin,licorne,poussin,sushi" && r.kawaii7 === false &&
       r.partie1b.split(",").length === 8 && r.kawaii8 === "false/true" && r.kawaii11 === "true/false" && r.album === "11/11/Album de stickers" && r.regles === "Règles du jeu/0/false" &&
       r.deux === "cupcake" && r.cinq === "chat,cupcake,nuage" && r.etalees === "chat,cupcake" && r.enLigneAutre === "cupcake,etoile,macaron" && r.enLigneMoi === "cupcake,etoile,macaron,poussin" && r.fenetre && erreurs.length === 0,
       `album de stickers : ${JSON.stringify(r)}`);
@@ -445,10 +451,10 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
-  // 20. Album de stickers caché : l'étoile filante qui traverse l'accueil, touchée, l'affiche (accueil + Réglages), et ça reste
+  // 20. Album de stickers caché : l'étoile filante qui traverse l'accueil, touchée, l'affiche (bouton sur l'accueil, plus de ligne dans les Réglages), et ça reste
   {
     const { ctx, page, erreurs } = await ouvrir();
-    const etat = () => page.evaluate(() => ({ accueil: !document.getElementById("albumAccueil").hidden, reglages: getComputedStyle(document.getElementById("btnAlbum")).display !== "none", garde: localStorage.getItem("alcuno_album_decouvert"), etoile: !!document.querySelector(".etoileFilante") }));
+    const etat = () => page.evaluate(() => ({ accueil: !document.getElementById("albumAccueil").hidden, reglages: !!document.getElementById("btnAlbum"), garde: localStorage.getItem("alcuno_album_decouvert"), etoile: !!document.querySelector(".etoileFilante") }));
     const avant = await etat();
     await page.evaluate(() => passageEtoileFilante(true));
     await page.waitForTimeout(600);
@@ -470,7 +476,7 @@ function verifier(ok, texte){
     await page.click("#btnAlbumAccueil"); await page.waitForTimeout(700);
     const ouvert = await page.evaluate(() => document.querySelector("#ecranRegles h2").textContent + "/" + document.getElementById("ecranRegles").style.display);
     verifier(!avant.accueil && !avant.reglages && !avant.etoile && enVol.etoile && taille && ratee.etoile === false && !ratee.accueil &&
-      apres.accueil && apres.reglages && apres.garde === "1" && message.includes("Vœu exaucé") && !encore.etoile && recharge.accueil && ouvert === "Album de stickers/" && erreurs.length === 0,
+      apres.accueil && !apres.reglages && apres.garde === "1" && message.includes("Vœu exaucé") && !encore.etoile && recharge.accueil && ouvert === "Album de stickers/" && erreurs.length === 0,
       `étoile filante : en vol ${enVol.etoile}, ratée -> album ${ratee.accueil}, touchée -> ${JSON.stringify(apres)} « ${message} », plus de passage ${!encore.etoile}, après rechargement ${recharge.accueil}, bouton d'accueil : ${ouvert}`);
     await ctx.close();
   }

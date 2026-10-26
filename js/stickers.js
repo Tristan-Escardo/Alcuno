@@ -3,7 +3,7 @@
 // (fichier chargé après ceux d'avant dans index.html : voir l'en-tête de script.js)
 // =============================================================================================
 // #region Album de stickers
-// Les stickers sont gardés sur ce téléphone (stockage local du navigateur). En classique (un seul téléphone pour
+// Rien ne se gagne tant que l'album n'est pas découvert (étoile filante de l'accueil, plus bas). Les stickers sont gardés sur ce téléphone (stockage local du navigateur). En classique (un seul téléphone pour
 // toute la table), un sticker se gagne quand ça arrive à n'importe quel joueur ; en ligne, seulement quand ça
 // arrive à soi (pseudoActuel). Tout est compté à la fin de la partie, à partir des statistiques du récap
 // (statsPartie, js/plateau.js), sauf « Fraise » (mise en pause d'un joueur), comptée tout de suite.
@@ -45,12 +45,12 @@ function tableConcerne(table){ return Object.keys(table || {}).some((nom) => Num
 
 // Ajoute les stickers donnés (ceux qu'on n'a pas encore) ; renvoie la liste des nouveaux
 function gagnerStickers(ids){
+  if (!albumDecouvert()) return []; // (rien ne se gagne tant que l'album n'est pas découvert)
   const a = lireAlbum();
   const nouveaux = ids.filter((id, i) => ids.indexOf(id) === i && !a.gagnes.includes(id));
   if (!nouveaux.length) return [];
   a.gagnes.push(...nouveaux);
   ecrireAlbum(a);
-  majResumeAlbum();
   if (a.gagnes.length >= STICKERS_POUR_KAWAII && !kawaiiDebloque()) debloquerKawaii(); // (js/reglages.js)
   return nouveaux;
 }
@@ -65,7 +65,7 @@ function annoncerStickers(nouveaux, delai){
 
 // Fin de partie (afficherOverlayFinUnRestants, js/regles.js) : on compte ce qui s'est passé (statsPartie)
 function stickersFinDePartie(){
-  if (rattrapageEnCours) return; // (rejeu accéléré d'une partie reprise ou d'une reconnexion : déjà compté)
+  if (rattrapageEnCours || !albumDecouvert()) return; // (rien ne se gagne, ni ne se compte, tant que l'album n'est pas découvert) // (rejeu accéléré d'une partie reprise ou d'une reconnexion : déjà compté)
   const a = lireAlbum();
   a.parties++;
   a.fins.push(Date.now());
@@ -87,20 +87,11 @@ function stickersFinDePartie(){
 
 // Un joueur mis en pause (basculerPauseJoueur, js/plateau.js)
 function stickerPause(nom){
-  if (rattrapageEnCours || !stickerConcerne(nom)) return;
+  if (rattrapageEnCours || !albumDecouvert() || !stickerConcerne(nom)) return;
   annoncerStickers(gagnerStickers(["fraise"]), 2200);
 }
 
-// ----- Réglages : ligne « Album de stickers » et écran de l'album -----
-function majResumeAlbum(){
-  const note = document.getElementById("albumResume");
-  if (!note) return;
-  const n = nombreStickers();
-  note.textContent = kawaiiDebloque()
-    ? `${n} / ${STICKERS.length} stickers · thème Kawaii débloqué`
-    : `${n} / ${STICKERS.length} stickers · complète l'album pour débloquer le thème Kawaii`;
-}
-
+// ----- Écran de l'album (bouton de l'accueil, une fois l'album découvert par l'étoile filante) -----
 // L'album s'ouvre dans l'écran des règles (mêmes blocs, donc les mêmes couleurs dans chaque thème) ; ouvrirRegles remet les règles
 function ouvrirAlbum(){
   const a = lireAlbum();
@@ -165,9 +156,7 @@ function albumDecouvert(){
 function majAlbumVisible(){
   const visible = albumDecouvert();
   const accueil = document.getElementById("albumAccueil");
-  const ligne = document.getElementById("btnAlbum");
   if (accueil) accueil.hidden = !visible;
-  if (ligne) ligne.style.display = visible ? "" : "none";
 }
 function decouvrirAlbum(message){
   if (albumDecouvert()) return;
@@ -232,10 +221,8 @@ function paillettesVoeu(zone, x, y){
 }
 
 (function(){
-  document.getElementById("btnAlbum").addEventListener("click", ouvrirAlbum);
   document.getElementById("btnAlbumAccueil").addEventListener("click", ouvrirAlbum);
   majAlbumVisible();
-  majResumeAlbum();
   setTimeout(passageEtoileFilante, 10000); // (la première fois : 10 s après l'ouverture)
 })();
 
