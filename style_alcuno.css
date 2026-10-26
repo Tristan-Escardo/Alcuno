@@ -1179,8 +1179,8 @@ html[data-theme="galaxie"] .fin-choix-numeros b{ background: #8fd0ff; color: #02
     #menu #jouer, #menu #nouvellePartie{ min-width: 0; overflow: hidden; text-overflow: ellipsis; }
     html.accessibilite #menu :is(#jouer, #nouvellePartie){ font-size: clamp(13px, 4vw, 19px); } /* (texte agrandi, mais sans pousser « Caster » à la ligne) */
     #menu:has(#nouvellePartie:not([style*="none"])) :is(#nouvellePartie, #btnCaster){ margin-top: 0; } /* (première ligne en partie) */
-    #menu:has(#nouvellePartie:not([style*="none"])) #supprimerJoueur{ order: 5; } /* (en partie : « − » à droite de « Nouvelle partie », pas seul sur sa ligne) */
-    html #menu #btnCaster{ order: 6 !important; flex: 1 1 100%; height: 42px; padding-top: 0; padding-bottom: 0; font-size: 16px; }
+    #menu:has(#nouvellePartie:not([style*="none"])) #supprimerJoueur{ order: 6; } /* (en partie : « Nouvelle partie », puis « − », puis « Caster » sur la même ligne) */
+    html #menu #btnCaster{ order: 7 !important; flex: 1 1 100%; height: 42px; padding-top: 0; padding-bottom: 0; font-size: 16px; }
     /* Quand « Jouer » ou « Nouvelle partie » est affiché : « Caster » n'est plus que son icône, carrée, à côté (plus de place pour le gros bouton) */
     html #menu:is(:has(#jouer:not([style*="none"])), :has(#nouvellePartie:not([style*="none"]))) #btnCaster{ flex: 0 0 48px; min-height: 42px; padding-left: 0; padding-right: 0; }
     html #menu:is(:has(#jouer:not([style*="none"])), :has(#nouvellePartie:not([style*="none"]))) #btnCaster .casterTexte{ display: none; }
