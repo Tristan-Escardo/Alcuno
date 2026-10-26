@@ -503,7 +503,7 @@ function verifier(ok, texte){
     }
     await page.evaluate(() => { document.getElementById("ecranConfirmerAccueil").style.display = ""; });
     const gel = await page.evaluate(() => { const b = getComputedStyle(document.getElementById("btnConfirmerAccueilOui")); return b.borderTopColor + "|" + b.backgroundImage.slice(0, 29); });
-    verifier(faibles.length === 0 && gel.startsWith("rgb(255, 255, 255)|linear-gradient(rgb(226") && erreurs.length === 0,
+    verifier(faibles.length === 0 && gel.startsWith("rgb(255, 255, 255)|linear-gradient(rgb(249") && erreurs.length === 0,
       `thème Kawaii : lisibilité ${faibles.length ? faibles.join(" ; ") : "bonne sur 8 écrans"}, boutons de fenêtre ${gel}`);
     await ctx.close();
   }
