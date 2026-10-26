@@ -511,13 +511,14 @@ function verifier(ok, texte){
   // 12. Les fenêtres de déblocage (Prestige, Star Wars) gardent leurs propres boutons dans tous les thèmes
   {
     const { ctx, page } = await ouvrir();
-    const themes = [...THEMES, "prestige", "galaxie"];
+    const themes = [...THEMES, "prestige", "galaxie", "kawaii"];
     for (const [nom, fonction, selecteur] of [["Prestige", "afficherFenetrePrestige", ".fenetrePrestige-essayer, .fenetrePrestige-plusTard"],
-        ["Star Wars", "afficherFenetreGalaxie", ".fenetreGalaxie-ok, .fenetreGalaxie-plusTard"]]) {
+        ["Star Wars", "afficherFenetreGalaxie", ".fenetreGalaxie-ok, .fenetreGalaxie-plusTard"],
+        ["Kawaii", "afficherFenetreKawaii", ".fenetreKawaii-essayer, .fenetreKawaii-plusTard"]]) {
       const styles = [];
       for (const theme of themes) {
         styles.push(await page.evaluate(([theme, fonction, selecteur]) => {
-          document.querySelectorAll("#fenetrePrestige, #fenetreGalaxie").forEach((e) => e.remove());
+          document.querySelectorAll("#fenetrePrestige, #fenetreGalaxie, #fenetreKawaii").forEach((e) => e.remove());
           document.documentElement.dataset.theme = theme;
           eval(fonction + "()");
           return [...document.querySelectorAll(selecteur)].map((b) => { const s = getComputedStyle(b);
