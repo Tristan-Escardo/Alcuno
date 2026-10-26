@@ -526,6 +526,19 @@ function verifier(ok, texte){
     verifier(mauvais.length === 0, `bannière « Tour de » : collée en haut dans les ${positions.length} thèmes ${mauvais.length ? JSON.stringify(mauvais) : "(" + positions.map((p) => p.colle).join(", ") + " px)"}`);
   }
 
+  // 23. Mot secret du créateur : tapé comme nom de joueur, il débloque le thème Kawaii (pas ajouté comme joueur), fenêtre « débloqué », thème essayable
+  {
+    const { ctx, page, erreurs } = await ouvrir();
+    await page.click("#btnModeClassique"); await page.waitForTimeout(800);
+    await page.fill("#nomJoueur", "Tristan Kawaii"); await page.click("#ajouterJoueur"); await page.waitForTimeout(900);
+    const r = await page.evaluate(() => ({ debloque: kawaiiDebloque(), pastille: !document.getElementById("pastilleKawaii").hidden, joueurs: joueurs.length, champ: document.getElementById("nomJoueur").value, fenetre: !!document.getElementById("fenetreKawaii") }));
+    await page.click(".fenetreKawaii-essayer"); await page.waitForTimeout(700);
+    const theme = await page.evaluate(() => document.documentElement.dataset.theme);
+    verifier(r.debloque && r.pastille && r.joueurs === 0 && r.champ === "" && r.fenetre && theme === "kawaii" && erreurs.length === 0,
+      `mot secret Kawaii : ${JSON.stringify(r)}, thème après « L'essayer » : ${theme}`);
+    await ctx.close();
+  }
+
   // 12. Les fenêtres de déblocage (Prestige, Star Wars) gardent leurs propres boutons dans tous les thèmes
   {
     const { ctx, page } = await ouvrir();

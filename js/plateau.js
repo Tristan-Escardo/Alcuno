@@ -1671,6 +1671,14 @@ function ajouterJoueur(){
     return;
   }
 
+  // Mot secret du créateur pour débloquer le thème Kawaii sans l'album (js/reglages.js) : pas un joueur
+  if(estCodeKawaii(nom)){
+    nomJoueurInput.value = "";
+    if(document.activeElement) document.activeElement.blur(); // (le clavier se ferme)
+    debloquerKawaii(true);
+    return;
+  }
+
   const key = nom.toLocaleLowerCase("fr-FR");
 
   if (joueurs.some(j => (j || "").replace(/\s+/g, " ").trim().toLocaleLowerCase("fr-FR") === key)) {

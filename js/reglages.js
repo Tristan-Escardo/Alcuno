@@ -165,12 +165,23 @@ function vuNouveauKawaii(){
   try { localStorage.removeItem(CLE_KAWAII_NOUVEAU); } catch (e) {}
   document.documentElement.classList.remove("kawaii-nouveau");
 }
-function debloquerKawaii(){
-  if (kawaiiDebloque()) return;
+// Mot secret (nom de joueur) qui débloque le thème d'un coup, sans l'album : seulement son empreinte (comme Star Wars)
+const EMPREINTES_KAWAII = ["1cab6d44"];
+function estCodeKawaii(nom){
+  const mot = String(nom).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  let h = 0x811c9dc5;
+  for (const c of mot) { h ^= c.charCodeAt(0); h = Math.imul(h, 0x01000193) >>> 0; }
+  return EMPREINTES_KAWAII.includes(h.toString(16).padStart(8, "0"));
+}
+function debloquerKawaii(immediat = false){
+  if (kawaiiDebloque()) {
+    if (immediat) afficherFenetreKawaii(); // (mot secret retapé : la fenêtre revient pour essayer le thème)
+    return;
+  }
   try { localStorage.setItem(CLE_KAWAII, "1"); localStorage.setItem(CLE_KAWAII_NOUVEAU, "1"); } catch (e) {}
   majPastilleKawaii();
   document.documentElement.classList.add("kawaii-nouveau");
-  setTimeout(afficherFenetreKawaii, 3200); // (après le récap de fin de partie et la notif du sticker)
+  setTimeout(afficherFenetreKawaii, immediat ? 300 : 3200); // (sinon : après le récap de fin de partie et la notif du sticker)
 }
 // Fenêtre « Thème Kawaii débloqué » : « L'essayer maintenant » met le thème, « Plus tard » ferme
 function afficherFenetreKawaii(){
