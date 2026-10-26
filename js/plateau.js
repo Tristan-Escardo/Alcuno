@@ -765,7 +765,7 @@ function ouvrirVoletPause(nom, bouton){
   volet.querySelector(".voletPause-nom").textContent = avecCouronne(nom);
   volet.querySelector(".voletPause-texte").innerHTML = enPause
     ? "De retour parmi nous ?"
-    : "En pause clope ? Aux toilettes en train de vomir ?<br>Son tour sera sauté jusqu'à ce qu'il revienne.";
+    : "En pause clope, aux toilettes…<br>Son tour sera sauté jusqu'à ce qu'il revienne.";
   volet.querySelector(".voletPause-ok").textContent = enPause ? `${nom} est de retour` : `Mettre ${nom} en pause`;
   rendreVoletGlissable(volet);
   volet.addEventListener("click", (e) => { if(e.target === volet) fermerVoletPause(); });
