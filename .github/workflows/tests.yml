@@ -20,6 +20,8 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Lancer le test
         run: node tests/test_demarrage.js
+      - name: Lancer le test de la page de stats (bouton de réinitialisation)
+        run: node tests/test_stats_reset.js
 
   partie-robot:
     # Une partie complète jouée par le robot dans 4 configurations (debout, paysage, accessibilité, petit écran)

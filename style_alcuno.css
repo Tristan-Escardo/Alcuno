@@ -2687,7 +2687,7 @@ header h1{
   background:
     radial-gradient(circle at 50% 45%, rgba(255,215,0,0.16), transparent 60%),
     rgba(20, 0, 14, 0.94);
-  animation: annonceApparaitDisparait 1.5s ease forwards;
+  animation: annonceApparaitDisparait 3.5s ease forwards;
 }
 
 #annonceNouvellePartie .annonce-titre{
@@ -2713,8 +2713,8 @@ header h1{
 
 @keyframes annonceApparaitDisparait{
   0%   { opacity: 0; }
-  12%  { opacity: 1; }
-  75%  { opacity: 1; }
+  8%   { opacity: 1; }
+  85%  { opacity: 1; }
   100% { opacity: 0; }
 }
 

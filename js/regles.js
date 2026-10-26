@@ -2019,7 +2019,7 @@ btnNouvellePartie.addEventListener("click", () => {
 
 document.getElementById("btnRetourNouvellePartie").addEventListener("click", fermerEcranNouvellePartie);
 
-// Courte annonce après « Rejouer (avec les mêmes joueurs) » : disparaît toute seule (~1,5 s)
+// Courte annonce après « Rejouer (avec les mêmes joueurs) » : disparaît toute seule (~3,5 s)
 // ou au tap. Hors des overlays du jeu : ne bloque rien, même en ligne.
 function annoncerNouvellePartie(){
   const ancienne = document.getElementById("annonceNouvellePartie");
@@ -2036,7 +2036,7 @@ function annoncerNouvellePartie(){
   annonce.addEventListener("animationend", (e) => {
     if(e.animationName === "annonceApparaitDisparait") retirer();
   });
-  setTimeout(retirer, 2000); // sécurité (ex. animations désactivées)
+  setTimeout(retirer, 4500); // sécurité (ex. animations désactivées)
 
   document.body.appendChild(annonce);
 }

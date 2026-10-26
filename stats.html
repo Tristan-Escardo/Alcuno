@@ -92,6 +92,16 @@
         .pointe{ display: flex; align-items: baseline; gap: 10px; margin: -2px 0 10px; }
         .pointe b{ font-size: 30px; font-weight: 700; color: var(--cyan-clair); text-shadow: 0 0 10px var(--cyan); white-space: nowrap; }
         .pointe span{ color: var(--cyan-doux); font-size: 15px; }
+        .zoneReset{ text-align: center; }
+        .btnReset, .btnResetNon{ width: 100%; padding: 12px; border-radius: 4px; font: 700 13px "Orbitron", Arial, sans-serif; letter-spacing: .14em; cursor: pointer; }
+        .btnReset{ border: 1px solid #ff4d6d; background: rgba(255, 77, 109, .1); color: #ff9fbd; text-shadow: 0 0 8px #ff4d6d; }
+        .btnResetNon{ border: 1px solid rgba(0, 229, 255, .4); background: transparent; color: var(--cyan-clair); }
+        .btnReset:disabled{ opacity: .5; cursor: default; }
+        .texteReset{ color: #ffc2d4; font-size: 15px; line-height: 1.4; margin-bottom: 12px; }
+        .boutonsReset{ display: grid; gap: 8px; }
+        #confirmeReset[hidden]{ display: none; }
+        .messageReset{ min-height: 18px; margin-top: 10px; font-size: 14px; color: var(--cyan-doux); }
+        .messageReset.erreur{ color: #ff7b9c; }
         .note{ text-align: center; color: #3f7088; font-size: 12px; margin-top: 18px; }
 
         /* Code d'accès */
@@ -170,16 +180,28 @@
         <section class="bloc"><div class="titre">Versions en circulation</div><div id="barresVersions"></div></section>
         <section class="bloc"><div class="titre">Thèmes choisis</div><div id="barresThemes"></div></section>
 
+        <section class="bloc zoneReset">
+            <button type="button" id="btnReset" class="btnReset">Réinitialiser toutes les statistiques</button>
+            <div id="confirmeReset" hidden>
+                <div class="texteReset">Tout effacer ?<br>Visites, parties, appareils : tout repart de zéro. C'est définitif.</div>
+                <div class="boutonsReset">
+                    <button type="button" id="btnResetOui" class="btnReset">Oui, tout effacer</button>
+                    <button type="button" id="btnResetNon" class="btnResetNon">Annuler</button>
+                </div>
+            </div>
+            <div id="messageReset" class="messageReset" aria-live="polite"></div>
+        </section>
+
         <p class="note">Appareils vus ces 30 derniers jours · aucune donnée personnelle<br>Alcuno Stats <span id="versionStats"></span></p>
     </main>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
+        import { getDatabase, ref, onValue, get, update } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
 
         // Empreinte (SHA-256) du code d'accès : le code lui-même n'est écrit nulle part
         // Version de la page de stats (à part de celle du jeu : +0.0.1 à chaque modification de cette page)
-        const VERSION_STATS = "1.5.7";
+        const VERSION_STATS = "1.6.0";
         document.getElementById("versionStats").textContent = VERSION_STATS;
 
         const EMPREINTE_CODE = "2c8125d3adc62dac73f3ae036a86e00ba51b12b0dfb38fec2184e76441ed6826";
@@ -349,6 +371,47 @@
             let decalage = 0;
             onValue(ref(db, ".info/serverTimeOffset"), (s) => { decalage = Number(s.val()) || 0; });
             const maintenant = () => Date.now() + decalage;
+
+            // ----- Réinitialiser toutes les statistiques -----
+            // On efface chaque valeur une par une (« chemin » : null) : les règles Firebase n'autorisent l'écriture que sur ces
+            // valeurs-là (compteurs, visiteurs, heures, appareils), pas sur « stats » en bloc. « presence » (le direct) n'est pas touché.
+            const feuilles = (noeud, chemin, sortie) => {
+                if (noeud !== null && typeof noeud === "object") {
+                    Object.keys(noeud).forEach((cle) => feuilles(noeud[cle], `${chemin}/${cle}`, sortie));
+                } else sortie.push(chemin);
+                return sortie;
+            };
+            const cheminsAEffacer = (stats) => {
+                const chemins = [];
+                feuilles((stats || {}).jours || {}, "jours", chemins);
+                Object.keys((stats || {}).appareils || {}).forEach((id) => chemins.push(`appareils/${id}`));
+                return chemins;
+            };
+            const btnReset = document.getElementById("btnReset");
+            const confirmeReset = document.getElementById("confirmeReset");
+            const messageReset = document.getElementById("messageReset");
+            const dire = (texte, erreur) => { messageReset.textContent = texte; messageReset.classList.toggle("erreur", !!erreur); };
+            btnReset.addEventListener("click", () => { btnReset.hidden = true; confirmeReset.hidden = false; dire(""); });
+            document.getElementById("btnResetNon").addEventListener("click", () => { confirmeReset.hidden = true; btnReset.hidden = false; });
+            document.getElementById("btnResetOui").addEventListener("click", async (e) => {
+                const oui = e.currentTarget;
+                oui.disabled = true;
+                dire("Effacement en cours…");
+                try {
+                    const chemins = cheminsAEffacer((await get(ref(db, "stats"))).val());
+                    for (let i = 0; i < chemins.length; i += 400) {
+                        const lot = {};
+                        chemins.slice(i, i + 400).forEach((c) => { lot[c] = null; });
+                        await update(ref(db, "stats"), lot);
+                    }
+                    dire(chemins.length ? "Statistiques remises à zéro ✓" : "Il n'y avait rien à effacer");
+                } catch (erreur) {
+                    dire("Effacement refusé ou interrompu : " + (erreur && erreur.message ? erreur.message : erreur), true);
+                }
+                oui.disabled = false;
+                confirmeReset.hidden = true;
+                btnReset.hidden = false;
+            });
 
             // ----- En ce moment -----
             let presences = {};
