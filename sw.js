@@ -7,7 +7,7 @@
 //
 // Changer CACHE (ex. "alcuno-v2") force les téléphones à repartir d'une copie locale propre.
 
-const CACHE = "alcuno-v3"; // v3 : QR code de la partie (js/qrcode.js) ; v2 : cartes HD en WebP (les anciennes .jpg sont supprimées du cache)
+const CACHE = "alcuno-v4"; // v4 : album de stickers et thème Kawaii ; v3 : QR code de la partie (js/qrcode.js) ; v2 : cartes HD en WebP (les anciennes .jpg sont supprimées du cache)
 
 // Copié dès l'installation : de quoi jouer en classique sans réseau
 const A_PRECHARGER = [
@@ -23,8 +23,21 @@ const A_PRECHARGER = [
   "./js/retour-demarrage.js",
   "./js/tele.js",
   "./js/stats.js",
+  "./js/stickers.js",
   "./js/mouchard.js",
   "./style_alcuno.css",
+  "./style_kawaii.css",
+  "./stickers/cupcake.svg",
+  "./stickers/chat.svg",
+  "./stickers/lapin.svg",
+  "./stickers/poussin.svg",
+  "./stickers/etoile.svg",
+  "./stickers/licorne.svg",
+  "./stickers/fraise.svg",
+  "./stickers/sushi.svg",
+  "./stickers/macaron.svg",
+  "./stickers/chou.svg",
+  "./stickers/nuage.svg",
   "./manifest.json",
   "./icones/icone-192.png",
   "./icones/icone-512.png",

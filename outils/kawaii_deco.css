@@ -1,0 +1,111 @@
+/* Décors et formes du thème Kawaii (ajoutés après les règles tirées de Givre, voir outils/generer_kawaii.py) */
+html[data-theme="kawaii"]{
+  --fond-theme: #ffd9ee;
+  --couleur-barre: #ffd0e8;
+  --deco-theme:
+    radial-gradient(circle, rgba(255, 255, 255, 0.85) 0 5px, transparent 6px) 0 0 / 50px 50px,
+    radial-gradient(circle, rgba(255, 255, 255, 0.55) 0 3px, transparent 4px) 25px 25px / 50px 50px,
+    linear-gradient(165deg, #ffc9e6 0%, #e9d4ff 45%, #c9ecff 100%);
+  --overlay-fond: radial-gradient(circle, rgba(255, 255, 255, 0.85) 0 5px, transparent 6px) 0 0 / 50px 50px, linear-gradient(165deg, #ffc9e6 0%, #e9d4ff 45%, #c9ecff 100%);
+  --ic-licorne: url("stickers/licorne.svg"); --ic-cupcake: url("stickers/cupcake.svg"); --ic-lapin: url("stickers/lapin.svg");
+  --ic-chat: url("stickers/chat.svg"); --ic-fraise: url("stickers/fraise.svg"); --ic-nuage: url("stickers/nuage.svg");
+  --ic-poussin: url("stickers/poussin.svg"); --ic-etoile: url("stickers/etoile.svg"); --ic-macaron: url("stickers/macaron.svg");
+  --ic-chou: url("stickers/chou.svg");
+  --kawaii-prune: #5b2a6e; --kawaii-rose: #ff4f9a; --kawaii-rose-fonce: #c2276f;
+}
+html[data-theme="kawaii"] body{ font-family: "Arial Rounded MT Bold", "Avenir Next Rounded", "Nunito", Arial, sans-serif; }
+html[data-theme="kawaii"] :is(button, input, textarea, select){ font-family: inherit; }
+html[data-theme="kawaii"] .overlay-opaque{ background: var(--overlay-fond) !important; }
+
+/* Panneaux : feutrine blanche en relief, couture rose pointillée */
+html[data-theme="kawaii"] :is(header, .menu, .blocMessages, .optionReglage, .blocReglage, #ecranRegles .blocRegles, .ecranPause, #stickyJoueurActif){
+  border-radius: 28px !important; border: 4px solid #fff !important;
+  box-shadow: 0 7px 0 rgba(200, 100, 170, 0.4), 0 14px 22px rgba(140, 60, 120, 0.2) !important;
+}
+html[data-theme="kawaii"] :is(header, .menu, .blocMessages, .optionReglage, .blocReglage, #ecranRegles .blocRegles){ outline: 2px dashed #ff9ccb; outline-offset: -11px; }
+html[data-theme="kawaii"] .voletPause-feuille{ border-radius: 30px 30px 0 0 !important; border: 4px solid #fff !important; border-bottom: none !important; }
+html[data-theme="kawaii"] .messages::before{ display: none !important; }
+html[data-theme="kawaii"] .messages{ background: transparent !important; border-color: transparent !important; box-shadow: none !important; }
+
+/* Titres : rose bonbon, contour blanc, relief */
+html[data-theme="kawaii"] :is(header h1, #choixMode #titreAccueil){
+  color: var(--kawaii-rose) !important; -webkit-text-stroke: 1.5px #fff; paint-order: stroke fill;
+  text-shadow: 0 4px 0 var(--kawaii-rose-fonce), 0 8px 14px rgba(150, 40, 110, 0.25) !important; animation: none !important;
+}
+html[data-theme="kawaii"] header h1::before{ content: ""; display: inline-block; width: 1.25em; height: 1.25em; vertical-align: -0.28em; margin-right: 0.12em; background: var(--ic-licorne) center / contain no-repeat; -webkit-text-stroke: 0; }
+html[data-theme="kawaii"] header h1::after{ content: ""; display: inline-block; width: 0.8em; height: 0.8em; vertical-align: -0.1em; margin-left: 0.12em; background: var(--ic-etoile) center / contain no-repeat; -webkit-text-stroke: 0; }
+html[data-theme="kawaii"] #choixMode #titreAccueil::before{ content: ""; display: block; width: 1.6em; height: 1.6em; margin: 0 auto -0.1em; background: var(--ic-licorne) center / contain no-repeat; animation: kawaiiFlotte 3s ease-in-out infinite alternate; }
+html[data-theme="kawaii"] #choixMode #titreAccueil::after{ content: ""; display: block; width: 1.4em; height: 0.9em; margin: 0.1em auto 0; background: var(--ic-nuage) center / contain no-repeat; }
+@keyframes kawaiiFlotte{ from{ transform: translateY(-5px) rotate(-6deg); } to{ transform: translateY(6px) rotate(6deg); } }
+
+/* Titres des blocs et pastilles des joueurs : un petit personnage chacun */
+html[data-theme="kawaii"] :is(.blocActif, .blocJoueurs, .blocRegles) .titreBloc::before{ content: ""; display: inline-block; width: 1.5em; height: 1.5em; vertical-align: -0.4em; margin-right: 0.25em; background-position: center; background-size: contain; background-repeat: no-repeat; }
+html[data-theme="kawaii"] .blocActif .titreBloc::before{ background-image: var(--ic-lapin); }
+html[data-theme="kawaii"] .blocJoueurs .titreBloc::before{ background-image: var(--ic-cupcake); }
+html[data-theme="kawaii"] .blocRegles .titreBloc::before{ background-image: var(--ic-fraise); }
+html[data-theme="kawaii"] .joueur-ligne{ border-radius: 999px; border: 3px solid #ffc1de !important; box-shadow: 0 3px 0 #ffc1de; }
+html[data-theme="kawaii"] #listeJoueurs .joueur-ligne::before{ content: ""; flex: none; width: 1.45em; height: 1.45em; margin-right: 0.15em; background: var(--ic-chat) center / contain no-repeat; }
+html[data-theme="kawaii"] #listeJoueurs .joueur-ligne:nth-child(6n+2)::before{ background-image: var(--ic-lapin); }
+html[data-theme="kawaii"] #listeJoueurs .joueur-ligne:nth-child(6n+3)::before{ background-image: var(--ic-licorne); }
+html[data-theme="kawaii"] #listeJoueurs .joueur-ligne:nth-child(6n+4)::before{ background-image: var(--ic-cupcake); }
+html[data-theme="kawaii"] #listeJoueurs .joueur-ligne:nth-child(6n+5)::before{ background-image: var(--ic-fraise); }
+html[data-theme="kawaii"] #listeJoueurs .joueur-ligne:nth-child(6n)::before{ background-image: var(--ic-nuage); }
+html[data-theme="kawaii"] #listeJoueurs .joueur-ligne-pigeon::before{ background-image: var(--ic-poussin) !important; }
+html[data-theme="kawaii"] #listeJoueurs .joueur-ligne-actif{ background: linear-gradient(180deg, #fff0a0, #ffd04a) !important; color: #6b3300 !important; border-color: #fff !important; box-shadow: 0 4px 0 #c48a0a !important; }
+
+/* Boutons en gélatine */
+html[data-theme="kawaii"] :is(#btnModeEnLigne, #btnModeClassique, #jouer, #nouvellePartie, #ajouterJoueur, #supprimerJoueur, #menu #btnCaster, .voletPause-ok, .voletPause-annuler, .bouton-pigeon, .btnRetour, #btnReprendrePause, #btnRepriseOui, #btnRepriseNon){
+  border: 3px solid #fff !important; border-radius: 999px !important; color: #fff !important; font-weight: 900;
+  background: linear-gradient(180deg, #ff94c6, #ff4f9a) !important; text-shadow: 0 2px 0 var(--kawaii-rose-fonce) !important;
+  box-shadow: 0 6px 0 var(--kawaii-rose-fonce), 0 10px 14px rgba(150, 30, 90, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.55) !important;
+}
+html[data-theme="kawaii"] :is(#btnModeEnLigne, #ajouterJoueur, #menu #btnCaster){ background: linear-gradient(180deg, #a8ecff, #4fc0ee) !important; text-shadow: 0 2px 0 #2a86b0 !important; box-shadow: 0 6px 0 #2a86b0, 0 10px 14px rgba(20, 100, 140, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.55) !important; }
+html[data-theme="kawaii"] #supprimerJoueur{ background: linear-gradient(180deg, #d9c2ff, #a97bff) !important; text-shadow: 0 2px 0 #6f45c9 !important; box-shadow: 0 6px 0 #6f45c9, 0 10px 14px rgba(90, 50, 150, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.55) !important; }
+html[data-theme="kawaii"] .voletPause-annuler{ background: #fff !important; color: #e0388c !important; text-shadow: none !important; border-color: #ffc1de !important; box-shadow: 0 4px 0 #ffc1de !important; }
+html[data-theme="kawaii"] :is(#btnModeEnLigne, #btnModeClassique, #jouer, #nouvellePartie, .voletPause-ok)::before{ content: ""; display: inline-block; width: 1.5em; height: 1.5em; vertical-align: -0.4em; margin-right: 0.3em; background-position: center; background-size: contain; background-repeat: no-repeat; }
+html[data-theme="kawaii"] #btnModeEnLigne::before{ background-image: var(--ic-nuage); }
+html[data-theme="kawaii"] #btnModeClassique::before{ background-image: var(--ic-licorne); }
+html[data-theme="kawaii"] #jouer::before{ background-image: var(--ic-macaron); }
+html[data-theme="kawaii"] #nouvellePartie::before{ background-image: var(--ic-chou); }
+html[data-theme="kawaii"] .voletPause-ok::before{ background-image: var(--ic-chat); }
+html[data-theme="kawaii"] .voletPause-nom::before{ content: ""; display: inline-block; width: 1.4em; height: 1.4em; vertical-align: -0.3em; margin-right: 0.2em; background: var(--ic-chat) center / contain no-repeat; }
+html[data-theme="kawaii"] #stickyJoueurActif{ position: relative; }
+html[data-theme="kawaii"] #stickyJoueurActif::after{ content: ""; position: absolute; right: -6px; top: -12px; width: 22px; height: 22px; background: var(--ic-etoile) center / contain no-repeat; }
+
+/* Dos des cartes rosés */
+html[data-theme="kawaii"] .Carte:not(.retournee){ filter: hue-rotate(-32deg) saturate(1.1) brightness(1.15) drop-shadow(0 3px 0 rgba(200, 100, 170, 0.45)); }
+
+/* Annonces : poussin du pigeon, licorne et nuage autour de « CARTE DORÉE » */
+html[data-theme="kawaii"] #overlayRegleUnique .regle-titre{ color: var(--kawaii-rose) !important; -webkit-text-stroke: 2px #fff; paint-order: stroke fill; text-shadow: 0 4px 0 var(--kawaii-rose-fonce) !important; }
+html[data-theme="kawaii"] #overlayRegleUnique .regle-titre::before{ content: ""; display: block; width: 96px; height: 96px; margin: 0 auto 4px; background: var(--ic-poussin) center / contain no-repeat; }
+html[data-theme="kawaii"] #overlayRegleUnique:not(.overlay-doree) .regle-detail{ color: var(--kawaii-prune) !important; }
+html[data-theme="kawaii"] :is(#overlayRegleUnique, #overlayCarteDoree, #overlayPredictionFin) .doree-titre{ white-space: nowrap; color: var(--kawaii-rose) !important; -webkit-text-stroke: 2px #fff; paint-order: stroke fill; text-shadow: 0 3px 0 var(--kawaii-rose-fonce) !important; }
+html[data-theme="kawaii"] :is(#overlayRegleUnique, #overlayCarteDoree, #overlayPredictionFin) .doree-etincelle{ font-size: 0 !important; display: inline-block; vertical-align: middle; }
+html[data-theme="kawaii"] :is(#overlayRegleUnique, #overlayCarteDoree, #overlayPredictionFin) .doree-etincelle::before{ content: ""; display: inline-block; width: 40px; height: 40px; background: var(--ic-licorne) center / contain no-repeat; }
+html[data-theme="kawaii"] :is(#overlayRegleUnique, #overlayCarteDoree, #overlayPredictionFin) .doree-etincelle:last-of-type::before{ background-image: var(--ic-nuage); }
+/* étincelles de la carte dorée : roses et dorées */
+html[data-theme="kawaii"] .etincelle.e0{ --c: #ff4f9a; } html[data-theme="kawaii"] .etincelle.e1{ --c: #ffb300; }
+html[data-theme="kawaii"] .etincelle.e2{ --c: #b46bff; } html[data-theme="kawaii"] .etincelle.e3{ --c: #35c9a6; }
+
+/* Stickers qui flottent derrière tout (créés par js/stickers.js) */
+#stickersKawaii{ display: none; }
+html[data-theme="kawaii"] #stickersKawaii{ display: block; position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+#stickersKawaii span{ position: absolute; background: center / contain no-repeat; opacity: 0.8; filter: drop-shadow(0 3px 0 rgba(120, 50, 110, 0.18)); animation: kawaiiFlotte var(--duree, 5s) ease-in-out var(--delai, 0s) infinite alternate; }
+@media (prefers-reduced-motion: reduce){ #stickersKawaii span, html[data-theme="kawaii"] #choixMode #titreAccueil::before{ animation: none; } }
+
+/* Panneaux opaques (les stickers de fond ne doivent pas passer sous le texte) */
+html[data-theme="kawaii"] :is(header, .menu, .blocMessages, .optionReglage, .blocReglage, #ecranRegles .blocRegles, .ecranPause, .voletPause-feuille, #stickyJoueurActif){
+  background: linear-gradient(180deg, #ffffff, #fff1fa) !important;
+}
+html[data-theme="kawaii"] :is(.menu, .blocMessages) :is(input){ background: #fff; }
+/* Boutons bleus : plus foncés pour que le texte blanc se lise */
+html[data-theme="kawaii"] :is(#btnModeEnLigne, #ajouterJoueur, #menu #btnCaster){ background: linear-gradient(180deg, #78d6f2, #2a9fd0) !important; text-shadow: 0 2px 0 #1b6a8e !important; box-shadow: 0 6px 0 #1b6a8e, 0 10px 14px rgba(20, 100, 140, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.5) !important; }
+html[data-theme="kawaii"] .titreAccueilBarre{ background: linear-gradient(90deg, #ff4f9a, #ffb12e, #35c9a6, #5aa8ff, #b46bff) !important; }
+/* Annonces et carte dorée sur le fond à pois */
+html[data-theme="kawaii"] :is(#overlayCouleur, #overlayPlus4, #overlayPigeon, #overlayFinUnRestants, #overlayDuel, #overlayRegleUnique, #overlayRegleUnique.overlay-doree, #overlayCarteDoree, #overlayAnnulation, #overlayResultatAnnulation, #overlayPredictionFin){
+  background: var(--overlay-fond) !important;
+}
+html[data-theme="kawaii"].overlay-ouvert, html[data-theme="kawaii"].overlay-ouvert body, html[data-theme="kawaii"] #voileOverlays{ background: #ffd0e8; }
+
+/* Accessibilité (texte agrandi) : le titre de la carte dorée peut passer à la ligne */
+html.accessibilite[data-theme="kawaii"] :is(#overlayRegleUnique, #overlayCarteDoree, #overlayPredictionFin) .doree-titre{ white-space: normal; }

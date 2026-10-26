@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+<path d="M24 58 L76 58 L69 91 Q68 95 64 95 L36 95 Q32 95 31 91 Z" fill="#ffc1dd" stroke="#7a3b6e" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M36 60 L40 94 M50 60 L50 94 M64 60 L60 94" stroke="#ff9cc6" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+<ellipse cx="50" cy="52" rx="33" ry="12" fill="#ffa6d5" stroke="#7a3b6e" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<ellipse cx="50" cy="38" rx="25" ry="11.5" fill="#ffbde0" stroke="#7a3b6e" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<ellipse cx="50" cy="26" rx="16" ry="10" fill="#ffd3ec" stroke="#7a3b6e" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M44 18 Q50 6 56 18" fill="#ffd3ec" stroke="#7a3b6e" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="50" cy="14" r="6.3" fill="#ff4d79" stroke="#7a3b6e" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="48" cy="12" r="1.8" fill="#fff" opacity=".85"/>
+<path d="M50 8 Q54 2 60 3" fill="none" stroke="#5aa86a" stroke-width="2.4" stroke-linecap="round"/>
+<rect x="30" y="31" width="5" height="2.4" rx="1.2" fill="#7fb4ff" transform="rotate(-25 32 32)"/><rect x="62" y="38" width="5" height="2.4" rx="1.2" fill="#ffd36e" transform="rotate(30 64 39)"/><rect x="38" y="24" width="5" height="2.4" rx="1.2" fill="#8fe6c9" transform="rotate(40 40 25)"/><rect x="70" y="50" width="5" height="2.4" rx="1.2" fill="#b79bff" transform="rotate(-20 72 51)"/>
+<ellipse cx="41.72" cy="51" rx="3.036" ry="3.8640000000000003" fill="#3b2145"/><ellipse cx="58.28" cy="51" rx="3.036" ry="3.8640000000000003" fill="#3b2145"/><circle cx="40.708" cy="49.528" r="1.1960000000000002" fill="#fff"/><circle cx="57.268" cy="49.528" r="1.1960000000000002" fill="#fff"/><circle cx="42.824" cy="52.288" r="0.552" fill="#fff"/><circle cx="59.384" cy="52.288" r="0.552" fill="#fff"/><ellipse cx="35.28" cy="55.784" rx="4.232" ry="2.668" fill="#ff7fae" opacity=".62"/><ellipse cx="64.72" cy="55.784" rx="4.232" ry="2.668" fill="#ff7fae" opacity=".62"/><path d="M47.056 54.68 Q50 58.544 52.944 54.68" fill="none" stroke="#7a3b6e" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/></svg>

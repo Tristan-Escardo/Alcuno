@@ -30,6 +30,7 @@ const CONFIGS = [
   { nom: "téléphone debout, Bordeaux", largeur: 390, hauteur: 780, theme: "bordeaux" },
   { nom: "téléphone en paysage, Sombre", largeur: 750, hauteur: 390, theme: "noir" },
   { nom: "accessibilité, Star Wars", largeur: 390, hauteur: 780, theme: "galaxie", accessibilite: true },
+  { nom: "téléphone debout, Kawaii (album de stickers)", largeur: 390, hauteur: 780, theme: "kawaii" },
   { nom: "petit écran + accessibilité, Givre, partie express", largeur: 320, hauteur: 640, theme: "givre", accessibilite: true, express: true }
 ];
 
@@ -46,7 +47,7 @@ const CONFIGS = [
     await page.addInitScript(prelude);
     await page.addInitScript(robot);
     await page.addInitScript(([theme, acc, express]) => {
-      try { localStorage.setItem("alcuno_theme", theme); if (acc) localStorage.setItem("alcuno_accessibilite", "1"); if (express) localStorage.setItem("alcuno_partie_express", "1"); } catch (e) {}
+      try { localStorage.setItem("alcuno_theme", theme); localStorage.setItem("alcuno_theme_kawaii", "1"); if (acc) localStorage.setItem("alcuno_accessibilite", "1"); if (express) localStorage.setItem("alcuno_partie_express", "1"); } catch (e) {}
     }, [c.theme, !!c.accessibilite, !!c.express]);
     await page.goto(url);
     let rapport = null;

@@ -1262,7 +1262,7 @@ html[data-theme="galaxie"] .fin-choix-numeros b{ background: #8fd0ff; color: #02
     .blocActif{ flex: 1 1 0; flex-direction: column; align-items: flex-start; justify-content: center; gap: 2px; min-height: 0; }
     .blocActif .joueurActif{ font-size: 22px; }
     .blocJoueurs{ flex: 2 1 0; }
-    .blocRegles{ flex: 2 1 0; min-height: 0; }
+    .messages .blocRegles{ flex: 2 1 0; min-height: 0; } /* (seulement dans la barre de jeu : la page Règles / Album a aussi des .blocRegles) */
     html #listeJoueurs .joueur-ligne{ min-height: 34px; font-size: 16px; }
     html #listeJoueurs .btnPauseJoueur{ width: 24px; height: 24px; }
     .blocRegles .regleZero, .blocRegles .reglePigeon, .blocRegles .rappelTour{ font-size: 15px; }
@@ -4761,7 +4761,7 @@ html[data-theme="givre"] #ecranReglages .pastilleTheme[aria-pressed="true"]{
   opacity: 1;
 }
 /* Sombre : nom en noir, à peine cerclé de gris clair pour rester lisible sur le fond sombre (pas de halo) */
-html:not([data-theme="givre"]) #ecranReglages .pastilleTheme[data-theme="noir"] .nomTheme{
+html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) #ecranReglages .pastilleTheme[data-theme="noir"] .nomTheme{
   color: #000;
   opacity: 1;
   -webkit-text-stroke: 1px rgba(255, 255, 255, 0.4);
@@ -5315,7 +5315,7 @@ html.accessibilite #ecranInstallation #btnInstallationPlusTard{ font-size: 19px;
 /* ===== Boutons jaunes à texte blanc : plus lisibles (thèmes sombres ; Givre a ses boutons cyan) =====
    Léger dégradé doré (le jaune du haut reste celui d'avant) et ombre du texte plus marquée.
    Mêmes boutons dans les overlays des règles (règle suivante). */
-html:not([data-theme="givre"]) :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu,
+html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu,
   #btnCreerPartie, #btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR,
   #lancerPartieEnLigne, #btnRejouerMemes, #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button,
   #btnConfirmerAccueilOui, #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon,
@@ -5330,7 +5330,7 @@ html:not([data-theme="givre"]) :is(#btnModeEnLigne, #btnModeClassique, .btnRetou
    style que les autres boutons (avant : or à texte noir). !important : le JS colore certains de ces
    boutons directement (annulations, joueurs déjà choisis du duel). Carte dorée : boutons or métallique
    inchangés. */
-html:not([data-theme="givre"]) :is(#overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayDuel button:not(:disabled),
+html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayDuel button:not(:disabled),
   #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
   #overlayAnnulation button){
   background: linear-gradient(180deg, #ffd426, #f6b800) !important;
@@ -7109,7 +7109,8 @@ html[data-theme="noir"] .aideAccueil-voile{ background: rgba(0, 0, 0, 0.82); }
 
 /* Thème Prestige débloqué, pas encore vu : point rouge sur l'icône des Réglages, « NOUVEAU » sur la pastille */
 html.prestige-nouveau #choixMode #btnReglages::after,
-html.galaxie-nouveau #choixMode #btnReglages::after{
+html.galaxie-nouveau #choixMode #btnReglages::after,
+html.kawaii-nouveau #choixMode #btnReglages::after{
   content: "";
   position: absolute;
   top: 0;
@@ -7121,9 +7122,10 @@ html.galaxie-nouveau #choixMode #btnReglages::after{
   box-shadow: 0 0 0 2px var(--fond-theme), 0 0 10px #ff3b5c;
   animation: pointNouveau 1.6s ease-in-out infinite;
 }
-#pastillePrestige, #pastilleGalaxie{ position: relative; }
+#pastillePrestige, #pastilleGalaxie, #pastilleKawaii{ position: relative; }
 html.prestige-nouveau #pastillePrestige::after,
-html.galaxie-nouveau #pastilleGalaxie::after{
+html.galaxie-nouveau #pastilleGalaxie::after,
+html.kawaii-nouveau #pastilleKawaii::after{
   content: "NOUVEAU";
   position: absolute;
   top: -8px;
@@ -7140,7 +7142,7 @@ html.galaxie-nouveau #pastilleGalaxie::after{
   pointer-events: none;
 }
 @keyframes pointNouveau{ 50%{ transform: scale(1.25); } }
-@media (prefers-reduced-motion: reduce){ :is(html.prestige-nouveau, html.galaxie-nouveau) #choixMode #btnReglages::after{ animation: none; } }
+@media (prefers-reduced-motion: reduce){ :is(html.prestige-nouveau, html.galaxie-nouveau, html.kawaii-nouveau) #choixMode #btnReglages::after{ animation: none; } }
 
 /* ===== Carte Couleur : ce qu'elle fait, dit au choix et rappelé dans le bloc Règles ===== */
 #overlayCouleur .explication-couleur{
@@ -8073,3 +8075,40 @@ html[data-theme="noir"] :is(input:not([type="checkbox"]):not([type="range"]):not
   box-shadow: 0 0 0 1px rgba(255, 210, 38, 0.45) !important;
 }
 html[data-theme="noir"] :focus-visible{ outline-color: #ffd426; }
+
+/* ===== Album de stickers (s'ouvre dans l'écran des règles : mêmes blocs, mêmes couleurs de thème ; js/stickers.js) ===== */
+:root{ --album-silhouette: brightness(0) invert(1) opacity(0.3); --album-barre-fond: rgba(255, 255, 255, 0.14); --album-barre-plein: #FFD700; }
+html[data-theme="givre"], html[data-theme="kawaii"]{ --album-silhouette: brightness(0) opacity(0.22); --album-barre-fond: rgba(13, 53, 80, 0.14); --album-barre-plein: var(--givre-accent); }
+#ecranRegles .albumSticker{ flex: none; width: 56px; height: 56px; margin: 0; filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.22)); }
+#ecranRegles .albumLigne:not(.albumGagne) .albumSticker{ filter: var(--album-silhouette); }
+#ecranRegles .albumTexte{ margin: 0 0 10px; font-size: 14px; line-height: 1.35; color: rgba(255, 255, 255, 0.82); }
+#ecranRegles .albumBarre{ height: 10px; margin: 0 0 12px; border-radius: 999px; background: var(--album-barre-fond); overflow: hidden; }
+#ecranRegles .albumBarre span{ display: block; height: 100%; border-radius: 999px; background: var(--album-barre-plein); transition: width 0.4s ease; }
+html[data-theme="givre"] #ecranRegles .albumTexte{ color: var(--givre-doux); }
+
+/* ===== Fenêtre « Thème Kawaii débloqué » (ses propres couleurs pastel, dans tous les thèmes) ===== */
+#fenetreKawaii{
+  position: fixed; inset: 0; z-index: 2147483500; display: flex; align-items: center; justify-content: center; padding: 22px;
+  background: rgba(70, 20, 80, 0.55); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  animation: fenetrePrestigeVoile 0.3s ease both;
+}
+#fenetreKawaii.fenetreKawaii-sortie{ animation: fenetrePrestigeVoile 0.25s ease reverse both; }
+.fenetreKawaii-carte{
+  width: min(340px, 100%); box-sizing: border-box; padding: 26px 22px 22px; text-align: center; border-radius: 32px;
+  font-family: "Arial Rounded MT Bold", "Avenir Next Rounded", Arial, sans-serif;
+  background: radial-gradient(circle, rgba(255,255,255,.9) 0 5px, transparent 6px) 0 0 / 46px 46px, linear-gradient(165deg, #ffd0e8, #ead6ff 55%, #cdeeff);
+  border: 4px solid #fff; box-shadow: 0 8px 0 rgba(190, 80, 150, 0.45), 0 18px 40px rgba(60, 10, 70, 0.5);
+  animation: fenetrePrestigeArrive 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+.fenetreKawaii-secret{ font: 900 12px Arial, sans-serif; letter-spacing: 0.12em; text-transform: uppercase; color: #a13a82; }
+.fenetreKawaii-stickers{ display: flex; justify-content: center; gap: 4px; margin: 10px 0 8px; }
+.fenetreKawaii-stickers img{ filter: drop-shadow(0 3px 0 rgba(120, 50, 110, 0.3)); animation: kawaiiSaute 1.6s ease-in-out infinite; }
+.fenetreKawaii-stickers img:nth-child(2){ animation-delay: 0.2s; } .fenetreKawaii-stickers img:nth-child(3){ animation-delay: 0.4s; }
+@keyframes kawaiiSaute{ 0%, 100%{ transform: translateY(0) rotate(-4deg); } 50%{ transform: translateY(-8px) rotate(4deg); } }
+.fenetreKawaii-titre{ font: 900 28px/1.15 "Arial Rounded MT Bold", Arial, sans-serif; color: #ff4f9a; -webkit-text-stroke: 1.5px #fff; paint-order: stroke fill; text-shadow: 0 4px 0 #c2276f; }
+.fenetreKawaii-texte{ font: 700 15px/1.4 Arial, sans-serif; color: #5b2a6e; margin: 12px 0 20px; }
+.fenetreKawaii-carte button{ display: block; width: 100%; border-radius: 999px; cursor: pointer; font: 900 17px "Arial Rounded MT Bold", Arial, sans-serif; padding: 14px; }
+.fenetreKawaii-essayer{ color: #fff; border: 3px solid #fff; background: linear-gradient(180deg, #ff94c6, #ff4f9a); text-shadow: 0 2px 0 #c2276f; box-shadow: 0 5px 0 #c2276f, inset 0 3px 0 rgba(255, 255, 255, 0.55); }
+.fenetreKawaii-plusTard{ margin-top: 12px; color: #a13a82; background: #fff; border: 3px solid #ffc1de; box-shadow: 0 4px 0 #ffc1de; }
+.fenetreKawaii-carte button:active{ filter: brightness(0.95); transform: scale(0.98); }
+@media (prefers-reduced-motion: reduce){ #fenetreKawaii, .fenetreKawaii-carte, .fenetreKawaii-stickers img{ animation: none; } }

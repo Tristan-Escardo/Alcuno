@@ -18,7 +18,7 @@
         // et en parallèle : en bas de la page, ils s'exécutent d'affilée, sans attente entre deux fichiers
         // (aucun bouton ni minuteur ne peut se déclencher avant que tout le jeu soit là).
         window.FICHIERS_JEU = ["script.js", "js/qrcode.js", "js/reglages.js", "js/en-ligne.js", "js/plateau.js", "js/regles.js",
-                               "js/synchro-en-ligne.js", "js/retour-demarrage.js", "js/tele.js", "js/stats.js", "js/mouchard.js"];
+                               "js/synchro-en-ligne.js", "js/retour-demarrage.js", "js/tele.js", "js/stats.js", "js/stickers.js", "js/mouchard.js"];
         window.FICHIERS_JEU.forEach(function (f) {
             document.write('<link rel="preload" as="script" href="' + f + '?t=' + window.ANTI_CACHE + '">');
         });
@@ -67,12 +67,13 @@
         try { var theme = localStorage.getItem("alcuno_theme"); if (theme === "violet") { theme = "soleil"; localStorage.setItem("alcuno_theme", theme); } if (theme) document.documentElement.dataset.theme = theme; } catch (e) {}
         // Barre du téléphone à la couleur du thème dès le premier affichage (mêmes couleurs que THEMES dans script.js)
         var couleursBarre = { bordeaux: "#2b001d", noir: "#000000", vert: "#08301e", bleu: "#0a1634", soleil: "#1f3566",
-                              cerisier: "#5a1740", givre: "#e4f5fc", prestige: "#937810", galaxie: "#02030a" };
+                              cerisier: "#5a1740", givre: "#e4f5fc", prestige: "#937810", galaxie: "#02030a", kawaii: "#ffd6ec" };
         document.write('<meta name="theme-color" content="' + (couleursBarre[theme] || couleursBarre.bordeaux) + '">');
         // iPhone : page rechargée après un changement de thème (voir rafraichirBarreIphone dans script.js) :
         // on rouvre les Réglages dès le premier affichage
         try { if (sessionStorage.getItem("alcuno_rouvrir_reglages") !== null) document.documentElement.classList.add("rouvrir-reglages"); } catch (e) {}
         document.write('<link rel="stylesheet" href="style_alcuno.css?t=' + window.ANTI_CACHE + '" />');
+        document.write('<link rel="stylesheet" href="style_kawaii.css?t=' + window.ANTI_CACHE + '" />'); // thème Kawaii (généré : outils/generer_kawaii.py)
     </script>
     <title>Alcuno</title>
 
@@ -200,6 +201,8 @@
                         <!-- Thème secret : débloqué en découvrant l'écran des créateurs (4 taps sur le titre) -->
                         <button type="button" class="pastilleTheme" data-theme="prestige" style="--c:#f5c842;--c-givre:#9a7400" id="pastillePrestige" hidden><span class="rond" style="background:linear-gradient(135deg,#3a2806 15%,#d4a017 60%,#fff2b0)"></span><span class="nomTheme">Prestige</span></button>
                         <button type="button" class="pastilleTheme" data-theme="galaxie" style="--c:#FFE81F;--c-givre:#1a3f8a" id="pastilleGalaxie" hidden><span class="rond rondGalaxie"></span><span class="nomTheme">Star Wars</span></button>
+                        <!-- Thème secret : débloqué avec 8 stickers de l'album (js/stickers.js) -->
+                        <button type="button" class="pastilleTheme" data-theme="kawaii" style="--c:#ff8fc2;--c-givre:#c2276f" id="pastilleKawaii" hidden><span class="rond" style="background:linear-gradient(135deg,#ffb3d9 20%,#d9b8ff 55%,#b3e5ff)"></span><span class="nomTheme">Kawaii</span></button>
                     </div>
                 </div>
 
@@ -322,6 +325,14 @@
                     <button type="button" id="btnOublierPartie">Oublier</button>
                 </div>
 
+                <!-- Album de stickers à gagner en jouant : 8 stickers débloquent le thème Kawaii (js/stickers.js) -->
+                <button type="button" class="optionReglage optionLien" id="btnAlbum">
+                    <span class="optionTexte">
+                        <span class="optionTitre">Album de stickers</span>
+                        <span class="optionNote" id="albumResume"></span>
+                    </span>
+                    <svg class="optionChevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+                </button>
                 <!-- Mode télé : pour une télé que le jeu n'a pas reconnue toute seule (voir le début de cette page) -->
                 <button type="button" class="optionReglage optionLien" id="btnAfficherEcranTele">
                     <span class="optionTexte">

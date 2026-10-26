@@ -40,6 +40,7 @@ function afficherOverlayFinUnRestants(){
   overlay.classList.add("overlay-recap");
   overlay.style.overflowY = "auto";
   recapActuel = calculerRecap(restants);
+  try { stickersFinDePartie(); } catch (e) {} // (album de stickers, js/stickers.js)
   overlay.appendChild(construireRecap(recapActuel));
 
   const btnTerminer = document.createElement("button");
@@ -1777,6 +1778,7 @@ function lancerPartie(){
   const express = enLigneActif
     ? !!dernierEtatManche && graineExpress(dernierEtatManche.seed)
     : sauvegardeClassique ? !!sauvegardeClassique.express : estPartieExpress();
+  partieExpress = express;
   if(express) paquet = reduirePaquetExpress(paquet);
 
   // Paquet duel (réutilisable à l'infini via resetPaquetDuelSiBesoin)

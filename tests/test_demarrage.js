@@ -366,6 +366,76 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
+  // 18. Album de stickers : conditions (classique : à la table ; en ligne : seulement soi), 8 stickers => thème Kawaii débloqué
+  {
+    const { ctx, page, erreurs } = await ouvrir();
+    const r = await page.evaluate(async () => {
+      const o = {};
+      const trier = () => lireAlbum().gagnes.slice().sort().join();
+      try { localStorage.removeItem("alcuno_stickers"); localStorage.removeItem("alcuno_theme_kawaii"); } catch (e) {}
+      o.avantKawaii = kawaiiDebloque() + "/" + document.getElementById("pastilleKawaii").hidden;
+      // classique : une partie express avec pigeon, duel, annulation, +4 et carte dorée
+      enLigneActif = false; partieExpress = true;
+      statsPartie = { pigeon: { Tom: 1 }, plusGros: {}, annulees: { Lea: 1 }, duels: { Max: 1 }, plus4: { Tom: 2 }, doree: { tireur: "Tom", victime: "Lea" } };
+      stickersFinDePartie();
+      o.partie1 = trier();
+      o.kawaii7 = kawaiiDebloque();
+      stickerPause("Tom"); // 8e sticker : Fraise
+      o.partie1b = trier();
+      o.kawaii8 = kawaiiDebloque() + "/" + document.getElementById("pastilleKawaii").hidden;
+      // album : 11 lignes, 8 gagnées ; les règles se remettent ensuite
+      ouvrirAlbum();
+      o.album = document.querySelectorAll(".albumLigne").length + "/" + document.querySelectorAll(".albumGagne").length + "/" + document.querySelector("#ecranRegles h2").textContent;
+      ouvrirRegles();
+      o.regles = document.querySelector("#ecranRegles h2").textContent + "/" + document.querySelectorAll(".albumLigne").length + "/" + document.getElementById("ecranRegles").classList.contains("album");
+      // 5 parties d'affilée : Chat (3 parties) et Nuage (5 en 6 h)
+      localStorage.removeItem("alcuno_stickers"); partieExpress = false;
+      statsPartie = { pigeon: {}, plusGros: {}, annulees: {}, duels: {}, plus4: {}, doree: null };
+      for (let i = 0; i < 5; i++) stickersFinDePartie();
+      o.cinq = trier();
+      // en ligne : seulement ce qui arrive à soi
+      localStorage.removeItem("alcuno_stickers");
+      enLigneActif = true; pseudoActuel = "Zoe"; partieExpress = false;
+      statsPartie = { pigeon: { Tom: 1 }, plusGros: {}, annulees: {}, duels: {}, plus4: {}, doree: { tireur: "Tom", victime: "Lea" } };
+      stickersFinDePartie();
+      o.enLigneAutre = trier();
+      statsPartie = { pigeon: { Zoe: 1 }, plusGros: {}, annulees: {}, duels: {}, plus4: {}, doree: { tireur: "Zoe", victime: "Lea" } };
+      stickersFinDePartie();
+      o.enLigneMoi = trier();
+      enLigneActif = false; pseudoActuel = null;
+      await new Promise((res) => setTimeout(res, 3600));
+      o.fenetre = !!document.getElementById("fenetreKawaii");
+      return o;
+    });
+    verifier(r.avantKawaii === "false/true" && r.partie1 === "chou,cupcake,etoile,lapin,licorne,poussin,sushi" && r.kawaii7 === false &&
+      r.partie1b.split(",").length === 8 && r.kawaii8 === "true/false" && r.album === "11/8/Album de stickers" && r.regles === "Règles du jeu/0/false" &&
+      r.cinq === "chat,cupcake,nuage" && r.enLigneAutre === "cupcake,macaron" && r.enLigneMoi === "cupcake,etoile,macaron,poussin" && r.fenetre && erreurs.length === 0,
+      `album de stickers : ${JSON.stringify(r)}`);
+    await ctx.close();
+  }
+
+  // 19. Thème Kawaii : démarre sans erreur, fond rose, boutons en gélatine blanche, étoiles / personnages dessinés, refusé tant qu'il n'est pas débloqué
+  {
+    const refus = await ouvrir({}, `try{localStorage.setItem("alcuno_theme","kawaii")}catch(e){}`);
+    const themeRefuse = await refus.page.evaluate(() => document.documentElement.dataset.theme);
+    await refus.ctx.close();
+    const { ctx, page, erreurs } = await ouvrir({}, `try{localStorage.setItem("alcuno_theme","kawaii");localStorage.setItem("alcuno_theme_kawaii","1")}catch(e){}`);
+    await page.click("#btnModeClassique"); await page.waitForTimeout(800);
+    for (const nom of ["Tom", "Lea", "Max"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(250); }
+    await page.click("#jouer"); await page.waitForTimeout(1200);
+    const k = await page.evaluate(() => {
+      const b = getComputedStyle(document.getElementById("nouvellePartie"));
+      const zone = document.getElementById("stickersKawaii");
+      return { theme: document.documentElement.dataset.theme, bord: b.borderTopColor, rayon: parseFloat(b.borderTopLeftRadius) > 20,
+        stickers: getComputedStyle(zone).display + "/" + zone.children.length, pastille: !document.getElementById("pastilleKawaii").hidden,
+        icone: getComputedStyle(document.querySelector("#listeJoueurs .joueur-ligne"), "::before").backgroundImage.includes("stickers/"),
+        barre: document.querySelector('meta[name="theme-color"]').content };
+    });
+    verifier(themeRefuse === "bordeaux" && k.theme === "kawaii" && k.bord === "rgb(255, 255, 255)" && k.rayon && k.stickers === "block/18" && k.pastille && k.icone && k.barre === "#ffd6ec" && erreurs.length === 0,
+      `thème Kawaii : refusé tant que verrouillé (${themeRefuse}), ${JSON.stringify(k)}`);
+    await ctx.close();
+  }
+
   // 12. Les fenêtres de déblocage (Prestige, Star Wars) gardent leurs propres boutons dans tous les thèmes
   {
     const { ctx, page } = await ouvrir();

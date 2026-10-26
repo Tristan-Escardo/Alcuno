@@ -45,7 +45,7 @@ const CLE_THEME = "alcuno_theme";
 // Couleur de la barre du téléphone pour chaque thème (= --couleur-barre du CSS, le tout haut de la page).
 // Mêmes couleurs dans le script du <head> de index.html, qui la pose dès le premier affichage.
 const THEMES = { bordeaux: "#2b001d", noir: "#000000", vert: "#08301e", bleu: "#0a1634", soleil: "#1f3566",
-                 cerisier: "#5a1740", givre: "#e4f5fc", prestige: "#937810", galaxie: "#02030a" };
+                 cerisier: "#5a1740", givre: "#e4f5fc", prestige: "#937810", galaxie: "#02030a", kawaii: "#ffd6ec" };
 
 // Thème secret « Prestige » : débloqué en découvrant l'écran des créateurs (4 taps sur le titre)
 const CLE_PRESTIGE = "alcuno_theme_prestige";
@@ -149,6 +149,61 @@ function debloquerGalaxie(){
   majPastilleGalaxie();
   afficherGeneriqueGalaxie(premiere);
 }
+// ===== Thème secret « Kawaii » : débloqué avec 8 stickers de l'album (js/stickers.js) =====
+const CLE_KAWAII = "alcuno_theme_kawaii";
+const CLE_KAWAII_NOUVEAU = "alcuno_kawaii_nouveau";
+function kawaiiDebloque(){
+  try { return localStorage.getItem(CLE_KAWAII) === "1"; } catch (e) { return false; }
+}
+function majPastilleKawaii(){
+  const pastille = document.getElementById("pastilleKawaii");
+  if (pastille) pastille.hidden = !kawaiiDebloque();
+}
+// « NOUVEAU » sur la pastille et point rouge sur les Réglages, jusqu'à ce qu'on ait essayé le thème (comme Prestige)
+try { if (localStorage.getItem(CLE_KAWAII_NOUVEAU) && kawaiiDebloque()) document.documentElement.classList.add("kawaii-nouveau"); } catch (e) {}
+function vuNouveauKawaii(){
+  try { localStorage.removeItem(CLE_KAWAII_NOUVEAU); } catch (e) {}
+  document.documentElement.classList.remove("kawaii-nouveau");
+}
+function debloquerKawaii(){
+  if (kawaiiDebloque()) return;
+  try { localStorage.setItem(CLE_KAWAII, "1"); localStorage.setItem(CLE_KAWAII_NOUVEAU, "1"); } catch (e) {}
+  majPastilleKawaii();
+  document.documentElement.classList.add("kawaii-nouveau");
+  setTimeout(afficherFenetreKawaii, 3200); // (après le récap de fin de partie et la notif du sticker)
+}
+// Fenêtre « Thème Kawaii débloqué » : « L'essayer maintenant » met le thème, « Plus tard » ferme
+function afficherFenetreKawaii(){
+  if (document.getElementById("fenetreKawaii")) return;
+  const voile = document.createElement("div");
+  voile.id = "fenetreKawaii";
+  voile.setAttribute("role", "dialog");
+  voile.setAttribute("aria-label", "Thème Kawaii débloqué");
+  voile.innerHTML = `
+    <div class="fenetreKawaii-carte">
+      <div class="fenetreKawaii-secret">Album complété à ${STICKERS_POUR_KAWAII} stickers !</div>
+      <div class="fenetreKawaii-stickers" aria-hidden="true">
+        <img src="stickers/licorne.svg" alt="" width="64" height="64"><img src="stickers/cupcake.svg" alt="" width="64" height="64"><img src="stickers/chat.svg" alt="" width="64" height="64">
+      </div>
+      <div class="fenetreKawaii-titre">Thème Kawaii<br>débloqué !</div>
+      <div class="fenetreKawaii-texte">Il est maintenant dans<br>Réglages › Thèmes</div>
+      <button type="button" class="fenetreKawaii-essayer">L'essayer maintenant</button>
+      <button type="button" class="fenetreKawaii-plusTard">Plus tard</button>
+    </div>`;
+  const fermer = () => {
+    voile.classList.add("fenetreKawaii-sortie");
+    setTimeout(() => voile.remove(), 250);
+  };
+  voile.querySelector(".fenetreKawaii-essayer").addEventListener("click", () => {
+    fermer();
+    const pastille = document.getElementById("pastilleKawaii");
+    if (pastille) pastille.click(); // comme dans les réglages (musique, thème gardé, barre du téléphone…)
+  });
+  voile.querySelector(".fenetreKawaii-plusTard").addEventListener("click", fermer);
+  vibrer([60, 40, 60]);
+  document.body.appendChild(voile);
+}
+
 // Accueil du thème Star Wars : le Nyan Cat traverse l'écran de temps en temps, d'un bord au bord d'en
 // face par un trajet au hasard, derrière les boutons. icones/nyan_cat.png : 12 images l'une sous l'autre
 // (985 x 140 chacune), le chat du GIF fourni et son arc-en-ciel prolongé loin derrière, qui ondule comme
@@ -455,10 +510,11 @@ function peindreBarreTelephone(){
 }
 
 function appliquerTheme(nom, sansMusique = false){
-  if (!THEMES[nom] || (nom === "prestige" && !prestigeDebloque()) || (nom === "galaxie" && !galaxieDebloquee())) nom = "bordeaux";
+  if (!THEMES[nom] || (nom === "prestige" && !prestigeDebloque()) || (nom === "galaxie" && !galaxieDebloquee()) || (nom === "kawaii" && !kawaiiDebloque())) nom = "bordeaux";
   document.documentElement.dataset.theme = nom;
   if (nom === "prestige") vuNouveauPrestige(); // thème essayé : le rappel « NOUVEAU » s'en va
   if (nom === "galaxie") vuNouveauGalaxie();
+  if (nom === "kawaii") vuNouveauKawaii();
   peindreBarreTelephone();
   document.querySelectorAll(".pastilleTheme").forEach((b) => {
     b.setAttribute("aria-pressed", b.dataset.theme === nom ? "true" : "false");
@@ -530,6 +586,7 @@ document.documentElement.classList.remove("rouvrir-reglages");
 
 majPastillePrestige();
 majPastilleGalaxie();
+majPastilleKawaii();
 let themeChoisi = "bordeaux";
 try { themeChoisi = localStorage.getItem(CLE_THEME) || "bordeaux"; } catch (e) {}
 if (themeChoisi === "violet") themeChoisi = "soleil"; // ancien thème, remplacé par Soleil couchant
@@ -2064,6 +2121,8 @@ function remplirRegles(){
 
 function ouvrirRegles(){
   jouerSon("regles"); // (à la place du clic des boutons, voir BOUTONS_AVEC_LEUR_SON)
+  ecranRegles.classList.remove("album"); // (l'album de stickers s'ouvre dans cet écran : js/stickers.js)
+  ecranRegles.querySelector("h2").textContent = "Règles du jeu";
   remplirRegles();
   ecranRegles.scrollTop = 0;
   choixDejaEnAttente = new Set(choixEnAttentePourMoi()); // déjà là à l'ouverture : on ne referme pas pour eux

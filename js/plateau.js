@@ -139,6 +139,7 @@ const GORGEES_CUL_SEC = 5;
 
 // Récap de fin de partie (afficherOverlayFinUnRestants, js/regles.js) : ce qui s'est passé pendant la
 // partie. Tous les téléphones jouent les mêmes actions : en ligne, chacun a le même récap.
+let partieExpress = false; // la partie en cours est une partie express (voir lancerPartie, js/regles.js ; album de stickers, js/stickers.js)
 let statsPartie = null;
 function reinitialiserStatsPartie(){
   statsPartie = { pigeon: {}, plusGros: {}, annulees: {}, duels: {}, plus4: {}, doree: null };
@@ -684,6 +685,7 @@ function basculerPauseJoueur(nom){
   } else {
     if(indexJoueursActifs().length <= 2) return;
     joueursEnPause.add(nom);
+    try { stickerPause(nom); } catch (e) {} // (album de stickers, js/stickers.js)
     const courant = indexJoueur % joueurs.length;
     if(joueurs[courant] === nom){
       indexJoueur = nextPlayerIndex(courant); // c'était son tour : au suivant
