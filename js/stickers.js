@@ -180,10 +180,10 @@ function decouvrirAlbum(message){
 }
 
 // Étoile filante (stickers/etoile_filante.svg, 220 x 100, queue à gauche) : entre par un côté de l'accueil et ressort par l'autre,
-// lentement (4 s) et avec une grande zone de tap. Elle ne passe plus une fois l'album découvert.
+// lentement (4 s) et avec une grande zone de tap. Première fois 10 s après l'ouverture, puis toutes les 35 à 45 s. Elle ne passe plus une fois l'album découvert.
 const ETOILE_L = 150, ETOILE_H = 68; // taille à l'écran
 function passageEtoileFilante(force){
-  if (!force) setTimeout(passageEtoileFilante, 30000 + Math.random() * 30000);
+  if (!force) setTimeout(passageEtoileFilante, 35000 + Math.random() * 10000);
   const accueil = document.getElementById("choixMode");
   if (albumDecouvert() || document.querySelector(".etoileFilante") || !accueil || getComputedStyle(accueil).display === "none" || !accueil.clientHeight ||
       (!force && (document.visibilityState !== "visible" || document.documentElement.classList.contains("mode-tele")))) return;
@@ -236,7 +236,7 @@ function paillettesVoeu(zone, x, y){
   document.getElementById("btnAlbumAccueil").addEventListener("click", ouvrirAlbum);
   majAlbumVisible();
   majResumeAlbum();
-  setTimeout(passageEtoileFilante, 7000); // (la première fois, vite : le temps de lancer le jeu)
+  setTimeout(passageEtoileFilante, 10000); // (la première fois : 10 s après l'ouverture)
 })();
 
 // ----- Thème Kawaii : stickers qui flottent derrière le jeu (visibles seulement avec ce thème, voir style_kawaii.css) -----
