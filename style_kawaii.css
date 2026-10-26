@@ -659,12 +659,11 @@ html[data-theme="kawaii"] body{ font-family: "Arial Rounded MT Bold", "Avenir Ne
 html[data-theme="kawaii"] :is(button, input, textarea, select){ font-family: inherit; }
 html[data-theme="kawaii"] .overlay-opaque{ background: var(--overlay-fond) !important; }
 
-/* Panneaux : feutrine blanche en relief, couture rose pointillée */
+/* Panneaux : feutrine blanche en relief */
 html[data-theme="kawaii"] :is(header, .menu, .blocMessages, .optionReglage, .blocReglage, #ecranRegles .blocRegles, .ecranPause, #stickyJoueurActif){
   border-radius: 28px !important; border: 4px solid #fff !important;
   box-shadow: 0 7px 0 rgba(200, 100, 170, 0.4), 0 14px 22px rgba(140, 60, 120, 0.2) !important;
 }
-html[data-theme="kawaii"] :is(header, .menu, .blocMessages, .optionReglage, .blocReglage, #ecranRegles .blocRegles){ outline: 2px dashed #ff9ccb; outline-offset: -11px; }
 html[data-theme="kawaii"] .voletPause-feuille{ border-radius: 30px 30px 0 0 !important; border: 4px solid #fff !important; border-bottom: none !important; }
 html[data-theme="kawaii"] .messages::before{ display: none !important; }
 html[data-theme="kawaii"] .messages{ background: transparent !important; border-color: transparent !important; box-shadow: none !important; }
