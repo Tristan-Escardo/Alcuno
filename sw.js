@@ -38,6 +38,7 @@ const A_PRECHARGER = [
   "./stickers/macaron.svg",
   "./stickers/chou.svg",
   "./stickers/nuage.svg",
+  "./stickers/etoile_filante.svg",
   "./manifest.json",
   "./icones/icone-192.png",
   "./icones/icone-512.png",

@@ -157,7 +157,7 @@ function ouvrirAlbum(){
   ouvrirPage(page);
 }
 
-// ----- Découverte de l'album : 3 taps rapides sur la barre arc-en-ciel sous le titre de l'accueil -----
+// ----- Découverte de l'album : une étoile filante traverse l'accueil de temps en temps ; la toucher fait un vœu et révèle l'album -----
 const CLE_ALBUM_DECOUVERT = "alcuno_album_decouvert";
 function albumDecouvert(){
   try { return localStorage.getItem(CLE_ALBUM_DECOUVERT) === "1"; } catch (e) { return false; }
@@ -169,30 +169,75 @@ function majAlbumVisible(){
   if (accueil) accueil.hidden = !visible;
   if (ligne) ligne.style.display = visible ? "" : "none";
 }
-function decouvrirAlbum(){
+function decouvrirAlbum(message){
   if (albumDecouvert()) return;
   try { localStorage.setItem(CLE_ALBUM_DECOUVERT, "1"); } catch (e) {}
   majAlbumVisible();
   try { vibrer([60, 40, 60]); } catch (e) {}
   const n = nombreStickers();
-  afficherNotificationHaut("", n ? `Album de stickers découvert ! (${n} / ${STICKERS.length})` : "Album de stickers découvert !", true);
+  const suite = n ? ` (${n} / ${STICKERS.length})` : "";
+  afficherNotificationHaut("", (message || "Album de stickers découvert !") + suite, true);
+}
+
+// Étoile filante (stickers/etoile_filante.svg, 220 x 100, queue à gauche) : entre par un côté de l'accueil et ressort par l'autre,
+// lentement (4 s) et avec une grande zone de tap. Elle ne passe plus une fois l'album découvert.
+const ETOILE_L = 150, ETOILE_H = 68; // taille à l'écran
+function passageEtoileFilante(force){
+  if (!force) setTimeout(passageEtoileFilante, 30000 + Math.random() * 30000);
+  const accueil = document.getElementById("choixMode");
+  if (albumDecouvert() || document.querySelector(".etoileFilante") || !accueil || getComputedStyle(accueil).display === "none" || !accueil.clientHeight ||
+      (!force && (document.visibilityState !== "visible" || document.documentElement.classList.contains("mode-tele")))) return;
+  const W = accueil.clientWidth, H = accueil.clientHeight;
+  const hasard = (a, b) => a + Math.random() * (b - a);
+  const versDroite = Math.random() < 0.5;
+  const x0 = versDroite ? -ETOILE_L : W + ETOILE_L, x1 = versDroite ? W + ETOILE_L : -ETOILE_L;
+  const y0 = hasard(0.12, 0.45) * H, y1 = y0 + hasard(0.12, 0.3) * H; // (elle descend : étoile filante)
+  const pente = Math.atan2(y1 - y0, Math.abs(x1 - x0)) * 0.6; // (penchée un peu moins que le trajet)
+  const angle = versDroite ? pente : -pente; // (vers la gauche, l'image est retournée : l'angle aussi)
+  const bouton = document.createElement("div"); // (pas un <button> : les thèmes habillent tous les boutons de l'accueil)
+  bouton.setAttribute("role", "button");
+  bouton.className = "etoileFilante";
+  bouton.setAttribute("aria-label", "Étoile filante : fais un vœu");
+  const image = document.createElement("img");
+  image.src = "stickers/etoile_filante.svg";
+  image.alt = "";
+  image.draggable = false;
+  bouton.appendChild(image);
+  accueil.appendChild(bouton);
+  const retourne = versDroite ? "" : " scaleX(-1)";
+  const position = (x, y) => `translate(${x - ETOILE_L / 2}px, ${y - ETOILE_H / 2}px) rotate(${angle}rad)${retourne}`;
+  const vol = bouton.animate([{ transform: position(x0, y0) }, { transform: position(x1, y1) }], { duration: 4200, easing: "linear" });
+  vol.onfinish = () => bouton.remove();
+  bouton.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    const r = bouton.getBoundingClientRect();
+    vol.cancel();
+    bouton.remove();
+    paillettesVoeu(accueil, r.left + r.width / 2, r.top + r.height / 2);
+    decouvrirAlbum("Vœu exaucé ✨ Album de stickers découvert !");
+  }, { once: true });
+}
+// Petite explosion de paillettes à l'endroit où on a touché l'étoile
+function paillettesVoeu(zone, x, y){
+  const couleurs = ["#ffd84d", "#ff9ccf", "#9fd4ff", "#9ff0d0", "#fff"];
+  const cadre = zone.getBoundingClientRect();
+  for (let i = 0; i < 14; i++) {
+    const p = document.createElement("span");
+    p.className = "paillette";
+    const a = (i / 14) * Math.PI * 2, d = 40 + Math.random() * 50;
+    p.style.cssText = `left:${x - cadre.left}px;top:${y - cadre.top}px;background:${couleurs[i % couleurs.length]};--dx:${Math.cos(a) * d}px;--dy:${Math.sin(a) * d}px`;
+    zone.appendChild(p);
+    setTimeout(() => p.remove(), 800);
+  }
 }
 
 (function(){
   document.getElementById("btnAlbum").addEventListener("click", ouvrirAlbum);
   document.getElementById("btnAlbumAccueil").addEventListener("click", ouvrirAlbum);
-  const barre = document.querySelector("#choixMode .titreAccueilBarre");
-  let taps = 0, dernier = 0;
-  if (barre) barre.addEventListener("click", () => {
-    const maintenant = Date.now();
-    taps = maintenant - dernier < 700 ? taps + 1 : 1;
-    dernier = maintenant;
-    if (taps >= 3) { taps = 0; decouvrirAlbum(); }
-  });
   majAlbumVisible();
   majResumeAlbum();
+  setTimeout(passageEtoileFilante, 7000); // (la première fois, vite : le temps de lancer le jeu)
 })();
-// #endregion
 
 // ----- Thème Kawaii : stickers qui flottent derrière le jeu (visibles seulement avec ce thème, voir style_kawaii.css) -----
 (function(){

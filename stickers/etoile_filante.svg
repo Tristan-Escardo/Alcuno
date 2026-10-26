@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 100">
+<defs>
+<linearGradient id="ef-tete" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffb3dd" stop-opacity="0"/><stop offset=".55" stop-color="#ffb3dd" stop-opacity=".75"/><stop offset="1" stop-color="#ffe27a" stop-opacity=".95"/></linearGradient>
+<linearGradient id="ef-bleu" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8fc8ff" stop-opacity="0"/><stop offset="1" stop-color="#8fc8ff" stop-opacity=".85"/></linearGradient>
+<linearGradient id="ef-vert" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9ff0d0" stop-opacity="0"/><stop offset="1" stop-color="#9ff0d0" stop-opacity=".85"/></linearGradient>
+</defs>
+<path d="M4 50 L132 22 Q150 50 132 78 Z" fill="url(#ef-tete)"/>
+<path d="M30 70 L132 64" stroke="url(#ef-bleu)" stroke-width="7" stroke-linecap="round" fill="none"/>
+<path d="M44 30 L132 38" stroke="url(#ef-vert)" stroke-width="6" stroke-linecap="round" fill="none"/>
+<g fill="#fff" stroke="#7a3b6e" stroke-width="1.4" stroke-linejoin="round">
+<path d="M36 44 l3 -8 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3z" fill="#ffd84d"/>
+<path d="M78 74 l2.4 -6 l2.4 6 l6 2.4 l-6 2.4 l-2.4 6 l-2.4 -6 l-6 -2.4z" fill="#ff9ccf"/>
+<path d="M104 24 l2 -5 l2 5 l5 2 l-5 2 l-2 5 l-2 -5 l-5 -2z" fill="#9fd4ff"/>
+</g>
+<g transform="translate(112 4) scale(.9)">
+<path d="M50 10 L61 38 L91 40 L67 59 L75 88 L50 71 L25 88 L33 59 L9 40 L39 38Z" fill="#ffd84d" stroke="#7a3b6e" stroke-width="2.4" stroke-linejoin="round"/>
+<ellipse cx="38" cy="38" rx="5" ry="2.4" fill="#fff" opacity=".75" transform="rotate(-30 38 38)"/>
+<ellipse cx="42.35" cy="52" rx="2.8049999999999997" ry="3.57" fill="#3b2145"/><ellipse cx="57.65" cy="52" rx="2.8049999999999997" ry="3.57" fill="#3b2145"/><circle cx="41.415" cy="50.64" r="1.105" fill="#fff"/><circle cx="56.714999999999996" cy="50.64" r="1.105" fill="#fff"/><circle cx="43.370000000000005" cy="53.19" r="0.51" fill="#fff"/><circle cx="58.67" cy="53.19" r="0.51" fill="#fff"/><ellipse cx="36.4" cy="56.42" rx="3.9099999999999997" ry="2.465" fill="#ff9cb0" opacity=".62"/><ellipse cx="63.6" cy="56.42" rx="3.9099999999999997" ry="2.465" fill="#ff9cb0" opacity=".62"/><path d="M47.28 55.4 Q50 58.97 52.72 55.4" fill="none" stroke="#7a3b6e" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/>
+</g></svg>

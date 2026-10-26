@@ -445,24 +445,33 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
-  // 20. Album de stickers caché : 3 taps rapides sur la barre arc-en-ciel sous le titre l'affichent (accueil + Réglages), et ça reste
+  // 20. Album de stickers caché : l'étoile filante qui traverse l'accueil, touchée, l'affiche (accueil + Réglages), et ça reste
   {
     const { ctx, page, erreurs } = await ouvrir();
-    const etat = () => page.evaluate(() => ({ accueil: !document.getElementById("albumAccueil").hidden, reglages: getComputedStyle(document.getElementById("btnAlbum")).display !== "none", garde: localStorage.getItem("alcuno_album_decouvert") }));
+    const etat = () => page.evaluate(() => ({ accueil: !document.getElementById("albumAccueil").hidden, reglages: getComputedStyle(document.getElementById("btnAlbum")).display !== "none", garde: localStorage.getItem("alcuno_album_decouvert"), etoile: !!document.querySelector(".etoileFilante") }));
     const avant = await etat();
-    await page.click("#choixMode .titreAccueilBarre"); await page.waitForTimeout(900); await page.click("#choixMode .titreAccueilBarre"); await page.waitForTimeout(900);
-    await page.click("#choixMode .titreAccueilBarre"); // 3 taps trop espacés : rien
-    const lent = await etat();
-    await page.waitForTimeout(900);
-    for (let i = 0; i < 3; i++) await page.click("#choixMode .titreAccueilBarre");
-    await page.waitForTimeout(400);
+    await page.evaluate(() => passageEtoileFilante(true));
+    await page.waitForTimeout(600);
+    const enVol = await etat();
+    const taille = await page.evaluate(() => { const r = document.querySelector(".etoileFilante").getBoundingClientRect(); return Math.round(r.width) > 100; });
+    await page.waitForTimeout(4300); // elle ressort sans être touchée : rien ne change
+    const ratee = await etat();
+    await page.evaluate(() => passageEtoileFilante(true));
+    await page.waitForTimeout(500);
+    await page.evaluate(() => document.querySelector(".etoileFilante").dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, cancelable: true })));
+    await page.waitForTimeout(500);
     const apres = await etat();
+    const message = await page.evaluate(() => (document.getElementById("notifHaut") || {}).innerText || "");
+    await page.evaluate(() => passageEtoileFilante(true)); // plus de passage une fois l'album découvert
+    await page.waitForTimeout(300);
+    const encore = await etat();
     await page.reload(); await page.waitForTimeout(900);
     const recharge = await etat();
     await page.click("#btnAlbumAccueil"); await page.waitForTimeout(700);
     const ouvert = await page.evaluate(() => document.querySelector("#ecranRegles h2").textContent + "/" + document.getElementById("ecranRegles").style.display);
-    verifier(!avant.accueil && !avant.reglages && !lent.accueil && apres.accueil && apres.reglages && apres.garde === "1" && recharge.accueil && ouvert === "Album de stickers/" && erreurs.length === 0,
-      `album caché : avant ${JSON.stringify(avant)}, 3 taps lents ${lent.accueil}, 3 taps rapides ${JSON.stringify(apres)}, après rechargement ${recharge.accueil}, bouton d'accueil : ${ouvert}`);
+    verifier(!avant.accueil && !avant.reglages && !avant.etoile && enVol.etoile && taille && ratee.etoile === false && !ratee.accueil &&
+      apres.accueil && apres.reglages && apres.garde === "1" && message.includes("Vœu exaucé") && !encore.etoile && recharge.accueil && ouvert === "Album de stickers/" && erreurs.length === 0,
+      `étoile filante : en vol ${enVol.etoile}, ratée -> album ${ratee.accueil}, touchée -> ${JSON.stringify(apres)} « ${message} », plus de passage ${!encore.etoile}, après rechargement ${recharge.accueil}, bouton d'accueil : ${ouvert}`);
     await ctx.close();
   }
 
