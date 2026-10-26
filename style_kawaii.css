@@ -711,7 +711,6 @@ html[data-theme="kawaii"] #jouer::before{ background-image: var(--ic-macaron); }
 html[data-theme="kawaii"] #nouvellePartie::before{ background-image: var(--ic-chou); }
 html[data-theme="kawaii"] .voletPause-ok::before{ background-image: var(--ic-chat); }
 html[data-theme="kawaii"] .voletPause-nom::before{ content: ""; display: inline-block; width: 1.4em; height: 1.4em; vertical-align: -0.3em; margin-right: 0.2em; background: var(--ic-chat) center / contain no-repeat; }
-html[data-theme="kawaii"] #stickyJoueurActif{ position: relative; }
 html[data-theme="kawaii"] #stickyJoueurActif::after{ content: ""; position: absolute; right: -6px; top: -12px; width: 22px; height: 22px; background: var(--ic-etoile) center / contain no-repeat; }
 
 /* Dos des cartes rosés */

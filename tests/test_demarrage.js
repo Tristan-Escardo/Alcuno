@@ -508,6 +508,24 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
+  // 22. Bannière « Tour de … » : collée en haut de l'écran quand on a défilé, dans tous les thèmes (Kawaii la poussait en bas)
+  {
+    const positions = [];
+    for (const theme of [...THEMES, "prestige", "galaxie", "kawaii"]) {
+      const { ctx, page } = await ouvrir({}, `try{localStorage.setItem("alcuno_theme","${theme}");localStorage.setItem("alcuno_theme_galaxie","1");localStorage.setItem("alcuno_theme_prestige","1");localStorage.setItem("alcuno_theme_kawaii","1")}catch(e){}`);
+      await page.click("#btnModeClassique"); await page.waitForTimeout(700);
+      for (const nom of ["Tom", "Lea", "Max"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(150); }
+      await page.click("#jouer"); await page.waitForTimeout(1200);
+      const debut = await page.evaluate(() => Math.round(document.getElementById("stickyJoueurActif").getBoundingClientRect().top));
+      await page.mouse.move(200, 400); await page.mouse.wheel(0, 3000); await page.waitForTimeout(700);
+      const colle = await page.evaluate(() => Math.round(document.getElementById("stickyJoueurActif").getBoundingClientRect().top));
+      positions.push({ theme, debut, colle });
+      await ctx.close();
+    }
+    const mauvais = positions.filter((p) => p.colle > 30 || p.debut > 600);
+    verifier(mauvais.length === 0, `bannière « Tour de » : collée en haut dans les ${positions.length} thèmes ${mauvais.length ? JSON.stringify(mauvais) : "(" + positions.map((p) => p.colle).join(", ") + " px)"}`);
+  }
+
   // 12. Les fenêtres de déblocage (Prestige, Star Wars) gardent leurs propres boutons dans tous les thèmes
   {
     const { ctx, page } = await ouvrir();
