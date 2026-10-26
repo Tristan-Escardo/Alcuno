@@ -632,6 +632,23 @@ for (let i = 0; i < 26; i++) {
   zoneEtincelles.appendChild(etincelle);
 }
 
+// Kawaii : petits personnages qui lévitent sur l'écran d'accueil (répartis en grille, un peu décalés au hasard)
+const zoneFlotteurs = document.getElementById("kawaiiFlotteurs");
+const personnagesKawaii = ["coeur", "licorne", "etoile", "nuage", "scintille", "cupcake", "arcenciel", "lapin", "bulle", "fraise", "sucette", "chat",
+  "scintille", "fleur", "macaron", "poussin", "glace", "coeur", "etoile", "chou"];
+personnagesKawaii.forEach((nom, i) => {
+  const perso = document.createElement("span");
+  const taille = 30 + Math.random() * 26;
+  const duree = 5 + Math.random() * 5;
+  perso.style.left = `${(i % 5) * 20 + Math.random() * 12}%`;
+  perso.style.top = `${Math.floor(i / 5) * 24 + 2 + Math.random() * 14}%`;
+  perso.style.width = perso.style.height = `${taille}px`;
+  perso.style.backgroundImage = `url("stickers/${nom}.svg")`;
+  perso.style.animationDuration = `${duree}s`;
+  perso.style.animationDelay = `${-Math.random() * duree}s`;
+  zoneFlotteurs.appendChild(perso);
+});
+
 document.querySelectorAll(".pastilleTheme").forEach((pastille) => {
   pastille.addEventListener("click", () => {
     // Changement de thème : la musique d'ambiance se coupe (on la réactive soi-même dans les réglages)
