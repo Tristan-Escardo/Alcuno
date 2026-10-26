@@ -1,5 +1,5 @@
 // =============================================================================================
-// ALCUNO : Album de stickers (à gagner en jouant) : 8 stickers sur 11 débloquent le thème Kawaii
+// ALCUNO : Album de stickers (à gagner en jouant) : les 11 stickers débloquent le thème Kawaii
 // (fichier chargé après ceux d'avant dans index.html : voir l'en-tête de script.js)
 // =============================================================================================
 // #region Album de stickers
@@ -8,7 +8,7 @@
 // arrive à soi (pseudoActuel). Tout est compté à la fin de la partie, à partir des statistiques du récap
 // (statsPartie, js/plateau.js), sauf « Fraise » (mise en pause d'un joueur), comptée tout de suite.
 const CLE_STICKERS = "alcuno_stickers";
-const STICKERS_POUR_KAWAII = 8;
+const STICKERS_POUR_KAWAII = 11; // tout l'album
 const FENETRE_SOIREE = 6 * 60 * 60 * 1000; // « même soirée » : 5 parties finies en 6 h
 const STICKERS = [
   { id: "cupcake", nom: "Cupcake",         indice: "Finir une partie" },
@@ -98,7 +98,7 @@ function majResumeAlbum(){
   const n = nombreStickers();
   note.textContent = kawaiiDebloque()
     ? `${n} / ${STICKERS.length} stickers · thème Kawaii débloqué`
-    : `${n} / ${STICKERS.length} stickers · ${STICKERS_POUR_KAWAII} pour débloquer le thème Kawaii`;
+    : `${n} / ${STICKERS.length} stickers · complète l'album pour débloquer le thème Kawaii`;
 }
 
 // L'album s'ouvre dans l'écran des règles (mêmes blocs, donc les mêmes couleurs dans chaque thème) ; ouvrirRegles remet les règles
@@ -117,8 +117,8 @@ function ouvrirAlbum(){
   const texte = document.createElement("p");
   texte.className = "albumTexte";
   texte.textContent = kawaiiDebloque()
-    ? "Il est dans Réglages › Thèmes. Continue l'album pour le compléter !"
-    : `Gagne ${STICKERS_POUR_KAWAII} stickers sur ${STICKERS.length} pour débloquer le thème Kawaii.`;
+    ? "Il est dans Réglages › Thèmes. Bravo, album complet !"
+    : `Gagne les ${STICKERS.length} stickers pour débloquer le thème Kawaii.`;
   const barre = document.createElement("div");
   barre.className = "albumBarre";
   const rempli = document.createElement("span");

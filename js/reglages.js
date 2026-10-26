@@ -149,7 +149,7 @@ function debloquerGalaxie(){
   majPastilleGalaxie();
   afficherGeneriqueGalaxie(premiere);
 }
-// ===== Thème secret « Kawaii » : débloqué avec 8 stickers de l'album (js/stickers.js) =====
+// ===== Thème secret « Kawaii » : débloqué avec les 11 stickers de l'album (js/stickers.js) =====
 const CLE_KAWAII = "alcuno_theme_kawaii";
 const CLE_KAWAII_NOUVEAU = "alcuno_kawaii_nouveau";
 function kawaiiDebloque(){
@@ -181,7 +181,7 @@ function afficherFenetreKawaii(){
   voile.setAttribute("aria-label", "Thème Kawaii débloqué");
   voile.innerHTML = `
     <div class="fenetreKawaii-carte">
-      <div class="fenetreKawaii-secret">Album complété à ${STICKERS_POUR_KAWAII} stickers !</div>
+      <div class="fenetreKawaii-secret">Album complet : 11 stickers !</div>
       <div class="fenetreKawaii-stickers" aria-hidden="true">
         <img src="stickers/licorne.svg" alt="" width="64" height="64"><img src="stickers/cupcake.svg" alt="" width="64" height="64"><img src="stickers/chat.svg" alt="" width="64" height="64">
       </div>

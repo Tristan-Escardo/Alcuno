@@ -366,7 +366,7 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
-  // 18. Album de stickers : conditions (classique : à la table ; en ligne : seulement soi), 8 stickers => thème Kawaii débloqué
+  // 18. Album de stickers : conditions (classique : à la table ; en ligne : seulement soi), les 11 stickers => thème Kawaii débloqué
   {
     const { ctx, page, erreurs } = await ouvrir();
     const r = await page.evaluate(async () => {
@@ -382,7 +382,10 @@ function verifier(ok, texte){
       o.kawaii7 = kawaiiDebloque();
       stickerPause("Tom"); // 8e sticker : Fraise
       o.partie1b = trier();
-      o.kawaii8 = kawaiiDebloque() + "/" + document.getElementById("pastilleKawaii").hidden;
+      o.kawaii8 = kawaiiDebloque() + "/" + document.getElementById("pastilleKawaii").hidden; // (pas encore : il faut les 11)
+      localStorage.setItem("alcuno_stickers", JSON.stringify({ gagnes: STICKERS.map((s) => s.id).slice(0, 10), parties: 5, fins: [] }));
+      gagnerStickers([STICKERS[10].id]); // 11e sticker
+      o.kawaii11 = kawaiiDebloque() + "/" + document.getElementById("pastilleKawaii").hidden;
       // album : 11 lignes, 8 gagnées ; les règles se remettent ensuite
       ouvrirAlbum();
       o.album = document.querySelectorAll(".albumLigne").length + "/" + document.querySelectorAll(".albumGagne").length + "/" + document.querySelector("#ecranRegles h2").textContent;
@@ -408,7 +411,7 @@ function verifier(ok, texte){
       return o;
     });
     verifier(r.avantKawaii === "false/true" && r.partie1 === "chou,cupcake,etoile,lapin,licorne,poussin,sushi" && r.kawaii7 === false &&
-      r.partie1b.split(",").length === 8 && r.kawaii8 === "true/false" && r.album === "11/8/Album de stickers" && r.regles === "Règles du jeu/0/false" &&
+      r.partie1b.split(",").length === 8 && r.kawaii8 === "false/true" && r.kawaii11 === "true/false" && r.album === "11/11/Album de stickers" && r.regles === "Règles du jeu/0/false" &&
       r.cinq === "chat,cupcake,nuage" && r.enLigneAutre === "cupcake,macaron" && r.enLigneMoi === "cupcake,etoile,macaron,poussin" && r.fenetre && erreurs.length === 0,
       `album de stickers : ${JSON.stringify(r)}`);
     await ctx.close();
