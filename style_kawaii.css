@@ -659,10 +659,10 @@ html[data-theme="kawaii"] body{ font-family: "Arial Rounded MT Bold", "Avenir Ne
 html[data-theme="kawaii"] :is(button, input, textarea, select){ font-family: inherit; }
 html[data-theme="kawaii"] .overlay-opaque{ background: var(--overlay-fond) !important; }
 
-/* Panneaux : feutrine blanche en relief */
+/* Panneaux : verre irisé holographique (reflets rose, bleu, menthe, jaune) */
 html[data-theme="kawaii"] :is(header, .menu, .blocMessages, .optionReglage, .blocReglage, #ecranRegles .blocRegles, .ecranPause, #stickyJoueurActif){
-  border-radius: 28px !important; border: 4px solid #fff !important;
-  box-shadow: 0 7px 0 rgba(200, 100, 170, 0.4), 0 14px 22px rgba(140, 60, 120, 0.2) !important;
+  border-radius: 30px !important; border: 2px solid rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 10px 26px rgba(150, 90, 200, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.8), inset 0 10px 18px rgba(255, 255, 255, 0.85), inset 0 -8px 16px rgba(190, 150, 255, 0.25) !important;
 }
 html[data-theme="kawaii"] .voletPause-feuille{ border-radius: 30px 30px 0 0 !important; border: 4px solid #fff !important; border-bottom: none !important; }
 html[data-theme="kawaii"] .messages::before{ display: none !important; }
@@ -733,10 +733,25 @@ html[data-theme="kawaii"] #stickersKawaii{ display: block; position: fixed; inse
 #stickersKawaii span{ position: absolute; background: center / contain no-repeat; opacity: 0.8; filter: drop-shadow(0 3px 0 rgba(120, 50, 110, 0.18)); animation: kawaiiFlotte var(--duree, 5s) ease-in-out var(--delai, 0s) infinite alternate; }
 @media (prefers-reduced-motion: reduce){ #stickersKawaii span, html[data-theme="kawaii"] #choixMode #titreAccueil::before{ animation: none; } }
 
-/* Panneaux opaques (les stickers de fond ne doivent pas passer sous le texte) */
-html[data-theme="kawaii"] :is(header, .menu, .blocMessages, .optionReglage, .blocReglage, #ecranRegles .blocRegles, .ecranPause, .voletPause-feuille, #stickyJoueurActif){
-  background: linear-gradient(180deg, #ffffff, #fff1fa) !important;
+/* Verre : assez opaque pour que les stickers de fond ne gênent pas la lecture, flou léger derrière */
+html[data-theme="kawaii"] :is(header, .menu, .blocMessages, .optionReglage, #ecranRegles .blocRegles, #stickyJoueurActif){
+  background: linear-gradient(125deg, rgba(255, 255, 255, 0.94) 0%, rgba(255, 224, 242, 0.88) 28%, rgba(224, 233, 255, 0.88) 52%, rgba(214, 255, 240, 0.88) 76%, rgba(255, 249, 220, 0.92) 100%) !important;
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
 }
+html[data-theme="kawaii"] .blocReglage{ background: transparent !important; border: none !important; box-shadow: none !important; -webkit-backdrop-filter: none; backdrop-filter: none; }
+html[data-theme="kawaii"] :is(.ecranPause, .voletPause-feuille){ background: linear-gradient(125deg, #ffffff 0%, #ffe3f3 30%, #e3ebff 58%, #dcfff2 82%, #fff8dc 100%) !important; }
+/* Reflet de lumière qui traverse les panneaux de temps en temps */
+html[data-theme="kawaii"] :is(.blocMessages, .optionReglage, #ecranRegles .blocRegles){ position: relative; overflow: hidden; }
+html[data-theme="kawaii"] :is(.blocMessages, .optionReglage, #ecranRegles .blocRegles)::before{
+  content: ""; position: absolute; top: 0; bottom: 0; left: -70%; width: 40%; pointer-events: none; z-index: 0;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.85), transparent); transform: skewX(-18deg);
+  animation: kawaiiReflet 7s ease-in-out infinite;
+}
+html[data-theme="kawaii"] :is(.blocMessages, .optionReglage, #ecranRegles .blocRegles) > *{ position: relative; z-index: 1; }
+html[data-theme="kawaii"] .blocMessages:nth-child(2)::before{ animation-delay: 1.6s; }
+html[data-theme="kawaii"] .blocMessages:nth-child(3)::before{ animation-delay: 3.2s; }
+@keyframes kawaiiReflet{ 0%, 55%{ left: -70%; } 100%{ left: 140%; } }
+@media (prefers-reduced-motion: reduce){ html[data-theme="kawaii"] :is(.blocMessages, .optionReglage, #ecranRegles .blocRegles)::before{ animation: none; display: none; } }
 html[data-theme="kawaii"] :is(.menu, .blocMessages) :is(input){ background: #fff; }
 /* Boutons bleus : plus foncés pour que le texte blanc se lise */
 html[data-theme="kawaii"] :is(#btnModeEnLigne, #ajouterJoueur, #menu #btnCaster){ background: linear-gradient(180deg, #2a95cc, #1c75a8) !important; text-shadow: 0 2px 0 #0f4f73 !important; box-shadow: 0 6px 0 #0f4f73, 0 10px 14px rgba(20, 100, 140, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.5) !important; }
