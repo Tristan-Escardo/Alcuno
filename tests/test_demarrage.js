@@ -327,6 +327,30 @@ function verifier(ok, texte){
       `partie express : ${normal.cartes} cartes normale, ${express.cartes} en express (${express.familles} familles, ${express.trois} « 3 »), graine ${express.graine}`);
   }
 
+  // 16. Carte dorée : étincelles derrière l'annonce et le choix de la victime ; bleues (étoiles du titre comprises) en Star Wars
+  {
+    const { ctx, page, erreurs } = await ouvrir({}, `try{localStorage.setItem("alcuno_theme","galaxie");localStorage.setItem("alcuno_theme_galaxie","1")}catch(e){}`);
+    await page.click("#btnModeClassique"); await page.waitForTimeout(800);
+    for (const nom of ["Tom", "Lea", "Max"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(250); }
+    await page.click("#jouer"); await page.waitForTimeout(1200);
+    const lire = () => page.evaluate(() => {
+      const zone = document.querySelector(".etincelles-doree");
+      const bleu = (c) => { const m = c.match(/\d+/g).map(Number); return m[2] > m[0] + 60; }; // (plus de bleu que de rouge)
+      return { n: zone ? zone.children.length : 0, clic: zone ? getComputedStyle(zone).pointerEvents : "",
+        bleues: zone ? [...zone.children].every((e) => bleu(getComputedStyle(e).backgroundColor)) : false,
+        etoiles: [...document.querySelectorAll(".doree-etincelle")].map((e) => bleu(getComputedStyle(e).color)).join() };
+    });
+    await page.evaluate(() => { montrerOverlayRegle("CARTE DORÉE\nTexte", "carte_doree"); habillerOverlayCarteDoree("Texte"); });
+    const annonce = await lire();
+    await page.evaluate(() => { montrerOverlayRegle("Une autre règle\nTexte"); });
+    const apres = await lire();
+    await page.evaluate(() => { document.querySelectorAll('[id^="overlay"]').forEach((e) => e.remove()); afficherOverlayCarteDoree(0); });
+    const choix = await lire();
+    verifier(annonce.n === 36 && annonce.clic === "none" && annonce.bleues && annonce.etoiles === "true,true" && apres.n === 0 && choix.n === 36 && choix.bleues && erreurs.length === 0,
+      `carte dorée : étincelles ${annonce.n} (bleues ${annonce.bleues}, étoiles du titre ${annonce.etoiles}), retirées après (${apres.n}), au choix ${choix.n}`);
+    await ctx.close();
+  }
+
   // 12. Les fenêtres de déblocage (Prestige, Star Wars) gardent leurs propres boutons dans tous les thèmes
   {
     const { ctx, page } = await ouvrir();

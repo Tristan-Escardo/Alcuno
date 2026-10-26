@@ -593,6 +593,7 @@ function montrerOverlayRegle(message, classeCarte = "", classeCarteSupplementair
     }
     // Overlay réutilisé : on retire l'habillage doré d'un message carte dorée précédent
     overlay.classList.remove("overlay-doree");
+    overlay.querySelectorAll(".etincelles-doree").forEach(z => z.remove());
     const cartes = overlay.querySelector(".overlay-regle-cartes");
     const boxTexte = overlay.querySelector(".overlay-regle-texte");
 
@@ -794,12 +795,32 @@ function habillerOverlayCelien(message, citation, signature){
   boxTexte.appendChild(bloc);
 }
 
+// Petites étincelles qui scintillent en continu derrière la carte dorée (annonce et choix de la victime).
+// Positions et rythmes tirés au hasard (Math.random : purement visuel, pas le hasard du jeu) ; couleurs selon le thème (CSS).
+function ajouterEtincellesDoree(overlay){
+  if(!overlay || overlay.querySelector(".etincelles-doree")) return;
+  const zone = document.createElement("div");
+  zone.className = "etincelles-doree";
+  zone.setAttribute("aria-hidden", "true");
+  for(let i = 0; i < 36; i++){
+    const e = document.createElement("span");
+    const point = Math.random() < 0.35;
+    const taille = point ? 3 + Math.random() * 3 : 7 + Math.random() * 10;
+    e.className = `etincelle e${i % 4}${point ? " etincelle-point" : ""}`;
+    e.style.cssText = `left:${(Math.random() * 100).toFixed(1)}%;top:${(6 + Math.random() * 88).toFixed(1)}%;width:${taille.toFixed(1)}px;height:${taille.toFixed(1)}px;` +
+      `--duree:${(2.2 + Math.random() * 2.6).toFixed(2)}s;--delai:${(-Math.random() * 5).toFixed(2)}s`;
+    zone.appendChild(e);
+  }
+  overlay.insertBefore(zone, overlay.firstChild);
+}
+
 function habillerOverlayCarteDoree(texte, titreHtml = TITRE_CARTE_DOREE){
   const overlay = document.getElementById("overlayRegleUnique");
   const boxTexte = overlay && overlay.querySelector(".overlay-regle-texte");
   if(!boxTexte) return;
 
   overlay.classList.add("overlay-doree");
+  ajouterEtincellesDoree(overlay);
   boxTexte.innerHTML = "";
 
   const titre = document.createElement("div");
@@ -824,6 +845,7 @@ function afficherOverlayCarteDoree(joueurActuel){
 
   const overlay = document.createElement("div");
   overlay.id = "overlayCarteDoree";
+  ajouterEtincellesDoree(overlay);
 
   // En-tête : la carte dorée qui brille, le titre, puis la consigne
   const carte = document.createElement("div");
