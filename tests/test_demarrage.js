@@ -351,6 +351,21 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
+  // 17. Thème Sombre : boutons de la fenêtre de pause presque noirs au texte doré, champ de texte sans contour bleu du navigateur
+  {
+    const { ctx, page, erreurs } = await ouvrir({}, `try{localStorage.setItem("alcuno_theme","noir")}catch(e){}`);
+    await page.click("#btnModeClassique"); await page.waitForTimeout(800);
+    await page.focus("#nomJoueur");
+    const champ = await page.evaluate(() => { const c = getComputedStyle(document.getElementById("nomJoueur")); return { contour: c.outlineStyle, bord: c.borderColor }; });
+    for (const nom of ["Tom", "Lea", "Max"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(250); }
+    await page.click("#jouer"); await page.waitForTimeout(1200);
+    await page.click("#listeJoueurs .joueur-ligne:nth-child(2) .btnPauseJoueur"); await page.waitForTimeout(700);
+    const boutons = await page.evaluate(() => [".voletPause-ok", ".voletPause-annuler"].map((sel) => { const c = getComputedStyle(document.querySelector(sel)); return c.color + "|" + c.backgroundImage.slice(0, 40); }));
+    verifier(champ.contour === "none" && /255, 2\d\d, \d+/.test(champ.bord) && boutons.every((b) => b.startsWith("rgb(255, 212, 38)") && b.includes("linear-gradient(rgb(13, 11, 6)")) && erreurs.length === 0,
+      `thème Sombre : champ de texte (contour ${champ.contour}, bord ${champ.bord}), boutons de pause ${boutons.join(" ; ")}`);
+    await ctx.close();
+  }
+
   // 12. Les fenêtres de déblocage (Prestige, Star Wars) gardent leurs propres boutons dans tous les thèmes
   {
     const { ctx, page } = await ouvrir();

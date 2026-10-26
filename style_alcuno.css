@@ -8052,3 +8052,24 @@ html[data-theme="galaxie"] .etincelle.e2{ --c: #2f9bff; } html[data-theme="galax
 @media (prefers-reduced-motion: reduce){ .etincelles-doree{ display: none; } }
 /* Star Wars : les deux ✦ autour de « CARTE DORÉE » en bleu aussi */
 html[data-theme="galaxie"] :is(#overlayRegleUnique, #overlayCarteDoree, #overlayPredictionFin) .doree-etincelle{ color: #49b4ff !important; text-shadow: 0 0 10px #2f9bff !important; }
+
+/* ===== Fenêtres du bas (pause, carte, historique) : accordées aux thèmes ===== */
+/* Sombre : mêmes boutons presque noirs, texte et liseré dorés que le reste du thème */
+html[data-theme="noir"] :is(.voletPause-ok, .voletPause-annuler){
+  background: linear-gradient(180deg, #0d0b06, #030302) !important;
+  color: #ffd426 !important;
+  border: 1px solid rgba(255, 210, 38, 0.6) !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+html[data-theme="noir"] .voletPause-feuille{ border-top: 1px solid rgba(255, 210, 38, 0.35); }
+/* Givre : « Aucune carte tirée pour l'instant » était gris clair sur fond clair */
+html[data-theme="givre"] .historique-vide{ color: var(--givre-texte); }
+
+/* Sombre : plus de contour bleu du navigateur dans les champs de texte : liseré doré à la place */
+html[data-theme="noir"] :is(input:not([type="checkbox"]):not([type="range"]):not([type="file"]), textarea, select):focus{
+  outline: none !important;
+  border-color: rgba(255, 210, 38, 0.85) !important;
+  box-shadow: 0 0 0 1px rgba(255, 210, 38, 0.45) !important;
+}
+html[data-theme="noir"] :focus-visible{ outline-color: #ffd426; }
