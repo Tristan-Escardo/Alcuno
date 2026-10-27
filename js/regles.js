@@ -879,6 +879,7 @@ function afficherOverlayCarteDoree(joueurActuel){
       overlay.remove();
       unlockScroll();
       if(statsPartie) statsPartie.doree = { tireur: choisisseur, victime: nom };
+      try { stickerInstantane("doree"); } catch (e) {} // (album de stickers, js/stickers.js)
       afficherOverlayTiensGueule(nom);
 
       // En ligne : on débloque tout de suite. L'overlay reste affiché jusqu'au tap, mais ne doit

@@ -148,6 +148,7 @@ reinitialiserStatsPartie();
 function compterStat(cle, nom, n = 1){
   if(!nom || !statsPartie) return;
   statsPartie[cle][nom] = (statsPartie[cle][nom] || 0) + n;
+  try { stickerInstantane(cle, nom, n); } catch (e) {} // (album de stickers : gagné tout de suite, js/stickers.js)
 }
 
 // Données du récap (envoyées telles quelles à la télé). restants : les « 1 » gardés, bus à la fin
@@ -1200,6 +1201,7 @@ function lancerOverlayPrediction(startIndex){
           // Le cul sec collectif vient d'être annoncé : on retourne la carte dorée sur le plateau
           carteDoreeEnJeu = false;
           if(statsPartie) statsPartie.doree = { personne: true };
+          try { stickerInstantane("doree"); } catch (e) {}
           const caseDoree = plateau.children[indexCaseDoree];
           if(caseDoree){
             caseDoree.classList.remove("dos_dore");
@@ -1896,6 +1898,7 @@ function finDePartie(){
 
   carteDoreeEnJeu = false;
   if(statsPartie) statsPartie.doree = { personne: true };
+  try { stickerInstantane("doree"); } catch (e) {}
   joueurs.forEach(nom => noterGorgees(nom, estModeSoft() ? 2 : GORGEES_CUL_SEC));
   const caseDoree = plateau.children[indexCaseDoree];
   if(caseDoree){

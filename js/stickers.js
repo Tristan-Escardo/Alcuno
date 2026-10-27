@@ -85,6 +85,17 @@ function stickersFinDePartie(){
   annoncerStickers(gagnerStickers(gagnes), 1800);
 }
 
+// Les stickers « d'action » se gagnent tout de suite, au moment où ça arrive (compterStat, js/plateau.js ; carte dorée,
+// js/regles.js et js/plateau.js) : pigeon, gorgée annulée, duel gagné, +4 reçu, carte dorée. Ceux de fin de partie
+// (cupcake, chat, sushi, macaron, nuage) restent comptés par stickersFinDePartie, qui rattrape aussi tout oubli.
+const STICKER_PAR_STAT = { pigeon: "poussin", annulees: "lapin", duels: "licorne", plus4: "chou", doree: "etoile" };
+function stickerInstantane(cle, nom, n = 1){
+  const id = STICKER_PAR_STAT[cle];
+  if (!id || n <= 0 || rattrapageEnCours || !albumDecouvert()) return;
+  if (cle !== "doree" && !stickerConcerne(nom)) return;
+  annoncerStickers(gagnerStickers([id]), 1200);
+}
+
 // Un joueur mis en pause (basculerPauseJoueur, js/plateau.js)
 function stickerPause(nom){
   if (rattrapageEnCours || !albumDecouvert() || !stickerConcerne(nom)) return;
