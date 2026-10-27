@@ -596,6 +596,73 @@ function verifier(ok, texte){
     verifier(mauvais.length === 0, `joueur actif en gros et en jaune dans les ${TOUS_LES_THEMES.length} thèmes, même pendant un choix ${mauvais.map((p) => p.join(" : ")).join(" ; ")}`);
   }
 
+  // 25. Thèmes Kawaii et Star Wars : plus aucune ancienne image de carte (dos.gif, *.webp) sur les écrans où des cartes s'affichent
+  // (plateau, fenêtres de jeu, fin de partie, Règles, Album) ; la carte dorée garde sa propre image
+  {
+    const restes = [];
+    for (const theme of ["kawaii", "galaxie"]) {
+      const { ctx, page, erreurs } = await ouvrir({}, `try{localStorage.setItem("alcuno_theme","${theme}");localStorage.setItem("alcuno_theme_kawaii","1");localStorage.setItem("alcuno_theme_galaxie","1");localStorage.setItem("alcuno_album_decouvert","1")}catch(e){}`);
+      await page.click("#btnModeClassique"); await page.waitForTimeout(600);
+      for (const nom of ["Tom", "Lea", "Max"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(150); }
+      await page.click("#jouer"); await page.waitForTimeout(900);
+      const anciennes = (nom) => page.evaluate((nom) => {
+        const ok = /kawaii\/|galaxie\/|dos_kawaii|dos_galaxie|carte_doree/, mauvais = [];
+        document.querySelectorAll("*").forEach((e) => {
+          for (const ps of [null, "::before", "::after"]) {
+            const bg = getComputedStyle(e, ps).backgroundImage;
+            if (bg && bg.includes("Cartes/") && !ok.test(bg) && e.getBoundingClientRect().width > 0) mauvais.push((e.id || e.className) + " " + bg.split("/").pop().slice(0, 24));
+          }
+          if (e.tagName === "IMG" && /Cartes\//.test(e.src) && !ok.test(e.src)) mauvais.push("IMG " + e.src.split("/").pop());
+        });
+        return mauvais.length ? nom + " : " + [...new Set(mauvais)].slice(0, 4).join(" | ") : "";
+      }, nom);
+      const ecrans = [["plateau", null], ["carte dorée", () => afficherOverlayCarteDoree(0)], ["duel", () => lancerOverlayChoixDuel(0, "cinq_rouge")],
+        ["+4", () => afficherOverlayPlus4(0, "plus_4")], ["pigeon", () => afficherMenuPigeon()], ["couleur", () => montrerOverlayRegle("Couleur ROUGE\nTest", "couleur")],
+        ["règle", () => montrerOverlayRegle("Test\nrègle", "interdit")], ["fin de partie", () => afficherOverlayFinUnRestants()],
+        ["Règles", () => ouvrirRegles()], ["Album", () => ouvrirAlbum()]];
+      for (const [nom, ouvrirEcran] of ecrans) {
+        if (ouvrirEcran) { await page.evaluate(ouvrirEcran); await page.waitForTimeout(700); }
+        const r = await anciennes(nom);
+        if (r) restes.push(theme + " " + r);
+        await page.evaluate(() => { document.querySelectorAll('[id^="overlay"]').forEach((e) => e.remove()); try { unlockScroll(); } catch (e) {} });
+      }
+      if (erreurs.length) restes.push(theme + " erreurs " + erreurs.join("|"));
+      await ctx.close();
+    }
+    verifier(restes.length === 0, `Kawaii et Star Wars : plus d'ancienne image de carte sur 10 écrans ${restes.join(" ; ")}`);
+  }
+
+  // 26. Télé (page ?tele) : la liste des joueurs met le joueur du tour en haut, en gros et en jaune, et les cartes suivent le thème du téléphone
+  {
+    const problemes = [];
+    const ctx = await nav.newContext({ viewport: { width: 1280, height: 720 } });
+    for (const theme of ["bordeaux", "kawaii", "galaxie", "givre"]) {
+      const page = await ctx.newPage();
+      const erreurs = [];
+      page.on("pageerror", (e) => erreurs.push(e.message));
+      await page.goto(url + "?tele"); await page.waitForTimeout(900);
+      const r = await page.evaluate((theme) => {
+        const etat = { partie: true, theme, cartes: ["cinq_rouge", "plus_4", "", "d", "interdit_bleu", "r", "couleur"],
+          joueurs: [{ n: "Tom", a: 0, g: 0, s: 0 }, { n: "Lea", t: true, a: 2, g: 0, s: 0 }, { n: "Max", a: 0, g: 0, s: 0 }], tour: "Lea", regles: [], h: [], musique: 0 };
+        dessinerTele(document.getElementById("ecranTele"), etat);
+        const liste = document.querySelector(".tele-joueurs"), premiere = liste.firstElementChild, actif = liste.querySelector(".tele-joueur-actif");
+        const cartes = [...document.querySelectorAll(".tele-plateau .Carte")].map((c) => getComputedStyle(c).backgroundImage);
+        const attendu = theme === "kawaii" ? /kawaii\/|dos_kawaii/ : theme === "galaxie" ? /galaxie\/|dos_galaxie/ : /\.webp|dos\.gif/;
+        const bad = cartes.filter((b) => !attendu.test(b));
+        const lr = liste.getBoundingClientRect(), ar = actif ? actif.getBoundingClientRect() : { width: 0, top: 0 };
+        const visuellementPremier = actif && [...liste.children].every((c) => ar.top <= c.getBoundingClientRect().top + 1);
+        return [document.documentElement.dataset.theme === theme ? "" : "thème " + document.documentElement.dataset.theme,
+          actif && visuellementPremier ? "" : "pas en haut", actif && ar.width > lr.width * 0.8 ? "" : "étroit",
+          actif && getComputedStyle(actif).backgroundImage.includes("rgb(255, 2") ? "" : "pas jaune",
+          cartes.length === 7 ? "" : cartes.length + " cartes", bad.length ? "images " + bad.slice(0, 2).map((b) => b.split("/").pop()).join(",") : ""].filter(Boolean).join(", ");
+      }, theme);
+      if (r || erreurs.length) problemes.push(`${theme} : ${r} ${erreurs.join("|")}`);
+      await page.close();
+    }
+    await ctx.close();
+    verifier(problemes.length === 0, `télé : joueur du tour en haut et en jaune, cartes du thème (4 thèmes) ${problemes.join(" ; ")}`);
+  }
+
   await nav.close();
   serveur.close();
   console.log(echecs ? `\n${echecs} ÉCHEC(S)` : "\nTOUT EST OK");
