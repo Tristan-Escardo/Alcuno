@@ -842,6 +842,11 @@ html[data-theme="kawaii"] #ecranTele .tele-ecran{ background: var(--overlay-fond
 html[data-theme="kawaii"] #ecranTele .tele-ecran-titre{ color: var(--kawaii-rose); -webkit-text-stroke: 0.25vh #fff; paint-order: stroke fill; text-shadow: 0 0.6vh 0 var(--kawaii-rose-fonce); }
 html[data-theme="kawaii"] #ecranTele .tele-ecran-detail{ color: var(--kawaii-prune); }
 html[data-theme="kawaii"] #ecranTele .tele-puce{ background: linear-gradient(180deg, #f9a6cb, #ee70a9); border: 0.4vh solid #fff; color: #6b1450; box-shadow: 0 0.5vh 0 var(--kawaii-rose-bouton); }
+
+/* Télé, historique des dernières cartes : texte prune sur le fond pastel (il était blanc, donc invisible) */
+html[data-theme="kawaii"] #ecranTele .tele-historique-ligne{ color: var(--kawaii-prune); border-top-color: rgba(150, 70, 140, 0.28); }
+html[data-theme="kawaii"] #ecranTele .tele-historique-quoi{ color: var(--kawaii-prune); }
+html[data-theme="kawaii"] #ecranTele .tele-historique-quoi em{ color: var(--kawaii-rose); }
 /* GÉNÉRÉ par outils/generer_cartes_kawaii.py : faces de cartes du thème Kawaii */
 html[data-theme="kawaii"] .zero_vert { background-image: url("Cartes/kawaii/zero_vert.svg"); }
 html[data-theme="kawaii"] .zero_jaune { background-image: url("Cartes/kawaii/zero_jaune.svg"); }

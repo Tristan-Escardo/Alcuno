@@ -8277,3 +8277,14 @@ html[data-theme="galaxie"] #ecranTele .tele-puce{ background: rgba(47, 155, 255,
   .stickerGagne img{ animation: stickerFondu 2s ease-out forwards; }
   @keyframes stickerFondu{ 0%, 80% { opacity: 1; } 100% { opacity: 0; } }
 }
+
+/* Télé : l'écran par-dessus (annonces, duel, +4, historique…) prend une teinte sombre du thème, au lieu d'un noir identique partout
+   (Sombre garde le noir ; Givre, Soleil et Kawaii ont déjà leur propre écran) */
+html[data-theme="bordeaux"] #ecranTele .tele-ecran{ background: radial-gradient(ellipse 110% 70% at 50% 45%, rgba(120,20,70,.5), rgba(26,2,16,.97) 75%), rgba(26,2,16,.97); }
+html[data-theme="vert"] #ecranTele .tele-ecran{ background: radial-gradient(ellipse 110% 70% at 50% 45%, rgba(20,110,60,.5), rgba(3,26,14,.97) 75%), rgba(3,26,14,.97); }
+html[data-theme="bleu"] #ecranTele .tele-ecran{ background: radial-gradient(ellipse 110% 70% at 50% 45%, rgba(40,80,170,.5), rgba(4,10,30,.97) 75%), rgba(4,10,30,.97); }
+html[data-theme="cerisier"] #ecranTele .tele-ecran{ background: radial-gradient(ellipse 110% 70% at 50% 45%, rgba(190,50,120,.45), rgba(24,3,16,.97) 75%), rgba(24,3,16,.97); }
+html[data-theme="prestige"] #ecranTele .tele-ecran{ background: radial-gradient(ellipse 110% 70% at 50% 45%, rgba(190,140,20,.45), rgba(14,10,2,.97) 75%), rgba(14,10,2,.97); }
+
+/* Télé, historique des dernières cartes : « Soleil couchant » (jaune sur pêche) lisible */
+html[data-theme="soleil"] #ecranTele .tele-historique-quoi em{ color: #8a1f4a; }

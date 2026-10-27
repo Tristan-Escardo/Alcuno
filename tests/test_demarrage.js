@@ -682,6 +682,41 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
+  // 28. Télé : les fenêtres (+4, historique des dernières cartes) s'affichent dans les 10 thèmes, avec le fond du thème, sans erreur ;
+  // en Kawaii le texte de l'historique est foncé (il était blanc sur fond pastel, donc invisible)
+  {
+    const problemes = [];
+    const ctx = await nav.newContext({ viewport: { width: 1280, height: 720 } });
+    const FONDS = { bordeaux: "radial", vert: "radial", bleu: "radial", cerisier: "radial", prestige: "radial", galaxie: "radial", kawaii: "radial", soleil: "linear", noir: "", givre: "" };
+    for (const theme of Object.keys(FONDS)) {
+      const page = await ctx.newPage();
+      const erreurs = [];
+      page.on("pageerror", (e) => erreurs.push(e.message));
+      await page.goto(url + "?tele"); await page.waitForTimeout(800);
+      for (const [nom, ecranTele, h] of [
+        ["+4", { id: "overlayPlus4", texte: "+4\nDistribue 4 gorgées", cartes: ["plus_4"], choix: [{ t: "Lea +1" }, { t: "Max" }] }, []],
+        ["historique", { id: "voletHistorique", texte: "", cartes: [], choix: [] }, [{ c: "cinq_rouge", n: "Tom", l: ["Tom boit 5 gorgées"] }, { c: "quatre_bleu", n: "Lea", l: ["Duel"] }]]]) {
+        const r = await page.evaluate(([theme, ecranTele, h, fond]) => {
+          dessinerTele(document.getElementById("ecranTele"), { partie: true, theme, cartes: ["cinq_rouge", "plus_4", ""], joueurs: [{ n: "Tom", a: 0, g: 0, s: 0 }, { n: "Lea", t: true, a: 0, g: 0, s: 0 }],
+            tour: "Lea", regles: [], h, musique: 0, ecran: ecranTele });
+          const e = document.querySelector("#ecranTele .tele-ecran");
+          if (!e || e.hidden) return "fenêtre absente";
+          const st = getComputedStyle(e), mal = [];
+          if (fond && !st.backgroundImage.includes(fond + "-gradient")) mal.push("fond " + st.backgroundImage.slice(0, 30));
+          if (!fond && st.backgroundImage !== "none") mal.push("fond non uni");
+          const ligne = document.querySelector("#ecranTele .tele-historique-ligne");
+          if (theme === "kawaii" && ligne) { const m = getComputedStyle(ligne).color.match(/\d+/g).map(Number); if (m[0] + m[1] + m[2] > 450) mal.push("texte historique trop clair " + getComputedStyle(ligne).color); }
+          return mal.join(", ");
+        }, [theme, ecranTele, h, FONDS[theme]]);
+        if (r) problemes.push(`${theme}/${nom} : ${r}`);
+      }
+      if (erreurs.length) problemes.push(`${theme} erreurs ${erreurs.join("|")}`);
+      await page.close();
+    }
+    await ctx.close();
+    verifier(problemes.length === 0, `télé : fenêtres +4 et historique dans les 10 thèmes ${problemes.join(" ; ")}`);
+  }
+
   await nav.close();
   serveur.close();
   console.log(echecs ? `\n${echecs} ÉCHEC(S)` : "\nTOUT EST OK");

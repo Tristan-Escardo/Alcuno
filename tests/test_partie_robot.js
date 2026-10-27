@@ -31,7 +31,15 @@ const CONFIGS = [
   { nom: "téléphone en paysage, Sombre", largeur: 750, hauteur: 390, theme: "noir" },
   { nom: "accessibilité, Star Wars", largeur: 390, hauteur: 780, theme: "galaxie", accessibilite: true },
   { nom: "téléphone debout, Kawaii (album de stickers)", largeur: 390, hauteur: 780, theme: "kawaii" },
-  { nom: "petit écran + accessibilité, Givre, partie express", largeur: 320, hauteur: 640, theme: "givre", accessibilite: true, express: true }
+  { nom: "petit écran + accessibilité, Givre, partie express", largeur: 320, hauteur: 640, theme: "givre", accessibilite: true, express: true },
+  // Thèmes à cartes redessinées (dos qui alternent, faces) : debout et en paysage, avec la pastille du joueur actif qui change à chaque tour
+  { nom: "téléphone debout, Star Wars", largeur: 390, hauteur: 780, theme: "galaxie" },
+  { nom: "téléphone en paysage, Kawaii", largeur: 844, hauteur: 390, theme: "kawaii" },
+  { nom: "téléphone en paysage, Star Wars", largeur: 844, hauteur: 390, theme: "galaxie" },
+  // Autres thèmes (couleur du joueur actif propre à chacun)
+  { nom: "téléphone debout, Casino", largeur: 390, hauteur: 780, theme: "vert" },
+  { nom: "téléphone debout, Cerisier", largeur: 390, hauteur: 780, theme: "cerisier" },
+  { nom: "téléphone debout, Soleil couchant", largeur: 390, hauteur: 780, theme: "soleil" }
 ];
 
 (async () => {
