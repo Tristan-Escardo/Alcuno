@@ -58,8 +58,6 @@ html[data-theme="kawaii"] :is(#btnModeEnLigne, #btnModeClassique, #jouer, #nouve
   background: linear-gradient(180deg, #f9a6cb, #ee70a9) !important; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) !important;
   box-shadow: 0 6px 0 var(--kawaii-rose-bouton), 0 10px 14px rgba(150, 30, 90, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.55) !important;
 }
-html[data-theme="kawaii"] :is(#ajouterJoueur, #menu #btnCaster){ background: linear-gradient(180deg, #a8ecff, #4fc0ee) !important; text-shadow: 0 2px 0 #2a86b0 !important; box-shadow: 0 6px 0 #2a86b0, 0 10px 14px rgba(20, 100, 140, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.55) !important; }
-html[data-theme="kawaii"] #supprimerJoueur{ background: linear-gradient(180deg, #8a5de0, #6b3fc4) !important; text-shadow: 0 2px 0 #43238a !important; box-shadow: 0 6px 0 #43238a, 0 10px 14px rgba(90, 50, 150, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.55) !important; }
 html[data-theme="kawaii"] .voletPause-annuler{ background: #fff !important; color: #b81c68 !important; text-shadow: none !important; border-color: #ffc1de !important; box-shadow: 0 4px 0 #ffc1de !important; }
 html[data-theme="kawaii"] :is(#btnModeEnLigne, #btnModeClassique, #jouer, #nouvellePartie, .voletPause-ok)::before{ content: ""; display: inline-block; width: 1.5em; height: 1.5em; vertical-align: -0.4em; margin-right: 0.3em; background-position: center; background-size: contain; background-repeat: no-repeat; }
 html[data-theme="kawaii"] #btnModeEnLigne::before{ background-image: var(--ic-nuage); }
@@ -111,8 +109,6 @@ html[data-theme="kawaii"] .blocMessages:nth-child(3)::before{ animation-delay: 3
 @keyframes kawaiiReflet{ 0%, 55%{ left: -70%; } 100%{ left: 140%; } }
 @media (prefers-reduced-motion: reduce){ html[data-theme="kawaii"] :is(.blocMessages, .optionReglage, #ecranRegles .blocRegles)::before{ animation: none; display: none; } }
 html[data-theme="kawaii"] :is(.menu, .blocMessages) :is(input){ background: #fff; }
-/* Boutons bleus : plus foncés pour que le texte blanc se lise */
-html[data-theme="kawaii"] :is(#ajouterJoueur, #menu #btnCaster){ background: linear-gradient(180deg, #2a95cc, #1c75a8) !important; text-shadow: 0 2px 0 #0f4f73 !important; box-shadow: 0 6px 0 #0f4f73, 0 10px 14px rgba(20, 100, 140, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.5) !important; }
 html[data-theme="kawaii"] .titreAccueilBarre{ background: linear-gradient(90deg, #ff4f9a, #ffb12e, #35c9a6, #5aa8ff, #b46bff) !important; }
 /* Annonces et carte dorée sur le fond à pois */
 html[data-theme="kawaii"] :is(#overlayCouleur, #overlayPlus4, #overlayPigeon, #overlayFinUnRestants, #overlayDuel, #overlayRegleUnique, #overlayRegleUnique.overlay-doree, #overlayCarteDoree, #overlayAnnulation, #overlayResultatAnnulation, #overlayPredictionFin){
