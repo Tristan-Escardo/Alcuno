@@ -7740,10 +7740,10 @@ html[data-theme="galaxie"] .regleBloc em, html[data-theme="galaxie"] .detailRegl
 html[data-theme="galaxie"] .regleZero.regleBloc{ color:#bfe6ff !important; text-shadow: 0 0 8px rgba(80,170,255,.6); }
 html[data-theme="galaxie"] .regleZero .regleBloc-titre{ color:#8fd0ff !important; text-shadow: 0 0 10px #2f9bff !important; text-transform:none !important; font-size:17px !important; letter-spacing:.02em !important; }
 
-/* Dos des cartes : deux sabres croisés (Cartes/dos_galaxie.svg) ; les faces ont un « _ » ou « couleur » */
+/* Dos des cartes : deux sabres croisés (Cartes/dos_galaxie_argent.svg) ; les faces ont un « _ » ou « couleur » */
 html[data-theme="galaxie"] .Carte:not(.retournee):not([class*="_"]):not([class*="couleur"]),
 html.faces-fermees[data-theme="galaxie"] #plateau .Carte.retournee.recachee,
-html[data-theme="galaxie"] .tele-plateau .Carte.carte-recachee{ background-image: url("Cartes/dos_galaxie.svg") !important; }
+html[data-theme="galaxie"] .tele-plateau .Carte.carte-recachee{ background-image: url("Cartes/dos_galaxie_argent.svg") !important; }
 /* Carte dorée en hologramme */
 html[data-theme="galaxie"] :is(#overlayRegleUnique.overlay-doree, #overlayCarteDoree){ background: repeating-linear-gradient(0deg, rgba(120,200,255,.08) 0 2px, transparent 2px 5px), radial-gradient(ellipse at 50% 45%, rgba(40,120,255,.3), rgba(2,3,10,.97) 65%), #02030a !important; }
 html[data-theme="galaxie"] :is(#overlayRegleUnique.overlay-doree .Carte, #overlayCarteDoree .doree-carte-vedette){ filter: sepia(1) hue-rotate(170deg) saturate(2.2) brightness(1.15) drop-shadow(0 0 14px #49b4ff) !important; animation: hologramme 2.6s steps(1) infinite; }
@@ -7957,7 +7957,7 @@ html[data-theme="soleil"] :is(#overlayCarteDoree, #overlayRegleUnique.overlay-do
 html[data-theme="galaxie"] .Carte.retournee.carte_doree{ filter: sepia(1) hue-rotate(170deg) saturate(2.2) brightness(1.15) drop-shadow(0 0 6px #49b4ff) !important; animation: hologramme 2.6s steps(1) infinite; }
 /* Star Wars : dos de la carte dorée = le même dos aux sabres, discret ; toutes les 5 s environ, il grésille
    une demi-seconde comme un hologramme qui capte mal (teinte bleue, lignes de balayage, petit décalage) */
-html[data-theme="galaxie"] .Carte.dos_dore:not(.retournee){ background-image: url("Cartes/dos_galaxie.svg") !important; animation: dosHoloGresille 5s linear infinite; }
+html[data-theme="galaxie"] .Carte.dos_dore:not(.retournee){ background-image: url("Cartes/dos_galaxie_argent.svg") !important; animation: dosHoloGresille 5s linear infinite; }
 html[data-theme="galaxie"] .Carte.dos_dore:not(.retournee)::after{ transform: none !important; opacity: 0;
   background: repeating-linear-gradient(0deg, rgba(160,220,255,.35) 0 2px, transparent 2px 5px), rgba(60,160,255,.18) !important;
   animation: dosHoloLignes 5s linear infinite !important; }
