@@ -657,7 +657,7 @@ for (let i = 0; i < 36; i++) {
 // ... et des paillettes roses qui scintillent
 for (let i = 0; i < 46; i++) {
   const paillette = document.createElement("i");
-  const taille = 9 + Math.random() * 14;
+  const taille = 6 + Math.random() * 8;
   const duree = 0.8 + Math.random() * 1.4;
   paillette.style.left = `${Math.random() * 98}%`;
   paillette.style.top = `${Math.random() * 98}%`;
