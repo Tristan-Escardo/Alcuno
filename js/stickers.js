@@ -15,7 +15,7 @@ const STICKERS = [
   { id: "chat",    nom: "Chat",            indice: "Finir 3 parties" },
   { id: "lapin",   nom: "Lapin",           indice: "Annuler une gorgée" },
   { id: "poussin", nom: "Poussin",         indice: "Devenir pigeon" },
-  { id: "etoile",  nom: "Étoile",          indice: "Tirer la carte dorée" },
+  { id: "etoile",  nom: "Étoile",          indice: "Tirer la carte dorée", secret: true }, // (secret : « ??? » tant qu'il n'est pas gagné)
   { id: "licorne", nom: "Licorne",         indice: "Gagner un duel" },
   { id: "fraise",  nom: "Fraise",          indice: "Mettre un joueur en pause" },
   { id: "sushi",   nom: "Sushi",           indice: "Finir une partie express" },
@@ -147,7 +147,7 @@ function ouvrirAlbum(){
     nom.textContent = gagne ? s.nom : "???";
     const detail = document.createElement("span");
     detail.className = "detailRegle";
-    detail.textContent = (gagne ? "✓ " : "") + s.indice;
+    detail.textContent = gagne ? "✓ " + s.indice : (s.secret ? "???" : s.indice);
     texteLigne.append(nom, detail);
     ligne.append(image, texteLigne);
     bloc.appendChild(ligne);
