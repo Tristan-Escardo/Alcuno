@@ -7,7 +7,7 @@
 //
 // Changer CACHE (ex. "alcuno-v2") force les téléphones à repartir d'une copie locale propre.
 
-const CACHE = "alcuno-v7"; // v7 : dos Kawaii avec « ALC UNO » ; v6 : dos de cartes Kawaii ; v5 : petits personnages flottants du thème Kawaii ; v4 : album de stickers et thème Kawaii ; v3 : QR code de la partie (js/qrcode.js) ; v2 : cartes HD en WebP (les anciennes .jpg sont supprimées du cache)
+const CACHE = "alcuno-v8"; // v8 : dos Kawaii renommés (dos_kawaii_alcuno_*) pour sortir des anciens caches ; v7 : dos Kawaii avec « ALC UNO » ; v6 : dos de cartes Kawaii ; v5 : petits personnages flottants du thème Kawaii ; v4 : album de stickers et thème Kawaii ; v3 : QR code de la partie (js/qrcode.js) ; v2 : cartes HD en WebP (les anciennes .jpg sont supprimées du cache)
 
 // Copié dès l'installation : de quoi jouer en classique sans réseau
 const A_PRECHARGER = [
@@ -38,9 +38,9 @@ const A_PRECHARGER = [
   "./stickers/macaron.svg",
   "./stickers/chou.svg",
   "./stickers/nuage.svg",
-  "./Cartes/dos_kawaii_licorne.svg",
-  "./Cartes/dos_kawaii_nuages.svg",
-  "./Cartes/dos_kawaii_gourmand.svg",
+  "./Cartes/dos_kawaii_alcuno_licorne.svg",
+  "./Cartes/dos_kawaii_alcuno_nuages.svg",
+  "./Cartes/dos_kawaii_alcuno_gourmand.svg",
   "./stickers/etoile_filante.svg",
   "./stickers/coeur.svg",
   "./stickers/arcenciel.svg",

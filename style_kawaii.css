@@ -809,10 +809,10 @@ html[data-theme="kawaii"] #ecranReglages .blocReglage > .optionReglage:not(:last
 /* Dos des cartes : 3 dessins qui alternent (licorne, nuages, gourmand), comme Star Wars a son dos (Cartes/dos_kawaii_*.svg) */
 html[data-theme="kawaii"] .Carte:not(.retournee):not([class*="_"]):not([class*="couleur"]):nth-child(3n+1),
 html.faces-fermees[data-theme="kawaii"] #plateau .Carte.retournee.recachee:nth-child(3n+1),
-html[data-theme="kawaii"] .tele-plateau .Carte.carte-recachee:nth-child(3n+1){ background-image: url("Cartes/dos_kawaii_licorne.svg") !important; }
+html[data-theme="kawaii"] .tele-plateau .Carte.carte-recachee:nth-child(3n+1){ background-image: url("Cartes/dos_kawaii_alcuno_licorne.svg") !important; }
 html[data-theme="kawaii"] .Carte:not(.retournee):not([class*="_"]):not([class*="couleur"]):nth-child(3n+2),
 html.faces-fermees[data-theme="kawaii"] #plateau .Carte.retournee.recachee:nth-child(3n+2),
-html[data-theme="kawaii"] .tele-plateau .Carte.carte-recachee:nth-child(3n+2){ background-image: url("Cartes/dos_kawaii_nuages.svg") !important; }
+html[data-theme="kawaii"] .tele-plateau .Carte.carte-recachee:nth-child(3n+2){ background-image: url("Cartes/dos_kawaii_alcuno_nuages.svg") !important; }
 html[data-theme="kawaii"] .Carte:not(.retournee):not([class*="_"]):not([class*="couleur"]):nth-child(3n),
 html.faces-fermees[data-theme="kawaii"] #plateau .Carte.retournee.recachee:nth-child(3n),
-html[data-theme="kawaii"] .tele-plateau .Carte.carte-recachee:nth-child(3n){ background-image: url("Cartes/dos_kawaii_gourmand.svg") !important; }
+html[data-theme="kawaii"] .tele-plateau .Carte.carte-recachee:nth-child(3n){ background-image: url("Cartes/dos_kawaii_alcuno_gourmand.svg") !important; }
