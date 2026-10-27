@@ -733,7 +733,7 @@ function verifier(ok, texte){
     await page.evaluate(() => { document.querySelectorAll('[id^="overlay"]').forEach((e) => e.remove()); const r = document.getElementById("rappelTour"); r.style.display = "block"; r.textContent = "C'est à Tom de jouer, tire une carte."; });
     await page.waitForTimeout(1300);
     const dites = await page.evaluate(() => window.__voix);
-    verifier(note === "Ça marche mais avec quelques bugs, veuillez excuser votre développeur préféré 🙏" && !coche && avant === 0 &&
+    verifier(note === "Ça marche mais avec quelques rares bugs, veuillez excuser votre développeur préféré 🙏" && !coche && avant === 0 &&
       dites[0] === "Annonces à voix haute activées.|fr-FR" && dites[1] === "CARTE DORÉE. Il ou elle boit plus 4 gorgées (1 sur 4)|fr-FR" && dites[2] === "C'est à Tom de jouer, tire une carte.|fr-FR" && erreurs.length === 0,
       `voix : note « ${note} », coché ${coche}, avant activation ${avant} lecture, ensuite ${JSON.stringify(dites)} ${erreurs.join("|")}`);
     await ctx.close();
