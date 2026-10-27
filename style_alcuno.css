@@ -7744,6 +7744,15 @@ html[data-theme="galaxie"] .regleZero .regleBloc-titre{ color:#8fd0ff !important
 html[data-theme="galaxie"] .Carte:not(.retournee):not([class*="_"]):not([class*="couleur"]),
 html.faces-fermees[data-theme="galaxie"] #plateau .Carte.retournee.recachee,
 html[data-theme="galaxie"] .tele-plateau .Carte.carte-recachee{ background-image: url("Cartes/dos_galaxie_argent.svg") !important; }
+/* Trois dos qui alternent (sabres, hyperespace, planète), comme en Kawaii ; la carte dorée de dos fait pareil, avec son reflet */
+html[data-theme="galaxie"] .Carte:not(.retournee):not([class*="_"]):not([class*="couleur"]):nth-child(3n+2),
+html.faces-fermees[data-theme="galaxie"] #plateau .Carte.retournee.recachee:nth-child(3n+2),
+html[data-theme="galaxie"] .tele-plateau .Carte.carte-recachee:nth-child(3n+2),
+html[data-theme="galaxie"] .Carte.dos_dore:not(.retournee):nth-child(3n+2){ background-image: url("Cartes/dos_galaxie_hyperespace.svg") !important; }
+html[data-theme="galaxie"] .Carte:not(.retournee):not([class*="_"]):not([class*="couleur"]):nth-child(3n),
+html.faces-fermees[data-theme="galaxie"] #plateau .Carte.retournee.recachee:nth-child(3n),
+html[data-theme="galaxie"] .tele-plateau .Carte.carte-recachee:nth-child(3n),
+html[data-theme="galaxie"] .Carte.dos_dore:not(.retournee):nth-child(3n){ background-image: url("Cartes/dos_galaxie_planete.svg") !important; }
 /* Carte dorée en hologramme */
 html[data-theme="galaxie"] :is(#overlayRegleUnique.overlay-doree, #overlayCarteDoree){ background: repeating-linear-gradient(0deg, rgba(120,200,255,.08) 0 2px, transparent 2px 5px), radial-gradient(ellipse at 50% 45%, rgba(40,120,255,.3), rgba(2,3,10,.97) 65%), #02030a !important; }
 html[data-theme="galaxie"] :is(#overlayRegleUnique.overlay-doree .Carte, #overlayCarteDoree .doree-carte-vedette){ filter: sepia(1) hue-rotate(170deg) saturate(2.2) brightness(1.15) drop-shadow(0 0 14px #49b4ff) !important; animation: hologramme 2.6s steps(1) infinite; }
