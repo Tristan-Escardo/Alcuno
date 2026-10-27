@@ -8144,3 +8144,60 @@ html #listeJoueurs .joueur-ligne-actif .btnPauseJoueur{ position: absolute; righ
 html #listeJoueurs .joueur-ligne-actif{ position: relative; }
 @keyframes joueurActifArrive{ 0%{ transform: scale(0.94); } 60%{ transform: scale(1.03); } 100%{ transform: scale(1); } }
 @media (prefers-reduced-motion: reduce){ html #listeJoueurs .joueur-ligne-actif{ animation: none; } }
+
+/* ===== Faces de cartes Star Wars (généré par outils/generer_cartes_galaxie.py) ===== */
+html[data-theme="galaxie"] .zero_vert { background-image: url("Cartes/galaxie/zero_vert.svg"); }
+html[data-theme="galaxie"] .zero_jaune { background-image: url("Cartes/galaxie/zero_jaune.svg"); }
+html[data-theme="galaxie"] .zero_rouge { background-image: url("Cartes/galaxie/zero_rouge.svg"); }
+html[data-theme="galaxie"] .zero_bleu { background-image: url("Cartes/galaxie/zero_bleu.svg"); }
+html[data-theme="galaxie"] .un_vert, html[data-theme="galaxie"] .un_vert1 { background-image: url("Cartes/galaxie/un_vert.svg"); }
+html[data-theme="galaxie"] .un_jaune, html[data-theme="galaxie"] .un_jaune1 { background-image: url("Cartes/galaxie/un_jaune.svg"); }
+html[data-theme="galaxie"] .un_rouge, html[data-theme="galaxie"] .un_rouge1 { background-image: url("Cartes/galaxie/un_rouge.svg"); }
+html[data-theme="galaxie"] .un_bleu, html[data-theme="galaxie"] .un_bleu1 { background-image: url("Cartes/galaxie/un_bleu.svg"); }
+html[data-theme="galaxie"] .deux_vert, html[data-theme="galaxie"] .deux_vert1 { background-image: url("Cartes/galaxie/deux_vert.svg"); }
+html[data-theme="galaxie"] .deux_jaune, html[data-theme="galaxie"] .deux_jaune1 { background-image: url("Cartes/galaxie/deux_jaune.svg"); }
+html[data-theme="galaxie"] .deux_rouge, html[data-theme="galaxie"] .deux_rouge1 { background-image: url("Cartes/galaxie/deux_rouge.svg"); }
+html[data-theme="galaxie"] .deux_bleu, html[data-theme="galaxie"] .deux_bleu1 { background-image: url("Cartes/galaxie/deux_bleu.svg"); }
+html[data-theme="galaxie"] .trois_vert, html[data-theme="galaxie"] .trois_vert1 { background-image: url("Cartes/galaxie/trois_vert.svg"); }
+html[data-theme="galaxie"] .trois_jaune, html[data-theme="galaxie"] .trois_jaune1 { background-image: url("Cartes/galaxie/trois_jaune.svg"); }
+html[data-theme="galaxie"] .trois_rouge, html[data-theme="galaxie"] .trois_rouge1 { background-image: url("Cartes/galaxie/trois_rouge.svg"); }
+html[data-theme="galaxie"] .trois_bleu, html[data-theme="galaxie"] .trois_bleu1 { background-image: url("Cartes/galaxie/trois_bleu.svg"); }
+html[data-theme="galaxie"] .quatre_vert, html[data-theme="galaxie"] .quatre_vert1 { background-image: url("Cartes/galaxie/quatre_vert.svg"); }
+html[data-theme="galaxie"] .quatre_jaune, html[data-theme="galaxie"] .quatre_jaune1 { background-image: url("Cartes/galaxie/quatre_jaune.svg"); }
+html[data-theme="galaxie"] .quatre_rouge, html[data-theme="galaxie"] .quatre_rouge1 { background-image: url("Cartes/galaxie/quatre_rouge.svg"); }
+html[data-theme="galaxie"] .quatre_bleu, html[data-theme="galaxie"] .quatre_bleu1 { background-image: url("Cartes/galaxie/quatre_bleu.svg"); }
+html[data-theme="galaxie"] .cinq_vert, html[data-theme="galaxie"] .cinq_vert1 { background-image: url("Cartes/galaxie/cinq_vert.svg"); }
+html[data-theme="galaxie"] .cinq_jaune, html[data-theme="galaxie"] .cinq_jaune1 { background-image: url("Cartes/galaxie/cinq_jaune.svg"); }
+html[data-theme="galaxie"] .cinq_rouge, html[data-theme="galaxie"] .cinq_rouge1 { background-image: url("Cartes/galaxie/cinq_rouge.svg"); }
+html[data-theme="galaxie"] .cinq_bleu, html[data-theme="galaxie"] .cinq_bleu1 { background-image: url("Cartes/galaxie/cinq_bleu.svg"); }
+html[data-theme="galaxie"] .six_vert, html[data-theme="galaxie"] .six_vert1 { background-image: url("Cartes/galaxie/six_vert.svg"); }
+html[data-theme="galaxie"] .six_jaune, html[data-theme="galaxie"] .six_jaune1 { background-image: url("Cartes/galaxie/six_jaune.svg"); }
+html[data-theme="galaxie"] .six_rouge, html[data-theme="galaxie"] .six_rouge1 { background-image: url("Cartes/galaxie/six_rouge.svg"); }
+html[data-theme="galaxie"] .six_bleu, html[data-theme="galaxie"] .six_bleu1 { background-image: url("Cartes/galaxie/six_bleu.svg"); }
+html[data-theme="galaxie"] .sept_vert, html[data-theme="galaxie"] .sept_vert1 { background-image: url("Cartes/galaxie/sept_vert.svg"); }
+html[data-theme="galaxie"] .sept_jaune, html[data-theme="galaxie"] .sept_jaune1 { background-image: url("Cartes/galaxie/sept_jaune.svg"); }
+html[data-theme="galaxie"] .sept_rouge, html[data-theme="galaxie"] .sept_rouge1 { background-image: url("Cartes/galaxie/sept_rouge.svg"); }
+html[data-theme="galaxie"] .sept_bleu, html[data-theme="galaxie"] .sept_bleu1 { background-image: url("Cartes/galaxie/sept_bleu.svg"); }
+html[data-theme="galaxie"] .huit_vert, html[data-theme="galaxie"] .huit_vert1 { background-image: url("Cartes/galaxie/huit_vert.svg"); }
+html[data-theme="galaxie"] .huit_jaune, html[data-theme="galaxie"] .huit_jaune1 { background-image: url("Cartes/galaxie/huit_jaune.svg"); }
+html[data-theme="galaxie"] .huit_rouge, html[data-theme="galaxie"] .huit_rouge1 { background-image: url("Cartes/galaxie/huit_rouge.svg"); }
+html[data-theme="galaxie"] .huit_bleu, html[data-theme="galaxie"] .huit_bleu1 { background-image: url("Cartes/galaxie/huit_bleu.svg"); }
+html[data-theme="galaxie"] .neuf_vert, html[data-theme="galaxie"] .neuf_vert1 { background-image: url("Cartes/galaxie/neuf_vert.svg"); }
+html[data-theme="galaxie"] .neuf_jaune, html[data-theme="galaxie"] .neuf_jaune1 { background-image: url("Cartes/galaxie/neuf_jaune.svg"); }
+html[data-theme="galaxie"] .neuf_rouge, html[data-theme="galaxie"] .neuf_rouge1 { background-image: url("Cartes/galaxie/neuf_rouge.svg"); }
+html[data-theme="galaxie"] .neuf_bleu, html[data-theme="galaxie"] .neuf_bleu1 { background-image: url("Cartes/galaxie/neuf_bleu.svg"); }
+html[data-theme="galaxie"] .interdit_vert { background-image: url("Cartes/galaxie/interdit_vert.svg"); }
+html[data-theme="galaxie"] .interdit_jaune { background-image: url("Cartes/galaxie/interdit_jaune.svg"); }
+html[data-theme="galaxie"] .interdit_rouge { background-image: url("Cartes/galaxie/interdit_rouge.svg"); }
+html[data-theme="galaxie"] .interdit_bleu { background-image: url("Cartes/galaxie/interdit_bleu.svg"); }
+html[data-theme="galaxie"] .couleur, html[data-theme="galaxie"] .couleur1, html[data-theme="galaxie"] .couleur2, html[data-theme="galaxie"] .couleur3 { background-image: url("Cartes/galaxie/couleur.svg"); }
+html[data-theme="galaxie"] .plus_2_vert, html[data-theme="galaxie"] .plus_2_vert1 { background-image: url("Cartes/galaxie/plus_2_vert.svg"); }
+html[data-theme="galaxie"] .plus_2_jaune, html[data-theme="galaxie"] .plus_2_jaune1 { background-image: url("Cartes/galaxie/plus_2_jaune.svg"); }
+html[data-theme="galaxie"] .plus_2_rouge, html[data-theme="galaxie"] .plus_2_rouge1 { background-image: url("Cartes/galaxie/plus_2_rouge.svg"); }
+html[data-theme="galaxie"] .plus_2_bleu, html[data-theme="galaxie"] .plus_2_bleu1 { background-image: url("Cartes/galaxie/plus_2_bleu.svg"); }
+html[data-theme="galaxie"] .plus_4, html[data-theme="galaxie"] .plus_4_1, html[data-theme="galaxie"] .plus_4_2, html[data-theme="galaxie"] .plus_4_3 { background-image: url("Cartes/galaxie/plus_4.svg"); }
+html[data-theme="galaxie"] .switch_vert { background-image: url("Cartes/galaxie/switch_vert.svg"); }
+html[data-theme="galaxie"] .switch_jaune { background-image: url("Cartes/galaxie/switch_jaune.svg"); }
+html[data-theme="galaxie"] .switch_rouge { background-image: url("Cartes/galaxie/switch_rouge.svg"); }
+html[data-theme="galaxie"] .switch_bleu { background-image: url("Cartes/galaxie/switch_bleu.svg"); }
+/* ===== fin des faces de cartes Star Wars ===== */
