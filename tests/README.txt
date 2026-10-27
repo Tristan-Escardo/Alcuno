@@ -100,3 +100,15 @@ Après chaque mise en ligne (git push)
   Attend que GitHub Pages ait publié le dernier commit, puis vérifie que le site en ligne affiche la
   même version que le code. Résultat attendu : « RÉSULTAT : OK, le site en ligne est en x.y.z ».
   En cas d'échec de la publication (incident passager côté GitHub) : refaire un push.
+
+
+Cache du service worker et images (tests/test_cache.js)
+-------------------------------------------------------
+  node tests/test_cache.js
+  Échoue si une image de Cartes/, stickers/ ou icones/ a changé sans qu'on ait changé CACHE dans sw.js (les téléphones
+  garderaient les anciennes images), ou si une image manque dans A_PRECHARGER de sw.js.
+  Quand tu changes une image : 1) change CACHE dans sw.js (alcuno-v12 -> alcuno-v13), 2) lance
+  node outils/maj_empreinte_cache.js (enregistre l'empreinte dans tests/empreinte_cache.json), 3) commite les deux.
+  Tourne aussi sur GitHub à chaque push.
+
+À regarder sur un vrai iPhone après une mise à jour : voir tests/VERIFICATION_IPHONE.md

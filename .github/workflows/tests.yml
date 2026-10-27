@@ -18,6 +18,8 @@ jobs:
         run: |
           npm i --no-save playwright
           npx playwright install --with-deps chromium
+      - name: Vérifier que le nom du cache change quand une image change
+        run: node tests/test_cache.js
       - name: Lancer le test
         run: node tests/test_demarrage.js
       - name: Lancer le test de la page de stats (bouton de réinitialisation)
