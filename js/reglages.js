@@ -645,7 +645,12 @@ for (let i = 0; i < 36; i++) {
   perso.style.top = `${Math.floor(i / 6) * 16 + 1 + Math.random() * 10}%`;
   perso.style.width = perso.style.height = `${taille}px`;
   perso.style.backgroundImage = `url("stickers/${nom}.svg")`;
-  perso.style.animationDuration = `${duree}s`;
+  // trajet de dérive propre à chacun (4 points, en boucle) : ils se baladent dans tous les sens
+  const hasard = (m) => `${Math.round((Math.random() * 2 - 1) * m)}px`;
+  for (let k = 1; k <= 3; k++) { perso.style.setProperty(`--x${k}`, hasard(28)); perso.style.setProperty(`--y${k}`, hasard(28)); }
+  perso.style.setProperty("--r1", `${Math.round((Math.random() * 2 - 1) * 25)}deg`);
+  perso.style.setProperty("--r2", `${Math.round((Math.random() * 2 - 1) * 25)}deg`);
+  perso.style.animationDuration = `${duree * 2.5}s`;
   perso.style.animationDelay = `${-Math.random() * duree}s`;
   zoneFlotteurs.appendChild(perso);
 }
