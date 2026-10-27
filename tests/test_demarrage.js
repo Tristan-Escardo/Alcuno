@@ -739,6 +739,40 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
+  // 30. Voix et télé : quand le téléphone caste, c'est la télé qui lit l'annonce (le téléphone se tait) ; la télé ne lit que si le téléphone a
+  // activé le réglage (état « voix »), une seule fois par texte affiché
+  {
+    const simuler = `window.__voix = []; Object.defineProperty(window, "speechSynthesis", { value: { speak: (u) => window.__voix.push(u.text), cancel() {}, getVoices() { return []; } }, configurable: true }); window.SpeechSynthesisUtterance = function (t) { this.text = t; };`;
+    // téléphone qui caste : silence
+    const tel = await ouvrir({}, simuler + `localStorage.setItem("alcuno_voix", "1");`);
+    await tel.page.evaluate(() => { codeTele = "ABCDE"; montrerOverlayRegle("Couleur ROUGE\nTest annonce", "couleur"); });
+    await tel.page.waitForTimeout(1000);
+    const telDit = await tel.page.evaluate(() => window.__voix.length);
+    const telEtat = await tel.page.evaluate(() => etatPourTele().voix);
+    await tel.ctx.close();
+    // télé
+    const ctx = await nav.newContext({ viewport: { width: 1280, height: 720 } });
+    const page = await ctx.newPage();
+    const erreurs = [];
+    page.on("pageerror", (e) => erreurs.push(e.message));
+    await page.addInitScript(simuler);
+    await page.goto(url + "?tele"); await page.waitForTimeout(800);
+    const dites = await page.evaluate(() => {
+      const base = { partie: true, theme: "bordeaux", cartes: ["cinq_rouge", ""], joueurs: [{ n: "Tom", a: 0, g: 0, s: 0 }, { n: "Lea", t: true, a: 0, g: 0, s: 0 }], tour: "Lea", h: [], musique: 0 };
+      const dessiner = (voix, regles, ecran) => dessinerTele(document.getElementById("ecranTele"), { ...base, voix, regles, ecran });
+      dessiner(0, "C'est à Lea de jouer, tire une carte.", null);       // réglage désactivé : rien
+      const sans = window.__voix.length;
+      dessiner(1, "C'est à Lea de jouer, tire une carte.", null);       // lu
+      dessiner(1, "C'est à Lea de jouer, tire une carte.", null);       // même texte : pas relu
+      dessiner(1, "", { id: "overlayRegleUnique", texte: "CARTE DORÉE\nIl/elle boit +4 gorgées", cartes: [], choix: [] }); // annonce : lue nettoyée
+      return { sans, lus: window.__voix.slice() };
+    });
+    verifier(telDit === 0 && telEtat === 1 && dites.sans === 0 && dites.lus.length === 2 && dites.lus[0] === "C'est à Lea de jouer, tire une carte." &&
+      dites.lus[1] === "CARTE DORÉE. Il ou elle boit plus 4 gorgées" && erreurs.length === 0,
+      `voix et télé : téléphone qui caste dit ${telDit} (voix envoyée ${telEtat}), télé sans réglage ${dites.sans}, avec : ${JSON.stringify(dites.lus)} ${erreurs.join("|")}`);
+    await ctx.close();
+  }
+
   await nav.close();
   serveur.close();
   console.log(echecs ? `\n${echecs} ÉCHEC(S)` : "\nTOUT EST OK");

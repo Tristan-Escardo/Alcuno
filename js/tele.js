@@ -249,6 +249,7 @@ function etatPourTele(){
     couleur: couleurChoisie || "",
     regles,
     theme: document.documentElement.dataset.theme || "bordeaux",
+    voix: voixActive ? 1 : 0, // (réglage « Annonces à voix haute » : la télé lit alors les annonces, js/reglages.js)
     pause: !!pauseEnCours,
     musique: caseMusique.checked && !pauseEnCours ? volumeMusique : 0, // (la télé la joue à ce volume ; pas en pause)
     sons: sonsTele,
@@ -498,6 +499,9 @@ function demarrerPageTele(){
   caseSons.checked = true;
   volumeSons = 100;
   document.addEventListener("keydown", debloquerSon, { capture: true });
+  // La voix des annonces, comme le son, ne part qu'après une première touche de la télécommande (ou un clic)
+  const debloquerVoix = () => { try { const u = new SpeechSynthesisUtterance(" "); u.volume = 0; window.speechSynthesis.speak(u); } catch (e) {} };
+  ["keydown", "pointerdown"].forEach((type) => document.addEventListener(type, debloquerVoix, { once: true, capture: true }));
   chargerSons();
   const majSonTele = () => {
     ecran.querySelector(".tele-son-coupe").hidden = !!(contexteSon && contexteSon.state === "running");
@@ -772,6 +776,20 @@ function envolerCarteTele(ecran, envol){
   };
 }
 
+// Annonces à voix haute sur la télé : quand le téléphone qui caste a activé le réglage, la télé lit la fenêtre d'annonce affichée,
+// sinon la règle / le rappel du tour (« C'est à Tom de jouer… »). Chaque texte n'est lu qu'une fois tant qu'il reste affiché.
+let derniereLectureTele = "";
+function lireSurTele(etat){
+  if (!etat || !etat.voix || !etat.partie) { derniereLectureTele = ""; return; }
+  const e = etat.ecran;
+  const texte = e ? (e.recap ? "" : e.texte || "") : etat.regles || "";
+  if (!texte) { derniereLectureTele = ""; return; }
+  const cle = (e ? e.id : "") + "|" + texte;
+  if (cle === derniereLectureTele) return;
+  derniereLectureTele = cle;
+  try { dire(String(texte).replace(/\n+/g, ". ")); } catch (err) {}
+}
+
 function dessinerTele(ecran, etat){
   const attente = ecran.querySelector(".tele-attente");
   const jeu = ecran.querySelector(".tele-jeu");
@@ -794,6 +812,7 @@ function dessinerTele(ecran, etat){
   attente.hidden = true;
   jeu.hidden = false;
   appliquerThemeTele(etat.theme);
+  lireSurTele(etat);
   musiqueTele = Number(etat.musique) > 0 ? { volume: Number(etat.musique), theme: etat.theme, enPartie: !!etat.partie } : null;
   pauseMusiqueTele = !!etat.pause; // (la musique reprendra au même endroit après la pause)
   majMusique();

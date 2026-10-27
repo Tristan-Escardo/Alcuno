@@ -1730,10 +1730,9 @@ function textePourVoix(brut){
 }
 
 let voixDernier = { texte: "", date: 0 };
-function parler(brut, force = false){
-  if (!voixPossible || (!voixActive && !force)) return;
-  if (document.documentElement.classList.contains("mode-tele")) return;
-  try { if (rattrapageEnCours) return; } catch (e) {}
+// Lit un texte tout de suite (sans tenir compte du réglage : l'appelant a déjà décidé). Sert au téléphone (parler) et à la télé.
+function dire(brut, force = false){
+  if (!voixPossible) return;
   const texte = textePourVoix(brut);
   if (!texte) return;
   if (!force && texte === voixDernier.texte && Date.now() - voixDernier.date < 6000) return; // (la même annonce lue deux fois de suite)
@@ -1747,6 +1746,15 @@ function parler(brut, force = false){
     window.speechSynthesis.speak(lecture);
     try { attenuerMusique(Math.min(8, 1.5 + texte.length * 0.07)); } catch (e) {} // la musique baisse pendant la lecture
   } catch (e) {}
+}
+// Annonce du téléphone : seulement si le réglage est activé, pas sur la page télé (elle lit via lireSurTele, js/tele.js), pas pendant le
+// rejeu accéléré d'une reconnexion, et pas quand ce téléphone caste : c'est alors la télé qui lit l'annonce
+function parler(brut, force = false){
+  if (!voixPossible || (!voixActive && !force)) return;
+  if (document.documentElement.classList.contains("mode-tele")) return;
+  try { if (rattrapageEnCours) return; } catch (e) {}
+  try { if (codeTele) return; } catch (e) {}
+  dire(brut, force);
 }
 
 caseVoix.addEventListener("change", () => {
