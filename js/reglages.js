@@ -1707,7 +1707,7 @@ function vibrer(motif){
 // Chaque bloc reçoit, sur le côté, une poignée « ≡ » : on l'attrape et on le fait glisser (au clavier : flèches haut et bas sur la
 // poignée). « OK » termine, « Par défaut » remet l'ordre d'origine. L'ordre est gardé sur
 // ce téléphone (clé alcuno_ordre_reglages) sous forme de la liste des data-cle de index.html ; un réglage ajouté plus tard à l'appli
-// (absent de l'ordre gardé) se place à sa position d'origine. Le glisser est fait à la main (événements « pointer ») : le
+// (absent de l'ordre gardé) se place à sa position d'origine. « Partager » et « À propos » restent en bas, sans poignée. Le glisser est fait à la main (événements « pointer ») : le
 // glisser-déposer du navigateur ne marche pas au doigt.
 const CLE_ORDRE_REGLAGES = "alcuno_ordre_reglages";
 const contenuReglages = document.querySelector("#ecranReglages .reglages-contenu");
@@ -1726,7 +1726,8 @@ function appliquerOrdreReglages(ordre){
     const place = avant ? voulu.indexOf(avant) + 1 : 0;
     voulu.splice(place, 0, cle);
   });
-  voulu.forEach((cle) => contenuReglages.appendChild(parCle.get(cle)));
+  const fin = contenuReglages.querySelector(":scope > .blocPartage"); // (« Partager » et « À propos » ne bougent pas : toujours en bas)
+  voulu.forEach((cle) => contenuReglages.insertBefore(parCle.get(cle), fin));
 }
 function enregistrerOrdreReglages(){
   const ordre = blocsReglages().map((e) => e.dataset.cle);

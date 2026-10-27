@@ -840,14 +840,17 @@ function verifier(ok, texte){
     const stocke = await page.evaluate(() => localStorage.getItem("alcuno_ordre_reglages"));
     await page.click("#btnModifierReglages"); await page.waitForTimeout(300);
     const interrupteur = await page.evaluate(() => { const c = document.getElementById("optionVibrations"), v = c.checked; c.click(); return c.checked !== v; });
+    // « Partager » et « À propos » : pas de poignée et toujours en bas, même après avoir réorganisé (vérifié ici avant l'ordre d'origine, plus haut après le glisser)
+    const queue = await page.evaluate(() => { const e = [...document.querySelectorAll("#ecranReglages .reglages-contenu > *")].filter((x) => x.id !== "controlesReglages"); return e.slice(-2).map((x) => x.className).join(","); });
+    const fixesSansPoignee = await page.evaluate(() => !document.querySelector('.blocPartage[data-cle], .aPropos[data-cle], .ctrlReglage[data-pour="partage"], .ctrlReglage[data-pour="a-propos"]'));
     const attendueFleche = origine.replace("sons,musique", "musique,sons");
     // glisser : « voix » est monté (la distance exacte dépend du défilement), sans qu'aucun bloc ne soit perdu ni dupliqué
     const monte = apresGlisse.split(",").indexOf("voix") < apresFleche.split(",").indexOf("voix") && apresGlisse.split(",").sort().join() === apresFleche.split(",").sort().join();
     const attendueGlisse = apresGlisse;
     verifier(avant.defaut === "none" && avant.texte === "Modifier" && avant.poignees === 0 && pendant.edition && pendant.texte === "OK" && pendant.defaut !== "none" &&
-      pendant.poignees >= 14 && pendant.fleches === 0 && pendant.tremble === "none" && pendant.poigneesVisibles === pendant.visibles && pendant.desalignees === 0 && apresFleche === attendueFleche && monte &&
-      !fini.edition && fini.controles === 0 && fini.texte === "Modifier" && rechargee === attendueGlisse && parDefaut === origine && stocke === null && interrupteur && erreurs.length === 0,
-      `réglages réorganisables : avant ${JSON.stringify(avant)}, pendant ${JSON.stringify(pendant)}, flèche ${apresFleche === attendueFleche}, glisser monté ${monte} (${apresGlisse}), fini ${JSON.stringify(fini)}, rechargé ${rechargee === attendueGlisse}, par défaut ${parDefaut === origine}, stocké ${stocke}, interrupteur ${interrupteur} ${erreurs.join("|")}`);
+      pendant.poignees >= 14 && pendant.fleches === 0 && pendant.tremble === "none" && pendant.poigneesVisibles === pendant.visibles && pendant.desalignees === 0 && pendant.poignees === 14 && apresFleche === attendueFleche && monte &&
+      !fini.edition && fini.controles === 0 && fini.texte === "Modifier" && rechargee === attendueGlisse && parDefaut === origine && stocke === null && interrupteur && queue === "blocPartage,aPropos" && fixesSansPoignee && erreurs.length === 0,
+      `réglages réorganisables : avant ${JSON.stringify(avant)}, pendant ${JSON.stringify(pendant)}, flèche ${apresFleche === attendueFleche}, glisser monté ${monte} (${apresGlisse}), fini ${JSON.stringify(fini)}, rechargé ${rechargee === attendueGlisse}, par défaut ${parDefaut === origine}, stocké ${stocke}, interrupteur ${interrupteur}, fin de page ${queue}, fixes sans poignée ${fixesSansPoignee} ${erreurs.join("|")}`);
     await ctx.close();
   }
 

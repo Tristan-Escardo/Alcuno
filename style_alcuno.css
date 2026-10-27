@@ -8290,15 +8290,10 @@ html[data-theme="prestige"] #ecranTele .tele-ecran{ background: radial-gradient(
 html[data-theme="soleil"] #ecranTele .tele-historique-quoi em{ color: #8a1f4a; }
 
 /* ===== Réorganiser les Réglages (js/reglages.js, « Réorganiser les Réglages ») ===== */
-/* « Modifier » et « Par défaut » : petits et discrets, bien moins visibles que « ← Retour » (couleur du texte du thème, fond transparent) */
-#ecranReglages .btnModifierReglages{
-  position: absolute; top: 29px; right: 20px; padding: 5px 11px; font: inherit; font-size: 12px; font-weight: 700; color: inherit;
-  background: transparent; border: 1px solid currentColor; border-radius: 999px; opacity: 0.55; cursor: pointer; box-shadow: none; text-shadow: none;
-}
-#ecranReglages .btnModifierReglages:hover, #ecranReglages .btnModifierReglages:focus-visible{ opacity: 0.9; }
-#ecranReglages #btnParDefautReglages{ right: 92px; }
+/* « Modifier », « Par défaut » et « OK » : le même bouton lumineux que « ← Retour » (celui de chaque thème), mais plus petit */
+#ecranReglages .btnModifierReglages{ left: auto !important; right: 20px; top: 28px; padding: 6px 13px !important; font-size: 13px !important; border-width: 2px !important; min-width: 0 !important; width: auto !important; }
+#ecranReglages #btnParDefautReglages{ right: 84px; }
 #ecranReglages #btnParDefautReglages[hidden]{ display: none; }
-.reglages-edition #btnModifierReglages{ opacity: 0.9; background: rgba(128, 128, 128, 0.22); }
 #ecranReglages .reglages-contenu{ position: relative; }
 .reglages-edition .reglages-contenu{ padding-left: 54px; }
 .reglages-edition .reglages-contenu > h2{ margin-left: -54px; }
