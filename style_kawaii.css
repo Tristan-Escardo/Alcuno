@@ -824,6 +824,11 @@ html[data-theme="kawaii"] .menu{ margin-bottom: 12px !important; }
 
 /* Crédits : même rose que la barre de l'heure de l'iPhone (balise theme-color du thème Kawaii : #ffd6ec) */
 html[data-theme="kawaii"] #ecranCredits{ background: #ffd6ec; }
+
+/* Carte dorée de dos : même dos que les autres cartes (sinon elle se reconnaît tout de suite) ; son reflet doré qui passe reste */
+html[data-theme="kawaii"] .Carte.dos_dore:not(.retournee):nth-child(3n+1){ background-image: url("Cartes/dos_kawaii_alcuno_licorne.svg") !important; }
+html[data-theme="kawaii"] .Carte.dos_dore:not(.retournee):nth-child(3n+2){ background-image: url("Cartes/dos_kawaii_alcuno_nuages.svg") !important; }
+html[data-theme="kawaii"] .Carte.dos_dore:not(.retournee):nth-child(3n){ background-image: url("Cartes/dos_kawaii_alcuno_gourmand.svg") !important; }
 /* GÉNÉRÉ par outils/generer_cartes_kawaii.py : faces de cartes du thème Kawaii */
 html[data-theme="kawaii"] .zero_vert { background-image: url("Cartes/kawaii/zero_vert.svg"); }
 html[data-theme="kawaii"] .zero_jaune { background-image: url("Cartes/kawaii/zero_jaune.svg"); }
