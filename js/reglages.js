@@ -1703,6 +1703,156 @@ function vibrer(motif){
   try { navigator.vibrate(motif); } catch (e) {}
 }
 
+// ===== Réorganiser les Réglages : « Modifier » (en haut à droite) =====
+// Les blocs se mettent à trembler et chacun reçoit, sur le côté, une poignée « ≡ » (on l'attrape et on le fait glisser) et deux
+// flèches ▲ ▼ (pour monter ou descendre d'un cran). « OK » termine, « Par défaut » remet l'ordre d'origine. L'ordre est gardé sur
+// ce téléphone (clé alcuno_ordre_reglages) sous forme de la liste des data-cle de index.html ; un réglage ajouté plus tard à l'appli
+// (absent de l'ordre gardé) se place à sa position d'origine. Le glisser est fait à la main (événements « pointer ») : le
+// glisser-déposer du navigateur ne marche pas au doigt.
+const CLE_ORDRE_REGLAGES = "alcuno_ordre_reglages";
+const contenuReglages = document.querySelector("#ecranReglages .reglages-contenu");
+const btnModifierReglages = document.getElementById("btnModifierReglages");
+const btnParDefautReglages = document.getElementById("btnParDefautReglages");
+const blocsReglages = () => Array.from(contenuReglages.children).filter((e) => e.dataset.cle);
+const blocsVisiblesReglages = () => blocsReglages().filter((e) => e.offsetHeight > 0);
+const ORDRE_REGLAGES_PAR_DEFAUT = blocsReglages().map((e) => e.dataset.cle);
+
+function appliquerOrdreReglages(ordre){
+  const parCle = new Map(blocsReglages().map((e) => [e.dataset.cle, e]));
+  const voulu = ordre.filter((c, i) => parCle.has(c) && ordre.indexOf(c) === i);
+  ORDRE_REGLAGES_PAR_DEFAUT.forEach((cle, i) => { // (réglage inconnu de l'ordre gardé : juste après celui qui le précède d'origine)
+    if (voulu.includes(cle)) return;
+    const avant = ORDRE_REGLAGES_PAR_DEFAUT[i - 1];
+    const place = avant ? voulu.indexOf(avant) + 1 : 0;
+    voulu.splice(place, 0, cle);
+  });
+  voulu.forEach((cle) => contenuReglages.appendChild(parCle.get(cle)));
+}
+function enregistrerOrdreReglages(){
+  const ordre = blocsReglages().map((e) => e.dataset.cle);
+  try {
+    if (ordre.join() === ORDRE_REGLAGES_PAR_DEFAUT.join()) localStorage.removeItem(CLE_ORDRE_REGLAGES);
+    else localStorage.setItem(CLE_ORDRE_REGLAGES, JSON.stringify(ordre));
+  } catch (e) {}
+}
+try {
+  const gardé = JSON.parse(localStorage.getItem(CLE_ORDRE_REGLAGES) || "null");
+  if (Array.isArray(gardé) && gardé.every((c) => typeof c === "string")) appliquerOrdreReglages(gardé);
+} catch (e) {}
+
+let editionReglages = false;
+let zoneControlesReglages = null;
+const nomBlocReglage = (bloc) => ((bloc.querySelector(".optionTitre") || {}).textContent || bloc.dataset.cle).replace(/\s+/g, " ").trim();
+
+function placerControlesReglages(){
+  if (!zoneControlesReglages) return;
+  zoneControlesReglages.querySelectorAll(".ctrlReglage").forEach((groupe) => {
+    const bloc = contenuReglages.querySelector(`[data-cle="${groupe.dataset.pour}"]`);
+    if (!bloc || bloc.offsetHeight === 0) { groupe.hidden = true; return; }
+    groupe.hidden = false;
+    groupe.style.top = `${bloc.offsetTop + (bloc.glisseDy || 0) + Math.max(0, (bloc.offsetHeight - groupe.offsetHeight) / 2)}px`;
+  });
+}
+function construireControlesReglages(){
+  zoneControlesReglages = document.createElement("div");
+  zoneControlesReglages.id = "controlesReglages";
+  blocsReglages().forEach((bloc) => {
+    const nom = nomBlocReglage(bloc);
+    const groupe = document.createElement("div");
+    groupe.className = "ctrlReglage";
+    groupe.dataset.pour = bloc.dataset.cle;
+    groupe.innerHTML = `<button type="button" class="ctrlPoignee" aria-label="Déplacer ${nom}">≡</button>
+      <span class="ctrlFleches"><button type="button" class="ctrlHaut" aria-label="Monter ${nom}">▲</button><button type="button" class="ctrlBas" aria-label="Descendre ${nom}">▼</button></span>`;
+    groupe.querySelector(".ctrlHaut").addEventListener("click", () => deplacerBlocReglage(bloc, -1));
+    groupe.querySelector(".ctrlBas").addEventListener("click", () => deplacerBlocReglage(bloc, 1));
+    groupe.querySelector(".ctrlPoignee").addEventListener("pointerdown", (e) => demarrerGlisseReglage(bloc, e));
+    zoneControlesReglages.appendChild(groupe);
+  });
+  contenuReglages.appendChild(zoneControlesReglages);
+}
+function deplacerBlocReglage(bloc, sens){
+  const visibles = blocsVisiblesReglages();
+  const voisin = visibles[visibles.indexOf(bloc) + sens];
+  if (!voisin) return;
+  contenuReglages.insertBefore(bloc, sens < 0 ? voisin : voisin.nextSibling);
+  enregistrerOrdreReglages();
+  placerControlesReglages();
+  try { bloc.scrollIntoView({ block: "nearest", behavior: "smooth" }); } catch (e) {}
+}
+
+// Glisser : la poignée suit le doigt ; dès que le centre du bloc dépasse celui d'un voisin, ils échangent leurs places
+let glisseReglage = null;
+function demarrerGlisseReglage(bloc, e){
+  e.preventDefault();
+  const poignee = e.currentTarget;
+  try { poignee.setPointerCapture(e.pointerId); } catch (err) {}
+  const defileur = document.getElementById("ecranReglages");
+  glisseReglage = { bloc, poignee, defileur, departY: e.clientY + defileur.scrollTop, departHaut: bloc.offsetTop, y: e.clientY, id: e.pointerId };
+  bloc.classList.add("glisse");
+  const suivre = () => {
+    const g = glisseReglage;
+    if (!g) return;
+    if (g.y < 90) g.defileur.scrollTop -= 14; else if (g.y > innerHeight - 90) g.defileur.scrollTop += 14; // (défile aux bords de l'écran)
+    let dy = g.y + g.defileur.scrollTop - g.departY + (g.departHaut - g.bloc.offsetTop);
+    g.bloc.glisseDy = dy;
+    const centre = () => g.bloc.offsetTop + g.bloc.glisseDy + g.bloc.offsetHeight / 2;
+    const visibles = blocsVisiblesReglages();
+    const i = visibles.indexOf(g.bloc);
+    const haut = visibles[i - 1], bas = visibles[i + 1];
+    if (haut && centre() < haut.offsetTop + haut.offsetHeight / 2) contenuReglages.insertBefore(g.bloc, haut);
+    else if (bas && centre() > bas.offsetTop + bas.offsetHeight / 2) contenuReglages.insertBefore(g.bloc, bas.nextSibling);
+    dy = g.y + g.defileur.scrollTop - g.departY + (g.departHaut - g.bloc.offsetTop); // (la place a pu changer : on recalcule)
+    g.bloc.glisseDy = dy;
+    g.bloc.style.transform = `translateY(${dy}px)`;
+    placerControlesReglages();
+    g.trame = requestAnimationFrame(suivre);
+  };
+  glisseReglage.trame = requestAnimationFrame(suivre);
+  poignee.addEventListener("pointermove", (ev) => { if (glisseReglage) glisseReglage.y = ev.clientY; });
+  const fin = () => {
+    const g = glisseReglage;
+    if (!g) return;
+    cancelAnimationFrame(g.trame);
+    g.bloc.classList.remove("glisse");
+    g.bloc.style.transform = "";
+    g.bloc.glisseDy = 0;
+    glisseReglage = null;
+    enregistrerOrdreReglages();
+    placerControlesReglages();
+  };
+  poignee.addEventListener("pointerup", fin, { once: true });
+  poignee.addEventListener("pointercancel", fin, { once: true });
+}
+
+function entrerEditionReglages(){
+  if (editionReglages) return;
+  editionReglages = true;
+  document.getElementById("ecranReglages").classList.add("reglages-edition");
+  btnModifierReglages.textContent = "OK";
+  btnParDefautReglages.hidden = false;
+  construireControlesReglages();
+  requestAnimationFrame(placerControlesReglages); // (après la mise en page avec la marge de gauche)
+}
+function finirEditionReglages(){
+  if (!editionReglages) return;
+  editionReglages = false;
+  document.getElementById("ecranReglages").classList.remove("reglages-edition");
+  btnModifierReglages.textContent = "Modifier";
+  btnParDefautReglages.hidden = true;
+  if (zoneControlesReglages) zoneControlesReglages.remove();
+  zoneControlesReglages = null;
+}
+btnModifierReglages.addEventListener("click", () => (editionReglages ? finirEditionReglages() : entrerEditionReglages()));
+btnParDefautReglages.addEventListener("click", () => {
+  appliquerOrdreReglages(ORDRE_REGLAGES_PAR_DEFAUT);
+  contenuReglages.appendChild(zoneControlesReglages); // (les poignées restent après les blocs)
+  enregistrerOrdreReglages();
+  requestAnimationFrame(placerControlesReglages);
+});
+document.getElementById("btnFermerReglages").addEventListener("click", finirEditionReglages, true);
+document.getElementById("btnReglages").addEventListener("click", finirEditionReglages, true);
+window.addEventListener("resize", () => requestAnimationFrame(placerControlesReglages));
+
 // ===== Annonces à voix haute (synthèse vocale du navigateur, réglage désactivé de base) =====
 // Lit à voix haute le texte des fenêtres d'annonce (pigeon, duel, +4, carte dorée…), des règles affichées sous le plateau et le
 // rappel du tour (« C'est à Tom de jouer… »).
@@ -1742,6 +1892,28 @@ function textePourVoix(brut){
     .replace(/\s+/g, " ").replace(/\s+([.,!?])/g, "$1").replace(/([!?])\./g, "$1").trim();
 }
 
+// Meilleure voix française de l'appareil : une voix « améliorée / premium / naturelle » si elle existe, sinon le français de France
+// (avant le français du Canada ou de Belgique), de préférence installée sur l'appareil. Recalculée si la liste des voix change.
+let voixFrChoisie = null, voixFrCherchee = false;
+function noteVoix(v){
+  const nom = `${v.name || ""} ${v.voiceURI || ""}`;
+  let n = 0;
+  if (/premium|enhanced|am[ée]lior[ée]e?|neural|natural|naturelle/i.test(nom)) n += 100;
+  if (/^fr[-_]FR$/i.test(v.lang)) n += 20; else if (/^fr$/i.test(v.lang)) n += 10;
+  if (v.localService) n += 5;
+  if (/google/i.test(nom)) n += 3;
+  if (v.default) n += 1;
+  return n;
+}
+function meilleureVoixFr(){
+  if (voixFrCherchee && voixFrChoisie) return voixFrChoisie;
+  const voix = (window.speechSynthesis.getVoices() || []).filter((v) => /^fr/i.test(v.lang));
+  voixFrCherchee = voix.length > 0; // (liste encore vide : on redemande à la prochaine lecture)
+  voixFrChoisie = voix.length ? voix.slice().sort((a, b) => noteVoix(b) - noteVoix(a))[0] : null;
+  return voixFrChoisie;
+}
+try { if (voixPossible) window.speechSynthesis.addEventListener("voiceschanged", () => { voixFrCherchee = false; voixFrChoisie = null; }); } catch (e) {}
+
 let voixDernier = { texte: "", date: 0 };
 // Lit un texte tout de suite (sans tenir compte du réglage : l'appelant a déjà décidé). Sert au téléphone (parler) et à la télé.
 function dire(brut, force = false, vitesse = null){
@@ -1755,7 +1927,7 @@ function dire(brut, force = false, vitesse = null){
     const lecture = new SpeechSynthesisUtterance(texte);
     lecture.lang = "fr-FR";
     lecture.rate = Math.min(1.6, Math.max(0.6, Number(vitesse) || vitesseVoix));
-    const voixFr = (window.speechSynthesis.getVoices() || []).find((v) => /^fr/i.test(v.lang));
+    const voixFr = meilleureVoixFr();
     if (voixFr) lecture.voice = voixFr;
     window.speechSynthesis.speak(lecture);
     try { attenuerMusique(Math.min(8, 1.5 + texte.length * 0.07)); } catch (e) {} // la musique baisse pendant la lecture

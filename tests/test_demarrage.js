@@ -780,6 +780,70 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
+  // 31. Voix : la meilleure voix française est choisie (améliorée > France > autre français ; jamais une voix non française)
+  {
+    const voix = [{ name: "Anglais", lang: "en-US" }, { name: "Chantal", lang: "fr-CA", localService: true }, { name: "Thomas", lang: "fr-FR", localService: true, default: true },
+      { name: "Amélie (améliorée)", lang: "fr-FR", localService: true }, { name: "Allemand", lang: "de-DE" }];
+    const simuler = `window.__choisies = []; const liste = ${JSON.stringify(voix)};
+      Object.defineProperty(window, "speechSynthesis", { value: { speak: (u) => window.__choisies.push(u.voice ? u.voice.name : null), cancel() {}, getVoices() { return liste; }, addEventListener() {} }, configurable: true });
+      window.SpeechSynthesisUtterance = function (t) { this.text = t; };`;
+    const { ctx, page, erreurs } = await ouvrir({}, simuler);
+    const choix = await page.evaluate((liste) => {
+      const nom = () => { const v = meilleureVoixFr(); return v ? v.name : null; };
+      const a = nom();
+      window.speechSynthesis.getVoices = () => liste.filter((v) => v.name !== "Amélie (améliorée)"); voixFrCherchee = false; voixFrChoisie = null; // plus de voix améliorée
+      const b = nom();
+      window.speechSynthesis.getVoices = () => liste.filter((v) => !/^fr/.test(v.lang)); voixFrCherchee = false; voixFrChoisie = null;
+      const c = nom();
+      dire("Essai de voix", true);
+      return [a, b, c];
+    }, voix);
+    verifier(JSON.stringify(choix) === '["Amélie (améliorée)","Thomas",null]' && erreurs.length === 0, `voix : meilleure voix française ${JSON.stringify(choix)} ${erreurs.join("|")}`);
+    await ctx.close();
+  }
+
+  // 32. Réorganiser les Réglages : « Modifier » -> poignées et flèches, flèche ▲ et glisser changent l'ordre, il est gardé après rechargement,
+  // « Par défaut » le remet, les réglages répondent toujours après « OK », aucun bloc perdu
+  {
+    const { ctx, page, erreurs } = await ouvrir();
+    const ordre = () => page.evaluate(() => [...document.querySelectorAll("#ecranReglages .reglages-contenu > [data-cle]")].map((e) => e.dataset.cle).join(","));
+    await page.click("#btnReglages"); await page.waitForTimeout(600);
+    const origine = await ordre();
+    const avant = await page.evaluate(() => ({ defaut: getComputedStyle(document.getElementById("btnParDefautReglages")).display, texte: document.getElementById("btnModifierReglages").textContent, poignees: document.querySelectorAll(".ctrlReglage").length }));
+    await page.click("#btnModifierReglages"); await page.waitForTimeout(400);
+    const pendant = await page.evaluate(() => ({ edition: document.getElementById("ecranReglages").classList.contains("reglages-edition"), texte: document.getElementById("btnModifierReglages").textContent,
+      defaut: getComputedStyle(document.getElementById("btnParDefautReglages")).display, poignees: document.querySelectorAll(".ctrlReglage .ctrlPoignee").length, fleches: document.querySelectorAll(".ctrlReglage .ctrlHaut").length }));
+    await page.click('.ctrlReglage[data-pour="musique"] .ctrlHaut'); await page.waitForTimeout(200);
+    const apresFleche = await ordre();
+    const poignee = await page.$('.ctrlReglage[data-pour="voix"] .ctrlPoignee');
+    await poignee.scrollIntoViewIfNeeded(); await page.waitForTimeout(300);
+    const r = await poignee.boundingBox();
+    await page.mouse.move(r.x + r.width / 2, r.y + r.height / 2); await page.mouse.down();
+    for (let i = 1; i <= 14; i++) { await page.mouse.move(r.x + r.width / 2, r.y + r.height / 2 - i * 25); await page.waitForTimeout(40); }
+    await page.mouse.up(); await page.waitForTimeout(300);
+    const apresGlisse = await ordre();
+    await page.click("#btnModifierReglages"); await page.waitForTimeout(300);
+    const fini = await page.evaluate(() => ({ edition: document.getElementById("ecranReglages").classList.contains("reglages-edition"), controles: document.querySelectorAll(".ctrlReglage").length, texte: document.getElementById("btnModifierReglages").textContent }));
+    await page.reload(); await page.waitForTimeout(700);
+    await page.click("#btnReglages"); await page.waitForTimeout(500);
+    const rechargee = await ordre();
+    await page.click("#btnModifierReglages"); await page.waitForTimeout(300);
+    await page.click("#btnParDefautReglages"); await page.waitForTimeout(300);
+    const parDefaut = await ordre();
+    const stocke = await page.evaluate(() => localStorage.getItem("alcuno_ordre_reglages"));
+    await page.click("#btnModifierReglages"); await page.waitForTimeout(300);
+    const interrupteur = await page.evaluate(() => { const c = document.getElementById("optionVibrations"), v = c.checked; c.click(); return c.checked !== v; });
+    const attendueFleche = origine.replace("sons,musique", "musique,sons");
+    // glisser : « voix » est monté (la distance exacte dépend du défilement), sans qu'aucun bloc ne soit perdu ni dupliqué
+    const monte = apresGlisse.split(",").indexOf("voix") < apresFleche.split(",").indexOf("voix") && apresGlisse.split(",").sort().join() === apresFleche.split(",").sort().join();
+    const attendueGlisse = apresGlisse;
+    verifier(avant.defaut === "none" && avant.texte === "Modifier" && avant.poignees === 0 && pendant.edition && pendant.texte === "OK" && pendant.defaut !== "none" &&
+      pendant.poignees === pendant.fleches && pendant.poignees >= 14 && apresFleche === attendueFleche && monte &&
+      !fini.edition && fini.controles === 0 && fini.texte === "Modifier" && rechargee === attendueGlisse && parDefaut === origine && stocke === null && interrupteur && erreurs.length === 0,
+      `réglages réorganisables : avant ${JSON.stringify(avant)}, pendant ${JSON.stringify(pendant)}, flèche ${apresFleche === attendueFleche}, glisser monté ${monte} (${apresGlisse}), fini ${JSON.stringify(fini)}, rechargé ${rechargee === attendueGlisse}, par défaut ${parDefaut === origine}, stocké ${stocke}, interrupteur ${interrupteur} ${erreurs.join("|")}`);
+    await ctx.close();
+  }
+
   await nav.close();
   serveur.close();
   console.log(echecs ? `\n${echecs} ÉCHEC(S)` : "\nTOUT EST OK");

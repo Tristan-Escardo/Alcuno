@@ -8288,3 +8288,23 @@ html[data-theme="prestige"] #ecranTele .tele-ecran{ background: radial-gradient(
 
 /* Télé, historique des dernières cartes : « Soleil couchant » (jaune sur pêche) lisible */
 html[data-theme="soleil"] #ecranTele .tele-historique-quoi em{ color: #8a1f4a; }
+
+/* ===== Réorganiser les Réglages (js/reglages.js, « Réorganiser les Réglages ») ===== */
+#ecranReglages .btnModifierReglages{ left: auto; right: 20px; }
+#ecranReglages #btnParDefautReglages{ right: 108px; }
+#ecranReglages .reglages-contenu{ position: relative; }
+.reglages-edition .reglages-contenu{ padding-left: 58px; }
+.reglages-edition .reglages-contenu > h2{ margin-left: -58px; }
+/* les blocs tremblent un peu ; leurs réglages ne répondent plus tant qu'on est en modification */
+.reglages-edition .reglages-contenu > [data-cle]{ pointer-events: none; animation: reglageTremble 0.3s ease-in-out infinite alternate; }
+.reglages-edition .reglages-contenu > [data-cle]:nth-child(even){ animation-delay: -0.15s; animation-direction: alternate-reverse; }
+.reglages-edition .reglages-contenu > [data-cle].glisse{ animation: none; z-index: 5; position: relative; transition: none; box-shadow: 0 14px 30px rgba(0, 0, 0, 0.45); }
+@keyframes reglageTremble{ from{ transform: rotate(-0.35deg); } to{ transform: rotate(0.35deg); } }
+@media (prefers-reduced-motion: reduce){ .reglages-edition .reglages-contenu > [data-cle]{ animation: none; } }
+#controlesReglages{ position: absolute; left: 0; top: 0; width: 52px; pointer-events: none; }
+.ctrlReglage{ position: absolute; left: 0; width: 52px; display: flex; flex-direction: column; align-items: center; gap: 4px; pointer-events: auto; }
+.ctrlReglage button{ font: inherit; color: inherit; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.45); background: rgba(255, 255, 255, 0.16); border-radius: 10px; touch-action: none; padding: 0; }
+.ctrlReglage .ctrlPoignee{ width: 48px; height: 30px; font-size: 22px; line-height: 1; letter-spacing: 0; cursor: grab; }
+.ctrlReglage .ctrlFleches{ display: flex; gap: 4px; }
+.ctrlReglage .ctrlFleches button{ width: 22px; height: 26px; font-size: 11px; touch-action: manipulation; }
+html[data-theme="givre"] .ctrlReglage button, html[data-theme="kawaii"] .ctrlReglage button{ border-color: rgba(60, 60, 110, 0.4); background: rgba(255, 255, 255, 0.75); }

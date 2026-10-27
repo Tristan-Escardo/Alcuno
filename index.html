@@ -187,10 +187,13 @@
 
         <section class="ecranReglages" id="ecranReglages" style="display:none;">
             <button type="button" id="btnFermerReglages" class="btnRetour">← Retour</button>
+            <!-- Réorganiser les blocs des Réglages (voir « Réorganiser les Réglages » dans js/reglages.js) -->
+            <button type="button" id="btnParDefautReglages" class="btnRetour btnModifierReglages" hidden>Par défaut</button>
+            <button type="button" id="btnModifierReglages" class="btnRetour btnModifierReglages">Modifier</button>
             <div class="reglages-contenu">
                 <h2>Réglages</h2>
 
-                <div class="blocReglage">
+                <div class="blocReglage" data-cle="themes">
                     <div class="optionReglage optionAction">
                         <span class="optionTexte">
                             <span class="optionTitre">Thèmes</span>
@@ -212,7 +215,7 @@
                     </div>
                 </div>
 
-                <div class="blocReglage">
+                <div class="blocReglage" data-cle="sons">
                     <div class="optionReglage">
                         <span class="optionTexte">
                             <span class="optionTitre">Sons système</span>
@@ -229,7 +232,7 @@
                     </div>
                 </div>
 
-                <div class="blocReglage">
+                <div class="blocReglage" data-cle="musique">
                     <div class="optionReglage">
                         <span class="optionTexte">
                             <span class="optionTitre">Musique d'ambiance</span>
@@ -246,7 +249,7 @@
                     </div>
                 </div>
 
-                <div class="optionReglage">
+                <div class="optionReglage" data-cle="vibrations">
                     <span class="optionTexte">
                         <span class="optionTitre">Vibrations</span>
                         <span class="optionNote">Android uniquement</span>
@@ -255,7 +258,7 @@
                     <label class="interrupteur" for="optionVibrations" aria-hidden="true"></label>
                 </div>
 
-                <div class="blocReglage">
+                <div class="blocReglage" data-cle="voix">
                     <div class="optionReglage">
                         <span class="optionTexte">
                             <span class="optionTitre">Annonces à voix haute</span>
@@ -272,7 +275,7 @@
                     </div>
                 </div>
 
-                <div class="optionReglage">
+                <div class="optionReglage" data-cle="ecran-allume">
                     <span class="optionTexte">
                         <span class="optionTitre">Écran toujours allumé</span>
                         <span class="optionNote">Pendant les parties, le téléphone ne se met pas en veille.</span>
@@ -281,7 +284,7 @@
                     <label class="interrupteur" for="optionEcranAllume" aria-hidden="true"></label>
                 </div>
 
-                <div class="optionReglage">
+                <div class="optionReglage" data-cle="faces-cachees">
                     <span class="optionTexte">
                         <span class="optionTitre">Faces cachées</span>
                         <span class="optionNote">Les cartes se cachent après avoir été retournées pour les vilains tricheurs.<br>Oui Roseanna, c'est pour toi.<br><br>En ligne : c'est le réglage de l'hôte qui compte, quand il crée la partie.</span>
@@ -290,7 +293,7 @@
                     <label class="interrupteur" for="optionFacesFermees" aria-hidden="true"></label>
                 </div>
 
-                <div class="optionReglage">
+                <div class="optionReglage" data-cle="accessibilite">
                     <span class="optionTexte">
                         <span class="optionTitre">Accessibilité pour les gens bourrés 🍻</span>
                         <span class="optionNote">Textes et boutons plus gros.</span>
@@ -299,7 +302,7 @@
                     <label class="interrupteur" for="optionAccessibilite" aria-hidden="true"></label>
                 </div>
 
-                <div class="optionReglage">
+                <div class="optionReglage" data-cle="mode-pj">
                     <span class="optionTexte">
                         <span class="optionTitre">Mode PJ</span>
                         <span class="optionNote">Tu prends 2x moins cher que dans la version normale.<br><br>En ligne : c'est le réglage de l'hôte qui compte, quand il crée la partie.</span>
@@ -308,7 +311,7 @@
                     <label class="interrupteur" for="optionModeSoft" aria-hidden="true"></label>
                 </div>
 
-                <div class="optionReglage">
+                <div class="optionReglage" data-cle="express">
                     <span class="optionTexte">
                         <span class="optionTitre">Partie express</span>
                         <span class="optionNote">Environ 2x moins de cartes (28 au lieu de 52) : une partie plus courte.<br><br>En ligne : c'est le réglage de celui qui lance la partie qui compte.</span>
@@ -317,7 +320,7 @@
                     <label class="interrupteur" for="optionPartieExpress" aria-hidden="true"></label>
                 </div>
 
-                <div class="blocReglage">
+                <div class="blocReglage" data-cle="eau">
                     <div class="optionReglage">
                         <span class="optionTexte">
                             <span class="optionTitre">Rappel «&nbsp;Bois de l'eau&nbsp;💧&nbsp;»</span>
@@ -328,7 +331,7 @@
                     </div>
                 </div>
 
-                <div class="blocReglage">
+                <div class="blocReglage" data-cle="gaucher">
                     <div class="optionReglage">
                         <span class="optionTexte">
                             <span class="optionTitre">Mode gaucher&nbsp;<span class="mainGauche" aria-hidden="true">🤚</span></span>
@@ -340,7 +343,7 @@
                 </div>
 
                 <!-- Partie en ligne dont ce téléphone se souvient (affiché seulement s'il y en a une) -->
-                <div class="optionReglage optionAction" id="lignePartieMemoire" style="display:none;">
+                <div class="optionReglage optionAction" id="lignePartieMemoire" data-cle="partie-memoire" style="display:none;">
                     <span class="optionTexte">
                         <span class="optionTitre">Partie en mémoire</span>
                         <span class="optionNote" id="textePartieMemoire"></span>
@@ -349,7 +352,7 @@
                 </div>
 
                 <!-- Mode télé : pour une télé que le jeu n'a pas reconnue toute seule (voir le début de cette page) -->
-                <button type="button" class="optionReglage optionLien" id="btnAfficherEcranTele">
+                <button type="button" class="optionReglage optionLien" id="btnAfficherEcranTele" data-cle="ecran-tele">
                     <span class="optionTexte">
                         <span class="optionTitre">Afficher l'écran télé</span>
                         <span class="optionNote">Sur une télé, si l'écran télé ne s'est pas affiché tout seul.</span>
@@ -357,7 +360,7 @@
                     <svg class="optionChevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
                 </button>
 
-                <div class="blocPartage">
+                <div class="blocPartage" data-cle="partage">
                     <div class="aProposTitre">Partager le jeu</div>
                     <img src="icones/qr_alcuno.svg" alt="QR code du jeu Alcuno" class="qrJeu" width="180" height="180">
                     <p class="lienJeu">tristan-escardo.github.io/Alcuno</p>
@@ -365,7 +368,7 @@
                     <p class="lienBug">Un problème ? <button type="button" id="btnSignalerBug">Signaler un bug</button></p>
                 </div>
 
-                <div class="aPropos">
+                <div class="aPropos" data-cle="a-propos">
                     <div class="aProposTitre">À propos</div>
                     <p id="versionJeu" class="versionJeu"></p>
                     <button type="button" id="btnDiagnostic" class="btnDiagnostic">Copier le diagnostic</button>

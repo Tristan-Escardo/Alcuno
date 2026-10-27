@@ -639,6 +639,7 @@ html[data-theme="kawaii"] .historique-vide{ color: var(--givre-texte); }
 html[data-theme="kawaii"]{ --album-silhouette: brightness(0) opacity(0.22); --album-barre-fond: rgba(80, 13, 80, 0.14); --album-barre-plein: var(--givre-accent); }
 html[data-theme="kawaii"] #ecranRegles .albumTexte{ color: var(--givre-doux); }
 html[data-theme="kawaii"]{ --actif-haut: #ff7fbf; --actif-bas: #f02a8d; --actif-texte: #450345; --actif-halo: #ff3f9f; }
+html[data-theme="kawaii"] .ctrlReglage button{ border-color: rgba(110, 60, 85, 0.4); background: rgba(255, 255, 255, 0.75); }
 
 /* ===== Décors et formes du thème Kawaii ===== */
 /* Décors et formes du thème Kawaii (ajoutés après les règles tirées de Givre, voir outils/generer_kawaii.py) */
