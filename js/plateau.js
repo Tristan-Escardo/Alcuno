@@ -1584,7 +1584,9 @@ function majBoutonsJoueurs(){
 
 // Pastille du joueur dont c'est le tour, dans la liste des joueurs (aucune pendant un choix : pigeon, duel…)
 function marquerJoueurActifDansListe(){
-  const actif = partieLancee && !choixPigeonEnCours && !duelEnCours && joueurs.length > 0 ? indexJoueur % joueurs.length : -1;
+  // (aussi pendant un choix : pigeon, duel… : sa pastille reste en gros sous la fenêtre ; sinon, quand la fenêtre se retirait
+  // avant la fin de l'état du jeu, la liste restait un instant sans joueur en gros)
+  const actif = partieLancee && joueurs.length > 0 ? indexJoueur % joueurs.length : -1;
   listeJoueurs.querySelectorAll(".joueur-ligne").forEach((ligne, i) => ligne.classList.toggle("joueur-ligne-actif", i === actif));
 }
 
