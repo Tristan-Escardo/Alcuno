@@ -8217,3 +8217,15 @@ html #listeJoueurs .joueur-ligne-actif .bonus-annulation{ color: #8a3b00; }
 @media (orientation: landscape) and (max-height: 520px){
   :root{ --cols: 8; --card-w: clamp(70px, 10.5vw, 104px); }
 }
+
+/* Télé : comme sur le téléphone, le joueur dont c'est le tour passe en haut de la liste, sur toute la largeur, en gros et en
+   jaune plein (avant : seulement un petit triangle ▶ devant son nom) */
+#ecranTele .tele-joueurs:not(.tele-joueurs-2col){ display: flex; flex-direction: column; }
+#ecranTele .tele-joueur-actif{
+  order: -1; grid-column: 1 / -1; justify-content: center; gap: 1.6vh; margin-bottom: 0.8vh; padding: 1vh 2.4vh;
+  font-size: 4.4vh; border-radius: 999px; border: 0.35vh solid #fff;
+  background: linear-gradient(180deg, #fff27a, #ffd400); color: #3b2a00;
+  box-shadow: 0 0 0 0.3vh #ffd400, 0 0 2.4vh rgba(255, 214, 0, 0.6);
+}
+#ecranTele .tele-joueurs-2col .tele-joueur-actif{ font-size: 3.6vh; padding: 0.8vh 2vh; }
+#ecranTele .tele-joueur-actif .tele-badge{ background: #3b2a00; color: #ffe94a; }

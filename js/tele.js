@@ -864,7 +864,7 @@ function dessinerTele(ecran, etat){
       ligne.className = "tele-joueur" + (j.t ? " tele-joueur-actif" : "") + (j.z ? " tele-joueur-pause" : "") + (j.p ? " tele-joueur-pigeon" : "");
       ligne.dataset.nom = j.n;
       const nom = document.createElement("span");
-      nom.innerText = (j.t ? "▶ " : "") + j.n + (j.p ? " 🐦" : "") + (j.z ? " · en pause" : "");
+      nom.innerText = j.n + (j.p ? " 🐦" : "") + (j.z ? " · en pause" : "");
       ligne.appendChild(nom);
       if (j.a > 0) {
         const badge = document.createElement("span");
