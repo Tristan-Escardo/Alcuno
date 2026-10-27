@@ -856,6 +856,7 @@ const MONTEE_MUSIQUE = 0.8;  // secondes de fondu au démarrage (lancement, reto
 const BOUCLES_EXACTES = {
   musique_ambiance_soleil: { avant: 0.3, longueur: 903552 / 44100 }, // 8 mesures à 93,7 BPM
   musique_ambiance_sombre: { avant: 0.3, longueur: 2903870 / 44100 }, // 65,85 s (de 11 s à 1 min 17 du morceau, qui se répète)
+  musique_ambiance_kawaii: { avant: 0.3, longueur: 4111952 / 44100 }, // 93,24 s = 64 mesures à 164,7 BPM (de 25,5 s à 1 min 58,8 du morceau)
   musique_ambiance_galaxie: { avant: 0.3, longueur: 7898850 / 44100 }, // 179,11 s (de 10,7 s à 3 min 10 du morceau, qui se répète)
   debloquage_theme_galaxie: { avant: 0.3, longueur: 4201001 / 44100 }, // 95,26 s (générique du thème Star Wars)
 };
