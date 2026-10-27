@@ -530,7 +530,7 @@ function verifier(ok, texte){
   {
     const { ctx, page, erreurs } = await ouvrir();
     await page.click("#btnModeClassique"); await page.waitForTimeout(800);
-    await page.fill("#nomJoueur", "Tristan Kawaii"); await page.click("#ajouterJoueur"); await page.waitForTimeout(900);
+    await page.fill("#nomJoueur", "testkawaiidev"); await page.click("#ajouterJoueur"); await page.waitForTimeout(900);
     const r = await page.evaluate(() => ({ debloque: kawaiiDebloque(), pastille: !document.getElementById("pastilleKawaii").hidden, joueurs: joueurs.length, champ: document.getElementById("nomJoueur").value, fenetre: !!document.getElementById("fenetreKawaii") }));
     await page.click(".fenetreKawaii-essayer"); await page.waitForTimeout(700);
     const theme = await page.evaluate(() => document.documentElement.dataset.theme);

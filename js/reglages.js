@@ -166,7 +166,7 @@ function vuNouveauKawaii(){
   document.documentElement.classList.remove("kawaii-nouveau");
 }
 // Mot secret (nom de joueur) qui débloque le thème d'un coup, sans l'album : seulement son empreinte (comme Star Wars)
-const EMPREINTES_KAWAII = ["1cab6d44"];
+const EMPREINTES_KAWAII = ["5199ea9a"];
 function estCodeKawaii(nom){
   const mot = String(nom).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
   let h = 0x811c9dc5;
