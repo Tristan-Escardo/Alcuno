@@ -634,8 +634,8 @@ for (let i = 0; i < 26; i++) {
 
 // Kawaii : petits personnages qui lévitent sur l'écran d'accueil (répartis en grille, un peu décalés au hasard)
 const zoneFlotteurs = document.getElementById("kawaiiFlotteurs");
-const personnagesKawaii = ["coeur", "licorne", "etoile", "nuage", "scintille", "cupcake", "arcenciel", "lapin", "bulle", "fraise", "sucette", "chat",
-  "scintille", "fleur", "macaron", "poussin", "glace", "coeur", "etoile", "chou"];
+const personnagesKawaii = ["coeur", "licorne", "etoile", "nuage", "chat", "cupcake", "arcenciel", "lapin", "bulle", "fraise", "sucette", "chat",
+  "bulle", "fleur", "macaron", "poussin", "glace", "coeur", "etoile", "chou"];
 for (let i = 0; i < 36; i++) {
   const nom = personnagesKawaii[i % personnagesKawaii.length];
   const perso = document.createElement("span");
