@@ -638,6 +638,7 @@ html[data-theme="kawaii"] .etincelle.e3{ --c: #ff7fbf; }
 html[data-theme="kawaii"] .historique-vide{ color: var(--givre-texte); }
 html[data-theme="kawaii"]{ --album-silhouette: brightness(0) opacity(0.22); --album-barre-fond: rgba(80, 13, 80, 0.14); --album-barre-plein: var(--givre-accent); }
 html[data-theme="kawaii"] #ecranRegles .albumTexte{ color: var(--givre-doux); }
+html[data-theme="kawaii"]{ --actif-haut: #ff7fbf; --actif-bas: #f02a8d; --actif-texte: #450345; --actif-halo: #ff3f9f; }
 
 /* ===== Décors et formes du thème Kawaii ===== */
 /* Décors et formes du thème Kawaii (ajoutés après les règles tirées de Givre, voir outils/generer_kawaii.py) */
@@ -832,6 +833,15 @@ html[data-theme="kawaii"] .Carte.dos_dore:not(.retournee):nth-child(3n){ backgro
 
 /* Page Règles : la ligne « dos de carte » (Pari sur la dernière carte) est une carte retournée sans face : même dos que le jeu */
 html[data-theme="kawaii"] #ecranRegles .ligneRegle .Carte.retournee:not([class*="_"]):not([class*="couleur"]){ background-image: url("Cartes/dos_kawaii_alcuno_licorne.svg") !important; }
+
+/* Joueur du tour (jeu et télé) : le jaune bonbon de ce thème */
+html[data-theme="kawaii"]{ --actif-haut: #fff0a0; --actif-bas: #ffd04a; --actif-texte: #6b3300; --actif-halo: #ffd04a; }
+
+/* Télé : l'écran par-dessus (annonces, duel, +4…) sur le fond à pois du jeu, titres roses, puces en gélatine */
+html[data-theme="kawaii"] #ecranTele .tele-ecran{ background: var(--overlay-fond); }
+html[data-theme="kawaii"] #ecranTele .tele-ecran-titre{ color: var(--kawaii-rose); -webkit-text-stroke: 0.25vh #fff; paint-order: stroke fill; text-shadow: 0 0.6vh 0 var(--kawaii-rose-fonce); }
+html[data-theme="kawaii"] #ecranTele .tele-ecran-detail{ color: var(--kawaii-prune); }
+html[data-theme="kawaii"] #ecranTele .tele-puce{ background: linear-gradient(180deg, #f9a6cb, #ee70a9); border: 0.4vh solid #fff; color: #6b1450; box-shadow: 0 0.5vh 0 var(--kawaii-rose-bouton); }
 /* GÉNÉRÉ par outils/generer_cartes_kawaii.py : faces de cartes du thème Kawaii */
 html[data-theme="kawaii"] .zero_vert { background-image: url("Cartes/kawaii/zero_vert.svg"); }
 html[data-theme="kawaii"] .zero_jaune { background-image: url("Cartes/kawaii/zero_jaune.svg"); }

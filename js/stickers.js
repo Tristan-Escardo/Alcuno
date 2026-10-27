@@ -55,11 +55,31 @@ function gagnerStickers(ids){
   return nouveaux;
 }
 
+// Le sticker gagné apparaît un instant au milieu de l'écran (il grossit, des éclats partent autour), en plus de la notif du haut
+function effetSticker(id){
+  const zone = document.createElement("div");
+  zone.className = "stickerGagne";
+  zone.setAttribute("aria-hidden", "true");
+  const image = document.createElement("img");
+  image.src = `stickers/${id}.svg`;
+  image.alt = "";
+  zone.appendChild(image);
+  for (let i = 0; i < 14; i++) {
+    const eclat = document.createElement("i");
+    eclat.style.setProperty("--a", `${Math.round((i / 14) * 360 + Math.random() * 20)}deg`);
+    eclat.style.setProperty("--d", `${Math.round(70 + Math.random() * 60)}px`);
+    zone.appendChild(eclat);
+  }
+  document.body.appendChild(zone);
+  setTimeout(() => zone.remove(), 2400);
+}
+
 function annoncerStickers(nouveaux, delai){
   if (!nouveaux.length) return;
   const noms = nouveaux.map((id) => (STICKERS.find((s) => s.id === id) || {}).nom).filter(Boolean);
   setTimeout(() => {
     try { afficherNotificationHaut("", noms.length > 1 ? `Nouveaux stickers : ${noms.join(", ")}` : `Nouveau sticker : ${noms[0]} !`, true); } catch (e) {}
+    try { effetSticker(nouveaux[0]); } catch (e) {}
   }, delai);
 }
 

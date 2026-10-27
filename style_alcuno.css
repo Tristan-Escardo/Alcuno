@@ -8211,15 +8211,23 @@ html[data-theme="galaxie"] .switch_rouge { background-image: url("Cartes/galaxie
 html[data-theme="galaxie"] .switch_bleu { background-image: url("Cartes/galaxie/switch_bleu.svg"); }
 /* ===== fin des faces de cartes Star Wars ===== */
 
-/* Joueur dont c'est le tour : jaune plein et vif dans tous les thèmes (avant : un voile jaune à 12 %, difficile à voir ;
-   le thème Kawaii a déjà le sien, plus spécifique) */
+/* Joueur dont c'est le tour : plein, vif et propre à chaque thème (avant : un voile jaune à 12 %, difficile à voir). Les
+   couleurs sont des variables (--actif-*), reprises aussi par la télé ; le thème Kawaii a déjà son jaune, plus spécifique. */
+:root{ --actif-haut: #fff27a; --actif-bas: #ffd400; --actif-texte: #3b2a00; --actif-halo: #ffd400; }
+html[data-theme="noir"]{ --actif-haut: #ffffff; --actif-bas: #c9ced9; --actif-texte: #0b0b12; --actif-halo: #ffffff; }
+html[data-theme="vert"]{ --actif-haut: #8dffb4; --actif-bas: #19d964; --actif-texte: #04301a; --actif-halo: #3dff8a; }
+html[data-theme="bleu"]{ --actif-haut: #9fe0ff; --actif-bas: #2f9bff; --actif-texte: #03203f; --actif-halo: #5ab4ff; }
+html[data-theme="soleil"]{ --actif-haut: #ffd9a8; --actif-bas: #ff8a5c; --actif-texte: #4a1500; --actif-halo: #ff9a6b; }
+html[data-theme="cerisier"]{ --actif-haut: #ffc2de; --actif-bas: #ff5fa8; --actif-texte: #4a0a2a; --actif-halo: #ff7fba; }
+html[data-theme="givre"]{ --actif-haut: #7fe0ff; --actif-bas: #2aa6f0; --actif-texte: #032a45; --actif-halo: #3fb8ff; }
+html[data-theme="prestige"]{ --actif-haut: #fff6c8; --actif-bas: #f2c235; --actif-texte: #3a2400; --actif-halo: #ffd75e; }
 html #listeJoueurs .joueur-ligne-actif{
-  background: linear-gradient(180deg, #fff27a, #ffd400) !important; color: #3b2a00 !important; border-color: #fff !important;
-  box-shadow: 0 0 0 2px #ffd400, 0 0 18px rgba(255, 214, 0, 0.65) !important; text-shadow: none !important;
+  background: linear-gradient(180deg, var(--actif-haut), var(--actif-bas)) !important; color: var(--actif-texte) !important; border-color: #fff !important;
+  box-shadow: 0 0 0 2px var(--actif-bas), 0 0 18px var(--actif-halo) !important; text-shadow: none !important;
 }
-html[data-theme="galaxie"] #listeJoueurs .joueur-ligne-actif, html[data-theme="galaxie"] #listeJoueurs .joueur-ligne-actif *{ color: #3b2a00 !important; }
-html #listeJoueurs .joueur-ligne-actif .btnPauseJoueur{ color: #3b2a00; border-color: rgba(59, 42, 0, 0.55); opacity: 1; }
-html #listeJoueurs .joueur-ligne-actif .bonus-annulation{ color: #8a3b00; }
+html[data-theme="galaxie"] #listeJoueurs .joueur-ligne-actif, html[data-theme="galaxie"] #listeJoueurs .joueur-ligne-actif *{ color: var(--actif-texte) !important; }
+html #listeJoueurs .joueur-ligne-actif .btnPauseJoueur{ color: var(--actif-texte); border-color: var(--actif-texte); opacity: 1; }
+html #listeJoueurs .joueur-ligne-actif .bonus-annulation{ color: var(--actif-texte); }
 
 /* Téléphone en paysage (écran bas) : 8 cartes par rangée au lieu de 13, pour qu'elles restent lisibles (~90 px de large
    au lieu de 50) ; le plateau fait plus de rangées, on défile. Les fenêtres de PC (plus hautes) gardent 13. */
@@ -8233,11 +8241,39 @@ html #listeJoueurs .joueur-ligne-actif .bonus-annulation{ color: #8a3b00; }
 #ecranTele .tele-joueur-actif{
   order: -1; grid-column: 1 / -1; justify-content: center; gap: 1.6vh; margin-bottom: 0.8vh; padding: 1vh 2.4vh;
   font-size: 4.4vh; border-radius: 999px; border: 0.35vh solid #fff;
-  background: linear-gradient(180deg, #fff27a, #ffd400); color: #3b2a00;
-  box-shadow: 0 0 0 0.3vh #ffd400, 0 0 2.4vh rgba(255, 214, 0, 0.6);
+  background: linear-gradient(180deg, var(--actif-haut), var(--actif-bas)); color: var(--actif-texte);
+  box-shadow: 0 0 0 0.3vh var(--actif-bas), 0 0 2.4vh var(--actif-halo);
 }
 #ecranTele .tele-joueurs-2col .tele-joueur-actif{ font-size: 3.6vh; padding: 0.8vh 2vh; }
-#ecranTele .tele-joueur-actif .tele-badge{ background: #3b2a00; color: #ffe94a; }
+#ecranTele .tele-joueur-actif .tele-badge{ background: var(--actif-texte); color: var(--actif-haut); }
 
 /* Page Règles (Star Wars) : la ligne « dos de carte » prend le même dos que le jeu */
 html[data-theme="galaxie"] #ecranRegles .ligneRegle .Carte.retournee:not([class*="_"]):not([class*="couleur"]){ background-image: url("Cartes/dos_galaxie_argent.svg") !important; }
+
+/* Télé, thème Star Wars : l'écran par-dessus (annonces, duel, +4…) prend le fond d'espace bleuté du jeu et des puces « hologramme » */
+html[data-theme="galaxie"] #ecranTele .tele-ecran{ background: radial-gradient(ellipse 110% 70% at 50% 45%, rgba(40, 90, 190, .35), rgba(2, 3, 10, .98) 70%), #02030a; }
+html[data-theme="galaxie"] #ecranTele .tele-ecran-detail{ color: #d8f1ff; }
+html[data-theme="galaxie"] #ecranTele .tele-puce{ background: rgba(47, 155, 255, .14); border-color: #49b4ff; color: #9fe0ff; }
+
+/* Sticker gagné : il apparaît au milieu de l'écran, grossit en rebondissant, des éclats partent autour, puis il s'envole (js/stickers.js) */
+.stickerGagne{ position: fixed; left: 50%; top: 38%; width: 0; height: 0; z-index: 2147483000; pointer-events: none; }
+.stickerGagne img{ position: absolute; left: -65px; top: -65px; width: 130px; height: 130px; filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4)); animation: stickerPop 2.2s ease-out forwards; }
+.stickerGagne i{ position: absolute; left: -6px; top: -6px; width: 12px; height: 12px; background: #ffd54f;
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); animation: stickerEclat 1.3s ease-out 0.25s forwards; opacity: 0; }
+.stickerGagne i:nth-of-type(4n+2){ background: #ff8fc2; } .stickerGagne i:nth-of-type(4n+3){ background: #8fe6c9; } .stickerGagne i:nth-of-type(4n){ background: #7fc8ff; }
+@keyframes stickerPop{
+  0%   { transform: scale(0) rotate(-25deg); opacity: 0; }
+  18%  { transform: scale(1.3) rotate(8deg); opacity: 1; }
+  30%  { transform: scale(1) rotate(-3deg); }
+  75%  { transform: scale(1) rotate(0); opacity: 1; }
+  100% { transform: translateY(-34px) scale(0.9); opacity: 0; }
+}
+@keyframes stickerEclat{
+  0%   { transform: rotate(var(--a)) translateX(24px) scale(0.3); opacity: 1; }
+  100% { transform: rotate(var(--a)) translateX(var(--d)) scale(1.2); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce){
+  .stickerGagne i{ display: none; }
+  .stickerGagne img{ animation: stickerFondu 2s ease-out forwards; }
+  @keyframes stickerFondu{ 0%, 80% { opacity: 1; } 100% { opacity: 0; } }
+}

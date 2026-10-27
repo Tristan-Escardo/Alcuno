@@ -190,3 +190,12 @@ html[data-theme="kawaii"] .Carte.dos_dore:not(.retournee):nth-child(3n){ backgro
 
 /* Page Règles : la ligne « dos de carte » (Pari sur la dernière carte) est une carte retournée sans face : même dos que le jeu */
 html[data-theme="kawaii"] #ecranRegles .ligneRegle .Carte.retournee:not([class*="_"]):not([class*="couleur"]){ background-image: url("Cartes/dos_kawaii_alcuno_licorne.svg") !important; }
+
+/* Joueur du tour (jeu et télé) : le jaune bonbon de ce thème */
+html[data-theme="kawaii"]{ --actif-haut: #fff0a0; --actif-bas: #ffd04a; --actif-texte: #6b3300; --actif-halo: #ffd04a; }
+
+/* Télé : l'écran par-dessus (annonces, duel, +4…) sur le fond à pois du jeu, titres roses, puces en gélatine */
+html[data-theme="kawaii"] #ecranTele .tele-ecran{ background: var(--overlay-fond); }
+html[data-theme="kawaii"] #ecranTele .tele-ecran-titre{ color: var(--kawaii-rose); -webkit-text-stroke: 0.25vh #fff; paint-order: stroke fill; text-shadow: 0 0.6vh 0 var(--kawaii-rose-fonce); }
+html[data-theme="kawaii"] #ecranTele .tele-ecran-detail{ color: var(--kawaii-prune); }
+html[data-theme="kawaii"] #ecranTele .tele-puce{ background: linear-gradient(180deg, #f9a6cb, #ee70a9); border: 0.4vh solid #fff; color: #6b1450; box-shadow: 0 0.5vh 0 var(--kawaii-rose-bouton); }

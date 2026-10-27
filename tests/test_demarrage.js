@@ -562,7 +562,7 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
-  // 24. Joueur dont c'est le tour : sa pastille est en haut de la liste, en gros, en jaune plein, dans tous les thèmes, et RESTE en gros
+  // 24. Joueur dont c'est le tour : sa pastille est en haut de la liste, en gros, pleine et lisible (couleur propre au thème), et RESTE en gros
   // pendant les fenêtres de choix (duel, pigeon…) : avant, la liste restait un instant sans joueur en gros quand la fenêtre se retirait
   {
     const problemes = [];
@@ -578,8 +578,14 @@ function verifier(ok, texte){
         if (actives.length !== 1) return "actives:" + actives.length;
         const r = actives[0].getBoundingClientRect();
         const haut = Math.min(...[...document.querySelectorAll("#listeJoueurs .joueur-ligne")].map((l) => l.getBoundingClientRect().top));
-        const bg = getComputedStyle(actives[0]).backgroundImage + getComputedStyle(actives[0]).backgroundColor;
-        return (r.width > liste.width * 0.8 ? "" : "étroite ") + (Math.abs(r.top - haut) < 2 ? "" : "pas-en-haut ") + (bg.includes("rgb(255, 2") || bg.includes("rgb(255, 3") ? "" : "pas-jaune:" + bg.slice(0, 60));
+        // plein (dégradé opaque) et lisible : le texte contraste au moins 4,5 avec le haut ET le bas du dégradé (chaque thème a sa couleur)
+        const st = getComputedStyle(actives[0]);
+        const rgb = (t) => [...String(t).matchAll(/rgb\((\d+), (\d+), (\d+)\)/g)].map((m) => m.slice(1, 4).map(Number));
+        const lum = ([r, g, b]) => { const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
+        const fonds = rgb(st.backgroundImage), texte = rgb(st.color)[0];
+        const contraste = (c) => (Math.max(lum(c), lum(texte)) + 0.05) / (Math.min(lum(c), lum(texte)) + 0.05);
+        const plein = fonds.length >= 2 && texte && !/rgba/.test(st.backgroundImage) && fonds.every((c) => contraste(c) >= 4.5);
+        return (r.width > liste.width * 0.8 ? "" : "étroite ") + (Math.abs(r.top - haut) < 2 ? "" : "pas-en-haut ") + (plein ? "" : "pas-plein-ou-illisible:" + st.backgroundImage.slice(0, 70) + " texte " + st.color);
       });
       problemes.push([theme, "départ", await mesure()]);
       await page.evaluate(() => { indexJoueur = 1; afficherJoueurActif(); });
@@ -593,7 +599,7 @@ function verifier(ok, texte){
       await ctx.close();
     }
     const mauvais = problemes.filter((p) => p[2]);
-    verifier(mauvais.length === 0, `joueur actif en gros et en jaune dans les ${TOUS_LES_THEMES.length} thèmes, même pendant un choix ${mauvais.map((p) => p.join(" : ")).join(" ; ")}`);
+    verifier(mauvais.length === 0, `joueur actif en gros, plein et lisible dans les ${TOUS_LES_THEMES.length} thèmes, même pendant un choix ${mauvais.map((p) => p.join(" : ")).join(" ; ")}`);
   }
 
   // 25. Thèmes Kawaii et Star Wars : plus aucune ancienne image de carte (dos.gif, *.webp) sur les écrans où des cartes s'affichent
@@ -653,7 +659,7 @@ function verifier(ok, texte){
         const visuellementPremier = actif && [...liste.children].every((c) => ar.top <= c.getBoundingClientRect().top + 1);
         return [document.documentElement.dataset.theme === theme ? "" : "thème " + document.documentElement.dataset.theme,
           actif && visuellementPremier ? "" : "pas en haut", actif && ar.width > lr.width * 0.8 ? "" : "étroit",
-          actif && getComputedStyle(actif).backgroundImage.includes("rgb(255, 2") ? "" : "pas jaune",
+          actif && /rgb\(\d+, \d+, \d+\), rgb\(/.test(getComputedStyle(actif).backgroundImage) ? "" : "pas plein",
           cartes.length === 7 ? "" : cartes.length + " cartes", bad.length ? "images " + bad.slice(0, 2).map((b) => b.split("/").pop()).join(",") : ""].filter(Boolean).join(", ");
       }, theme);
       if (r || erreurs.length) problemes.push(`${theme} : ${r} ${erreurs.join("|")}`);
@@ -661,6 +667,19 @@ function verifier(ok, texte){
     }
     await ctx.close();
     verifier(problemes.length === 0, `télé : joueur du tour en haut et en jaune, cartes du thème (4 thèmes) ${problemes.join(" ; ")}`);
+  }
+
+  // 27. Sticker gagné : l'effet au milieu de l'écran (sticker + éclats) apparaît juste après l'action, puis disparaît tout seul
+  {
+    const { ctx, page, erreurs } = await ouvrir({}, `try{localStorage.setItem("alcuno_album_decouvert","1")}catch(e){}`);
+    await page.evaluate(() => { stickerInstantane("doree"); });
+    await page.waitForTimeout(1700);
+    const pendant = await page.evaluate(() => { const z = document.querySelector(".stickerGagne"); return z ? { img: z.querySelector("img").getAttribute("src"), eclats: z.querySelectorAll("i").length } : null; });
+    await page.waitForTimeout(2600);
+    const apres = await page.evaluate(() => document.querySelectorAll(".stickerGagne").length);
+    verifier(pendant && pendant.img === "stickers/etoile.svg" && pendant.eclats === 14 && apres === 0 && erreurs.length === 0,
+      `sticker gagné : effet affiché (${JSON.stringify(pendant)}) puis retiré (${apres}) ${erreurs.join("|")}`);
+    await ctx.close();
   }
 
   await nav.close();
