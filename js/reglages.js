@@ -1704,8 +1704,8 @@ function vibrer(motif){
 }
 
 // ===== Réorganiser les Réglages : « Modifier » (en haut à droite) =====
-// Les blocs se mettent à trembler et chacun reçoit, sur le côté, une poignée « ≡ » (on l'attrape et on le fait glisser) et deux
-// flèches ▲ ▼ (pour monter ou descendre d'un cran). « OK » termine, « Par défaut » remet l'ordre d'origine. L'ordre est gardé sur
+// Chaque bloc reçoit, sur le côté, une poignée « ≡ » : on l'attrape et on le fait glisser (au clavier : flèches haut et bas sur la
+// poignée). « OK » termine, « Par défaut » remet l'ordre d'origine. L'ordre est gardé sur
 // ce téléphone (clé alcuno_ordre_reglages) sous forme de la liste des data-cle de index.html ; un réglage ajouté plus tard à l'appli
 // (absent de l'ordre gardé) se place à sa position d'origine. Le glisser est fait à la main (événements « pointer ») : le
 // glisser-déposer du navigateur ne marche pas au doigt.
@@ -1761,11 +1761,15 @@ function construireControlesReglages(){
     const groupe = document.createElement("div");
     groupe.className = "ctrlReglage";
     groupe.dataset.pour = bloc.dataset.cle;
-    groupe.innerHTML = `<button type="button" class="ctrlPoignee" aria-label="Déplacer ${nom}">≡</button>
-      <span class="ctrlFleches"><button type="button" class="ctrlHaut" aria-label="Monter ${nom}">▲</button><button type="button" class="ctrlBas" aria-label="Descendre ${nom}">▼</button></span>`;
-    groupe.querySelector(".ctrlHaut").addEventListener("click", () => deplacerBlocReglage(bloc, -1));
-    groupe.querySelector(".ctrlBas").addEventListener("click", () => deplacerBlocReglage(bloc, 1));
-    groupe.querySelector(".ctrlPoignee").addEventListener("pointerdown", (e) => demarrerGlisseReglage(bloc, e));
+    groupe.innerHTML = `<button type="button" class="ctrlPoignee" aria-label="Déplacer ${nom} (glisser, ou flèches haut et bas du clavier)">≡</button>`;
+    const poignee = groupe.querySelector(".ctrlPoignee");
+    poignee.addEventListener("pointerdown", (e) => demarrerGlisseReglage(bloc, e));
+    poignee.addEventListener("keydown", (e) => { // (clavier : la poignée a le focus, flèches haut / bas)
+      if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
+      e.preventDefault();
+      deplacerBlocReglage(bloc, e.key === "ArrowUp" ? -1 : 1);
+      poignee.focus();
+    });
     zoneControlesReglages.appendChild(groupe);
   });
   contenuReglages.appendChild(zoneControlesReglages);

@@ -802,7 +802,7 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
-  // 32. Réorganiser les Réglages : « Modifier » -> poignées et flèches, flèche ▲ et glisser changent l'ordre, il est gardé après rechargement,
+  // 32. Réorganiser les Réglages : « Modifier » -> poignées (sans flèches ni tremblement), glisser et flèches du clavier changent l'ordre, il est gardé après rechargement,
   // « Par défaut » le remet, les réglages répondent toujours après « OK », aucun bloc perdu
   {
     const { ctx, page, erreurs } = await ouvrir();
@@ -812,8 +812,9 @@ function verifier(ok, texte){
     const avant = await page.evaluate(() => ({ defaut: getComputedStyle(document.getElementById("btnParDefautReglages")).display, texte: document.getElementById("btnModifierReglages").textContent, poignees: document.querySelectorAll(".ctrlReglage").length }));
     await page.click("#btnModifierReglages"); await page.waitForTimeout(400);
     const pendant = await page.evaluate(() => ({ edition: document.getElementById("ecranReglages").classList.contains("reglages-edition"), texte: document.getElementById("btnModifierReglages").textContent,
-      defaut: getComputedStyle(document.getElementById("btnParDefautReglages")).display, poignees: document.querySelectorAll(".ctrlReglage .ctrlPoignee").length, fleches: document.querySelectorAll(".ctrlReglage .ctrlHaut").length }));
-    await page.click('.ctrlReglage[data-pour="musique"] .ctrlHaut'); await page.waitForTimeout(200);
+      defaut: getComputedStyle(document.getElementById("btnParDefautReglages")).display, poignees: document.querySelectorAll(".ctrlReglage .ctrlPoignee").length, fleches: document.querySelectorAll(".ctrlHaut, .ctrlBas").length,
+      tremble: getComputedStyle(document.querySelector('#ecranReglages .reglages-contenu > [data-cle]')).animationName }));
+    await page.focus('.ctrlReglage[data-pour="musique"] .ctrlPoignee'); await page.keyboard.press("ArrowUp"); await page.waitForTimeout(200); // (clavier : monte d'un cran)
     const apresFleche = await ordre();
     const poignee = await page.$('.ctrlReglage[data-pour="voix"] .ctrlPoignee');
     await poignee.scrollIntoViewIfNeeded(); await page.waitForTimeout(300);
@@ -838,7 +839,7 @@ function verifier(ok, texte){
     const monte = apresGlisse.split(",").indexOf("voix") < apresFleche.split(",").indexOf("voix") && apresGlisse.split(",").sort().join() === apresFleche.split(",").sort().join();
     const attendueGlisse = apresGlisse;
     verifier(avant.defaut === "none" && avant.texte === "Modifier" && avant.poignees === 0 && pendant.edition && pendant.texte === "OK" && pendant.defaut !== "none" &&
-      pendant.poignees === pendant.fleches && pendant.poignees >= 14 && apresFleche === attendueFleche && monte &&
+      pendant.poignees >= 14 && pendant.fleches === 0 && pendant.tremble === "none" && apresFleche === attendueFleche && monte &&
       !fini.edition && fini.controles === 0 && fini.texte === "Modifier" && rechargee === attendueGlisse && parDefaut === origine && stocke === null && interrupteur && erreurs.length === 0,
       `réglages réorganisables : avant ${JSON.stringify(avant)}, pendant ${JSON.stringify(pendant)}, flèche ${apresFleche === attendueFleche}, glisser monté ${monte} (${apresGlisse}), fini ${JSON.stringify(fini)}, rechargé ${rechargee === attendueGlisse}, par défaut ${parDefaut === origine}, stocké ${stocke}, interrupteur ${interrupteur} ${erreurs.join("|")}`);
     await ctx.close();

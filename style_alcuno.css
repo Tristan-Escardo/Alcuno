@@ -8290,21 +8290,23 @@ html[data-theme="prestige"] #ecranTele .tele-ecran{ background: radial-gradient(
 html[data-theme="soleil"] #ecranTele .tele-historique-quoi em{ color: #8a1f4a; }
 
 /* ===== Réorganiser les Réglages (js/reglages.js, « Réorganiser les Réglages ») ===== */
-#ecranReglages .btnModifierReglages{ left: auto; right: 20px; }
-#ecranReglages #btnParDefautReglages{ right: 108px; }
+/* « Modifier » et « Par défaut » : petits et discrets, bien moins visibles que « ← Retour » (couleur du texte du thème, fond transparent) */
+#ecranReglages .btnModifierReglages{
+  position: absolute; top: 29px; right: 20px; padding: 5px 11px; font: inherit; font-size: 12px; font-weight: 700; color: inherit;
+  background: transparent; border: 1px solid currentColor; border-radius: 999px; opacity: 0.55; cursor: pointer; box-shadow: none; text-shadow: none;
+}
+#ecranReglages .btnModifierReglages:hover, #ecranReglages .btnModifierReglages:focus-visible{ opacity: 0.9; }
+#ecranReglages #btnParDefautReglages{ right: 92px; }
+#ecranReglages #btnParDefautReglages[hidden]{ display: none; }
+.reglages-edition #btnModifierReglages{ opacity: 0.9; background: rgba(128, 128, 128, 0.22); }
 #ecranReglages .reglages-contenu{ position: relative; }
-.reglages-edition .reglages-contenu{ padding-left: 58px; }
-.reglages-edition .reglages-contenu > h2{ margin-left: -58px; }
-/* les blocs tremblent un peu ; leurs réglages ne répondent plus tant qu'on est en modification */
-.reglages-edition .reglages-contenu > [data-cle]{ pointer-events: none; animation: reglageTremble 0.3s ease-in-out infinite alternate; }
-.reglages-edition .reglages-contenu > [data-cle]:nth-child(even){ animation-delay: -0.15s; animation-direction: alternate-reverse; }
-.reglages-edition .reglages-contenu > [data-cle].glisse{ animation: none; z-index: 5; position: relative; transition: none; box-shadow: 0 14px 30px rgba(0, 0, 0, 0.45); }
-@keyframes reglageTremble{ from{ transform: rotate(-0.35deg); } to{ transform: rotate(0.35deg); } }
-@media (prefers-reduced-motion: reduce){ .reglages-edition .reglages-contenu > [data-cle]{ animation: none; } }
-#controlesReglages{ position: absolute; left: 0; top: 0; width: 52px; pointer-events: none; }
-.ctrlReglage{ position: absolute; left: 0; width: 52px; display: flex; flex-direction: column; align-items: center; gap: 4px; pointer-events: auto; }
+.reglages-edition .reglages-contenu{ padding-left: 54px; }
+.reglages-edition .reglages-contenu > h2{ margin-left: -54px; }
+/* pendant la modification, les réglages ne répondent plus (on ne change rien par erreur en glissant) */
+.reglages-edition .reglages-contenu > [data-cle]{ pointer-events: none; }
+.reglages-edition .reglages-contenu > [data-cle].glisse{ z-index: 5; position: relative; transition: none; box-shadow: 0 14px 30px rgba(0, 0, 0, 0.45); }
+#controlesReglages{ position: absolute; left: 0; top: 0; width: 46px; pointer-events: none; }
+.ctrlReglage{ position: absolute; left: 0; width: 46px; display: flex; justify-content: center; pointer-events: auto; }
 .ctrlReglage button{ font: inherit; color: inherit; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.45); background: rgba(255, 255, 255, 0.16); border-radius: 10px; touch-action: none; padding: 0; }
-.ctrlReglage .ctrlPoignee{ width: 48px; height: 30px; font-size: 22px; line-height: 1; letter-spacing: 0; cursor: grab; }
-.ctrlReglage .ctrlFleches{ display: flex; gap: 4px; }
-.ctrlReglage .ctrlFleches button{ width: 22px; height: 26px; font-size: 11px; touch-action: manipulation; }
+.ctrlReglage .ctrlPoignee{ width: 42px; height: 34px; font-size: 22px; line-height: 1; cursor: grab; }
 html[data-theme="givre"] .ctrlReglage button, html[data-theme="kawaii"] .ctrlReglage button{ border-color: rgba(60, 60, 110, 0.4); background: rgba(255, 255, 255, 0.75); }
