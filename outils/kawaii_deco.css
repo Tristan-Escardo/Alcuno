@@ -160,3 +160,6 @@ html[data-theme="kawaii"] #kawaiiFlotteurs{ display: block; }
 
 /* Fenêtre +4 : pas de rectangle de fond derrière les boutons (le fond à pois reste visible) */
 html[data-theme="kawaii"] #overlayPlus4 :is(.plus4-actions, .plus4-container-joueurs){ background: transparent !important; }
+
+/* Réglages : de l'air entre le titre d'un bloc (Thèmes, Sons système…) et ce qu'il y a dessous (pastilles, curseur) */
+html[data-theme="kawaii"] #ecranReglages .blocReglage > .optionReglage:not(:last-child){ margin-bottom: 14px !important; }
