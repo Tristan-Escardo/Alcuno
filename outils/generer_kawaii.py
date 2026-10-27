@@ -134,6 +134,8 @@ def principal():
             if r: sortie.append(r)
     sortie.append("\n/* ===== Décors et formes du thème Kawaii ===== */\n")
     sortie.append(open(DECO, encoding="utf8").read())
+    cartes_css = os.path.join(RACINE, "outils", "kawaii_cartes.css")
+    if os.path.exists(cartes_css): sortie.append(open(cartes_css, encoding="utf8").read())
     open(SORTIE, "w", encoding="utf8").write("".join(sortie))
     print(f"{SORTIE} : {len(''.join(sortie))} caractères")
 
