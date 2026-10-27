@@ -8128,3 +8128,19 @@ html[data-theme="givre"] #ecranRegles .albumTexte{ color: var(--givre-doux); }
 #choixMode .paillette{ position: absolute; z-index: 6; width: 9px; height: 9px; margin: -4px 0 0 -4px; pointer-events: none;
   clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); animation: paillette 0.8s ease-out forwards; }
 @keyframes paillette{ from{ transform: translate(0, 0) scale(1.4); opacity: 1; } to{ transform: translate(var(--dx), var(--dy)) scale(0.3) rotate(180deg); opacity: 0; } }
+
+/* ===== Joueur dont c'est le tour : le bloc « Joueur actif » n'existe plus à l'écran (l'élément #joueurActif reste dans la
+   page pour le JS) ; à la place, sa pastille de la liste passe en haut, sur toute la largeur et en plus grand. L'ordre
+   visuel seul change (order) : l'ordre des éléments reste celui des joueurs, donc les index du JS ne bougent pas. ===== */
+.blocActif{ display: none !important; }
+html #listeJoueurs{ display: flex; flex-wrap: wrap; gap: 6px; }
+html #listeJoueurs .joueur-ligne-actif{
+  order: -1; flex: 1 1 100%; justify-content: center; text-align: center;
+  min-height: 56px; font-size: 1.45em; padding-top: 6px; padding-bottom: 6px;
+  transform-origin: 50% 50%; animation: joueurActifArrive 0.35s ease-out;
+}
+html #listeJoueurs .joueur-ligne-actif .joueur-nom{ flex: 0 1 auto; }
+html #listeJoueurs .joueur-ligne-actif .btnPauseJoueur{ position: absolute; right: 8px; }
+html #listeJoueurs .joueur-ligne-actif{ position: relative; }
+@keyframes joueurActifArrive{ 0%{ transform: scale(0.94); } 60%{ transform: scale(1.03); } 100%{ transform: scale(1); } }
+@media (prefers-reduced-motion: reduce){ html #listeJoueurs .joueur-ligne-actif{ animation: none; } }
