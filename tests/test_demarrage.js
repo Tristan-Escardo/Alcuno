@@ -718,7 +718,7 @@ function verifier(ok, texte){
   }
 
   // 29. Annonces à voix haute : réglage (description du développeur), désactivé de base, lit les fenêtres d'annonce seulement une fois activé,
-  // texte nettoyé (emojis, « +1 » -> « plus 1 », « Il/elle » -> « Il ou elle »), rien sur la télé
+  // texte nettoyé (emojis, « +1 » -> « plus 1 », « Il/elle » -> « Il ou elle »), lecture du rappel du tour, rien sur la télé
   {
     const simuler = `window.__voix = []; Object.defineProperty(window, "speechSynthesis", { value: { speak: (u) => window.__voix.push(u.text + "|" + u.lang), cancel() {}, getVoices() { return []; } }, configurable: true }); window.SpeechSynthesisUtterance = function (t) { this.text = t; };`;
     const { ctx, page, erreurs } = await ouvrir({}, simuler);
@@ -730,9 +730,11 @@ function verifier(ok, texte){
     await page.evaluate(() => { document.querySelectorAll('[id^="overlay"]').forEach((e) => e.remove()); const c = document.getElementById("optionVoix"); c.checked = true; c.dispatchEvent(new Event("change")); });
     await page.evaluate(() => montrerOverlayRegle("✦ CARTE DORÉE ✦\nIl/elle boit +4 gorgées (1/4) 👑", "doree"));
     await page.waitForTimeout(1000);
+    await page.evaluate(() => { document.querySelectorAll('[id^="overlay"]').forEach((e) => e.remove()); const r = document.getElementById("rappelTour"); r.style.display = "block"; r.textContent = "C'est à Tom de jouer, tire une carte."; });
+    await page.waitForTimeout(1300);
     const dites = await page.evaluate(() => window.__voix);
     verifier(note === "Ça marche mais avec quelques bugs, veuillez excuser votre développeur préféré 🙏" && !coche && avant === 0 &&
-      dites[0] === "Annonces à voix haute activées.|fr-FR" && dites[1] === "CARTE DORÉE. Il ou elle boit plus 4 gorgées (1 sur 4)|fr-FR" && erreurs.length === 0,
+      dites[0] === "Annonces à voix haute activées.|fr-FR" && dites[1] === "CARTE DORÉE. Il ou elle boit plus 4 gorgées (1 sur 4)|fr-FR" && dites[2] === "C'est à Tom de jouer, tire une carte.|fr-FR" && erreurs.length === 0,
       `voix : note « ${note} », coché ${coche}, avant activation ${avant} lecture, ensuite ${JSON.stringify(dites)} ${erreurs.join("|")}`);
     await ctx.close();
   }

@@ -1704,7 +1704,8 @@ function vibrer(motif){
 }
 
 // ===== Annonces à voix haute (synthèse vocale du navigateur, réglage désactivé de base) =====
-// Lit à voix haute le texte des fenêtres d'annonce (pigeon, duel, +4, carte dorée…) et des règles affichées sous le plateau.
+// Lit à voix haute le texte des fenêtres d'annonce (pigeon, duel, +4, carte dorée…), des règles affichées sous le plateau et le
+// rappel du tour (« C'est à Tom de jouer… »).
 // Pas sur la télé (elle a son propre écran), ni pendant le rejeu accéléré d'une reconnexion. Sur iPhone, la première phrase doit
 // partir d'un tap : c'est pourquoi activer le réglage dit une phrase de test.
 const CLE_VOIX = "alcuno_voix";
@@ -1786,6 +1787,16 @@ if (voixPossible) {
   };
   const zoneRegles = document.getElementById("messageTexte");
   if (zoneRegles) new MutationObserver(() => { clearTimeout(minuteurRegles); minuteurRegles = setTimeout(lireRegles, 500); }).observe(zoneRegles, { childList: true });
+
+  // « C'est à Tom de jouer, tire une carte. » : lu à chaque changement de tour (en ligne : « C'est à toi de jouer… » pour celui dont c'est le tour)
+  let minuteurTour = null;
+  const lireTour = () => {
+    if (!voixActive || document.querySelector('body > [id^="overlay"]')) return;
+    const rappel = document.getElementById("rappelTour");
+    if (rappel && rappel.style.display !== "none" && rappel.textContent.trim()) parler(rappel.textContent);
+  };
+  const rappelTourZone = document.getElementById("rappelTour");
+  if (rappelTourZone) new MutationObserver(() => { clearTimeout(minuteurTour); minuteurTour = setTimeout(lireTour, 700); }).observe(rappelTourZone, { childList: true, characterData: true, subtree: true });
 }
 
 let dernierTourVibre = null; // en ligne : on vibre une seule fois par tour (voir majStickyJoueurActif)
