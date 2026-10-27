@@ -636,18 +636,19 @@ for (let i = 0; i < 26; i++) {
 const zoneFlotteurs = document.getElementById("kawaiiFlotteurs");
 const personnagesKawaii = ["coeur", "licorne", "etoile", "nuage", "scintille", "cupcake", "arcenciel", "lapin", "bulle", "fraise", "sucette", "chat",
   "scintille", "fleur", "macaron", "poussin", "glace", "coeur", "etoile", "chou"];
-personnagesKawaii.forEach((nom, i) => {
+for (let i = 0; i < 36; i++) {
+  const nom = personnagesKawaii[i % personnagesKawaii.length];
   const perso = document.createElement("span");
-  const taille = 30 + Math.random() * 26;
-  const duree = 5 + Math.random() * 5;
-  perso.style.left = `${(i % 5) * 20 + Math.random() * 12}%`;
-  perso.style.top = `${Math.floor(i / 5) * 24 + 2 + Math.random() * 14}%`;
+  const taille = 16 + Math.random() * 14;
+  const duree = 1.8 + Math.random() * 2;
+  perso.style.left = `${(i % 6) * 16 + Math.random() * 10}%`;
+  perso.style.top = `${Math.floor(i / 6) * 16 + 1 + Math.random() * 10}%`;
   perso.style.width = perso.style.height = `${taille}px`;
   perso.style.backgroundImage = `url("stickers/${nom}.svg")`;
   perso.style.animationDuration = `${duree}s`;
   perso.style.animationDelay = `${-Math.random() * duree}s`;
   zoneFlotteurs.appendChild(perso);
-});
+}
 
 document.querySelectorAll(".pastilleTheme").forEach((pastille) => {
   pastille.addEventListener("click", () => {

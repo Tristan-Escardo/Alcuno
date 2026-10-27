@@ -148,21 +148,7 @@ html[data-theme="kawaii"][data-theme] body #ecranPause{ background: var(--overla
 html[data-theme="kawaii"] #kawaiiFlotteurs{ display: block; }
 #kawaiiFlotteurs span{ position: absolute; background: center / contain no-repeat; opacity: 0.9; animation: kawaiiLevite ease-in-out infinite alternate; }
 @keyframes kawaiiLevite{
-  from{ transform: translate(-6px, 10px) rotate(-8deg); }
-  to  { transform: translate(8px, -14px) rotate(8deg); }
+  from{ transform: translate(-8px, 12px) rotate(-12deg); }
+  to  { transform: translate(10px, -16px) rotate(12deg); }
 }
 @media (prefers-reduced-motion: reduce){ #kawaiiFlotteurs span{ animation: none; } }
-
-/* Titre de l'accueil en licorne : crinière arc-en-ciel et corne dorée sur le A */
-html[data-theme="kawaii"] #choixMode #titreAccueil{
-  background: linear-gradient(90deg, #ff4fa3, #ff8a3d, #f2c200, #2fcf7f, #2aa9f0, #8a5cf0, #ff4fa3) 0 0 / 200% 100%;
-  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
-  text-shadow: none !important; filter: drop-shadow(0 4px 0 var(--kawaii-rose-fonce)) drop-shadow(0 8px 10px rgba(150, 40, 110, 0.25));
-  animation: kawaiiCriniere 6s linear infinite !important;
-}
-@keyframes kawaiiCriniere{ to{ background-position: 200% 0; } }
-html[data-theme="kawaii"] #choixMode .couronneTitre{
-  display: block; top: -0.4em; left: 0.3em; right: auto; width: 0.4em; height: 0.6em; transform: rotate(-12deg);
-  background: url("stickers/corne.svg") center / contain no-repeat; filter: none;
-}
-html[data-theme="kawaii"] #choixMode .couronneTitre svg{ display: none; }
