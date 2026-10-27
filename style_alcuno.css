@@ -8238,3 +8238,6 @@ html #listeJoueurs .joueur-ligne-actif .bonus-annulation{ color: #8a3b00; }
 }
 #ecranTele .tele-joueurs-2col .tele-joueur-actif{ font-size: 3.6vh; padding: 0.8vh 2vh; }
 #ecranTele .tele-joueur-actif .tele-badge{ background: #3b2a00; color: #ffe94a; }
+
+/* Page Règles (Star Wars) : la ligne « dos de carte » prend le même dos que le jeu */
+html[data-theme="galaxie"] #ecranRegles .ligneRegle .Carte.retournee:not([class*="_"]):not([class*="couleur"]){ background-image: url("Cartes/dos_galaxie_argent.svg") !important; }
