@@ -717,6 +717,26 @@ function verifier(ok, texte){
     verifier(problemes.length === 0, `télé : fenêtres +4 et historique dans les 10 thèmes ${problemes.join(" ; ")}`);
   }
 
+  // 29. Annonces à voix haute : réglage (description du développeur), désactivé de base, lit les fenêtres d'annonce seulement une fois activé,
+  // texte nettoyé (emojis, « +1 » -> « plus 1 », « Il/elle » -> « Il ou elle »), rien sur la télé
+  {
+    const simuler = `window.__voix = []; Object.defineProperty(window, "speechSynthesis", { value: { speak: (u) => window.__voix.push(u.text + "|" + u.lang), cancel() {}, getVoices() { return []; } }, configurable: true }); window.SpeechSynthesisUtterance = function (t) { this.text = t; };`;
+    const { ctx, page, erreurs } = await ouvrir({}, simuler);
+    const note = await page.evaluate(() => document.getElementById("noteVoix").innerText);
+    const coche = await page.evaluate(() => document.getElementById("optionVoix").checked);
+    await page.evaluate(() => montrerOverlayRegle("Couleur ROUGE\nLe prochain qui tire une carte rouge boit +1 gorgée", "couleur"));
+    await page.waitForTimeout(1000);
+    const avant = await page.evaluate(() => window.__voix.length);
+    await page.evaluate(() => { document.querySelectorAll('[id^="overlay"]').forEach((e) => e.remove()); const c = document.getElementById("optionVoix"); c.checked = true; c.dispatchEvent(new Event("change")); });
+    await page.evaluate(() => montrerOverlayRegle("✦ CARTE DORÉE ✦\nIl/elle boit +4 gorgées (1/4) 👑", "doree"));
+    await page.waitForTimeout(1000);
+    const dites = await page.evaluate(() => window.__voix);
+    verifier(note === "Ça marche mais avec quelques bugs, veuillez excuser votre développeur préféré 🙏" && !coche && avant === 0 &&
+      dites[0] === "Annonces à voix haute activées.|fr-FR" && dites[1] === "CARTE DORÉE. Il ou elle boit plus 4 gorgées (1 sur 4)|fr-FR" && erreurs.length === 0,
+      `voix : note « ${note} », coché ${coche}, avant activation ${avant} lecture, ensuite ${JSON.stringify(dites)} ${erreurs.join("|")}`);
+    await ctx.close();
+  }
+
   await nav.close();
   serveur.close();
   console.log(echecs ? `\n${echecs} ÉCHEC(S)` : "\nTOUT EST OK");

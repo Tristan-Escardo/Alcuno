@@ -1703,6 +1703,91 @@ function vibrer(motif){
   try { navigator.vibrate(motif); } catch (e) {}
 }
 
+// ===== Annonces à voix haute (synthèse vocale du navigateur, réglage désactivé de base) =====
+// Lit à voix haute le texte des fenêtres d'annonce (pigeon, duel, +4, carte dorée…) et des règles affichées sous le plateau.
+// Pas sur la télé (elle a son propre écran), ni pendant le rejeu accéléré d'une reconnexion. Sur iPhone, la première phrase doit
+// partir d'un tap : c'est pourquoi activer le réglage dit une phrase de test.
+const CLE_VOIX = "alcuno_voix";
+const caseVoix = document.getElementById("optionVoix");
+const voixPossible = typeof window.speechSynthesis !== "undefined" && typeof window.SpeechSynthesisUtterance === "function";
+let voixActive = false;
+try { voixActive = localStorage.getItem(CLE_VOIX) === "1" && voixPossible; } catch (e) {}
+caseVoix.checked = voixActive;
+if (!voixPossible) {
+  caseVoix.disabled = true;
+  document.getElementById("noteVoix").insertAdjacentHTML("beforeend", "<br>Indisponible sur cet appareil.");
+}
+
+// Texte prêt à être lu : sans emojis ni symboles, « +4 » -> « plus 4 », « 1/4 » -> « 1 sur 4 », « Il/elle » -> « Il ou elle »
+function textePourVoix(brut){
+  return String(brut || "")
+    .replace(/\p{Extended_Pictographic}|\uFE0F|[✦✧★☆▶◀●•]/gu, " ")
+    .replace(/\b(Il|Elle|il|elle)\/(il|elle)\b/g, "$1 ou $2")
+    .replace(/\+(\d+)/g, "plus $1")
+    .replace(/(\d+)\s*\/\s*(\d+)/g, "$1 sur $2")
+    .replace(/\s+/g, " ").replace(/\s+([.,!?])/g, "$1").replace(/([!?])\./g, "$1").trim();
+}
+
+let voixDernier = { texte: "", date: 0 };
+function parler(brut, force = false){
+  if (!voixPossible || (!voixActive && !force)) return;
+  if (document.documentElement.classList.contains("mode-tele")) return;
+  try { if (rattrapageEnCours) return; } catch (e) {}
+  const texte = textePourVoix(brut);
+  if (!texte) return;
+  if (!force && texte === voixDernier.texte && Date.now() - voixDernier.date < 6000) return; // (la même annonce lue deux fois de suite)
+  voixDernier = { texte, date: Date.now() };
+  try {
+    window.speechSynthesis.cancel();
+    const lecture = new SpeechSynthesisUtterance(texte);
+    lecture.lang = "fr-FR";
+    const voixFr = (window.speechSynthesis.getVoices() || []).find((v) => /^fr/i.test(v.lang));
+    if (voixFr) lecture.voice = voixFr;
+    window.speechSynthesis.speak(lecture);
+    try { attenuerMusique(Math.min(8, 1.5 + texte.length * 0.07)); } catch (e) {} // la musique baisse pendant la lecture
+  } catch (e) {}
+}
+
+caseVoix.addEventListener("change", () => {
+  voixActive = caseVoix.checked && voixPossible;
+  try { localStorage.setItem(CLE_VOIX, voixActive ? "1" : "0"); } catch (e) {}
+  if (voixActive) parler("Annonces à voix haute activées.", true); // (part d'un tap : nécessaire sur iPhone)
+  else { try { window.speechSynthesis.cancel(); } catch (e) {} }
+});
+document.addEventListener("visibilitychange", () => { if (document.visibilityState !== "visible" && voixPossible) { try { window.speechSynthesis.cancel(); } catch (e) {} } });
+
+// Fenêtres d'annonce : lues quand elles apparaissent et quand leur texte change (l'annonce « règle » est une même fenêtre réutilisée)
+if (voixPossible) {
+  const surveilles = new WeakSet();
+  const lireFenetre = (fenetre) => {
+    if (!voixActive || !fenetre.isConnected) return;
+    let texte = "";
+    try { texte = texteSansBoutons(fenetre); } catch (e) { texte = fenetre.innerText || ""; } // (js/tele.js : le texte sans les boutons ni les cartes)
+    parler(String(texte).replace(/\n+/g, ". "));
+  };
+  const surveiller = (fenetre) => {
+    if (surveilles.has(fenetre)) return;
+    surveilles.add(fenetre);
+    let minuteur = null;
+    const planifier = () => { clearTimeout(minuteur); minuteur = setTimeout(() => lireFenetre(fenetre), 450); };
+    new MutationObserver(planifier).observe(fenetre, { childList: true, subtree: true, characterData: true });
+    planifier();
+  };
+  new MutationObserver((mutations) => {
+    for (const m of mutations) m.addedNodes.forEach((n) => { if (n.nodeType === 1 && /^overlay/.test(n.id || "")) surveiller(n); });
+  }).observe(document.body, { childList: true });
+
+  // Règles sous le plateau (« Il/elle boit 1 gorgée… ») : seulement quand aucune fenêtre ne les annonce déjà
+  let minuteurRegles = null;
+  const lireRegles = () => {
+    if (!voixActive || document.querySelector('body > [id^="overlay"]')) return;
+    const zone = document.getElementById("messageTexte");
+    if (zone && zone.innerText.trim()) parler(zone.innerText);
+  };
+  const zoneRegles = document.getElementById("messageTexte");
+  if (zoneRegles) new MutationObserver(() => { clearTimeout(minuteurRegles); minuteurRegles = setTimeout(lireRegles, 500); }).observe(zoneRegles, { childList: true });
+}
+
 let dernierTourVibre = null; // en ligne : on vibre une seule fois par tour (voir majStickyJoueurActif)
 
 // ===== Écran toujours allumé pendant une partie (Wake Lock) =====
