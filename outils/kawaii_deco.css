@@ -174,3 +174,8 @@ html[data-theme="kawaii"] .tele-plateau .Carte.carte-recachee:nth-child(3n+2){ b
 html[data-theme="kawaii"] .Carte:not(.retournee):not([class*="_"]):not([class*="couleur"]):nth-child(3n),
 html.faces-fermees[data-theme="kawaii"] #plateau .Carte.retournee.recachee:nth-child(3n),
 html[data-theme="kawaii"] .tele-plateau .Carte.carte-recachee:nth-child(3n){ background-image: url("Cartes/dos_kawaii_alcuno_gourmand.svg") !important; }
+
+/* Partie : le cadre autour des blocs est invisible dans ce thème, donc son marge intérieur ne faisait qu'un grand vide sous
+   « Nouvelle partie » (et des blocs plus étroits que le menu) : même espace partout, mêmes largeurs */
+html[data-theme="kawaii"] #messages{ padding: 0 !important; }
+html[data-theme="kawaii"] .menu{ margin-bottom: 12px !important; }
