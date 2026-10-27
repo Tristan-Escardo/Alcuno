@@ -8201,3 +8201,13 @@ html[data-theme="galaxie"] .switch_jaune { background-image: url("Cartes/galaxie
 html[data-theme="galaxie"] .switch_rouge { background-image: url("Cartes/galaxie/switch_rouge.svg"); }
 html[data-theme="galaxie"] .switch_bleu { background-image: url("Cartes/galaxie/switch_bleu.svg"); }
 /* ===== fin des faces de cartes Star Wars ===== */
+
+/* Joueur dont c'est le tour : jaune plein et vif dans tous les thèmes (avant : un voile jaune à 12 %, difficile à voir ;
+   le thème Kawaii a déjà le sien, plus spécifique) */
+html #listeJoueurs .joueur-ligne-actif{
+  background: linear-gradient(180deg, #fff27a, #ffd400) !important; color: #3b2a00 !important; border-color: #fff !important;
+  box-shadow: 0 0 0 2px #ffd400, 0 0 18px rgba(255, 214, 0, 0.65) !important; text-shadow: none !important;
+}
+html[data-theme="galaxie"] #listeJoueurs .joueur-ligne-actif, html[data-theme="galaxie"] #listeJoueurs .joueur-ligne-actif *{ color: #3b2a00 !important; }
+html #listeJoueurs .joueur-ligne-actif .btnPauseJoueur{ color: #3b2a00; border-color: rgba(59, 42, 0, 0.55); opacity: 1; }
+html #listeJoueurs .joueur-ligne-actif .bonus-annulation{ color: #8a3b00; }
