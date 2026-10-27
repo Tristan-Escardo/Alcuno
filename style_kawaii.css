@@ -793,4 +793,6 @@ html[data-theme="kawaii"] #kawaiiFlotteurs{ display: block; }
   from{ transform: translate(-8px, 12px) rotate(-12deg); }
   to  { transform: translate(10px, -16px) rotate(12deg); }
 }
-@media (prefers-reduced-motion: reduce){ #kawaiiFlotteurs span{ animation: none; } }
+#kawaiiFlotteurs i{ position: absolute; background: radial-gradient(circle, #fff 0 18%, #ff8fc8 40%, #ff5fae 100%); clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); animation: kawaiiPaillette ease-in-out infinite; }
+@keyframes kawaiiPaillette{ 0%, 100%{ transform: scale(0.2) rotate(0deg); opacity: 0; } 50%{ transform: scale(1) rotate(45deg); opacity: 1; } }
+@media (prefers-reduced-motion: reduce){ #kawaiiFlotteurs span, #kawaiiFlotteurs i{ animation: none; } }

@@ -640,7 +640,7 @@ for (let i = 0; i < 36; i++) {
   const nom = personnagesKawaii[i % personnagesKawaii.length];
   const perso = document.createElement("span");
   const taille = 16 + Math.random() * 14;
-  const duree = 1.8 + Math.random() * 2;
+  const duree = 1.1 + Math.random() * 1.3;
   perso.style.left = `${(i % 6) * 16 + Math.random() * 10}%`;
   perso.style.top = `${Math.floor(i / 6) * 16 + 1 + Math.random() * 10}%`;
   perso.style.width = perso.style.height = `${taille}px`;
@@ -648,6 +648,18 @@ for (let i = 0; i < 36; i++) {
   perso.style.animationDuration = `${duree}s`;
   perso.style.animationDelay = `${-Math.random() * duree}s`;
   zoneFlotteurs.appendChild(perso);
+}
+// ... et des paillettes roses qui scintillent
+for (let i = 0; i < 40; i++) {
+  const paillette = document.createElement("i");
+  const taille = 5 + Math.random() * 9;
+  const duree = 0.9 + Math.random() * 1.6;
+  paillette.style.left = `${Math.random() * 98}%`;
+  paillette.style.top = `${Math.random() * 98}%`;
+  paillette.style.width = paillette.style.height = `${taille}px`;
+  paillette.style.animationDuration = `${duree}s`;
+  paillette.style.animationDelay = `${-Math.random() * duree}s`;
+  zoneFlotteurs.appendChild(paillette);
 }
 
 document.querySelectorAll(".pastilleTheme").forEach((pastille) => {
