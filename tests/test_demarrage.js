@@ -813,7 +813,13 @@ function verifier(ok, texte){
     await page.click("#btnModifierReglages"); await page.waitForTimeout(400);
     const pendant = await page.evaluate(() => ({ edition: document.getElementById("ecranReglages").classList.contains("reglages-edition"), texte: document.getElementById("btnModifierReglages").textContent,
       defaut: getComputedStyle(document.getElementById("btnParDefautReglages")).display, poignees: document.querySelectorAll(".ctrlReglage .ctrlPoignee").length, fleches: document.querySelectorAll(".ctrlHaut, .ctrlBas").length,
-      tremble: getComputedStyle(document.querySelector('#ecranReglages .reglages-contenu > [data-cle]')).animationName }));
+      tremble: getComputedStyle(document.querySelector('#ecranReglages .reglages-contenu > [data-cle]')).animationName,
+      // une poignée par bloc visible, et chacune à la hauteur de « son » bloc (avant : celle d'un bloc caché restait en haut de la page)
+      visibles: [...document.querySelectorAll("#ecranReglages .reglages-contenu > [data-cle]")].filter((b) => b.offsetHeight > 0).length,
+      poigneesVisibles: [...document.querySelectorAll(".ctrlReglage")].filter((g) => g.offsetHeight > 0).length,
+      desalignees: [...document.querySelectorAll(".ctrlReglage")].filter((g) => g.offsetHeight > 0).filter((g) => {
+        const b = document.querySelector('#ecranReglages .reglages-contenu > [data-cle="' + g.dataset.pour + '"]'), r = b.getBoundingClientRect(), q = g.getBoundingClientRect();
+        return q.top < r.top - 2 || q.bottom > r.bottom + 2; }).length }));
     await page.focus('.ctrlReglage[data-pour="musique"] .ctrlPoignee'); await page.keyboard.press("ArrowUp"); await page.waitForTimeout(200); // (clavier : monte d'un cran)
     const apresFleche = await ordre();
     const poignee = await page.$('.ctrlReglage[data-pour="voix"] .ctrlPoignee');
@@ -839,7 +845,7 @@ function verifier(ok, texte){
     const monte = apresGlisse.split(",").indexOf("voix") < apresFleche.split(",").indexOf("voix") && apresGlisse.split(",").sort().join() === apresFleche.split(",").sort().join();
     const attendueGlisse = apresGlisse;
     verifier(avant.defaut === "none" && avant.texte === "Modifier" && avant.poignees === 0 && pendant.edition && pendant.texte === "OK" && pendant.defaut !== "none" &&
-      pendant.poignees >= 14 && pendant.fleches === 0 && pendant.tremble === "none" && apresFleche === attendueFleche && monte &&
+      pendant.poignees >= 14 && pendant.fleches === 0 && pendant.tremble === "none" && pendant.poigneesVisibles === pendant.visibles && pendant.desalignees === 0 && apresFleche === attendueFleche && monte &&
       !fini.edition && fini.controles === 0 && fini.texte === "Modifier" && rechargee === attendueGlisse && parDefaut === origine && stocke === null && interrupteur && erreurs.length === 0,
       `réglages réorganisables : avant ${JSON.stringify(avant)}, pendant ${JSON.stringify(pendant)}, flèche ${apresFleche === attendueFleche}, glisser monté ${monte} (${apresGlisse}), fini ${JSON.stringify(fini)}, rechargé ${rechargee === attendueGlisse}, par défaut ${parDefaut === origine}, stocké ${stocke}, interrupteur ${interrupteur} ${erreurs.join("|")}`);
     await ctx.close();

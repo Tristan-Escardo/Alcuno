@@ -8307,6 +8307,7 @@ html[data-theme="soleil"] #ecranTele .tele-historique-quoi em{ color: #8a1f4a; }
 .reglages-edition .reglages-contenu > [data-cle].glisse{ z-index: 5; position: relative; transition: none; box-shadow: 0 14px 30px rgba(0, 0, 0, 0.45); }
 #controlesReglages{ position: absolute; left: 0; top: 0; width: 46px; pointer-events: none; }
 .ctrlReglage{ position: absolute; left: 0; width: 46px; display: flex; justify-content: center; pointer-events: auto; }
+.ctrlReglage[hidden]{ display: none; } /* (bloc caché, ex. « Partie en mémoire » : pas de poignée) */
 .ctrlReglage button{ font: inherit; color: inherit; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.45); background: rgba(255, 255, 255, 0.16); border-radius: 10px; touch-action: none; padding: 0; }
 .ctrlReglage .ctrlPoignee{ width: 42px; height: 34px; font-size: 22px; line-height: 1; cursor: grab; }
 html[data-theme="givre"] .ctrlReglage button, html[data-theme="kawaii"] .ctrlReglage button{ border-color: rgba(60, 60, 110, 0.4); background: rgba(255, 255, 255, 0.75); }
