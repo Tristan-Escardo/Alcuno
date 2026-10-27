@@ -650,10 +650,10 @@ for (let i = 0; i < 36; i++) {
   zoneFlotteurs.appendChild(perso);
 }
 // ... et des paillettes roses qui scintillent
-for (let i = 0; i < 40; i++) {
+for (let i = 0; i < 46; i++) {
   const paillette = document.createElement("i");
-  const taille = 5 + Math.random() * 9;
-  const duree = 0.9 + Math.random() * 1.6;
+  const taille = 9 + Math.random() * 14;
+  const duree = 0.8 + Math.random() * 1.4;
   paillette.style.left = `${Math.random() * 98}%`;
   paillette.style.top = `${Math.random() * 98}%`;
   paillette.style.width = paillette.style.height = `${taille}px`;
