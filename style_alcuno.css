@@ -8211,3 +8211,9 @@ html #listeJoueurs .joueur-ligne-actif{
 html[data-theme="galaxie"] #listeJoueurs .joueur-ligne-actif, html[data-theme="galaxie"] #listeJoueurs .joueur-ligne-actif *{ color: #3b2a00 !important; }
 html #listeJoueurs .joueur-ligne-actif .btnPauseJoueur{ color: #3b2a00; border-color: rgba(59, 42, 0, 0.55); opacity: 1; }
 html #listeJoueurs .joueur-ligne-actif .bonus-annulation{ color: #8a3b00; }
+
+/* Téléphone en paysage (écran bas) : 8 cartes par rangée au lieu de 13, pour qu'elles restent lisibles (~90 px de large
+   au lieu de 50) ; le plateau fait plus de rangées, on défile. Les fenêtres de PC (plus hautes) gardent 13. */
+@media (orientation: landscape) and (max-height: 520px){
+  :root{ --cols: 8; --card-w: clamp(70px, 10.5vw, 104px); }
+}
