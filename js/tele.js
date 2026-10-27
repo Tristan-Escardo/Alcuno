@@ -250,6 +250,7 @@ function etatPourTele(){
     regles,
     theme: document.documentElement.dataset.theme || "bordeaux",
     voix: voixActive ? 1 : 0, // (réglage « Annonces à voix haute » : la télé lit alors les annonces, js/reglages.js)
+    vitesseVoix, // (et à la vitesse choisie sur le téléphone)
     pause: !!pauseEnCours,
     musique: caseMusique.checked && !pauseEnCours ? volumeMusique : 0, // (la télé la joue à ce volume ; pas en pause)
     sons: sonsTele,
@@ -787,7 +788,7 @@ function lireSurTele(etat){
   const cle = (e ? e.id : "") + "|" + texte;
   if (cle === derniereLectureTele) return;
   derniereLectureTele = cle;
-  try { dire(String(texte).replace(/\n+/g, ". ")); } catch (err) {}
+  try { dire(String(texte).replace(/\n+/g, ". "), false, etat.vitesseVoix); } catch (err) {}
 }
 
 function dessinerTele(ecran, etat){

@@ -720,7 +720,7 @@ function verifier(ok, texte){
   // 29. Annonces à voix haute : réglage (description du développeur), désactivé de base, lit les fenêtres d'annonce seulement une fois activé,
   // texte nettoyé (emojis, « +1 » -> « plus 1 », « Il/elle » -> « Il ou elle »), lecture du rappel du tour, rien sur la télé
   {
-    const simuler = `window.__voix = []; Object.defineProperty(window, "speechSynthesis", { value: { speak: (u) => window.__voix.push(u.text + "|" + u.lang), cancel() {}, getVoices() { return []; } }, configurable: true }); window.SpeechSynthesisUtterance = function (t) { this.text = t; };`;
+    const simuler = `window.__voix = []; Object.defineProperty(window, "speechSynthesis", { value: { speak: (u) => { window.__voix.push(u.text + "|" + u.lang); window.__rates = (window.__rates || []).concat(u.rate); }, cancel() {}, getVoices() { return []; } }, configurable: true }); window.SpeechSynthesisUtterance = function (t) { this.text = t; };`;
     const { ctx, page, erreurs } = await ouvrir({}, simuler);
     const note = await page.evaluate(() => document.getElementById("noteVoix").innerText);
     const coche = await page.evaluate(() => document.getElementById("optionVoix").checked);
@@ -733,6 +733,13 @@ function verifier(ok, texte){
     await page.evaluate(() => { document.querySelectorAll('[id^="overlay"]').forEach((e) => e.remove()); const r = document.getElementById("rappelTour"); r.style.display = "block"; r.textContent = "C'est à Tom de jouer, tire une carte."; });
     await page.waitForTimeout(1300);
     const dites = await page.evaluate(() => window.__voix);
+    // curseur de vitesse : 1,0 par défaut, inactif tant que la voix est désactivée (ici activée) ; 1,4 -> les phrases suivantes à cette vitesse, gardée
+    const vitesse0 = await page.evaluate(() => ({ v: document.getElementById("vitesseVoix").value, txt: document.getElementById("vitesseVoixValeur").innerText, actif: !document.getElementById("vitesseVoix").disabled }));
+    await page.evaluate(() => { const c = document.getElementById("vitesseVoix"); c.value = "1.4"; c.dispatchEvent(new Event("input")); c.dispatchEvent(new Event("change")); });
+    await page.waitForTimeout(300);
+    const vitesse1 = await page.evaluate(() => ({ txt: document.getElementById("vitesseVoixValeur").innerText, stockee: localStorage.getItem("alcuno_vitesse_voix"), derniere: window.__rates[window.__rates.length - 1], tele: etatPourTele().vitesseVoix }));
+    verifier(vitesse0.v === "1" && vitesse0.txt === "1,0×" && vitesse0.actif && vitesse1.txt === "1,4×" && vitesse1.stockee === "1.4" && vitesse1.derniere === 1.4 && vitesse1.tele === 1.4,
+      `voix : curseur de vitesse ${JSON.stringify(vitesse0)} puis ${JSON.stringify(vitesse1)}`);
     verifier(note === "Ça marche mais avec quelques rares bugs, veuillez excuser votre développeur préféré 🙏" && !coche && avant === 0 &&
       dites[0] === "Annonces à voix haute activées.|fr-FR" && dites[1] === "CARTE DORÉE. Il ou elle boit plus 4 gorgées (1 sur 4)|fr-FR" && dites[2] === "C'est à Tom de jouer, tire une carte.|fr-FR" && erreurs.length === 0,
       `voix : note « ${note} », coché ${coche}, avant activation ${avant} lecture, ensuite ${JSON.stringify(dites)} ${erreurs.join("|")}`);

@@ -1714,6 +1714,19 @@ const voixPossible = typeof window.speechSynthesis !== "undefined" && typeof win
 let voixActive = false;
 try { voixActive = localStorage.getItem(CLE_VOIX) === "1" && voixPossible; } catch (e) {}
 caseVoix.checked = voixActive;
+// Vitesse de la voix : de 0,6 (posée) à 1,6 (rapide), 1 = normale ; envoyée aussi à la télé quand ce téléphone caste
+const CLE_VITESSE_VOIX = "alcuno_vitesse_voix";
+const curseurVoix = document.getElementById("vitesseVoix");
+const ligneVitesseVoix = document.getElementById("ligneVitesseVoix");
+let vitesseVoix = 1;
+try { const v = Number(localStorage.getItem(CLE_VITESSE_VOIX)); if (v >= 0.6 && v <= 1.6) vitesseVoix = v; } catch (e) {}
+curseurVoix.value = vitesseVoix;
+function majLigneVoix(){
+  document.getElementById("vitesseVoixValeur").innerText = vitesseVoix.toFixed(1).replace(".", ",") + "×";
+  curseurVoix.disabled = !caseVoix.checked;
+  ligneVitesseVoix.classList.toggle("inactif", !caseVoix.checked);
+}
+majLigneVoix();
 if (!voixPossible) {
   caseVoix.disabled = true;
   document.getElementById("noteVoix").insertAdjacentHTML("beforeend", "<br>Indisponible sur cet appareil.");
@@ -1731,7 +1744,7 @@ function textePourVoix(brut){
 
 let voixDernier = { texte: "", date: 0 };
 // Lit un texte tout de suite (sans tenir compte du réglage : l'appelant a déjà décidé). Sert au téléphone (parler) et à la télé.
-function dire(brut, force = false){
+function dire(brut, force = false, vitesse = null){
   if (!voixPossible) return;
   const texte = textePourVoix(brut);
   if (!texte) return;
@@ -1741,6 +1754,7 @@ function dire(brut, force = false){
     window.speechSynthesis.cancel();
     const lecture = new SpeechSynthesisUtterance(texte);
     lecture.lang = "fr-FR";
+    lecture.rate = Math.min(1.6, Math.max(0.6, Number(vitesse) || vitesseVoix));
     const voixFr = (window.speechSynthesis.getVoices() || []).find((v) => /^fr/i.test(v.lang));
     if (voixFr) lecture.voice = voixFr;
     window.speechSynthesis.speak(lecture);
@@ -1757,8 +1771,18 @@ function parler(brut, force = false){
   dire(brut, force);
 }
 
+curseurVoix.addEventListener("input", () => {
+  vitesseVoix = Number(curseurVoix.value);
+  majLigneVoix();
+});
+curseurVoix.addEventListener("change", () => {
+  try { localStorage.setItem(CLE_VITESSE_VOIX, String(vitesseVoix)); } catch (e) {}
+  parler("Voilà la vitesse de la voix.", true); // (essai au relâchement, comme le curseur du volume)
+});
+
 caseVoix.addEventListener("change", () => {
   voixActive = caseVoix.checked && voixPossible;
+  majLigneVoix();
   try { localStorage.setItem(CLE_VOIX, voixActive ? "1" : "0"); } catch (e) {}
   if (voixActive) parler("Annonces à voix haute activées.", true); // (part d'un tap : nécessaire sur iPhone)
   else { try { window.speechSynthesis.cancel(); } catch (e) {} }
