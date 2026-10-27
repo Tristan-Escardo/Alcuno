@@ -31,6 +31,7 @@ MUSIQUE D'AMBIANCE (en boucle, réglage « Musique d'ambiance ») :
   musique_ambiance_soleil.mp3    thème Soleil couchant
   musique_ambiance_sombre.mp3    thème Sombre (boucle exacte, voir BOUCLES_EXACTES dans js/reglages.js)
   musique_ambiance_galaxie.mp3   thème Star Wars (boucle exacte de 2 min 59, voir BOUCLES_EXACTES)
+  musique_ambiance_kawaii.mp3    thème secret Kawaii
   Jusqu'à 3-4 minutes, 128 kbit/s (environ 1 Mo par minute) : elle se lance plus vite.
 
 GÉNÉRIQUE DU THÈME SECRET STAR WARS (au volume des sons, la musique d'ambiance se tait pendant) :
