@@ -562,6 +562,40 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
+  // 24. Joueur dont c'est le tour : sa pastille est en haut de la liste, en gros, en jaune plein, dans tous les thèmes, et RESTE en gros
+  // pendant les fenêtres de choix (duel, pigeon…) : avant, la liste restait un instant sans joueur en gros quand la fenêtre se retirait
+  {
+    const problemes = [];
+    const TOUS_LES_THEMES = [...THEMES, "prestige", "galaxie", "kawaii"];
+    for (const theme of TOUS_LES_THEMES) {
+      const { ctx, page, erreurs } = await ouvrir({}, `try{localStorage.setItem("alcuno_theme","${theme}");localStorage.setItem("alcuno_theme_prestige","1");localStorage.setItem("alcuno_theme_galaxie","1");localStorage.setItem("alcuno_theme_kawaii","1")}catch(e){}`);
+      await page.click("#btnModeClassique"); await page.waitForTimeout(700);
+      for (const nom of ["Tom", "Lea", "Max"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(200); }
+      await page.click("#jouer"); await page.waitForTimeout(1000);
+      const mesure = () => page.evaluate(() => {
+        const liste = document.getElementById("listeJoueurs").getBoundingClientRect();
+        const actives = [...document.querySelectorAll("#listeJoueurs .joueur-ligne-actif")];
+        if (actives.length !== 1) return "actives:" + actives.length;
+        const r = actives[0].getBoundingClientRect();
+        const haut = Math.min(...[...document.querySelectorAll("#listeJoueurs .joueur-ligne")].map((l) => l.getBoundingClientRect().top));
+        const bg = getComputedStyle(actives[0]).backgroundImage + getComputedStyle(actives[0]).backgroundColor;
+        return (r.width > liste.width * 0.8 ? "" : "étroite ") + (Math.abs(r.top - haut) < 2 ? "" : "pas-en-haut ") + (bg.includes("rgb(255, 2") || bg.includes("rgb(255, 3") ? "" : "pas-jaune:" + bg.slice(0, 60));
+      });
+      problemes.push([theme, "départ", await mesure()]);
+      await page.evaluate(() => { indexJoueur = 1; afficherJoueurActif(); });
+      problemes.push([theme, "tour 2", await mesure()]);
+      // fenêtres de choix ouvertes : la pastille reste là
+      await page.evaluate(() => { choixPigeonEnCours = true; duelEnCours = true; afficherJoueurActif(); });
+      problemes.push([theme, "pendant un choix", await mesure()]);
+      await page.evaluate(() => { choixPigeonEnCours = false; duelEnCours = false; afficherJoueurs(); });
+      problemes.push([theme, "après le choix", await mesure()]);
+      problemes.push([theme, "erreurs", erreurs.join("|")]);
+      await ctx.close();
+    }
+    const mauvais = problemes.filter((p) => p[2]);
+    verifier(mauvais.length === 0, `joueur actif en gros et en jaune dans les ${TOUS_LES_THEMES.length} thèmes, même pendant un choix ${mauvais.map((p) => p.join(" : ")).join(" ; ")}`);
+  }
+
   await nav.close();
   serveur.close();
   console.log(echecs ? `\n${echecs} ÉCHEC(S)` : "\nTOUT EST OK");
