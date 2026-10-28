@@ -34,7 +34,7 @@
     },
     "config": {
       ".read": true,
-      ".write": "auth != null && auth.uid === 'REMPLACE_PAR_TON_UID'",
+      ".write": "auth != null && auth.uid === 'Ex6dzCTIfGhZXPhedzIYzKZWxQm1'",
       "annonce": {
         ".validate": "newData.hasChild('texte')",
         "texte": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 140" },
@@ -61,8 +61,8 @@
       "$autre": { ".validate": false }
     },
     "config_hist": {
-      ".read": "auth != null && auth.uid === 'REMPLACE_PAR_TON_UID'",
-      ".write": "auth != null && auth.uid === 'REMPLACE_PAR_TON_UID'"
+      ".read": "auth != null && auth.uid === 'Ex6dzCTIfGhZXPhedzIYzKZWxQm1'",
+      ".write": "auth != null && auth.uid === 'Ex6dzCTIfGhZXPhedzIYzKZWxQm1'"
     },
     "presence": {
       ".read": true,
