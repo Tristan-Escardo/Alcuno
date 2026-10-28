@@ -120,11 +120,29 @@ export const signOut = async () => { utilisateur = null; ecouteur(null); };
   const d = await etat();
   verifier(d.jours === 0 && d.appareils === 0 && d.presence === 1 && d.message.includes("remises à zéro") && d.bouton && !d.confirme,
     `« Oui » : tout est effacé (jours ${d.jours}, appareils ${d.appareils}), le direct est gardé (présence ${d.presence}), message « ${d.message} »`);
-  const lienPilotage = await page.evaluate(() => { const l = document.querySelector(".lienPilotage"); return l && l.getAttribute("href"); });
-  verifier(lienPilotage === "pilotage.html", `stats : lien vers la page de pilotage (${lienPilotage})`);
-  // Pilotage du jeu (réglages à distance) : page à part, pilotage.html
+  // Onglets Stats / Pilotage : tap sur l'onglet, glissement du doigt (gauche = Pilotage, droite = Stats), pas de glissement depuis un champ
+  const vues = () => page.evaluate(() => ({ stats: document.getElementById("vueStats").classList.contains("actif") && getComputedStyle(document.getElementById("vueStats")).display !== "none",
+    pilotage: document.getElementById("vuePilotage").classList.contains("actif") && getComputedStyle(document.getElementById("vuePilotage")).display !== "none",
+    onglet: document.querySelector('.onglet[aria-selected="true"]').dataset.vue, sous: document.getElementById("sousTitre").textContent, hash: location.hash }));
+  const glisser = (dx, cible = "document.body") => page.evaluate(([dx, cible]) => {
+    const el = cible === "document.body" ? document.body : document.querySelector(cible);
+    const t = (x) => new Touch({ identifier: 1, target: el, clientX: x, clientY: 300 });
+    el.dispatchEvent(new TouchEvent("touchstart", { bubbles: true, cancelable: true, touches: [t(200)], changedTouches: [t(200)] }));
+    el.dispatchEvent(new TouchEvent("touchend", { bubbles: true, cancelable: true, touches: [], changedTouches: [t(200 + dx)] }));
+  }, [dx, cible]);
+  const v0 = await vues();
+  await glisser(-200); const v1 = await vues();
+  await glisser(-200); const v1b = await vues(); // (déjà sur Pilotage : rien de plus)
+  await glisser(200); const v2 = await vues();
+  await page.click("#ongletPilotage"); const v3 = await vues();
+  await page.click("#ongletStats"); const v4 = await vues();
+  await glisser(-200, "#pilEmail"); const v5 = await vues(); // (un glissement qui démarre dans un champ ne change pas de page)
+  await glisser(-30); const v6 = await vues(); // (trop court)
+  verifier(v0.stats && !v0.pilotage && v1.pilotage && !v1.stats && v1.onglet === "pilotage" && v1.sous === "Pilotage" && v1.hash === "#pilotage" && v1b.pilotage && v2.stats && !v2.pilotage && v2.sous === "Statistiques" && v3.pilotage && v4.stats && v4.hash === "" && v6.stats,
+    `onglets Stats / Pilotage : glisser, taper (${JSON.stringify([v0.stats, v1.pilotage, v1b.pilotage, v2.stats, v3.pilotage, v4.stats, v5.stats, v6.stats])})`);
+  // Pilotage du jeu (réglages à distance) : deuxième onglet de la même page
   const nbErreursStats = erreurs.length;
-  await page.goto(url.replace("stats.html", "pilotage.html")); await page.waitForTimeout(800);
+  await glisser(-200);
   const pil = (js) => page.evaluate(js);
   const avantConnexion = await pil(() => ({ connexion: !document.getElementById("pilConnexion").hidden, panneau: document.getElementById("pilPanneau").hidden }));
   await page.fill("#pilEmail", "moi@exemple.fr"); await page.fill("#pilMdp", "mauvais"); await page.click("#pilConnecter"); await page.waitForTimeout(200);

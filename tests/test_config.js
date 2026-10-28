@@ -76,8 +76,8 @@ verifier(pd("volume de la musique par défaut à 50") === '[{"op":"defaut","cibl
 const prog = L.appliquer({}, { op: "annonce", texte: "Plus tard", debut: T0 + 3600000, dureeMin: 60, avantVersion: "9.70.0" }, T0);
 verifier(prog.config.annonce.debut === T0 + 3600000 && prog.config.annonce.fin === T0 + 7200000 && prog.config.annonce.avantVersion === "9.70.0" && !L.appliquer({}, { op: "annonce", texte: "x", avantVersion: "abc" }, 0).config, "annonce programmée : la durée compte depuis le début");
 
-// stats.html et pilotage.html : les scripts de la page sont syntaxiquement corrects
-for (const nom of ["stats.html", "pilotage.html"]) {
+// stats.html (statistiques + pilotage) : le script de la page est syntaxiquement correct
+for (const nom of ["stats.html"]) {
   const html = fs.readFileSync(path.join(__dirname, "..", nom), "utf8");
   const scripts = [...html.matchAll(/<script type="module">([\s\S]*?)<\/script>/g)].map((m) => m[1]);
   const tmp = path.join(require("os").tmpdir(), "page_module_test.mjs");

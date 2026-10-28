@@ -1,6 +1,6 @@
 # Piloter le jeu à distance (Alcuno Stats → « Pilotage du jeu »)
 
-Depuis la page privée **Alcuno Stats** (bouton « Pilotage du jeu », qui ouvre `pilotage.html`), tu règles le jeu sans rien republier :
+Depuis la page privée **Alcuno Stats** (onglet **Pilotage** en haut : tape dessus ou glisse le doigt vers la gauche ; glisse vers la droite pour revenir aux stats), tu règles le jeu sans rien republier :
 annonce sur l'accueil, voix / musique / mode en ligne coupés, thèmes cachés ou de saison
 (visibles seulement sur une période, chaque année), mise à jour demandée. Tout est annulable.
 
@@ -47,7 +47,7 @@ Après une mise à jour du jeu qui touche `database.rules.json`, recolle-le dans
 Pour comprendre des demandes plus libres : clé gratuite **Google Gemini** (aistudio.google.com → *Get API key*),
 collée dans « Assistant intelligent gratuit ». Elle reste dans ton téléphone, jamais dans le jeu ni sur GitHub.
 L'IA ne peut proposer que les réglages de la liste ci-dessus, vérifiés par le code, et tu valides avant.
-Le modèle utilisé est `MODELE_IA` dans `pilotage.html` (à changer si Google le renomme).
+Le modèle utilisé est `MODELE_IA` dans `stats.html` (à changer si Google le renomme).
 
 ## Ce que ça ne peut pas faire
 
