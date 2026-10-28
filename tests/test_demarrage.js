@@ -950,6 +950,34 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
+  // 36. Réglages à distance, suite : annonce programmée (pas avant son début), annonce visée par version, valeurs de départ des curseurs
+  // (seulement pour ceux qui n'ont jamais touché au curseur)
+  {
+    const lire = async (config, avant) => {
+      const ctx = await nav.newContext({ viewport: { width: 390, height: 780 } });
+      const page = await ctx.newPage();
+      const erreurs = [];
+      page.on("pageerror", (e) => erreurs.push(e.message));
+      await page.addInitScript(([c, pre]) => { try { localStorage.setItem("alcuno_config_distante", JSON.stringify(c)); Object.entries(pre).forEach(([k, v]) => localStorage.setItem(k, v)); } catch (e) {} }, [config, avant || {}]);
+      await page.goto(url); await page.waitForTimeout(700);
+      const r = await page.evaluate(() => ({ annonce: !document.getElementById("annonceAccueil").hidden, volume: document.getElementById("volumeMusique").value, vitesse: document.getElementById("vitesseVoix").value,
+        volumeJeu: volumeMusique, vitesseJeu: vitesseVoix, texteVolume: document.getElementById("volumeMusiqueValeur").innerText }));
+      await ctx.close();
+      return Object.assign(r, { erreurs: erreurs.length });
+    };
+    const plusTard = await lire({ annonce: { texte: "Bientôt", debut: Date.now() + 3600000 } });
+    const dejaDebutee = await lire({ annonce: { texte: "Déjà", debut: Date.now() - 3600000, fin: Date.now() + 3600000 } });
+    const terminee = await lire({ annonce: { texte: "Finie", debut: Date.now() - 7200000, fin: Date.now() - 3600000 } });
+    const vieux = await lire({ annonce: { texte: "Pour les vieux", avantVersion: "1.0.0" } });
+    const recent = await lire({ annonce: { texte: "Pour tous les anciens", avantVersion: "99.0.0" } });
+    const defauts = await lire({ defauts: { volumeMusique: 55, vitesseVoix: 1.4 } });
+    const choisi = await lire({ defauts: { volumeMusique: 55, vitesseVoix: 1.4 } }, { alcuno_volume_musique: "20", alcuno_vitesse_voix: "0.8" });
+    const aucun = await lire({});
+    verifier(!plusTard.annonce && dejaDebutee.annonce && !terminee.annonce && !vieux.annonce && recent.annonce && plusTard.erreurs + recent.erreurs + defauts.erreurs === 0, `annonce programmée / terminée / visée par version : ${plusTard.annonce}/${dejaDebutee.annonce}/${terminee.annonce}/${vieux.annonce}/${recent.annonce}`);
+    verifier(defauts.volume === "55" && defauts.volumeJeu === 55 && defauts.vitesse === "1.4" && defauts.vitesseJeu === 1.4 && /55/.test(defauts.texteVolume) && choisi.volumeJeu === 20 && choisi.vitesseJeu === 0.8 && aucun.volumeJeu === 30 && aucun.vitesseJeu === 1,
+      `valeurs de départ : ${JSON.stringify(defauts)} / déjà choisies ${JSON.stringify(choisi)} / aucune ${JSON.stringify(aucun)}`);
+  }
+
   await nav.close();
   serveur.close();
   console.log(echecs ? `\n${echecs} ÉCHEC(S)` : "\nTOUT EST OK");

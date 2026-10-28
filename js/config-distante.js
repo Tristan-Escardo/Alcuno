@@ -35,13 +35,34 @@ function appliquerConfigDistante(){
   const actuel = racine.dataset.theme || "bordeaux";
   if (themeBloqueADistance(actuel)) appliquerTheme("bordeaux");
 
-  // bandeau de l'accueil : annonce, ou demande de mise à jour
+  appliquerDefautsDistants();
+  majAnnonceAccueil();
+}
+
+// Valeurs de départ imposées à distance (volume de la musique, vitesse de la voix) : seulement pour ceux qui n'ont jamais touché au curseur
+function appliquerDefautsDistants(){
+  const d = configDistante.defauts || {};
+  try {
+    if (localStorage.getItem(CLE_VOLUME_MUSIQUE) === null) {
+      volumeMusique = d.volumeMusique !== undefined ? d.volumeMusique : 30;
+      curseurMusique.value = volumeMusique; majLigneMusique();
+    }
+    if (localStorage.getItem(CLE_VITESSE_VOIX) === null) {
+      vitesseVoix = d.vitesseVoix !== undefined ? d.vitesseVoix : 1;
+      curseurVoix.value = vitesseVoix; majLigneVoix();
+    }
+  } catch (e) {}
+}
+
+// Bandeau de l'accueil : annonce (commencée, pas finie, pour cette version), ou demande de mise à jour. Revu chaque minute :
+// une annonce programmée apparaît toute seule à l'heure dite.
+function majAnnonceAccueil(){
   const zone = document.getElementById("annonceAccueil");
   if (!zone) return;
   let texte = "", maj = false, cle = "";
   if (configDistante.majMin && ConfigLib.versionPlusVieille(VERSION_AFFICHEE, configDistante.majMin)) {
     texte = `Une nouvelle version du jeu est disponible (${configDistante.majMin}).`; maj = true; cle = "maj" + configDistante.majMin;
-  } else if (ConfigLib.annonceVisible(configDistante, Date.now())) {
+  } else if (ConfigLib.annonceVisible(configDistante, Date.now(), VERSION_AFFICHEE)) {
     texte = configDistante.annonce.texte; cle = "annonce" + (configDistante.annonce.maj || 0) + texte;
   }
   let vue = ""; try { vue = localStorage.getItem(CLE_ANNONCE_VUE) || ""; } catch (e) {}
@@ -60,6 +81,8 @@ function lireConfigDistante(){
       configDistante = ConfigLib.valider(s.val());
       try { localStorage.setItem(CLE_CONFIG_DISTANTE, JSON.stringify(configDistante)); } catch (e) {}
       appliquerConfigDistante();
+      // Dit à pilotage.html que cet appareil a bien lu la config (et laquelle) : voyant « lecture »
+      if (!estPageTele) window.fbUpdate(window.fbRef(window.firebaseDB, `stats/appareils/${idStats}`), { confVu: window.fbServerTimestamp(), confV: configDistante.v || 0 }).catch(() => {});
     }).catch(() => {}); // (pas de réseau ou règles Firebase pas encore à jour : on garde la dernière copie)
   });
 }
@@ -76,4 +99,5 @@ document.addEventListener("visibilitychange", () => {
 
 appliquerConfigDistante();
 lireConfigDistante();
+setInterval(majAnnonceAccueil, 60 * 1000);
 // #endregion

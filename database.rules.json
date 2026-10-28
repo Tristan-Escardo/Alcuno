@@ -28,6 +28,8 @@
           "theme": { ".validate": "newData.isString() && newData.val().length <= 12" },
           "version": { ".validate": "newData.isString() && newData.val().length <= 12" },
           "vu": { ".validate": "newData.isNumber()" },
+          "confVu": { ".validate": "newData.isNumber()" },
+          "confV": { ".validate": "newData.isNumber()" },
           "$autre": { ".validate": false }
         }
       }
@@ -39,9 +41,17 @@
         ".validate": "newData.hasChild('texte')",
         "texte": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 140" },
         "fin": { ".validate": "newData.isNumber()" },
+        "debut": { ".validate": "newData.isNumber()" },
         "maj": { ".validate": "newData.isNumber()" },
+        "avantVersion": { ".validate": "newData.isString() && newData.val().matches(/^[0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}$/)" },
         "$autre": { ".validate": false }
       },
+      "defauts": {
+        "volumeMusique": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100" },
+        "vitesseVoix": { ".validate": "newData.isNumber() && newData.val() >= 0.6 && newData.val() <= 1.6" },
+        "$autre": { ".validate": false }
+      },
+      "v": { ".validate": "newData.isNumber()" },
       "coupures": {
         "voix": { ".validate": "newData.isBoolean()" },
         "musique": { ".validate": "newData.isBoolean()" },

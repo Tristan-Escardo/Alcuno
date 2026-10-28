@@ -56,6 +56,26 @@ for (const [phrase, voulu] of Object.entries(attendu)) verifier(cmds(phrase) ===
 verifier(L.interpreter("bonjour").cmds.length === 0 && L.interpreter("").cmds.length === 0 && L.interpreter("bonjour").raison, "assistant : phrase incomprise => explication");
 verifier(L.decrire({}).join() === "rien : le jeu est réglé par défaut" && L.decrire(cfg).length === 1, "description des réglages en cours");
 
+// annonces programmées, version visée, valeurs de départ, date de la modification
+const A = (a) => L.valider({ annonce: Object.assign({ texte: "x" }, a) });
+verifier(!L.annonceVisible(A({ debut: 2000 }), 1000, "9.65.0") && L.annonceVisible(A({ debut: 2000 }), 2500, "9.65.0") && !L.annonceVisible(A({ debut: 2000, fin: 3000 }), 3500, "9.65.0"), "annonce programmée : pas avant le début, plus après la fin");
+verifier(L.annonceVisible(A({ avantVersion: "9.66.0" }), 1, "9.65.0") && !L.annonceVisible(A({ avantVersion: "9.65.0" }), 1, "9.65.0") && !L.annonceVisible(A({ avantVersion: "9.65.0" }), 1, "9.70.1") && L.annonceVisible(A({}), 1, "1.0.0"), "annonce visée : seulement les versions plus anciennes");
+const d = L.valider({ defauts: { volumeMusique: 47, vitesseVoix: 1.34 }, v: 123 });
+verifier(d.defauts.volumeMusique === 45 && d.defauts.vitesseVoix === 1.3 && d.v === 123 && !L.valider({ defauts: { volumeMusique: 150, vitesseVoix: 9 } }).defauts && !("v" in L.valider({ v: "x" })), "valeurs de départ arrondies, refusées hors limites ; date de modification");
+let cd = L.appliquer({}, { op: "defaut", cible: "volumeMusique", valeur: 50 }, 0);
+cd = L.appliquer(cd.config, { op: "defaut", cible: "vitesseVoix", valeur: 1.2 }, 0);
+verifier(cd.config.defauts.volumeMusique === 50 && cd.config.defauts.vitesseVoix === 1.2 && !L.appliquer({}, { op: "defaut", cible: "volumeMusique", valeur: 101 }, 0).config && !L.appliquer({}, { op: "defaut", cible: "x", valeur: 1 }, 0).config, "commande « valeur de départ »");
+verifier(!L.appliquer(cd.config, { op: "defaut", cible: "volumeMusique", valeur: null }, 0).config.defauts.volumeMusique && !L.appliquer(L.appliquer(cd.config, { op: "defaut", cible: "volumeMusique", valeur: null }, 0).config, { op: "defaut", cible: "vitesseVoix", valeur: null }, 0).config.defauts, "valeur de départ retirée, sans résidu");
+const T0 = new Date(2026, 9, 28, 15, 0).getTime(); // mercredi 28 octobre 2026, 15 h
+const quand = (phrase) => { const c = L.interpreter(phrase, T0).cmds[0]; return c && c.debut ? new Date(c.debut).toLocaleString("sv-SE").slice(0, 16) : null; };
+verifier(quand("annonce demain à 18h : Salut") === "2026-10-29 18:00" && quand("annonce : « Salut » samedi 21h30") === "2026-10-31 21:30" && quand("annonce le 5 novembre à 20h : Salut") === "2026-11-05 20:00" && quand("annonce à 12h : Salut") === "2026-10-29 12:00" && quand("annonce à 17h : Salut") === "2026-10-28 17:00" && quand("annonce mercredi à 10h : Salut") === "2026-11-04 10:00" && quand("annonce ce soir : Salut") === "2026-10-28 20:00" && quand("annonce : Salut pendant 2h") === null, "assistant : début de l'annonce (demain, jour de la semaine, date, heure seule)");
+const ia = L.interpreter("affiche l'annonce «Mise à jour dispo» pour les versions avant 9.65.0 pendant 3 jours", T0).cmds[0];
+verifier(ia.avantVersion === "9.65.0" && ia.dureeMin === 4320 && ia.texte === "Mise à jour dispo" && !ia.debut, "assistant : version visée et durée");
+const pd = (p) => JSON.stringify(L.interpreter(p, T0).cmds);
+verifier(pd("volume de la musique par défaut à 50") === '[{"op":"defaut","cible":"volumeMusique","valeur":50}]' && pd("vitesse de la voix 1,2 par défaut") === '[{"op":"defaut","cible":"vitesseVoix","valeur":1.2}]' && pd("remets le volume de la musique par défaut") === '[{"op":"defaut","cible":"volumeMusique","valeur":null}]', "assistant : valeurs de départ");
+const prog = L.appliquer({}, { op: "annonce", texte: "Plus tard", debut: T0 + 3600000, dureeMin: 60, avantVersion: "9.70.0" }, T0);
+verifier(prog.config.annonce.debut === T0 + 3600000 && prog.config.annonce.fin === T0 + 7200000 && prog.config.annonce.avantVersion === "9.70.0" && !L.appliquer({}, { op: "annonce", texte: "x", avantVersion: "abc" }, 0).config, "annonce programmée : la durée compte depuis le début");
+
 // stats.html et pilotage.html : les scripts de la page sont syntaxiquement corrects
 for (const nom of ["stats.html", "pilotage.html"]) {
   const html = fs.readFileSync(path.join(__dirname, "..", nom), "utf8");
@@ -67,5 +87,6 @@ for (const nom of ["stats.html", "pilotage.html"]) {
 }
 // les règles Firebase restent un JSON valide qui protège « config » en écriture
 const regles = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "database.rules.json"), "utf8")).rules;
+verifier(regles.stats.appareils.$id.confVu && regles.stats.appareils.$id.confV && regles.config.v && regles.config.defauts && regles.config.annonce.debut && regles.config.annonce.avantVersion, "règles Firebase : champs des nouveaux réglages");
 verifier(regles.config[".read"] === true && /auth\.uid/.test(regles.config[".write"]) && /auth\.uid/.test(regles.config_hist[".write"]) && regles.config_hist[".read"] !== true, "règles Firebase : config lisible par tous, écriture réservée au compte administrateur");
 console.log(process.exitCode ? "\nÉCHEC(S)" : `\nTOUT EST OK (${ok})`);

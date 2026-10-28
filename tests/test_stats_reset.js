@@ -145,10 +145,31 @@ export const signOut = async () => { utilisateur = null; ecouteur(null); };
   const annule = await pil(() => ({ config: JSON.stringify(window.__arbre.config || null), hist: Object.keys(window.__arbre.config_hist || {}).length }));
   await page.click("#pilAnnulerDerniere"); await page.waitForTimeout(300);
   const toutAnnule = await pil(() => ({ config: window.__arbre.config || null, hist: Object.keys(window.__arbre.config_hist || {}).length }));
+  // annonce programmée + version visée + valeurs de départ + aperçu + historique + voyant de lecture
+  page.on("dialog", (d) => d.accept());
+  await page.fill("#pilAnnonce", "Bientôt !");
+  await page.fill("#pilAnnonceDebut", "2099-01-02T18:30"); await page.fill("#pilAnnonceAvant", "9.70.0");
+  await page.click("#pilPublierAnnonce"); await page.waitForTimeout(300);
+  const prog = await pil(() => ({ annonce: window.__arbre.config.annonce, apercu: document.getElementById("pilApercu").textContent }));
+  await page.selectOption("#pilDefVolume", "55"); await page.selectOption("#pilDefVitesse", "1.3"); await page.click("#pilAppliquerDefauts"); await page.waitForTimeout(300);
+  const defauts = await pil(() => ({ d: window.__arbre.config.defauts, v: typeof window.__arbre.config.v, apercu: document.getElementById("pilApercu").textContent, etat: document.getElementById("pilEtat").textContent }));
+  const histoAvant = await pil(() => document.querySelectorAll("#pilHisto button").length);
+  await page.click("#pilHisto button >> nth=0"); await page.waitForTimeout(400); // revient avant les valeurs de départ
+  const retour = await pil(() => ({ defauts: window.__arbre.config.defauts || null, annonce: !!window.__arbre.config.annonce, histo: document.querySelectorAll("#pilHisto button").length }));
+  const lecture = await pil(() => document.getElementById("pilLecture").textContent);
+  await page.evaluate(() => { window.__arbre.stats = { appareils: { abcdefghij01: { os: "ios", vu: Date.now(), confVu: Date.now() - 120000, confV: window.__arbre.config.v }, abcdefghij02: { os: "android", vu: Date.now() } } }; });
+  await page.click('#pilCoupures button[data-coupure="musique"]'); await page.waitForTimeout(300); // (redessine aussi le voyant)
+  const lecture2 = await pil(() => document.getElementById("pilLecture").textContent);
+  await page.click("#pilAnnulerDerniere"); await page.waitForTimeout(300);
+  await page.click("#pilRetirerAnnonce"); await page.waitForTimeout(300);
+  verifier(prog.annonce.debut === new Date("2099-01-02T18:30").getTime() && prog.annonce.avantVersion === "9.70.0" && /Bientôt/.test(prog.apercu) && /apparaîtra/.test(prog.apercu) && /9\.70\.0/.test(prog.apercu), `pilotage : annonce programmée + version visée + aperçu (${JSON.stringify(prog.annonce)})`);
+  verifier(defauts.d && defauts.d.volumeMusique === 55 && defauts.d.vitesseVoix === 1.3 && defauts.v === "number" && /55 %/.test(defauts.apercu) && /1,3×/.test(defauts.etat), `pilotage : valeurs de départ (${JSON.stringify(defauts.d)})`);
+  verifier(histoAvant >= 2 && retour.defauts === null && retour.annonce && retour.histo > histoAvant - 1, `pilotage : historique, « Revenir avant » (${histoAvant} entrées, après ${JSON.stringify(retour)})`);
+  verifier(/Aucun appareil/.test(lecture) && /2 appareils vus/.test(lecture2) && /1 ont lu/.test(lecture2) && /0 ont ta dernière modification/.test(lecture2) && /il y a 2 min/.test(lecture2), `pilotage : voyant de lecture (« ${lecture.slice(0, 80)} » puis « ${lecture2} »)`);
   verifier(avantConnexion.connexion && avantConnexion.panneau && /incorrect/.test(refuse) && connecte.panneau && connecte.uid === "UID-TEST-123" && /rien/.test(connecte.etat), `pilotage : connexion refusée puis acceptée (${refuse} / ${JSON.stringify(connecte)})`);
   verifier(/coupe|Couper/i.test(propose.texte) && propose.visible && propose.config === null && /compris/.test(incompris) && /"voix":true/.test(applique.config) && applique.hist === 1 && /voix/.test(applique.etat), `pilotage : l'assistant propose, puis applique après validation, avec historique (${propose.texte} / ${JSON.stringify(applique)}) message « ${incompris.slice(0, 30)} »`);
   verifier(/"voix":true/.test(complet) && /"kawaii":\{"actif":false\}/.test(complet) && /"texte":"Bienvenue !"/.test(complet) && /"fin":\d+/.test(complet), `pilotage : boutons thème et annonce (${complet})`);
-  verifier(/"voix":true/.test(annule.config) && !/Bienvenue|kawaii/.test(annule.config) && annule.hist === 1 && toutAnnule.config === null && toutAnnule.hist === 0, `pilotage : « annuler » revient en arrière pas à pas (${JSON.stringify(annule)} puis ${JSON.stringify(toutAnnule)})`);
+  verifier(/"voix":true/.test(annule.config) && !/Bienvenue|kawaii/.test(annule.config) && annule.hist === 1 && toutAnnule.config && Object.keys(toutAnnule.config).join() === "v" && toutAnnule.hist === 0, `pilotage : « annuler » revient en arrière pas à pas (${JSON.stringify(annule)} puis ${JSON.stringify(toutAnnule)})`);
   verifier(erreurs.length === 0 && nbErreursStats === 0, `aucune erreur dans les pages (${erreurs.length})`);
   await nav.close(); serveur.close();
   console.log(echecs ? `\n${echecs} ÉCHEC(S)` : "\nTOUT EST OK");

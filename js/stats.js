@@ -9,7 +9,8 @@
 // - stats/jours/AAAA-MM-JJ : visites, installs, parties, partiesEnLigne, doreesEnJeu, doreesTirees
 //   (compteurs), heures/{HH} (parties
 //   lancées à chaque heure) et visiteurs/{id} ;
-// - stats/appareils/{id} : os, thème, version, dernière visite (répartitions de la page stats) ;
+// - stats/appareils/{id} : os, thème, version, dernière visite (répartitions de la page stats), et la dernière lecture des
+//   réglages à distance : confVu (quand) et confV (quelle modification) : voyant de pilotage.html ;
 // - presence/{id} : ce que fait ce téléphone en ce moment (menu, classique, enligne, tele), retiré
 //   par Firebase dès que le téléphone se déconnecte (« en ce moment » de la page stats).
 const CLE_ID_STATS = "alcuno_id_stats";
@@ -47,7 +48,8 @@ function compterStats(nom){
 
 function noterAppareilStats(){
   attendreFirebase(() => {
-    window.fbSet(refStats(`stats/appareils/${idStats}`), {
+    // (update et non set : la fiche garde confVu / confV, écrits par js/config-distante.js)
+    window.fbUpdate(refStats(`stats/appareils/${idStats}`), {
       os: systemeStats(),
       theme: document.documentElement.dataset.theme || "bordeaux",
       version: VERSION_AFFICHEE,

@@ -18,12 +18,27 @@ Le jeu ne peut pas être bloqué par ça : sans réseau ou si Firebase ne répon
    Tant que ce n'est pas fait, personne ne peut écrire : le pilotage affiche « Refusé par Firebase ».
 4. Ouvre Alcuno Stats, descends jusqu'à **Pilotage du jeu**, connecte-toi.
 
+## Mise à jour des règles (version 9.65.0)
+
+Les règles ont de nouveaux champs (annonce programmée, version visée, valeurs de départ, voyant de lecture).
+Après une mise à jour du jeu qui touche `database.rules.json`, recolle-le dans Realtime Database → Règles → **Publier**
+(ton UID y est déjà). Sans ça, le pilotage affiche « Refusé par Firebase » pour ces nouveaux réglages.
+
 ## Utilisation
 
 - **Assistant** : écris une phrase, il te montre ce qu'il a compris, tu valides. Exemples :
   `coupe la voix` · `ferme le mode en ligne` · `désactive le thème Kawaii` ·
   `thème Star Wars du 1er mai au 4 mai` · `annonce : « Soirée ce soir ! » pendant 2 jours` ·
   `oblige la mise à jour 9.64.0` · `remets tout à zéro`.
+- **Aperçu** : « Ce que voit un joueur » montre l'accueil avec la config actuelle, et chaque demande de l'assistant
+  montre l'aperçu *après* application avant que tu valides.
+- **Annonce programmée** : « annonce demain à 18h : « Soirée ! » pendant 3 heures » (ou le champ « Début »). Elle apparaît toute seule à l'heure.
+- **Annonce visée** : « … pour les versions avant 9.65.0 » (ou le champ « Seulement pour les versions avant »).
+- **Valeurs de départ** : volume de la musique et vitesse de la voix pour ceux qui n'ont jamais touché au curseur
+  (« volume de la musique par défaut à 50 »).
+- **Historique** : les 20 dernières modifications ; « Revenir avant » rétablit l'état d'avant l'une d'elles.
+- **Lecture par les joueurs** : combien d'appareils ont lu les réglages, et combien ont ta dernière modification
+  (les appareils en 9.65.0 ou plus le signalent ; un avertissement apparaît si aucun ne l'a fait).
 - **Boutons** : Couper / Remettre une fonction, Cacher / Remettre un thème, période d'un thème, annonce.
 - **Annuler la dernière modification** : revient à l'état d'avant (l'historique est dans `config_hist`).
 

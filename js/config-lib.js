@@ -5,10 +5,13 @@
 // Il est chargé par le jeu (index.html), par stats.html et par les tests (node).
 //
 // Dans Firebase, « config » contient (tout est facultatif) :
-//   annonce   : { texte, fin }                 message affiché sur l'accueil (fin : date en ms, facultative)
+//   annonce   : { texte, debut, fin, avantVersion }  message sur l'accueil (debut / fin : dates en ms, facultatives ;
+//                                              avantVersion : seulement pour les versions du jeu plus anciennes que celle-ci)
 //   coupures  : { voix, musique, enligne }     true = fonction coupée pour tout le monde
 //   themes    : { <thème>: { actif, debut, fin } }   actif:false = thème caché ; debut/fin = « MM-JJ » (chaque année)
 //   majMin    : "9.64.0"                       version minimale : en dessous, bandeau « mets à jour »
+//   defauts   : { volumeMusique, vitesseVoix } valeurs de départ (seulement pour ceux qui n'ont jamais touché au curseur)
+//   v         : date de la dernière modification (ms) : les appareils la renvoient dans stats/appareils (voyant du pilotage)
 // =============================================================================================
 (function (global) {
   "use strict";
@@ -37,6 +40,8 @@
       c.annonce = { texte: a.texte.trim().slice(0, TEXTE_MAX) };
       if (typeof a.fin === "number" && isFinite(a.fin)) c.annonce.fin = a.fin;
       if (typeof a.maj === "number" && isFinite(a.maj)) c.annonce.maj = a.maj;
+      if (typeof a.debut === "number" && isFinite(a.debut)) c.annonce.debut = a.debut;
+      if (typeof a.avantVersion === "string" && /^\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(a.avantVersion)) c.annonce.avantVersion = a.avantVersion;
     }
     if (estObjet(brut.coupures)) {
       COUPURES_CONNUES.forEach((n) => { if (brut.coupures[n] === true) (c.coupures = c.coupures || {})[n] = true; });
@@ -51,6 +56,12 @@
         if (Object.keys(o).length) (c.themes = c.themes || {})[t] = o;
       });
     }
+    if (estObjet(brut.defauts)) {
+      const d = brut.defauts;
+      if (typeof d.volumeMusique === "number" && d.volumeMusique >= 0 && d.volumeMusique <= 100) (c.defauts = c.defauts || {}).volumeMusique = Math.round(d.volumeMusique / 5) * 5;
+      if (typeof d.vitesseVoix === "number" && d.vitesseVoix >= 0.6 && d.vitesseVoix <= 1.6) (c.defauts = c.defauts || {}).vitesseVoix = Math.round(d.vitesseVoix * 10) / 10;
+    }
+    if (typeof brut.v === "number" && isFinite(brut.v)) c.v = brut.v;
     if (typeof brut.majMin === "string" && /^\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(brut.majMin)) c.majMin = brut.majMin;
     return c;
   }
@@ -76,9 +87,14 @@
 
   const coupee = (config, nom) => !!(config && config.coupures && config.coupures[nom]);
 
-  function annonceVisible(config, maintenant) {
+  // Annonce à montrer maintenant ? (commencée, pas finie, et pour cette version du jeu)
+  function annonceVisible(config, maintenant, version) {
     const a = config && config.annonce;
-    return !!a && (typeof a.fin !== "number" || a.fin > maintenant);
+    if (!a) return false;
+    if (typeof a.debut === "number" && a.debut > maintenant) return false;
+    if (typeof a.fin === "number" && a.fin <= maintenant) return false;
+    if (a.avantVersion && version && !versionPlusVieille(version, a.avantVersion)) return false;
+    return true;
   }
 
   // ----- Commandes : { op: … } -----
@@ -94,9 +110,15 @@
         const texte = String(cmd.texte || "").trim().slice(0, TEXTE_MAX);
         if (!texte) return { erreur: "Il manque le texte de l'annonce." };
         c.annonce = { texte, maj: maintenant };
-        let fin = "";
-        if (Number(cmd.dureeMin) > 0) { c.annonce.fin = maintenant + Math.round(Number(cmd.dureeMin)) * 60000; fin = ` (${dureeEnTexte(Number(cmd.dureeMin))})`; }
-        return { config: c, resume: `Annonce sur l'accueil : « ${texte} »${fin}` };
+        let debut = "", duree = "", version = "";
+        const t0 = Number(cmd.debut) > maintenant ? Number(cmd.debut) : maintenant;
+        if (t0 > maintenant) { c.annonce.debut = t0; debut = ` à partir du ${new Date(t0).toLocaleString("fr-FR", { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })}`; }
+        if (Number(cmd.dureeMin) > 0) { c.annonce.fin = t0 + Math.round(Number(cmd.dureeMin)) * 60000; duree = `, pendant ${dureeEnTexte(Number(cmd.dureeMin))}`; }
+        if (cmd.avantVersion) {
+          if (!/^\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(String(cmd.avantVersion))) return { erreur: "Version illisible (attendu : 9.64.0)." };
+          c.annonce.avantVersion = String(cmd.avantVersion); version = `, seulement pour les versions avant ${cmd.avantVersion}`;
+        }
+        return { config: c, resume: `Annonce sur l'accueil : « ${texte} »${debut}${duree}${version}` };
       }
       case "annonce_off":
         delete c.annonce;
@@ -140,6 +162,19 @@
         c.majMin = String(cmd.version);
         return { config: c, resume: `Demander la mise à jour sous la version ${c.majMin}` };
       }
+      case "defaut": {
+        const bornes = { volumeMusique: [0, 100, 5, "Volume de la musique", " %"], vitesseVoix: [0.6, 1.6, 0.1, "Vitesse de la voix", "×"] }[cmd.cible];
+        if (!bornes) return { erreur: "Je ne sais pas régler « " + cmd.cible + " »." };
+        if (cmd.valeur === null || cmd.valeur === undefined) {
+          if (c.defauts) { delete c.defauts[cmd.cible]; if (!Object.keys(c.defauts).length) delete c.defauts; }
+          return { config: c, resume: `${bornes[3]} : chacun garde son réglage (plus de valeur par défaut imposée)` };
+        }
+        let x = Number(cmd.valeur);
+        if (!isFinite(x) || x < bornes[0] - 1e-9 || x > bornes[1] + 1e-9) return { erreur: `${bornes[3]} : valeur entre ${bornes[0]} et ${bornes[1]}.` };
+        x = Math.round(x / bornes[2]) * bornes[2]; x = Math.round(x * 100) / 100;
+        (c.defauts = c.defauts || {})[cmd.cible] = x;
+        return { config: c, resume: `${bornes[3]} par défaut : ${String(x).replace(".", ",")}${bornes[4]} (pour ceux qui n'ont jamais touché au curseur)` };
+      }
       case "tout_remettre":
         return { config: {}, resume: "Tout remettre par défaut (aucun réglage à distance)" };
       default:
@@ -179,6 +214,35 @@
     return null;
   }
 
+  const JOURS_SEMAINE = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
+  // Début d'une annonce programmée : « demain à 18h », « samedi 21h30 », « le 5 novembre à 20h », « ce soir à 21h », « à 18h »
+  function debutDans(t, maintenant) {
+    const now = new Date(maintenant);
+    const base = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const plus = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+    const h = t.match(/(\d{1,2})\s*(?:h|:)\s*(\d{2})?/);
+    let jour = null, genre = "fixe"; // fixe : jour dit clairement ; semaine : « samedi » (le prochain) ; heure : seulement « à 18h »
+    if (/apres[- ]demain/.test(t)) jour = plus(base, 2);
+    else if (/\bdemain\b/.test(t)) jour = plus(base, 1);
+    else if (/ce soir|aujourd'hui|ce matin|cet apres/.test(t)) jour = base;
+    else {
+      const i = JOURS_SEMAINE.findIndex((n) => new RegExp("\\b" + n + "\\b").test(t));
+      if (i >= 0) { jour = plus(base, (i - now.getDay() + 7) % 7); genre = "semaine"; }
+      else {
+        const d = dateDans(t, 0);
+        if (d) { const [m, j] = d.md.split("-").map(Number); jour = new Date(now.getFullYear(), m - 1, j); if (plus(jour, 1) <= now) jour = new Date(now.getFullYear() + 1, m - 1, j); }
+      }
+    }
+    if (!jour && !h) return null;
+    if (!jour) { jour = base; genre = "heure"; }
+    const soir = /ce soir/.test(t);
+    let heure = h ? Number(h[1]) : (soir ? 20 : 8), min = h && h[2] ? Number(h[2]) : 0;
+    if (heure > 23 || min > 59) return null;
+    let d = new Date(jour.getFullYear(), jour.getMonth(), jour.getDate(), heure, min);
+    if (d <= now && genre !== "fixe") d.setDate(d.getDate() + (genre === "semaine" ? 7 : 1));
+    return d.getTime();
+  }
+
   function dureeDans(t) { // « pendant 2 jours », « 3 heures », « une semaine »
     const m = t.match(/(?:pendant|pour|durant|jusqu a dans)\s+(un|une|\d+)\s*(minutes?|min|heures?|h|jours?|j|semaines?)/);
     if (!m) return 0;
@@ -191,26 +255,27 @@
   }
 
   // Plusieurs demandes dans une phrase (« coupe la voix et la musique », « … puis désactive le thème Kawaii »)
-  function interpreter(texteBrut) {
+  function interpreter(texteBrut, maintenant) {
+    maintenant = typeof maintenant === "number" ? maintenant : Date.now();
     const brut = String(texteBrut || "").trim();
     if (!/[«"“:]/.test(brut)) {
-      const parties = brut.split(/\s*(?:,|;|\bet\b|\bpuis\b)\s*/i).filter(Boolean);
+      const parties = brut.split(/\s*(?:,(?!\d)|;|\bet\b|\bpuis\b)\s*/i).filter(Boolean);
       if (parties.length > 1) {
         const verbe = parties[0].split(/\s+/)[0];
         const cmds = []; let raison = "";
         for (const [i, partie] of parties.entries()) {
-          let r = interpreterUne(partie);
-          if (!r.cmds.length && i > 0) r = interpreterUne(verbe + " " + partie);
+          let r = interpreterUne(partie, maintenant);
+          if (!r.cmds.length && i > 0) r = interpreterUne(verbe + " " + partie, maintenant);
           if (!r.cmds.length) return { cmds: [], raison: r.raison };
           cmds.push(...r.cmds);
         }
         return { cmds, raison };
       }
     }
-    return interpreterUne(brut);
+    return interpreterUne(brut, maintenant);
   }
 
-  function interpreterUne(texteBrut) {
+  function interpreterUne(texteBrut, maintenant) {
     const brut = String(texteBrut || "").trim();
     const t = sansAccent(brut).replace(/[’‘]/g, "'");
     const cmds = [];
@@ -229,7 +294,23 @@
       if (!entre) { texte = texte.replace(reDuree, ""); }
       const cmd = { op: "annonce", texte: texte.trim() };
       if (d) cmd.dureeMin = d;
+      // (le début et la version visée se disent hors du texte : avant les « : », ou hors des guillemets)
+      const hors = (entre ? reste : sansAccent(brut.slice(0, brut.indexOf(":")))).replace(/(?:pendant|pour|durant)\s+(?:un|une|\d+)\s*[a-z]+/, " ");
+      const av = hors.match(/(?:avant|inferieure?s?|moins que|en dessous de|sous)\s*(?:a |de |la |les )?(?:version\s*)?(\d+\.\d+\.\d+)/);
+      if (av) cmd.avantVersion = av[1];
+      const debut = debutDans(hors.replace(/(\d+\.\d+\.\d+)/, " "), maintenant);
+      if (debut) cmd.debut = debut;
       cmds.push(cmd);
+    }
+
+    // valeurs par défaut des curseurs
+    if (!cmds.length && /\b(volume|vitesse)\b/.test(t)) {
+      const cible = /volume/.test(t) && /musique|ambiance/.test(t) ? "volumeMusique" : /vitesse/.test(t) && /voix|lecture|annonce/.test(t) ? "vitesseVoix" : null;
+      if (cible) {
+        const n = t.match(/(\d+(?:[.,]\d+)?)/);
+        if (n) cmds.push({ op: "defaut", cible, valeur: Number(n[1].replace(",", ".")) });
+        else if (/par defaut|remets?|supprime|retire|enleve|plus de/.test(t)) cmds.push({ op: "defaut", cible, valeur: null });
+      }
     }
 
     // version minimale
@@ -263,13 +344,15 @@
   // Phrase de description de l'état actuel (pour l'assistant et pour l'IA)
   function decrire(config) {
     const c = valider(config), l = [];
-    if (c.annonce) l.push(`annonce : « ${c.annonce.texte} »${typeof c.annonce.fin === "number" ? " (jusqu'au " + new Date(c.annonce.fin).toLocaleString("fr-FR") + ")" : ""}`);
+    if (c.annonce) l.push(`annonce : « ${c.annonce.texte} »${typeof c.annonce.debut === "number" ? " (dès le " + new Date(c.annonce.debut).toLocaleString("fr-FR") + ")" : ""}${typeof c.annonce.fin === "number" ? " (jusqu'au " + new Date(c.annonce.fin).toLocaleString("fr-FR") + ")" : ""}${c.annonce.avantVersion ? " (versions avant " + c.annonce.avantVersion + ")" : ""}`);
     COUPURES_CONNUES.forEach((n) => { if (coupee(c, n)) l.push(`${NOMS_COUPURES[n]} : coupé`); });
     Object.keys(c.themes || {}).forEach((t) => {
       const x = c.themes[t];
       l.push(`thème ${NOMS_THEMES[t]} : ${x.actif === false ? "caché" : "visible"}${x.debut ? ", du " + dateEnTexte(x.debut) + " au " + dateEnTexte(x.fin) : ""}`);
     });
     if (c.majMin) l.push(`mise à jour obligatoire sous la version ${c.majMin}`);
+    if (c.defauts && c.defauts.volumeMusique !== undefined) l.push(`volume de la musique par défaut : ${c.defauts.volumeMusique} %`);
+    if (c.defauts && c.defauts.vitesseVoix !== undefined) l.push(`vitesse de la voix par défaut : ${String(c.defauts.vitesseVoix).replace(".", ",")}×`);
     return l.length ? l : ["rien : le jeu est réglé par défaut"];
   }
 
