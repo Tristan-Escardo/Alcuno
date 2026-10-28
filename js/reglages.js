@@ -1911,13 +1911,19 @@ function noteVoix(v){
   return n;
 }
 function meilleureVoixFr(){
+  ecouterChangementDeVoix();
   if (voixFrCherchee && voixFrChoisie) return voixFrChoisie;
   const voix = (window.speechSynthesis.getVoices() || []).filter((v) => /^fr/i.test(v.lang));
   voixFrCherchee = voix.length > 0; // (liste encore vide : on redemande à la prochaine lecture)
   voixFrChoisie = voix.length ? voix.slice().sort((a, b) => noteVoix(b) - noteVoix(a))[0] : null;
   return voixFrChoisie;
 }
-try { if (voixPossible) window.speechSynthesis.addEventListener("voiceschanged", () => { voixFrCherchee = false; voixFrChoisie = null; }); } catch (e) {}
+let ecouteVoix = false; // (la synthèse vocale n'est touchée qu'à la première lecture : réglage désactivé = on n'y touche pas du tout)
+function ecouterChangementDeVoix(){
+  if (ecouteVoix) return;
+  ecouteVoix = true;
+  try { window.speechSynthesis.addEventListener("voiceschanged", () => { voixFrCherchee = false; voixFrChoisie = null; }); } catch (e) {}
+}
 
 let voixDernier = { texte: "", date: 0 };
 // Lit un texte tout de suite (sans tenir compte du réglage : l'appelant a déjà décidé). Sert au téléphone (parler) et à la télé.
@@ -1934,6 +1940,11 @@ function dire(brut, force = false, vitesse = null){
     lecture.rate = Math.min(1.6, Math.max(0.6, Number(vitesse) || vitesseVoix));
     const voixFr = meilleureVoixFr();
     if (voixFr) lecture.voice = voixFr;
+    const apres = () => { // (iPhone : la voix peut interrompre le son de la page ; une fois la lecture finie, on relance le son et la musique)
+      for (const attente of [100, 1500]) setTimeout(() => { try { if (contexteSon && contexteSon.state !== "running") contexteSon.resume().catch(() => {}); majMusique(); } catch (e) {} }, attente);
+    };
+    lecture.onend = apres;
+    lecture.onerror = apres;
     window.speechSynthesis.speak(lecture);
     try { attenuerMusique(Math.min(8, 1.5 + texte.length * 0.07)); } catch (e) {} // la musique baisse pendant la lecture
   } catch (e) {}
@@ -1964,7 +1975,7 @@ caseVoix.addEventListener("change", () => {
   if (voixActive) parler("Annonces à voix haute activées.", true); // (part d'un tap : nécessaire sur iPhone)
   else { try { window.speechSynthesis.cancel(); } catch (e) {} }
 });
-document.addEventListener("visibilitychange", () => { if (document.visibilityState !== "visible" && voixPossible) { try { window.speechSynthesis.cancel(); } catch (e) {} } });
+document.addEventListener("visibilitychange", () => { if (document.visibilityState !== "visible" && voixActive) { try { window.speechSynthesis.cancel(); } catch (e) {} } });
 
 // Fenêtres d'annonce : lues quand elles apparaissent et quand leur texte change (l'annonce « règle » est une même fenêtre réutilisée)
 if (voixPossible) {
