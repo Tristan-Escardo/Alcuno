@@ -104,37 +104,9 @@
         .messageReset.erreur{ color: #ff7b9c; }
         .note{ text-align: center; color: #3f7088; font-size: 12px; margin-top: 18px; }
 
-        /* Pilotage du jeu */
-        .pilNote{ font-size: 14px; line-height: 1.4; color: var(--cyan-doux); margin: 0 0 10px; }
-        .pilNote.erreur, .pilMessage.erreur{ color: #ff7b9c; }
-        .pilNote b{ color: var(--cyan-clair); }
-        #blocPilotage input[type=text], #blocPilotage input[type=email], #blocPilotage input[type=password], #blocPilotage input[type=date], #blocPilotage select, #blocPilotage textarea{
-            width: 100%; box-sizing: border-box; margin: 0 0 8px; padding: 11px; border-radius: 6px; border: 1px solid rgba(0, 229, 255, .4);
-            background: rgba(0, 229, 255, .06); color: var(--cyan-clair); font: 600 16px "Inter", Arial, sans-serif; outline: none;
-        }
-        #blocPilotage textarea{ min-height: 74px; resize: vertical; }
-        .pilBtn{
-            width: 100%; padding: 11px; margin-bottom: 8px; border-radius: 6px; border: 1px solid var(--cyan); background: rgba(0, 229, 255, .12);
-            color: var(--cyan-clair); font: 700 12px "Orbitron", Arial, sans-serif; letter-spacing: .12em; cursor: pointer;
-        }
-        .pilBtn.sec{ border-color: rgba(0, 229, 255, .3); background: transparent; color: var(--cyan-doux); }
-        .pilBtn.danger{ border-color: #ff4d6d; color: #ff9fbd; background: rgba(255, 77, 109, .08); }
-        .pilBtn:disabled{ opacity: .5; cursor: default; }
-        .pilEtat{ border: 1px solid rgba(0, 229, 255, .3); background: rgba(0, 229, 255, .05); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; font-size: 15px; line-height: 1.5; }
-        .pilEtat div::before{ content: "• "; color: var(--cyan); }
-        .pilSous{ font: 700 11px "Orbitron", Arial, sans-serif; letter-spacing: .16em; text-transform: uppercase; color: var(--cyan-titre); margin: 16px 0 8px; }
-        .pilExemples{ display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
-        .pilExemples button{ font: 600 13px "Rajdhani", Arial, sans-serif; padding: 5px 9px; border-radius: 14px; border: 1px solid rgba(0, 229, 255, .35); background: transparent; color: var(--cyan-doux); cursor: pointer; }
-        .pilPropose{ border: 1px solid var(--rose); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; font-size: 15px; line-height: 1.5; color: #ffd6f6; }
-        .pilPropose[hidden], #pilPanneau[hidden], #pilConnexion[hidden], #pilDroits[hidden]{ display: none; }
-        .pilLigne{ display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 7px 0; border-top: 1px solid rgba(0, 229, 255, .14); font-size: 16px; }
-        .pilLigne:first-child{ border-top: 0; }
-        .pilLigne button{ font: 700 12px "Rajdhani", Arial, sans-serif; padding: 6px 12px; border-radius: 14px; cursor: pointer; border: 1px solid var(--cyan); background: transparent; color: var(--cyan-clair); min-width: 78px; }
-        .pilLigne button.coupe{ border-color: #ff4d6d; color: #ff9fbd; }
-        .pilMessage{ min-height: 18px; font-size: 14px; color: var(--cyan-doux); }
-        #blocPilotage details{ margin-top: 12px; font-size: 14px; color: var(--cyan-doux); }
-        #blocPilotage summary{ cursor: pointer; color: var(--cyan-titre); }
-        #blocPilotage code{ word-break: break-all; color: var(--cyan-clair); }
+        .lienPilotage{ display: block; text-align: center; padding: 14px; margin-bottom: 14px; border-radius: 14px; border: 1px solid var(--rose); background: linear-gradient(180deg, rgba(60, 10, 50, .6), rgba(20, 4, 24, .8)); color: #ffd6f6; text-decoration: none; font: 700 14px "Orbitron", Arial, sans-serif; letter-spacing: .14em; text-transform: uppercase; }
+        .lienPilotage small{ display: block; margin-top: 6px; font: 500 14px "Rajdhani", Arial, sans-serif; letter-spacing: .04em; text-transform: none; color: var(--cyan-doux); }
+        .lienPilotage:active{ transform: scale(.98); background: rgba(255, 79, 216, .28); }
 
         /* Code d'accès */
         #porte{ position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #020713; padding: 20px; }
@@ -212,69 +184,7 @@
         <section class="bloc"><div class="titre">Versions en circulation</div><div id="barresVersions"></div></section>
         <section class="bloc"><div class="titre">Thèmes choisis</div><div id="barresThemes"></div></section>
 
-        <section class="bloc" id="blocPilotage">
-            <div class="titre">Pilotage du jeu</div>
-            <div id="pilConnexion" hidden>
-                <p class="pilNote">Change le jeu à distance (annonce, fonctions coupées, thèmes de saison…) sans rien republier.<br>Connecte-toi avec le compte administrateur créé dans Firebase.</p>
-                <input id="pilEmail" type="email" autocomplete="username" placeholder="E-mail" autocapitalize="off">
-                <input id="pilMdp" type="password" autocomplete="current-password" placeholder="Mot de passe">
-                <button type="button" class="pilBtn" id="pilConnecter">Se connecter</button>
-            </div>
-            <div id="pilPanneau" hidden>
-                <div class="pilSous" style="margin-top:0">Réglé en ce moment</div>
-                <div class="pilEtat" id="pilEtat">…</div>
-
-                <div class="pilSous">Assistant</div>
-                <p class="pilNote">Écris ce que tu veux en français. Je te montre ce que j'ai compris avant d'appliquer.</p>
-                <textarea id="pilTexte" placeholder="Ex : coupe la voix"></textarea>
-                <div class="pilExemples" id="pilExemples"></div>
-                <button type="button" class="pilBtn" id="pilComprendre">Comprendre</button>
-                <div class="pilPropose" id="pilPropose" hidden>
-                    <div id="pilProposeListe"></div>
-                    <button type="button" class="pilBtn" id="pilAppliquer" style="margin-top:10px">Appliquer</button>
-                    <button type="button" class="pilBtn sec" id="pilAnnulerPropose">Ne rien faire</button>
-                </div>
-
-                <div class="pilSous">Fonctions</div>
-                <div id="pilCoupures"></div>
-
-                <div class="pilSous">Thèmes</div>
-                <div id="pilThemes"></div>
-                <p class="pilNote" style="margin-top:8px">Thème de saison (visible seulement sur une période, chaque année) :</p>
-                <select id="pilThemePeriode"></select>
-                <input id="pilDebut" type="date" aria-label="Début">
-                <input id="pilFin" type="date" aria-label="Fin">
-                <button type="button" class="pilBtn" id="pilAppliquerPeriode">Appliquer la période</button>
-
-                <div class="pilSous">Annonce sur l'accueil</div>
-                <input id="pilAnnonce" type="text" maxlength="140" placeholder="Texte (140 caractères max)">
-                <select id="pilAnnonceDuree">
-                    <option value="0">Jusqu'à ce que je la retire</option>
-                    <option value="60">1 heure</option><option value="360">6 heures</option><option value="1440">1 jour</option>
-                    <option value="4320">3 jours</option><option value="10080">1 semaine</option>
-                </select>
-                <button type="button" class="pilBtn" id="pilPublierAnnonce">Publier l'annonce</button>
-                <button type="button" class="pilBtn sec" id="pilRetirerAnnonce">Retirer l'annonce</button>
-
-                <div class="pilSous">Annuler</div>
-                <button type="button" class="pilBtn sec" id="pilAnnulerDerniere">↩ Annuler la dernière modification</button>
-                <button type="button" class="pilBtn danger" id="pilToutRemettre">Tout remettre par défaut</button>
-                <div class="pilMessage" id="pilMessage" aria-live="polite"></div>
-
-                <details>
-                    <summary>Assistant intelligent gratuit (facultatif)</summary>
-                    <p class="pilNote" style="margin-top:8px">Sans IA, l'assistant comprend les phrases simples. Pour qu'il comprenne des demandes plus libres, colle ici une clé gratuite Google Gemini (aistudio.google.com → « Get API key »). Elle reste dans ce téléphone, jamais dans le jeu. L'IA propose seulement des réglages de la liste : tu valides toujours avant.</p>
-                    <input id="pilCleIA" type="password" placeholder="Clé Gemini" autocomplete="off">
-                    <button type="button" class="pilBtn sec" id="pilEnregistrerCle">Enregistrer la clé</button>
-                    <button type="button" class="pilBtn sec" id="pilDemanderIA">Demander à l'IA</button>
-                </details>
-                <details>
-                    <summary>Sécurité et compte</summary>
-                    <p class="pilNote" style="margin-top:8px">Identifiant de ce compte (à mettre dans les règles Firebase) :<br><code id="pilUid">–</code></p>
-                    <button type="button" class="pilBtn sec" id="pilDeconnecter">Se déconnecter</button>
-                </details>
-            </div>
-        </section>
+        <a class="lienPilotage" href="pilotage.html">Pilotage du jeu <span aria-hidden="true">→</span><small>annonce, fonctions coupées, thèmes de saison</small></a>
 
         <div class="zoneReset">
             <button type="button" id="btnReset" class="btnReset">Réinitialiser toutes les statistiques</button>
@@ -291,15 +201,13 @@
         <p class="note">Appareils vus ces 30 derniers jours · aucune donnée personnelle<br>Alcuno Stats <span id="versionStats"></span></p>
     </main>
 
-    <script src="js/config-lib.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-        import { getDatabase, ref, onValue, get, update, set, query, orderByKey, limitToLast, remove } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
-        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+        import { getDatabase, ref, onValue, get, update } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
 
         // Empreinte (SHA-256) du code d'accès : le code lui-même n'est écrit nulle part
         // Version de la page de stats (à part de celle du jeu : +0.0.1 à chaque modification de cette page)
-        const VERSION_STATS = "1.7.0";
+        const VERSION_STATS = "1.7.1";
         document.getElementById("versionStats").textContent = VERSION_STATS;
 
         const EMPREINTE_CODE = "2c8125d3adc62dac73f3ae036a86e00ba51b12b0dfb38fec2184e76441ed6826";
@@ -309,12 +217,6 @@
             bordeaux: "Bordeaux", noir: "Sombre", vert: "Casino", bleu: "Nuit", soleil: "Soleil couchant",
             cerisier: "Cerisier", givre: "Givre", prestige: "Prestige", galaxie: "Star Wars", kawaii: "Kawaii"
         };
-        // Pilotage du jeu (suite plus bas : demarrerPilotage)
-        const MODELE_IA = "gemini-2.5-flash"; // (gratuit avec une clé de aistudio.google.com ; à changer ici si Google le renomme)
-        const CLE_IA = "alcuno_pilotage_cle_ia";
-        const EXEMPLES = ["coupe la voix", "remets la voix", "ferme le mode en ligne", "désactive le thème Kawaii",
-            "thème Star Wars du 1er mai au 4 mai", "annonce : « Soirée ce soir ! » pendant 2 jours", "retire l'annonce", "oblige la mise à jour 9.64.0"];
-
         const NOMS_OS = { ios: "iPhone", android: "Android", ordi: "Ordinateur" };
         const PRESENCE_VALABLE = 3 * 60 * 1000; // présence pas rafraîchie depuis 3 min : téléphone parti
         const APPAREILS_VUS_DEPUIS = 30 * 24 * 3600 * 1000;
@@ -459,171 +361,6 @@
             barres("barresJours", compte, {}, 7);
         }
 
-        // ===== Pilotage du jeu (réglages à distance : js/config-lib.js) =====
-        // Lecture de « config » : tout le monde (le jeu la lit). Écriture : seulement le compte administrateur (règles Firebase).
-        function demarrerPilotage(app, db){
-            const $ = (id) => document.getElementById(id);
-            const auth = getAuth(app);
-            let config = {};
-            let proposition = [];
-            const message = (t, erreur) => { $("pilMessage").textContent = t; $("pilMessage").classList.toggle("erreur", !!erreur); };
-            const ecape = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-
-            // exemples cliquables, listes de thèmes
-            $("pilExemples").innerHTML = EXEMPLES.map((e) => `<button type="button">${ecape(e)}</button>`).join("");
-            $("pilExemples").addEventListener("click", (ev) => { if (ev.target.tagName === "BUTTON") { $("pilTexte").value = ev.target.textContent; $("pilTexte").focus(); } });
-            $("pilThemePeriode").innerHTML = ConfigLib.THEMES_CONNUS.map((t) => `<option value="${t}">${ecape(ConfigLib.NOMS_THEMES[t])}</option>`).join("");
-
-            function dessiner(){
-                $("pilEtat").innerHTML = ConfigLib.decrire(config).map((l) => `<div>${ecape(l)}</div>`).join("");
-                $("pilCoupures").innerHTML = ConfigLib.COUPURES_CONNUES.map((n) => {
-                    const coupe = ConfigLib.coupee(config, n);
-                    const nom = ConfigLib.NOMS_COUPURES[n];
-                    return `<div class="pilLigne"><span>${ecape(nom[0].toUpperCase() + nom.slice(1))} : <b>${coupe ? "coupé" : "actif"}</b></span><button type="button" class="${coupe ? "" : "coupe"}" data-coupure="${n}" data-etat="${coupe ? 0 : 1}">${coupe ? "Remettre" : "Couper"}</button></div>`;
-                }).join("");
-                $("pilThemes").innerHTML = ConfigLib.THEMES_CONNUS.map((t) => {
-                    const x = (config.themes || {})[t] || {};
-                    const cache = x.actif === false;
-                    const saison = x.debut ? ` · du ${ConfigLib.dateEnTexte(x.debut)} au ${ConfigLib.dateEnTexte(x.fin)}` : "";
-                    return `<div class="pilLigne"><span>${ecape(ConfigLib.NOMS_THEMES[t])}${cache ? " <b>(caché)</b>" : ""}${ecape(saison)}</span><button type="button" class="${cache ? "" : "coupe"}" data-theme="${t}" data-actif="${cache ? 1 : 0}">${cache ? "Remettre" : "Cacher"}</button></div>`;
-                }).join("");
-            }
-
-            // Écrit la nouvelle config en gardant l'ancienne dans « config_hist » (pour pouvoir annuler)
-            async function ecrire(nouvelle, resume){
-                const propre = ConfigLib.valider(nouvelle);
-                const cle = String(Date.now());
-                await set(ref(db, "config_hist/" + cle), { avant: Object.keys(config).length ? config : "vide", resume: String(resume).slice(0, 300) });
-                await set(ref(db, "config"), Object.keys(propre).length ? propre : null);
-            }
-            async function lancer(cmds){
-                let c = config; const resumes = [];
-                for (const cmd of cmds) {
-                    const r = ConfigLib.appliquer(c, cmd, Date.now() + decalageServeur());
-                    if (r.erreur) { message(r.erreur, true); return false; }
-                    c = r.config; resumes.push(r.resume);
-                }
-                try {
-                    await ecrire(c, resumes.join(" ; "));
-                    message("C'est fait ✓ : " + resumes.join(" ; "));
-                    return true;
-                } catch (e) {
-                    message(/PERMISSION|permission/.test(String(e && e.message)) ? "Refusé par Firebase : les règles ne connaissent pas encore ce compte (voir « Sécurité et compte » plus bas)." : "Échec : " + (e && e.message ? e.message : e), true);
-                    return false;
-                }
-            }
-            const decalageServeur = () => 0;
-
-            onValue(ref(db, "config"), (s) => { config = ConfigLib.valider(s.val()); dessiner(); });
-
-            $("pilCoupures").addEventListener("click", (ev) => {
-                const b = ev.target.closest("button"); if (!b) return;
-                lancer([{ op: "coupure", cible: b.dataset.coupure, etat: b.dataset.etat === "1" }]);
-            });
-            $("pilThemes").addEventListener("click", (ev) => {
-                const b = ev.target.closest("button"); if (!b) return;
-                lancer([{ op: "theme", id: b.dataset.theme, actif: b.dataset.actif === "1" }]);
-            });
-            $("pilAppliquerPeriode").addEventListener("click", () => {
-                const d = $("pilDebut").value, f = $("pilFin").value; // « AAAA-MM-JJ » → « MM-JJ »
-                if (!d || !f) { message("Choisis un début et une fin.", true); return; }
-                lancer([{ op: "theme", id: $("pilThemePeriode").value, debut: d.slice(5), fin: f.slice(5) }]);
-            });
-            $("pilPublierAnnonce").addEventListener("click", async () => {
-                if (await lancer([{ op: "annonce", texte: $("pilAnnonce").value, dureeMin: Number($("pilAnnonceDuree").value) }])) $("pilAnnonce").value = "";
-            });
-            $("pilRetirerAnnonce").addEventListener("click", () => lancer([{ op: "annonce_off" }]));
-            $("pilToutRemettre").addEventListener("click", () => { if (confirm("Tout remettre par défaut ?")) lancer([{ op: "tout_remettre" }]); });
-            $("pilAnnulerDerniere").addEventListener("click", async () => {
-                try {
-                    const s = await get(query(ref(db, "config_hist"), orderByKey(), limitToLast(1)));
-                    const v = s.val();
-                    if (!v) { message("Rien à annuler.", true); return; }
-                    const cle = Object.keys(v)[0], h = v[cle];
-                    const avant = h.avant === "vide" ? null : ConfigLib.valider(h.avant);
-                    await set(ref(db, "config"), avant && Object.keys(avant).length ? avant : null);
-                    await remove(ref(db, "config_hist/" + cle));
-                    message("Annulé ✓ : " + (h.resume || "dernière modification"));
-                } catch (e) { message("Échec : " + (e && e.message ? e.message : e), true); }
-            });
-
-            // Assistant
-            function montrerProposition(cmds){
-                proposition = cmds;
-                let c = config; const lignes = [];
-                for (const cmd of cmds) { const r = ConfigLib.appliquer(c, cmd, Date.now()); if (r.erreur) lignes.push("⚠ " + r.erreur); else { c = r.config; lignes.push(r.resume); } }
-                $("pilProposeListe").innerHTML = "J'ai compris :" + lignes.map((l) => `<div>→ ${ecape(l)}</div>`).join("");
-                $("pilPropose").hidden = false;
-            }
-            $("pilComprendre").addEventListener("click", async () => {
-                message(""); $("pilPropose").hidden = true;
-                const texte = $("pilTexte").value;
-                const r = ConfigLib.interpreter(texte);
-                if (r.cmds.length) { montrerProposition(r.cmds); return; }
-                if (localStorage.getItem(CLE_IA) && texte.trim()) { await demanderIA(); return; }
-                message(r.raison, true);
-            });
-            $("pilAppliquer").addEventListener("click", async () => {
-                if (await lancer(proposition)) { $("pilPropose").hidden = true; $("pilTexte").value = ""; }
-            });
-            $("pilAnnulerPropose").addEventListener("click", () => { $("pilPropose").hidden = true; });
-
-            // IA gratuite (Gemini) : transforme une phrase libre en commandes de la liste, que ConfigLib vérifie et que tu valides
-            $("pilCleIA").value = localStorage.getItem(CLE_IA) ? "••••••••" : "";
-            $("pilEnregistrerCle").addEventListener("click", () => {
-                const v = $("pilCleIA").value.trim();
-                if (v && !/^•+$/.test(v)) { localStorage.setItem(CLE_IA, v); $("pilCleIA").value = "••••••••"; message("Clé enregistrée sur ce téléphone ✓"); }
-                else if (!v) { localStorage.removeItem(CLE_IA); message("Clé effacée."); }
-            });
-            async function demanderIA(){
-                const cle = localStorage.getItem(CLE_IA);
-                const texte = $("pilTexte").value.trim();
-                if (!cle) { message("Ajoute d'abord une clé Gemini (section ci-dessous).", true); return; }
-                if (!texte) { message("Écris ta demande d'abord.", true); return; }
-                message("L'IA réfléchit…");
-                const consigne = `Tu pilotes un jeu de cartes à boire. Transforme la demande de l'utilisateur en une LISTE JSON de commandes, rien d'autre. Commandes possibles :
-{"op":"annonce","texte":"…(140 car. max)","dureeMin":nombre facultatif}
-{"op":"annonce_off"}
-{"op":"coupure","cible":"voix"|"musique"|"enligne","etat":true (couper)|false (remettre)}
-{"op":"theme","id":"${ConfigLib.THEMES_CONNUS.join('"|"')}","actif":true|false}
-{"op":"theme","id":"…","debut":"MM-JJ","fin":"MM-JJ"} (thème de saison, chaque année)
-{"op":"theme_periode_off","id":"…"}
-{"op":"majmin","version":"x.y.z"|null}
-{"op":"tout_remettre"}
-Noms des thèmes : ${ConfigLib.THEMES_CONNUS.map((t) => t + "=" + ConfigLib.NOMS_THEMES[t]).join(", ")}. Si la demande n'est pas possible avec ces commandes, réponds []. Réglages actuels : ${ConfigLib.decrire(config).join(" ; ")}. Date du jour : ${new Date().toISOString().slice(0, 10)}.`;
-                try {
-                    const rep = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODELE_IA}:generateContent?key=${encodeURIComponent(cle)}`, {
-                        method: "POST", headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ systemInstruction: { parts: [{ text: consigne }] }, contents: [{ role: "user", parts: [{ text: texte }] }], generationConfig: { responseMimeType: "application/json", temperature: 0 } })
-                    });
-                    const j = await rep.json();
-                    if (!rep.ok) throw new Error((j.error && j.error.message) || ("erreur " + rep.status));
-                    let cmds = JSON.parse(j.candidates[0].content.parts[0].text);
-                    if (!Array.isArray(cmds)) cmds = [cmds];
-                    cmds = cmds.slice(0, 6);
-                    if (!cmds.length) { message("L'IA ne voit pas comment faire ça avec les réglages possibles.", true); return; }
-                    message("");
-                    montrerProposition(cmds);
-                } catch (e) { message("L'IA n'a pas répondu : " + (e && e.message ? e.message : e), true); }
-            }
-            $("pilDemanderIA").addEventListener("click", demanderIA);
-
-            // Connexion
-            const erreursConnexion = { "auth/invalid-credential": "E-mail ou mot de passe incorrect.", "auth/invalid-email": "E-mail invalide.", "auth/too-many-requests": "Trop d'essais, réessaie dans quelques minutes.", "auth/network-request-failed": "Pas de réseau.", "auth/operation-not-allowed": "La connexion par e-mail n'est pas activée dans Firebase (Authentication → Sign-in method)." };
-            $("pilConnecter").addEventListener("click", async () => {
-                message("");
-                try { await signInWithEmailAndPassword(auth, $("pilEmail").value.trim(), $("pilMdp").value); $("pilMdp").value = ""; }
-                catch (e) { message(erreursConnexion[e.code] || ("Connexion refusée : " + (e.code || e.message)), true); }
-            });
-            $("pilMdp").addEventListener("keydown", (ev) => { if (ev.key === "Enter") $("pilConnecter").click(); });
-            $("pilDeconnecter").addEventListener("click", () => signOut(auth));
-            onAuthStateChanged(auth, (u) => {
-                $("pilConnexion").hidden = !!u;
-                $("pilPanneau").hidden = !u;
-                $("pilUid").textContent = u ? u.uid : "–";
-            });
-        }
-
         function demarrer(){
             const app = initializeApp({
                 apiKey: "AIzaSyApZL1dCQLGdrZFjsGJC0y4DxLUzorum4M",
@@ -640,8 +377,6 @@ Noms des thèmes : ${ConfigLib.THEMES_CONNUS.map((t) => t + "=" + ConfigLib.NOMS
             let decalage = 0;
             onValue(ref(db, ".info/serverTimeOffset"), (s) => { decalage = Number(s.val()) || 0; });
             const maintenant = () => Date.now() + decalage;
-
-            demarrerPilotage(app, db);
 
             // ----- Réinitialiser toutes les statistiques -----
             // On efface chaque valeur une par une (« chemin » : null) : les règles Firebase n'autorisent l'écriture que sur ces

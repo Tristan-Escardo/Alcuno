@@ -56,13 +56,15 @@ for (const [phrase, voulu] of Object.entries(attendu)) verifier(cmds(phrase) ===
 verifier(L.interpreter("bonjour").cmds.length === 0 && L.interpreter("").cmds.length === 0 && L.interpreter("bonjour").raison, "assistant : phrase incomprise => explication");
 verifier(L.decrire({}).join() === "rien : le jeu est réglé par défaut" && L.decrire(cfg).length === 1, "description des réglages en cours");
 
-// stats.html : le script de pilotage est syntaxiquement correct
-const html = fs.readFileSync(path.join(__dirname, "..", "stats.html"), "utf8");
-const scripts = [...html.matchAll(/<script type="module">([\s\S]*?)<\/script>/g)].map((m) => m[1]);
-const tmp = path.join(require("os").tmpdir(), "stats_module_test.mjs");
-fs.writeFileSync(tmp, scripts.join("\n"));
-const r = require("child_process").spawnSync(process.execPath, ["--check", tmp], { encoding: "utf8" });
-verifier(scripts.length === 1 && r.status === 0, "stats.html : script du pilotage sans erreur de syntaxe " + (r.stderr || ""));
+// stats.html et pilotage.html : les scripts de la page sont syntaxiquement corrects
+for (const nom of ["stats.html", "pilotage.html"]) {
+  const html = fs.readFileSync(path.join(__dirname, "..", nom), "utf8");
+  const scripts = [...html.matchAll(/<script type="module">([\s\S]*?)<\/script>/g)].map((m) => m[1]);
+  const tmp = path.join(require("os").tmpdir(), "page_module_test.mjs");
+  fs.writeFileSync(tmp, scripts.join("\n"));
+  const r = require("child_process").spawnSync(process.execPath, ["--check", tmp], { encoding: "utf8" });
+  verifier(scripts.length === 1 && r.status === 0, nom + " : script sans erreur de syntaxe " + (r.stderr || ""));
+}
 // les règles Firebase restent un JSON valide qui protège « config » en écriture
 const regles = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "database.rules.json"), "utf8")).rules;
 verifier(regles.config[".read"] === true && /auth\.uid/.test(regles.config[".write"]) && /auth\.uid/.test(regles.config_hist[".write"]) && regles.config_hist[".read"] !== true, "règles Firebase : config lisible par tous, écriture réservée au compte administrateur");

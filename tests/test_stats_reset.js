@@ -120,7 +120,11 @@ export const signOut = async () => { utilisateur = null; ecouteur(null); };
   const d = await etat();
   verifier(d.jours === 0 && d.appareils === 0 && d.presence === 1 && d.message.includes("remises à zéro") && d.bouton && !d.confirme,
     `« Oui » : tout est effacé (jours ${d.jours}, appareils ${d.appareils}), le direct est gardé (présence ${d.presence}), message « ${d.message} »`);
-  // Pilotage du jeu (réglages à distance) : connexion, assistant, boutons, annulation, tout dans le Firebase simulé
+  const lienPilotage = await page.evaluate(() => { const l = document.querySelector(".lienPilotage"); return l && l.getAttribute("href"); });
+  verifier(lienPilotage === "pilotage.html", `stats : lien vers la page de pilotage (${lienPilotage})`);
+  // Pilotage du jeu (réglages à distance) : page à part, pilotage.html
+  const nbErreursStats = erreurs.length;
+  await page.goto(url.replace("stats.html", "pilotage.html")); await page.waitForTimeout(800);
   const pil = (js) => page.evaluate(js);
   const avantConnexion = await pil(() => ({ connexion: !document.getElementById("pilConnexion").hidden, panneau: document.getElementById("pilPanneau").hidden }));
   await page.fill("#pilEmail", "moi@exemple.fr"); await page.fill("#pilMdp", "mauvais"); await page.click("#pilConnecter"); await page.waitForTimeout(200);
@@ -145,7 +149,7 @@ export const signOut = async () => { utilisateur = null; ecouteur(null); };
   verifier(/coupe|Couper/i.test(propose.texte) && propose.visible && propose.config === null && /compris/.test(incompris) && /"voix":true/.test(applique.config) && applique.hist === 1 && /voix/.test(applique.etat), `pilotage : l'assistant propose, puis applique après validation, avec historique (${propose.texte} / ${JSON.stringify(applique)}) message « ${incompris.slice(0, 30)} »`);
   verifier(/"voix":true/.test(complet) && /"kawaii":\{"actif":false\}/.test(complet) && /"texte":"Bienvenue !"/.test(complet) && /"fin":\d+/.test(complet), `pilotage : boutons thème et annonce (${complet})`);
   verifier(/"voix":true/.test(annule.config) && !/Bienvenue|kawaii/.test(annule.config) && annule.hist === 1 && toutAnnule.config === null && toutAnnule.hist === 0, `pilotage : « annuler » revient en arrière pas à pas (${JSON.stringify(annule)} puis ${JSON.stringify(toutAnnule)})`);
-  verifier(erreurs.length === 0, `aucune erreur dans la page (${erreurs.length})`);
+  verifier(erreurs.length === 0 && nbErreursStats === 0, `aucune erreur dans les pages (${erreurs.length})`);
   await nav.close(); serveur.close();
   console.log(echecs ? `\n${echecs} ÉCHEC(S)` : "\nTOUT EST OK");
   process.exit(echecs ? 1 : 0);
