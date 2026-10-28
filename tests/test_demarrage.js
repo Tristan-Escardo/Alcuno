@@ -848,7 +848,7 @@ function verifier(ok, texte){
     const monte = apresGlisse.split(",").indexOf("voix") < apresFleche.split(",").indexOf("voix") && apresGlisse.split(",").sort().join() === apresFleche.split(",").sort().join();
     const attendueGlisse = apresGlisse;
     verifier(avant.defaut === "none" && avant.texte === "Modifier" && avant.poignees === 0 && pendant.edition && pendant.texte === "OK" && pendant.defaut !== "none" &&
-      pendant.poignees >= 14 && pendant.fleches === 0 && pendant.tremble === "none" && pendant.poigneesVisibles === pendant.visibles && pendant.desalignees === 0 && pendant.poignees === 15 && apresFleche === attendueFleche && monte &&
+      pendant.poignees >= 14 && pendant.fleches === 0 && pendant.tremble === "none" && pendant.poigneesVisibles === pendant.visibles && pendant.desalignees === 0 && pendant.poignees === 14 && apresFleche === attendueFleche && monte &&
       !fini.edition && fini.controles === 0 && fini.texte === "Modifier" && rechargee === attendueGlisse && parDefaut === origine && stocke === null && interrupteur && queue === "blocPartage,aPropos" && fixesSansPoignee && erreurs.length === 0,
       `réglages réorganisables : avant ${JSON.stringify(avant)}, pendant ${JSON.stringify(pendant)}, flèche ${apresFleche === attendueFleche}, glisser monté ${monte} (${apresGlisse}), fini ${JSON.stringify(fini)}, rechargé ${rechargee === attendueGlisse}, par défaut ${parDefaut === origine}, stocké ${stocke}, interrupteur ${interrupteur}, fin de page ${queue}, fixes sans poignée ${fixesSansPoignee} ${erreurs.join("|")}`);
     await ctx.close();
@@ -891,36 +891,31 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
-  // 34. Sauvegarde de la progression : le bloc est juste sous « Afficher l'écran télé » ; le code contient la progression et les réglages mais
-  // PAS les identifiants ni codes de partie ; un code modifié ou n'importe quel texte est refusé ; restaurer (confirmation en deux temps)
-  // REMPLACE la progression d'un autre téléphone (ce qui n'est pas dans le code disparaît) puis recharge
+  // 34. Téléphone : le survol ne change pas l'aspect des boutons « Modifier » et « Retour » des Réglages (sur iPhone, le survol reste « collé »
+  // après un tap : en Givre, « Modifier » restait bleu clair après « OK »). On force l'état survol et on compare, dans les 10 thèmes.
   {
-    const clipboard = `window.__copie = null; Object.defineProperty(navigator, "clipboard", { value: { writeText: async (t) => { window.__copie = t; } }, configurable: true });`;
-    const origine = await ouvrir({}, `if (!sessionStorage.getItem("init")) { sessionStorage.setItem("init", "1"); localStorage.setItem("alcuno_stickers", JSON.stringify({ gagnes: ["cupcake", "lapin"], parties: 4, fins: [1, 2] })); localStorage.setItem("alcuno_album_decouvert", "1"); localStorage.setItem("alcuno_theme_kawaii", "1"); localStorage.setItem("alcuno_theme", "kawaii"); localStorage.setItem("alcuno_voix", "1"); localStorage.setItem("alcuno_code_tele", "ABCDE"); localStorage.setItem("alcuno_id_stats", "identifiant-prive"); } ` + clipboard);
-    await origine.page.click("#btnReglages"); await origine.page.waitForTimeout(500);
-    await origine.page.click("#btnCopierSauvegarde"); await origine.page.waitForTimeout(300);
-    const code = await origine.page.evaluate(() => window.__copie);
-    const position = await origine.page.evaluate(() => { const e = [...document.querySelectorAll("#ecranReglages .reglages-contenu > [data-cle]")].map((x) => x.dataset.cle); return e[e.indexOf("ecran-tele") + 1]; });
-    const donnees = (() => { try { return JSON.parse(Buffer.from((code || "").split("-")[1].replace(/-/g, "+").replace(/_/g, "/"), "base64").toString("utf8")); } catch (e) { return null; } })();
-    await origine.ctx.close();
-    const autre = await ouvrir({}, `if (!sessionStorage.getItem("init")) { sessionStorage.setItem("init", "1"); localStorage.setItem("alcuno_theme_galaxie", "1"); localStorage.setItem("alcuno_theme", "galaxie"); localStorage.setItem("alcuno_code_tele", "ZZZZZ"); }`);
-    await autre.page.click("#btnReglages"); await autre.page.waitForTimeout(500);
-    const note = () => autre.page.evaluate(() => document.getElementById("noteSauvegarde").textContent);
-    await autre.page.fill("#champSauvegarde", "n'importe quoi"); await autre.page.click("#btnRestaurerSauvegarde");
-    const refuse1 = (await note()).startsWith("Code invalide");
-    await autre.page.fill("#champSauvegarde", code.slice(0, -3) + "abc"); await autre.page.click("#btnRestaurerSauvegarde");
-    const refuse2 = (await note()).startsWith("Code invalide");
-    await autre.page.fill("#champSauvegarde", code); await autre.page.click("#btnRestaurerSauvegarde");
-    const confirmation = await autre.page.evaluate(() => document.getElementById("btnRestaurerSauvegarde").textContent);
-    const intactAvant = await autre.page.evaluate(() => localStorage.getItem("alcuno_theme_galaxie")); // (rien n'a changé avant la confirmation)
-    await autre.page.click("#btnRestaurerSauvegarde"); await autre.page.waitForTimeout(2500);
-    const apres = await autre.page.evaluate(() => ({ kawaii: localStorage.getItem("alcuno_theme_kawaii"), galaxie: localStorage.getItem("alcuno_theme_galaxie"), theme: localStorage.getItem("alcuno_theme"),
-      voix: localStorage.getItem("alcuno_voix"), stickers: localStorage.getItem("alcuno_stickers"), tele: localStorage.getItem("alcuno_code_tele"), actif: document.documentElement.dataset.theme }));
-    verifier(position === "sauvegarde" && donnees && donnees.theme_kawaii === "1" && donnees.voix === "1" && !("code_tele" in donnees) && !("id_stats" in donnees) && !/identifiant-prive/.test(JSON.stringify(donnees)) &&
-      refuse1 && refuse2 && confirmation === "Confirmer le remplacement" && intactAvant === "1" &&
-      apres.kawaii === "1" && apres.galaxie === null && apres.theme === "kawaii" && apres.actif === "kawaii" && apres.voix === "1" && apres.tele === "ZZZZZ" && /cupcake/.test(apres.stickers) && autre.erreurs.length === 0,
-      `sauvegarde : position ${position}, code ${code && code.length} car., refus ${refuse1}/${refuse2}, confirmation « ${confirmation} », après ${JSON.stringify(apres)} ${autre.erreurs.join("|")}`);
-    await autre.ctx.close();
+    const THEMES_DEB = ["bordeaux", "noir", "vert", "bleu", "soleil", "cerisier", "givre", "prestige", "galaxie", "kawaii"];
+    const differents = [];
+    for (const theme of THEMES_DEB) {
+      const ctx = await nav.newContext({ viewport: { width: 390, height: 700 }, hasTouch: true, isMobile: true });
+      const page = await ctx.newPage();
+      await page.addInitScript((t) => { try { localStorage.setItem("alcuno_theme", t); localStorage.setItem("alcuno_theme_prestige", "1"); localStorage.setItem("alcuno_theme_galaxie", "1"); localStorage.setItem("alcuno_theme_kawaii", "1"); } catch (e) {} }, theme);
+      await page.goto(url); await page.waitForTimeout(600);
+      await page.tap("#btnReglages"); await page.waitForTimeout(500);
+      const cdp = await ctx.newCDPSession(page);
+      await cdp.send("DOM.enable"); await cdp.send("CSS.enable");
+      const racine = await cdp.send("DOM.getDocument");
+      for (const selecteur of ["#btnModifierReglages", "#btnFermerReglages"]) {
+        const aspect = () => page.evaluate((s) => { const st = getComputedStyle(document.querySelector(s)); return st.backgroundImage + "|" + st.backgroundColor + "|" + st.boxShadow; }, selecteur);
+        const normal = await aspect();
+        const noeud = await cdp.send("DOM.querySelector", { nodeId: racine.root.nodeId, selector: selecteur });
+        await cdp.send("CSS.forcePseudoState", { nodeId: noeud.nodeId, forcedPseudoClasses: ["hover"] });
+        if ((await aspect()) !== normal) differents.push(theme + " " + selecteur);
+        await cdp.send("CSS.forcePseudoState", { nodeId: noeud.nodeId, forcedPseudoClasses: [] });
+      }
+      await ctx.close();
+    }
+    verifier(differents.length === 0, `survol collé : aspect des boutons des Réglages inchangé au survol sur téléphone dans les 10 thèmes ${differents.join(", ")}`);
   }
 
   await nav.close();

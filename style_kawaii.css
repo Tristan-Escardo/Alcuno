@@ -140,9 +140,11 @@ html[data-theme="kawaii"] #listeSuppression .supp-retrait{
   text-shadow: none;
   box-shadow: 0 0 0 1px var(--givre-bord) inset;
 }
+@media (hover: hover){
 html[data-theme="kawaii"] .btnRetour:hover,
 html[data-theme="kawaii"] .btnAccueil:hover{
-  background: linear-gradient(180deg, #f66fb3, #e03a8d) !important;
+    background: linear-gradient(180deg, #f66fb3, #e03a8d) !important;
+  }
 }
 html[data-theme="kawaii"] #enLigne .separateurOu{ color: var(--givre-texte); opacity: 0.75; }
 html[data-theme="kawaii"] #enLigne .separateurOu::before,

@@ -4544,9 +4544,11 @@ html[data-theme="givre"] #listeSuppression .supp-retrait{
   text-shadow: none;
   box-shadow: 0 0 0 1px var(--givre-bord) inset;
 }
-html[data-theme="givre"] .btnRetour:hover,
-html[data-theme="givre"] .btnAccueil:hover{
-  background: linear-gradient(180deg, #6fd6f6, #3aa6e0) !important;
+@media (hover: hover){ /* survol : seulement avec une souris (sur téléphone il reste collé après un tap : « Modifier » restait clair) */
+  html[data-theme="givre"] .btnRetour:hover,
+  html[data-theme="givre"] .btnAccueil:hover{
+    background: linear-gradient(180deg, #6fd6f6, #3aa6e0) !important;
+  }
 }
 
 /* Champs de texte */
@@ -8310,14 +8312,3 @@ html[data-theme="givre"] .ctrlReglage button, html[data-theme="kawaii"] .ctrlReg
 /* Réglages : état de la musique hors connexion (sous le volume de la musique) */
 #ecranReglages #noteMusiqueHorsLigne{ display: block; padding: 2px 14px 10px; font-size: 13px; }
 #ecranReglages #noteMusiqueHorsLigne[hidden]{ display: none; }
-
-/* Réglages : sauvegarde de la progression (copier / coller un code) */
-#ecranReglages .sauvegardeLigne{ display: flex; gap: 8px; flex-wrap: wrap; padding: 4px 2px 8px; }
-#ecranReglages .btnSauvegarde{ font: inherit; font-size: 14px; font-weight: 800; color: inherit; background: transparent; border: 1.5px solid currentColor; border-radius: 12px; padding: 9px 14px; cursor: pointer; }
-#ecranReglages .btnSauvegarde[hidden]{ display: none; }
-#ecranReglages .btnSauvegarde:active{ opacity: 0.6; }
-#ecranReglages .champSauvegarde{ display: block; width: 100%; box-sizing: border-box; font: 12px/1.35 ui-monospace, Menlo, Consolas, monospace; color: inherit; background: rgba(128, 128, 128, 0.14);
-  border: 1px solid rgba(128, 128, 128, 0.45); border-radius: 10px; padding: 8px 10px; resize: vertical; word-break: break-all; }
-#ecranReglages .champSauvegarde::placeholder{ color: inherit; opacity: 0.55; }
-#ecranReglages #noteSauvegarde{ display: block; padding: 0 2px 6px; font-size: 13px; }
-#ecranReglages #noteSauvegarde:empty{ display: none; }
