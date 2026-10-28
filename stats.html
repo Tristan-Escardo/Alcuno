@@ -164,6 +164,15 @@
         .pilLigne button{ font: 700 12px "Rajdhani", Arial, sans-serif; padding: 6px 12px; border-radius: 14px; cursor: pointer; border: 1px solid var(--cyan); background: transparent; color: var(--cyan-clair); min-width: 78px; }
         .pilLigne button.coupe{ border-color: #ff4d6d; color: #ff9fbd; }
         .pilMessage{ position: fixed; left: 12px; right: 12px; bottom: calc(14px + env(safe-area-inset-bottom)); z-index: 5; max-width: 496px; margin: 0 auto; padding: 12px 14px; border-radius: 10px; font-size: 15px; line-height: 1.35; color: var(--cyan-clair); background: rgba(2, 24, 40, .96); border: 1px solid var(--cyan); box-shadow: 0 6px 24px rgba(0,0,0,.6); }
+        .pilFil{ display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; max-height: 340px; overflow-y: auto; padding-right: 2px; }
+        .pilFil:empty{ display: none; }
+        .bulle{ max-width: 90%; padding: 8px 12px; border-radius: 14px; font-size: 15px; line-height: 1.35; white-space: pre-wrap; overflow-wrap: anywhere; }
+        .bulle.moi{ align-self: flex-end; background: rgba(0, 229, 255, .16); border: 1px solid rgba(0, 229, 255, .4); color: var(--cyan-clair); }
+        .bulle.assistant{ align-self: flex-start; background: rgba(255, 79, 216, .12); border: 1px solid rgba(255, 79, 216, .4); color: #ffe0f8; }
+        .pilVariantes{ display: flex; flex-direction: column; gap: 6px; margin: 0 0 10px; }
+        .pilVariantes:empty{ display: none; }
+        .pilVariantes button{ text-align: left; font: 600 14px "Rajdhani", Arial, sans-serif; line-height: 1.3; padding: 9px 11px; border-radius: 10px; border: 1px solid rgba(255, 79, 216, .5); background: rgba(255, 79, 216, .08); color: #ffe0f8; cursor: pointer; }
+        .pilVariantes button:active{ background: rgba(255, 79, 216, .35); transform: scale(.98); }
         .pilApercu{ border: 1px dashed rgba(0, 229, 255, .45); border-radius: 14px; padding: 12px; margin-bottom: 12px; background: #1b0620; color: #fff; text-align: center; }
         .pilApercu:empty{ display: none; }
         .pilApercu .apTitre{ font: 900 20px "Orbitron", Arial, sans-serif; letter-spacing: .12em; color: #ffd23f; margin-bottom: 8px; }
@@ -316,16 +325,21 @@
                 <div class="pilEtat" id="pilLecture">…</div>
 
                 <div class="pilSous">Assistant</div>
-                <p class="pilNote">Écris ce que tu veux en français. Je te montre ce que j'ai compris avant d'appliquer.</p>
+                <p class="pilNote">Écris ce que tu veux en français, ou pose une question sur les stats (« combien de parties cette semaine ? »). Je te montre ce que j'ai compris avant d'appliquer, et je me souviens de la conversation (« finalement non, remets-la »).</p>
+                <div class="pilFil" id="pilFil" aria-live="polite"></div>
                 <textarea id="pilTexte" placeholder="Ex : coupe la voix"></textarea>
                 <div class="pilExemples" id="pilExemples"></div>
-                <button type="button" class="pilBtn" id="pilComprendre">Comprendre</button>
+                <button type="button" class="pilBtn" id="pilComprendre">Envoyer</button>
+                <button type="button" class="pilBtn sec" id="pilEffacerFil" hidden>Effacer la conversation</button>
                 <div class="pilPropose" id="pilPropose" hidden>
                     <div id="pilProposeListe"></div>
                     <div class="pilApercu" id="pilApercuPropose" style="margin-top:10px"></div>
                     <button type="button" class="pilBtn" id="pilAppliquer" style="margin-top:10px">Appliquer</button>
                     <button type="button" class="pilBtn sec" id="pilAnnulerPropose">Ne rien faire</button>
                 </div>
+
+                <div class="pilSous">Raccourcis</div>
+                <div class="pilExemples" id="pilRaccourcis"></div>
 
                 <div class="pilSous">Fonctions</div>
                 <div id="pilCoupures"></div>
@@ -339,7 +353,10 @@
                 <button type="button" class="pilBtn" id="pilAppliquerPeriode">Appliquer la période</button>
 
                 <div class="pilSous">Annonce sur l'accueil</div>
+                <div class="pilExemples" id="pilModeles"></div>
                 <input id="pilAnnonce" type="text" maxlength="140" placeholder="Texte (140 caractères max)">
+                <button type="button" class="pilBtn sec" id="pilReformuler">✨ Reformuler avec l'IA</button>
+                <div class="pilVariantes" id="pilVariantes"></div>
                 <select id="pilAnnonceDuree">
                     <option value="0">Jusqu'à ce que je la retire</option>
                     <option value="60">1 heure</option><option value="360">6 heures</option><option value="1440">1 jour</option>
@@ -369,10 +386,10 @@
 
                 <details>
                     <summary>Assistant intelligent gratuit (facultatif)</summary>
-                    <p class="pilNote" style="margin-top:8px">Sans IA, l'assistant comprend les phrases simples. Pour qu'il comprenne des demandes plus libres, colle ici une clé gratuite Google Gemini (aistudio.google.com → « Get API key »). Elle reste dans ce téléphone, jamais dans le jeu. L'IA propose seulement des réglages de la liste : tu valides toujours avant.</p>
+                    <p class="pilNote" style="margin-top:8px">Sans IA, l'assistant comprend les phrases simples. Pour qu'il comprenne des demandes plus libres, colle ici une clé gratuite Google Gemini (aistudio.google.com → « Get API key »). Elle reste dans ce téléphone, jamais dans le jeu. L'IA propose seulement des réglages de la liste : tu valides toujours avant. Elle sert aussi à reformuler une annonce et à répondre aux questions sur les stats.</p>
                     <input id="pilCleIA" type="password" placeholder="Clé Gemini" autocomplete="off">
-                    <button type="button" class="pilBtn sec" id="pilEnregistrerCle">Enregistrer la clé</button>
-                    <button type="button" class="pilBtn sec" id="pilDemanderIA">Demander à l'IA</button>
+                    <button type="button" class="pilBtn sec" id="pilEnregistrerCle">Enregistrer et tester la clé</button>
+                    <div class="pilNote" id="pilIAEtat"></div>
                 </details>
                 <details>
                     <summary>Sécurité et compte</summary>
@@ -395,7 +412,7 @@
 
         // Empreinte (SHA-256) du code d'accès : le code lui-même n'est écrit nulle part
         // Version de la page de stats (à part de celle du jeu : +0.0.1 à chaque modification de cette page)
-        const VERSION_STATS = "1.10.0";
+        const VERSION_STATS = "1.11.0";
         document.getElementById("versionStats").textContent = VERSION_STATS;
         document.getElementById("versionStats2").textContent = VERSION_STATS;
         document.getElementById("versionStats3").textContent = VERSION_STATS;
@@ -410,8 +427,13 @@
         // Pilotage du jeu (suite plus bas : demarrerPilotage)
         const MODELE_IA = "gemini-2.5-flash"; // (gratuit avec une clé de aistudio.google.com ; à changer ici si Google le renomme)
         const CLE_IA = "alcuno_pilotage_cle_ia";
-        const EXEMPLES = ["coupe la voix", "remets la voix", "ferme le mode en ligne", "désactive le thème Kawaii",
-            "thème Star Wars du 1er mai au 4 mai", "annonce : « Soirée ce soir ! » pendant 2 jours", "retire l'annonce", "oblige la mise à jour 9.64.0"];
+        const EXEMPLES = ["coupe la voix", "remets la voix", "finalement non", "désactive le thème Kawaii",
+            "thème Star Wars du 1er mai au 4 mai", "annonce demain à 18h : « Soirée ! » pendant 3 heures", "mode maintenance", "combien de parties cette semaine ?", "quelle version plante le plus ?"];
+
+        // Dernières données lues par la page (pour les questions de l'assistant)
+        const donnees = { jours: {}, appareils: {}, sante: {} };
+        const CLE_MODELE_IA = "alcuno_pilotage_modele_ia";
+        const modeleIA = () => { try { return localStorage.getItem(CLE_MODELE_IA) || MODELE_IA; } catch (e) { return MODELE_IA; } };
 
         const NOMS_OS = { ios: "iPhone", android: "Android", ordi: "Ordinateur" };
         const PRESENCE_VALABLE = 3 * 60 * 1000; // présence pas rafraîchie depuis 3 min : téléphone parti
@@ -729,7 +751,17 @@
                 } catch (e) { message("Échec : " + (e && e.message ? e.message : e), true); }
             });
 
-            // Assistant
+            // Assistant : conversation (il se souvient), commandes, questions sur les stats, IA facultative
+            const fil = []; // { role: "moi" | "assistant", texte, cmds? }
+            let derniereDemande = [];
+            function dessinerFil(){
+                $("pilFil").innerHTML = fil.map((m) => `<div class="bulle ${m.role}">${ecape(m.texte)}</div>`).join("");
+                $("pilEffacerFil").hidden = !fil.length;
+                $("pilFil").scrollTop = $("pilFil").scrollHeight;
+            }
+            function direFil(texte, cmds){ fil.push({ role: "assistant", texte, cmds }); while (fil.length > 14) fil.shift(); dessinerFil(); }
+            $("pilEffacerFil").addEventListener("click", () => { fil.length = 0; derniereDemande = []; $("pilPropose").hidden = true; dessinerFil(); });
+
             function montrerProposition(cmds){
                 proposition = cmds;
                 let c = config; const lignes = [];
@@ -739,33 +771,55 @@
                 const boite = document.createElement("div"); apercu(c, boite); $("pilApercuPropose").appendChild(boite);
                 $("pilPropose").hidden = false;
             }
-            $("pilComprendre").addEventListener("click", async () => {
-                message(""); $("pilPropose").hidden = true;
-                const texte = $("pilTexte").value;
-                const r = ConfigLib.interpreter(texte, Date.now());
-                if (r.cmds.length) { montrerProposition(r.cmds); return; }
-                if (localStorage.getItem(CLE_IA) && texte.trim()) { await demanderIA(); return; }
-                message(r.raison, true);
-            });
-            $("pilAppliquer").addEventListener("click", async () => {
-                if (await lancer(proposition)) { $("pilPropose").hidden = true; $("pilTexte").value = ""; }
-            });
-            $("pilAnnulerPropose").addEventListener("click", () => { $("pilPropose").hidden = true; });
-
-            // IA gratuite (Gemini) : transforme une phrase libre en commandes de la liste, que ConfigLib vérifie et que tu valides
-            $("pilCleIA").value = localStorage.getItem(CLE_IA) ? "••••••••" : "";
-            $("pilEnregistrerCle").addEventListener("click", () => {
-                const v = $("pilCleIA").value.trim();
-                if (v && !/^•+$/.test(v)) { localStorage.setItem(CLE_IA, v); $("pilCleIA").value = "••••••••"; message("Clé enregistrée sur ce téléphone ✓"); }
-                else if (!v) { localStorage.removeItem(CLE_IA); message("Clé effacée."); }
-            });
-            async function demanderIA(){
-                const cle = localStorage.getItem(CLE_IA);
+            async function envoyer(){
                 const texte = $("pilTexte").value.trim();
-                if (!cle) { message("Ajoute d'abord une clé Gemini (section ci-dessous).", true); return; }
                 if (!texte) { message("Écris ta demande d'abord.", true); return; }
-                message("L'IA réfléchit…");
-                const consigne = `Tu pilotes un jeu de cartes à boire. Transforme la demande de l'utilisateur en une LISTE JSON de commandes, rien d'autre. Commandes possibles :
+                message(""); $("pilPropose").hidden = true;
+                fil.push({ role: "moi", texte }); $("pilTexte").value = ""; dessinerFil();
+                const r = ConfigLib.interpreter(texte, Date.now(), derniereDemande);
+                if (r.cmds.length) { direFil("Compris : regarde ci-dessous et valide.", r.cmds); montrerProposition(r.cmds); return; }
+                const reponse = ConfigLib.repondreQuestion(texte, construireResume());
+                if (reponse) { direFil(reponse); return; }
+                if (cleIA()) { await demanderIA(); return; }
+                direFil(r.raison || "Je n'ai pas compris. Essaie une phrase plus simple, ou ajoute une clé Gemini (en bas) pour que je comprenne les demandes plus libres.");
+            }
+            $("pilComprendre").addEventListener("click", envoyer);
+            $("pilAppliquer").addEventListener("click", async () => {
+                const faites = proposition;
+                if (await lancer(faites)) { derniereDemande = faites; $("pilPropose").hidden = true; direFil("C'est fait ✓"); }
+            });
+            $("pilAnnulerPropose").addEventListener("click", () => { $("pilPropose").hidden = true; direFil("D'accord, je ne change rien."); });
+
+            // Raccourcis : plusieurs réglages d'un coup
+            $("pilRaccourcis").innerHTML = Object.keys(ConfigLib.SCENARIOS).map((k) => `<button type="button" data-raccourci="${k}">${ecape(ConfigLib.SCENARIOS[k].nom)}</button>`).join("");
+            $("pilRaccourcis").addEventListener("click", (ev) => {
+                const b = ev.target.closest("button[data-raccourci]"); if (!b) return;
+                const sc = ConfigLib.SCENARIOS[b.dataset.raccourci];
+                fil.push({ role: "moi", texte: sc.nom }); const cmds = sc.cmds(); direFil("Raccourci prêt : regarde et valide.", cmds); montrerProposition(cmds);
+            });
+            // Modèles d'annonces
+            $("pilModeles").innerHTML = ConfigLib.MODELES_ANNONCES.map((m, i) => `<button type="button" data-modele="${i}">${ecape(m.nom)}</button>`).join("");
+            $("pilModeles").addEventListener("click", (ev) => {
+                const b = ev.target.closest("button[data-modele]"); if (!b) return;
+                $("pilAnnonce").value = ConfigLib.MODELES_ANNONCES[Number(b.dataset.modele)].texte; $("pilAnnonce").focus();
+            });
+
+            // IA gratuite (Gemini)
+            const cleIA = () => { try { return localStorage.getItem(CLE_IA); } catch (e) { return null; } };
+            $("pilCleIA").value = cleIA() ? "••••••••" : "";
+            const etatIA = (t, erreur) => { $("pilIAEtat").textContent = t; $("pilIAEtat").classList.toggle("erreur", !!erreur); };
+            $("pilEnregistrerCle").addEventListener("click", async () => {
+                const v = $("pilCleIA").value.trim();
+                if (!v) { try { localStorage.removeItem(CLE_IA); localStorage.removeItem(CLE_MODELE_IA); } catch (e) {} etatIA("Clé effacée."); return; }
+                const cle = /^•+$/.test(v) ? cleIA() : v;
+                if (!cle) { etatIA("Colle ta clé d'abord.", true); return; }
+                etatIA("Test de la clé…");
+                const t = await testerCleIA(cle);
+                if (t.ok) { try { localStorage.setItem(CLE_IA, cle); } catch (e) {} $("pilCleIA").value = "••••••••"; }
+                etatIA(t.message, !t.ok);
+            });
+            const systemeIA = () => `Tu es l'assistant de pilotage d'un jeu de cartes à boire (Alcuno). Réponds UNIQUEMENT par un objet JSON : {"commandes":[…],"reponse":"phrase courte en français"}.
+« commandes » : liste (vide si aucune) prise parmi :
 {"op":"annonce","texte":"…(140 car. max)","dureeMin":nombre facultatif,"debut":"AAAA-MM-JJTHH:MM" facultatif (heure locale, programmée),"avantVersion":"x.y.z" facultatif (seulement pour les versions plus anciennes)}
 {"op":"defaut","cible":"volumeMusique"(0-100 par 5)|"vitesseVoix"(0.6-1.6),"valeur":nombre|null}
 {"op":"annonce_off"}
@@ -775,23 +829,50 @@
 {"op":"theme_periode_off","id":"…"}
 {"op":"majmin","version":"x.y.z"|null}
 {"op":"tout_remettre"}
-Noms des thèmes : ${ConfigLib.THEMES_CONNUS.map((t) => t + "=" + ConfigLib.NOMS_THEMES[t]).join(", ")}. Si la demande n'est pas possible avec ces commandes, réponds []. Réglages actuels : ${ConfigLib.decrire(config).join(" ; ")}. Date du jour : ${new Date().toISOString().slice(0, 10)}.`;
+Si l'utilisateur pose une QUESTION sur les statistiques ou la santé du jeu, laisse « commandes » vide et réponds dans « reponse » d'après les données ci-dessous, sans rien inventer (dis « je n'ai pas cette donnée » sinon).
+Si la demande est impossible avec ces commandes, « commandes » est vide et « reponse » l'explique.
+Noms des thèmes : ${ConfigLib.THEMES_CONNUS.map((t) => t + "=" + ConfigLib.NOMS_THEMES[t]).join(", ")}.
+Réglages actuels : ${ConfigLib.decrire(config).join(" ; ")}.
+Date du jour : ${new Date().toISOString().slice(0, 10)}.
+Données (stats) : ${JSON.stringify((() => { const r = construireResume(); const jours = {}; joursPasses(14).forEach((j) => { if (r.jours[j]) jours[j] = r.jours[j]; }); return { ...r, jours }; })())}`;
+            async function demanderIA(){
+                const cle = cleIA();
+                if (!cle) { direFil("Ajoute d'abord une clé Gemini (section en bas).", undefined); return; }
+                message("L'IA réfléchit…");
+                // la conversation jusqu'ici (sans le dernier message, ajouté à la fin) : l'IA se souvient de ce qui a été dit
+                const contenus = fil.slice(0, -1).slice(-8).map((m) => ({ role: m.role === "moi" ? "user" : "model", parts: [{ text: m.role === "moi" ? m.texte : JSON.stringify({ commandes: m.cmds || [], reponse: m.texte }) }] }));
+                contenus.push({ role: "user", parts: [{ text: fil[fil.length - 1].texte }] });
                 try {
-                    const rep = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODELE_IA}:generateContent?key=${encodeURIComponent(cle)}`, {
-                        method: "POST", headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ systemInstruction: { parts: [{ text: consigne }] }, contents: [{ role: "user", parts: [{ text: texte }] }], generationConfig: { responseMimeType: "application/json", temperature: 0 } })
-                    });
-                    const j = await rep.json();
-                    if (!rep.ok) throw new Error((j.error && j.error.message) || ("erreur " + rep.status));
-                    let cmds = JSON.parse(j.candidates[0].content.parts[0].text);
-                    if (!Array.isArray(cmds)) cmds = [cmds];
-                    cmds = cmds.slice(0, 6).map((c) => (c && typeof c.debut === "string" ? { ...c, debut: Date.parse(c.debut) } : c));
-                    if (!cmds.length) { message("L'IA ne voit pas comment faire ça avec les réglages possibles.", true); return; }
+                    const j = await appelerGemini(cle, systemeIA(), contenus);
                     message("");
-                    montrerProposition(cmds);
-                } catch (e) { message("L'IA n'a pas répondu : " + (e && e.message ? e.message : e), true); }
+                    let cmds = Array.isArray(j) ? j : Array.isArray(j.commandes) ? j.commandes : [];
+                    cmds = cmds.slice(0, 6).map((c) => (c && typeof c.debut === "string" ? { ...c, debut: Date.parse(c.debut) } : c));
+                    const phrase = !Array.isArray(j) && typeof j.reponse === "string" ? j.reponse.slice(0, 600) : "";
+                    if (cmds.length) { direFil(phrase || "Voilà ce que je propose : regarde et valide.", cmds); montrerProposition(cmds); }
+                    else direFil(phrase || "Je ne vois pas comment faire ça avec les réglages possibles.");
+                } catch (e) { message("L'IA n'a pas répondu : " + (e && e.message ? e.message : e), true); direFil("(L'IA n'a pas répondu.)"); }
             }
-            $("pilDemanderIA").addEventListener("click", demanderIA);
+            // Reformuler l'annonce : 3 variantes à choisir
+            $("pilReformuler").addEventListener("click", async () => {
+                const texte = $("pilAnnonce").value.trim();
+                if (!texte) { message("Écris d'abord ton annonce, même en brouillon.", true); return; }
+                const cle = cleIA();
+                if (!cle) { message("Pour reformuler, ajoute une clé Gemini gratuite (section en bas).", true); return; }
+                message("L'IA réécrit…"); $("pilVariantes").innerHTML = "";
+                try {
+                    const j = await appelerGemini(cle, 'Réécris ce message d\'annonce pour un jeu de cartes à boire entre amis : 3 variantes différentes, en français, chaleureuses et courtes, 140 caractères maximum chacune, un émoji au plus. N\'invente aucune information (date, lieu, chiffre) qui n\'est pas dans le texte. Réponds uniquement par {"variantes":["…","…","…"]}.', [{ role: "user", parts: [{ text: texte }] }]);
+                    const v = (Array.isArray(j.variantes) ? j.variantes : []).filter((x) => typeof x === "string" && x.trim()).slice(0, 3).map((x) => x.trim().slice(0, 140));
+                    if (!v.length) { message("L'IA n'a rien proposé, réessaie.", true); return; }
+                    message("");
+                    $("pilVariantes").innerHTML = v.map((x, i) => `<button type="button" data-variante="${i}">${ecape(x)}</button>`).join("");
+                    $("pilVariantes").dataset.liste = JSON.stringify(v);
+                } catch (e) { message("L'IA n'a pas répondu : " + (e && e.message ? e.message : e), true); }
+            });
+            $("pilVariantes").addEventListener("click", (ev) => {
+                const b = ev.target.closest("button[data-variante]"); if (!b) return;
+                try { $("pilAnnonce").value = JSON.parse($("pilVariantes").dataset.liste)[Number(b.dataset.variante)]; } catch (e) {}
+                $("pilVariantes").innerHTML = "";
+            });
 
             // Connexion
             const erreursConnexion = { "auth/invalid-credential": "E-mail ou mot de passe incorrect.", "auth/invalid-email": "E-mail invalide.", "auth/too-many-requests": "Trop d'essais, réessaie dans quelques minutes.", "auth/network-request-failed": "Pas de réseau.", "auth/operation-not-allowed": "La connexion par e-mail n'est pas activée dans Firebase (Authentication → Sign-in method)." };
@@ -850,6 +931,78 @@ Noms des thèmes : ${ConfigLib.THEMES_CONNUS.map((t) => t + "=" + ConfigLib.NOMS
             });
         }
 
+        // Résumé compact des stats, pour répondre aux questions (ConfigLib.repondreQuestion) et pour l'IA
+        function construireResume(){
+            const aujourdhui = jourDe(new Date()), jours = {};
+            Object.entries(donnees.jours).forEach(([j, d]) => { d = d || {}; jours[j] = { visites: Number(d.visites || 0), installs: Number(d.installs || 0), parties: Number(d.parties || 0), partiesEnLigne: Number(d.partiesEnLigne || 0) }; });
+            const unique = (liste) => { const ids = new Set(); liste.forEach((j) => Object.keys((donnees.jours[j] || {}).visiteurs || {}).forEach((id) => ids.add(id))); return ids.size; };
+            const os = {}, themes = {}, versions = {};
+            Object.values(donnees.appareils).forEach((a) => {
+                if (!a || Date.now() - Number(a.vu || 0) > APPAREILS_VUS_DEPUIS) return;
+                os[a.os] = (os[a.os] || 0) + 1; if (a.theme) themes[a.theme] = (themes[a.theme] || 0) + 1; if (a.version) versions[a.version] = (versions[a.version] || 0) + 1;
+            });
+            const ignores = (donnees.sante || {}).ignores || {};
+            const plantages = agregerPlantages(donnees.sante || {}).filter((a) => !ignores[a.sig]).map((a) => ({ msg: a.msg, fichier: a.fichier, n: a.n, n24: a.n24, versions: a.versions }));
+            return { aujourdhui, jours, visiteurs: { aujourdhui: unique([aujourdhui]), "7": unique(joursPasses(7)), "30": unique(joursPasses(30)), tout: unique(Object.keys(donnees.jours)) }, os, themes, versions, plantages };
+        }
+        // Plantages regroupés par empreinte sur 7 jours (onglet Santé et résumé)
+        function agregerPlantages(sante){
+            const sept = new Set(joursPasses(7)), par = {}, maintenant = Date.now();
+            Object.entries(sante.jours || {}).forEach(([jour, sigs]) => {
+                if (!sept.has(jour)) return;
+                Object.entries(sigs || {}).forEach(([sig, e]) => {
+                    if (!e || typeof e !== "object") return;
+                    const a = par[sig] = par[sig] || { sig, msg: e.msg, fichier: e.fichier, n: 0, n24: 0, derniere: 0, versions: {}, os: {} };
+                    const n = Number(e.n) || 1;
+                    a.n += n; a.derniere = Math.max(a.derniere, Number(e.vu) || 0);
+                    if (maintenant - Number(e.vu || 0) < 24 * 3600 * 1000) a.n24 += n;
+                    if (e.version) a.versions[e.version] = (a.versions[e.version] || 0) + n;
+                    if (e.os) a.os[e.os] = (a.os[e.os] || 0) + n;
+                });
+            });
+            return Object.values(par).sort((x, y) => y.n - x.n);
+        }
+
+        // Google Gemini (clé gratuite, gardée dans ce téléphone) : appel avec réessai automatique si le modèle a été renommé
+        const MODELES_IA_PREFERES = ["gemini-2.5-flash", "gemini-flash-latest", "gemini-2.0-flash", "gemini-1.5-flash"];
+        const API_IA = "https://generativelanguage.googleapis.com/v1beta/";
+        async function listerModelesIA(cle){
+            const rep = await fetch(`${API_IA}models?pageSize=100&key=${encodeURIComponent(cle)}`);
+            const j = await rep.json().catch(() => ({}));
+            if (!rep.ok) { const e = new Error((j.error && j.error.message) || "erreur " + rep.status); e.statut = rep.status; throw e; }
+            return (j.models || []).filter((m) => (m.supportedGenerationMethods || []).indexOf("generateContent") >= 0).map((m) => String(m.name).replace(/^models\//, ""));
+        }
+        function choisirModeleIA(disponibles){
+            for (const p of MODELES_IA_PREFERES) if (disponibles.indexOf(p) >= 0) return p;
+            const flash = disponibles.filter((n) => /flash/.test(n) && !/(lite|image|tts|live|thinking|exp|preview|audio)/.test(n)).sort().reverse();
+            return flash[0] || disponibles[0] || null;
+        }
+        // Teste la clé : « valide » + modèle retenu, ou la raison du refus
+        async function testerCleIA(cle){
+            try {
+                const modele = choisirModeleIA(await listerModelesIA(cle));
+                if (!modele) return { ok: false, message: "Clé valide, mais aucun modèle utilisable n'est ouvert à ce compte." };
+                try { localStorage.setItem(CLE_MODELE_IA, modele); } catch (e) {}
+                return { ok: true, message: `Clé valide ✓ · modèle utilisé : ${modele}`, modele };
+            } catch (e) {
+                if (e.statut === 400 || e.statut === 401 || e.statut === 403) return { ok: false, message: "Clé refusée par Google : vérifie qu'elle est bien copiée en entier (aistudio.google.com → Get API key)." };
+                return { ok: false, message: "Impossible de joindre Google : " + (e && e.message ? e.message : e) };
+            }
+        }
+        async function appelerGemini(cle, systeme, contenus, essai = 0){
+            const rep = await fetch(`${API_IA}models/${modeleIA()}:generateContent?key=${encodeURIComponent(cle)}`, {
+                method: "POST", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ systemInstruction: { parts: [{ text: systeme }] }, contents: contenus, generationConfig: { responseMimeType: "application/json", temperature: 0.2 } })
+            });
+            if (rep.status === 404 && essai === 0) { // (modèle renommé ou retiré : on en cherche un autre et on réessaie une fois)
+                const t = await testerCleIA(cle);
+                if (t.ok) return appelerGemini(cle, systeme, contenus, 1);
+            }
+            const j = await rep.json().catch(() => ({}));
+            if (!rep.ok) throw new Error((j.error && j.error.message) || ("erreur " + rep.status));
+            return JSON.parse(j.candidates[0].content.parts[0].text);
+        }
+
         // ===== Santé du jeu : plantages envoyés par js/stats.js (sante/jours/AAAA-MM-JJ/{empreinte}), regroupés sur 7 jours =====
         function demarrerSante(app, db){
             const $ = (id) => document.getElementById(id);
@@ -858,22 +1011,7 @@ Noms des thèmes : ${ConfigLib.THEMES_CONNUS.map((t) => t + "=" + ConfigLib.NOMS
             onAuthStateChanged(getAuth(app), (u) => { admin = u; dessiner(); });
             const ilYA = (ms) => { const min = Math.max(0, Math.round((Date.now() - ms) / 60000)); return min < 1 ? "à l'instant" : min < 90 ? `il y a ${min} min` : min < 2880 ? `il y a ${Math.round(min / 60)} h` : `il y a ${Math.round(min / 1440)} j`; };
 
-            function agreger(){
-                const sept = new Set(joursPasses(7)), par = {}, maintenant = Date.now();
-                Object.entries(sante.jours || {}).forEach(([jour, sigs]) => {
-                    if (!sept.has(jour)) return;
-                    Object.entries(sigs || {}).forEach(([sig, e]) => {
-                        if (!e || typeof e !== "object") return;
-                        const a = par[sig] = par[sig] || { sig, msg: e.msg, fichier: e.fichier, n: 0, n24: 0, derniere: 0, versions: {}, os: {} };
-                        const n = Number(e.n) || 1;
-                        a.n += n; a.derniere = Math.max(a.derniere, Number(e.vu) || 0);
-                        if (maintenant - Number(e.vu || 0) < 24 * 3600 * 1000) a.n24 += n;
-                        if (e.version) a.versions[e.version] = (a.versions[e.version] || 0) + n;
-                        if (e.os) a.os[e.os] = (a.os[e.os] || 0) + n;
-                    });
-                });
-                return Object.values(par).sort((x, y) => y.n - x.n);
-            }
+            function agreger(){ return agregerPlantages(sante); }
             const ligne = (a, texteBouton, attribut) => {
                 const versions = Object.entries(a.versions).sort((x, y) => y[1] - x[1]).map(([v, n]) => `${ecape(v)} ×${n}`).join(", ");
                 const os = Object.keys(a.os).map((o) => NOMS_OS[o] || o).join(", ");
@@ -908,7 +1046,7 @@ Noms des thèmes : ${ConfigLib.THEMES_CONNUS.map((t) => t + "=" + ConfigLib.NOMS
                 if (!confirm("Effacer tout le journal des plantages ?")) return;
                 try { await remove(ref(db, "sante/jours")); } catch (e) { refus(e); }
             });
-            onValue(ref(db, "sante"), (s) => { sante = s.val() || {}; dessiner(); }, () => { $("santeEtat").textContent = "Journal illisible (règles Firebase pas à jour ?)"; });
+            onValue(ref(db, "sante"), (s) => { sante = s.val() || {}; donnees.sante = sante; dessiner(); }, () => { $("santeEtat").textContent = "Journal illisible (règles Firebase pas à jour ?)"; });
             setInterval(dessiner, 60000);
         }
 
@@ -993,6 +1131,7 @@ Noms des thèmes : ${ConfigLib.THEMES_CONNUS.map((t) => t + "=" + ConfigLib.NOMS
             // ----- Fréquentation + courbe -----
             onValue(ref(db, "stats/jours"), (s) => {
                 const jours = s.val() || {};
+                donnees.jours = jours;
                 const derniers7 = joursPasses(7);
                 const derniers30 = joursPasses(30);
                 const aujourdhui = derniers7[0];
@@ -1023,6 +1162,7 @@ Noms des thèmes : ${ConfigLib.THEMES_CONNUS.map((t) => t + "=" + ConfigLib.NOMS
 
             // ----- Téléphones, thèmes, versions (appareils vus ces 30 derniers jours) -----
             onValue(ref(db, "stats/appareils"), (s) => {
+                donnees.appareils = s.val() || {};
                 const os = {}, themes = {}, versions = {};
                 Object.values(s.val() || {}).forEach((a) => {
                     if (!a || maintenant() - Number(a.vu || 0) > APPAREILS_VUS_DEPUIS) return;

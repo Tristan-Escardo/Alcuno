@@ -255,9 +255,67 @@
   }
 
   // Plusieurs demandes dans une phrase (« coupe la voix et la musique », « … puis désactive le thème Kawaii »)
-  function interpreter(texteBrut, maintenant) {
+  // « finalement non, remets-la », « annule ça » : l'inverse de la dernière demande ; « fais pareil pour la musique » : la même demande
+  // sur une autre cible. `contexte` : les commandes de la dernière demande appliquée.
+  function inverse(cmd) {
+    switch (cmd.op) {
+      case "coupure": return { op: "coupure", cible: cmd.cible, etat: !cmd.etat };
+      case "theme": return cmd.actif === false ? { op: "theme", id: cmd.id, actif: true } : cmd.actif === true ? { op: "theme", id: cmd.id, actif: false } : cmd.debut ? { op: "theme_periode_off", id: cmd.id } : null;
+      case "annonce": return { op: "annonce_off" };
+      case "defaut": return { op: "defaut", cible: cmd.cible, valeur: null };
+      case "majmin": return { op: "majmin", version: null };
+      default: return null;
+    }
+  }
+  function suite(brut, contexte) {
+    const t = sansAccent(brut).replace(/[’‘]/g, "'");
+    const cible = coupureDans(t), theme = themeDans(t);
+    if (/\b(pareil|idem|meme chose|de meme)\b/.test(t) && (cible || theme)) {
+      const derniere = (contexte || []).filter((c) => c.op === "coupure" || (c.op === "theme" && c.actif !== undefined)).pop();
+      if (!derniere) return { cmds: [], raison: "Je n'ai pas de demande récente à refaire." };
+      if (derniere.op === "coupure" && cible) return { cmds: [{ op: "coupure", cible, etat: derniere.etat }] };
+      if (derniere.op === "theme" && theme) return { cmds: [{ op: "theme", id: theme, actif: derniere.actif }] };
+      return null;
+    }
+    const sansCible = !cible && !theme && !/annonce|version|volume|vitesse|maintenance|silence|son\b|\d/.test(t);
+    if (sansCible && /(finalement|annule (ca|tout ca|la derniere)|oublie ca|laisse tomber|defais|remets?-(la|le|les)\b|retire-(la|le|les)\b|enleve-(la|le|les)\b)/.test(t)) {
+      if (!(contexte || []).length) return { cmds: [], raison: "Je n'ai pas de modification récente à annuler." };
+      const cmds = contexte.map(inverse).filter(Boolean);
+      return cmds.length ? { cmds } : { cmds: [], raison: "Je ne sais pas annuler cette demande : utilise « Annuler la dernière modification »." };
+    }
+    return null;
+  }
+
+  // Raccourcis : plusieurs réglages d'un coup (boutons « Raccourcis » et phrases comme « mode maintenance »)
+  const SCENARIOS = {
+    maintenance: { nom: "🛠️ Mode maintenance", detecte: /mode maintenance|mets?(?: le jeu)? en maintenance|maintenance (?:on|en cours|commence)|lance(?:r)? la maintenance/,
+      cmds: () => [{ op: "coupure", cible: "enligne", etat: true }, { op: "annonce", texte: "Petite maintenance en cours : le mode en ligne revient bientôt 🛠️", dureeMin: 1440 }] },
+    fin_maintenance: { nom: "✅ Fin de maintenance", detecte: /fin (?:de la |de )?maintenance|sors? de la maintenance|maintenance (?:finie|terminee)|remets? le jeu en route/,
+      cmds: () => [{ op: "coupure", cible: "enligne", etat: false }, { op: "annonce_off" }] },
+    silence: { nom: "🔇 Silence total", detecte: /silence total|coupe (?:tout )?le son|plus aucun son/,
+      cmds: () => [{ op: "coupure", cible: "voix", etat: true }, { op: "coupure", cible: "musique", etat: true }] },
+    son: { nom: "🔊 Rétablir le son", detecte: /retablis? le son|remets? le son|rallume (?:tout )?le son/,
+      cmds: () => [{ op: "coupure", cible: "voix", etat: false }, { op: "coupure", cible: "musique", etat: false }] },
+    bug: { nom: "🆘 Bug connu", detecte: /bug connu|previens (?:du|d'un) bug/,
+      cmds: () => [{ op: "annonce", texte: "Un bug est connu, on s'en occupe 🙏", dureeMin: 1440 }] }
+  };
+  function scenarioDans(t) { for (const k of ["fin_maintenance", "maintenance", "silence", "son", "bug"]) if (SCENARIOS[k].detecte.test(t)) return k; return null; }
+
+  // Modèles d'annonces (boutons de pilotage) : le texte part dans le champ, à adapter
+  const MODELES_ANNONCES = [
+    { nom: "Soirée", texte: "Soirée ce soir ! Préparez vos verres 🍻" },
+    { nom: "Mise à jour", texte: "Nouvelle version disponible : rouvrez le jeu pour en profiter ✨" },
+    { nom: "Nouveau thème", texte: "Un nouveau thème vient d'arriver, allez voir dans les Réglages 🎨" },
+    { nom: "Maintenance", texte: "Petite maintenance en cours, merci de patienter 🛠️" },
+    { nom: "Bug connu", texte: "Un bug est connu, on s'en occupe 🙏" },
+    { nom: "Merci", texte: "Merci de jouer à Alcuno, vous êtes au top 💛" }
+  ];
+
+  function interpreter(texteBrut, maintenant, contexte) {
     maintenant = typeof maintenant === "number" ? maintenant : Date.now();
     const brut = String(texteBrut || "").trim();
+    const sv = suite(brut, contexte);
+    if (sv) return sv;
     if (!/[«"“:]/.test(brut)) {
       const parties = brut.split(/\s*(?:,(?!\d)|;|\bet\b|\bpuis\b)\s*/i).filter(Boolean);
       if (parties.length > 1) {
@@ -282,6 +340,8 @@
     if (!t) return { cmds, raison: "Écris une demande, par exemple : coupe la voix." };
 
     if (/(remets?|reinitialise|reset|annule) (tout|tous les reglages)|tout remettre|retour (aux )?reglages par defaut/.test(t)) return { cmds: [{ op: "tout_remettre" }] };
+    const raccourci = scenarioDans(t);
+    if (raccourci) return { cmds: SCENARIOS[raccourci].cmds(), raccourci };
 
     // annonce
     const entre = brut.match(/[«"“]([^»"”]+)[»"”]/);
@@ -356,9 +416,80 @@
     return l.length ? l : ["rien : le jeu est réglé par défaut"];
   }
 
+  // ----- Questions sur les stats : réponses sans IA aux questions courantes -----
+  // `resume` (construit par la page stats) : { aujourdhui:"AAAA-MM-JJ", jours:{ jour:{visites,installs,parties,partiesEnLigne} },
+  //   visiteurs:{aujourdhui,"7","30",tout}, os:{ios,android,ordi}, themes:{theme:n}, versions:{version:n},
+  //   plantages:[{msg,fichier,n,n24,versions:{v:n}}] }
+  const nbr = (n) => Number(n || 0).toLocaleString("fr-FR");
+  const pluriel = (n, un, plusieurs) => (n > 1 ? plusieurs : un);
+  function periodeDans(t) {
+    if (/aujourd'?hui|ce jour/.test(t)) return { cle: "aujourdhui", jours: 1, texte: "aujourd'hui" };
+    if (/\bhier\b/.test(t)) return { cle: "hier", jours: 1, decalage: 1, texte: "hier" };
+    if (/(ce|le|sur le|les 30 derniers) (mois|jours)|30 (derniers )?jours/.test(t) || /\bmois\b/.test(t)) return { cle: "30", jours: 30, texte: "ces 30 derniers jours" };
+    if (/total|depuis (le debut|toujours|le lancement)|en tout/.test(t)) return { cle: "tout", jours: 100000, texte: "au total" };
+    return { cle: "7", jours: 7, texte: "ces 7 derniers jours" };
+  }
+  function jourMoins(aujourdhui, n) { const [a, m, j] = aujourdhui.split("-").map(Number); const d = new Date(a, m - 1, j - n); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; }
+  function sommeJours(resume, champ, periode) {
+    let somme = 0;
+    for (let i = 0; i < Math.min(periode.jours, 4000); i++) {
+      const d = periode.jours >= 100000 ? null : jourMoins(resume.aujourdhui, (periode.decalage || 0) + i);
+      if (d === null) { Object.values(resume.jours || {}).forEach((j) => { somme += Number((j || {})[champ] || 0); }); break; }
+      somme += Number(((resume.jours || {})[d] || {})[champ] || 0);
+    }
+    return somme;
+  }
+  function classement(compte, noms, max) {
+    const total = Object.values(compte || {}).reduce((x, n) => x + n, 0);
+    if (!total) return null;
+    return Object.entries(compte).sort((x, y) => y[1] - x[1]).slice(0, max || 3).map(([k, n]) => `${(noms && noms[k]) || k} (${Math.round(100 * n / total)} %)`);
+  }
+  function repondreQuestion(texteBrut, resume) {
+    const t = sansAccent(texteBrut).replace(/[’‘]/g, "'");
+    if (!resume || !resume.aujourdhui || !/[a-z]/.test(t)) return null;
+    const p = periodeDans(t);
+    const question = /combien|nombre|total|\?|stats?\b|quel(?:le|s|les)?\b|c'est quoi|donne[- ]moi/.test(t); // (pas une demande comme « fais plaisir à tout le monde »)
+    if (/plantage|erreur|crash|bug|plante/.test(t) && !/theme/.test(t) && question) {
+      const l = resume.plantages || [];
+      if (/version/.test(t)) {
+        const parVersion = {}; l.forEach((e) => Object.entries(e.versions || {}).forEach(([v, n]) => { parVersion[v] = (parVersion[v] || 0) + n; }));
+        const top = Object.entries(parVersion).sort((x, y) => y[1] - x[1])[0];
+        return top ? `La version qui plante le plus (7 jours) : ${top[0]}, avec ${top[1]} plantage${pluriel(top[1], "", "s")}.` : "Aucun plantage enregistré sur 7 jours.";
+      }
+      const n24 = l.reduce((x, e) => x + (e.n24 || 0), 0), n7 = l.reduce((x, e) => x + (e.n || 0), 0);
+      return n7 ? `${nbr(n24)} plantage${pluriel(n24, "", "s")} ces dernières 24 h, ${nbr(n7)} sur 7 jours (${l.length} type${pluriel(l.length, "", "s")} d'erreur${pluriel(l.length, "", "s")}). Le plus fréquent : « ${l.slice().sort((x, y) => y.n - x.n)[0].msg} ».` : "Aucun plantage enregistré sur 7 jours 🎉";
+    }
+    if (/theme/.test(t) && /(plus|favori|populaire|utilis|choisi|prefere)/.test(t) && question) {
+      const c = classement(resume.themes, NOMS_THEMES, 3);
+      return c ? `Thèmes les plus choisis : ${c.join(", ")}.` : "Pas encore de données sur les thèmes.";
+    }
+    if (/version/.test(t) && /(plus|repandue|utilis|circul)/.test(t) && question) {
+      const c = classement(resume.versions, null, 3);
+      return c ? `Versions les plus utilisées (30 jours) : ${c.join(", ")}.` : "Pas encore de données sur les versions.";
+    }
+    if (/(iphone|android|ordinateur|ordi\b|telephone|appareil|systeme)/.test(t) && question) {
+      const c = classement(resume.os, { ios: "iPhone", android: "Android", ordi: "Ordinateur" }, 3);
+      return c ? `Appareils (30 jours) : ${c.join(", ")}.` : "Pas encore de données sur les appareils.";
+    }
+    if (!question) return null;
+    if (/visiteur|joueurs?\b|\bgens\b|personnes/.test(t) && !/partie/.test(t)) {
+      if (p.cle === "hier") return "Je n'ai pas le nombre de visiteurs différents pour hier seul : demande « aujourd'hui », « cette semaine » ou « ce mois ».";
+      const n = (resume.visiteurs || {})[p.cle];
+      return n === undefined ? null : `Visiteurs différents ${p.texte} : ${nbr(n)}.`;
+    }
+    if (/install/.test(t)) { const n = sommeJours(resume, "installs", p); return `Installations ${p.texte} : ${nbr(n)}.`; }
+    if (/visite|ouvertures?/.test(t)) { const n = sommeJours(resume, "visites", p); return `Visites ${p.texte} : ${nbr(n)}.`; }
+    if (/partie/.test(t)) {
+      const c = sommeJours(resume, "parties", p), l = sommeJours(resume, "partiesEnLigne", p);
+      return `Parties ${p.texte} : ${nbr(c + l)} (${nbr(c)} classique${pluriel(c, "", "s")}, ${nbr(l)} en ligne).`;
+    }
+    return null;
+  }
+
   global.ConfigLib = {
     THEMES_CONNUS, NOMS_THEMES, COUPURES_CONNUES, NOMS_COUPURES, TEXTE_MAX,
-    valider, versionPlusVieille, themeDisponible, coupee, annonceVisible, appliquer, interpreter, decrire, dansPeriode, dateEnTexte
+    valider, versionPlusVieille, themeDisponible, coupee, annonceVisible, appliquer, interpreter, decrire, dansPeriode, dateEnTexte,
+    SCENARIOS, MODELES_ANNONCES, repondreQuestion
   };
   if (typeof module !== "undefined" && module.exports) module.exports = global.ConfigLib;
 })(typeof window !== "undefined" ? window : globalThis);

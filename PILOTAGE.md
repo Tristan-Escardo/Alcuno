@@ -35,6 +35,19 @@ version du jeu, type d'appareil. Au plus 5 types d'erreurs par ouverture du jeu,
 - **Ignorer** une erreur connue (elle ne compte plus) ; **Effacer le journal**. Ça demande d'être connecté dans l'onglet Pilotage.
 - Il faut **republier `database.rules.json`** (nouvelle section `sante`), sinon rien n'est enregistré.
 
+## Assistant : conversation, questions, raccourcis (stats 1.11.0)
+
+- **Il se souvient de la conversation** : « coupe la voix » puis « finalement non, remets-la » ou « fais pareil pour la musique ».
+  Avec une clé Gemini, l'IA reçoit aussi les derniers échanges.
+- **Questions sur les stats**, sans IA pour les cas courants : « combien de parties cette semaine ? », « quel thème est le plus utilisé ? »,
+  « quelle version plante le plus ? », « combien de plantages ? »… Avec une clé Gemini, il répond aussi aux questions plus libres
+  d'après les chiffres de la page (il n'invente rien).
+- **Raccourcis** (boutons ou phrases) : 🛠️ Mode maintenance (coupe le mode en ligne + annonce), ✅ Fin de maintenance, 🔇 Silence total,
+  🔊 Rétablir le son, 🆘 Bug connu. Tu valides toujours avant.
+- **Modèles d'annonces** : un tap remplit le champ, à adapter ; **✨ Reformuler avec l'IA** propose 3 variantes (sans inventer de dates ni de chiffres).
+- **Clé Gemini** : « Enregistrer et tester la clé » dit si elle est valide et choisit tout seul un modèle disponible ;
+  si Google renomme le modèle, l'appel est réessayé automatiquement avec un autre.
+
 ## Annonce à plusieurs endroits
 
 L'annonce s'affiche sur l'accueil, en haut des Réglages et en haut des Crédits. La fermer la ferme partout.
@@ -62,7 +75,7 @@ L'annonce s'affiche sur l'accueil, en haut des Réglages et en haut des Crédits
 Pour comprendre des demandes plus libres : clé gratuite **Google Gemini** (aistudio.google.com → *Get API key*),
 collée dans « Assistant intelligent gratuit ». Elle reste dans ton téléphone, jamais dans le jeu ni sur GitHub.
 L'IA ne peut proposer que les réglages de la liste ci-dessus, vérifiés par le code, et tu valides avant.
-Le modèle utilisé est `MODELE_IA` dans `stats.html` (à changer si Google le renomme).
+Le modèle est choisi automatiquement (`MODELE_IA` dans `stats.html` n'est que le premier essai).
 
 ## Ce que ça ne peut pas faire
 

@@ -76,6 +76,25 @@ verifier(pd("volume de la musique par défaut à 50") === '[{"op":"defaut","cibl
 const prog = L.appliquer({}, { op: "annonce", texte: "Plus tard", debut: T0 + 3600000, dureeMin: 60, avantVersion: "9.70.0" }, T0);
 verifier(prog.config.annonce.debut === T0 + 3600000 && prog.config.annonce.fin === T0 + 7200000 && prog.config.annonce.avantVersion === "9.70.0" && !L.appliquer({}, { op: "annonce", texte: "x", avantVersion: "abc" }, 0).config, "annonce programmée : la durée compte depuis le début");
 
+// conversation : suites (« finalement non », « fais pareil »), raccourcis, questions sur les stats, modèles d'annonces
+const suiteDe = (phrase, ctx) => JSON.stringify(L.interpreter(phrase, T0, ctx).cmds);
+const ctxVoix = [{ op: "coupure", cible: "voix", etat: true }];
+verifier(suiteDe("finalement non, remets-la", ctxVoix) === '[{"op":"coupure","cible":"voix","etat":false}]' && suiteDe("annule ça", ctxVoix) === '[{"op":"coupure","cible":"voix","etat":false}]'
+  && suiteDe("fais pareil pour la musique", ctxVoix) === '[{"op":"coupure","cible":"musique","etat":true}]' && suiteDe("remets-le", [{ op: "theme", id: "kawaii", actif: false }]) === '[{"op":"theme","id":"kawaii","actif":true}]'
+  && suiteDe("fais pareil pour le thème givre", [{ op: "theme", id: "kawaii", actif: false }]) === '[{"op":"theme","id":"givre","actif":false}]'
+  && suiteDe("annule ça", [{ op: "annonce", texte: "x" }]) === '[{"op":"annonce_off"}]' && suiteDe("annule ça", []) === "[]" && !!L.interpreter("annule ça", T0, []).raison && suiteDe("coupe la voix", ctxVoix) === '[{"op":"coupure","cible":"voix","etat":true}]', "assistant : mémoire de la conversation (finalement non, fais pareil)");
+verifier(L.interpreter("mode maintenance", T0).raccourci === "maintenance" && L.interpreter("mode maintenance", T0).cmds.length === 2 && L.interpreter("fin de la maintenance", T0).raccourci === "fin_maintenance" && L.interpreter("silence total", T0).cmds.length === 2 && L.interpreter("rétablis le son", T0).raccourci === "son"
+  && Object.keys(L.SCENARIOS).length === 5 && Object.values(L.SCENARIOS).every((x) => x.nom && x.cmds().every((c) => !L.appliquer({}, c, T0).erreur)) && L.MODELES_ANNONCES.length >= 5 && L.MODELES_ANNONCES.every((m) => m.texte.length <= L.TEXTE_MAX), "raccourcis et modèles d'annonces valides");
+const R = { aujourdhui: "2026-10-28", jours: { "2026-10-28": { visites: 10, installs: 1, parties: 4, partiesEnLigne: 2 }, "2026-10-27": { visites: 20, parties: 5, partiesEnLigne: 1 }, "2026-10-01": { visites: 100, parties: 30, partiesEnLigne: 10 } },
+  visiteurs: { aujourdhui: 6, "7": 18, "30": 40, tout: 55 }, os: { ios: 30, android: 8, ordi: 2 }, themes: { bordeaux: 20, givre: 10, kawaii: 10 }, versions: { "9.66.0": 25, "9.65.1": 10 },
+  plantages: [{ msg: "TypeError: x", fichier: "a.js:1", n: 7, n24: 3, versions: { "9.66.0": 3, "9.65.1": 4 } }] };
+const q = (t) => L.repondreQuestion(t, R);
+verifier(q("combien de parties cette semaine ?") === "Parties ces 7 derniers jours : 12 (9 classiques, 3 en ligne)." && q("combien de parties aujourd'hui") === "Parties aujourd'hui : 6 (4 classiques, 2 en ligne)." && q("combien de parties hier") === "Parties hier : 6 (5 classiques, 1 en ligne)."
+  && q("combien de visites ce mois") === "Visites ces 30 derniers jours : 130." && q("combien d'installations au total") === "Installations au total : 1." && q("combien de visiteurs cette semaine") === "Visiteurs différents ces 7 derniers jours : 18."
+  && /Bordeaux \(50 %\)/.test(q("quel thème est le plus utilisé ?")) && /9\.66\.0 \(71 %\)/.test(q("quelle version est la plus répandue ?")) && /9\.65\.1, avec 4/.test(q("quelle version plante le plus ?")) && /3 plantages ces dernières 24 h, 7 sur 7 jours/.test(q("combien de plantages ?")) && /iPhone \(75 %\)/.test(q("combien d'iPhone ?")),
+  "questions sur les stats : réponses locales exactes");
+verifier(q("fais plaisir à tout le monde") === null && q("pourquoi le ciel est bleu ?") === null && q("coupe les parties") === null && L.repondreQuestion("combien de parties", null) === null, "questions : une demande ordinaire n'est pas prise pour une question");
+
 // stats.html (statistiques + pilotage) : le script de la page est syntaxiquement correct
 for (const nom of ["stats.html"]) {
   const html = fs.readFileSync(path.join(__dirname, "..", nom), "utf8");

@@ -174,7 +174,7 @@ export const signOut = async () => { utilisateur = null; ecouteurs.forEach((e) =
   await page.fill("#pilMdp", "bon"); await page.click("#pilConnecter"); await page.waitForTimeout(300);
   const connecte = await pil(() => ({ panneau: !document.getElementById("pilPanneau").hidden, uid: document.getElementById("pilUid").textContent, etat: document.getElementById("pilEtat").textContent }));
   await page.fill("#pilTexte", "blabla"); await page.click("#pilComprendre"); await page.waitForTimeout(200);
-  const incompris = await pil(() => document.getElementById("pilMessage").textContent);
+  const incompris = await pil(() => [...document.querySelectorAll("#pilFil .bulle")].pop().textContent);
   await page.fill("#pilTexte", "coupe la voix"); await page.click("#pilComprendre"); await page.waitForTimeout(200);
   const propose = await pil(() => ({ visible: !document.getElementById("pilPropose").hidden, texte: document.getElementById("pilProposeListe").textContent, config: window.__arbre.config || null }));
   await page.click("#pilAppliquer"); await page.waitForTimeout(300);
@@ -212,6 +212,75 @@ export const signOut = async () => { utilisateur = null; ecouteurs.forEach((e) =
   verifier(/coupe|Couper/i.test(propose.texte) && propose.visible && propose.config === null && /compris/.test(incompris) && /"voix":true/.test(applique.config) && applique.hist === 1 && /voix/.test(applique.etat), `pilotage : l'assistant propose, puis applique après validation, avec historique (${propose.texte} / ${JSON.stringify(applique)}) message « ${incompris.slice(0, 30)} »`);
   verifier(/"voix":true/.test(complet) && /"kawaii":\{"actif":false\}/.test(complet) && /"texte":"Bienvenue !"/.test(complet) && /"fin":\d+/.test(complet), `pilotage : boutons thème et annonce (${complet})`);
   verifier(/"voix":true/.test(annule.config) && !/Bienvenue|kawaii/.test(annule.config) && annule.hist === 1 && toutAnnule.config && Object.keys(toutAnnule.config).join() === "v" && toutAnnule.hist === 0, `pilotage : « annuler » revient en arrière pas à pas (${JSON.stringify(annule)} puis ${JSON.stringify(toutAnnule)})`);
+  // Assistant : se souvient (« finalement non »), répond aux questions sur les stats, raccourcis, modèles d'annonces
+  await page.click("#ongletPilotage"); await page.waitForTimeout(200);
+  const envoyer = async (texte) => { await page.fill("#pilTexte", texte); await page.click("#pilComprendre"); await page.waitForTimeout(250); };
+  const dernier = () => page.evaluate(() => ({ bulle: [...document.querySelectorAll("#pilFil .bulle")].pop().textContent, liste: document.getElementById("pilProposeListe").textContent, propose: !document.getElementById("pilPropose").hidden }));
+  await page.evaluate((auj) => { window.__arbre.stats = { jours: { [auj]: { visites: 10, parties: 4, partiesEnLigne: 2, visiteurs: { abcdefghij01: true, abcdefghij02: true } } }, appareils: { abcdefghij01: { os: "ios", vu: Date.now(), theme: "kawaii", version: "9.66.0" }, abcdefghij02: { os: "android", vu: Date.now(), theme: "kawaii", version: "9.65.1" } } }; window.__notifier(); }, jourDe(0));
+  await page.click("#pilEffacerFil");
+  await envoyer("coupe la voix"); await page.click("#pilAppliquer"); await page.waitForTimeout(300);
+  await envoyer("finalement non, remets-la"); const suiteNon = await dernier();
+  await page.click("#pilAnnulerPropose");
+  await envoyer("combien de parties aujourd'hui ?"); const questionParties = await dernier();
+  await envoyer("quel thème est le plus utilisé ?"); const questionTheme = await dernier();
+  await envoyer("combien de plantages ?"); const questionPlantages = await dernier();
+  await page.click('#pilRaccourcis button[data-raccourci="maintenance"]'); await page.waitForTimeout(200);
+  const raccourci = await dernier();
+  await page.click("#pilAppliquer"); await page.waitForTimeout(300);
+  const maintenance = await page.evaluate(() => ({ enligne: !!(window.__arbre.config.coupures || {}).enligne, annonce: (window.__arbre.config.annonce || {}).texte || "" }));
+  await page.click('#pilModeles button[data-modele="0"]');
+  const modele = await page.evaluate(() => document.getElementById("pilAnnonce").value);
+  const nbBulles = await page.evaluate(() => document.querySelectorAll("#pilFil .bulle").length);
+  verifier(/Remettre les annonces/.test(suiteNon.liste) && suiteNon.propose && /Parties aujourd'hui : 6 \(4 classiques, 2 en ligne\)/.test(questionParties.bulle) && /Kawaii \(100 %\)/.test(questionTheme.bulle) && /plantage/i.test(questionPlantages.bulle) && !questionParties.propose,
+    `assistant : suite « finalement non », questions sur les stats (${JSON.stringify([suiteNon.liste, questionParties.bulle, questionTheme.bulle, questionPlantages.bulle])})`);
+  verifier(/mode en ligne/i.test(raccourci.liste) && /maintenance/i.test(raccourci.liste) && maintenance.enligne && /maintenance/i.test(maintenance.annonce) && /Soirée/.test(modele) && nbBulles >= 8, `raccourci « maintenance » + modèle d'annonce (${JSON.stringify([raccourci.liste, maintenance, modele, nbBulles])})`);
+  await page.click("#pilEffacerFil"); await page.click("#pilAnnulerDerniere"); await page.waitForTimeout(300); await page.click("#pilRetirerAnnonce"); await page.waitForTimeout(200);
+
+  // IA (Gemini simulé) : test de la clé, conversation avec historique, modèle renommé, reformulation de l'annonce
+  const appelsIA = [];
+  await page.route("https://generativelanguage.googleapis.com/**", async (route) => {
+    const req = route.request(), url = req.url();
+    const cors = { "access-control-allow-origin": "*", "access-control-allow-headers": "*", "access-control-allow-methods": "GET,POST,OPTIONS" };
+    if (req.method() === "OPTIONS") return route.fulfill({ status: 204, headers: cors });
+    const json = (corps, status = 200) => route.fulfill({ status, headers: { ...cors, "content-type": "application/json" }, body: JSON.stringify(corps) });
+    if (/models\?/.test(url)) {
+      if (/key=MAUVAISE/.test(url)) return json({ error: { message: "API key not valid" } }, 403);
+      return json({ models: [{ name: "models/embedding-001", supportedGenerationMethods: ["embedContent"] }, { name: "models/gemini-2.5-flash", supportedGenerationMethods: ["generateContent"] }] });
+    }
+    const corps = JSON.parse(req.postData() || "{}");
+    appelsIA.push({ url, systeme: corps.systemInstruction.parts[0].text, contenus: corps.contents });
+    if (/models\/disparu:/.test(url)) return json({ error: { message: "model not found" } }, 404);
+    if (/Réécris/.test(corps.systemInstruction.parts[0].text)) return json({ candidates: [{ content: { parts: [{ text: JSON.stringify({ variantes: ["Variante A 🍻", "Variante B", "Variante C"] }) }] } }] });
+    const dernierTexte = corps.contents[corps.contents.length - 1].parts[0].text;
+    const rep = /plaisir/.test(dernierTexte) ? { commandes: [{ op: "coupure", cible: "musique", etat: true }], reponse: "Historique reçu : " + corps.contents.length } : { commandes: [], reponse: "Je ne gère que le jeu." };
+    return json({ candidates: [{ content: { parts: [{ text: JSON.stringify(rep) }] } }] });
+  });
+  await page.evaluate(() => { document.getElementById("pilCleIA").closest("details").open = true; });
+  await page.fill("#pilCleIA", "MAUVAISE"); await page.click("#pilEnregistrerCle"); await page.waitForTimeout(400);
+  const cleMauvaise = await page.evaluate(() => ({ etat: document.getElementById("pilIAEtat").textContent, stockee: localStorage.getItem("alcuno_pilotage_cle_ia") }));
+  await page.fill("#pilCleIA", "BONNE"); await page.click("#pilEnregistrerCle"); await page.waitForTimeout(400);
+  const cleBonne = await page.evaluate(() => ({ etat: document.getElementById("pilIAEtat").textContent, stockee: localStorage.getItem("alcuno_pilotage_cle_ia"), modele: localStorage.getItem("alcuno_pilotage_modele_ia") }));
+  await envoyer("pourquoi le ciel est bleu ?"); await page.waitForTimeout(300);
+  const horsSujet = await dernier();
+  await envoyer("fais plaisir à tout le monde"); await page.waitForTimeout(300);
+  const ia = await dernier();
+  await page.click("#pilAnnulerPropose");
+  await page.evaluate(() => localStorage.setItem("alcuno_pilotage_modele_ia", "disparu"));
+  await envoyer("fais plaisir à tout le monde encore"); await page.waitForTimeout(500);
+  const renomme = await dernier(); const modeleApres = await page.evaluate(() => localStorage.getItem("alcuno_pilotage_modele_ia"));
+  await page.click("#pilAnnulerPropose");
+  await page.fill("#pilAnnonce", "soirée samedi"); await page.click("#pilReformuler"); await page.waitForTimeout(400);
+  const variantes = await page.evaluate(() => [...document.querySelectorAll("#pilVariantes button")].map((b) => b.textContent));
+  await page.click('#pilVariantes button[data-variante="1"]');
+  const choisie = await page.evaluate(() => ({ texte: document.getElementById("pilAnnonce").value, restantes: document.querySelectorAll("#pilVariantes button").length }));
+  const appelHistorique = appelsIA.find((x) => /plaisir/.test(JSON.stringify(x.contenus)) && x.contenus.length > 1);
+  verifier(/refusée/.test(cleMauvaise.etat) && cleMauvaise.stockee === null && /Clé valide ✓ · modèle utilisé : gemini-2\.5-flash/.test(cleBonne.etat) && cleBonne.stockee === "BONNE" && cleBonne.modele === "gemini-2.5-flash", `IA : clé refusée / valide, modèle retenu (${JSON.stringify([cleMauvaise, cleBonne])})`);
+  verifier(/Je ne gère que le jeu/.test(horsSujet.bulle) && !horsSujet.propose && /Historique reçu : [3-9]/.test(ia.bulle) && ia.propose && /musique/i.test(ia.liste) && appelHistorique && /aujourdhui/.test(appelHistorique.systeme) && /gemini-2\.5-flash/.test(appelsIA[0].url),
+    `IA : conversation avec historique et données des stats (${JSON.stringify([horsSujet.bulle, ia.bulle, ia.liste])})`);
+  verifier(/Historique reçu/.test(renomme.bulle) && modeleApres === "gemini-2.5-flash" && appelsIA.some((x) => /models\/disparu:/.test(x.url)), `IA : modèle renommé (404) => un autre modèle est trouvé et la demande réessayée (${modeleApres})`);
+  verifier(variantes.length === 3 && choisie.texte === "Variante B" && choisie.restantes === 0, `IA : reformulation de l'annonce en 3 variantes (${JSON.stringify([variantes, choisie])})`);
+  await page.evaluate(() => { localStorage.removeItem("alcuno_pilotage_cle_ia"); localStorage.removeItem("alcuno_pilotage_modele_ia"); });
+
   // Santé, connecté : ignorer / réafficher / effacer
   await page.click("#ongletSante"); await page.waitForTimeout(200);
   await page.click('#santeListe button[data-ignorer="aaaaaaaaaaaa"]'); await page.waitForTimeout(300);
