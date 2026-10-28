@@ -63,9 +63,11 @@
         .pilApercu{ border: 1px dashed rgba(0, 229, 255, .45); border-radius: 14px; padding: 12px; margin-bottom: 12px; background: #1b0620; color: #fff; text-align: center; }
         .pilApercu:empty{ display: none; }
         .pilApercu .apTitre{ font: 900 20px "Orbitron", Arial, sans-serif; letter-spacing: .12em; color: #ffd23f; margin-bottom: 8px; }
-        .pilApercu .apBandeau{ display: block; margin: 0 auto 8px; padding: 8px 10px; border-radius: 10px; font-size: 14px; font-weight: 700; line-height: 1.3; color: #1a1020; background: linear-gradient(180deg, #ffe27a, #ffc43d); }
+        .pilApercu .apBandeau{ display: flex; align-items: center; gap: 10px; margin: 0 auto 10px; padding: 10px 12px; border-radius: 14px; text-align: left; font-size: 14px; font-weight: 700; line-height: 1.3; color: #1b1226; background: linear-gradient(180deg, #fff, #f4eefb); border: 2px solid #ffd400; box-shadow: 0 0 14px rgba(255, 212, 0, .55); }
+        .pilApercu .apBandeau b{ flex: 0 0 auto; display: flex; width: 34px; height: 34px; border-radius: 50%; align-items: center; justify-content: center; background: linear-gradient(180deg, #fff27a, #ffd400); font-size: 17px; }
+        .pilApercu .apBandeau small{ display: block; font: 900 9px "Orbitron", Arial, sans-serif; letter-spacing: .16em; text-transform: uppercase; color: #6b4d00; margin-bottom: 2px; }
         .pilApercu .apBandeau.attente{ opacity: .55; outline: 2px dashed #fff8; }
-        .pilApercu .apBandeau.maj{ background: #ffd6f6; }
+        .pilApercu .apBandeau.maj{ border-color: #b48cff; box-shadow: 0 0 14px rgba(180, 140, 255, .55); }
         .pilApercu .apBtn{ margin: 6px auto; padding: 9px; border-radius: 10px; font-weight: 700; font-size: 14px; background: linear-gradient(180deg, #ffd23f, #f0a500); color: #2a1500; }
         .pilApercu .apBtn.coupe{ opacity: .4; filter: grayscale(.7); }
         .pilApercu .apNote{ margin-top: 8px; font-size: 13px; line-height: 1.5; color: #e0c8ff; text-align: left; }
@@ -212,10 +214,10 @@
             function apercu(cfg, el){
                 const m = Date.now(), a = cfg.annonce, lignes = [];
                 let html = '<div class="apTitre">ALCUNO</div>';
-                if (cfg.majMin) html += `<div class="apBandeau maj">Une nouvelle version du jeu est disponible (${ecape(cfg.majMin)}). <u>Mettre à jour</u></div>`;
+                if (cfg.majMin) html += `<div class="apBandeau maj"><b>🚀</b><span><small>Mise à jour</small>Une nouvelle version du jeu est disponible (${ecape(cfg.majMin)}).</span></div>`;
                 if (a) {
                     const fini = typeof a.fin === "number" && a.fin <= m;
-                    html += `<div class="apBandeau${typeof a.debut === "number" && a.debut > m || fini ? " attente" : ""}">${ecape(a.texte)}</div>`;
+                    html += `<div class="apBandeau${typeof a.debut === "number" && a.debut > m || fini ? " attente" : ""}"><b>📣</b><span><small>Annonce</small>${ecape(a.texte)}</span></div>`;
                     if (typeof a.debut === "number" && a.debut > m) lignes.push("⏰ L'annonce apparaîtra le " + new Date(a.debut).toLocaleString("fr-FR", { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" }));
                     if (fini) lignes.push("L'annonce est terminée (elle n'est plus affichée)");
                     if (a.avantVersion) lignes.push("Affichée seulement pour les versions avant " + a.avantVersion);

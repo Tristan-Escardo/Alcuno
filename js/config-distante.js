@@ -70,6 +70,8 @@ function majAnnonceAccueil(){
   zone.hidden = !afficher;
   zone.dataset.cle = cle;
   document.getElementById("texteAnnonce").textContent = texte;
+  document.getElementById("etiquetteAnnonce").textContent = maj ? "Mise à jour" : "Annonce";
+  document.getElementById("iconeAnnonce").textContent = maj ? "🚀" : "📣";
   document.getElementById("btnAnnonceMaj").hidden = !maj;
   document.getElementById("btnAnnonceFermer").hidden = maj; // (une mise à jour demandée ne se ferme pas)
 }

@@ -8326,20 +8326,46 @@ html[data-theme="givre"] .ctrlReglage button, html[data-theme="kawaii"] .ctrlReg
 .pastilleTheme.themeCoupe{ display: none !important; }
 html.coupure-voix [data-cle="voix"]{ display: none !important; }
 #btnModeEnLigne:disabled{ opacity: .45; filter: grayscale(.6); pointer-events: none; }
+/* Annonce de l'accueil : carte claire lisible dans tous les thèmes, liseré et pastille aux couleurs du thème (--actif-*) */
 #choixMode .annonceAccueil{
   position: relative; z-index: 3; box-sizing: border-box;
-  display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;
-  width: min(92%, 420px); margin: 0 auto 14px; padding: 10px 40px 10px 14px;
-  border-radius: 14px; text-align: center; font-weight: 700; font-size: 15px; line-height: 1.3;
-  color: #1a1020; background: linear-gradient(180deg, #ffe27a, #ffc43d); border: 2px solid #fff6c9;
-  box-shadow: 0 6px 18px rgba(0,0,0,.35);
+  display: flex; align-items: center; gap: 12px;
+  width: min(92%, 420px); margin: 0 auto 16px; padding: 12px 40px 12px 12px;
+  border-radius: 18px; text-align: left;
+  color: #1b1226; background: linear-gradient(180deg, #ffffff, #f4eefb);
+  border: 2px solid var(--actif-bas, #ffd400);
+  box-shadow: 0 8px 22px rgba(0,0,0,.35), 0 0 18px var(--actif-halo, #ffd400);
+  animation: annonceEntree .55s cubic-bezier(.2,1.2,.4,1) both;
 }
 #choixMode .annonceAccueil[hidden]{ display: none; }
+@keyframes annonceEntree{ from{ opacity: 0; transform: translateY(-14px) scale(.96); } to{ opacity: 1; transform: none; } }
+#choixMode .annonceAccueil .annonceIcone{
+  flex: 0 0 auto; width: 44px; height: 44px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-size: 22px; line-height: 1;
+  background: linear-gradient(180deg, var(--actif-haut, #fff27a), var(--actif-bas, #ffd400));
+  box-shadow: inset 0 -2px 0 rgba(0,0,0,.12), 0 2px 6px rgba(0,0,0,.25);
+  animation: annonceIcone 1.2s .5s ease-in-out 1 both;
+}
+@keyframes annonceIcone{ 0%,100%{ transform: rotate(0); } 25%{ transform: rotate(-16deg); } 60%{ transform: rotate(12deg); } }
+#choixMode .annonceAccueil .annonceCorps{ display: flex; flex-direction: column; align-items: flex-start; gap: 3px; min-width: 0; }
+#choixMode .annonceAccueil .annonceEtiquette{
+  font-size: 11px; font-weight: 900; letter-spacing: .16em; text-transform: uppercase;
+  color: #6b4d00; opacity: .85;
+}
+#choixMode .annonceAccueil .annonceTexte{ font-size: 16px; font-weight: 700; line-height: 1.3; overflow-wrap: anywhere; color: #1b1226; }
 #choixMode .annonceAccueil button{
-  font: inherit; font-size: 14px; font-weight: 800; border: 0; border-radius: 10px; padding: 6px 12px;
-  color: #fff; background: #1a1020; cursor: pointer;
+  all: unset; box-sizing: border-box; cursor: pointer; -webkit-tap-highlight-color: transparent;
 }
+#choixMode .annonceAccueil #btnAnnonceMaj{
+  margin-top: 6px; padding: 7px 14px; border-radius: 999px; font-size: 14px; font-weight: 800; color: #fff;
+  background: linear-gradient(180deg, #5a3a8a, #3a2266); box-shadow: 0 2px 6px rgba(0,0,0,.3);
+}
+#choixMode .annonceAccueil #btnAnnonceMaj[hidden]{ display: none; }
+#choixMode .annonceAccueil #btnAnnonceMaj:active{ transform: scale(.96); }
 #choixMode .annonceAccueil #btnAnnonceFermer{
-  position: absolute; top: 4px; right: 4px; width: 30px; height: 30px; padding: 0; line-height: 30px; text-align: center;
-  background: transparent; color: #1a1020; font-size: 16px;
+  position: absolute; top: 6px; right: 6px; width: 30px; height: 30px; line-height: 30px; text-align: center;
+  border-radius: 50%; font-size: 14px; font-weight: 800; color: #6a5a7a; background: rgba(0,0,0,.06);
 }
+#choixMode .annonceAccueil #btnAnnonceFermer:active{ background: rgba(0,0,0,.18); }
+#choixMode .annonceAccueil #btnAnnonceFermer[hidden]{ display: none; }
+@media (prefers-reduced-motion: reduce){ #choixMode .annonceAccueil, #choixMode .annonceAccueil .annonceIcone{ animation: none; } }

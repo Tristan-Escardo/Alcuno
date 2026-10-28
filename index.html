@@ -173,9 +173,13 @@
                 <div class="titreAccueilBarre" aria-hidden="true"></div>
             </div>
             <!-- Annonce pilotée à distance depuis stats.html (voir js/config-distante.js) -->
-            <div id="annonceAccueil" class="annonceAccueil" hidden>
-                <span id="texteAnnonce"></span>
-                <button type="button" id="btnAnnonceMaj" hidden>Mettre à jour</button>
+            <div id="annonceAccueil" class="annonceAccueil" role="status" hidden>
+                <span class="annonceIcone" id="iconeAnnonce" aria-hidden="true">📣</span>
+                <div class="annonceCorps">
+                    <span class="annonceEtiquette" id="etiquetteAnnonce">Annonce</span>
+                    <span class="annonceTexte" id="texteAnnonce"></span>
+                    <button type="button" id="btnAnnonceMaj" hidden>Mettre à jour</button>
+                </div>
                 <button type="button" id="btnAnnonceFermer" aria-label="Fermer l'annonce">✕</button>
             </div>
             <button type="button" id="btnModeEnLigne">Mode en ligne</button>
