@@ -7,7 +7,7 @@
 //
 // Changer CACHE (ex. "alcuno-v2") force les téléphones à repartir d'une copie locale propre.
 
-const CACHE = "alcuno-v12"; // v12 : trois dos Star Wars qui alternent ; v11 : dos Star Wars en acier (dos_galaxie_argent.svg) ; v10 : faces de cartes Star Wars (Cartes/galaxie/) ; v9 : faces de cartes Kawaii (Cartes/kawaii/) ; v8 : dos Kawaii renommés (dos_kawaii_alcuno_*) pour sortir des anciens caches ; v7 : dos Kawaii avec « ALC UNO » ; v6 : dos de cartes Kawaii ; v5 : petits personnages flottants du thème Kawaii ; v4 : album de stickers et thème Kawaii ; v3 : QR code de la partie (js/qrcode.js) ; v2 : cartes HD en WebP (les anciennes .jpg sont supprimées du cache)
+const CACHE = "alcuno-v13"; // v13 : musique d'ambiance gardée en cache à la première écoute (hors connexion) ; v12 : trois dos Star Wars qui alternent ; v11 : dos Star Wars en acier (dos_galaxie_argent.svg) ; v10 : faces de cartes Star Wars (Cartes/galaxie/) ; v9 : faces de cartes Kawaii (Cartes/kawaii/) ; v8 : dos Kawaii renommés (dos_kawaii_alcuno_*) pour sortir des anciens caches ; v7 : dos Kawaii avec « ALC UNO » ; v6 : dos de cartes Kawaii ; v5 : petits personnages flottants du thème Kawaii ; v4 : album de stickers et thème Kawaii ; v3 : QR code de la partie (js/qrcode.js) ; v2 : cartes HD en WebP (les anciennes .jpg sont supprimées du cache)
 
 // Copié dès l'installation : de quoi jouer en classique sans réseau
 const A_PRECHARGER = [
@@ -254,11 +254,25 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(requete.url);
   // Firebase, polices, etc. : pas touché (le mode en ligne a de toute façon besoin du réseau)
   if (url.origin !== self.location.origin) return;
-  // Musique d'ambiance : lue en flux par morceaux (requêtes « Range »), pas gardée (fichiers lourds)
-  if (url.pathname.includes("/Sons/musique")) return;
-
   // Une seule copie par fichier : on ignore le « ?t=... » anti-cache de index.html
   const cle = url.origin + url.pathname;
+
+  // Musique d'ambiance : le jeu la télécharge en entier (Web Audio). Fichiers lourds (1 à 3 Mo) qui ne changent pas : on ne les garde
+  // qu'à la première écoute (pas de préchargement des 8 morceaux), et ensuite on les sert d'abord depuis le cache, pour que la musique
+  // marche hors connexion (mode avion). Un morceau modifié = changer CACHE ci-dessus (tests/test_cache.js le vérifie).
+  if (url.pathname.includes("/Sons/musique")) {
+    if (requete.headers.has("range")) return; // (lecture en flux par morceaux : réseau, comme avant)
+    event.respondWith(
+      caches.match(cle).then((enCache) => enCache || fetch(requete).then((reponse) => {
+        if (reponse.ok && reponse.status === 200) {
+          const copie = reponse.clone();
+          caches.open(CACHE).then((cache) => cache.put(cle, copie));
+        }
+        return reponse;
+      }))
+    );
+    return;
+  }
 
   event.respondWith(
     fetch(requete)

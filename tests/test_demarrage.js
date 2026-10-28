@@ -854,6 +854,28 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
+  // 33. Musique hors connexion (mode avion) : une fois écoutée en ligne, elle est gardée par le service worker et joue sans réseau
+  {
+    const ctx = await nav.newContext({ viewport: { width: 390, height: 780 } });
+    const page = await ctx.newPage();
+    const erreurs = [];
+    page.on("pageerror", (e) => erreurs.push(e.message));
+    await page.addInitScript(() => { try { localStorage.setItem("alcuno_theme", "bordeaux"); localStorage.setItem("alcuno_musique", "1"); localStorage.setItem("alcuno_volume_musique", "60"); } catch (e) {} });
+    await page.goto(url);
+    await page.evaluate(() => navigator.serviceWorker.ready.then(() => 1));
+    await page.waitForTimeout(1500);
+    await page.reload(); await page.waitForTimeout(500);
+    await page.mouse.click(200, 400); await page.waitForTimeout(3500);
+    const enLigne = await page.evaluate(() => !!(lecteurMusique && lecteurMusique.actif));
+    const gardee = await page.evaluate(async () => { const c = await caches.open((await caches.keys())[0]); return (await c.keys()).some((r) => /Sons\/musique_ambiance\.mp3$/.test(r.url)); });
+    await ctx.setOffline(true);
+    await page.goto(url); await page.waitForTimeout(800);
+    await page.mouse.click(200, 400); await page.waitForTimeout(3500);
+    const horsLigne = await page.evaluate(() => !!(lecteurMusique && lecteurMusique.actif));
+    verifier(enLigne && gardee && horsLigne && erreurs.length === 0, `musique hors connexion : en ligne ${enLigne}, gardée ${gardee}, sans réseau ${horsLigne} ${erreurs.join("|")}`);
+    await ctx.close();
+  }
+
   await nav.close();
   serveur.close();
   console.log(echecs ? `\n${echecs} ÉCHEC(S)` : "\nTOUT EST OK");

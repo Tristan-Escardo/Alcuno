@@ -15,9 +15,11 @@ function fichiers(dossier){
   parcourir(dossier);
   return sortie;
 }
+// Les morceaux de musique (Sons/musique*.mp3) sont gardés en cache d'abord (sw.js) : ils comptent aussi
+const MUSIQUES = () => fichiers("Sons").filter((f) => /^Sons\/musique[^/]*\.mp3$/.test(f));
 function empreinte(){
   const h = crypto.createHash("sha1");
-  for (const f of DOSSIERS.flatMap(fichiers).sort()) {
+  for (const f of DOSSIERS.flatMap(fichiers).concat(MUSIQUES()).sort()) {
     h.update(f + "\0"); h.update(crypto.createHash("sha1").update(fs.readFileSync(path.join(RACINE, f))).digest("hex") + "\n");
   }
   return h.digest("hex");
