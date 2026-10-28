@@ -361,6 +361,15 @@
                     <svg class="optionChevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
                 </button>
 
+                <!-- Dit si le jeu peut se lancer sans réseau (mode avion) : fichiers du jeu + musiques gardés par le service worker -->
+                <div class="optionReglage" id="ligneHorsLigne" data-cle="hors-ligne">
+                    <span class="optionTexte">
+                        <span class="optionTitre">Utilisable hors connexion</span>
+                        <span class="optionNote" id="texteHorsLigne">Vérification…</span>
+                    </span>
+                    <span class="pastilleHorsLigne" id="pastilleHorsLigne" aria-hidden="true">…</span>
+                </div>
+
                 <div class="blocPartage">
                     <div class="aProposTitre">Partager le jeu</div>
                     <img src="icones/qr_alcuno.svg" alt="QR code du jeu Alcuno" class="qrJeu" width="180" height="180">

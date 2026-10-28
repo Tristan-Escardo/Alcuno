@@ -8312,3 +8312,12 @@ html[data-theme="givre"] .ctrlReglage button, html[data-theme="kawaii"] .ctrlReg
 /* Réglages : état de la musique hors connexion (sous le volume de la musique) */
 #ecranReglages #noteMusiqueHorsLigne{ display: block; padding: 2px 14px 10px; font-size: 13px; }
 #ecranReglages #noteMusiqueHorsLigne[hidden]{ display: none; }
+
+/* Pastille du bloc « Utilisable hors connexion » (Réglages) */
+#ecranReglages .pastilleHorsLigne{
+  flex: 0 0 auto; width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 18px; color: #fff; background: #8a8f98;
+}
+#ecranReglages #ligneHorsLigne[data-etat="ok"] .pastilleHorsLigne{ background: #22b866; }
+#ecranReglages #ligneHorsLigne[data-etat="non"] .pastilleHorsLigne{ background: #d64545; }

@@ -1106,14 +1106,33 @@ function musiquesAGarder(){ // (ordre de priorité : thème en cours, musique de
   return Array.from(new Set([actuel].concat(nomsMusiquesAPreparer())));
 }
 const musiqueGardee = async (nom) => { try { return !!(await caches.match(`Sons/${nom}.mp3`)); } catch (e) { return false; } };
+// Bloc « Utilisable hors connexion » des Réglages : les fichiers du jeu sont-ils gardés ? (plus les musiques, comptées plus bas)
+const ligneHorsLigne = document.getElementById("ligneHorsLigne");
+const FICHIERS_JEU_HORS_LIGNE = ["index.html", "script.js", "style_alcuno.css", "js/plateau.js", "js/reglages.js"];
+async function majStatutHorsLigne(pretes, total){
+  const texte = document.getElementById("texteHorsLigne"), pastille = document.getElementById("pastilleHorsLigne");
+  let etat, message;
+  if (!(window.caches && navigator.serviceWorker)) { etat = "non"; message = "Pas possible sur ce navigateur."; }
+  else {
+    let jeuPret = false;
+    try { jeuPret = (await Promise.all(FICHIERS_JEU_HORS_LIGNE.map((f) => caches.match(f)))).every(Boolean); } catch (e) {}
+    if (!jeuPret) { etat = "attente"; message = "Pas encore prêt : reste connecté et rouvre le jeu une fois."; }
+    else if (pretes < total) { etat = "attente"; message = `Le jeu est prêt. Musiques : ${pretes} / ${total} gardées (active la musique en ligne pour les garder).`; }
+    else { etat = "ok"; message = "Prêt : le jeu et les musiques marchent sans réseau (mode avion)."; }
+  }
+  ligneHorsLigne.dataset.etat = etat;
+  texte.textContent = message;
+  pastille.textContent = etat === "ok" ? "✓" : etat === "non" ? "✕" : "…";
+}
 async function majNoteMusiqueHorsLigne(){
   // (visible aussi quand la musique est coupée : changer de thème la coupe, et on veut quand même voir si elle est prête hors connexion)
   const ok = window.caches && navigator.serviceWorker && navigator.serviceWorker.controller;
   noteMusiqueHorsLigne.hidden = !ok;
-  if (!ok) return;
+  if (!ok) { majStatutHorsLigne(0, 1); return; }
   const noms = musiquesAGarder();
   let pretes = 0;
   for (const nom of noms) if (await musiqueGardee(nom)) pretes++;
+  majStatutHorsLigne(pretes, noms.length);
   noteMusiqueHorsLigne.textContent = pretes >= noms.length
     ? "Hors connexion : musiques prêtes ✓"
     : !caseMusique.checked ? `Hors connexion : ${pretes} / ${noms.length} prêtes. Active la musique pour télécharger le reste.`

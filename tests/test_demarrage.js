@@ -848,7 +848,7 @@ function verifier(ok, texte){
     const monte = apresGlisse.split(",").indexOf("voix") < apresFleche.split(",").indexOf("voix") && apresGlisse.split(",").sort().join() === apresFleche.split(",").sort().join();
     const attendueGlisse = apresGlisse;
     verifier(avant.defaut === "none" && avant.texte === "Modifier" && avant.poignees === 0 && pendant.edition && pendant.texte === "OK" && pendant.defaut !== "none" &&
-      pendant.poignees >= 14 && pendant.fleches === 0 && pendant.tremble === "none" && pendant.poigneesVisibles === pendant.visibles && pendant.desalignees === 0 && pendant.poignees === 14 && apresFleche === attendueFleche && monte &&
+      pendant.poignees >= 15 && pendant.fleches === 0 && pendant.tremble === "none" && pendant.poigneesVisibles === pendant.visibles && pendant.desalignees === 0 && pendant.poignees === 15 && apresFleche === attendueFleche && monte &&
       !fini.edition && fini.controles === 0 && fini.texte === "Modifier" && rechargee === attendueGlisse && parDefaut === origine && stocke === null && interrupteur && queue === "blocPartage,aPropos" && fixesSansPoignee && erreurs.length === 0,
       `réglages réorganisables : avant ${JSON.stringify(avant)}, pendant ${JSON.stringify(pendant)}, flèche ${apresFleche === attendueFleche}, glisser monté ${monte} (${apresGlisse}), fini ${JSON.stringify(fini)}, rechargé ${rechargee === attendueGlisse}, par défaut ${parDefaut === origine}, stocké ${stocke}, interrupteur ${interrupteur}, fin de page ${queue}, fixes sans poignée ${fixesSansPoignee} ${erreurs.join("|")}`);
     await ctx.close();
@@ -882,12 +882,14 @@ function verifier(ok, texte){
     }
     await page.click("#btnReglages"); await page.waitForTimeout(600);
     const note = await page.evaluate(() => { const n = document.getElementById("noteMusiqueHorsLigne"); return n.hidden ? "(cachée)" : n.textContent; });
+    // bloc « Utilisable hors connexion » : coche verte quand le jeu et les musiques sont gardés, en mode avion
+    const hl = await page.evaluate(() => { const l = document.getElementById("ligneHorsLigne"); return l.dataset.etat + "|" + document.getElementById("pastilleHorsLigne").textContent + "|" + (l.getBoundingClientRect().height > 20); });
     // la ligne reste visible quand la musique est coupée (changer de thème la coupe)
     await page.evaluate(() => { const c = document.getElementById("optionMusique"); c.checked = false; c.dispatchEvent(new Event("change")); }); await page.waitForTimeout(800);
     const noteCoupee = await page.evaluate(() => { const n = document.getElementById("noteMusiqueHorsLigne"); return n.hidden ? "(cachée)" : n.textContent; });
     verifier(gardees.length >= 6 && gardees.includes("musique_ambiance.mp3") && horsLigne && themes.join() === "musique_ambiance_givre,musique_ambiance_cerisier,musique_ambiance_sombre" &&
-      note === "Hors connexion : musiques prêtes ✓" && noteCoupee === "Hors connexion : musiques prêtes ✓" && erreurs.length === 0,
-      `musique hors connexion : gardées sans tap ${JSON.stringify(gardees)}, jouée sans réseau ${horsLigne}, après changement de thème ${JSON.stringify(themes)}, ligne « ${note} », musique coupée « ${noteCoupee} » ${erreurs.join("|")}`);
+      hl === "ok|✓|true" && note === "Hors connexion : musiques prêtes ✓" && noteCoupee === "Hors connexion : musiques prêtes ✓" && erreurs.length === 0,
+      `musique hors connexion : gardées sans tap ${JSON.stringify(gardees)}, jouée sans réseau ${horsLigne}, après changement de thème ${JSON.stringify(themes)}, ligne « ${note} », bloc hors connexion ${hl}, musique coupée « ${noteCoupee} » ${erreurs.join("|")}`);
     await ctx.close();
   }
 
