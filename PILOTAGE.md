@@ -24,6 +24,21 @@ Les règles ont de nouveaux champs (annonce programmée, version visée, valeurs
 Après une mise à jour du jeu qui touche `database.rules.json`, recolle-le dans Realtime Database → Règles → **Publier**
 (ton UID y est déjà). Sans ça, le pilotage affiche « Refusé par Firebase » pour ces nouveaux réglages.
 
+## Onglet Santé (jeu 9.66.0)
+
+Le jeu envoie les vrais plantages (erreurs JavaScript non rattrapées) à l'onglet **Santé** d'Alcuno Stats, sans rien de personnel :
+message nettoyé (tout ce qui est entre guillemets est remplacé, donc jamais un pseudo ni un code de partie), fichier et ligne,
+version du jeu, type d'appareil. Au plus 5 types d'erreurs par ouverture du jeu, chacun une seule fois.
+
+- Voyant vert / orange / rouge selon le nombre de plantages des dernières 24 h, et un badge rouge sur l'onglet.
+- Les erreurs sont regroupées sur 7 jours (nombre, versions touchées, appareils, dernière fois).
+- **Ignorer** une erreur connue (elle ne compte plus) ; **Effacer le journal**. Ça demande d'être connecté dans l'onglet Pilotage.
+- Il faut **republier `database.rules.json`** (nouvelle section `sante`), sinon rien n'est enregistré.
+
+## Annonce à plusieurs endroits
+
+L'annonce s'affiche sur l'accueil, en haut des Réglages et en haut des Crédits. La fermer la ferme partout.
+
 ## Utilisation
 
 - **Assistant** : écris une phrase, il te montre ce qu'il a compris, tu valides. Exemples :

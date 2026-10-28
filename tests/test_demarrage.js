@@ -978,6 +978,44 @@ function verifier(ok, texte){
       `valeurs de départ : ${JSON.stringify(defauts)} / déjà choisies ${JSON.stringify(choisi)} / aucune ${JSON.stringify(aucun)}`);
   }
 
+  // 37. Annonce aussi en haut des Réglages et des Crédits (même carte, la fermer la ferme partout) ; plantages envoyés à l'onglet Santé
+  // d'Alcuno Stats : message nettoyé (rien de personnel), bruit connu ignoré, une seule fois par empreinte, 5 au plus
+  {
+    const ctx = await nav.newContext({ viewport: { width: 390, height: 780 } });
+    const page = await ctx.newPage();
+    await page.addInitScript(() => { try { localStorage.setItem("alcuno_config_distante", JSON.stringify({ annonce: { texte: "Soirée samedi !", maj: 1 } })); } catch (e) {} });
+    await page.goto(url); await page.waitForTimeout(700);
+    const cartes = await page.evaluate(() => {
+      const visible = (el) => !!el && el.getBoundingClientRect().height > 0 && getComputedStyle(el).display !== "none";
+      const reglages = document.querySelector("#ecranReglages [data-annonce-relais] .annonceAccueil"), credits = document.querySelector("#ecranCredits [data-annonce-relais] .annonceAccueil");
+      return { reglages: !!reglages && reglages.textContent.includes("Soirée samedi !"), credits: !!credits && credits.textContent.includes("Soirée samedi !"), accueil: visible(document.getElementById("annonceAccueil")) };
+    });
+    await page.click("#btnReglages"); await page.waitForTimeout(400);
+    const dansReglages = await page.evaluate(() => { const c = document.querySelector("#ecranReglages .annonceAccueil"); const r = c && c.getBoundingClientRect(); return !!c && r.height > 30 && r.width > 200 && r.top >= 0; });
+    await page.click("#ecranReglages .annonceFermer"); await page.waitForTimeout(200);
+    const apres = await page.evaluate(() => ({ relais: document.querySelectorAll("[data-annonce-relais] .annonceAccueil").length, accueil: document.getElementById("annonceAccueil").hidden }));
+    const plantage = await page.evaluate(() => {
+      const base = location.href.split("?")[0].replace(/[^/]*$/, "");
+      const p = (message, fichier, ligne) => preparerPlantage({ message, fichier, ligne });
+      const a = p("TypeError: Cannot read properties of undefined (reading 'Léo') pour \"ABCDE\"", base + "js/plateau.js?t=123", 120);
+      const memeLigne = p("TypeError: Cannot read properties of undefined (reading 'Tom') pour \"ZZZZZ\"", base + "js/plateau.js", 120);
+      const autreLigne = p("TypeError: Cannot read properties of undefined (reading 'Tom') pour \"ZZZZZ\"", base + "js/plateau.js", 121);
+      return { a, memeSig: !!a && !!memeLigne && a.sig === memeLigne.sig, autreSig: !!a && !!autreLigne && a.sig !== autreLigne.sig,
+        bruit: [p("ResizeObserver loop completed with undelivered notifications.", "", 0), p("Script error.", "", 0), p("boom", "https://autre-site.example/x.js", 3), p("boom", "chrome-extension://abc/x.js", 3), p("", base + "script.js", 1)],
+        sigOk: !!a && /^[a-z0-9]{12}$/.test(a.sig) };
+    });
+    const envoi = await page.evaluate(() => {
+      const base = location.href.split("?")[0].replace(/[^/]*$/, "");
+      for (let i = 0; i < 8; i++) window.dispatchEvent(new ErrorEvent("error", { message: "Plantage numéro " + "x".repeat(i + 1) + " 'secret'", filename: base + "js/plateau.js", lineno: 10 + i }));
+      window.dispatchEvent(new ErrorEvent("error", { message: "Plantage numéro x 'secret'", filename: base + "js/plateau.js", lineno: 10 }));
+      return { envoyes: plantagesEnvoyes.size };
+    });
+    verifier(cartes.reglages && cartes.credits && cartes.accueil && dansReglages && apres.relais === 0 && apres.accueil, `annonce aussi dans Réglages et Crédits, fermée partout (${JSON.stringify(cartes)} ${dansReglages} ${JSON.stringify(apres)})`);
+    verifier(plantage.a && plantage.a.msg === "TypeError: Cannot read properties of undefined (reading '…') pour '…'" && plantage.a.fichier === "plateau.js:120" && plantage.memeSig && plantage.autreSig && plantage.sigOk && plantage.bruit.every((x) => x === null) && envoi.envoyes === 5,
+      `plantages : message sans rien de personnel, bruit ignoré, 5 au plus (${JSON.stringify(plantage)} ${JSON.stringify(envoi)})`);
+    await ctx.close();
+  }
+
   await nav.close();
   serveur.close();
   console.log(echecs ? `\n${echecs} ÉCHEC(S)` : "\nTOUT EST OK");

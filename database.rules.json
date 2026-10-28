@@ -74,6 +74,33 @@
       ".read": "auth != null && auth.uid === 'Ex6dzCTIfGhZXPhedzIYzKZWxQm1'",
       ".write": "auth != null && auth.uid === 'Ex6dzCTIfGhZXPhedzIYzKZWxQm1'"
     },
+    "sante": {
+      ".read": true,
+      "jours": {
+        ".write": "auth != null && auth.uid === 'Ex6dzCTIfGhZXPhedzIYzKZWxQm1'",
+        "$jour": {
+          ".validate": "$jour.matches(/^20[0-9][0-9]-[01][0-9]-[0-3][0-9]$/)",
+          "$sig": {
+            ".write": "newData.exists()",
+            ".validate": "$sig.matches(/^[a-z0-9]{12}$/) && newData.hasChildren(['msg', 'vu'])",
+            "msg": { ".validate": "newData.isString() && newData.val().length <= 130" },
+            "fichier": { ".validate": "newData.isString() && newData.val().length <= 40" },
+            "version": { ".validate": "newData.isString() && newData.val().length <= 12" },
+            "os": { ".validate": "newData.isString() && newData.val().matches(/^(ios|android|ordi)$/)" },
+            "vu": { ".validate": "newData.isNumber()" },
+            "n": { ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" },
+            "$autre": { ".validate": false }
+          }
+        }
+      },
+      "ignores": {
+        "$sig": {
+          ".write": "auth != null && auth.uid === 'Ex6dzCTIfGhZXPhedzIYzKZWxQm1'",
+          ".validate": "$sig.matches(/^[a-z0-9]{12}$/) && newData.val() === true"
+        }
+      },
+      "$autre": { ".validate": false }
+    },
     "presence": {
       ".read": true,
       "$id": {

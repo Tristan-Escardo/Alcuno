@@ -43,8 +43,14 @@ function noterErreur(texte){
   erreursRecentes.push(`${new Date().toLocaleTimeString("fr-FR")} ${String(texte).slice(0, 220)}`);
   if (erreursRecentes.length > 25) erreursRecentes.shift();
 }
-window.addEventListener("error", (e) => noterErreur(`${e.message} (${(e.filename || "").split("/").pop().split("?")[0]} ligne ${e.lineno})`));
-window.addEventListener("unhandledrejection", (e) => noterErreur(`promesse : ${e.reason && (e.reason.message || e.reason)}`));
+// Vrais plantages (pas les avertissements) : aussi envoyés, sans rien de personnel, à l'onglet « Santé » d'Alcuno Stats (js/stats.js)
+const plantagesEnAttente = [];
+function noterPlantage(message, fichier, ligne){
+  if (plantagesEnAttente.length < 10) plantagesEnAttente.push({ message, fichier, ligne });
+  if (typeof envoyerPlantages === "function") { try { envoyerPlantages(); } catch (e) {} }
+}
+window.addEventListener("error", (e) => { noterErreur(`${e.message} (${(e.filename || "").split("/").pop().split("?")[0]} ligne ${e.lineno})`); noterPlantage(e.message, e.filename, e.lineno); });
+window.addEventListener("unhandledrejection", (e) => { noterErreur(`promesse : ${e.reason && (e.reason.message || e.reason)}`); noterPlantage("promesse : " + (e.reason && (e.reason.message || e.reason)), "", 0); });
 ["warn", "error"].forEach((type) => {
   const original = console[type].bind(console);
   console[type] = (...args) => {
@@ -161,7 +167,7 @@ function avecCouronne(nom){
 // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
 // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
 // Numérotation : +0.0.1 à chaque mise en ligne, et après x.y.9 on passe à x.(y+1).0 (ex. 9.5.9 => 9.6.0)
-const VERSION_AFFICHEE = "9.65.1";
+const VERSION_AFFICHEE = "9.66.0";
 const VERSION_JEU = VERSION_AFFICHEE.split(".")
   .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
 // À l'écran : le numéro complet, pour voir d'un coup d'œil si un téléphone est à jour

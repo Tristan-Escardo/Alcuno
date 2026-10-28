@@ -8327,7 +8327,7 @@ html[data-theme="givre"] .ctrlReglage button, html[data-theme="kawaii"] .ctrlReg
 html.coupure-voix [data-cle="voix"]{ display: none !important; }
 #btnModeEnLigne:disabled{ opacity: .45; filter: grayscale(.6); pointer-events: none; }
 /* Annonce de l'accueil : carte claire lisible dans tous les thèmes, liseré et pastille aux couleurs du thème (--actif-*) */
-#choixMode .annonceAccueil{
+.annonceAccueil{
   position: relative; z-index: 3; box-sizing: border-box;
   display: flex; align-items: center; gap: 12px;
   width: min(92%, 420px); margin: 0 auto 16px; padding: 12px 40px 12px 12px;
@@ -8337,9 +8337,9 @@ html.coupure-voix [data-cle="voix"]{ display: none !important; }
   box-shadow: 0 8px 22px rgba(0,0,0,.35), 0 0 18px var(--actif-halo, #ffd400);
   animation: annonceEntree .55s cubic-bezier(.2,1.2,.4,1) both;
 }
-#choixMode .annonceAccueil[hidden]{ display: none; }
+.annonceAccueil[hidden]{ display: none; }
 @keyframes annonceEntree{ from{ opacity: 0; transform: translateY(-14px) scale(.96); } to{ opacity: 1; transform: none; } }
-#choixMode .annonceAccueil .annonceIcone{
+.annonceAccueil .annonceIcone{
   flex: 0 0 auto; width: 44px; height: 44px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center; font-size: 22px; line-height: 1;
   background: linear-gradient(180deg, var(--actif-haut, #fff27a), var(--actif-bas, #ffd400));
@@ -8347,25 +8347,28 @@ html.coupure-voix [data-cle="voix"]{ display: none !important; }
   animation: annonceIcone 1.2s .5s ease-in-out 1 both;
 }
 @keyframes annonceIcone{ 0%,100%{ transform: rotate(0); } 25%{ transform: rotate(-16deg); } 60%{ transform: rotate(12deg); } }
-#choixMode .annonceAccueil .annonceCorps{ display: flex; flex-direction: column; align-items: flex-start; gap: 3px; min-width: 0; }
-#choixMode .annonceAccueil .annonceEtiquette{
+.annonceAccueil .annonceCorps{ display: flex; flex-direction: column; align-items: flex-start; gap: 3px; min-width: 0; }
+.annonceAccueil .annonceEtiquette{
   font-size: 11px; font-weight: 900; letter-spacing: .16em; text-transform: uppercase;
   color: #6b4d00; opacity: .85;
 }
-#choixMode .annonceAccueil .annonceTexte{ font-size: 16px; font-weight: 700; line-height: 1.3; overflow-wrap: anywhere; color: #1b1226; }
-#choixMode .annonceAccueil button{
+.annonceAccueil .annonceTexte{ font-size: 16px; font-weight: 700; line-height: 1.3; overflow-wrap: anywhere; color: #1b1226; }
+html[data-theme] .annonceAccueil button{
   all: unset; box-sizing: border-box; cursor: pointer; -webkit-tap-highlight-color: transparent;
 }
-#choixMode .annonceAccueil #btnAnnonceMaj{
+html[data-theme] .annonceAccueil .annonceMaj, html[data-theme] .annonceAccueil #btnAnnonceMaj{
   margin-top: 6px; padding: 7px 14px; border-radius: 999px; font-size: 14px; font-weight: 800; color: #fff;
   background: linear-gradient(180deg, #5a3a8a, #3a2266); box-shadow: 0 2px 6px rgba(0,0,0,.3);
 }
-#choixMode .annonceAccueil #btnAnnonceMaj[hidden]{ display: none; }
-#choixMode .annonceAccueil #btnAnnonceMaj:active{ transform: scale(.96); }
-#choixMode .annonceAccueil #btnAnnonceFermer{
+html[data-theme] .annonceAccueil button[hidden]{ display: none; }
+html[data-theme] .annonceAccueil .annonceMaj:active, html[data-theme] .annonceAccueil #btnAnnonceMaj:active{ transform: scale(.96); }
+html[data-theme] .annonceAccueil .annonceFermer, html[data-theme] .annonceAccueil #btnAnnonceFermer{
   position: absolute; top: 6px; right: 6px; width: 30px; height: 30px; line-height: 30px; text-align: center;
   border-radius: 50%; font-size: 14px; font-weight: 800; color: #6a5a7a; background: rgba(0,0,0,.06);
 }
-#choixMode .annonceAccueil #btnAnnonceFermer:active{ background: rgba(0,0,0,.18); }
-#choixMode .annonceAccueil #btnAnnonceFermer[hidden]{ display: none; }
-@media (prefers-reduced-motion: reduce){ #choixMode .annonceAccueil, #choixMode .annonceAccueil .annonceIcone{ animation: none; } }
+html[data-theme] .annonceAccueil .annonceFermer:active, html[data-theme] .annonceAccueil #btnAnnonceFermer:active{ background: rgba(0,0,0,.18); }
+@media (prefers-reduced-motion: reduce){ .annonceAccueil, .annonceAccueil .annonceIcone{ animation: none; } }
+/* La même carte dans les Réglages et les Crédits */
+.annonceRelais{ display: flex; justify-content: center; margin: 4px 0 14px; }
+.annonceRelais[hidden]{ display: none; }
+.annonceRelais .annonceAccueil{ margin: 0 auto; animation: none; }

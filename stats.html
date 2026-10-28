@@ -106,9 +106,24 @@
 
         /* Onglets Stats / Pilotage (glisser à gauche / à droite pour passer de l'un à l'autre) */
         .onglets{ position: sticky; top: 0; z-index: 6; display: flex; gap: 8px; padding: 6px 0 12px; margin: 0 0 6px; background: linear-gradient(#020713 78%, rgba(2, 7, 19, 0)); }
-        .onglet{ flex: 1; text-align: center; padding: 12px 8px; border-radius: 10px; border: 1px solid rgba(0, 229, 255, .3); background: transparent; color: var(--cyan-doux); font: 700 12px "Orbitron", Arial, sans-serif; letter-spacing: .16em; text-transform: uppercase; cursor: pointer; -webkit-tap-highlight-color: rgba(0, 229, 255, .35); transition: transform .08s, background .08s; }
+        .onglet{ flex: 1; text-align: center; padding: 12px 4px; border-radius: 10px; border: 1px solid rgba(0, 229, 255, .3); background: transparent; color: var(--cyan-doux); font: 700 11px "Orbitron", Arial, sans-serif; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; -webkit-tap-highlight-color: rgba(0, 229, 255, .35); transition: transform .08s, background .08s; }
         .onglet[aria-selected="true"]{ background: rgba(0, 229, 255, .16); border-color: var(--cyan); color: var(--cyan-clair); box-shadow: 0 0 14px rgba(0, 229, 255, .35); text-shadow: 0 0 8px var(--cyan); }
         .onglet:active{ transform: scale(.97); background: rgba(0, 229, 255, .3); }
+        .badgeOnglet{ display: inline-block; min-width: 16px; margin-left: 6px; padding: 1px 5px; border-radius: 9px; background: #ff4d6d; color: #fff; font: 700 11px "Inter", Arial, sans-serif; letter-spacing: 0; vertical-align: 1px; }
+        .badgeOnglet[hidden]{ display: none; }
+        .santeEtat{ display: flex; align-items: center; gap: 14px; padding: 12px; margin-bottom: 12px; border-radius: 12px; border: 1px solid rgba(0, 229, 255, .3); background: rgba(0, 229, 255, .05); font-size: 17px; line-height: 1.3; }
+        .santePastille{ flex: 0 0 auto; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font: 900 22px "Inter", Arial, sans-serif; color: #04121a; background: #2ee59d; box-shadow: 0 0 14px #2ee59d; }
+        .santePastille.att{ background: #ffb02e; box-shadow: 0 0 14px #ffb02e; }
+        .santePastille.grave{ background: #ff4d6d; box-shadow: 0 0 14px #ff4d6d; color: #fff; }
+        .santeLigne{ padding: 10px 0; border-top: 1px solid rgba(0, 229, 255, .14); }
+        .santeLigne:first-child{ border-top: 0; }
+        .santeMsg{ font: 600 15px "Inter", Arial, sans-serif; color: var(--cyan-clair); word-break: break-word; }
+        .santeMeta{ margin: 4px 0 8px; font-size: 14px; color: var(--cyan-doux); line-height: 1.4; }
+        .santeLigne button, .santeActions button{ font: 700 12px "Rajdhani", Arial, sans-serif; padding: 6px 14px; border-radius: 14px; cursor: pointer; border: 1px solid var(--cyan); background: transparent; color: var(--cyan-clair); }
+        .santeLigne button:active, .santeActions button:active{ background: rgba(0, 229, 255, .4); transform: scale(.96); }
+        .santeActions{ margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+        #vueSante details{ margin-top: 12px; font-size: 14px; color: var(--cyan-doux); }
+        #vueSante summary{ cursor: pointer; color: var(--cyan-titre); }
         .vue{ display: none; }
         .vue.actif{ display: block; }
         .vue.versGauche{ animation: vueGauche .24s ease-out; }
@@ -207,6 +222,7 @@
         <div class="sous" id="sousTitre">Statistiques</div>
         <nav class="onglets" role="tablist" aria-label="Pages">
             <button type="button" class="onglet" id="ongletStats" role="tab" data-vue="stats" aria-selected="true">Stats</button>
+            <button type="button" class="onglet" id="ongletSante" role="tab" data-vue="sante" aria-selected="false">Santé<span class="badgeOnglet" id="badgeSante" hidden></span></button>
             <button type="button" class="onglet" id="ongletPilotage" role="tab" data-vue="pilotage" aria-selected="false">Pilotage</button>
         </nav>
         <div class="vue actif" id="vueStats">
@@ -265,6 +281,18 @@
         </div>
 
         <p class="note">Appareils vus ces 30 derniers jours · aucune donnée personnelle<br>Alcuno Stats <span id="versionStats"></span></p>
+        </div>
+
+        <div class="vue" id="vueSante">
+            <section class="bloc" id="blocSante">
+                <div class="titre">Plantages · 7 derniers jours</div>
+                <div class="santeEtat" id="santeEtat">…</div>
+                <div id="santeListe"></div>
+                <details id="santeIgnores" hidden><summary id="santeIgnoresTitre">Ignorés</summary><div id="santeIgnoresListe"></div></details>
+                <p class="pilNote" id="santeNote" style="margin-top:10px"></p>
+                <div class="santeActions"><button type="button" id="santeEffacer">Effacer le journal</button></div>
+            </section>
+            <p class="note">Erreurs du jeu, anonymes : message nettoyé, fichier, version, type d'appareil · rien de personnel<br>Alcuno Stats <span id="versionStats3"></span></p>
         </div>
 
         <div class="vue" id="vuePilotage">
@@ -367,9 +395,10 @@
 
         // Empreinte (SHA-256) du code d'accès : le code lui-même n'est écrit nulle part
         // Version de la page de stats (à part de celle du jeu : +0.0.1 à chaque modification de cette page)
-        const VERSION_STATS = "1.9.0";
+        const VERSION_STATS = "1.10.0";
         document.getElementById("versionStats").textContent = VERSION_STATS;
         document.getElementById("versionStats2").textContent = VERSION_STATS;
+        document.getElementById("versionStats3").textContent = VERSION_STATS;
 
         const EMPREINTE_CODE = "2c8125d3adc62dac73f3ae036a86e00ba51b12b0dfb38fec2184e76441ed6826";
         const CLE_ACCES = "alcuno_stats_acces";
@@ -398,7 +427,7 @@
         let ouvert = false;
 
         // ----- Onglets Stats / Pilotage : un tap sur l'onglet, ou un glissement du doigt vers la gauche / la droite -----
-        const VUES = ["stats", "pilotage"];
+        const VUES = ["stats", "sante", "pilotage"];
         let vueActuelle = "stats";
         function montrerVue(nom, anime = true){
             if (VUES.indexOf(nom) < 0) return;
@@ -410,7 +439,7 @@
                 if (v === nom) { el.classList.add("actif"); if (anime) el.classList.add(sens); }
                 document.getElementById("onglet" + v[0].toUpperCase() + v.slice(1)).setAttribute("aria-selected", v === nom ? "true" : "false");
             });
-            document.getElementById("sousTitre").textContent = nom === "stats" ? "Statistiques" : "Pilotage";
+            document.getElementById("sousTitre").textContent = { stats: "Statistiques", sante: "Santé du jeu", pilotage: "Pilotage" }[nom];
             window.scrollTo(0, 0);
             try { history.replaceState(null, "", nom === "stats" ? location.pathname : "#" + nom); } catch (e) {}
         }
@@ -424,9 +453,12 @@
             if (!doigt || document.getElementById("contenu").hidden) return;
             const t = e.changedTouches[0], dx = t.clientX - doigt.x, dy = t.clientY - doigt.y, duree = Date.now() - doigt.t;
             doigt = null;
-            if (Math.abs(dx) > 60 && Math.abs(dy) < 45 && Math.abs(dx) > 2 * Math.abs(dy) && duree < 700) montrerVue(dx < 0 ? "pilotage" : "stats");
+            if (Math.abs(dx) > 60 && Math.abs(dy) < 45 && Math.abs(dx) > 2 * Math.abs(dy) && duree < 700) {
+                const suivante = VUES.indexOf(vueActuelle) + (dx < 0 ? 1 : -1); // (glisser vers la gauche : la page de droite)
+                if (suivante >= 0 && suivante < VUES.length) montrerVue(VUES[suivante]);
+            }
         }, { passive: true });
-        if (location.hash === "#pilotage") montrerVue("pilotage", false);
+        if (location.hash === "#pilotage" || location.hash === "#sante") montrerVue(location.hash.slice(1), false);
 
         function ouvrir(){
             if (ouvert) return;
@@ -436,7 +468,6 @@
             demarrer();
         }
 
-        try { if (localStorage.getItem(CLE_ACCES) === EMPREINTE_CODE) ouvrir(); } catch (e) { console.error(e); }
         if (!ouvert) document.getElementById("codePorte").focus();
 
         document.getElementById("formPorte").addEventListener("submit", async (e) => {
@@ -819,6 +850,68 @@ Noms des thèmes : ${ConfigLib.THEMES_CONNUS.map((t) => t + "=" + ConfigLib.NOMS
             });
         }
 
+        // ===== Santé du jeu : plantages envoyés par js/stats.js (sante/jours/AAAA-MM-JJ/{empreinte}), regroupés sur 7 jours =====
+        function demarrerSante(app, db){
+            const $ = (id) => document.getElementById(id);
+            const ecape = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+            let sante = {}, admin = null;
+            onAuthStateChanged(getAuth(app), (u) => { admin = u; dessiner(); });
+            const ilYA = (ms) => { const min = Math.max(0, Math.round((Date.now() - ms) / 60000)); return min < 1 ? "à l'instant" : min < 90 ? `il y a ${min} min` : min < 2880 ? `il y a ${Math.round(min / 60)} h` : `il y a ${Math.round(min / 1440)} j`; };
+
+            function agreger(){
+                const sept = new Set(joursPasses(7)), par = {}, maintenant = Date.now();
+                Object.entries(sante.jours || {}).forEach(([jour, sigs]) => {
+                    if (!sept.has(jour)) return;
+                    Object.entries(sigs || {}).forEach(([sig, e]) => {
+                        if (!e || typeof e !== "object") return;
+                        const a = par[sig] = par[sig] || { sig, msg: e.msg, fichier: e.fichier, n: 0, n24: 0, derniere: 0, versions: {}, os: {} };
+                        const n = Number(e.n) || 1;
+                        a.n += n; a.derniere = Math.max(a.derniere, Number(e.vu) || 0);
+                        if (maintenant - Number(e.vu || 0) < 24 * 3600 * 1000) a.n24 += n;
+                        if (e.version) a.versions[e.version] = (a.versions[e.version] || 0) + n;
+                        if (e.os) a.os[e.os] = (a.os[e.os] || 0) + n;
+                    });
+                });
+                return Object.values(par).sort((x, y) => y.n - x.n);
+            }
+            const ligne = (a, texteBouton, attribut) => {
+                const versions = Object.entries(a.versions).sort((x, y) => y[1] - x[1]).map(([v, n]) => `${ecape(v)} ×${n}`).join(", ");
+                const os = Object.keys(a.os).map((o) => NOMS_OS[o] || o).join(", ");
+                return `<div class="santeLigne"><div class="santeMsg">${ecape(a.msg || "(sans message)")}</div><div class="santeMeta">${ecape(a.fichier || "")} · ×${a.n} · ${versions}${os ? " · " + ecape(os) : ""} · ${ilYA(a.derniere)}</div><button type="button" ${attribut}="${a.sig}">${texteBouton}</button></div>`;
+            };
+            function dessiner(){
+                const toutes = agreger(), ignores = sante.ignores || {};
+                const actives = toutes.filter((a) => !ignores[a.sig]), ignorees = toutes.filter((a) => ignores[a.sig]);
+                const n24 = actives.reduce((s, a) => s + a.n24, 0);
+                const niveau = n24 === 0 ? "ok" : n24 < 10 ? "att" : "grave";
+                $("santeEtat").innerHTML = `<div class="santePastille ${niveau}" aria-hidden="true">${niveau === "ok" ? "✓" : niveau === "att" ? "!" : "✕"}</div><div>${n24 === 0 ? "Aucun plantage ces dernières 24 h" : `<b>${n24} plantage${n24 > 1 ? "s" : ""}</b> ces dernières 24 h`}<br><span style="color:var(--cyan-doux);font-size:14px">${actives.length} type${actives.length > 1 ? "s" : ""} d'erreur${actives.length > 1 ? "s" : ""} sur 7 jours</span></div>`;
+                $("santeListe").innerHTML = actives.length ? actives.map((a) => ligne(a, "Ignorer", "data-ignorer")).join("") : '<div class="vide">Rien à signaler 🎉</div>';
+                $("santeIgnores").hidden = !ignorees.length;
+                $("santeIgnoresTitre").textContent = `Ignorés (${ignorees.length})`;
+                $("santeIgnoresListe").innerHTML = ignorees.map((a) => ligne(a, "Réafficher", "data-reafficher")).join("");
+                const badge = $("badgeSante");
+                badge.hidden = n24 === 0; badge.textContent = n24 > 99 ? "99+" : String(n24);
+                $("santeNote").textContent = admin ? "" : "Pour ignorer une erreur ou effacer le journal, connecte-toi dans l'onglet Pilotage.";
+                $("santeEffacer").hidden = !admin;
+            }
+            const refus = (e) => { $("santeNote").textContent = "Refusé par Firebase : " + (e && e.message ? e.message : e); };
+            $("blocSante").addEventListener("click", async (ev) => {
+                const b = ev.target.closest("button[data-ignorer], button[data-reafficher]");
+                if (!b) return;
+                if (!admin) { $("santeNote").textContent = "Connecte-toi dans l'onglet Pilotage pour ignorer une erreur."; return; }
+                try {
+                    if (b.dataset.ignorer) await set(ref(db, "sante/ignores/" + b.dataset.ignorer), true);
+                    else await remove(ref(db, "sante/ignores/" + b.dataset.reafficher));
+                } catch (e) { refus(e); }
+            });
+            $("santeEffacer").addEventListener("click", async () => {
+                if (!confirm("Effacer tout le journal des plantages ?")) return;
+                try { await remove(ref(db, "sante/jours")); } catch (e) { refus(e); }
+            });
+            onValue(ref(db, "sante"), (s) => { sante = s.val() || {}; dessiner(); }, () => { $("santeEtat").textContent = "Journal illisible (règles Firebase pas à jour ?)"; });
+            setInterval(dessiner, 60000);
+        }
+
         function demarrer(){
             const app = initializeApp({
                 apiKey: "AIzaSyApZL1dCQLGdrZFjsGJC0y4DxLUzorum4M",
@@ -831,6 +924,7 @@ Noms des thèmes : ${ConfigLib.THEMES_CONNUS.map((t) => t + "=" + ConfigLib.NOMS
             });
             const db = getDatabase(app);
             demarrerPilotage(app, db);
+            demarrerSante(app, db);
 
             // Heure du serveur (les dates de présence viennent de lui)
             let decalage = 0;
@@ -941,6 +1035,9 @@ Noms des thèmes : ${ConfigLib.THEMES_CONNUS.map((t) => t + "=" + ConfigLib.NOMS
                 barres("barresVersions", versions, {}, 4);
             });
         }
+
+        // (en dernier : tout ce que demarrer() utilise doit être déclaré avant)
+        try { if (localStorage.getItem(CLE_ACCES) === EMPREINTE_CODE) ouvrir(); } catch (e) { console.error(e); }
     </script>
 </body>
 </html>

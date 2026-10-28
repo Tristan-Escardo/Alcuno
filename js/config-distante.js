@@ -74,6 +74,32 @@ function majAnnonceAccueil(){
   document.getElementById("iconeAnnonce").textContent = maj ? "🚀" : "📣";
   document.getElementById("btnAnnonceMaj").hidden = !maj;
   document.getElementById("btnAnnonceFermer").hidden = maj; // (une mise à jour demandée ne se ferme pas)
+  // la même carte en haut des Réglages et des Crédits (plus de chances qu'elle soit vue)
+  document.querySelectorAll("[data-annonce-relais]").forEach((conteneur) => {
+    conteneur.hidden = !afficher;
+    conteneur.textContent = "";
+    if (!afficher) return;
+    const carte = document.createElement("div");
+    carte.className = "annonceAccueil";
+    carte.setAttribute("role", "status");
+    const icone = document.createElement("span"); icone.className = "annonceIcone"; icone.textContent = maj ? "🚀" : "📣";
+    const corps = document.createElement("div"); corps.className = "annonceCorps";
+    const etiquette = document.createElement("span"); etiquette.className = "annonceEtiquette"; etiquette.textContent = maj ? "Mise à jour" : "Annonce";
+    const message = document.createElement("span"); message.className = "annonceTexte"; message.textContent = texte;
+    corps.append(etiquette, message);
+    if (maj) {
+      const bouton = document.createElement("button"); bouton.type = "button"; bouton.className = "annonceMaj"; bouton.textContent = "Mettre à jour";
+      bouton.addEventListener("click", () => location.reload());
+      corps.append(bouton);
+    }
+    carte.append(icone, corps);
+    if (!maj) {
+      const fermer = document.createElement("button"); fermer.type = "button"; fermer.className = "annonceFermer"; fermer.setAttribute("aria-label", "Fermer l'annonce"); fermer.textContent = "✕";
+      fermer.addEventListener("click", fermerAnnonce);
+      carte.append(fermer);
+    }
+    conteneur.append(carte);
+  });
 }
 
 function lireConfigDistante(){
@@ -89,11 +115,13 @@ function lireConfigDistante(){
   });
 }
 
-document.getElementById("btnAnnonceFermer").addEventListener("click", () => {
+function fermerAnnonce(){ // (ferme la carte de l'accueil et ses doubles)
   const zone = document.getElementById("annonceAccueil");
   try { localStorage.setItem(CLE_ANNONCE_VUE, zone.dataset.cle || ""); } catch (e) {}
   zone.hidden = true;
-});
+  document.querySelectorAll("[data-annonce-relais]").forEach((c) => { c.hidden = true; c.textContent = ""; });
+}
+document.getElementById("btnAnnonceFermer").addEventListener("click", fermerAnnonce);
 document.getElementById("btnAnnonceMaj").addEventListener("click", () => { location.reload(); });
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible" && Date.now() - configLueLe > CONFIG_REFRAICHIR_APRES) lireConfigDistante();

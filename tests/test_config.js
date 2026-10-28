@@ -88,5 +88,6 @@ for (const nom of ["stats.html"]) {
 // les règles Firebase restent un JSON valide qui protège « config » en écriture
 const regles = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "database.rules.json"), "utf8")).rules;
 verifier(regles.stats.appareils.$id.confVu && regles.stats.appareils.$id.confV && regles.config.v && regles.config.defauts && regles.config.annonce.debut && regles.config.annonce.avantVersion, "règles Firebase : champs des nouveaux réglages");
+verifier(regles.sante[".read"] === true && regles.sante.jours[".write"].includes("auth.uid") && regles.sante.ignores.$sig[".write"].includes("auth.uid") && regles.sante.jours.$jour.$sig[".write"] === "newData.exists()" && regles.sante.jours.$jour.$sig.n[".validate"].includes("data.exists()"), "règles Firebase : journal de santé (écriture des erreurs ouverte mais sans suppression ; effacer et ignorer réservés à l'administrateur)");
 verifier(regles.config[".read"] === true && /auth\.uid/.test(regles.config[".write"]) && /auth\.uid/.test(regles.config_hist[".write"]) && regles.config_hist[".read"] !== true, "règles Firebase : config lisible par tous, écriture réservée au compte administrateur");
 console.log(process.exitCode ? "\nÉCHEC(S)" : `\nTOUT EST OK (${ok})`);

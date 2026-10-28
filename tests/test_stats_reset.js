@@ -33,6 +33,7 @@ window.__ecritures = [];
 const lire = (chemin) => chemin.split("/").filter(Boolean).reduce((n, c) => (n === undefined || n === null ? undefined : n[c]), arbre);
 const instantane = (chemin) => { const v = lire(chemin); return { val: () => (v === undefined ? null : JSON.parse(JSON.stringify(v))) }; };
 const abonnes = [];
+window.__notifier = () => abonnes.forEach(([c, rappel]) => rappel(instantane(c)));
 export const getDatabase = () => ({});
 export const ref = (db, chemin) => ({ chemin });
 export const onValue = (r, rappel) => { abonnes.push([r.chemin, rappel]); rappel(instantane(r.chemin)); };
@@ -70,14 +71,15 @@ export const update = async (r, lot) => {
 `;
 
 const FAUX_AUTH = `
-let ecouteur = null; let utilisateur = null;
-export const getAuth = () => ({});
-export const onAuthStateChanged = (auth, rappel) => { ecouteur = rappel; rappel(utilisateur); };
+const ecouteurs = []; let utilisateur = null;
+const AUTH = {};
+export const getAuth = () => AUTH;
+export const onAuthStateChanged = (auth, rappel) => { ecouteurs.push(rappel); rappel(utilisateur); };
 export const signInWithEmailAndPassword = async (auth, email, mdp) => {
   if (mdp !== "bon") { const e = new Error("x"); e.code = "auth/invalid-credential"; throw e; }
-  utilisateur = { uid: "UID-TEST-123" }; ecouteur(utilisateur); return { user: utilisateur };
+  utilisateur = { uid: "UID-TEST-123" }; ecouteurs.forEach((e) => e(utilisateur)); return { user: utilisateur };
 };
-export const signOut = async () => { utilisateur = null; ecouteur(null); };
+export const signOut = async () => { utilisateur = null; ecouteurs.forEach((e) => e(null)); };
 `;
 
 (async () => {
@@ -122,6 +124,7 @@ export const signOut = async () => { utilisateur = null; ecouteur(null); };
     `« Oui » : tout est effacé (jours ${d.jours}, appareils ${d.appareils}), le direct est gardé (présence ${d.presence}), message « ${d.message} »`);
   // Onglets Stats / Pilotage : tap sur l'onglet, glissement du doigt (gauche = Pilotage, droite = Stats), pas de glissement depuis un champ
   const vues = () => page.evaluate(() => ({ stats: document.getElementById("vueStats").classList.contains("actif") && getComputedStyle(document.getElementById("vueStats")).display !== "none",
+    sante: document.getElementById("vueSante").classList.contains("actif") && getComputedStyle(document.getElementById("vueSante")).display !== "none",
     pilotage: document.getElementById("vuePilotage").classList.contains("actif") && getComputedStyle(document.getElementById("vuePilotage")).display !== "none",
     onglet: document.querySelector('.onglet[aria-selected="true"]').dataset.vue, sous: document.getElementById("sousTitre").textContent, hash: location.hash }));
   const glisser = (dx, cible = "document.body") => page.evaluate(([dx, cible]) => {
@@ -132,17 +135,38 @@ export const signOut = async () => { utilisateur = null; ecouteur(null); };
   }, [dx, cible]);
   const v0 = await vues();
   await glisser(-200); const v1 = await vues();
-  await glisser(-200); const v1b = await vues(); // (déjà sur Pilotage : rien de plus)
+  await glisser(-200); const v1b = await vues();
+  await glisser(-200); const v1c = await vues(); // (déjà sur la dernière page : rien de plus)
   await glisser(200); const v2 = await vues();
+  await glisser(200); const v2b = await vues();
+  await glisser(200); const v2c = await vues(); // (déjà sur la première page)
   await page.click("#ongletPilotage"); const v3 = await vues();
+  await page.click("#ongletSante"); const v3b = await vues();
   await page.click("#ongletStats"); const v4 = await vues();
   await glisser(-200, "#pilEmail"); const v5 = await vues(); // (un glissement qui démarre dans un champ ne change pas de page)
   await glisser(-30); const v6 = await vues(); // (trop court)
-  verifier(v0.stats && !v0.pilotage && v1.pilotage && !v1.stats && v1.onglet === "pilotage" && v1.sous === "Pilotage" && v1.hash === "#pilotage" && v1b.pilotage && v2.stats && !v2.pilotage && v2.sous === "Statistiques" && v3.pilotage && v4.stats && v4.hash === "" && v6.stats,
-    `onglets Stats / Pilotage : glisser, taper (${JSON.stringify([v0.stats, v1.pilotage, v1b.pilotage, v2.stats, v3.pilotage, v4.stats, v5.stats, v6.stats])})`);
+  verifier(v0.stats && !v0.pilotage && v1.sante && v1.sous === "Santé du jeu" && v1.hash === "#sante" && v1b.pilotage && v1b.sous === "Pilotage" && v1c.pilotage && v2.sante && v2b.stats && v2b.sous === "Statistiques" && v2c.stats && v3.pilotage && v3b.sante && v4.stats && v4.hash === "" && v5.stats && v6.stats,
+    `onglets Stats / Santé / Pilotage : glisser, taper (${JSON.stringify([v0.stats, v1.sante, v1b.pilotage, v1c.pilotage, v2.sante, v2b.stats, v2c.stats, v3.pilotage, v3b.sante, v4.stats, v5.stats, v6.stats])})`);
+  // Santé : plantages envoyés par le jeu, regroupés sur 7 jours
+  const jourDe = (decalage) => { const d = new Date(Date.now() - decalage * 86400000); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
+  await page.evaluate(([auj, hier, vieux]) => {
+    window.__arbre.sante = { jours: {
+      [auj]: { aaaaaaaaaaaa: { msg: "TypeError: x is not a function", fichier: "plateau.js:120", version: "9.66.0", os: "ios", vu: Date.now() - 3600000, n: 3 },
+               bbbbbbbbbbbb: { msg: "RangeError: ancien", fichier: "regles.js:9", version: "9.60.0", os: "android", vu: Date.now() - 5 * 3600000, n: 2 } },
+      [hier]: { aaaaaaaaaaaa: { msg: "TypeError: x is not a function", fichier: "plateau.js:120", version: "9.65.1", os: "android", vu: Date.now() - 30 * 3600000, n: 4 } },
+      [vieux]: { cccccccccccc: { msg: "trop vieux", fichier: "x.js:1", version: "9.0.0", os: "ios", vu: 1, n: 9 } } } };
+    window.__notifier();
+  }, [jourDe(0), jourDe(1), jourDe(20)]);
+  await page.click("#ongletSante"); await page.waitForTimeout(200);
+  const sante1 = await page.evaluate(() => ({ etat: document.getElementById("santeEtat").textContent, lignes: [...document.querySelectorAll("#santeListe .santeLigne")].map((l) => l.textContent), badge: document.getElementById("badgeSante").hidden ? "" : document.getElementById("badgeSante").textContent, effacer: document.getElementById("santeEffacer").hidden }));
+  await page.click('#santeListe button[data-ignorer="aaaaaaaaaaaa"]'); await page.waitForTimeout(200);
+  const sante2 = await page.evaluate(() => ({ note: document.getElementById("santeNote").textContent, ignore: (window.__arbre.sante.ignores || {}).aaaaaaaaaaaa || null }));
+  verifier(/5 plantages/.test(sante1.etat) && sante1.lignes.length === 2 && /×7/.test(sante1.lignes[0]) && /9\.66\.0 ×3/.test(sante1.lignes[0]) && /9\.65\.1 ×4/.test(sante1.lignes[0]) && /plateau\.js:120/.test(sante1.lignes[0]) && !/trop vieux/.test(sante1.lignes.join()) && sante1.badge === "5" && sante1.effacer && /Connecte-toi/.test(sante2.note) && sante2.ignore === null,
+    `santé : plantages regroupés sur 7 jours, badge, ignorer demande la connexion (${sante1.etat} / ${JSON.stringify(sante1.lignes)} / badge ${sante1.badge} / ${sante2.note})`);
+  await page.click("#ongletStats");
   // Pilotage du jeu (réglages à distance) : deuxième onglet de la même page
   const nbErreursStats = erreurs.length;
-  await glisser(-200);
+  await page.click("#ongletPilotage"); await page.waitForTimeout(200);
   const pil = (js) => page.evaluate(js);
   const avantConnexion = await pil(() => ({ connexion: !document.getElementById("pilConnexion").hidden, panneau: document.getElementById("pilPanneau").hidden }));
   await page.fill("#pilEmail", "moi@exemple.fr"); await page.fill("#pilMdp", "mauvais"); await page.click("#pilConnecter"); await page.waitForTimeout(200);
@@ -188,6 +212,16 @@ export const signOut = async () => { utilisateur = null; ecouteur(null); };
   verifier(/coupe|Couper/i.test(propose.texte) && propose.visible && propose.config === null && /compris/.test(incompris) && /"voix":true/.test(applique.config) && applique.hist === 1 && /voix/.test(applique.etat), `pilotage : l'assistant propose, puis applique après validation, avec historique (${propose.texte} / ${JSON.stringify(applique)}) message « ${incompris.slice(0, 30)} »`);
   verifier(/"voix":true/.test(complet) && /"kawaii":\{"actif":false\}/.test(complet) && /"texte":"Bienvenue !"/.test(complet) && /"fin":\d+/.test(complet), `pilotage : boutons thème et annonce (${complet})`);
   verifier(/"voix":true/.test(annule.config) && !/Bienvenue|kawaii/.test(annule.config) && annule.hist === 1 && toutAnnule.config && Object.keys(toutAnnule.config).join() === "v" && toutAnnule.hist === 0, `pilotage : « annuler » revient en arrière pas à pas (${JSON.stringify(annule)} puis ${JSON.stringify(toutAnnule)})`);
+  // Santé, connecté : ignorer / réafficher / effacer
+  await page.click("#ongletSante"); await page.waitForTimeout(200);
+  await page.click('#santeListe button[data-ignorer="aaaaaaaaaaaa"]'); await page.waitForTimeout(300);
+  const ign = await page.evaluate(() => ({ ignore: window.__arbre.sante.ignores && window.__arbre.sante.ignores.aaaaaaaaaaaa, lignes: document.querySelectorAll("#santeListe .santeLigne").length, ignores: document.getElementById("santeIgnoresTitre").textContent, badge: document.getElementById("badgeSante").hidden ? "" : document.getElementById("badgeSante").textContent, etat: document.getElementById("santeEtat").textContent }));
+  await page.evaluate(() => { document.getElementById("santeIgnores").open = true; });
+  await page.click('#santeIgnoresListe button[data-reafficher="aaaaaaaaaaaa"]'); await page.waitForTimeout(300);
+  const reaf = await page.evaluate(() => ({ ignore: !!(window.__arbre.sante.ignores || {}).aaaaaaaaaaaa, lignes: document.querySelectorAll("#santeListe .santeLigne").length }));
+  await page.click("#santeEffacer"); await page.waitForTimeout(300);
+  const efface = await page.evaluate(() => ({ jours: !!(window.__arbre.sante && window.__arbre.sante.jours), etat: document.getElementById("santeEtat").textContent }));
+  verifier(ign.ignore === true && ign.lignes === 1 && /Ignorés \(1\)/.test(ign.ignores) && ign.badge === "2" && reaf.ignore === false && reaf.lignes === 2 && !efface.jours && /Aucun plantage/.test(efface.etat), `santé (connecté) : ignorer, réafficher, effacer (${JSON.stringify([ign, reaf, efface])})`);
   verifier(erreurs.length === 0 && nbErreursStats === 0, `aucune erreur dans les pages (${erreurs.length})`);
   await nav.close(); serveur.close();
   console.log(echecs ? `\n${echecs} ÉCHEC(S)` : "\nTOUT EST OK");

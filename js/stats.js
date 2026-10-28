@@ -75,6 +75,46 @@ function noterDoreeStats(nom){
   compterStats(nom);
 }
 
+// Plantages (onglet « Santé » d'Alcuno Stats) : erreurs JavaScript non rattrapées, envoyées sans rien de personnel :
+// message nettoyé (tout ce qui est entre guillemets est remplacé : un pseudo ou un code de partie ne part jamais), fichier et ligne,
+// version du jeu et type d'appareil. Regroupés par empreinte dans sante/jours/AAAA-MM-JJ/{empreinte} avec un compteur.
+// Au plus 5 empreintes différentes par ouverture du jeu, chacune une seule fois.
+const PLANTAGES_MAX_PAR_SESSION = 5;
+const plantagesEnvoyes = new Set();
+const PLANTAGES_IGNORES = /ResizeObserver|^Script error|extension:|Non-Error promise rejection|Load failed|Failed to fetch|NetworkError/i;
+
+function nettoyerMessagePlantage(brut){
+  return String(brut || "").replace(/https?:\/\/\S+/g, "").replace(/'[^']*'|"[^"]*"|`[^`]*`/g, "'…'").replace(/\s+/g, " ").trim().slice(0, 120);
+}
+function empreinteTexte(texte){ // (petite empreinte stable, 12 caractères [a-z0-9])
+  let h1 = 5381, h2 = 52711;
+  for (let i = 0; i < texte.length; i++) { const c = texte.charCodeAt(i); h1 = ((h1 * 33) ^ c) >>> 0; h2 = ((h2 * 31) + c) >>> 0; }
+  return (h1.toString(36) + h2.toString(36) + "000000000000").slice(0, 12);
+}
+// Renvoie {sig, msg, fichier} à envoyer, ou null (bruit connu, autre origine, déjà envoyé)
+function preparerPlantage(p){
+  const message = nettoyerMessagePlantage(p.message);
+  if (!message || PLANTAGES_IGNORES.test(message) || PLANTAGES_IGNORES.test(String(p.fichier || ""))) return null;
+  let nom = "";
+  try {
+    if (p.fichier) { const u = new URL(p.fichier, location.href); if (u.origin !== location.origin) return null; nom = u.pathname.split("/").pop(); }
+  } catch (e) { return null; }
+  const fichier = (nom + (p.ligne ? ":" + Number(p.ligne) : "")).slice(0, 40);
+  return { sig: empreinteTexte(message + "|" + fichier), msg: message, fichier };
+}
+function envoyerPlantages(){
+  while (plantagesEnAttente.length && plantagesEnvoyes.size < PLANTAGES_MAX_PAR_SESSION) {
+    const p = preparerPlantage(plantagesEnAttente.shift());
+    if (!p || plantagesEnvoyes.has(p.sig)) continue;
+    plantagesEnvoyes.add(p.sig);
+    attendreFirebase(() => {
+      const base = `sante/jours/${jourStats()}/${p.sig}`;
+      window.fbUpdate(refStats(base), { msg: p.msg, fichier: p.fichier, version: VERSION_AFFICHEE, os: systemeStats(), vu: window.fbServerTimestamp() })
+        .then(() => window.fbRunTransaction(refStats(base + "/n"), (n) => (n || 0) + 1)).catch(() => {});
+    });
+  }
+}
+
 // Installation : premier lancement depuis l'icône de l'écran d'accueil (iPhone et Android), ou
 // l'événement d'installation de Chrome (Android). Une seule fois par téléphone.
 function noterInstallationStats(){
@@ -126,6 +166,7 @@ if (!estPageTele) {
   if (enAppli) noterInstallationStats();
   window.addEventListener("appinstalled", noterInstallationStats);
 }
+envoyerPlantages(); // (plantages survenus avant le chargement de ce fichier)
 
 attendreFirebase(() => {
   majPresence(true);
