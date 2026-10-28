@@ -20,6 +20,8 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Vérifier que le nom du cache change quand une image change
         run: node tests/test_cache.js
+      - name: Tester les réglages à distance (assistant, commandes, règles Firebase)
+        run: node tests/test_config.js
       - name: Lancer le test
         run: node tests/test_demarrage.js
       - name: Lancer le test de la page de stats (bouton de réinitialisation)

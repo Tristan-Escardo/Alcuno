@@ -920,6 +920,36 @@ function verifier(ok, texte){
     verifier(differents.length === 0, `survol collé : aspect des boutons des Réglages inchangé au survol sur téléphone dans les 10 thèmes ${differents.join(", ")}`);
   }
 
+  // 35. Réglages à distance (js/config-distante.js) : une copie de « config » gardée dans le téléphone est appliquée tout de suite
+  // (annonce sur l'accueil, voix coupée, mode en ligne coupé, thème caché => retour à Bordeaux, mise à jour demandée)
+  {
+    const ctx = await nav.newContext({ viewport: { width: 390, height: 780 } });
+    const page = await ctx.newPage();
+    const erreurs = [];
+    page.on("pageerror", (e) => erreurs.push(e.message));
+    const config = { annonce: { texte: "Soirée ce soir !", maj: 1 }, coupures: { voix: true, enligne: true }, themes: { givre: { actif: false }, cerisier: { debut: "01-01", fin: "01-01" } } };
+    await page.addInitScript((c) => { try { localStorage.setItem("alcuno_theme", "givre"); if (!localStorage.getItem("alcuno_config_distante")) localStorage.setItem("alcuno_config_distante", JSON.stringify(c)); } catch (e) {} }, config);
+    await page.goto(url); await page.waitForTimeout(800);
+    const etat = await page.evaluate(() => {
+      const vis = (id) => { const e = document.getElementById(id); return !!e && !e.hidden && getComputedStyle(e).display !== "none" && e.getBoundingClientRect().height > 0; };
+      const pastille = (t) => getComputedStyle(document.querySelector(`.pastilleTheme[data-theme="${t}"]`)).display;
+      return { annonce: vis("annonceAccueil"), texte: document.getElementById("texteAnnonce").textContent, maj: vis("btnAnnonceMaj"), enligne: document.getElementById("btnModeEnLigne").disabled,
+        theme: document.documentElement.dataset.theme, givre: pastille("givre"), bordeaux: pastille("bordeaux"), cerisier: pastille("cerisier"),
+        voix: document.querySelector('[data-cle="voix"]') ? getComputedStyle(document.querySelector('[data-cle="voix"]')).display : "absent", classe: document.documentElement.classList.contains("coupure-voix") };
+    });
+    // fermer l'annonce : elle ne revient pas au rechargement, mais une nouvelle annonce oui
+    await page.click("#btnAnnonceFermer"); await page.waitForTimeout(200);
+    await page.reload(); await page.waitForTimeout(800);
+    const apresFermeture = await page.evaluate(() => document.getElementById("annonceAccueil").hidden);
+    await page.evaluate(() => { localStorage.setItem("alcuno_config_distante", JSON.stringify({ annonce: { texte: "Autre annonce", maj: 2 }, majMin: "99.0.0" })); });
+    await page.reload(); await page.waitForTimeout(800);
+    const miseAJour = await page.evaluate(() => ({ visible: !document.getElementById("annonceAccueil").hidden, texte: document.getElementById("texteAnnonce").textContent, btnMaj: !document.getElementById("btnAnnonceMaj").hidden, fermer: !document.getElementById("btnAnnonceFermer").hidden, enligne: document.getElementById("btnModeEnLigne").disabled }));
+    verifier(etat.annonce && etat.texte === "Soirée ce soir !" && !etat.maj && etat.enligne && etat.theme === "bordeaux" && etat.givre === "none" && etat.bordeaux !== "none" && etat.cerisier === "none" &&
+      etat.voix === "none" && etat.classe && apresFermeture === true && miseAJour.visible && /99\.0\.0/.test(miseAJour.texte) && miseAJour.btnMaj && !miseAJour.fermer && !miseAJour.enligne && erreurs.length === 0,
+      `réglages à distance : ${JSON.stringify(etat)} après fermeture caché ${apresFermeture}, mise à jour ${JSON.stringify(miseAJour)} ${erreurs.join(" | ")}`);
+    await ctx.close();
+  }
+
   await nav.close();
   serveur.close();
   console.log(echecs ? `\n${echecs} ÉCHEC(S)` : "\nTOUT EST OK");

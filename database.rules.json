@@ -32,6 +32,38 @@
         }
       }
     },
+    "config": {
+      ".read": true,
+      ".write": "auth != null && auth.uid === 'REMPLACE_PAR_TON_UID'",
+      "annonce": {
+        ".validate": "newData.hasChild('texte')",
+        "texte": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 140" },
+        "fin": { ".validate": "newData.isNumber()" },
+        "maj": { ".validate": "newData.isNumber()" },
+        "$autre": { ".validate": false }
+      },
+      "coupures": {
+        "voix": { ".validate": "newData.isBoolean()" },
+        "musique": { ".validate": "newData.isBoolean()" },
+        "enligne": { ".validate": "newData.isBoolean()" },
+        "$autre": { ".validate": false }
+      },
+      "themes": {
+        "$theme": {
+          ".validate": "$theme.matches(/^(bordeaux|noir|vert|bleu|soleil|cerisier|givre|prestige|galaxie|kawaii)$/)",
+          "actif": { ".validate": "newData.isBoolean()" },
+          "debut": { ".validate": "newData.isString() && newData.val().matches(/^[01][0-9]-[0-3][0-9]$/)" },
+          "fin": { ".validate": "newData.isString() && newData.val().matches(/^[01][0-9]-[0-3][0-9]$/)" },
+          "$autre": { ".validate": false }
+        }
+      },
+      "majMin": { ".validate": "newData.isString() && newData.val().matches(/^[0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}$/)" },
+      "$autre": { ".validate": false }
+    },
+    "config_hist": {
+      ".read": "auth != null && auth.uid === 'REMPLACE_PAR_TON_UID'",
+      ".write": "auth != null && auth.uid === 'REMPLACE_PAR_TON_UID'"
+    },
     "presence": {
       ".read": true,
       "$id": {

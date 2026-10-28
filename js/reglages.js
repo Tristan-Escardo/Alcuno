@@ -521,7 +521,7 @@ function peindreBarreTelephone(){
 }
 
 function appliquerTheme(nom, sansMusique = false){
-  if (!THEMES[nom] || (nom === "prestige" && !prestigeDebloque()) || (nom === "galaxie" && !galaxieDebloquee()) || (nom === "kawaii" && !kawaiiDebloque())) nom = "bordeaux";
+  if (!THEMES[nom] || (typeof themeBloqueADistance === "function" && themeBloqueADistance(nom)) || (nom === "prestige" && !prestigeDebloque()) || (nom === "galaxie" && !galaxieDebloquee()) || (nom === "kawaii" && !kawaiiDebloque())) nom = "bordeaux";
   document.documentElement.dataset.theme = nom;
   if (nom === "prestige") vuNouveauPrestige(); // thème essayé : le rappel « NOUVEAU » s'en va
   if (nom === "galaxie") vuNouveauGalaxie();
@@ -880,7 +880,7 @@ function fichierMusique(theme){
 
 function musiqueVoulue(){
   if (document.documentElement.classList.contains("mode-tele")) return musiqueTele;
-  if (!caseMusique.checked || volumeMusique === 0 || document.visibilityState !== "visible") return null;
+  if (!caseMusique.checked || volumeMusique === 0 || document.visibilityState !== "visible" || ConfigLib.coupee(configDistante, "musique")) return null;
   let caste = false, enPause = false;
   try { caste = !!codeTele; } catch (e) {} // (js/tele.js, chargé en dernier)
   try { enPause = !!pauseEnCours; } catch (e) {} // (js/plateau.js) : pas de musique pendant la pause
@@ -2007,7 +2007,7 @@ function ecouterChangementDeVoix(){
 let voixDernier = { texte: "", date: 0 };
 // Lit un texte tout de suite (sans tenir compte du réglage : l'appelant a déjà décidé). Sert au téléphone (parler) et à la télé.
 function dire(brut, force = false, vitesse = null){
-  if (!voixPossible) return;
+  if (!voixPossible || ConfigLib.coupee(configDistante, "voix")) return;
   const texte = textePourVoix(brut);
   if (!texte) return;
   if (!force && texte === voixDernier.texte && Date.now() - voixDernier.date < 6000) return; // (la même annonce lue deux fois de suite)

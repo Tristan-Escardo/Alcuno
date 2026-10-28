@@ -28,6 +28,8 @@
 //     Mode en ligne : synchronisation des actions, rattrapage
 //   js/retour-demarrage.js
 //     Bouton retour du téléphone et démarrage du jeu
+//   js/config-lib.js (avant reglages.js), js/config-distante.js
+//     Réglages à distance (annonce, fonctions coupées, thèmes cachés ou de saison), pilotés depuis stats.html
 //   js/tele.js, js/stats.js
 //     Mode télé, statistiques anonymes
 //   js/mouchard.js
@@ -84,6 +86,9 @@ function lireCodeInvitation(enAppli){
 // ================== MODE DE JEU (classique / en ligne) ==================
 // Le module Firebase s'exécute souvent AVANT ce code : l'événement "firebase-ready"
 // est alors déjà passé, on se fie donc à la présence de window.firebaseDB
+// Réglages à distance (js/config-lib.js, js/config-distante.js) : copie validée de « config » dans Firebase, {} tant qu'il n'y en a pas
+let configDistante = {};
+
 function attendreFirebase(callback){
   if (window.firebaseDB) {
     callback();
@@ -156,7 +161,7 @@ function avecCouronne(nom){
 // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
 // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
 // Numérotation : +0.0.1 à chaque mise en ligne, et après x.y.9 on passe à x.(y+1).0 (ex. 9.5.9 => 9.6.0)
-const VERSION_AFFICHEE = "9.63.0";
+const VERSION_AFFICHEE = "9.64.0";
 const VERSION_JEU = VERSION_AFFICHEE.split(".")
   .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
 // À l'écran : le numéro complet, pour voir d'un coup d'œil si un téléphone est à jour

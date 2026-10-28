@@ -17,8 +17,8 @@
         // Fichiers du jeu, dans l'ordre (aussi dans sw.js, pour le hors connexion). Téléchargés tout de suite
         // et en parallèle : en bas de la page, ils s'exécutent d'affilée, sans attente entre deux fichiers
         // (aucun bouton ni minuteur ne peut se déclencher avant que tout le jeu soit là).
-        window.FICHIERS_JEU = ["script.js", "js/qrcode.js", "js/reglages.js", "js/en-ligne.js", "js/plateau.js", "js/regles.js",
-                               "js/synchro-en-ligne.js", "js/retour-demarrage.js", "js/tele.js", "js/stats.js", "js/stickers.js", "js/mouchard.js"];
+        window.FICHIERS_JEU = ["script.js", "js/qrcode.js", "js/config-lib.js", "js/reglages.js", "js/en-ligne.js", "js/plateau.js", "js/regles.js",
+                               "js/synchro-en-ligne.js", "js/retour-demarrage.js", "js/tele.js", "js/stats.js", "js/config-distante.js", "js/stickers.js", "js/mouchard.js"];
         window.FICHIERS_JEU.forEach(function (f) {
             document.write('<link rel="preload" as="script" href="' + f + '?t=' + window.ANTI_CACHE + '">');
         });
@@ -171,6 +171,12 @@
             <div class="titreAccueil">
                 <h1 id="titreAccueil">ALCUNO<span class="couronneTitre" aria-hidden="true"><svg viewBox="0 0 64 48" aria-hidden="true"><defs><linearGradient id="orCouronne" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff3a8"/><stop offset="0.45" stop-color="#ffd23f"/><stop offset="1" stop-color="#c8880a"/></linearGradient></defs><path d="M6 40 L3 12 L18 24 L32 4 L46 24 L61 12 L58 40 Z" fill="url(#orCouronne)" stroke="#7a4b00" stroke-width="2.5" stroke-linejoin="round"/><rect x="5" y="38" width="54" height="8" rx="2" fill="url(#orCouronne)" stroke="#7a4b00" stroke-width="2.5"/><circle cx="3" cy="11" r="3.2" fill="#fff3a8" stroke="#7a4b00" stroke-width="1.5"/><circle cx="32" cy="4" r="3.6" fill="#fff3a8" stroke="#7a4b00" stroke-width="1.5"/><circle cx="61" cy="11" r="3.2" fill="#fff3a8" stroke="#7a4b00" stroke-width="1.5"/><circle cx="32" cy="30" r="4" fill="#e0263a" stroke="#7a4b00" stroke-width="1.2"/><circle cx="17" cy="32" r="2.8" fill="#2f7de1" stroke="#7a4b00" stroke-width="1.2"/><circle cx="47" cy="32" r="2.8" fill="#2f7de1" stroke="#7a4b00" stroke-width="1.2"/></svg></span></h1>
                 <div class="titreAccueilBarre" aria-hidden="true"></div>
+            </div>
+            <!-- Annonce pilotée à distance depuis stats.html (voir js/config-distante.js) -->
+            <div id="annonceAccueil" class="annonceAccueil" hidden>
+                <span id="texteAnnonce"></span>
+                <button type="button" id="btnAnnonceMaj" hidden>Mettre à jour</button>
+                <button type="button" id="btnAnnonceFermer" aria-label="Fermer l'annonce">✕</button>
             </div>
             <button type="button" id="btnModeEnLigne">Mode en ligne</button>
             <button type="button" id="btnModeClassique">Mode classique<br>(Hors connexion)</button>

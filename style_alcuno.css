@@ -8321,3 +8321,25 @@ html[data-theme="givre"] .ctrlReglage button, html[data-theme="kawaii"] .ctrlReg
 }
 #ecranReglages #ligneHorsLigne[data-etat="ok"] .pastilleHorsLigne{ background: #22b866; }
 #ecranReglages #ligneHorsLigne[data-etat="non"] .pastilleHorsLigne{ background: #d64545; }
+
+/* Réglages à distance (js/config-distante.js) : pastille de thème cachée, annonce de l'accueil */
+.pastilleTheme.themeCoupe{ display: none !important; }
+html.coupure-voix [data-cle="voix"]{ display: none !important; }
+#btnModeEnLigne:disabled{ opacity: .45; filter: grayscale(.6); pointer-events: none; }
+#choixMode .annonceAccueil{
+  position: relative; z-index: 3; box-sizing: border-box;
+  display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;
+  width: min(92%, 420px); margin: 0 auto 14px; padding: 10px 40px 10px 14px;
+  border-radius: 14px; text-align: center; font-weight: 700; font-size: 15px; line-height: 1.3;
+  color: #1a1020; background: linear-gradient(180deg, #ffe27a, #ffc43d); border: 2px solid #fff6c9;
+  box-shadow: 0 6px 18px rgba(0,0,0,.35);
+}
+#choixMode .annonceAccueil[hidden]{ display: none; }
+#choixMode .annonceAccueil button{
+  font: inherit; font-size: 14px; font-weight: 800; border: 0; border-radius: 10px; padding: 6px 12px;
+  color: #fff; background: #1a1020; cursor: pointer;
+}
+#choixMode .annonceAccueil #btnAnnonceFermer{
+  position: absolute; top: 4px; right: 4px; width: 30px; height: 30px; padding: 0; line-height: 30px; text-align: center;
+  background: transparent; color: #1a1020; font-size: 16px;
+}
