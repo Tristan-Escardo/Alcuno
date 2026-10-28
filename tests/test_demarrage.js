@@ -870,10 +870,21 @@ function verifier(ok, texte){
     const gardees = await page.evaluate(async () => { const c = await caches.open((await caches.keys())[0]); return (await c.keys()).map((r) => r.url.split("/").pop()).filter((n) => /^musique_ambiance/.test(n)).sort(); });
     await ctx.setOffline(true);
     await page.goto(url); await page.waitForTimeout(800);
-    await page.mouse.click(200, 400); await page.waitForTimeout(3500);
+    await page.mouse.click(4, 600); await page.waitForTimeout(3500);
     const horsLigne = await page.evaluate(() => !!(lecteurMusique && lecteurMusique.actif));
-    verifier(gardees.length >= 6 && gardees.includes("musique_ambiance.mp3") && horsLigne && erreurs.length === 0,
-      `musique hors connexion : gardées sans tap ${JSON.stringify(gardees)}, jouée sans réseau ${horsLigne} ${erreurs.join("|")}`);
+    // sans réseau : changer de thème puis couper / remettre la musique rejoue bien la musique du thème (elle est dans le cache)
+    const themes = [];
+    for (const theme of ["givre", "cerisier", "noir"]) {
+      await page.evaluate((t) => { appliquerTheme(t); }, theme); await page.waitForTimeout(300);
+      await page.evaluate(() => { const c = document.getElementById("optionMusique"); c.checked = false; c.dispatchEvent(new Event("change")); }); await page.waitForTimeout(600);
+      await page.evaluate(() => { const c = document.getElementById("optionMusique"); c.checked = true; c.dispatchEvent(new Event("change")); }); await page.waitForTimeout(2500);
+      themes.push(await page.evaluate(() => (lecteurMusique && lecteurMusique.actif ? lecteurMusique.nom : "silence")));
+    }
+    await page.click("#btnReglages"); await page.waitForTimeout(600);
+    const note = await page.evaluate(() => { const n = document.getElementById("noteMusiqueHorsLigne"); return n.hidden ? "(cachée)" : n.textContent; });
+    verifier(gardees.length >= 6 && gardees.includes("musique_ambiance.mp3") && horsLigne && themes.join() === "musique_ambiance_givre,musique_ambiance_cerisier,musique_ambiance_sombre" &&
+      note === "Hors connexion : toutes les musiques sont prêtes ✓" && erreurs.length === 0,
+      `musique hors connexion : gardées sans tap ${JSON.stringify(gardees)}, jouée sans réseau ${horsLigne}, après changement de thème ${JSON.stringify(themes)}, ligne « ${note} » ${erreurs.join("|")}`);
     await ctx.close();
   }
 

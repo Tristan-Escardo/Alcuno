@@ -1094,27 +1094,59 @@ function preparerToutesLesMusiques(ctx){
   nomsMusiquesAPreparer().reduce((suite, nom) => suite.then(() => chargerMusique(ctx, nom)), Promise.resolve());
 }
 
-// Musique hors connexion (mode avion) : quand la musique est activée et qu'il y a du réseau, les morceaux sont téléchargés en
-// arrière-plan pour que le service worker (sw.js) les garde ; sans attendre un tap, et aussi quand une nouvelle version de l'appli
-// prend la main, ou que le réseau revient. Un morceau déjà gardé n'est pas retéléchargé. Pas en économie de données.
+// Musique hors connexion (mode avion) : quand la musique est activée et qu'il y a du réseau, tous les morceaux disponibles sont
+// téléchargés tout de suite, en arrière-plan (celui du thème en cours d'abord, deux à la fois) pour que le service worker (sw.js) les
+// garde. Un morceau déjà gardé n'est pas retéléchargé ; pas en économie de données. Une ligne sous le volume de la musique dit où
+// on en est (« 5 / 8 prêtes ») pour savoir quand on peut couper le réseau. Reprend aussi quand une nouvelle version de l'appli prend la
+// main ou que le réseau revient.
+const noteMusiqueHorsLigne = document.getElementById("noteMusiqueHorsLigne");
+function musiquesAGarder(){ // (ordre de priorité : thème en cours, musique de base, thèmes débloqués)
+  const actuel = fichierMusique(document.documentElement.dataset.theme || "bordeaux");
+  return Array.from(new Set([actuel].concat(nomsMusiquesAPreparer())));
+}
+const musiqueGardee = async (nom) => { try { return !!(await caches.match(`Sons/${nom}.mp3`)); } catch (e) { return false; } };
+async function majNoteMusiqueHorsLigne(){
+  const ok = caseMusique.checked && window.caches && navigator.serviceWorker && navigator.serviceWorker.controller;
+  noteMusiqueHorsLigne.hidden = !ok;
+  if (!ok) return;
+  const noms = musiquesAGarder();
+  let pretes = 0;
+  for (const nom of noms) if (await musiqueGardee(nom)) pretes++;
+  noteMusiqueHorsLigne.textContent = pretes >= noms.length
+    ? "Hors connexion : toutes les musiques sont prêtes ✓"
+    : gardeMusiquesEnCours ? `Hors connexion : téléchargement des musiques (${pretes} / ${noms.length})…`
+    : navigator.onLine ? `Hors connexion : ${pretes} / ${noms.length} musiques prêtes, téléchargement à venir…`
+    : `Hors connexion : ${pretes} / ${noms.length} musiques prêtes (les autres demandent du réseau)`;
+}
 let gardeMusiquesEnCours = false;
 function garderMusiquesPourHorsLigne(){
+  majNoteMusiqueHorsLigne();
   if (gardeMusiquesEnCours || !caseMusique.checked || !navigator.onLine || !window.caches) return;
   if (!(navigator.serviceWorker && navigator.serviceWorker.controller)) return; // (c'est lui qui garde les fichiers)
   if (navigator.connection && navigator.connection.saveData) return;
   gardeMusiquesEnCours = true;
-  nomsMusiquesAPreparer().reduce((suite, nom) => suite.then(async () => {
-    const url = `Sons/${nom}.mp3`;
-    try {
-      if (await caches.match(url)) return;
-      const reponse = await fetch(url);
-      if (reponse.ok) await reponse.arrayBuffer(); // (lu en entier : le service worker en garde alors une copie)
-    } catch (e) {}
-  }), Promise.resolve()).then(() => { gardeMusiquesEnCours = false; }, () => { gardeMusiquesEnCours = false; });
+  majNoteMusiqueHorsLigne();
+  const noms = musiquesAGarder();
+  let suivant = 0;
+  const ouvrier = async () => {
+    while (suivant < noms.length) {
+      const nom = noms[suivant++];
+      try {
+        if (await musiqueGardee(nom)) continue;
+        const reponse = await fetch(`Sons/${nom}.mp3`);
+        if (reponse.ok) await reponse.arrayBuffer(); // (lu en entier : le service worker en garde alors une copie)
+      } catch (e) {}
+      majNoteMusiqueHorsLigne();
+    }
+  };
+  Promise.all([ouvrier(), ouvrier()]).then(() => { gardeMusiquesEnCours = false; majNoteMusiqueHorsLigne(); },
+    () => { gardeMusiquesEnCours = false; majNoteMusiqueHorsLigne(); });
 }
-window.addEventListener("load", () => setTimeout(garderMusiquesPourHorsLigne, 4000));
-window.addEventListener("online", () => setTimeout(garderMusiquesPourHorsLigne, 1000));
-if (navigator.serviceWorker) navigator.serviceWorker.addEventListener("controllerchange", () => setTimeout(garderMusiquesPourHorsLigne, 2000));
+window.addEventListener("load", () => setTimeout(garderMusiquesPourHorsLigne, 800));
+window.addEventListener("online", () => setTimeout(garderMusiquesPourHorsLigne, 500));
+window.addEventListener("offline", majNoteMusiqueHorsLigne);
+if (navigator.serviceWorker) navigator.serviceWorker.addEventListener("controllerchange", () => setTimeout(garderMusiquesPourHorsLigne, 800));
+document.getElementById("btnReglages").addEventListener("click", () => setTimeout(garderMusiquesPourHorsLigne, 300));
 document.addEventListener("visibilitychange", () => {
   // Appli quittée : le téléphone suspend le son presque aussitôt. Le fondu de 0,4 s de majMusique était
   // coupé net en plein volume (petit « bip » en quittant) : on éteint tout de suite, en 40 ms

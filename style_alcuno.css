@@ -8306,3 +8306,7 @@ html[data-theme="soleil"] #ecranTele .tele-historique-quoi em{ color: #8a1f4a; }
 .ctrlReglage button{ font: inherit; color: inherit; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.45); background: rgba(255, 255, 255, 0.16); border-radius: 10px; touch-action: none; padding: 0; }
 .ctrlReglage .ctrlPoignee{ width: 42px; height: 34px; font-size: 22px; line-height: 1; cursor: grab; }
 html[data-theme="givre"] .ctrlReglage button, html[data-theme="kawaii"] .ctrlReglage button{ border-color: rgba(60, 60, 110, 0.4); background: rgba(255, 255, 255, 0.75); }
+
+/* Réglages : état de la musique hors connexion (sous le volume de la musique) */
+#ecranReglages #noteMusiqueHorsLigne{ display: block; padding: 2px 14px 10px; font-size: 13px; }
+#ecranReglages #noteMusiqueHorsLigne[hidden]{ display: none; }
