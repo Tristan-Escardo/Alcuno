@@ -677,6 +677,7 @@ document.querySelectorAll(".pastilleTheme").forEach((pastille) => {
     }
     appliquerTheme(pastille.dataset.theme, barreIphoneARafraichir());
     try { localStorage.setItem(CLE_THEME, pastille.dataset.theme); } catch (e) {}
+    try { setTimeout(majNoteMusiqueHorsLigne, 300); } catch (e) {} // (la ligne « Hors connexion » sous le volume de la musique)
     try { noterAppareilStats(); } catch (e) {} // statistiques : thème choisi
     rafraichirBarreIphone();
   });
@@ -1106,17 +1107,19 @@ function musiquesAGarder(){ // (ordre de priorité : thème en cours, musique de
 }
 const musiqueGardee = async (nom) => { try { return !!(await caches.match(`Sons/${nom}.mp3`)); } catch (e) { return false; } };
 async function majNoteMusiqueHorsLigne(){
-  const ok = caseMusique.checked && window.caches && navigator.serviceWorker && navigator.serviceWorker.controller;
+  // (visible aussi quand la musique est coupée : changer de thème la coupe, et on veut quand même voir si elle est prête hors connexion)
+  const ok = window.caches && navigator.serviceWorker && navigator.serviceWorker.controller;
   noteMusiqueHorsLigne.hidden = !ok;
   if (!ok) return;
   const noms = musiquesAGarder();
   let pretes = 0;
   for (const nom of noms) if (await musiqueGardee(nom)) pretes++;
   noteMusiqueHorsLigne.textContent = pretes >= noms.length
-    ? "Hors connexion : toutes les musiques sont prêtes ✓"
-    : gardeMusiquesEnCours ? `Hors connexion : téléchargement des musiques (${pretes} / ${noms.length})…`
-    : navigator.onLine ? `Hors connexion : ${pretes} / ${noms.length} musiques prêtes, téléchargement à venir…`
-    : `Hors connexion : ${pretes} / ${noms.length} musiques prêtes (les autres demandent du réseau)`;
+    ? "Hors connexion : musiques prêtes ✓"
+    : !caseMusique.checked ? `Hors connexion : ${pretes} / ${noms.length} prêtes. Active la musique pour télécharger le reste.`
+    : gardeMusiquesEnCours ? `Hors connexion : téléchargement (${pretes} / ${noms.length})…`
+    : navigator.onLine ? `Hors connexion : ${pretes} / ${noms.length} prêtes, téléchargement à venir…`
+    : `Hors connexion : ${pretes} / ${noms.length} prêtes (le reste demande du réseau)`;
 }
 let gardeMusiquesEnCours = false;
 function garderMusiquesPourHorsLigne(){

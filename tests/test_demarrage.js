@@ -882,9 +882,12 @@ function verifier(ok, texte){
     }
     await page.click("#btnReglages"); await page.waitForTimeout(600);
     const note = await page.evaluate(() => { const n = document.getElementById("noteMusiqueHorsLigne"); return n.hidden ? "(cachée)" : n.textContent; });
+    // la ligne reste visible quand la musique est coupée (changer de thème la coupe)
+    await page.evaluate(() => { const c = document.getElementById("optionMusique"); c.checked = false; c.dispatchEvent(new Event("change")); }); await page.waitForTimeout(800);
+    const noteCoupee = await page.evaluate(() => { const n = document.getElementById("noteMusiqueHorsLigne"); return n.hidden ? "(cachée)" : n.textContent; });
     verifier(gardees.length >= 6 && gardees.includes("musique_ambiance.mp3") && horsLigne && themes.join() === "musique_ambiance_givre,musique_ambiance_cerisier,musique_ambiance_sombre" &&
-      note === "Hors connexion : toutes les musiques sont prêtes ✓" && erreurs.length === 0,
-      `musique hors connexion : gardées sans tap ${JSON.stringify(gardees)}, jouée sans réseau ${horsLigne}, après changement de thème ${JSON.stringify(themes)}, ligne « ${note} » ${erreurs.join("|")}`);
+      note === "Hors connexion : musiques prêtes ✓" && noteCoupee === "Hors connexion : musiques prêtes ✓" && erreurs.length === 0,
+      `musique hors connexion : gardées sans tap ${JSON.stringify(gardees)}, jouée sans réseau ${horsLigne}, après changement de thème ${JSON.stringify(themes)}, ligne « ${note} », musique coupée « ${noteCoupee} » ${erreurs.join("|")}`);
     await ctx.close();
   }
 
