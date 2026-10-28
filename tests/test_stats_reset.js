@@ -280,6 +280,55 @@ export const signOut = async () => { utilisateur = null; ecouteurs.forEach((e) =
   verifier(/Historique reçu/.test(renomme.bulle) && modeleApres === "gemini-2.5-flash" && appelsIA.some((x) => /models\/disparu:/.test(x.url)), `IA : modèle renommé (404) => un autre modèle est trouvé et la demande réessayée (${modeleApres})`);
   verifier(variantes.length === 3 && choisie.texte === "Variante B" && choisie.restantes === 0, `IA : reformulation de l'annonce en 3 variantes (${JSON.stringify([variantes, choisie])})`);
   await page.evaluate(() => { localStorage.removeItem("alcuno_pilotage_cle_ia"); localStorage.removeItem("alcuno_pilotage_modele_ia"); });
+  // Claude (Anthropic) et ChatGPT (OpenAI) simulés : une clé par fournisseur, en-têtes propres à chacun, même conversation
+  const appelsClaude = [], appelsOpenai = [];
+  const corsAutres = { "access-control-allow-origin": "*", "access-control-allow-headers": "*", "access-control-allow-methods": "GET,POST,OPTIONS" };
+  const repondre = (route, corps, status = 200) => route.fulfill({ status, headers: { ...corsAutres, "content-type": "application/json" }, body: JSON.stringify(corps) });
+  const reponseIA = (systeme, messages) => /Réécris/.test(systeme) ? { variantes: ["Version un", "Version deux", "Version trois"] } : /plaisir/.test(messages[messages.length - 1]) ? { commandes: [{ op: "coupure", cible: "voix", etat: true }], reponse: "Reçu " + messages.length + " message(s)" } : { commandes: [], reponse: "Autre réponse" };
+  await page.route("https://api.anthropic.com/**", async (route) => {
+    const req = route.request();
+    if (req.method() === "OPTIONS") return route.fulfill({ status: 204, headers: corsAutres });
+    if (/\/v1\/models/.test(req.url())) return req.headers()["x-api-key"] === "MAUVAISE-C" ? repondre(route, { error: { message: "invalid x-api-key" } }, 401) : repondre(route, { data: [{ id: "claude-sonnet-5-5" }, { id: "claude-haiku-5-5" }] });
+    const corps = JSON.parse(req.postData() || "{}");
+    appelsClaude.push({ entetes: req.headers(), corps });
+    const r = reponseIA(corps.system, corps.messages.map((m) => m.content));
+    return repondre(route, { content: [{ type: "text", text: "```json\n" + JSON.stringify(r) + "\n```" }] }); // (Claude peut entourer le JSON de texte : on le retrouve)
+  });
+  await page.route("https://api.openai.com/**", async (route) => {
+    const req = route.request();
+    if (req.method() === "OPTIONS") return route.fulfill({ status: 204, headers: corsAutres });
+    if (/\/v1\/models/.test(req.url())) return req.headers().authorization === "Bearer MAUVAISE-O" ? repondre(route, { error: { message: "Incorrect API key" } }, 401) : repondre(route, { data: [{ id: "text-embedding-3-small" }, { id: "gpt-4o-mini" }, { id: "gpt-4o" }] });
+    const corps = JSON.parse(req.postData() || "{}");
+    appelsOpenai.push({ entetes: req.headers(), corps });
+    const r = reponseIA(corps.messages[0].content, corps.messages.slice(1).map((m) => m.content));
+    return repondre(route, { choices: [{ message: { content: JSON.stringify(r) } }] });
+  });
+  const etatCle = () => page.evaluate(() => ({ etat: document.getElementById("pilIAEtat").textContent, champ: document.getElementById("pilCleIA").value, aide: document.getElementById("pilIAAide").textContent, fournisseur: document.getElementById("pilFournisseur").value }));
+  await page.selectOption("#pilFournisseur", "claude"); const claudeVide = await etatCle();
+  await page.fill("#pilCleIA", "MAUVAISE-C"); await page.click("#pilEnregistrerCle"); await page.waitForTimeout(400); const claudeMauvaise = await etatCle();
+  await page.fill("#pilCleIA", "CLE-C"); await page.click("#pilEnregistrerCle"); await page.waitForTimeout(400); const claudeBonne = await etatCle();
+  await envoyer("fais plaisir à tout le monde"); await page.waitForTimeout(400); const claude = await dernier();
+  await page.click("#pilAnnulerPropose");
+  await page.fill("#pilAnnonce", "brouillon"); await page.click("#pilReformuler"); await page.waitForTimeout(400);
+  const variantesClaude = await page.evaluate(() => [...document.querySelectorAll("#pilVariantes button")].map((b) => b.textContent));
+  await page.click('#pilVariantes button[data-variante="0"]');
+  await page.selectOption("#pilFournisseur", "openai"); const openaiVide = await etatCle();
+  await page.fill("#pilCleIA", "MAUVAISE-O"); await page.click("#pilEnregistrerCle"); await page.waitForTimeout(400); const openaiMauvaise = await etatCle();
+  await page.fill("#pilCleIA", "CLE-O"); await page.click("#pilEnregistrerCle"); await page.waitForTimeout(400); const openaiBonne = await etatCle();
+  await envoyer("fais plaisir à tout le monde encore une fois"); await page.waitForTimeout(400); const openai = await dernier();
+  await page.click("#pilAnnulerPropose");
+  await page.selectOption("#pilFournisseur", "gemini"); const retourGemini = await etatCle();
+  const stock = await page.evaluate(() => ({ c: localStorage.getItem("alcuno_pilotage_cle_ia_claude"), o: localStorage.getItem("alcuno_pilotage_cle_ia_openai"), g: localStorage.getItem("alcuno_pilotage_cle_ia"), mc: localStorage.getItem("alcuno_pilotage_modele_ia_claude"), mo: localStorage.getItem("alcuno_pilotage_modele_ia_openai"), f: localStorage.getItem("alcuno_pilotage_fournisseur") }));
+  const appelC = appelsClaude.find((x) => /plaisir/.test(JSON.stringify(x.corps.messages))), appelO = appelsOpenai[appelsOpenai.length - 1];
+  verifier(claudeVide.fournisseur === "claude" && /console\.anthropic\.com/.test(claudeVide.aide) && claudeVide.champ === "" && /refusée par Anthropic/.test(claudeMauvaise.etat) && /Clé valide ✓ · modèle utilisé : claude-haiku-5-5/.test(claudeBonne.etat) && stock.c === "CLE-C" && stock.mc === "claude-haiku-5-5",
+    `Claude : clé propre au fournisseur, refusée puis valide, modèle économique choisi (${JSON.stringify([claudeVide, claudeMauvaise.etat, claudeBonne.etat])})`);
+  verifier(/Reçu \d+ message/.test(claude.bulle) && claude.propose && /voix/i.test(claude.liste) && appelC && appelC.entetes["x-api-key"] === "CLE-C" && appelC.entetes["anthropic-dangerous-direct-browser-access"] === "true" && !!appelC.entetes["anthropic-version"] && appelC.corps.model === "claude-haiku-5-5" && appelC.corps.max_tokens > 0 && /aujourdhui/.test(appelC.corps.system) && appelC.corps.messages[0].role === "user" && appelC.corps.messages.every((m, i, l) => i === 0 || m.role !== l[i - 1].role) && variantesClaude.length === 3,
+    `Claude : conversation, en-têtes, JSON retrouvé dans la réponse, reformulation (${claude.bulle} / ${JSON.stringify(appelC && appelC.entetes)})`);
+  verifier(openaiVide.champ === "" && /platform\.openai\.com/.test(openaiVide.aide) && /refusée par OpenAI/.test(openaiMauvaise.etat) && /Clé valide ✓ · modèle utilisé : gpt-4o-mini/.test(openaiBonne.etat) && stock.o === "CLE-O" && stock.mo === "gpt-4o-mini" && /Reçu \d+ message/.test(openai.bulle) && openai.propose
+    && appelO && appelO.entetes.authorization === "Bearer CLE-O" && appelO.corps.model === "gpt-4o-mini" && appelO.corps.response_format.type === "json_object" && appelO.corps.messages[0].role === "system" && appelO.corps.messages[1].role === "user",
+    `ChatGPT : clé propre, refusée puis valide, requête (${JSON.stringify([openaiVide.aide, openaiMauvaise.etat, openaiBonne.etat, openai.bulle])})`);
+  verifier(retourGemini.fournisseur === "gemini" && retourGemini.champ === "" && stock.f === "gemini" && stock.g === null, `les clés restent séparées par fournisseur (retour à Gemini : ${JSON.stringify(retourGemini)} / ${JSON.stringify(stock)})`);
+  await page.evaluate(() => { Object.keys(localStorage).filter((k) => k.startsWith("alcuno_pilotage_cle_ia") || k.startsWith("alcuno_pilotage_modele_ia")).forEach((k) => localStorage.removeItem(k)); });
 
   // Santé, connecté : ignorer / réafficher / effacer
   await page.click("#ongletSante"); await page.waitForTimeout(200);

@@ -70,12 +70,19 @@ L'annonce s'affiche sur l'accueil, en haut des Réglages et en haut des Crédits
 - **Boutons** : Couper / Remettre une fonction, Cacher / Remettre un thème, période d'un thème, annonce.
 - **Annuler la dernière modification** : revient à l'état d'avant (l'historique est dans `config_hist`).
 
-## Assistant intelligent gratuit (facultatif)
+## Assistant intelligent (facultatif) : Gemini, Claude ou ChatGPT
 
-Pour comprendre des demandes plus libres : clé gratuite **Google Gemini** (aistudio.google.com → *Get API key*),
-collée dans « Assistant intelligent gratuit ». Elle reste dans ton téléphone, jamais dans le jeu ni sur GitHub.
-L'IA ne peut proposer que les réglages de la liste ci-dessus, vérifiés par le code, et tu valides avant.
-Le modèle est choisi automatiquement (`MODELE_IA` dans `stats.html` n'est que le premier essai).
+Dans « Assistant intelligent », choisis un **fournisseur** et colle ta clé (« Enregistrer et tester la clé » dit si elle est valide
+et choisit tout seul un modèle disponible, le plus économique ; si le modèle est renommé, l'appel est réessayé avec un autre) :
+
+| Fournisseur | Coût | Où prendre la clé |
+|---|---|---|
+| Google Gemini | **gratuit** (quota gratuit de Google, à vérifier sur leur page ; Google peut utiliser les échanges du quota gratuit pour s'améliorer) | aistudio.google.com → *Get API key* |
+| Claude (Anthropic) | payant à l'usage, crédit prépayé, **séparé** de l'abonnement Claude | console.anthropic.com → *API keys* |
+| ChatGPT (OpenAI) | payant à l'usage, crédit prépayé, **séparé** de l'abonnement ChatGPT | platform.openai.com/api-keys |
+
+Une clé par fournisseur, gardée dans ton téléphone (jamais dans le jeu ni sur GitHub). L'IA ne peut proposer que les réglages de la liste,
+vérifiés par le code, et tu valides avant. Elle sert aussi à reformuler une annonce et à répondre aux questions sur les stats.
 
 ## Ce que ça ne peut pas faire
 

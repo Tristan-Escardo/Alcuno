@@ -385,9 +385,16 @@
                 <button type="button" class="pilBtn danger" id="pilToutRemettre">Tout remettre par défaut</button>
 
                 <details>
-                    <summary>Assistant intelligent gratuit (facultatif)</summary>
-                    <p class="pilNote" style="margin-top:8px">Sans IA, l'assistant comprend les phrases simples. Pour qu'il comprenne des demandes plus libres, colle ici une clé gratuite Google Gemini (aistudio.google.com → « Get API key »). Elle reste dans ce téléphone, jamais dans le jeu. L'IA propose seulement des réglages de la liste : tu valides toujours avant. Elle sert aussi à reformuler une annonce et à répondre aux questions sur les stats.</p>
-                    <input id="pilCleIA" type="password" placeholder="Clé Gemini" autocomplete="off">
+                    <summary>Assistant intelligent (facultatif)</summary>
+                    <p class="pilNote" style="margin-top:8px">Sans IA, l'assistant comprend les phrases simples et répond aux questions courantes sur les stats. Avec une IA, il comprend les demandes plus libres, reformule tes annonces et répond à toutes les questions. La clé reste dans ce téléphone, jamais dans le jeu ni sur GitHub. L'IA propose seulement des réglages de la liste : tu valides toujours avant.</p>
+                    <label class="pilLabel" for="pilFournisseur">Fournisseur</label>
+                    <select id="pilFournisseur">
+                        <option value="gemini">Google Gemini (gratuit)</option>
+                        <option value="claude">Claude – Anthropic (payant à l'usage)</option>
+                        <option value="openai">ChatGPT – OpenAI (payant à l'usage)</option>
+                    </select>
+                    <p class="pilNote" id="pilIAAide"></p>
+                    <input id="pilCleIA" type="password" placeholder="Clé d'API" autocomplete="off">
                     <button type="button" class="pilBtn sec" id="pilEnregistrerCle">Enregistrer et tester la clé</button>
                     <div class="pilNote" id="pilIAEtat"></div>
                 </details>
@@ -412,7 +419,7 @@
 
         // Empreinte (SHA-256) du code d'accès : le code lui-même n'est écrit nulle part
         // Version de la page de stats (à part de celle du jeu : +0.0.1 à chaque modification de cette page)
-        const VERSION_STATS = "1.11.0";
+        const VERSION_STATS = "1.12.0";
         document.getElementById("versionStats").textContent = VERSION_STATS;
         document.getElementById("versionStats2").textContent = VERSION_STATS;
         document.getElementById("versionStats3").textContent = VERSION_STATS;
@@ -425,7 +432,6 @@
             cerisier: "Cerisier", givre: "Givre", prestige: "Prestige", galaxie: "Star Wars", kawaii: "Kawaii"
         };
         // Pilotage du jeu (suite plus bas : demarrerPilotage)
-        const MODELE_IA = "gemini-2.5-flash"; // (gratuit avec une clé de aistudio.google.com ; à changer ici si Google le renomme)
         const CLE_IA = "alcuno_pilotage_cle_ia";
         const EXEMPLES = ["coupe la voix", "remets la voix", "finalement non", "désactive le thème Kawaii",
             "thème Star Wars du 1er mai au 4 mai", "annonce demain à 18h : « Soirée ! » pendant 3 heures", "mode maintenance", "combien de parties cette semaine ?", "quelle version plante le plus ?"];
@@ -433,7 +439,6 @@
         // Dernières données lues par la page (pour les questions de l'assistant)
         const donnees = { jours: {}, appareils: {}, sante: {} };
         const CLE_MODELE_IA = "alcuno_pilotage_modele_ia";
-        const modeleIA = () => { try { return localStorage.getItem(CLE_MODELE_IA) || MODELE_IA; } catch (e) { return MODELE_IA; } };
 
         const NOMS_OS = { ios: "iPhone", android: "Android", ordi: "Ordinateur" };
         const PRESENCE_VALABLE = 3 * 60 * 1000; // présence pas rafraîchie depuis 3 min : téléphone parti
@@ -781,7 +786,7 @@
                 const reponse = ConfigLib.repondreQuestion(texte, construireResume());
                 if (reponse) { direFil(reponse); return; }
                 if (cleIA()) { await demanderIA(); return; }
-                direFil(r.raison || "Je n'ai pas compris. Essaie une phrase plus simple, ou ajoute une clé Gemini (en bas) pour que je comprenne les demandes plus libres.");
+                direFil(r.raison || "Je n'ai pas compris. Essaie une phrase plus simple, ou ajoute une clé d'IA (en bas) pour que je comprenne les demandes plus libres.");
             }
             $("pilComprendre").addEventListener("click", envoyer);
             $("pilAppliquer").addEventListener("click", async () => {
@@ -805,17 +810,24 @@
             });
 
             // IA gratuite (Gemini)
-            const cleIA = () => { try { return localStorage.getItem(CLE_IA); } catch (e) { return null; } };
-            $("pilCleIA").value = cleIA() ? "••••••••" : "";
             const etatIA = (t, erreur) => { $("pilIAEtat").textContent = t; $("pilIAEtat").classList.toggle("erreur", !!erreur); };
+            function majFournisseur(){ // (affiche le fournisseur choisi : aide, clé déjà enregistrée ou non)
+                $("pilFournisseur").value = idFournisseur();
+                $("pilIAAide").textContent = fournisseur().aide;
+                $("pilCleIA").value = cleIA() ? "••••••••" : "";
+                $("pilCleIA").placeholder = "Clé " + fournisseur().nom;
+                etatIA(cleIA() ? (modeleIA() ? `Clé enregistrée · modèle : ${modeleIA()}` : "Clé enregistrée.") : "");
+            }
+            $("pilFournisseur").addEventListener("change", () => { ecrireStock(CLE_FOURNISSEUR, $("pilFournisseur").value); majFournisseur(); });
+            majFournisseur();
             $("pilEnregistrerCle").addEventListener("click", async () => {
                 const v = $("pilCleIA").value.trim();
-                if (!v) { try { localStorage.removeItem(CLE_IA); localStorage.removeItem(CLE_MODELE_IA); } catch (e) {} etatIA("Clé effacée."); return; }
+                if (!v) { ecrireStock(CLE_IA + fournisseur().suffixe, null); ecrireStock(CLE_MODELE_IA + fournisseur().suffixe, null); etatIA("Clé effacée."); return; }
                 const cle = /^•+$/.test(v) ? cleIA() : v;
                 if (!cle) { etatIA("Colle ta clé d'abord.", true); return; }
                 etatIA("Test de la clé…");
                 const t = await testerCleIA(cle);
-                if (t.ok) { try { localStorage.setItem(CLE_IA, cle); } catch (e) {} $("pilCleIA").value = "••••••••"; }
+                if (t.ok) { ecrireStock(CLE_IA + fournisseur().suffixe, cle); $("pilCleIA").value = "••••••••"; }
                 etatIA(t.message, !t.ok);
             });
             const systemeIA = () => `Tu es l'assistant de pilotage d'un jeu de cartes à boire (Alcuno). Réponds UNIQUEMENT par un objet JSON : {"commandes":[…],"reponse":"phrase courte en français"}.
@@ -837,13 +849,13 @@ Date du jour : ${new Date().toISOString().slice(0, 10)}.
 Données (stats) : ${JSON.stringify((() => { const r = construireResume(); const jours = {}; joursPasses(14).forEach((j) => { if (r.jours[j]) jours[j] = r.jours[j]; }); return { ...r, jours }; })())}`;
             async function demanderIA(){
                 const cle = cleIA();
-                if (!cle) { direFil("Ajoute d'abord une clé Gemini (section en bas).", undefined); return; }
+                if (!cle) { direFil("Ajoute d'abord une clé d'IA (section en bas).", undefined); return; }
                 message("L'IA réfléchit…");
                 // la conversation jusqu'ici (sans le dernier message, ajouté à la fin) : l'IA se souvient de ce qui a été dit
-                const contenus = fil.slice(0, -1).slice(-8).map((m) => ({ role: m.role === "moi" ? "user" : "model", parts: [{ text: m.role === "moi" ? m.texte : JSON.stringify({ commandes: m.cmds || [], reponse: m.texte }) }] }));
-                contenus.push({ role: "user", parts: [{ text: fil[fil.length - 1].texte }] });
+                const contenus = fil.slice(0, -1).slice(-8).map((m) => ({ role: m.role === "moi" ? "user" : "assistant", texte: m.role === "moi" ? m.texte : JSON.stringify({ commandes: m.cmds || [], reponse: m.texte }) }));
+                contenus.push({ role: "user", texte: fil[fil.length - 1].texte });
                 try {
-                    const j = await appelerGemini(cle, systemeIA(), contenus);
+                    const j = await appelerIA(systemeIA(), contenus);
                     message("");
                     let cmds = Array.isArray(j) ? j : Array.isArray(j.commandes) ? j.commandes : [];
                     cmds = cmds.slice(0, 6).map((c) => (c && typeof c.debut === "string" ? { ...c, debut: Date.parse(c.debut) } : c));
@@ -857,10 +869,10 @@ Données (stats) : ${JSON.stringify((() => { const r = construireResume(); const
                 const texte = $("pilAnnonce").value.trim();
                 if (!texte) { message("Écris d'abord ton annonce, même en brouillon.", true); return; }
                 const cle = cleIA();
-                if (!cle) { message("Pour reformuler, ajoute une clé Gemini gratuite (section en bas).", true); return; }
+                if (!cle) { message("Pour reformuler, ajoute une clé d'IA (section en bas : Gemini est gratuit).", true); return; }
                 message("L'IA réécrit…"); $("pilVariantes").innerHTML = "";
                 try {
-                    const j = await appelerGemini(cle, 'Réécris ce message d\'annonce pour un jeu de cartes à boire entre amis : 3 variantes différentes, en français, chaleureuses et courtes, 140 caractères maximum chacune, un émoji au plus. N\'invente aucune information (date, lieu, chiffre) qui n\'est pas dans le texte. Réponds uniquement par {"variantes":["…","…","…"]}.', [{ role: "user", parts: [{ text: texte }] }]);
+                    const j = await appelerIA('Réécris ce message d\'annonce pour un jeu de cartes à boire entre amis : 3 variantes différentes, en français, chaleureuses et courtes, 140 caractères maximum chacune, un émoji au plus. N\'invente aucune information (date, lieu, chiffre) qui n\'est pas dans le texte. Réponds uniquement par {"variantes":["…","…","…"]}.', [{ role: "user", texte }]);
                     const v = (Array.isArray(j.variantes) ? j.variantes : []).filter((x) => typeof x === "string" && x.trim()).slice(0, 3).map((x) => x.trim().slice(0, 140));
                     if (!v.length) { message("L'IA n'a rien proposé, réessaie.", true); return; }
                     message("");
@@ -963,44 +975,125 @@ Données (stats) : ${JSON.stringify((() => { const r = construireResume(); const
             return Object.values(par).sort((x, y) => y.n - x.n);
         }
 
-        // Google Gemini (clé gratuite, gardée dans ce téléphone) : appel avec réessai automatique si le modèle a été renommé
-        const MODELES_IA_PREFERES = ["gemini-2.5-flash", "gemini-flash-latest", "gemini-2.0-flash", "gemini-1.5-flash"];
-        const API_IA = "https://generativelanguage.googleapis.com/v1beta/";
-        async function listerModelesIA(cle){
-            const rep = await fetch(`${API_IA}models?pageSize=100&key=${encodeURIComponent(cle)}`);
-            const j = await rep.json().catch(() => ({}));
-            if (!rep.ok) { const e = new Error((j.error && j.error.message) || "erreur " + rep.status); e.statut = rep.status; throw e; }
-            return (j.models || []).filter((m) => (m.supportedGenerationMethods || []).indexOf("generateContent") >= 0).map((m) => String(m.name).replace(/^models\//, ""));
-        }
-        function choisirModeleIA(disponibles){
-            for (const p of MODELES_IA_PREFERES) if (disponibles.indexOf(p) >= 0) return p;
-            const flash = disponibles.filter((n) => /flash/.test(n) && !/(lite|image|tts|live|thinking|exp|preview|audio)/.test(n)).sort().reverse();
-            return flash[0] || disponibles[0] || null;
-        }
+        // IA facultative : Google Gemini (clé gratuite), Claude (Anthropic) ou ChatGPT (OpenAI) (clés payantes à l'usage).
+        // La clé reste dans ce téléphone (une par fournisseur). Chaque fournisseur : lister(cle) -> modèles, choisir(modèles),
+        // appeler(cle, modele, systeme, messages) -> { ok, statut, texte, erreur }. Si le modèle choisi est renommé (404), on en cherche un autre.
+        const FOURNISSEURS = {
+            gemini: {
+                nom: "Google Gemini", gratuit: true, suffixe: "", aide: "Gratuit : aistudio.google.com → « Get API key ».",
+                refus: "Clé refusée par Google : vérifie qu'elle est bien copiée en entier (aistudio.google.com → Get API key).",
+                async lister(cle){
+                    const rep = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?pageSize=100&key=${encodeURIComponent(cle)}`);
+                    const j = await rep.json().catch(() => ({}));
+                    if (!rep.ok) { const e = new Error((j.error && j.error.message) || "erreur " + rep.status); e.statut = rep.status; throw e; }
+                    return (j.models || []).filter((m) => (m.supportedGenerationMethods || []).indexOf("generateContent") >= 0).map((m) => String(m.name).replace(/^models\//, ""));
+                },
+                choisir(dispo){
+                    for (const p of ["gemini-2.5-flash", "gemini-flash-latest", "gemini-2.0-flash", "gemini-1.5-flash"]) if (dispo.indexOf(p) >= 0) return p;
+                    return dispo.filter((n) => /flash/.test(n) && !/(lite|image|tts|live|thinking|exp|preview|audio)/.test(n)).sort().reverse()[0] || dispo[0] || null;
+                },
+                async appeler(cle, modele, systeme, messages){
+                    const rep = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modele}:generateContent?key=${encodeURIComponent(cle)}`, {
+                        method: "POST", headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ systemInstruction: { parts: [{ text: systeme }] }, contents: messages.map((m) => ({ role: m.role === "user" ? "user" : "model", parts: [{ text: m.texte }] })), generationConfig: { responseMimeType: "application/json", temperature: 0.2 } })
+                    });
+                    const j = await rep.json().catch(() => ({}));
+                    return { ok: rep.ok, statut: rep.status, erreur: j.error && j.error.message, texte: rep.ok ? j.candidates[0].content.parts[0].text : "" };
+                }
+            },
+            claude: {
+                nom: "Claude (Anthropic)", gratuit: false, suffixe: "_claude", aide: "Payant à l'usage : console.anthropic.com (crédit prépayé, séparé de l'abonnement Claude).",
+                refus: "Clé refusée par Anthropic : vérifie qu'elle est bien copiée en entier (console.anthropic.com → API keys) et que le compte a du crédit.",
+                entetes(cle){ return { "content-type": "application/json", "x-api-key": cle, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" }; },
+                async lister(cle){
+                    const rep = await fetch("https://api.anthropic.com/v1/models?limit=100", { headers: this.entetes(cle) });
+                    const j = await rep.json().catch(() => ({}));
+                    if (!rep.ok) { const e = new Error((j.error && j.error.message) || "erreur " + rep.status); e.statut = rep.status; throw e; }
+                    return (j.data || []).map((m) => m.id);
+                },
+                choisir(dispo){ // (le plus petit et le moins cher d'abord : Haiku)
+                    for (const p of ["claude-haiku-5-5", "claude-haiku-4-5", "claude-3-5-haiku-latest"]) if (dispo.indexOf(p) >= 0) return p;
+                    return dispo.filter((n) => /haiku/.test(n)).sort().reverse()[0] || dispo.filter((n) => /sonnet/.test(n)).sort().reverse()[0] || dispo[0] || null;
+                },
+                async appeler(cle, modele, systeme, messages){
+                    const rep = await fetch("https://api.anthropic.com/v1/messages", {
+                        method: "POST", headers: this.entetes(cle),
+                        body: JSON.stringify({ model: modele, max_tokens: 1024, system: systeme, messages: messages.map((m) => ({ role: m.role, content: m.texte })) })
+                    });
+                    const j = await rep.json().catch(() => ({}));
+                    return { ok: rep.ok, statut: rep.status, erreur: j.error && j.error.message, texte: rep.ok ? (j.content || []).filter((b) => b.type === "text").map((b) => b.text).join("") : "" };
+                }
+            },
+            openai: {
+                nom: "ChatGPT (OpenAI)", gratuit: false, suffixe: "_openai", aide: "Payant à l'usage : platform.openai.com/api-keys (crédit prépayé, séparé de l'abonnement ChatGPT).",
+                refus: "Clé refusée par OpenAI : vérifie qu'elle est bien copiée en entier (platform.openai.com/api-keys) et que le compte a du crédit.",
+                async lister(cle){
+                    const rep = await fetch("https://api.openai.com/v1/models", { headers: { Authorization: "Bearer " + cle } });
+                    const j = await rep.json().catch(() => ({}));
+                    if (!rep.ok) { const e = new Error((j.error && j.error.message) || "erreur " + rep.status); e.statut = rep.status; throw e; }
+                    return (j.data || []).map((m) => m.id);
+                },
+                choisir(dispo){
+                    for (const p of ["gpt-4o-mini", "gpt-4.1-mini", "gpt-5-mini", "gpt-4o"]) if (dispo.indexOf(p) >= 0) return p;
+                    return dispo.filter((n) => /^gpt-[\w.-]*mini$/.test(n) && !/(audio|realtime|transcribe|tts|search|image)/.test(n)).sort().reverse()[0] || dispo.filter((n) => /^gpt-/.test(n)).sort().reverse()[0] || null;
+                },
+                async appeler(cle, modele, systeme, messages){
+                    const rep = await fetch("https://api.openai.com/v1/chat/completions", {
+                        method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + cle },
+                        body: JSON.stringify({ model: modele, temperature: 0.2, response_format: { type: "json_object" }, messages: [{ role: "system", content: systeme }].concat(messages.map((m) => ({ role: m.role, content: m.texte }))) })
+                    });
+                    const j = await rep.json().catch(() => ({}));
+                    return { ok: rep.ok, statut: rep.status, erreur: j.error && j.error.message, texte: rep.ok ? j.choices[0].message.content : "" };
+                }
+            }
+        };
+        const CLE_FOURNISSEUR = "alcuno_pilotage_fournisseur";
+        const lireStock = (cle) => { try { return localStorage.getItem(cle); } catch (e) { return null; } };
+        const ecrireStock = (cle, v) => { try { if (v === null) localStorage.removeItem(cle); else localStorage.setItem(cle, v); } catch (e) {} };
+        const idFournisseur = () => (FOURNISSEURS[lireStock(CLE_FOURNISSEUR)] ? lireStock(CLE_FOURNISSEUR) : "gemini");
+        const fournisseur = () => FOURNISSEURS[idFournisseur()];
+        const cleIA = () => lireStock(CLE_IA + fournisseur().suffixe);
+        const modeleIA = () => lireStock(CLE_MODELE_IA + fournisseur().suffixe);
         // Teste la clé : « valide » + modèle retenu, ou la raison du refus
         async function testerCleIA(cle){
+            const f = fournisseur();
             try {
-                const modele = choisirModeleIA(await listerModelesIA(cle));
+                const modele = f.choisir(await f.lister(cle));
                 if (!modele) return { ok: false, message: "Clé valide, mais aucun modèle utilisable n'est ouvert à ce compte." };
-                try { localStorage.setItem(CLE_MODELE_IA, modele); } catch (e) {}
+                ecrireStock(CLE_MODELE_IA + f.suffixe, modele);
                 return { ok: true, message: `Clé valide ✓ · modèle utilisé : ${modele}`, modele };
             } catch (e) {
-                if (e.statut === 400 || e.statut === 401 || e.statut === 403) return { ok: false, message: "Clé refusée par Google : vérifie qu'elle est bien copiée en entier (aistudio.google.com → Get API key)." };
-                return { ok: false, message: "Impossible de joindre Google : " + (e && e.message ? e.message : e) };
+                if (e.statut === 400 || e.statut === 401 || e.statut === 403) return { ok: false, message: f.refus };
+                return { ok: false, message: `Impossible de joindre ${f.nom} : ${e && e.message ? e.message : e}` };
             }
         }
-        async function appelerGemini(cle, systeme, contenus, essai = 0){
-            const rep = await fetch(`${API_IA}models/${modeleIA()}:generateContent?key=${encodeURIComponent(cle)}`, {
-                method: "POST", headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ systemInstruction: { parts: [{ text: systeme }] }, contents: contenus, generationConfig: { responseMimeType: "application/json", temperature: 0.2 } })
+        // Messages { role: "user" | "assistant", texte } : on fusionne les tours qui se suivent et on commence par l'utilisateur
+        function normaliserMessages(messages){
+            const sortie = [];
+            messages.forEach((m) => {
+                if (!sortie.length && m.role !== "user") return;
+                if (sortie.length && sortie[sortie.length - 1].role === m.role) sortie[sortie.length - 1].texte += "\n" + m.texte;
+                else sortie.push({ role: m.role, texte: m.texte });
             });
-            if (rep.status === 404 && essai === 0) { // (modèle renommé ou retiré : on en cherche un autre et on réessaie une fois)
+            return sortie;
+        }
+        function lireJson(texte){
+            try { return JSON.parse(texte); } catch (e) {}
+            const m = String(texte).match(/\{[\s\S]*\}/);
+            if (!m) throw new Error("réponse illisible");
+            return JSON.parse(m[0]);
+        }
+        async function appelerIA(systeme, messages, essai = 0){
+            const f = fournisseur(), cle = cleIA();
+            let modele = modeleIA();
+            if (!modele) { const t = await testerCleIA(cle); if (!t.ok) throw new Error(t.message); modele = t.modele; }
+            const r = await f.appeler(cle, modele, systeme, normaliserMessages(messages));
+            if (r.statut === 404 && essai === 0) { // (modèle renommé ou retiré : on en cherche un autre et on réessaie une fois)
                 const t = await testerCleIA(cle);
-                if (t.ok) return appelerGemini(cle, systeme, contenus, 1);
+                if (t.ok) return appelerIA(systeme, messages, 1);
             }
-            const j = await rep.json().catch(() => ({}));
-            if (!rep.ok) throw new Error((j.error && j.error.message) || ("erreur " + rep.status));
-            return JSON.parse(j.candidates[0].content.parts[0].text);
+            if (!r.ok) throw new Error(r.erreur || ("erreur " + r.statut));
+            return lireJson(r.texte);
         }
 
         // ===== Santé du jeu : plantages envoyés par js/stats.js (sante/jours/AAAA-MM-JJ/{empreinte}), regroupés sur 7 jours =====
