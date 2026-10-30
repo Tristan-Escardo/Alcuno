@@ -8157,6 +8157,8 @@ html #listeJoueurs .joueur-ligne-actif{
 html #listeJoueurs .joueur-ligne-actif .joueur-nom{ flex: 0 1 auto; }
 html #listeJoueurs .joueur-ligne-actif .btnPauseJoueur{ position: absolute; right: 8px; }
 html #listeJoueurs .joueur-ligne-actif{ position: relative; }
+/* la place du bouton ⏸ (collé à droite), des deux côtés pour que le nom reste centré : ni le nom ni le « +1 » ne passent dessous */
+html #listeJoueurs .joueur-ligne-actif:has(.btnPauseJoueur){ padding-left: 44px; padding-right: 44px; }
 @keyframes joueurActifArrive{ 0%{ transform: scale(0.94); } 60%{ transform: scale(1.03); } 100%{ transform: scale(1); } }
 @media (prefers-reduced-motion: reduce){ html #listeJoueurs .joueur-ligne-actif{ animation: none; } }
 
@@ -8378,34 +8380,32 @@ html[data-theme] .annonceAccueil .annonceFermer:active, html[data-theme] .annonc
 .annonceRelais .annonceAccueil{ margin: 0 auto; animation: none; }
 
 
-/* ===== Réglages pendant une partie (⚙ en haut à droite du bloc « Joueurs » ; js/reglages.js) =====
+/* ===== Réglages pendant une partie (⚙ au bout du bandeau « Tour de », js/plateau.js ; js/reglages.js) =====
    Même réglage que celui de l'accueil, mais ceux qui pourraient casser la partie sont grisés */
-.blocJoueurs{ position: relative; }
-#btnReglagesJeu{
-  position: absolute !important; /* (des règles de thème mettent « relative » à tous les enfants des blocs) */
-  top: 4px;
-  right: 6px;
+#stickyJoueurActif #btnReglagesJeu{
+  flex: 0 0 auto;
   width: auto;
   min-width: 0;
-  margin: 0;
+  margin: -6px -6px -6px 2px;
   padding: 6px;
   border: none;
   border-radius: 50%;
   background: none;
   box-shadow: none;
   line-height: 0;
-  opacity: 0.9;
+  pointer-events: auto;
   cursor: pointer;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
-#btnReglagesJeu[hidden]{ display: none; }
-#btnReglagesJeu svg{
-  width: 24px; height: 24px; overflow: visible; fill: none;
+#stickyJoueurActif #btnReglagesJeu[hidden]{ display: none; }
+#stickyJoueurActif #btnReglagesJeu svg{
+  width: 22px; height: 22px; overflow: visible; fill: none;
   stroke: #FFD700; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
 }
-html[data-theme="givre"] #btnReglagesJeu svg{ stroke: #1a9be0; }
-html[data-theme="soleil"] #btnReglagesJeu svg{ stroke: var(--soleil-peche); }
+html[data-theme="givre"] #stickyJoueurActif #btnReglagesJeu svg{ stroke: #1a9be0; }
+html[data-theme="soleil"] #stickyJoueurActif #btnReglagesJeu svg{ stroke: var(--soleil-peche); }
+html.gaucher #stickyJoueurActif #btnReglagesJeu{ order: -1; margin: -6px 0 -6px -6px; }
 html.reglages-en-partie :is([data-cle="faces-cachees"], [data-cle="mode-pj"], [data-cle="express"], [data-cle="ecran-tele"], [data-cle="partie-memoire"]){
   opacity: 0.4;
   filter: grayscale(1);
@@ -8420,3 +8420,19 @@ html.reglages-en-partie :is([data-cle="faces-cachees"], [data-cle="mode-pj"], [d
   line-height: 1.4;
   text-align: center;
 }
+
+/* Nom du joueur dont c'est le tour, dans la bannière « Tour de » : jusqu'à 2 lignes avant d'être coupé (avec le ⚙, une seule
+   ligne ne laissait que « PIGEON (Orig… »), et « +1 » ne se casse jamais en « + » / « 1 » */
+#stickyJoueurActif{ border-radius: 24px; }
+#stickyJoueurActif .sticky-nom{
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+  text-overflow: clip;
+}
+#stickyJoueurActif .sticky-bonus, .bonus-annulation{ white-space: nowrap; }
+@media (max-width: 360px){ html #listeJoueurs .joueur-ligne-actif:has(.btnPauseJoueur){ padding-left: 36px; padding-right: 36px; } }
