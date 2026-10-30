@@ -1026,14 +1026,13 @@ function verifier(ok, texte){
     await page.click("#btnReglagesJeu"); await page.waitForTimeout(600);
     const e = await page.evaluate(() => ({
       dansBandeau: document.getElementById("btnReglagesJeu").parentElement.id === "stickyJoueurActif",
-      note: !document.getElementById("noteReglagesPartie").hidden,
       bloques: ["faces-cachees", "mode-pj", "express", "ecran-tele", "partie-memoire"].every((c) => { const l = document.querySelector(`#ecranReglages [data-cle="${c}"]`); return [l, ...l.querySelectorAll("input, button")].filter((x) => x.matches("input, button")).every((x) => x.disabled); }),
       libres: ["optionSons", "optionMusique", "optionVoix", "optionGaucher", "optionVibrations"].every((i) => !document.getElementById(i).disabled) }));
     await page.click("#btnFermerReglages"); await page.waitForTimeout(500);
     await page.evaluate(() => { document.getElementById("btnAccueilClassique").click(); });
     await page.waitForTimeout(300);
-    verifier(avantPartie && e.dansBandeau && e.note && e.bloques && e.libres && erreurs.length === 0,
-      `réglages en partie : ⚙ caché avant la partie (${avantPartie}), dans le bandeau (${e.dansBandeau}), note (${e.note}), à risque bloqués (${e.bloques}), autres libres (${e.libres})`);
+    verifier(avantPartie && e.dansBandeau && e.bloques && e.libres && erreurs.length === 0,
+      `réglages en partie : ⚙ caché avant la partie (${avantPartie}), dans le bandeau (${e.dansBandeau}), à risque bloqués (${e.bloques}), autres libres (${e.libres})`);
     await ctx.close();
   }
 

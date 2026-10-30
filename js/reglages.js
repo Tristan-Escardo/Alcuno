@@ -13,7 +13,6 @@ const REGLAGES_BLOQUES_EN_PARTIE = ["faces-cachees", "mode-pj", "express", "ecra
 function majReglagesEnPartie(){
   const enPartie = partieLancee;
   document.documentElement.classList.toggle("reglages-en-partie", enPartie);
-  document.getElementById("noteReglagesPartie").hidden = !enPartie;
   REGLAGES_BLOQUES_EN_PARTIE.forEach((cle) => {
     const ligne = ecranReglages.querySelector(`[data-cle="${cle}"]`);
     if (!ligne) return;

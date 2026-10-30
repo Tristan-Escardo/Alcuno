@@ -8411,15 +8411,6 @@ html.reglages-en-partie :is([data-cle="faces-cachees"], [data-cle="mode-pj"], [d
   filter: grayscale(1);
   pointer-events: none;
 }
-.noteReglagesPartie{
-  margin: 0 0 12px;
-  padding: 8px 12px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.1);
-  font-size: 14px;
-  line-height: 1.4;
-  text-align: center;
-}
 
 /* Nom du joueur dont c'est le tour, dans la bannière « Tour de » : jusqu'à 2 lignes avant d'être coupé (avec le ⚙, une seule
    ligne ne laissait que « PIGEON (Orig… »), et « +1 » ne se casse jamais en « + » / « 1 » */
