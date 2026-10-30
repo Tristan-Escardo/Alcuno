@@ -5,7 +5,7 @@ Une copie du jeu, sur sa propre adresse, pour essayer les modifications avant de
 ## Comment ça marche
 
 - `main` = le vrai jeu (GitHub Pages). On n'y envoie que ce qui a été essayé.
-- `test` = la branche d'essai. Netlify la publie toute seule à chaque push, sur une adresse à part (`lambent-conkies-fd7df9.netlify.app`).
+- `test` = la branche d'essai. Netlify la publie toute seule à chaque push, sur une adresse à part  (adresse en `.netlify.app`, visible sur la page du projet Netlify).
 - Quand la version de test est bonne : on fusionne `test` dans `main`, et c'est en ligne.
 
 L'appli de test est le même jeu (mêmes fichiers, même Firebase, parties en ligne et Pilotage compris), avec trois différences voulues :
