@@ -6481,7 +6481,7 @@ html[data-theme="givre"] #ecranReglages .optionLien:active{ background: #fff; }
 }
 
 /* ===== Pause (mode classique) : ⏸ au bout de la pastille « Tour de … » ; écran « PAUSE » sur la partie floutée ===== */
-#stickyJoueurActif :is(#btnPause, #btnHistorique, #btnReglagesJeu){
+#stickyJoueurActif :is(#btnPause, #btnHistorique){
   flex: 0 0 auto;
   width: auto;
   min-width: 0;
@@ -6500,7 +6500,6 @@ html[data-theme="givre"] #ecranReglages .optionLien:active{ background: #fff; }
 #stickyJoueurActif #btnPause[hidden]{ display: none; }
 #stickyJoueurActif #btnPause svg,
 #stickyJoueurActif #btnHistorique svg,
-#stickyJoueurActif #btnReglagesJeu svg,
 #ecranPause .pauseIcone svg,
 #ecranTele .tele-pause svg{
   overflow: visible;
@@ -6508,8 +6507,8 @@ html[data-theme="givre"] #ecranReglages .optionLien:active{ background: #fff; }
   stroke: #FFD700;
   stroke-width: 2.2;
 }
-#stickyJoueurActif :is(#btnPause, #btnHistorique, #btnReglagesJeu) svg{ width: 22px; height: 22px; }
-html[data-theme="givre"] #stickyJoueurActif :is(#btnPause, #btnHistorique, #btnReglagesJeu) svg{ stroke: #1a9be0; }
+#stickyJoueurActif :is(#btnPause, #btnHistorique) svg{ width: 22px; height: 22px; }
+html[data-theme="givre"] #stickyJoueurActif :is(#btnPause, #btnHistorique) svg{ stroke: #1a9be0; }
 
 #ecranPause{
   position: fixed;
@@ -6651,7 +6650,7 @@ html[data-theme="soleil"] .messages::before{ background: linear-gradient(90deg, 
 html[data-theme="soleil"] .blocMessages{ background: rgba(15, 22, 55, 0.35) !important; border-color: var(--soleil-bord) !important; }
 html[data-theme="soleil"] :is(.titreBloc, #ecranReglages .optionTitre, #ecranReglages h2, .aProposTitre){ color: var(--soleil-peche) !important; }
 html[data-theme="soleil"] #stickyJoueurActif{ background: linear-gradient(180deg, rgba(31,53,102,0.95), rgba(60,50,110,0.93)) !important; border-color: var(--soleil-bord) !important; }
-html[data-theme="soleil"] #stickyJoueurActif :is(#btnPause, #btnHistorique, #btnReglagesJeu) svg{ stroke: var(--soleil-peche); }
+html[data-theme="soleil"] #stickyJoueurActif :is(#btnPause, #btnHistorique) svg{ stroke: var(--soleil-peche); }
 /* Overlays : « heure dorée », l'inverse du fond (chaud en haut), texte et boutons bleu nuit */
 html[data-theme="soleil"] :is(#overlayCouleur, #overlayPlus4, #overlayPigeon, #overlayFinUnRestants, #overlayDuel, #overlayRegleUnique,
   #overlayAnnulation, #overlayResultatAnnulation, #overlayPredictionFin){
@@ -7527,11 +7526,11 @@ html.gaucher #btnRemonter{ left: auto; right: 16px; }
 html.gaucher #btnCodePartie{ left: auto; right: 17px; flex-direction: row-reverse; }
 html.gaucher #annulerChoix{ flex-direction: row-reverse; }
 html.gaucher #annulerChoix .annulerChoix-texte{ text-align: right; }
-html.gaucher #stickyJoueurActif :is(#btnPause, #btnHistorique, #btnReglagesJeu){ order: -1; margin: -6px 0 -6px -6px; }
+html.gaucher #stickyJoueurActif :is(#btnPause, #btnHistorique){ order: -1; margin: -6px 0 -6px -6px; }
 
 /* Dernières cartes (bouton 🕘 du bandeau « Tour de », js/plateau.js) */
-#stickyJoueurActif :is(#btnHistorique, #btnReglagesJeu){ margin-left: 2px; }
-html.gaucher #stickyJoueurActif :is(#btnHistorique, #btnReglagesJeu){ margin-left: -6px; margin-right: 2px; }
+#stickyJoueurActif :is(#btnHistorique){ margin-left: 2px; }
+html.gaucher #stickyJoueurActif :is(#btnHistorique){ margin-left: -6px; margin-right: 2px; }
 #voletHistorique .voletPause-nom{ text-align: left; margin-bottom: 8px; }
 .historique-liste{ text-align: left; }
 .historique-vide{ font: 700 15px Arial, sans-serif; color: #ddd; padding: 10px 0 6px; }
@@ -8379,10 +8378,41 @@ html[data-theme] .annonceAccueil .annonceFermer:active, html[data-theme] .annonc
 .annonceRelais .annonceAccueil{ margin: 0 auto; animation: none; }
 
 
-/* ===== Réglages pendant une partie (⚙ au bout du bandeau « Tour de », js/plateau.js ; js/reglages.js) =====
+/* ===== Réglages pendant une partie (⚙ en haut à droite du bandeau ALCUNO ; js/reglages.js) =====
    Même réglage que celui de l'accueil, mais ceux qui pourraient casser la partie sont grisés */
-#stickyJoueurActif #btnReglagesJeu[hidden]{ display: none; }
-#stickyJoueurActif #btnReglagesJeu svg{ stroke-linecap: round; stroke-linejoin: round; }
+header #btnReglagesJeu{
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: auto;
+  min-width: 0;
+  padding: 4px;
+  border: none;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  line-height: 0;
+  opacity: 0.9;
+  cursor: pointer;
+}
+header #btnReglagesJeu[hidden]{ display: none; }
+header #btnReglagesJeu svg{
+  width: 28px; height: 28px; overflow: visible; fill: none;
+  stroke: #FFD700; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
+  filter: drop-shadow(0 2px 0 rgba(120, 70, 0, 0.95)) drop-shadow(0 3px 6px rgba(0,0,0,0.45));
+}
+html[data-theme="givre"] header #btnReglagesJeu svg{ stroke: #1a9be0; }
+html[data-theme="soleil"] header #btnReglagesJeu svg{ stroke: var(--soleil-creme); }
+/* classique : le ⌂ se décale à gauche du ⚙ (en ligne il n'y a pas de ⌂) */
+header:has(#btnReglagesJeu:not([hidden])) #btnAccueilClassique{ right: 48px; }
+@media (max-width: 520px){
+  header #btnReglagesJeu{ right: 8px; padding: 3px; }
+  header #btnReglagesJeu svg{ width: 24px; height: 24px; }
+  header:has(#btnReglagesJeu:not([hidden])) #btnAccueilClassique{ right: 38px; }
+}
+@media (max-width: 340px){ header:has(#btnReglagesJeu:not([hidden])) h1{ font-size: 30px; } } /* très petit écran : le titre laisse la place au ⌂ et au ⚙ */
 html.reglages-en-partie :is([data-cle="faces-cachees"], [data-cle="mode-pj"], [data-cle="express"], [data-cle="ecran-tele"], [data-cle="partie-memoire"]){
   opacity: 0.4;
   filter: grayscale(1);

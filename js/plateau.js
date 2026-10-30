@@ -1363,10 +1363,6 @@ function creerUIJoueurActifSticky(){
   btnHistorique.addEventListener("click", () => { jouerSon("bouton"); ouvrirVoletHistorique(); });
   stickyJoueurActif.appendChild(btnHistorique);
 
-  // ⚙ Réglages en partie (bouton posé dans index.html, caché hors partie : voir majBoutonPause)
-  const btnReglagesJeu = document.getElementById("btnReglagesJeu");
-  if(btnReglagesJeu) stickyJoueurActif.appendChild(btnReglagesJeu);
-
   document.body.appendChild(stickyJoueurActif);
   repositionnerStickyJoueurActif();
 }

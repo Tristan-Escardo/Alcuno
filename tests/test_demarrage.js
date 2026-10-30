@@ -1016,7 +1016,7 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
-  // 38. Réglages pendant une partie : bouton ⚙ dans le bandeau « Tour de », réglages à risque grisés et bloqués, les autres libres
+  // 38. Réglages pendant une partie : bouton ⚙ en haut à droite, réglages à risque grisés et bloqués, les autres libres
   {
     const { ctx, page, erreurs } = await ouvrir();
     await page.click("#btnModeClassique"); await page.waitForTimeout(600);
@@ -1025,7 +1025,7 @@ function verifier(ok, texte){
     await page.click("#jouer"); await page.waitForTimeout(1200);
     await page.click("#btnReglagesJeu"); await page.waitForTimeout(600);
     const e = await page.evaluate(() => ({
-      dansBandeau: document.getElementById("btnReglagesJeu").parentElement.id === "stickyJoueurActif",
+      dansBandeau: document.getElementById("btnReglagesJeu").parentElement.tagName === "HEADER",
       note: !document.getElementById("noteReglagesPartie").hidden,
       bloques: ["faces-cachees", "mode-pj", "express", "ecran-tele", "partie-memoire"].every((c) => { const l = document.querySelector(`#ecranReglages [data-cle="${c}"]`); return [l, ...l.querySelectorAll("input, button")].filter((x) => x.matches("input, button")).every((x) => x.disabled); }),
       libres: ["optionSons", "optionMusique", "optionVoix", "optionGaucher", "optionVibrations"].every((i) => !document.getElementById(i).disabled) }));
@@ -1033,7 +1033,7 @@ function verifier(ok, texte){
     await page.evaluate(() => { document.getElementById("btnAccueilClassique").click(); });
     await page.waitForTimeout(300);
     verifier(avantPartie && e.dansBandeau && e.note && e.bloques && e.libres && erreurs.length === 0,
-      `réglages en partie : ⚙ caché avant la partie (${avantPartie}), dans le bandeau (${e.dansBandeau}), note (${e.note}), à risque bloqués (${e.bloques}), autres libres (${e.libres})`);
+      `réglages en partie : ⚙ caché avant la partie (${avantPartie}), dans l'en-tête (${e.dansBandeau}), note (${e.note}), à risque bloqués (${e.bloques}), autres libres (${e.libres})`);
     await ctx.close();
   }
 
