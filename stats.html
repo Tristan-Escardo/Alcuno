@@ -118,6 +118,10 @@
         .santeLigne{ padding: 10px 0; border-top: 1px solid rgba(0, 229, 255, .14); }
         .santeLigne:first-child{ border-top: 0; }
         .santeMsg{ font: 600 15px "Inter", Arial, sans-serif; color: var(--cyan-clair); word-break: break-word; }
+        .santeExplic{ margin: 0 0 10px; padding: 8px 10px; border-radius: 10px; background: rgba(0,229,255,0.06); font-size: 14px; line-height: 1.45; color: var(--cyan-clair); }
+        .santeAide{ margin: 0 0 12px; font-size: 14px; line-height: 1.45; }
+        .santeAide summary{ cursor: pointer; color: var(--cyan); font-weight: 700; }
+        .santeAide p{ margin: 8px 0 0; color: var(--cyan-doux); }
         .santeMeta{ margin: 4px 0 8px; font-size: 14px; color: var(--cyan-doux); line-height: 1.4; }
         .santeLigne button, .santeActions button{ font: 700 12px "Rajdhani", Arial, sans-serif; padding: 6px 14px; border-radius: 14px; cursor: pointer; border: 1px solid var(--cyan); background: transparent; color: var(--cyan-clair); }
         .santeLigne button:active, .santeActions button:active{ background: rgba(0, 229, 255, .4); transform: scale(.96); }
@@ -296,6 +300,11 @@
             <section class="bloc" id="blocSante">
                 <div class="titre">Plantages · 7 derniers jours</div>
                 <div class="santeEtat" id="santeEtat">…</div>
+                <details class="santeAide"><summary>Comment lire cette page ?</summary>
+                    <p>Chaque ligne est une <b>erreur du jeu</b> arrivée sur un téléphone : le message technique, le fichier, le nombre de fois (×), la version du jeu et le type d'appareil. Rien de personnel.</p>
+                    <p>Un plantage isolé (×1) est le plus souvent un accroc de chargement pendant une mise à jour : sans gravité. C'est à corriger quand la même erreur <b>se répète</b> ou touche <b>plusieurs appareils ou versions</b>.</p>
+                    <p>« Ignorer » cache l'erreur de la liste et du compteur rouge, sans rien supprimer ; « Effacer le journal » vide tout.</p>
+                </details>
                 <div id="santeListe"></div>
                 <details id="santeIgnores" hidden><summary id="santeIgnoresTitre">Ignorés</summary><div id="santeIgnoresListe"></div></details>
                 <p class="pilNote" id="santeNote" style="margin-top:10px"></p>
@@ -419,7 +428,7 @@
 
         // Empreinte (SHA-256) du code d'accès : le code lui-même n'est écrit nulle part
         // Version de la page de stats (à part de celle du jeu : +0.0.1 à chaque modification de cette page)
-        const VERSION_STATS = "1.12.0";
+        const VERSION_STATS = "1.13.0";
         document.getElementById("versionStats").textContent = VERSION_STATS;
         document.getElementById("versionStats2").textContent = VERSION_STATS;
         document.getElementById("versionStats3").textContent = VERSION_STATS;
@@ -1105,10 +1114,25 @@ Données (stats) : ${JSON.stringify((() => { const r = construireResume(); const
             const ilYA = (ms) => { const min = Math.max(0, Math.round((Date.now() - ms) / 60000)); return min < 1 ? "à l'instant" : min < 90 ? `il y a ${min} min` : min < 2880 ? `il y a ${Math.round(min / 60)} h` : `il y a ${Math.round(min / 1440)} j`; };
 
             function agreger(){ return agregerPlantages(sante); }
+            // Explication en français courant d'un plantage, d'après son message, et ce qu'il y a à en faire
+            function expliquer(a){
+                const m = String(a.msg || "");
+                let quoi = "Une erreur du jeu, sans cause évidente d'après son message.";
+                if (/is not defined/i.test(m)) quoi = "Le jeu cherche un morceau de code qui n'est pas arrivé. Cause la plus fréquente : un téléphone dont la page et les fichiers viennent de deux versions différentes pendant une mise à jour, ou un fichier mal chargé (réseau coupé). Le jeu se recharge alors tout seul.";
+                else if (/null|undefined/i.test(m) && /properties/i.test(m)) quoi = "Le jeu cherche un élément de l'écran (un bouton, un bloc) qui n'existe pas. Souvent la même cause qu'au-dessus : page pas entièrement à jour. Sinon, un vrai bug.";
+                else if (/is not a function/i.test(m)) quoi = "Le jeu appelle une fonction qui n'existe pas. Même cause fréquente : fichiers de deux versions mélangés.";
+                else if (/quota|storage|SecurityError/i.test(m)) quoi = "Le téléphone refuse d'enregistrer quelque chose (mémoire pleine ou navigation privée). Rarement un problème du jeu.";
+                else if (/fetch|network|load failed|timeout/i.test(m)) quoi = "Connexion coupée ou trop lente pendant un chargement. Pas un bug du jeu.";
+                const surveille = a.n >= 5 || Object.keys(a.versions).length > 1;
+                const faire = surveille
+                    ? "À surveiller : ça se répète ou touche plusieurs versions. Si ça continue après une mise à jour, c'est un vrai bug à corriger."
+                    : "Probablement ponctuel (vu " + a.n + " fois). Rien à faire pour l'instant : appuie sur « Ignorer » ; si ça revient, ça remontera ici.";
+                return `<div class="santeExplic"><b>Ce que ça veut dire :</b> ${quoi}<br><b>À faire ?</b> ${faire}</div>`;
+            }
             const ligne = (a, texteBouton, attribut) => {
                 const versions = Object.entries(a.versions).sort((x, y) => y[1] - x[1]).map(([v, n]) => `${ecape(v)} ×${n}`).join(", ");
                 const os = Object.keys(a.os).map((o) => NOMS_OS[o] || o).join(", ");
-                return `<div class="santeLigne"><div class="santeMsg">${ecape(a.msg || "(sans message)")}</div><div class="santeMeta">${ecape(a.fichier || "")} · ×${a.n} · ${versions}${os ? " · " + ecape(os) : ""} · ${ilYA(a.derniere)}</div><button type="button" ${attribut}="${a.sig}">${texteBouton}</button></div>`;
+                return `<div class="santeLigne"><div class="santeMsg">${ecape(a.msg || "(sans message)")}</div><div class="santeMeta">${ecape(a.fichier || "")} · ×${a.n} · ${versions}${os ? " · " + ecape(os) : ""} · ${ilYA(a.derniere)}</div>${expliquer(a)}<button type="button" ${attribut}="${a.sig}">${texteBouton}</button></div>`;
             };
             function dessiner(){
                 const toutes = agreger(), ignores = sante.ignores || {};
