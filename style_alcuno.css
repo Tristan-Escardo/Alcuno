@@ -8436,3 +8436,4 @@ html.reglages-en-partie :is([data-cle="faces-cachees"], [data-cle="mode-pj"], [d
 }
 #stickyJoueurActif .sticky-bonus, .bonus-annulation{ white-space: nowrap; }
 @media (max-width: 360px){ html #listeJoueurs .joueur-ligne-actif:has(.btnPauseJoueur){ padding-left: 36px; padding-right: 36px; } }
+#stickyJoueurActif .sticky-label[hidden]{ display: none; }

@@ -1475,6 +1475,7 @@ function majStickyJoueurActif(){
   const nomEl = stickyJoueurActif.querySelector(".sticky-nom");
   const bonusEl = stickyJoueurActif.querySelector(".sticky-bonus");
   labelEl.innerText = "Tour de";
+  labelEl.hidden = true; // (« Tour de » ne dit rien de plus que le nom : de la place pour lui ; seul « À toi » s'affiche, en ligne)
 
   if(!partieLancee || joueurs.length === 0 || choixPigeonEnCours || duelEnCours){
     stickyJoueurActif.classList.remove("visible", "is-pigeon", "has-bonus");
@@ -1495,6 +1496,7 @@ function majStickyJoueurActif(){
   const tour = `${mancheCourante}:${cartesRestantes()}`;
   if(enLigneActif && nom === pseudoActuel){
     labelEl.innerText = "À toi";
+    labelEl.hidden = false;
     // Vibre une seule fois par tour. Pas au tout premier tour (aucune carte retournée) : tout le monde
     // voit la partie démarrer
     if(tour !== dernierTourVibre){
