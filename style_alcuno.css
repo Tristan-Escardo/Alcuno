@@ -8378,41 +8378,34 @@ html[data-theme] .annonceAccueil .annonceFermer:active, html[data-theme] .annonc
 .annonceRelais .annonceAccueil{ margin: 0 auto; animation: none; }
 
 
-/* ===== Réglages pendant une partie (⚙ en haut à droite du bandeau ALCUNO ; js/reglages.js) =====
+/* ===== Réglages pendant une partie (⚙ en haut à droite du bloc « Joueurs » ; js/reglages.js) =====
    Même réglage que celui de l'accueil, mais ceux qui pourraient casser la partie sont grisés */
-header #btnReglagesJeu{
-  position: absolute;
-  top: 50%;
-  right: 12px;
-  transform: translateY(-50%);
-  z-index: 2;
+.blocJoueurs{ position: relative; }
+#btnReglagesJeu{
+  position: absolute !important; /* (des règles de thème mettent « relative » à tous les enfants des blocs) */
+  top: 4px;
+  right: 6px;
   width: auto;
   min-width: 0;
-  padding: 4px;
+  margin: 0;
+  padding: 6px;
   border: none;
-  border-radius: 0;
+  border-radius: 50%;
   background: none;
   box-shadow: none;
   line-height: 0;
   opacity: 0.9;
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
-header #btnReglagesJeu[hidden]{ display: none; }
-header #btnReglagesJeu svg{
-  width: 28px; height: 28px; overflow: visible; fill: none;
+#btnReglagesJeu[hidden]{ display: none; }
+#btnReglagesJeu svg{
+  width: 24px; height: 24px; overflow: visible; fill: none;
   stroke: #FFD700; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
-  filter: drop-shadow(0 2px 0 rgba(120, 70, 0, 0.95)) drop-shadow(0 3px 6px rgba(0,0,0,0.45));
 }
-html[data-theme="givre"] header #btnReglagesJeu svg{ stroke: #1a9be0; }
-html[data-theme="soleil"] header #btnReglagesJeu svg{ stroke: var(--soleil-creme); }
-/* classique : le ⌂ se décale à gauche du ⚙ (en ligne il n'y a pas de ⌂) */
-header:has(#btnReglagesJeu:not([hidden])) #btnAccueilClassique{ right: 48px; }
-@media (max-width: 520px){
-  header #btnReglagesJeu{ right: 8px; padding: 3px; }
-  header #btnReglagesJeu svg{ width: 24px; height: 24px; }
-  header:has(#btnReglagesJeu:not([hidden])) #btnAccueilClassique{ right: 38px; }
-}
-@media (max-width: 340px){ header:has(#btnReglagesJeu:not([hidden])) h1{ font-size: 30px; } } /* très petit écran : le titre laisse la place au ⌂ et au ⚙ */
+html[data-theme="givre"] #btnReglagesJeu svg{ stroke: #1a9be0; }
+html[data-theme="soleil"] #btnReglagesJeu svg{ stroke: var(--soleil-peche); }
 html.reglages-en-partie :is([data-cle="faces-cachees"], [data-cle="mode-pj"], [data-cle="express"], [data-cle="ecran-tele"], [data-cle="partie-memoire"]){
   opacity: 0.4;
   filter: grayscale(1);
