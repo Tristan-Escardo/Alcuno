@@ -3171,7 +3171,8 @@ html.overlay-ouvert{
   display: none;
   position: fixed;
   left: calc(10px + env(safe-area-inset-left, 0px));
-  bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  /* au-dessus de la flèche « remonter » (#btnRemonter : 20 px du bas + 42 px de haut), pas dessus */
+  bottom: calc(20px + 42px + 8px + env(safe-area-inset-bottom, 0px));
   z-index: 30001;
   align-items: center;
   gap: 6px;

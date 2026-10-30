@@ -59,6 +59,7 @@ function afficherRegleBloc(el, texte){
   el.appendChild(liste);
 }
 let stickyJoueurActif = null;
+let placeStickyPage = null; // marge sous le bloc d'infos réservée à la barre « À toi » posée dans la page
 
 
 /* ====== Cartes du plateau principal ====== */
@@ -1315,11 +1316,22 @@ function repositionnerStickyJoueurActif(){
       stickyJoueurActif.classList.add("dans-la-page");
       stickyJoueurActif.style.top = top + "px";
     }
+    // La barre est posée dans la page, sous le bloc d'infos : on lui garde sa place, sinon elle
+    // recouvre la première rangée de cartes (elle est plus haute que la marge de 16 px)
+    const place = Math.max(16, Math.ceil(stickyJoueurActif.offsetHeight) + 2 * gap);
+    if(place !== placeStickyPage){
+      placeStickyPage = place;
+      messagesBar.style.marginBottom = place + "px";
+    }
   } else if(modeSticky !== "colle"){
     modeSticky = "colle";
     topStickyPage = null;
     stickyJoueurActif.classList.remove("dans-la-page");
     stickyJoueurActif.style.top = "";
+  }
+  if(modeSticky === "colle" && placeStickyPage !== null){
+    placeStickyPage = null;
+    messagesBar.style.marginBottom = "";
   }
 }
 
@@ -1495,6 +1507,7 @@ function majStickyJoueurActif(){
   stickyJoueurActif.classList.toggle("is-pigeon", estPigeon);
   stickyJoueurActif.classList.toggle("has-bonus", n > 0);
   stickyJoueurActif.classList.add("visible");
+  repositionnerStickyJoueurActif(); // (la barre a pu changer de hauteur : nom plus long, « +1 »…)
 }
 
 // Un nom de joueur inséré dans du HTML doit passer par ici : sinon un pseudo comme
