@@ -110,7 +110,7 @@ function lireConfigDistante(){
       try { localStorage.setItem(CLE_CONFIG_DISTANTE, JSON.stringify(configDistante)); } catch (e) {}
       appliquerConfigDistante();
       // Dit à l'onglet Pilotage de stats.html que cet appareil a bien lu la config (et laquelle) : voyant « lecture »
-      if (!estPageTele) window.fbUpdate(window.fbRef(window.firebaseDB, `stats/appareils/${idStats}`), { confVu: window.fbServerTimestamp(), confV: configDistante.v || 0 }).catch(() => {});
+      if (!estPageTele && !MODE_TEST) window.fbUpdate(window.fbRef(window.firebaseDB, `stats/appareils/${idStats}`), { confVu: window.fbServerTimestamp(), confV: configDistante.v || 0 }).catch(() => {});
     }).catch(() => {}); // (pas de réseau ou règles Firebase pas encore à jour : on garde la dernière copie)
   });
 }

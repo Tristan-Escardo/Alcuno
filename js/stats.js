@@ -41,12 +41,14 @@ function refStats(chemin){ return window.fbRef(window.firebaseDB, chemin); }
 
 // Compteur du jour + 1 (transaction : deux téléphones au même instant comptent tous les deux)
 function compterStats(nom){
+  if (MODE_TEST) return; // (appli de test : pas de statistiques)
   attendreFirebase(() => {
     window.fbRunTransaction(refStats(`stats/jours/${jourStats()}/${nom}`), (n) => (n || 0) + 1).catch(() => {});
   });
 }
 
 function noterAppareilStats(){
+  if (MODE_TEST) return;
   attendreFirebase(() => {
     // (update et non set : la fiche garde confVu / confV, écrits par js/config-distante.js)
     window.fbUpdate(refStats(`stats/appareils/${idStats}`), {
@@ -103,6 +105,7 @@ function preparerPlantage(p){
   return { sig: empreinteTexte(message + "|" + fichier), msg: message, fichier };
 }
 function envoyerPlantages(){
+  if (MODE_TEST) { plantagesEnAttente.length = 0; return; }
   while (plantagesEnAttente.length && plantagesEnvoyes.size < PLANTAGES_MAX_PAR_SESSION) {
     const p = preparerPlantage(plantagesEnAttente.shift());
     if (!p || plantagesEnvoyes.has(p.sig)) continue;
@@ -139,7 +142,7 @@ function etatActuelPresence(){
 }
 
 function majPresence(force = false){
-  if (!window.firebaseDB) return;
+  if (MODE_TEST || !window.firebaseDB) return;
   const etat = document.visibilityState === "hidden" ? null : etatActuelPresence();
   const ref = refStats(`presence/${idStats}`);
   if (!etat) {
@@ -158,7 +161,7 @@ function majPresence(force = false){
 // ===== Au lancement =====
 if (!estPageTele) {
   compterStats("visites");
-  attendreFirebase(() => {
+  if (!MODE_TEST) attendreFirebase(() => {
     window.fbSet(refStats(`stats/jours/${jourStats()}/visiteurs/${idStats}`), true).catch(() => {});
   });
   noterAppareilStats();

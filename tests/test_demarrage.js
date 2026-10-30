@@ -1036,6 +1036,29 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
+  // 39. Appli de test (adresse autre que GitHub Pages, ou « ?modetest ») : « TEST » dans les Réglages et aucune écriture de statistiques
+  {
+    const ecritures = async (adresse) => {
+      const ctx = await nav.newContext({ viewport: { width: 390, height: 780 } });
+      const page = await ctx.newPage();
+      await page.addInitScript(() => {
+        window.__ecr = [];
+        const noter = (nom) => (...a) => { window.__ecr.push(nom + ":" + String(a[0])); return Promise.resolve({ val: () => null, exists: () => false }); };
+        window.firebaseDB = {};
+        window.fbRef = (db, chemin) => chemin;
+        window.fbSet = noter("set"); window.fbUpdate = noter("update"); window.fbRunTransaction = noter("tr"); window.fbRemove = noter("rm");
+        window.fbGet = noter("get"); window.fbOnDisconnect = () => ({ remove: () => Promise.resolve() }); window.fbServerTimestamp = () => 1;
+      });
+      await page.goto(adresse); await page.waitForTimeout(1500);
+      const r = await page.evaluate(() => ({ ecr: window.__ecr.filter((e) => /stats|presence/.test(e)), version: document.getElementById("versionJeu").innerText, test: MODE_TEST }));
+      await ctx.close();
+      return r;
+    };
+    const vrai = await ecritures(url), essai = await ecritures(url + "?modetest=1");
+    verifier(!vrai.test && !/TEST/.test(vrai.version) && vrai.ecr.length > 0 && essai.test && / · TEST$/.test(essai.version) && essai.ecr.length === 0,
+      `appli de test : vraie appli ${vrai.ecr.length} écritures de stats, version « ${vrai.version} » ; test ${essai.ecr.length} écriture, version « ${essai.version} »`);
+  }
+
   await nav.close();
   serveur.close();
   console.log(echecs ? `\n${echecs} ÉCHEC(S)` : "\nTOUT EST OK");

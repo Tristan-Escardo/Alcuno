@@ -1,0 +1,10 @@
+# Appli de test (Netlify) : mêmes fichiers que le jeu, servis tels quels (aucune compilation).
+# Ignoré par GitHub Pages. Voir TEST.md.
+[build]
+  publish = "."
+
+# L'appli de test ne doit pas apparaître dans Google
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
