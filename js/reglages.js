@@ -7,12 +7,33 @@
 // Chaque réglage est retenu sur le téléphone (stockage local du navigateur)
 const ecranReglages = document.getElementById("ecranReglages");
 
-document.getElementById("btnReglages").addEventListener("click", () => {
+// Réglages ouverts pendant une partie : ceux qui pourraient la casser (faces cachées, Mode PJ, partie express,
+// écran télé, partie en mémoire) sont grisés et bloqués ; tout le reste (thème, sons, voix, gaucher…) marche
+const REGLAGES_BLOQUES_EN_PARTIE = ["faces-cachees", "mode-pj", "express", "ecran-tele", "partie-memoire"];
+function majReglagesEnPartie(){
+  const enPartie = partieLancee;
+  document.documentElement.classList.toggle("reglages-en-partie", enPartie);
+  document.getElementById("noteReglagesPartie").hidden = !enPartie;
+  REGLAGES_BLOQUES_EN_PARTIE.forEach((cle) => {
+    const ligne = ecranReglages.querySelector(`[data-cle="${cle}"]`);
+    if (!ligne) return;
+    ligne.setAttribute("aria-disabled", enPartie ? "true" : "false");
+    [ligne, ...ligne.querySelectorAll("input, button")].forEach((el) => {
+      if (el.matches("input, button")) el.disabled = enPartie;
+    });
+  });
+}
+
+function ouvrirReglages(){
   // (le « NOUVEAU » d'un thème débloqué ne part pas en ouvrant les Réglages : seulement quand on essaie ce thème, voir appliquerTheme)
   majLignePartieMemoire();
+  majReglagesEnPartie();
+  choixDejaEnAttente = new Set(choixEnAttentePourMoi()); // (déjà là à l'ouverture : on ne referme pas pour eux)
   ecranReglages.scrollTop = 0;
   ouvrirPage(ecranReglages);
-});
+}
+document.getElementById("btnReglages").addEventListener("click", ouvrirReglages);
+document.getElementById("btnReglagesJeu").addEventListener("click", ouvrirReglages);
 
 activerMemePendantElan(document.getElementById("btnFermerReglages"), () => fermerPage(ecranReglages));
 
@@ -2584,15 +2605,19 @@ function choixEnAttentePourMoi(){
     .filter(el => el._net && actionPrete(el) && proprietaireAction(el) === pseudoActuel);
 }
 
+// (les Réglages ouverts en partie sont couverts aussi : ils cachaient le choix de la même façon)
+const pagesParDessusLaPartie = () => [ecranRegles, ecranReglages].filter(p => p.style.display !== "none" && !p.classList.contains("page-sortie"));
+
 function fermerReglesSiCestAMoi(){
-  if(ecranRegles.style.display === "none" || ecranRegles.classList.contains("page-sortie")) return;
+  const ouvertes = pagesParDessusLaPartie();
+  if(!ouvertes.length) return;
   if(!choixEnAttentePourMoi().some(el => !choixDejaEnAttente.has(el))) return;
-  fermerPage(ecranRegles);
+  ouvertes.forEach(p => fermerPage(p));
   afficherToast("C'est à toi de choisir !", 2500);
 }
 
 new MutationObserver(() => {
-  if(!enLigneActif || ecranRegles.style.display === "none" || verificationReglesPrevue) return;
+  if(!enLigneActif || !pagesParDessusLaPartie().length || verificationReglesPrevue) return;
   verificationReglesPrevue = true;
   requestAnimationFrame(() => {
     verificationReglesPrevue = false;
