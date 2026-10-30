@@ -55,7 +55,7 @@ const rond = (n) => Math.round(n);
 // ===== Activation : 5 taps sur la version =====
 const ligneVersion = document.getElementById("versionJeu");
 function majLigneVersionMouchard(){
-  ligneVersion.innerText = "Alcuno — version " + VERSION_AFFICHEE + (mouchardActif ? " · mouchard actif" : "");
+  ligneVersion.innerText = "Alcuno — version " + VERSION_AFFICHEE + (MODE_TEST ? " · TEST" : "") + (mouchardActif ? " · mouchard actif" : "");
 }
 let tapsVersion = [];
 // (doigt levé et pas « click » : des taps rapides sur un texte ne donnent pas tous un click)
