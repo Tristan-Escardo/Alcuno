@@ -1059,6 +1059,24 @@ function verifier(ok, texte){
       `appli de test : vraie appli ${vrai.ecr.length} écritures de stats, version « ${vrai.version} » ; test ${essai.ecr.length} écriture, version « ${essai.version} »`);
   }
 
+  // 40. Écran « le jeu n'a pas pu se charger » : sur un navigateur trop ancien, il le dit clairement (et plus « vérifie ta connexion »)
+  {
+    const message = async (vieux) => {
+      const ctx = await nav.newContext({ viewport: { width: 390, height: 780 } });
+      const page = await ctx.newPage();
+      await page.addInitScript((vieux) => { if (vieux) delete Promise.prototype.finally; }, vieux);
+      await page.goto(url); await page.waitForTimeout(800);
+      await page.evaluate(() => { window.echecChargementGere = false; sessionStorage.setItem("alcuno_rechargement_auto", "1"); window.echecChargementJeu(); }); // (déjà rechargé une fois : le message s'affiche)
+      await page.waitForTimeout(300);
+      const r = await page.evaluate(() => { const m = document.getElementById("echecChargement"); const b = m && m.getBoundingClientRect(); return { texte: m ? m.innerText : "", plein: !!b && b.top === 0 && b.height >= 700 }; });
+      await ctx.close();
+      return r;
+    };
+    const ancien = await message(true), normal = await message(false);
+    verifier(/trop ancien/.test(ancien.texte) && ancien.plein && /connexion/.test(normal.texte) && !/trop ancien/.test(normal.texte),
+      `écran d'échec : navigateur ancien « ${ancien.texte.replace(/\s+/g, " ").slice(0, 60)}… », normal « ${normal.texte.replace(/\s+/g, " ").slice(0, 45)}… »`);
+  }
+
   await nav.close();
   serveur.close();
   console.log(echecs ? `\n${echecs} ÉCHEC(S)` : "\nTOUT EST OK");

@@ -44,11 +44,20 @@
                 var m = document.createElement("div");
                 m.id = "echecChargement";
                 m.setAttribute("role", "alert");
-                m.style.cssText = "position:fixed;inset:0;z-index:2147483647;display:flex;flex-direction:column;" +
+                m.style.cssText = "position:fixed;top:0;left:0;right:0;bottom:0;z-index:2147483647;display:flex;flex-direction:column;" +
                     "align-items:center;justify-content:center;gap:18px;padding:24px;box-sizing:border-box;" +
                     "background:#2b001d;color:#fff;font:700 18px Arial,sans-serif;text-align:center;pointer-events:auto";
-                m.innerHTML = '<div style="font-size:42px">📶</div>' +
-                    '<div>Le jeu n’a pas pu se charger.<br>Vérifie ta connexion internet.</div>' +
+                // Navigateur trop ancien pour le jeu (ce qu'il utilise : async/await, Promise.finally, Object.entries, fetch, grilles CSS) :
+                // le dire clairement plutôt que « vérifie ta connexion »
+                var ancien = false;
+                try { new Function("async function f(){ await 1; }"); } catch (e) { ancien = true; }
+                if (!(window.Promise && Promise.prototype.finally && Object.entries && window.fetch && window.CSS && CSS.supports && CSS.supports("display", "grid"))) ancien = true;
+                var nav = (navigator.userAgent.match(/(SamsungBrowser|Chrome|CriOS|Firefox|FxiOS|Version)\/[\d.]+/) || [""])[0].replace("/", " ");
+                var texte = ancien
+                    ? 'Ton téléphone ou ton navigateur est probablement trop ancien pour charger le jeu.<br><span style="font-size:15px;font-weight:700;opacity:.8">Mets à jour ton navigateur ou ton système, ou joue depuis un autre téléphone.' + (nav ? '<br>(' + nav + ')' : '') + '</span>'
+                    : 'Le jeu n’a pas pu se charger.<br>Vérifie ta connexion internet.';
+                m.innerHTML = '<div style="font-size:42px">' + (ancien ? '📱' : '📶') + '</div>' +
+                    '<div>' + texte + '</div>' +
                     '<button type="button" style="padding:16px 34px;border:none;border-radius:14px;background:#ffcc00;' +
                     'color:#fff;font:900 20px Arial,sans-serif;text-shadow:0 1px 2px rgba(0,0,0,.45);cursor:pointer">Réessayer</button>';
                 m.querySelector("button").addEventListener("click", function () { location.reload(); });
