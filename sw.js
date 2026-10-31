@@ -276,8 +276,13 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  // La page (index.html) est toujours redemandée au serveur (« no-cache » : revalidée, un 304 suffit). Sinon GitHub Pages la laisse
+  // 10 minutes dans le cache du navigateur : juste après une mise en ligne, un téléphone avait l'ANCIENNE page avec les NOUVEAUX
+  // fichiers du jeu (leur « ?t=… » les rend toujours neufs), d'où des plantages d'un seul coup (« null is not an object » à
+  // reglages.js, « estIOS is not defined »…, onglet Santé d'Alcuno Stats).
+  const page = requete.mode === "navigate" || url.pathname.endsWith("/index.html");
   event.respondWith(
-    fetch(requete)
+    (page ? fetch(requete.url, { cache: "no-cache", credentials: "same-origin" }) : fetch(requete))
       .then((reponse) => {
         if (reponse.ok) {
           const copie = reponse.clone();
