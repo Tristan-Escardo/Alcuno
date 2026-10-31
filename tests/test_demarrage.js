@@ -1077,6 +1077,20 @@ function verifier(ok, texte){
       `écran d'échec : navigateur ancien « ${ancien.texte.replace(/\s+/g, " ").slice(0, 60)}… », normal « ${normal.texte.replace(/\s+/g, " ").slice(0, 45)}… »`);
   }
 
+  // 41. Générique Star Wars (noir plein écran) : la barre du téléphone en haut passe au noir le temps du générique, puis reprend la couleur du thème
+  {
+    const { ctx, page, erreurs } = await ouvrir({}, () => { try { localStorage.setItem("alcuno_theme", "prestige"); localStorage.setItem("alcuno_theme_prestige", "1"); } catch (e) {} });
+    const barre = () => page.evaluate(() => (document.querySelector('meta[name="theme-color"]') || {}).content);
+    const avant = await barre();
+    await page.evaluate(() => afficherGeneriqueGalaxie(true)); await page.waitForTimeout(300);
+    const pendant = await barre();
+    await page.click("#generiqueGalaxie"); await page.waitForTimeout(800);
+    const apres = await barre();
+    verifier(avant === "#937810" && pendant === "#000000" && apres === "#937810" && erreurs.length === 0,
+      `générique Star Wars : barre du haut ${avant} → ${pendant} pendant → ${apres} après`);
+    await ctx.close();
+  }
+
   await nav.close();
   serveur.close();
   console.log(echecs ? `\n${echecs} ÉCHEC(S)` : "\nTOUT EST OK");

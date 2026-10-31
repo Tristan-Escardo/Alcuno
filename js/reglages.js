@@ -359,7 +359,7 @@ function afficherGeneriqueGalaxie(premiere){
     clearTimeout(minuteur);
     arreterSonGenerique(son);
     ecran.classList.add("generique-sortie");
-    setTimeout(() => ecran.remove(), 400);
+    setTimeout(() => { ecran.remove(); peindreBarreTelephone(); }, 400); // (la barre reprend la couleur du thème)
     // Premier déblocage : le thème n'est pas mis tout seul, la fenêtre « débloqué » propose de l'essayer (comme
     // Prestige ; sur iPhone, changer de thème recharge la page et ferait disparaître la fenêtre).
     // Les fois suivantes (mot de passe retapé) : le thème est mis directement.
@@ -372,6 +372,7 @@ function afficherGeneriqueGalaxie(premiere){
   const son = jouerSonGenerique();
   ecran.addEventListener("click", terminer);
   document.body.appendChild(ecran);
+  peindreBarreTelephone("#000000"); // (le générique est noir : la barre du haut ne reste pas à la couleur du thème, dorée en Prestige)
   vibrer([80, 60, 80, 60, 200]);
 }
 
@@ -531,12 +532,13 @@ function rendreNotifGlissable(notif, duree){
 // modifier (sinon Chrome sur Android ne repeint parfois la barre qu'au premier changement de thème).
 // Remise aussi après la caméra (scanner) et au retour dans l'appli : l'iPhone pouvait repeindre la barre
 // en noir à ce moment-là (vu en castant, après « Scanner la télé »)
-function peindreBarreTelephone(){
+// couleur : pour un écran plein écran d'une autre couleur que le thème (générique Star Wars : noir), le temps qu'il est là
+function peindreBarreTelephone(couleur){
   const nom = document.documentElement.dataset.theme;
   document.querySelectorAll('meta[name="theme-color"]').forEach((ancienne) => ancienne.remove());
   const barre = document.createElement("meta");
   barre.name = "theme-color";
-  barre.content = THEMES[nom] || THEMES.bordeaux;
+  barre.content = (typeof couleur === "string" && couleur) || THEMES[nom] || THEMES.bordeaux;
   document.head.appendChild(barre);
 }
 
