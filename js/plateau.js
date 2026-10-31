@@ -328,7 +328,7 @@ function reduirePaquetExpress(paquetMelange){
   return paquetMelange.filter(c => {
     const f = familleCarte(c);
     gardees[f] = (gardees[f] || 0) + 1;
-    return gardees[f] <= (CARTES_EXPRESS[f] ?? 0);
+    return gardees[f] <= (CARTES_EXPRESS[f] || 0);
   });
 }
 
@@ -1164,7 +1164,7 @@ function lancerOverlayPrediction(startIndex){
       reveal.className = 'fin-choix-reveal';
 
       const prev = creerCartePreview(
-        derniereEstDoree ? "carte_doree" : (TYPES_PARIS.find(t=>t.id===vraiType)?.rep || lastCard)
+        derniereEstDoree ? "carte_doree" : ((TYPES_PARIS.find(t=>t.id===vraiType) || {}).rep || lastCard)
       );
       reveal.appendChild(prev);
 

@@ -1986,10 +1986,16 @@ if (!voixPossible) {
   document.getElementById("noteVoix").insertAdjacentHTML("beforeend", "<br>Indisponible sur cet appareil.");
 }
 
+// (les emojis : « \p{…} » n'existe qu'à partir de Chrome 64 ; écrit en texte et essayé ici, sinon un vieux téléphone ne chargeait plus
+// tout le fichier. Repli : les symboles courants seulement)
+let regexEmojisVoix;
+try { regexEmojisVoix = new RegExp("\\p{Extended_Pictographic}|\\uFE0F|[✦✧★☆▶◀●•]", "gu"); }
+catch (e) { regexEmojisVoix = /\uFE0F|[\u2600-\u27BF\u2B00-\u2BFF\u2190-\u21FF✦✧★☆▶◀●•]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|\uD83E[\uDC00-\uDFFF]/g; }
+
 // Texte prêt à être lu : sans emojis ni symboles, « +4 » -> « plus 4 », « 1/4 » -> « 1 sur 4 », « Il/elle » -> « Il ou elle »
 function textePourVoix(brut){
   return String(brut || "")
-    .replace(/\p{Extended_Pictographic}|\uFE0F|[✦✧★☆▶◀●•]/gu, " ")
+    .replace(regexEmojisVoix, " ")
     .replace(/\b(Il|Elle|il|elle)\/(il|elle)\b/g, "$1 ou $2")
     .replace(/\+(\d+)/g, "plus $1")
     .replace(/(\d+)\s*\/\s*(\d+)/g, "$1 sur $2")
