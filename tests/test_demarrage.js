@@ -1110,6 +1110,23 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
+  // 43. Écran PAUSE : plein et opaque dans les 10 thèmes (on voyait les cartes du plateau à travers)
+  {
+    const { ctx, page } = await ouvrir();
+    await page.click("#btnModeClassique"); await page.waitForTimeout(500);
+    for (const nom of ["Tom", "Lea"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(150); }
+    await page.click("#jouer"); await page.waitForTimeout(1200);
+    await page.evaluate(() => { localStorage.setItem("alcuno_theme_prestige", "1"); localStorage.setItem("alcuno_theme_galaxie", "1"); localStorage.setItem("alcuno_theme_kawaii", "1"); mettreEnPause(); });
+    const resultats = [];
+    for (const theme of [...THEMES, "prestige", "galaxie", "kawaii"]) {
+      const r = await page.evaluate((t) => { document.documentElement.dataset.theme = t; const c = getComputedStyle(document.getElementById("ecranPause")); return { fond: c.backgroundColor, image: c.backgroundImage, flou: c.backdropFilter }; }, theme);
+      resultats.push({ theme, opaque: (/^rgb\(/.test(r.fond) || r.image !== "none") && (r.flou === "none" || r.flou === undefined || r.image !== "none") });
+    }
+    const mauvais = resultats.filter((r) => !r.opaque).map((r) => r.theme);
+    verifier(mauvais.length === 0, `écran PAUSE opaque dans ${resultats.length} thèmes ${mauvais.length ? "(transparent : " + mauvais.join(", ") + ")" : ""}`);
+    await ctx.close();
+  }
+
   await nav.close();
   serveur.close();
   console.log(echecs ? `\n${echecs} ÉCHEC(S)` : "\nTOUT EST OK");
