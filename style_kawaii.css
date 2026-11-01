@@ -437,6 +437,9 @@ html[data-theme="kawaii"] #stickyJoueurActif.has-couleur .sticky-couleur{
   background: color-mix(in srgb, var(--couleur-jeu) 30%, #ffffff);
   color: color-mix(in srgb, var(--couleur-jeu) 45%, #500d50);
 }
+html[data-theme="kawaii"] #ecranRegles .btnFaqLien{ color: var(--givre-accent); border-color: var(--givre-bord); background: var(--givre-panneau); }
+html[data-theme="kawaii"] #ecranRegles .faqItem + .faqItem{ border-top-color: var(--givre-bord); }
+html[data-theme="kawaii"] #ecranRegles .faqImage{ border-color: var(--givre-bord); box-shadow: 0 6px 16px rgba(80, 13, 80, 0.2); }
 html[data-theme="kawaii"] #choixMode #btnRegles path,
 html[data-theme="kawaii"] header #btnReglesJeu path{ stroke: #e01a7d; }
 html[data-theme="kawaii"] #choixMode #btnRegles svg,

@@ -1186,6 +1186,30 @@ function verifier(ok, texte){
       `télé Kawaii : décor ${JSON.stringify(r.kawaii)}, autres thèmes : ${r.bleu.decor}`);
   }
 
+  // 46. FAQ : s'ouvre depuis les Règles et depuis les Réglages, questions dépliables, image chargée à l'ouverture, pas sur la télé
+  {
+    const { ctx, page, erreurs } = await ouvrir();
+    await page.click("#btnRegles"); await page.waitForTimeout(500);
+    const lienVisible = await page.evaluate(() => getComputedStyle(document.getElementById("btnFaqDepuisRegles")).display !== "none");
+    await page.click("#btnFaqDepuisRegles"); await page.waitForTimeout(500);
+    const avant = await page.evaluate(() => ({ titre: document.querySelector("#ecranRegles h2").textContent, n: document.querySelectorAll(".faqItem").length, images: document.querySelectorAll(".faqImage").length,
+      lien: getComputedStyle(document.getElementById("btnFaqDepuisRegles")).display, tele: !!reglesPourTele() }));
+    await page.click(".faqItem:nth-child(2) summary"); await page.waitForTimeout(700);
+    const apres = await page.evaluate(() => { const i = document.querySelector(".faqItem[open] .faqImage"); return i ? { charge: i.complete && i.naturalWidth > 0, largeur: Math.round(i.getBoundingClientRect().width), deborde: i.getBoundingClientRect().right > innerWidth } : null; });
+    await page.click("#btnFermerRegles"); await page.waitForTimeout(500);
+    await page.click("#btnRegles"); await page.waitForTimeout(500); // (les Règles reviennent normalement, sans la FAQ)
+    const regles = await page.evaluate(() => ({ titre: document.querySelector("#ecranRegles h2").textContent, faq: document.getElementById("ecranRegles").classList.contains("faq"), tele: !!reglesPourTele() }));
+    await page.click("#btnFermerRegles"); await page.waitForTimeout(500);
+    await page.click("#btnReglages"); await page.waitForTimeout(500);
+    await page.evaluate(() => document.getElementById("btnFaq").scrollIntoView({ block: "center" }));
+    await page.click("#btnFaq"); await page.waitForTimeout(500);
+    const depuisReglages = await page.evaluate(() => document.querySelector("#ecranRegles h2").textContent);
+    await ctx.close();
+    verifier(lienVisible && avant.titre === "Questions fréquentes" && avant.n >= 7 && avant.images === 0 && avant.lien === "none" && !avant.tele && apres && apres.charge && !apres.deborde &&
+      regles.titre === "Règles du jeu" && !regles.faq && regles.tele && depuisReglages === "Questions fréquentes" && erreurs.length === 0,
+      `FAQ : ${JSON.stringify({ lienVisible, avant, apres, regles, depuisReglages, erreurs })}`);
+  }
+
   await nav.close();
   serveur.close();
   console.log(echecs ? `\n${echecs} ÉCHEC(S)` : "\nTOUT EST OK");

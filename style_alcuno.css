@@ -5099,6 +5099,56 @@ header #btnReglesJeu path.couverture{
   color: rgba(255,255,255,0.82);
 }
 
+/* Questions fréquentes (FAQ) : s'ouvre dans l'écran des Règles (js/faq.js) */
+#ecranRegles .btnFaqLien{
+  display: block;
+  margin: 0 auto 14px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,215,0,0.45);
+  background: rgba(255,215,0,0.10);
+  color: #FFD700;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 900;
+  cursor: pointer;
+}
+#ecranRegles.album .btnFaqLien, #ecranRegles.faq .btnFaqLien{ display: none; }
+#ecranRegles .faqItem{ padding: 2px 0; }
+#ecranRegles .faqItem + .faqItem{ border-top: 1px solid rgba(255,255,255,0.08); }
+#ecranRegles .faqQuestion{
+  display: list-item;
+  list-style: none;
+  cursor: pointer;
+  padding: 10px 26px 10px 0;
+  position: relative;
+}
+#ecranRegles .faqQuestion::-webkit-details-marker{ display: none; }
+#ecranRegles .faqQuestion::after{
+  content: "";
+  position: absolute;
+  right: 6px; top: 50%;
+  width: 8px; height: 8px;
+  border-right: 2.5px solid currentColor; border-bottom: 2.5px solid currentColor;
+  transform: translateY(-70%) rotate(45deg);
+  transition: transform .18s;
+}
+#ecranRegles .faqItem[open] > .faqQuestion::after{ transform: translateY(-30%) rotate(-135deg); }
+#ecranRegles .faqReponse{ display: block; padding: 0 0 12px; }
+#ecranRegles .faqImage{
+  display: block;
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  margin: 10px auto 0;
+  border-radius: 14px;
+  border: 1px solid rgba(255,215,0,0.30);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+}
+html[data-theme="givre"] #ecranRegles .btnFaqLien{ color: var(--givre-accent); border-color: var(--givre-bord); background: var(--givre-panneau); }
+html[data-theme="givre"] #ecranRegles .faqItem + .faqItem{ border-top-color: var(--givre-bord); }
+html[data-theme="givre"] #ecranRegles .faqImage{ border-color: var(--givre-bord); box-shadow: 0 6px 16px rgba(13, 53, 80, 0.2); }
+
 /* Givre (thème clair) : mêmes couleurs que ses Réglages */
 html[data-theme="givre"] #choixMode #btnRegles path,
 html[data-theme="givre"] header #btnReglesJeu path{ stroke: #1a9be0; }

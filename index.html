@@ -18,7 +18,7 @@
         // et en parallèle : en bas de la page, ils s'exécutent d'affilée, sans attente entre deux fichiers
         // (aucun bouton ni minuteur ne peut se déclencher avant que tout le jeu soit là).
         window.FICHIERS_JEU = ["script.js", "js/qrcode.js", "js/config-lib.js", "js/reglages.js", "js/en-ligne.js", "js/plateau.js", "js/regles.js",
-                               "js/synchro-en-ligne.js", "js/retour-demarrage.js", "js/tele.js", "js/stats.js", "js/config-distante.js", "js/stickers.js", "js/mouchard.js"];
+                               "js/synchro-en-ligne.js", "js/retour-demarrage.js", "js/tele.js", "js/stats.js", "js/config-distante.js", "js/stickers.js", "js/faq.js", "js/mouchard.js"];
         window.FICHIERS_JEU.forEach(function (f) {
             document.write('<link rel="preload" as="script" href="' + f + '?t=' + window.ANTI_CACHE + '">');
         });
@@ -411,6 +411,8 @@
                 <div class="aPropos">
                     <div class="aProposTitre">À propos</div>
                     <p id="versionJeu" class="versionJeu"></p>
+                    <!-- Aide : la FAQ s'ouvre dans l'écran des Règles (js/faq.js) -->
+                    <button type="button" id="btnFaq" class="btnDiagnostic">❓ Aide et questions fréquentes</button>
                     <button type="button" id="btnDiagnostic" class="btnDiagnostic">Copier le diagnostic</button>
                 </div>
             </div>
@@ -598,6 +600,7 @@
             <button type="button" id="btnFermerRegles" class="btnRetour">← Retour</button>
             <div class="regles-contenu">
                 <h2>Règles du jeu</h2>
+                <button type="button" id="btnFaqDepuisRegles" class="btnFaqLien">❓ Questions fréquentes</button>
                 <div id="listeRegles"></div>
             </div>
         </section>

@@ -127,6 +127,7 @@ function stickerPause(nom){
 function ouvrirAlbum(){
   const a = lireAlbum();
   const page = document.getElementById("ecranRegles");
+  page.classList.remove("faq");
   page.classList.add("album");
   page.querySelector("h2").textContent = "Album de stickers";
   const liste = document.getElementById("listeRegles");

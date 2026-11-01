@@ -2592,7 +2592,7 @@ function remplirRegles(){
 
 function ouvrirRegles(){
   jouerSon("regles"); // (à la place du clic des boutons, voir BOUTONS_AVEC_LEUR_SON)
-  ecranRegles.classList.remove("album"); // (l'album de stickers s'ouvre dans cet écran : js/stickers.js)
+  ecranRegles.classList.remove("album", "faq"); // (l'album de stickers et la FAQ s'ouvrent dans cet écran : js/stickers.js, js/faq.js)
   ecranRegles.querySelector("h2").textContent = "Règles du jeu";
   remplirRegles();
   ecranRegles.scrollTop = 0;
