@@ -428,7 +428,7 @@
 
         // Empreinte (SHA-256) du code d'accès : le code lui-même n'est écrit nulle part
         // Version de la page de stats (à part de celle du jeu : +0.0.1 à chaque modification de cette page)
-        const VERSION_STATS = "1.14.0";
+        const VERSION_STATS = "1.14.1";
         document.getElementById("versionStats").textContent = VERSION_STATS;
         document.getElementById("versionStats2").textContent = VERSION_STATS;
         document.getElementById("versionStats3").textContent = VERSION_STATS;
@@ -1010,7 +1010,11 @@ Données (stats ; « jours » = les 45 derniers jours, « visiteurs » du jour =
                     return (j.models || []).filter((m) => (m.supportedGenerationMethods || []).indexOf("generateContent") >= 0).map((m) => String(m.name).replace(/^models\//, ""));
                 },
                 choisir(dispo){
-                    for (const p of ["gemini-2.5-flash", "gemini-flash-latest", "gemini-2.0-flash", "gemini-1.5-flash"]) if (dispo.indexOf(p) >= 0) return p;
+                    // le « flash » stable le plus récent de la liste du compte (Google retire les anciens : 2.5 n'est plus ouvert aux nouveaux comptes)
+                    const num = (n) => { const m = /^gemini-(\d+)(?:\.(\d+))?-flash$/.exec(n); return m ? Number(m[1]) * 1000 + Number(m[2] || 0) : -1; };
+                    const flash = dispo.filter((n) => num(n) >= 0).sort((a, b) => num(b) - num(a))[0];
+                    if (flash) return flash;
+                    if (dispo.indexOf("gemini-flash-latest") >= 0) return "gemini-flash-latest";
                     return dispo.filter((n) => /flash/.test(n) && !/(lite|image|tts|live|thinking|exp|preview|audio)/.test(n)).sort().reverse()[0] || dispo[0] || null;
                 },
                 async appeler(cle, modele, systeme, messages){
@@ -1076,10 +1080,10 @@ Données (stats ; « jours » = les 45 derniers jours, « visiteurs » du jour =
         const cleIA = () => lireStock(CLE_IA + fournisseur().suffixe);
         const modeleIA = () => lireStock(CLE_MODELE_IA + fournisseur().suffixe);
         // Teste la clé : « valide » + modèle retenu, ou la raison du refus
-        async function testerCleIA(cle){
+        async function testerCleIA(cle, exclure){
             const f = fournisseur();
             try {
-                const modele = f.choisir(await f.lister(cle));
+                const modele = f.choisir((await f.lister(cle)).filter((n) => n !== exclure));
                 if (!modele) return { ok: false, message: "Clé valide, mais aucun modèle utilisable n'est ouvert à ce compte." };
                 ecrireStock(CLE_MODELE_IA + f.suffixe, modele);
                 return { ok: true, message: `Clé valide ✓ · modèle utilisé : ${modele}`, modele };
@@ -1109,9 +1113,10 @@ Données (stats ; « jours » = les 45 derniers jours, « visiteurs » du jour =
             let modele = modeleIA();
             if (!modele) { const t = await testerCleIA(cle); if (!t.ok) throw new Error(t.message); modele = t.modele; }
             const r = await f.appeler(cle, modele, systeme, normaliserMessages(messages));
-            if (r.statut === 404 && essai === 0) { // (modèle renommé ou retiré : on en cherche un autre et on réessaie une fois)
-                const t = await testerCleIA(cle);
-                if (t.ok) return appelerIA(systeme, messages, 1);
+            if (!r.ok && essai < 2 && (r.statut === 404 || /no longer available|not found|deprecated|no longer supported/i.test(r.erreur || ""))) {
+                // modèle renommé ou retiré : on en cherche un autre (en écartant celui qui vient d'être refusé) et on réessaie
+                const t = await testerCleIA(cle, modele);
+                if (t.ok) return appelerIA(systeme, messages, essai + 1);
             }
             if (!r.ok) throw new Error(r.erreur || ("erreur " + r.statut));
             return lireJson(r.texte);
