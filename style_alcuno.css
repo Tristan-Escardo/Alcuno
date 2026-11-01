@@ -8428,12 +8428,3 @@ html.reglages-en-partie :is([data-cle="faces-cachees"], [data-cle="mode-pj"], [d
 #stickyJoueurActif .sticky-bonus, .bonus-annulation{ white-space: nowrap; }
 @media (max-width: 360px){ html #listeJoueurs .joueur-ligne-actif:has(.btnPauseJoueur){ padding-left: 36px; padding-right: 36px; } }
 #stickyJoueurActif .sticky-label[hidden]{ display: none; }
-
-/* Écran PAUSE : plein et opaque dans tous les thèmes (avant : voile à 50-75 % + flou, on voyait les cartes du plateau derrière) */
-#ecranPause{ background: rgb(15, 0, 9); -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
-html[data-theme="noir"] #ecranPause{ background: rgb(0, 0, 0) !important; }
-html[data-theme="vert"] #ecranPause{ background: rgb(2, 20, 11) !important; }
-html[data-theme="bleu"] #ecranPause{ background: rgb(3, 8, 26) !important; }
-html[data-theme="soleil"] #ecranPause{ background: rgb(31, 53, 102) !important; }
-html[data-theme="givre"] #ecranPause{ background: rgb(228, 245, 252) !important; }
-html[data-theme="galaxie"] #ecranPause{ background: rgb(2, 3, 10) !important; }
