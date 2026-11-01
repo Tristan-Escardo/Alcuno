@@ -428,7 +428,7 @@
 
         // Empreinte (SHA-256) du code d'accès : le code lui-même n'est écrit nulle part
         // Version de la page de stats (à part de celle du jeu : +0.0.1 à chaque modification de cette page)
-        const VERSION_STATS = "1.13.0";
+        const VERSION_STATS = "1.14.0";
         document.getElementById("versionStats").textContent = VERSION_STATS;
         document.getElementById("versionStats2").textContent = VERSION_STATS;
         document.getElementById("versionStats3").textContent = VERSION_STATS;
@@ -791,10 +791,13 @@
                 message(""); $("pilPropose").hidden = true;
                 fil.push({ role: "moi", texte }); $("pilTexte").value = ""; dessinerFil();
                 const r = ConfigLib.interpreter(texte, Date.now(), derniereDemande);
+                // Avec une clé d'IA, c'est elle qui répond à tout (elle comprend les phrases libres et voit toutes les stats) ;
+                // les réponses toutes faites ne servent plus que sans clé, ou si l'IA ne répond pas.
+                if (cleIA() && await demanderIA()) return;
                 if (r.cmds.length) { direFil("Compris : regarde ci-dessous et valide.", r.cmds); montrerProposition(r.cmds); return; }
                 const reponse = ConfigLib.repondreQuestion(texte, construireResume());
                 if (reponse) { direFil(reponse); return; }
-                if (cleIA()) { await demanderIA(); return; }
+                if (cleIA()) return; // (l'IA a déjà dit pourquoi elle n'a pas répondu)
                 direFil(r.raison || "Je n'ai pas compris. Essaie une phrase plus simple, ou ajoute une clé d'IA (en bas) pour que je comprenne les demandes plus libres.");
             }
             $("pilComprendre").addEventListener("click", envoyer);
@@ -850,15 +853,18 @@
 {"op":"theme_periode_off","id":"…"}
 {"op":"majmin","version":"x.y.z"|null}
 {"op":"tout_remettre"}
-Si l'utilisateur pose une QUESTION sur les statistiques ou la santé du jeu, laisse « commandes » vide et réponds dans « reponse » d'après les données ci-dessous, sans rien inventer (dis « je n'ai pas cette donnée » sinon).
+Tu parles à Tristan, le créateur du jeu. Réponds comme un analyste qui connaît le jeu : réponse utile, chiffrée, en français simple, sans jargon. Tu peux écrire jusqu'à une dizaine de lignes si la question le demande (« reponse » peut contenir des retours à la ligne \n).
+Si l'utilisateur pose une QUESTION (statistiques, santé du jeu, plantages, thèmes, appareils, versions, évolution, comparaison, conseil), laisse « commandes » vide et réponds dans « reponse » d'après les données ci-dessous. Calcule toi-même les sommes, moyennes, évolutions (en %), meilleurs et pires jours, jours de la semaine ; compare les périodes ; relève ce qui sort de l'ordinaire et propose une explication ou une action quand c'est utile. N'invente aucun chiffre : si une donnée manque, dis-le et dis laquelle. Aujourd'hui n'est pas fini : ne compare pas sa valeur à un jour complet sans le signaler.
+Une phrase vague ou une conversation (« salut », « et hier ? », « pourquoi ? ») : réponds naturellement en tenant compte des messages précédents.
+Plantages : « n » = nombre sur 7 jours, « n24 » = sur 24 h ; beaucoup de « is not defined » juste après une mise en ligne viennent surtout de pages pas encore à jour, pas forcément d'un vrai bug.
 Si la demande est impossible avec ces commandes, « commandes » est vide et « reponse » l'explique.
 Noms des thèmes : ${ConfigLib.THEMES_CONNUS.map((t) => t + "=" + ConfigLib.NOMS_THEMES[t]).join(", ")}.
 Réglages actuels : ${ConfigLib.decrire(config).join(" ; ")}.
 Date du jour : ${new Date().toISOString().slice(0, 10)}.
-Données (stats) : ${JSON.stringify((() => { const r = construireResume(); const jours = {}; joursPasses(14).forEach((j) => { if (r.jours[j]) jours[j] = r.jours[j]; }); return { ...r, jours }; })())}`;
+Données (stats ; « jours » = les 45 derniers jours, « visiteurs » du jour = personnes différentes ; os/themes/versions = appareils vus ces 30 jours) : ${JSON.stringify((() => { const r = construireResume(); const jours = {}; joursPasses(45).forEach((j) => { if (r.jours[j]) jours[j] = { ...r.jours[j], jour: ["dim", "lun", "mar", "mer", "jeu", "ven", "sam"][new Date(j + "T12:00:00").getDay()] }; }); return { ...r, jours }; })())}`;
             async function demanderIA(){
                 const cle = cleIA();
-                if (!cle) { direFil("Ajoute d'abord une clé d'IA (section en bas).", undefined); return; }
+                if (!cle) { direFil("Ajoute d'abord une clé d'IA (section en bas).", undefined); return false; }
                 message("L'IA réfléchit…");
                 // la conversation jusqu'ici (sans le dernier message, ajouté à la fin) : l'IA se souvient de ce qui a été dit
                 const contenus = fil.slice(0, -1).slice(-8).map((m) => ({ role: m.role === "moi" ? "user" : "assistant", texte: m.role === "moi" ? m.texte : JSON.stringify({ commandes: m.cmds || [], reponse: m.texte }) }));
@@ -871,7 +877,13 @@ Données (stats) : ${JSON.stringify((() => { const r = construireResume(); const
                     const phrase = !Array.isArray(j) && typeof j.reponse === "string" ? j.reponse.slice(0, 600) : "";
                     if (cmds.length) { direFil(phrase || "Voilà ce que je propose : regarde et valide.", cmds); montrerProposition(cmds); }
                     else direFil(phrase || "Je ne vois pas comment faire ça avec les réglages possibles.");
-                } catch (e) { message("L'IA n'a pas répondu : " + (e && e.message ? e.message : e), true); direFil("(L'IA n'a pas répondu.)"); }
+                    return true;
+                } catch (e) {
+                    const raison = e && e.message ? e.message : String(e);
+                    message("");
+                    direFil("⚠ L'IA n'a pas répondu (" + raison.slice(0, 200) + "). Je réponds avec mes réponses de base.");
+                    return false;
+                }
             }
             // Reformuler l'annonce : 3 variantes à choisir
             $("pilReformuler").addEventListener("click", async () => {
@@ -955,7 +967,7 @@ Données (stats) : ${JSON.stringify((() => { const r = construireResume(); const
         // Résumé compact des stats, pour répondre aux questions (ConfigLib.repondreQuestion) et pour l'IA
         function construireResume(){
             const aujourdhui = jourDe(new Date()), jours = {};
-            Object.entries(donnees.jours).forEach(([j, d]) => { d = d || {}; jours[j] = { visites: Number(d.visites || 0), installs: Number(d.installs || 0), parties: Number(d.parties || 0), partiesEnLigne: Number(d.partiesEnLigne || 0) }; });
+            Object.entries(donnees.jours).forEach(([j, d]) => { d = d || {}; jours[j] = { visites: Number(d.visites || 0), installs: Number(d.installs || 0), parties: Number(d.parties || 0), partiesEnLigne: Number(d.partiesEnLigne || 0), visiteurs: Object.keys(d.visiteurs || {}).length }; });
             const unique = (liste) => { const ids = new Set(); liste.forEach((j) => Object.keys((donnees.jours[j] || {}).visiteurs || {}).forEach((id) => ids.add(id))); return ids.size; };
             const os = {}, themes = {}, versions = {};
             Object.values(donnees.appareils).forEach((a) => {
@@ -1027,7 +1039,7 @@ Données (stats) : ${JSON.stringify((() => { const r = construireResume(); const
                 async appeler(cle, modele, systeme, messages){
                     const rep = await fetch("https://api.anthropic.com/v1/messages", {
                         method: "POST", headers: this.entetes(cle),
-                        body: JSON.stringify({ model: modele, max_tokens: 1024, system: systeme, messages: messages.map((m) => ({ role: m.role, content: m.texte })) })
+                        body: JSON.stringify({ model: modele, max_tokens: 1500, system: systeme, messages: messages.map((m) => ({ role: m.role, content: m.texte })) })
                     });
                     const j = await rep.json().catch(() => ({}));
                     return { ok: rep.ok, statut: rep.status, erreur: j.error && j.error.message, texte: rep.ok ? (j.content || []).filter((b) => b.type === "text").map((b) => b.text).join("") : "" };
