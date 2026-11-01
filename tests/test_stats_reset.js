@@ -122,6 +122,18 @@ export const signOut = async () => { utilisateur = null; ecouteurs.forEach((e) =
   const d = await etat();
   verifier(d.jours === 0 && d.appareils === 0 && d.presence === 1 && d.message.includes("remises à zéro") && d.bouton && !d.confirme,
     `« Oui » : tout est effacé (jours ${d.jours}, appareils ${d.appareils}), le direct est gardé (présence ${d.presence}), message « ${d.message} »`);
+  // Onglet Aide : 4 onglets tiennent sur la largeur du téléphone, la page s'ouvre, ses questions se déplient
+  await page.click("#ongletAide"); await page.waitForTimeout(400);
+  const aide = await page.evaluate(() => {
+    const bar = document.querySelector(".onglets").getBoundingClientRect();
+    const debord = Array.from(document.querySelectorAll(".onglet")).some((o) => o.scrollWidth > o.clientWidth + 1 || o.getBoundingClientRect().right > bar.right + 1);
+    return { actif: document.getElementById("vueAide").classList.contains("actif"), nb: document.querySelectorAll("#vueAide details").length, debord,
+      largeurPage: document.documentElement.scrollWidth, version: document.getElementById("versionStats4").textContent };
+  });
+  if (process.env.CAPTURE_AIDE) { await page.evaluate(() => document.querySelectorAll("#vueAide details")[3].open = true); await page.screenshot({ path: process.env.CAPTURE_AIDE }); }
+  verifier(aide.actif && aide.nb >= 8 && !aide.debord && aide.largeurPage <= 390 && /^\d+\.\d+\.\d+$/.test(aide.version), `onglet Aide : ${JSON.stringify(aide)}`);
+  await page.click("#ongletStats"); await page.waitForTimeout(300);
+
   // Onglets Stats / Pilotage : tap sur l'onglet, glissement du doigt (gauche = Pilotage, droite = Stats), pas de glissement depuis un champ
   const vues = () => page.evaluate(() => ({ stats: document.getElementById("vueStats").classList.contains("actif") && getComputedStyle(document.getElementById("vueStats")).display !== "none",
     sante: document.getElementById("vueSante").classList.contains("actif") && getComputedStyle(document.getElementById("vueSante")).display !== "none",
@@ -136,7 +148,9 @@ export const signOut = async () => { utilisateur = null; ecouteurs.forEach((e) =
   const v0 = await vues();
   await glisser(-200); const v1 = await vues();
   await glisser(-200); const v1b = await vues();
-  await glisser(-200); const v1c = await vues(); // (déjà sur la dernière page : rien de plus)
+  await glisser(-200); const v1c = await vues(); // (page Aide)
+  await glisser(-200); const v1d = await vues(); // (déjà sur la dernière page : rien de plus)
+  await glisser(200); const v1e = await vues(); // (retour à Pilotage)
   await glisser(200); const v2 = await vues();
   await glisser(200); const v2b = await vues();
   await glisser(200); const v2c = await vues(); // (déjà sur la première page)
@@ -145,8 +159,8 @@ export const signOut = async () => { utilisateur = null; ecouteurs.forEach((e) =
   await page.click("#ongletStats"); const v4 = await vues();
   await glisser(-200, "#pilEmail"); const v5 = await vues(); // (un glissement qui démarre dans un champ ne change pas de page)
   await glisser(-30); const v6 = await vues(); // (trop court)
-  verifier(v0.stats && !v0.pilotage && v1.sante && v1.sous === "Santé du jeu" && v1.hash === "#sante" && v1b.pilotage && v1b.sous === "Pilotage" && v1c.pilotage && v2.sante && v2b.stats && v2b.sous === "Statistiques" && v2c.stats && v3.pilotage && v3b.sante && v4.stats && v4.hash === "" && v5.stats && v6.stats,
-    `onglets Stats / Santé / Pilotage : glisser, taper (${JSON.stringify([v0.stats, v1.sante, v1b.pilotage, v1c.pilotage, v2.sante, v2b.stats, v2c.stats, v3.pilotage, v3b.sante, v4.stats, v5.stats, v6.stats])})`);
+  verifier(v0.stats && !v0.pilotage && v1.sante && v1.sous === "Santé du jeu" && v1.hash === "#sante" && v1b.pilotage && v1b.sous === "Pilotage" && v1c.onglet === "aide" && v1d.onglet === "aide" && v1e.pilotage && v2.sante && v2b.stats && v2b.sous === "Statistiques" && v2c.stats && v3.pilotage && v3b.sante && v4.stats && v4.hash === "" && v5.stats && v6.stats,
+    `onglets Stats / Santé / Pilotage : glisser, taper (${JSON.stringify([v0.stats, v1.sante, v1b.pilotage, v1c.onglet, v1d.onglet, v1e.pilotage, v2.sante, v2b.stats, v2c.stats, v3.pilotage, v3b.sante, v4.stats, v5.stats, v6.stats])})`);
   // Santé : plantages envoyés par le jeu, regroupés sur 7 jours
   const jourDe = (decalage) => { const d = new Date(Date.now() - decalage * 86400000); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
   await page.evaluate(([auj, hier, vieux]) => {

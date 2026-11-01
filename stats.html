@@ -109,6 +109,13 @@
         .onglet{ flex: 1; text-align: center; padding: 12px 4px; border-radius: 10px; border: 1px solid rgba(0, 229, 255, .3); background: transparent; color: var(--cyan-doux); font: 700 11px "Orbitron", Arial, sans-serif; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; -webkit-tap-highlight-color: rgba(0, 229, 255, .35); transition: transform .08s, background .08s; }
         .onglet[aria-selected="true"]{ background: rgba(0, 229, 255, .16); border-color: var(--cyan); color: var(--cyan-clair); box-shadow: 0 0 14px rgba(0, 229, 255, .35); text-shadow: 0 0 8px var(--cyan); }
         .onglet:active{ transform: scale(.97); background: rgba(0, 229, 255, .3); }
+        .onglets .onglet{ letter-spacing: .06em; padding-left: 2px; padding-right: 2px; }
+        .aideBloc details{ margin: 0 0 8px; padding: 10px 12px; border: 1px solid rgba(0, 229, 255, .22); border-radius: 12px; background: rgba(0, 229, 255, .04); font-size: 14px; line-height: 1.5; }
+        .aideBloc summary{ cursor: pointer; color: var(--cyan); font-weight: 700; }
+        .aideBloc p, .aideBloc li{ margin: 8px 0 0; color: var(--cyan-doux); }
+        .aideBloc ul{ margin: 4px 0 0; padding-left: 20px; }
+        .aideBloc b{ color: var(--cyan-clair); }
+        .aideBloc .aideLien{ display: inline-block; margin-top: 8px; padding: 8px 12px; border: 1px solid rgba(0, 229, 255, .4); border-radius: 10px; background: transparent; color: var(--cyan); font: inherit; font-weight: 700; cursor: pointer; }
         .badgeOnglet{ display: inline-block; min-width: 16px; margin-left: 6px; padding: 1px 5px; border-radius: 9px; background: #ff4d6d; color: #fff; font: 700 11px "Inter", Arial, sans-serif; letter-spacing: 0; vertical-align: 1px; }
         .badgeOnglet[hidden]{ display: none; }
         .santeEtat{ display: flex; align-items: center; gap: 14px; padding: 12px; margin-bottom: 12px; border-radius: 12px; border: 1px solid rgba(0, 229, 255, .3); background: rgba(0, 229, 255, .05); font-size: 17px; line-height: 1.3; }
@@ -237,6 +244,7 @@
             <button type="button" class="onglet" id="ongletStats" role="tab" data-vue="stats" aria-selected="true">Stats</button>
             <button type="button" class="onglet" id="ongletSante" role="tab" data-vue="sante" aria-selected="false">Santé<span class="badgeOnglet" id="badgeSante" hidden></span></button>
             <button type="button" class="onglet" id="ongletPilotage" role="tab" data-vue="pilotage" aria-selected="false">Pilotage</button>
+            <button type="button" class="onglet" id="ongletAide" role="tab" data-vue="aide" aria-selected="false">Aide</button>
         </nav>
         <div class="vue actif" id="vueStats">
 
@@ -418,6 +426,109 @@
         <div class="pilMessage" id="pilMessage" aria-live="polite"></div>
             <p class="note">Alcuno Stats <span id="versionStats2"></span></p>
         </div>
+
+        <div class="vue" id="vueAide">
+            <section class="bloc aideBloc">
+                <div class="titre">Aide</div>
+                <p class="pilNote" style="margin-top:0">Touche une question pour voir la réponse.</p>
+
+                <details><summary>Comment lire la page Stats ?</summary>
+                    <ul>
+                        <li><b>En temps réel</b> : les personnes qui ont le jeu ouvert maintenant, réparties entre partie classique, partie en ligne et télé castée.</li>
+                        <li><b>Fréquentation</b> : « visites » compte chaque ouverture du jeu ; « visiteurs » compte les personnes différentes (un joueur qui ouvre dix fois = 1 visiteur).</li>
+                        <li><b>Parties</b> : celles qui ont vraiment été lancées, classiques et en ligne.</li>
+                        <li><b>Heures de jeu</b> et <b>jours de la semaine</b> : quand on joue le plus (heure de pointe).</li>
+                        <li><b>Téléphones, versions, thèmes</b> : appareils vus ces 30 derniers jours seulement. Aucune donnée personnelle n'est gardée.</li>
+                        <li>L'appli de test ne compte pas dans les chiffres.</li>
+                    </ul>
+                </details>
+
+                <details><summary>Pourquoi mes chiffres sont à zéro ou bizarres ?</summary>
+                    <ul>
+                        <li>« Réinitialiser toutes les statistiques » (bas de la page Stats) remet tout à zéro, définitivement.</li>
+                        <li>Après une mise en ligne, les chiffres de versions mettent quelques jours à se stabiliser : un joueur n'est compté dans sa nouvelle version qu'à sa prochaine ouverture.</li>
+                        <li>Les appareils pas ouverts depuis 30 jours disparaissent des répartitions (téléphones, versions, thèmes).</li>
+                    </ul>
+                </details>
+
+                <details><summary>Que veut dire l'onglet Santé ?</summary>
+                    <p>Chaque ligne est une <b>erreur du jeu</b> arrivée sur un téléphone, sans rien de personnel. Le voyant (vert, orange, rouge) et le badge de l'onglet comptent les plantages des dernières 24 h.</p>
+                    <ul>
+                        <li>Une erreur vue <b>une seule fois</b> est presque toujours sans gravité.</li>
+                        <li>Des erreurs « is not defined » juste après une mise en ligne viennent surtout de pages pas encore à jour : elles s'arrêtent d'elles-mêmes.</li>
+                        <li>C'est à corriger quand la <b>même erreur se répète</b> ou touche plusieurs appareils ou versions.</li>
+                        <li><b>Ignorer</b> cache une erreur connue ; <b>Effacer le journal</b> vide tout (il faut être connecté dans Pilotage).</li>
+                    </ul>
+                </details>
+
+                <details><summary>À quoi sert chaque réglage du Pilotage ?</summary>
+                    <ul>
+                        <li><b>Fonctions</b> : couper la voix, la musique ou le mode en ligne pour tout le monde (utile en cas de bug ou de maintenance). Pense à les remettre.</li>
+                        <li><b>Thèmes</b> : cacher un thème, ou ne le montrer que sur une période chaque année (ex. Star Wars début mai).</li>
+                        <li><b>Annonce</b> : un message sur l'accueil, les Réglages et les Crédits (140 caractères). Tu peux la programmer (début + durée) ou la viser aux versions plus anciennes qu'une version donnée.</li>
+                        <li><b>Valeurs de départ</b> : volume de la musique et vitesse de la voix pour ceux qui n'ont jamais touché au curseur.</li>
+                        <li><b>Mise à jour demandée</b> : invite les joueurs d'une version trop ancienne à recharger le jeu.</li>
+                        <li><b>Historique</b> et <b>Annuler la dernière modification</b> : tout se défait. « Tout remettre par défaut » efface tous les réglages.</li>
+                        <li><b>Lecture par les joueurs</b> : combien d'appareils ont lu tes réglages (seuls ceux en 9.65.0 ou plus le signalent).</li>
+                    </ul>
+                    <p>Le Pilotage ne peut pas bloquer le jeu : sans réseau, il reste réglé par défaut. Un changement arrive chez les joueurs à leur prochaine ouverture du jeu.</p>
+                </details>
+
+                <details><summary>Comment utiliser l'assistant ?</summary>
+                    <p>Écris une phrase : il te montre ce qu'il a compris, et tu valides avant que rien ne change.</p>
+                    <ul>
+                        <li>Exemples : « coupe la voix », « désactive le thème Kawaii », « thème Star Wars du 1er mai au 4 mai », « annonce demain à 18h : Soirée ! pendant 3 heures », « remets tout à zéro ».</li>
+                        <li>Il se souvient de la conversation (« finalement non, remets-la »).</li>
+                        <li><b>Sans clé d'IA</b> : il comprend les phrases simples et répond à quelques questions (« combien de parties cette semaine ? »).</li>
+                        <li><b>Avec une clé</b> : il répond à tout, calcule, compare et explique d'après les 45 derniers jours.</li>
+                        <li>Les raccourcis (mode maintenance, silence total…) règlent plusieurs choses d'un coup.</li>
+                    </ul>
+                </details>
+
+                <details><summary>Comment ajouter une clé d'IA (Gemini gratuit) ?</summary>
+                    <ul>
+                        <li>Va sur aistudio.google.com, connecte-toi avec un compte Google, puis « Get API key ».</li>
+                        <li>Dans Pilotage, ouvre « Assistant intelligent (facultatif) », choisis Google Gemini, colle la clé, puis « Enregistrer et tester la clé ».</li>
+                        <li>L'appli choisit toute seule un modèle disponible, et en change si Google en retire un.</li>
+                        <li>La clé reste dans ce téléphone : jamais dans le jeu ni sur GitHub. Une clé par fournisseur ; Claude et ChatGPT sont payants à l'usage.</li>
+                    </ul>
+                </details>
+
+                <details><summary>L'IA affiche une erreur : que faire ?</summary>
+                    <ul>
+                        <li><b>Clé refusée</b> : la clé est mal copiée en entier, ou le compte n'a pas de crédit (Claude, ChatGPT).</li>
+                        <li><b>Quota dépassé / trop de demandes</b> : le quota gratuit est atteint ; attends un peu, ou jusqu'au lendemain.</li>
+                        <li><b>Modèle plus disponible</b> : appuie sur « Enregistrer et tester la clé » pour qu'il en choisisse un autre.</li>
+                        <li><b>Impossible de joindre</b> : connexion coupée ou bloquée.</li>
+                        <li>Dans tous les cas, l'assistant retombe sur ses réponses de base.</li>
+                    </ul>
+                </details>
+
+                <details><summary>« Refusé par Firebase » ou connexion impossible</summary>
+                    <ul>
+                        <li>Connecte-toi avec le compte administrateur créé dans Firebase (Authentication).</li>
+                        <li>« Refusé » veut dire que les règles de la base ne sont pas à jour : recolle <code>database.rules.json</code> dans Realtime Database → Règles (avec ton identifiant), puis Publier. Ton identifiant est dans Pilotage → « Sécurité et compte ».</li>
+                        <li>Le détail pas à pas est dans PILOTAGE.md, dans le dépôt GitHub.</li>
+                    </ul>
+                </details>
+
+                <details><summary>Comment essayer une modification avant de la mettre en ligne ?</summary>
+                    <ul>
+                        <li>On teste d'abord sur l'<b>appli de test</b> (adresse Netlify, privée). Elle est identique au vrai jeu mais n'envoie ni statistiques ni plantages, et affiche « · TEST » à côté de la version.</li>
+                        <li>Quand c'est bon, on la met en ligne sur <b>main</b> : c'est alors visible par tout le monde.</li>
+                        <li>Évite de mettre en ligne en pleine soirée : des gens sont peut-être en partie.</li>
+                    </ul>
+                </details>
+
+                <details><summary>Un joueur voit encore l'ancienne version</summary>
+                    <ul>
+                        <li>Après une mise en ligne, un joueur peut garder l'ancienne page quelques minutes. Fermer complètement l'appli puis la rouvrir règle presque toujours ça.</li>
+                        <li>Si ça persiste, utilise « Mise à jour demandée » dans Pilotage.</li>
+                    </ul>
+                </details>
+            </section>
+            <p class="note">Alcuno Stats <span id="versionStats4"></span></p>
+        </div>
     </main>
 
     <script src="js/config-lib.js"></script>
@@ -428,10 +539,11 @@
 
         // Empreinte (SHA-256) du code d'accès : le code lui-même n'est écrit nulle part
         // Version de la page de stats (à part de celle du jeu : +0.0.1 à chaque modification de cette page)
-        const VERSION_STATS = "1.14.1";
+        const VERSION_STATS = "1.15.0";
         document.getElementById("versionStats").textContent = VERSION_STATS;
         document.getElementById("versionStats2").textContent = VERSION_STATS;
         document.getElementById("versionStats3").textContent = VERSION_STATS;
+        document.getElementById("versionStats4").textContent = VERSION_STATS;
 
         const EMPREINTE_CODE = "2c8125d3adc62dac73f3ae036a86e00ba51b12b0dfb38fec2184e76441ed6826";
         const CLE_ACCES = "alcuno_stats_acces";
@@ -463,7 +575,7 @@
         let ouvert = false;
 
         // ----- Onglets Stats / Pilotage : un tap sur l'onglet, ou un glissement du doigt vers la gauche / la droite -----
-        const VUES = ["stats", "sante", "pilotage"];
+        const VUES = ["stats", "sante", "pilotage", "aide"];
         let vueActuelle = "stats";
         function montrerVue(nom, anime = true){
             if (VUES.indexOf(nom) < 0) return;
@@ -475,7 +587,7 @@
                 if (v === nom) { el.classList.add("actif"); if (anime) el.classList.add(sens); }
                 document.getElementById("onglet" + v[0].toUpperCase() + v.slice(1)).setAttribute("aria-selected", v === nom ? "true" : "false");
             });
-            document.getElementById("sousTitre").textContent = { stats: "Statistiques", sante: "Santé du jeu", pilotage: "Pilotage" }[nom];
+            document.getElementById("sousTitre").textContent = { stats: "Statistiques", sante: "Santé du jeu", pilotage: "Pilotage", aide: "Aide" }[nom];
             window.scrollTo(0, 0);
             try { history.replaceState(null, "", nom === "stats" ? location.pathname : "#" + nom); } catch (e) {}
         }
@@ -494,7 +606,7 @@
                 if (suivante >= 0 && suivante < VUES.length) montrerVue(VUES[suivante]);
             }
         }, { passive: true });
-        if (location.hash === "#pilotage" || location.hash === "#sante") montrerVue(location.hash.slice(1), false);
+        if (location.hash === "#pilotage" || location.hash === "#sante" || location.hash === "#aide") montrerVue(location.hash.slice(1), false);
 
         function ouvrir(){
             if (ouvert) return;

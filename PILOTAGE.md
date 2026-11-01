@@ -87,3 +87,8 @@ vérifiés par le code, et tu valides avant. Elle sert aussi à reformuler une a
 ## Ce que ça ne peut pas faire
 
 Ajouter une fonction, changer un design, corriger un bug ou modifier le texte des cartes : ça reste du code à publier.
+
+## Onglet Aide (stats 1.15.0)
+
+Un 4e onglet **Aide** dans Alcuno Stats : questions dépliables (lire les stats, la Santé, chaque réglage du Pilotage, l'assistant, la clé d'IA et ses erreurs,
+« Refusé par Firebase », tester sur l'appli de test, un joueur resté sur l'ancienne version). Glisser vers la gauche depuis Pilotage y mène.
