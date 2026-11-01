@@ -442,7 +442,7 @@
                         <li><b>Parties</b> : celles qui ont vraiment été lancées, classiques et en ligne.</li>
                         <li><b>Heures de jeu</b> et <b>jours de la semaine</b> : quand on joue le plus (heure de pointe).</li>
                         <li><b>Téléphones, versions, thèmes</b> : appareils vus ces 30 derniers jours seulement. Aucune donnée personnelle n'est gardée.</li>
-                        <li>L'appli de test ne compte pas dans les chiffres.</li>
+                        <li>Les passages de Claude (tests automatiques) ne comptent pas dans les chiffres.</li>
                     </ul>
                 </details>
 
@@ -516,14 +516,6 @@
                     </ul>
                 </details>
 
-                <details><summary>Comment essayer une modification avant de la mettre en ligne ?</summary>
-                    <ul>
-                        <li>On teste d'abord sur l'<b>appli de test</b> (adresse Netlify, privée). Elle est identique au vrai jeu mais n'envoie ni statistiques ni plantages, et affiche « · TEST » à côté de la version.</li>
-                        <li>Quand c'est bon, on la met en ligne sur <b>main</b> : c'est alors visible par tout le monde.</li>
-                        <li>Évite de mettre en ligne en pleine soirée : des gens sont peut-être en partie.</li>
-                    </ul>
-                </details>
-
                 <details><summary>Un joueur voit encore l'ancienne version</summary>
                     <ul>
                         <li>Après une mise en ligne, un joueur peut garder l'ancienne page quelques minutes. Fermer complètement l'appli puis la rouvrir règle presque toujours ça.</li>
@@ -554,7 +546,7 @@
         });
         const authPorte = getAuth(app);
         // Version de la page de stats (à part de celle du jeu : +0.0.1 à chaque modification de cette page)
-        const VERSION_STATS = "1.16.0";
+        const VERSION_STATS = "1.16.1";
         document.getElementById("versionStats").textContent = VERSION_STATS;
         document.getElementById("versionStats2").textContent = VERSION_STATS;
         document.getElementById("versionStats3").textContent = VERSION_STATS;
