@@ -216,6 +216,8 @@
             font: 600 20px "Inter", Arial, sans-serif; letter-spacing: .3em; text-align: center; outline: none;
             box-shadow: 0 0 12px rgba(0, 229, 255, .2);
         }
+        #porte input{ margin: 0 0 12px; font-size: 16px; letter-spacing: normal; }
+        #porte .sous{ margin-bottom: 22px; }
         #porte input:focus{ border-color: var(--cyan); box-shadow: 0 0 16px rgba(0, 229, 255, .45); }
         #porte button{
             width: 100%; padding: 13px; border-radius: 4px; border: 1px solid var(--cyan); background: rgba(0, 229, 255, .14);
@@ -228,10 +230,11 @@
 </head>
 <body>
     <div id="porte">
-        <form id="formPorte" autocomplete="off">
+        <form id="formPorte" autocomplete="on">
             <h1>ALCUNO</h1>
             <div class="sous">Accès privé</div>
-            <input id="codePorte" type="password" inputmode="numeric" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="CODE">
+            <input id="porteEmail" name="username" type="email" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="E-mail">
+            <input id="porteMdp" name="password" type="password" autocomplete="current-password" placeholder="Mot de passe">
             <button type="submit">Entrer</button>
             <div id="erreurPorte"></div>
         </form>
@@ -506,6 +509,7 @@
 
                 <details><summary>« Refusé par Firebase » ou connexion impossible</summary>
                     <ul>
+                        <li>Depuis la 1.16.0, la page Stats s'ouvre avec <b>l'e-mail et le mot de passe du compte administrateur</b> (plus de code). La session est gardée : tu ne le retapes que si tu te déconnectes.</li>
                         <li>Connecte-toi avec le compte administrateur créé dans Firebase (Authentication).</li>
                         <li>« Refusé » veut dire que les règles de la base ne sont pas à jour : recolle <code>database.rules.json</code> dans Realtime Database → Règles (avec ton identifiant), puis Publier. Ton identifiant est dans Pilotage → « Sécurité et compte ».</li>
                         <li>Le détail pas à pas est dans PILOTAGE.md, dans le dépôt GitHub.</li>
@@ -537,16 +541,25 @@
         import { getDatabase, ref, onValue, get, update, set, query, orderByKey, limitToLast, remove } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
-        // Empreinte (SHA-256) du code d'accès : le code lui-même n'est écrit nulle part
+        // L'accès se fait avec le compte administrateur Firebase (e-mail + mot de passe) : les règles de la base ne laissent lire
+        // les statistiques, la santé et la présence qu'à ce compte. La session est gardée par Firebase : on ne retape rien ensuite.
+        const app = initializeApp({
+            apiKey: "AIzaSyApZL1dCQLGdrZFjsGJC0y4DxLUzorum4M",
+            authDomain: "alcuno.firebaseapp.com",
+            databaseURL: "https://alcuno-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "alcuno",
+            storageBucket: "alcuno.firebasestorage.app",
+            messagingSenderId: "481896309098",
+            appId: "1:481896309098:web:c84fe2d2ded1df80810513"
+        });
+        const authPorte = getAuth(app);
         // Version de la page de stats (à part de celle du jeu : +0.0.1 à chaque modification de cette page)
-        const VERSION_STATS = "1.15.0";
+        const VERSION_STATS = "1.16.0";
         document.getElementById("versionStats").textContent = VERSION_STATS;
         document.getElementById("versionStats2").textContent = VERSION_STATS;
         document.getElementById("versionStats3").textContent = VERSION_STATS;
         document.getElementById("versionStats4").textContent = VERSION_STATS;
 
-        const EMPREINTE_CODE = "2c8125d3adc62dac73f3ae036a86e00ba51b12b0dfb38fec2184e76441ed6826";
-        const CLE_ACCES = "alcuno_stats_acces";
 
         const NOMS_THEMES = {
             bordeaux: "Bordeaux", noir: "Sombre", vert: "Casino", bleu: "Nuit", soleil: "Soleil couchant",
@@ -565,10 +578,6 @@
         const PRESENCE_VALABLE = 3 * 60 * 1000; // présence pas rafraîchie depuis 3 min : téléphone parti
         const APPAREILS_VUS_DEPUIS = 30 * 24 * 3600 * 1000;
 
-        async function empreinte(texte){
-            const octets = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(texte.trim().toUpperCase()));
-            return Array.from(new Uint8Array(octets)).map(o => o.toString(16).padStart(2, "0")).join("");
-        }
 
         const porte = document.getElementById("porte");
         const contenu = document.getElementById("contenu");
@@ -616,19 +625,22 @@
             demarrer();
         }
 
-        if (!ouvert) document.getElementById("codePorte").focus();
-
+        const ERREURS_PORTE = { "auth/invalid-credential": "E-mail ou mot de passe incorrect.", "auth/invalid-email": "E-mail invalide.", "auth/too-many-requests": "Trop d'essais, réessaie dans quelques minutes.", "auth/network-request-failed": "Pas de réseau." };
+        const CLE_EMAIL_PORTE = "alcuno_pilotage_email";
+        try { document.getElementById("porteEmail").value = localStorage.getItem(CLE_EMAIL_PORTE) || ""; } catch (e) {}
         document.getElementById("formPorte").addEventListener("submit", async (e) => {
             e.preventDefault();
-            const saisi = document.getElementById("codePorte").value;
-            if (await empreinte(saisi) === EMPREINTE_CODE) {
-                try { localStorage.setItem(CLE_ACCES, EMPREINTE_CODE); } catch (e) {}
-                ouvrir();
-            } else {
-                document.getElementById("erreurPorte").textContent = "Code incorrect";
-                document.getElementById("codePorte").select();
+            const email = document.getElementById("porteEmail").value.trim();
+            document.getElementById("erreurPorte").textContent = "";
+            try {
+                await signInWithEmailAndPassword(authPorte, email, document.getElementById("porteMdp").value);
+                try { localStorage.setItem(CLE_EMAIL_PORTE, email); } catch (e) {}
+                document.getElementById("porteMdp").value = "";
+            } catch (err) {
+                document.getElementById("erreurPorte").textContent = ERREURS_PORTE[err.code] || ("Connexion refusée : " + (err.code || err.message));
             }
         });
+
 
         // ===== Données =====
         const nombre = (n) => n.toLocaleString("fr-FR");
@@ -1297,15 +1309,6 @@ Données (stats ; « jours » = les 45 derniers jours, « visiteurs » du jour =
         }
 
         function demarrer(){
-            const app = initializeApp({
-                apiKey: "AIzaSyApZL1dCQLGdrZFjsGJC0y4DxLUzorum4M",
-                authDomain: "alcuno.firebaseapp.com",
-                databaseURL: "https://alcuno-default-rtdb.europe-west1.firebasedatabase.app",
-                projectId: "alcuno",
-                storageBucket: "alcuno.firebasestorage.app",
-                messagingSenderId: "481896309098",
-                appId: "1:481896309098:web:c84fe2d2ded1df80810513"
-            });
             const db = getDatabase(app);
             demarrerPilotage(app, db);
             demarrerSante(app, db);
@@ -1423,7 +1426,11 @@ Données (stats ; « jours » = les 45 derniers jours, « visiteurs » du jour =
         }
 
         // (en dernier : tout ce que demarrer() utilise doit être déclaré avant)
-        try { if (localStorage.getItem(CLE_ACCES) === EMPREINTE_CODE) ouvrir(); } catch (e) { console.error(e); }
+        // Connecté (session retrouvée ou connexion à l'instant) : la page s'ouvre. Déconnecté : retour à l'écran de connexion.
+        onAuthStateChanged(authPorte, (u) => {
+            if (u) ouvrir();
+            else if (ouvert) location.reload();
+        });
     </script>
 </body>
 </html>

@@ -1,21 +1,21 @@
 {
   "rules": {
     "stats": {
-      ".read": true,
+      ".read": "auth != null && auth.uid === 'Ex6dzCTIfGhZXPhedzIYzKZWxQm1'",
       "jours": {
         "$jour": {
           ".validate": "$jour.matches(/^20[0-9][0-9]-[01][0-9]-[0-3][0-9]$/)",
-          "visites": { ".write": true, ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" },
-          "installs": { ".write": true, ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" },
-          "parties": { ".write": true, ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" },
-          "partiesEnLigne": { ".write": true, ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" },
-          "doreesEnJeu": { ".write": true, ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" },
-          "doreesTirees": { ".write": true, ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" },
+          "visites": { ".read": true, ".write": true, ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" },
+          "installs": { ".read": true, ".write": true, ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" },
+          "parties": { ".read": true, ".write": true, ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" },
+          "partiesEnLigne": { ".read": true, ".write": true, ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" },
+          "doreesEnJeu": { ".read": true, ".write": true, ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" },
+          "doreesTirees": { ".read": true, ".write": true, ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" },
           "visiteurs": {
             "$id": { ".write": true, ".validate": "$id.matches(/^[a-z0-9]{12}$/) && newData.val() === true" }
           },
           "heures": {
-            "$h": { ".write": true, ".validate": "$h.matches(/^([01][0-9]|2[0-3])$/) && newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" }
+            "$h": { ".read": true, ".write": true, ".validate": "$h.matches(/^([01][0-9]|2[0-3])$/) && newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" }
           },
           "$autre": { ".validate": false }
         }
@@ -75,7 +75,7 @@
       ".write": "auth != null && auth.uid === 'Ex6dzCTIfGhZXPhedzIYzKZWxQm1'"
     },
     "sante": {
-      ".read": true,
+      ".read": "auth != null && auth.uid === 'Ex6dzCTIfGhZXPhedzIYzKZWxQm1'",
       "jours": {
         ".write": "auth != null && auth.uid === 'Ex6dzCTIfGhZXPhedzIYzKZWxQm1'",
         "$jour": {
@@ -88,7 +88,7 @@
             "version": { ".validate": "newData.isString() && newData.val().length <= 12" },
             "os": { ".validate": "newData.isString() && newData.val().matches(/^(ios|android|ordi)$/)" },
             "vu": { ".validate": "newData.isNumber()" },
-            "n": { ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" },
+            "n": { ".read": true, ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" },
             "$autre": { ".validate": false }
           }
         }
@@ -102,7 +102,7 @@
       "$autre": { ".validate": false }
     },
     "presence": {
-      ".read": true,
+      ".read": "auth != null && auth.uid === 'Ex6dzCTIfGhZXPhedzIYzKZWxQm1'",
       "$id": {
         ".write": true,
         ".validate": "$id.matches(/^[a-z0-9]{12}$/) && newData.hasChildren(['etat', 'maj'])",

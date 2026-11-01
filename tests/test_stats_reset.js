@@ -71,7 +71,7 @@ export const update = async (r, lot) => {
 `;
 
 const FAUX_AUTH = `
-const ecouteurs = []; let utilisateur = null;
+const ecouteurs = []; let utilisateur = null; try { if (localStorage.getItem("faux_utilisateur")) utilisateur = { uid: "UID-TEST-123" }; } catch (e) {}
 const AUTH = {};
 export const getAuth = () => AUTH;
 export const onAuthStateChanged = (auth, rappel) => { ecouteurs.push(rappel); rappel(utilisateur); };
@@ -90,15 +90,40 @@ export const signOut = async () => { utilisateur = null; ecouteurs.forEach((e) =
   const page = await nav.newPage({ viewport: { width: 390, height: 780 } });
   const erreurs = [];
   page.on("pageerror", (e) => erreurs.push(e.message));
-  await page.route("**/firebase-app.js", (r) => r.fulfill({ contentType: "text/javascript", body: FAUX_APP }));
-  await page.route("**/firebase-database.js", (r) => r.fulfill({ contentType: "text/javascript", body: FAUX_BASE }));
-  await page.route("**/firebase-auth.js", (r) => r.fulfill({ contentType: "text/javascript", body: FAUX_AUTH }));
-  await page.route(/fonts\.(googleapis|gstatic)\.com/, (r) => r.abort());
-  await page.addInitScript(() => { try { localStorage.setItem("alcuno_stats_acces", "2c8125d3adc62dac73f3ae036a86e00ba51b12b0dfb38fec2184e76441ed6826"); } catch (e) {} });
+  const brancher = async (p) => {
+    await p.route("**/firebase-app.js", (r) => r.fulfill({ contentType: "text/javascript", body: FAUX_APP }));
+    await p.route("**/firebase-database.js", (r) => r.fulfill({ contentType: "text/javascript", body: FAUX_BASE }));
+    await p.route("**/firebase-auth.js", (r) => r.fulfill({ contentType: "text/javascript", body: FAUX_AUTH }));
+    await p.route(/fonts\.(googleapis|gstatic)\.com/, (r) => r.abort());
+  };
+  await brancher(page);
+  await page.addInitScript(() => { try { localStorage.setItem("faux_utilisateur", "1"); } catch (e) {} }); // (session Firebase retrouvée : connecté d'office)
   await page.goto(url); await page.waitForTimeout(800);
 
   let echecs = 0;
   const verifier = (ok, texte) => { console.log((ok ? "OK    " : "ECHEC ") + texte); if (!ok) echecs++; };
+
+  // Écran de connexion : la page ne s'ouvre qu'avec le compte administrateur (les règles Firebase ne laissent lire les stats qu'à lui)
+  const porte = await (async () => {
+    const p2 = await nav.newPage({ viewport: { width: 390, height: 780 } });
+    await brancher(p2);
+    await p2.goto(url); await p2.waitForTimeout(600);
+    const etat = () => p2.evaluate(() => ({ porte: !document.getElementById("porte").hidden, contenu: !document.getElementById("contenu").hidden, erreur: document.getElementById("erreurPorte").textContent }));
+    const ferme = await etat();
+    await p2.fill("#porteEmail", "moi@exemple.fr"); await p2.fill("#porteMdp", "mauvais"); await p2.click("#formPorte button"); await p2.waitForTimeout(300);
+    const refuse = await etat();
+    await p2.fill("#porteMdp", "bon"); await p2.click("#formPorte button"); await p2.waitForTimeout(600);
+    const ouvert = await etat();
+    await p2.evaluate(() => document.getElementById("ongletPilotage").click()); await p2.waitForTimeout(200);
+    await p2.evaluate(() => { document.getElementById("pilDeconnecter").closest("details").open = true; });
+    await p2.click("#pilDeconnecter"); await p2.waitForTimeout(800); // (se déconnecter ramène à l'écran de connexion)
+    const deconnecte = await p2.evaluate(() => ({ porte: !document.getElementById("porte").hidden, contenu: !document.getElementById("contenu").hidden }));
+    await p2.close();
+    return { ferme, refuse, ouvert, deconnecte };
+  })();
+  verifier(porte.ferme.porte && !porte.ferme.contenu && /incorrect/.test(porte.refuse.erreur) && !porte.refuse.contenu && porte.ouvert.contenu && !porte.ouvert.porte && porte.deconnecte.porte && !porte.deconnecte.contenu,
+    `connexion : écran fermé, refusé, ouvert avec le bon mot de passe, retour à l'écran après déconnexion (${JSON.stringify(porte)})`);
+
   const etat = () => page.evaluate(() => ({ jours: Object.keys(window.__arbre.stats ? (window.__arbre.stats.jours || {}) : {}).length,
     appareils: Object.keys(window.__arbre.stats ? (window.__arbre.stats.appareils || {}) : {}).length,
     presence: Object.keys(window.__arbre.presence || {}).length,
@@ -173,19 +198,15 @@ export const signOut = async () => { utilisateur = null; ecouteurs.forEach((e) =
   }, [jourDe(0), jourDe(1), jourDe(20)]);
   await page.click("#ongletSante"); await page.waitForTimeout(200);
   const sante1 = await page.evaluate(() => ({ etat: document.getElementById("santeEtat").textContent, lignes: [...document.querySelectorAll("#santeListe .santeLigne")].map((l) => l.textContent), badge: document.getElementById("badgeSante").hidden ? "" : document.getElementById("badgeSante").textContent, effacer: document.getElementById("santeEffacer").hidden }));
-  await page.click('#santeListe button[data-ignorer="aaaaaaaaaaaa"]'); await page.waitForTimeout(200);
   const sante2 = await page.evaluate(() => ({ note: document.getElementById("santeNote").textContent, ignore: (window.__arbre.sante.ignores || {}).aaaaaaaaaaaa || null }));
-  verifier(/5 plantages/.test(sante1.etat) && sante1.lignes.length === 2 && /×7/.test(sante1.lignes[0]) && /9\.66\.0 ×3/.test(sante1.lignes[0]) && /9\.65\.1 ×4/.test(sante1.lignes[0]) && /plateau\.js:120/.test(sante1.lignes[0]) && !/trop vieux/.test(sante1.lignes.join()) && sante1.badge === "5" && sante1.effacer && /Connecte-toi/.test(sante2.note) && sante2.ignore === null,
-    `santé : plantages regroupés sur 7 jours, badge, ignorer demande la connexion (${sante1.etat} / ${JSON.stringify(sante1.lignes)} / badge ${sante1.badge} / ${sante2.note})`);
+  verifier(/5 plantages/.test(sante1.etat) && sante1.lignes.length === 2 && /×7/.test(sante1.lignes[0]) && /9\.66\.0 ×3/.test(sante1.lignes[0]) && /9\.65\.1 ×4/.test(sante1.lignes[0]) && /plateau\.js:120/.test(sante1.lignes[0]) && !/trop vieux/.test(sante1.lignes.join()) && sante1.badge === "5" && !sante1.effacer && !/Connecte-toi/.test(sante2.note) && sante2.ignore === null,
+    `santé : plantages regroupés sur 7 jours, badge, déjà connecté (${sante1.etat} / ${JSON.stringify(sante1.lignes)} / badge ${sante1.badge} / ${sante2.note})`);
   await page.click("#ongletStats");
   // Pilotage du jeu (réglages à distance) : deuxième onglet de la même page
   const nbErreursStats = erreurs.length;
   await page.click("#ongletPilotage"); await page.waitForTimeout(200);
   const pil = (js) => page.evaluate(js);
   const avantConnexion = await pil(() => ({ connexion: !document.getElementById("pilConnexion").hidden, panneau: document.getElementById("pilPanneau").hidden }));
-  await page.fill("#pilEmail", "moi@exemple.fr"); await page.fill("#pilMdp", "mauvais"); await page.click("#pilConnecter"); await page.waitForTimeout(200);
-  const refuse = await pil(() => document.getElementById("pilMessage").textContent);
-  await page.fill("#pilMdp", "bon"); await page.click("#pilConnecter"); await page.waitForTimeout(300);
   const connecte = await pil(() => ({ panneau: !document.getElementById("pilPanneau").hidden, uid: document.getElementById("pilUid").textContent, etat: document.getElementById("pilEtat").textContent }));
   await page.fill("#pilTexte", "blabla"); await page.click("#pilComprendre"); await page.waitForTimeout(200);
   const incompris = await pil(() => [...document.querySelectorAll("#pilFil .bulle")].pop().textContent);
@@ -222,7 +243,7 @@ export const signOut = async () => { utilisateur = null; ecouteurs.forEach((e) =
   verifier(defauts.d && defauts.d.volumeMusique === 55 && defauts.d.vitesseVoix === 1.3 && defauts.v === "number" && /55 %/.test(defauts.apercu) && /1,3×/.test(defauts.etat), `pilotage : valeurs de départ (${JSON.stringify(defauts.d)})`);
   verifier(histoAvant >= 2 && retour.defauts === null && retour.annonce && retour.histo > histoAvant - 1, `pilotage : historique, « Revenir avant » (${histoAvant} entrées, après ${JSON.stringify(retour)})`);
   verifier(/Aucun appareil/.test(lecture) && /2 appareils vus/.test(lecture2) && /1 ont lu/.test(lecture2) && /0 ont ta dernière modification/.test(lecture2) && /il y a 2 min/.test(lecture2), `pilotage : voyant de lecture (« ${lecture.slice(0, 80)} » puis « ${lecture2} »)`);
-  verifier(avantConnexion.connexion && avantConnexion.panneau && /incorrect/.test(refuse) && connecte.panneau && connecte.uid === "UID-TEST-123" && /rien/.test(connecte.etat), `pilotage : connexion refusée puis acceptée (${refuse} / ${JSON.stringify(connecte)})`);
+  verifier(!avantConnexion.connexion && !avantConnexion.panneau && connecte.panneau && connecte.uid === "UID-TEST-123" && /rien/.test(connecte.etat), `pilotage : déjà connecté avec la session de la page ( ${JSON.stringify(connecte)})`);
   verifier(/coupe|Couper/i.test(propose.texte) && propose.visible && propose.config === null && /compris/.test(incompris) && /"voix":true/.test(applique.config) && applique.hist === 1 && /voix/.test(applique.etat), `pilotage : l'assistant propose, puis applique après validation, avec historique (${propose.texte} / ${JSON.stringify(applique)}) message « ${incompris.slice(0, 30)} »`);
   verifier(/"voix":true/.test(complet) && /"kawaii":\{"actif":false\}/.test(complet) && /"texte":"Bienvenue !"/.test(complet) && /"fin":\d+/.test(complet), `pilotage : boutons thème et annonce (${complet})`);
   verifier(/"voix":true/.test(annule.config) && !/Bienvenue|kawaii/.test(annule.config) && annule.hist === 1 && toutAnnule.config && Object.keys(toutAnnule.config).join() === "v" && toutAnnule.hist === 0, `pilotage : « annuler » revient en arrière pas à pas (${JSON.stringify(annule)} puis ${JSON.stringify(toutAnnule)})`);

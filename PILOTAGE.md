@@ -92,3 +92,18 @@ Ajouter une fonction, changer un design, corriger un bug ou modifier le texte de
 
 Un 4e onglet **Aide** dans Alcuno Stats : questions dépliables (lire les stats, la Santé, chaque réglage du Pilotage, l'assistant, la clé d'IA et ses erreurs,
 « Refusé par Firebase », tester sur l'appli de test, un joueur resté sur l'ancienne version). Glisser vers la gauche depuis Pilotage y mène.
+
+## Sécurité : lecture réservée à l'administrateur (stats 1.16.0)
+
+Avant, les statistiques, la santé et la présence étaient lisibles par n'importe qui connaissant l'adresse de la base (le code de la page Stats ne protégeait que l'affichage).
+Maintenant :
+- `database.rules.json` : `stats`, `sante` et `presence` ne sont **lisibles que par ton compte administrateur**. Exception voulue : les compteurs eux-mêmes
+  (visites, parties, heures, `n` d'un plantage), que le jeu doit relire pour faire +1 (transactions) ; les listes d'appareils, de visiteurs et les messages d'erreur restent privés.
+- La page Stats s'ouvre avec **l'e-mail et le mot de passe** du compte administrateur (le code d'accès est supprimé). Firebase garde la session.
+
+**Ordre de mise en ligne** : 1) mettre la nouvelle page Stats en ligne (main) ; 2) seulement ensuite, recoller `database.rules.json` dans Realtime Database → Règles → **Publier**.
+Dans l'autre sens, l'ancienne page Stats (avec le code) ne verrait plus rien.
+Pour revenir en arrière : recoller l'ancien contenu de `database.rules.json` (git, version précédente) et Publier.
+
+À faire aussi dans la console (sans code) : restreindre la clé d'API aux adresses du jeu (Google Cloud Console → Identifiants), désactiver la création de comptes
+(Authentication → Paramètres → Actions de l'utilisateur), mot de passe administrateur long et unique, alerte de budget / quota.
