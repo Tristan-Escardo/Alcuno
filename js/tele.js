@@ -167,7 +167,14 @@ function texteSansBoutons(racine){
           enfant.classList.contains("plus4-container-joueurs") || enfant.classList.contains("plus4-actions") ||
           enfant.classList.contains("duel-boutons") || getComputedStyle(enfant).display === "none") return;
       if (enfant.tagName === "BR") { finir(); return; }
-      if (BALISES_EN_LIGNE.has(enfant.tagName)) { parcourir(enfant); return; }
+      if (BALISES_EN_LIGNE.has(enfant.tagName)) {
+        // (dans une ligne flex, ex. « nom ... carte choisie » du pari : à l'écran ils sont écartés, en texte ils se collaient)
+        const espace = noeud.nodeType === Node.ELEMENT_NODE && getComputedStyle(noeud).display.indexOf("flex") !== -1;
+        if (espace) ligne += " ";
+        parcourir(enfant);
+        if (espace) ligne += " ";
+        return;
+      }
       finir();
       parcourir(enfant);
       finir();

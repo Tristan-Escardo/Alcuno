@@ -185,6 +185,10 @@ function verifier(ok, texte){
     const trois = await compteur();
     verifier(sousTitreSurDeuxLignes && apresPose === 0 && un === "1" && deux === "2" && trois === "2,1" && erreurs.length === 0,
       `pari de la fin : phrase à la ligne (${sousTitreSurDeuxLignes}), rien au doigt posé (${apresPose}), compteur ${un} puis ${deux} puis ${trois}`);
+    // Sur la télé : le nom du joueur et la carte qu'il a choisie ne sont pas collés
+    const texteTele = await page.evaluate(() => ecranPourTele().texte);
+    const collee = /(Tom|Lea|Max)[A-Za-zÀ-ÿ]/.test(texteTele.replace(/Tom ←/g, "Tom "));
+    verifier(/Tom \S/.test(texteTele) && !collee, `pari de la fin sur la télé : nom et carte choisie séparés (« ${texteTele.replace(/\n/g, " | ")} »)`);
     await ctx.close();
   }
 
