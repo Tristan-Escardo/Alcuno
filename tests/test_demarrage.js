@@ -1159,6 +1159,29 @@ function verifier(ok, texte){
       `règles sur la télé : envoyées ouvertes (${etat.ecran && etat.ecran.id}), plus rien fermées (${apres}), ${r.lignes} règles affichées ${r.deborde ? "qui débordent" : "sans déborder"}`);
   }
 
+  // 45. Télé en Kawaii : décor (personnages et paillettes) visible seulement dans ce thème, « Télé XXXX » reste en bas à droite, tout tient à l'écran
+  {
+    const ctx = await nav.newContext({ viewport: { width: 1280, height: 720 } });
+    const page = await ctx.newPage();
+    const erreurs = [];
+    page.on("pageerror", (e) => erreurs.push(e.message));
+    await page.goto(url + "?tele"); await page.waitForTimeout(900);
+    const r = await page.evaluate(() => {
+      const etat = { partie: true, theme: "kawaii", cartes: ["cinq_rouge", "plus_4", "", "d"], joueurs: [{ n: "Tom", a: 0, g: 0, s: 0 }, { n: "Lea", t: true, a: 2, g: 0, s: 0, p: true }, { n: "Max", a: 0, g: 0, s: 0 }, { n: "Zoé", a: 1, g: 0, s: 0 }],
+        tour: "Lea", pigeon: true, couleur: "rouge", regles: "Tout le monde boit 1 gorgée sauf toi", h: [], musique: 0 };
+      const mesure = (theme) => {
+        etat.theme = theme; dessinerTele(document.getElementById("ecranTele"), etat);
+        const decor = document.querySelector(".tele-jeu .tele-decor-kawaii"), pied = document.querySelector(".tele-pied"), regles = document.querySelector(".tele-bloc-regles");
+        const rp = pied.getBoundingClientRect(), rr = regles.getBoundingClientRect();
+        return { decor: getComputedStyle(decor).display, spans: decor.querySelectorAll("span").length, paillettes: decor.querySelectorAll("i").length, piedADroite: rp.left > innerWidth / 2, reglesDansEcran: rr.bottom <= innerHeight };
+      };
+      return { kawaii: mesure("kawaii"), bleu: mesure("bleu") };
+    });
+    await ctx.close();
+    verifier(r.kawaii.decor === "block" && r.bleu.decor === "none" && r.kawaii.spans === 16 && r.kawaii.paillettes === 26 && r.kawaii.piedADroite && r.kawaii.reglesDansEcran && erreurs.length === 0,
+      `télé Kawaii : décor ${JSON.stringify(r.kawaii)}, autres thèmes : ${r.bleu.decor}`);
+  }
+
   await nav.close();
   serveur.close();
   console.log(echecs ? `\n${echecs} ÉCHEC(S)` : "\nTOUT EST OK");

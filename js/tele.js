@@ -423,6 +423,35 @@ function appliquerThemeTele(nom){
   document.documentElement.dataset.theme = nom;
 }
 
+// Thème Kawaii : petits personnages qui lévitent et paillettes qui scintillent derrière le jeu et derrière l'écran des annonces
+// (cachés dans les autres thèmes, voir outils/kawaii_deco.css). Peu nombreux et animés sans flou : les télés sont lentes.
+const STICKERS_DECOR_TELE = ["licorne", "chat", "coeur", "etoile", "cupcake", "arcenciel", "lapin", "fraise", "nuage", "poussin", "macaron", "bulle", "sucette", "fleur", "glace", "chou"];
+function creerDecorKawaiiTele(){
+  const zone = document.createElement("div");
+  zone.className = "tele-decor-kawaii";
+  zone.setAttribute("aria-hidden", "true");
+  const hasard = (a, b) => a + Math.random() * (b - a);
+  for (let i = 0; i < 16; i++) {
+    const e = document.createElement("span");
+    const taille = hasard(6, 11);
+    // répartis en grille 4 x 4, un peu décalés : ils couvrent tout l'écran
+    e.style.cssText = `left:${((i % 4) * 25 + hasard(0, 14)).toFixed(1)}%;top:${(Math.floor(i / 4) * 25 + hasard(0, 14)).toFixed(1)}%;` +
+      `width:${taille.toFixed(1)}vh;height:${taille.toFixed(1)}vh;background-image:url("stickers/${STICKERS_DECOR_TELE[i % STICKERS_DECOR_TELE.length]}.svg");` +
+      `animation-duration:${hasard(7, 13).toFixed(1)}s;animation-delay:${(-hasard(0, 8)).toFixed(1)}s;` +
+      `--x1:${hasard(-3, 3).toFixed(1)}vh;--y1:${hasard(-3, 3).toFixed(1)}vh;--x2:${hasard(-3, 3).toFixed(1)}vh;--y2:${hasard(-3, 3).toFixed(1)}vh;` +
+      `--x3:${hasard(-3, 3).toFixed(1)}vh;--y3:${hasard(-3, 3).toFixed(1)}vh;--r1:${Math.round(hasard(-22, 22))}deg;--r2:${Math.round(hasard(-22, 22))}deg`;
+    zone.appendChild(e);
+  }
+  for (let i = 0; i < 26; i++) {
+    const e = document.createElement("i");
+    const taille = hasard(1.2, 2.6);
+    e.style.cssText = `left:${hasard(0, 98).toFixed(1)}%;top:${hasard(0, 98).toFixed(1)}%;width:${taille.toFixed(1)}vh;height:${taille.toFixed(1)}vh;` +
+      `animation-duration:${hasard(1.6, 3.4).toFixed(1)}s;animation-delay:${(-hasard(0, 3)).toFixed(1)}s`;
+    zone.appendChild(e);
+  }
+  return zone;
+}
+
 function demarrerPageTele(){
   const code = genererCodeTele();
   const lien = `${ADRESSE_SITE_TELE}?caster=${code}`;
@@ -475,6 +504,8 @@ function demarrerPageTele(){
       <div class="tele-ecran-texte"></div>
       <div class="tele-ecran-choix"></div>
     </div>`;
+  ecran.querySelector(".tele-jeu").prepend(creerDecorKawaiiTele());
+  ecran.querySelector(".tele-ecran").prepend(creerDecorKawaiiTele());
   document.body.appendChild(ecran);
 
   const qr = qrcode(0, "M");

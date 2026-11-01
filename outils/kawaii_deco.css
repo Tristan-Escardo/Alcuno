@@ -150,13 +150,13 @@ html[data-theme="kawaii"] #kawaiiFlotteurs{ display: block; }
   75% { transform: translate(var(--x3), var(--y3)) rotate(var(--r2)); }
   100%{ transform: translate(0, 0) rotate(0deg); }
 }
-#kawaiiFlotteurs i{ position: absolute; background: center / contain no-repeat; animation: kawaiiPaillette ease-in-out infinite; }
-#kawaiiFlotteurs i:nth-child(4n+1){ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 0 Q56 44 100 50 Q56 56 50 100 Q44 56 0 50 Q44 44 50 0Z' fill='%2330d9a0' stroke='%230a7a5a' stroke-width='5' stroke-linejoin='round'/%3E%3Cpath d='M50 24 Q53 47 76 50 Q53 53 50 76 Q47 53 24 50 Q47 47 50 24Z' fill='%23fff'/%3E%3C/svg%3E"); filter: drop-shadow(0 0 3px #30d9a0) drop-shadow(0 0 7px #30d9a0); }
-#kawaiiFlotteurs i:nth-child(4n+2){ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 0 Q56 44 100 50 Q56 56 50 100 Q44 56 0 50 Q44 44 50 0Z' fill='%2318c8ea' stroke='%230a6f95' stroke-width='5' stroke-linejoin='round'/%3E%3Cpath d='M50 24 Q53 47 76 50 Q53 53 50 76 Q47 53 24 50 Q47 47 50 24Z' fill='%23fff'/%3E%3C/svg%3E"); filter: drop-shadow(0 0 3px #18c8ea) drop-shadow(0 0 7px #18c8ea); }
-#kawaiiFlotteurs i:nth-child(4n+3){ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 0 Q56 44 100 50 Q56 56 50 100 Q44 56 0 50 Q44 44 50 0Z' fill='%238a4dff' stroke='%234a1f9e' stroke-width='5' stroke-linejoin='round'/%3E%3Cpath d='M50 24 Q53 47 76 50 Q53 53 50 76 Q47 53 24 50 Q47 47 50 24Z' fill='%23fff'/%3E%3C/svg%3E"); filter: drop-shadow(0 0 3px #8a4dff) drop-shadow(0 0 7px #8a4dff); }
-#kawaiiFlotteurs i:nth-child(4n+4){ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 0 Q56 44 100 50 Q56 56 50 100 Q44 56 0 50 Q44 44 50 0Z' fill='%23ffffff' stroke='%239a5bd6' stroke-width='5' stroke-linejoin='round'/%3E%3Cpath d='M50 24 Q53 47 76 50 Q53 53 50 76 Q47 53 24 50 Q47 47 50 24Z' fill='%23fff'/%3E%3C/svg%3E"); filter: drop-shadow(0 0 3px #c9a0ff) drop-shadow(0 0 7px #c9a0ff); }
+#kawaiiFlotteurs i, .tele-decor-kawaii i{ position: absolute; background: center / contain no-repeat; animation: kawaiiPaillette ease-in-out infinite; }
+:is(#kawaiiFlotteurs, .tele-decor-kawaii) i:nth-child(4n+1){ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 0 Q56 44 100 50 Q56 56 50 100 Q44 56 0 50 Q44 44 50 0Z' fill='%2330d9a0' stroke='%230a7a5a' stroke-width='5' stroke-linejoin='round'/%3E%3Cpath d='M50 24 Q53 47 76 50 Q53 53 50 76 Q47 53 24 50 Q47 47 50 24Z' fill='%23fff'/%3E%3C/svg%3E"); filter: drop-shadow(0 0 3px #30d9a0) drop-shadow(0 0 7px #30d9a0); }
+:is(#kawaiiFlotteurs, .tele-decor-kawaii) i:nth-child(4n+2){ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 0 Q56 44 100 50 Q56 56 50 100 Q44 56 0 50 Q44 44 50 0Z' fill='%2318c8ea' stroke='%230a6f95' stroke-width='5' stroke-linejoin='round'/%3E%3Cpath d='M50 24 Q53 47 76 50 Q53 53 50 76 Q47 53 24 50 Q47 47 50 24Z' fill='%23fff'/%3E%3C/svg%3E"); filter: drop-shadow(0 0 3px #18c8ea) drop-shadow(0 0 7px #18c8ea); }
+:is(#kawaiiFlotteurs, .tele-decor-kawaii) i:nth-child(4n+3){ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 0 Q56 44 100 50 Q56 56 50 100 Q44 56 0 50 Q44 44 50 0Z' fill='%238a4dff' stroke='%234a1f9e' stroke-width='5' stroke-linejoin='round'/%3E%3Cpath d='M50 24 Q53 47 76 50 Q53 53 50 76 Q47 53 24 50 Q47 47 50 24Z' fill='%23fff'/%3E%3C/svg%3E"); filter: drop-shadow(0 0 3px #8a4dff) drop-shadow(0 0 7px #8a4dff); }
+:is(#kawaiiFlotteurs, .tele-decor-kawaii) i:nth-child(4n+4){ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 0 Q56 44 100 50 Q56 56 50 100 Q44 56 0 50 Q44 44 50 0Z' fill='%23ffffff' stroke='%239a5bd6' stroke-width='5' stroke-linejoin='round'/%3E%3Cpath d='M50 24 Q53 47 76 50 Q53 53 50 76 Q47 53 24 50 Q47 47 50 24Z' fill='%23fff'/%3E%3C/svg%3E"); filter: drop-shadow(0 0 3px #c9a0ff) drop-shadow(0 0 7px #c9a0ff); }
 @keyframes kawaiiPaillette{ 0%, 100%{ transform: scale(0.15) rotate(0deg); opacity: 0; } 50%{ transform: scale(1) rotate(50deg); opacity: 1; } }
-@media (prefers-reduced-motion: reduce){ #kawaiiFlotteurs span, #kawaiiFlotteurs i{ animation: none; } }
+@media (prefers-reduced-motion: reduce){ #kawaiiFlotteurs span, #kawaiiFlotteurs i, .tele-decor-kawaii span, .tele-decor-kawaii i{ animation: none; } }
 
 /* Fenêtre +4 : pas de rectangle de fond derrière les boutons (le fond à pois reste visible) */
 html[data-theme="kawaii"] #overlayPlus4 :is(.plus4-actions, .plus4-container-joueurs){ background: transparent !important; }
@@ -209,3 +209,69 @@ html[data-theme="kawaii"] #ecranTele .tele-regles-partie{ color: var(--kawaii-ro
 html[data-theme="kawaii"] #ecranTele .tele-regles-nom{ color: var(--kawaii-rose); }
 html[data-theme="kawaii"] #ecranTele :is(.tele-regles-ligne ul, .tele-regles-pj){ color: var(--kawaii-prune); }
 html[data-theme="kawaii"] #ecranTele .tele-regles-ligne em{ color: var(--kawaii-rose); }
+
+/* ===== Télé en Kawaii : même univers que le téléphone (verre irisé, personnages, paillettes, arc-en-ciel) ===== */
+.tele-decor-kawaii{ display: none; }
+html[data-theme="kawaii"] .tele-decor-kawaii{ display: block; position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+.tele-decor-kawaii span{ position: absolute; background: center / contain no-repeat; opacity: 0.92; filter: drop-shadow(0 0.5vh 0 rgba(120, 50, 110, 0.16)); animation: kawaiiLevite ease-in-out infinite; }
+html[data-theme="kawaii"] #ecranTele :is(.tele-entete, .tele-prepa, .tele-gauche, .tele-droite, .tele-ecran > :not(.tele-decor-kawaii)){ position: relative; z-index: 1; }
+html[data-theme="kawaii"] #ecranTele .tele-bloc{ position: relative; }
+html[data-theme="kawaii"] #ecranTele .tele-ecran{ overflow: hidden; }
+/* Panneaux : verre irisé holographique, bord blanc, reflets */
+html[data-theme="kawaii"] #ecranTele :is(.tele-entete, .tele-bloc){
+  border-radius: 3.2vh; border: 0.4vh solid rgba(255, 255, 255, 0.97);
+  background: linear-gradient(125deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 224, 242, 0.92) 28%, rgba(224, 233, 255, 0.92) 52%, rgba(214, 255, 240, 0.92) 76%, rgba(255, 249, 220, 0.95) 100%);
+  box-shadow: 0 1.2vh 3vh rgba(150, 90, 200, 0.32), inset 0 0 0 0.1vh rgba(255, 255, 255, 0.8), inset 0 1vh 2vh rgba(255, 255, 255, 0.85), inset 0 -0.8vh 1.8vh rgba(190, 150, 255, 0.25);
+}
+html[data-theme="kawaii"] #ecranTele .tele-tour.tele-avec-couleur{ background: linear-gradient(125deg, #fff, color-mix(in srgb, var(--couleur-tele) 22%, #ffffff)); }
+html[data-theme="kawaii"] #ecranTele :is(.tele-entete, .tele-bloc-joueurs, .tele-bloc-regles){ overflow: hidden; }
+html[data-theme="kawaii"] #ecranTele :is(.tele-entete, .tele-bloc-joueurs, .tele-bloc-regles)::before{
+  content: ""; position: absolute; top: 0; bottom: 0; left: -70%; width: 40%; pointer-events: none; z-index: 0;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.85), transparent); transform: skewX(-18deg); animation: kawaiiReflet 8s ease-in-out infinite;
+}
+html[data-theme="kawaii"] #ecranTele .tele-bloc-regles::before{ animation-delay: 3s; }
+html[data-theme="kawaii"] #ecranTele .tele-bloc-joueurs::before{ animation-delay: 1.5s; }
+html[data-theme="kawaii"] #ecranTele :is(.tele-entete, .tele-bloc-joueurs, .tele-bloc-regles) > *{ position: relative; z-index: 1; }
+/* Titre : licorne, étoile, contour blanc ; barre arc-en-ciel */
+html[data-theme="kawaii"] #ecranTele .tele-entete .tele-titre{ color: var(--kawaii-rose); -webkit-text-stroke: 0.3vh #fff; paint-order: stroke fill; text-shadow: 0 0.6vh 0 var(--kawaii-rose-fonce), 0 1.2vh 1.6vh rgba(150, 40, 110, 0.25); }
+html[data-theme="kawaii"] #ecranTele .tele-entete .tele-titre::before{ content: ""; display: inline-block; width: 1.2em; height: 1.2em; vertical-align: -0.25em; margin-right: 0.14em; background: var(--ic-licorne) center / contain no-repeat; }
+html[data-theme="kawaii"] #ecranTele .tele-entete .tele-titre::after{ content: ""; display: inline-block; width: 0.85em; height: 0.85em; vertical-align: -0.1em; margin-left: 0.14em; background: var(--ic-etoile) center / contain no-repeat; }
+html[data-theme="kawaii"] #ecranTele .tele-entete::after{ background: linear-gradient(90deg, #ff4f9a, #ffb12e, #35c9a6, #5aa8ff, #b46bff); height: 0.7vh; border-radius: 0.4vh; }
+/* Titres des blocs : un personnage chacun */
+html[data-theme="kawaii"] #ecranTele :is(.tele-bloc-titre, .tele-tour-label)::before{ content: ""; display: inline-block; width: 1.4em; height: 1.4em; vertical-align: -0.35em; margin-right: 0.3em; background-position: center; background-size: contain; background-repeat: no-repeat; }
+html[data-theme="kawaii"] #ecranTele .tele-tour-label::before{ background-image: var(--ic-lapin); }
+html[data-theme="kawaii"] #ecranTele .tele-bloc-joueurs .tele-bloc-titre::before{ background-image: var(--ic-cupcake); }
+html[data-theme="kawaii"] #ecranTele .tele-bloc-regles .tele-bloc-titre::before{ background-image: var(--ic-fraise); }
+/* Joueurs : un personnage devant chaque prénom, comme sur le téléphone */
+html[data-theme="kawaii"] #ecranTele .tele-joueur{ gap: 1.2vh; }
+html[data-theme="kawaii"] #ecranTele .tele-joueur::before{ content: ""; flex: none; width: 1.25em; height: 1.25em; background: var(--ic-chat) center / contain no-repeat; }
+html[data-theme="kawaii"] #ecranTele .tele-joueur > :first-child{ margin-right: auto; }
+html[data-theme="kawaii"] #ecranTele .tele-joueur:nth-child(6n+2)::before{ background-image: var(--ic-lapin); }
+html[data-theme="kawaii"] #ecranTele .tele-joueur:nth-child(6n+3)::before{ background-image: var(--ic-licorne); }
+html[data-theme="kawaii"] #ecranTele .tele-joueur:nth-child(6n+4)::before{ background-image: var(--ic-cupcake); }
+html[data-theme="kawaii"] #ecranTele .tele-joueur:nth-child(6n+5)::before{ background-image: var(--ic-fraise); }
+html[data-theme="kawaii"] #ecranTele .tele-joueur:nth-child(6n)::before{ background-image: var(--ic-nuage); }
+html[data-theme="kawaii"] #ecranTele .tele-joueur-pigeon::before{ background-image: var(--ic-poussin) !important; }
+/* Le bloc « Tour de » : une licorne perchée dessus */
+html[data-theme="kawaii"] #ecranTele .tele-tour{ position: relative; }
+html[data-theme="kawaii"] #ecranTele .tele-tour::after{ content: ""; position: absolute; right: 1.6vh; top: -3.4vh; width: 7.4vh; height: 7.4vh; background: var(--ic-licorne) center / contain no-repeat; filter: drop-shadow(0 0.4vh 0 rgba(120, 50, 110, 0.2)); animation: kawaiiFlotte 3.2s ease-in-out infinite alternate; z-index: 3; }
+/* Plateau : posé sur un grand panneau de verre */
+html[data-theme="kawaii"] #ecranTele .tele-plateau{ position: relative; isolation: isolate; }
+html[data-theme="kawaii"] #ecranTele .tele-plateau::before{
+  content: ""; position: absolute; inset: -1.6vh; z-index: -1; border-radius: 3.4vh; border: 0.4vh solid rgba(255, 255, 255, 0.97);
+  background: linear-gradient(125deg, rgba(255, 255, 255, 0.72), rgba(255, 224, 242, 0.62) 40%, rgba(224, 233, 255, 0.62) 70%, rgba(214, 255, 240, 0.7));
+  box-shadow: 0 1.2vh 3vh rgba(150, 90, 200, 0.28), inset 0 1vh 2vh rgba(255, 255, 255, 0.7);
+}
+/* Écran des annonces : étoile et cœur autour du titre, carte qui brille */
+html[data-theme="kawaii"] #ecranTele .tele-ecran-titre::before{ content: ""; display: inline-block; width: 0.9em; height: 0.9em; vertical-align: -0.1em; margin-right: 0.2em; background: var(--ic-etoile) center / contain no-repeat; }
+html[data-theme="kawaii"] #ecranTele .tele-ecran-titre::after{ content: ""; display: inline-block; width: 0.9em; height: 0.9em; vertical-align: -0.1em; margin-left: 0.2em; background: url("stickers/coeur.svg") center / contain no-repeat; }
+html[data-theme="kawaii"] #ecranTele .tele-ecran-cartes .Carte{ box-shadow: 0 0 0 0.5vh #fff, 0 0 4vh rgba(255, 140, 200, 0.85), 0 1.4vh 0 rgba(150, 60, 140, 0.25); }
+@media (prefers-reduced-motion: reduce){ html[data-theme="kawaii"] #ecranTele :is(.tele-entete, .tele-bloc-joueurs, .tele-bloc-regles)::before, html[data-theme="kawaii"] #ecranTele .tele-tour::after{ animation: none; display: none; } }
+/* Règle de couleur : fond clair de la couleur, plus de gris foncé */
+html[data-theme="kawaii"] #ecranTele .tele-couleur{ background: color-mix(in srgb, var(--c) 16%, #ffffff); text-shadow: none; color: var(--kawaii-prune); border-width: 0.4vh; border-radius: 2vh; }
+html[data-theme="kawaii"] #ecranTele .tele-couleur b{ color: var(--c); text-shadow: 0 0 0.3vh #fff, 0 0.2vh 0 rgba(80, 13, 80, 0.35); }
+/* Écran PAUSE de la télé : pastel plein (comme celui du téléphone), PAUSE rose bonbon */
+html[data-theme="kawaii"] #ecranTele .tele-pause{ background: linear-gradient(125deg, #ffffff 0%, #ffe3f3 30%, #e3ebff 58%, #dcfff2 82%, #fff8dc 100%); -webkit-backdrop-filter: none; backdrop-filter: none; }
+html[data-theme="kawaii"] #ecranTele .tele-pause svg{ fill: var(--kawaii-rose); }
+html[data-theme="kawaii"] #ecranTele .tele-pause-titre{ color: var(--kawaii-rose); -webkit-text-stroke: 0.4vh #fff; paint-order: stroke fill; text-shadow: 0 1vh 0 var(--kawaii-rose-fonce); }
+html[data-theme="kawaii"] #ecranTele .tele-pause-texte{ color: var(--kawaii-prune); }
