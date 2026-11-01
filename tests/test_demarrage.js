@@ -1110,6 +1110,30 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
+  // 43. Télé : l'écran qui reprend celui du téléphone (duel, pigeon, +4…) est plein dans les 10 thèmes : on ne voit pas les cartes du plateau à travers
+  {
+    const ctx = await nav.newContext({ viewport: { width: 1280, height: 720 } });
+    const page = await ctx.newPage();
+    await page.goto(url + "?tele"); await page.waitForTimeout(900);
+    const transparents = await page.evaluate(() => {
+      const etat = { partie: true, theme: "bordeaux", cartes: ["cinq_rouge", "plus_4", ""], joueurs: [{ n: "Tom", a: 0, g: 0, s: 0 }, { n: "Lea", t: true, a: 0, g: 0, s: 0 }], tour: "Lea", regles: [], h: [], musique: 0,
+        ecran: { id: "overlayPigeon", texte: "PIGEON\nTom", cartes: [], choix: [] } };
+      dessinerTele(document.getElementById("ecranTele"), etat);
+      const mauvais = [];
+      for (const t of ["bordeaux", "noir", "vert", "bleu", "soleil", "cerisier", "givre", "prestige", "galaxie", "kawaii"]) {
+        document.documentElement.dataset.theme = t;
+        const c = getComputedStyle(document.querySelector("#ecranTele .tele-ecran")).backgroundColor;
+        const m = c.match(/rgba?\(([^)]*)\)/), p = m ? m[1].split(",").map((x) => parseFloat(x)) : [];
+        const alpha = p.length === 4 ? p[3] : 1;
+        if (alpha < 1 && !/gradient/.test(getComputedStyle(document.querySelector("#ecranTele .tele-ecran")).backgroundImage)) mauvais.push(t + " " + c);
+        else if (alpha < 1) mauvais.push(t + " " + c);
+      }
+      return mauvais;
+    });
+    verifier(transparents.length === 0, `télé : écran du duel / pigeon plein dans 10 thèmes ${transparents.join(" ; ")}`);
+    await ctx.close();
+  }
+
   await nav.close();
   serveur.close();
   console.log(echecs ? `\n${echecs} ÉCHEC(S)` : "\nTOUT EST OK");
