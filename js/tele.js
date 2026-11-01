@@ -213,8 +213,24 @@ function reglesPourTele(){
   return { id: "ecranRegles", texte: "", cartes: [], choix: [], regles: { pj: !!estModeSoft(), parties } };
 }
 
+// FAQ ouverte sur le téléphone (js/faq.js) : la télé montre toutes les questions, et la réponse (avec son image) de celles qui sont dépliées
+function faqPourTele(){
+  const page = document.getElementById("ecranRegles");
+  if (!estAffiche(page) || !page.classList.contains("faq") || page.classList.contains("page-sortie")) return null;
+  const ouvertes = Array.from(document.querySelectorAll("#listeRegles .faqItem")).map((d) => d.open);
+  let n = 0;
+  const parties = QUESTIONS_FAQ.map((partie) => ({
+    t: partie.titre,
+    q: partie.questions.map((item) => {
+      const o = !!ouvertes[n++];
+      return o ? { n: item.q, o: 1, l: item.r, i: item.image || "" } : { n: item.q };
+    })
+  }));
+  return { id: "ecranRegles", texte: "", cartes: [], choix: [], faq: { parties } };
+}
+
 function ecranPourTele(){
-  const reglesOuvertes = reglesPourTele();
+  const reglesOuvertes = reglesPourTele() || faqPourTele();
   if (reglesOuvertes) return reglesOuvertes;
   const overlays = Array.from(document.querySelectorAll('body > [id^="overlay"]')).filter(estAffiche);
   const o = overlays[overlays.length - 1];
@@ -989,7 +1005,7 @@ function dessinerTele(ecran, etat){
   document.documentElement.classList.toggle("tele-ecran-ouvert", !!e); // (pas de reflet Prestige dessus)
   surEcran.classList.toggle("tele-ecran-historique", !!e && e.id === "voletHistorique");
   surEcran.classList.toggle("tele-ecran-recap", !!(e && e.recap));
-  surEcran.classList.toggle("tele-ecran-regles", !!(e && e.id === "ecranRegles" && e.regles));
+  surEcran.classList.toggle("tele-ecran-regles", !!(e && e.id === "ecranRegles" && (e.regles || e.faq)));
   if (e && e.recap) {
     surEcran.querySelector(".tele-ecran-cartes").innerHTML = "";
     surEcran.querySelector(".tele-ecran-choix").innerHTML = "";
@@ -999,10 +1015,11 @@ function dessinerTele(ecran, etat){
     return;
   }
   delete surEcran.querySelector(".tele-ecran-texte").dataset.recap;
-  if (e && e.id === "ecranRegles" && e.regles) {
+  if (e && e.id === "ecranRegles" && (e.regles || e.faq)) {
     surEcran.querySelector(".tele-ecran-cartes").innerHTML = "";
     surEcran.querySelector(".tele-ecran-choix").innerHTML = "";
-    dessinerReglesTele(surEcran.querySelector(".tele-ecran-texte"), e.regles);
+    if (e.faq) dessinerFaqTele(surEcran.querySelector(".tele-ecran-texte"), e.faq);
+    else dessinerReglesTele(surEcran.querySelector(".tele-ecran-texte"), e.regles);
   } else if (e && e.id === "voletHistorique") {
     surEcran.querySelector(".tele-ecran-cartes").innerHTML = "";
     surEcran.querySelector(".tele-ecran-choix").innerHTML = "";
@@ -1079,6 +1096,53 @@ function dessinerReglesTele(zone, regles){
       const liste = document.createElement("ul");
       (r.l || []).forEach((l) => { const li = document.createElement("li"); remplirBalisesTele(li, l); liste.appendChild(li); });
       texte.append(nom, liste);
+      ligne.appendChild(texte);
+      bloc.appendChild(ligne);
+    });
+    colonnes.appendChild(bloc);
+  });
+  zone.appendChild(colonnes);
+}
+
+// La FAQ en grand (ouverte sur le téléphone : voir faqPourTele) : toutes les questions, les réponses seulement des questions dépliées
+function dessinerFaqTele(zone, faq){
+  const cle = JSON.stringify(faq);
+  if (zone.dataset.regles === cle) return;
+  zone.dataset.regles = cle;
+  zone.innerHTML = "";
+  const titre = document.createElement("div");
+  titre.className = "tele-ecran-titre";
+  titre.innerText = "Questions fréquentes";
+  zone.appendChild(titre);
+  const colonnes = document.createElement("div");
+  colonnes.className = "tele-regles-colonnes";
+  (faq.parties || []).forEach((partie) => {
+    const bloc = document.createElement("div");
+    bloc.className = "tele-regles-bloc";
+    const h = document.createElement("div");
+    h.className = "tele-regles-partie";
+    h.innerText = partie.t;
+    bloc.appendChild(h);
+    (partie.q || []).forEach((q) => {
+      const ligne = document.createElement("div");
+      ligne.className = "tele-regles-ligne tele-faq-q" + (q.o ? " tele-faq-ouverte" : "");
+      const texte = document.createElement("div");
+      const nom = document.createElement("div");
+      nom.className = "tele-regles-nom";
+      nom.innerText = (q.o ? "▾ " : "▸ ") + q.n;
+      texte.appendChild(nom);
+      if (q.o) {
+        const liste = document.createElement("ul");
+        (q.l || []).forEach((l) => { const li = document.createElement("li"); remplirBalisesTele(li, l); liste.appendChild(li); });
+        texte.appendChild(liste);
+        if (q.i && /^faq\/[a-z0-9_-]+\.webp$/.test(q.i)) {
+          const img = document.createElement("img");
+          img.className = "tele-faq-image";
+          img.src = q.i;
+          img.alt = "";
+          texte.appendChild(img);
+        }
+      }
       ligne.appendChild(texte);
       bloc.appendChild(ligne);
     });

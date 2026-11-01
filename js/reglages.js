@@ -1297,7 +1297,7 @@ document.addEventListener("visibilitychange", () => {
 const SONS = ["cartes", "doree", "tiens_gueule", "bouton", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees", "regles", "accessibilite_on"]; // (les sons de sabre ne se chargent que dans le thème Star Wars, voir morceauSabre)
 // Sons de sabre : Sons/sabre/sabre_01.mp3 à sabre_54.mp3 (0,8 s chacun). Le clic des boutons en joue un au
 // hasard (jouerSon("bouton")). Si tu en supprimes, retire aussi leur nom de cette liste (et de SONS_A_PRECHARGER dans sw.js) ; un nom sans fichier est simplement ignoré (404).
-const SONS_SABRE = ["sabre/sabre_01", "sabre/sabre_02", "sabre/sabre_05", "sabre/sabre_07", "sabre/sabre_09", "sabre/sabre_11", "sabre/sabre_14", "sabre/sabre_15", "sabre/sabre_18", "sabre/sabre_22", "sabre/sabre_24", "sabre/sabre_26", "sabre/sabre_31", "sabre/sabre_33", "sabre/sabre_35", "sabre/sabre_37", "sabre/sabre_38", "sabre/sabre_40", "sabre/sabre_41", "sabre/sabre_48", "sabre/sabre_54"];
+const SONS_SABRE = ["sabre/sabre_01", "sabre/sabre_02", "sabre/sabre_05", "sabre/sabre_07", "sabre/sabre_09", "sabre/sabre_11", "sabre/sabre_14", "sabre/sabre_15", "sabre/sabre_18", "sabre/sabre_22", "sabre/sabre_26", "sabre/sabre_31", "sabre/sabre_33", "sabre/sabre_37", "sabre/sabre_40", "sabre/sabre_41", "sabre/sabre_48"];
 // Sons coupés au bout de N secondes (avec un petit fondu), même si le fichier est plus long
 const DUREE_MAX_SONS = { doree: 3, pigeon: 2, distribuer_gorgees: 0.8, bouton: 0.3 };
 const sonsCharges = {}; // nom -> son décodé (ou null si le fichier n'existe pas)
@@ -1342,7 +1342,7 @@ function chargerSons(){
 // (annuler des gorgées, distribuer au +4, choisir le pigeon ou la victime de la carte dorée), et sauf
 // « Signaler un bug » et « Copier le diagnostic » (silencieux)
 const BOUTONS_AVEC_LEUR_SON = ".bouton-annulation, .plus4-joueur-btn, #overlayPigeon .bouton-pigeon, .bouton-doree, " +
-  "#btnSignalerBug, #btnDiagnostic, #btnRegles, #btnReglesJeu, #bandeauMiseAJour .maj, .fenetreGalaxie-ok";
+  "#btnSignalerBug, #btnDiagnostic, #btnRegles, #btnReglesJeu, #btnFaq, #btnFaqDepuisRegles, #bandeauMiseAJour .maj, .fenetreGalaxie-ok";
 document.addEventListener("click", (e) => {
   if (!e.isTrusted || document.documentElement.classList.contains("mode-tele")) return;
   if (Date.now() - sonBoutonJoueLe < 500) return; // déjà joué au doigt levé (activerMemePendantElan)
@@ -2590,12 +2590,20 @@ function remplirRegles(){
   });
 }
 
-function ouvrirRegles(){
-  jouerSon("regles"); // (à la place du clic des boutons, voir BOUTONS_AVEC_LEUR_SON)
+// Remet le contenu des Règles dans l'écran (la FAQ, qui s'y ouvre aussi, y revient avec « Retour »)
+function afficherContenuRegles(){
   ecranRegles.classList.remove("album", "faq"); // (l'album de stickers et la FAQ s'ouvrent dans cet écran : js/stickers.js, js/faq.js)
   ecranRegles.querySelector("h2").textContent = "Règles du jeu";
   remplirRegles();
   ecranRegles.scrollTop = 0;
+}
+// FAQ ouverte depuis les Règles : « Retour » revient aux Règles (ouverte depuis les Réglages : il ferme, et on retrouve les Réglages)
+let faqRetourVersRegles = false;
+
+function ouvrirRegles(){
+  jouerSon("regles"); // (à la place du clic des boutons, voir BOUTONS_AVEC_LEUR_SON)
+  faqRetourVersRegles = false;
+  afficherContenuRegles();
   choixDejaEnAttente = new Set(choixEnAttentePourMoi()); // déjà là à l'ouverture : on ne referme pas pour eux
   ouvrirPage(ecranRegles);
 }
@@ -2634,6 +2642,9 @@ new MutationObserver(() => {
 
 document.getElementById("btnRegles").addEventListener("click", ouvrirRegles);
 document.getElementById("btnReglesJeu").addEventListener("click", ouvrirRegles);
-activerMemePendantElan(document.getElementById("btnFermerRegles"), () => fermerPage(ecranRegles));
+activerMemePendantElan(document.getElementById("btnFermerRegles"), () => {
+  if (ecranRegles.classList.contains("faq") && faqRetourVersRegles) { faqRetourVersRegles = false; afficherContenuRegles(); return; }
+  fermerPage(ecranRegles);
+});
 
 // #endregion

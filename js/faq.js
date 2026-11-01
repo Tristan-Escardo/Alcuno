@@ -13,9 +13,9 @@ const QUESTIONS_FAQ = [
       r: ["Touche le petit bouton <b>pause</b> ⏸ à côté du nom du joueur (toilettes, clope, appel…).",
           "Pendant sa pause, on le saute. S'il revient avant qu'une carte soit retournée, il récupère son tour.",
           "Touche ▶ pour le remettre en jeu."] },
-    { q: "Comment débloquer les thèmes et les stickers ?", r: [
-          "Les thèmes sont dans <b>Réglages › Thèmes</b>. Certains se débloquent en jouant.",
-          "Pour le thème Kawaii : collectionne les stickers de l'album (une étoile filante apparaît de temps en temps, et l'album se découvre en tapant 3 fois sur la barre arc-en-ciel sous le titre)."] }
+    { q: "Où changer le thème du jeu ?", r: [
+          "Dans <b>Réglages › Thèmes</b>, touche la pastille du thème que tu veux.",
+          "Certains thèmes se débloquent en jouant."] }
   ]},
   { titre: "En ligne et télé", questions: [
     { q: "Comment jouer en ligne avec des amis ?", image: "faq/enligne.webp", alt: "Écran du mode en ligne : Créer une partie et Rejoindre une partie sont entourés",
@@ -84,5 +84,5 @@ function ouvrirFaq(){
   if (page.style.display === "none" || page.classList.contains("page-sortie")) ouvrirPage(page);
 }
 
-document.getElementById("btnFaq").addEventListener("click", ouvrirFaq);
-document.getElementById("btnFaqDepuisRegles").addEventListener("click", ouvrirFaq);
+document.getElementById("btnFaq").addEventListener("click", () => { faqRetourVersRegles = false; ouvrirFaq(); });
+document.getElementById("btnFaqDepuisRegles").addEventListener("click", () => { faqRetourVersRegles = true; ouvrirFaq(); });

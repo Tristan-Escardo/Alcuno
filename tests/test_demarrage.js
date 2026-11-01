@@ -1163,6 +1163,31 @@ function verifier(ok, texte){
       `règles sur la télé : envoyées ouvertes (${etat.ecran && etat.ecran.id}), plus rien fermées (${apres}), ${r.lignes} règles affichées ${r.deborde ? "qui débordent" : "sans déborder"}`);
   }
 
+  // 44b. FAQ ouverte sur le téléphone : envoyée à la télé (toutes les questions, réponse et image des questions dépliées), qui l'affiche en grand
+  {
+    const { ctx, page, erreurs } = await ouvrir();
+    await page.click("#btnRegles"); await page.waitForTimeout(500);
+    await page.click("#btnFaqDepuisRegles"); await page.waitForTimeout(500);
+    const fermee = await page.evaluate(() => { const f = etatPourTele().ecran.faq; return { questions: f.parties.reduce((n, p) => n + p.q.length, 0), ouvertes: f.parties.reduce((n, p) => n + p.q.filter((q) => q.o).length, 0) }; });
+    await page.click(".faqItem:nth-child(2) summary"); await page.waitForTimeout(500);
+    const etat = await page.evaluate(() => etatPourTele());
+    await page.click("#btnFermerRegles"); await page.waitForTimeout(500); // (« Retour » : les Règles reviennent, la télé les montre)
+    const apres = await page.evaluate(() => etatPourTele().ecran);
+    await ctx.close();
+    const tv = await nav.newContext({ viewport: { width: 1280, height: 720 } });
+    const t = await tv.newPage();
+    await t.goto(url + "?tele"); await t.waitForTimeout(900);
+    const r = await t.evaluate((etat) => {
+      dessinerTele(document.getElementById("ecranTele"), etat);
+      const z = document.querySelector(".tele-ecran-texte"), sc = document.querySelector(".tele-ecran");
+      const img = document.querySelector(".tele-faq-image");
+      return { questions: document.querySelectorAll(".tele-faq-q").length, ouvertes: document.querySelectorAll(".tele-faq-ouverte").length, image: !!img, deborde: z.getBoundingClientRect().bottom > sc.clientHeight, titre: (document.querySelector(".tele-ecran-titre") || {}).innerText };
+    }, etat);
+    await tv.close();
+    verifier(fermee.questions === 7 && fermee.ouvertes === 0 && etat.ecran.faq && etat.ecran.faq.parties.some((p) => p.q.some((q) => q.o && q.i)) && apres && apres.regles && !apres.faq && r.questions === 7 && r.ouvertes === 1 && r.image && !r.deborde && r.titre === "Questions fréquentes" && erreurs.length === 0,
+      `FAQ sur la télé : ${JSON.stringify({ fermee, r, apres: apres && apres.id })}`);
+  }
+
   // 45. Télé en Kawaii : décor (personnages et paillettes) visible seulement dans ce thème, « Télé XXXX » reste en bas à droite, tout tient à l'écran
   {
     const ctx = await nav.newContext({ viewport: { width: 1280, height: 720 } });
@@ -1204,10 +1229,21 @@ function verifier(ok, texte){
     await page.evaluate(() => document.getElementById("btnFaq").scrollIntoView({ block: "center" }));
     await page.click("#btnFaq"); await page.waitForTimeout(500);
     const depuisReglages = await page.evaluate(() => document.querySelector("#ecranRegles h2").textContent);
+    const sonPropre = await page.evaluate(() => ["btnFaq", "btnFaqDepuisRegles"].every((id) => document.getElementById(id).matches(BOUTONS_AVEC_LEUR_SON))); // (pas de 2e son, ex. le sabre Star Wars)
+    await page.click("#btnFermerRegles"); await page.waitForTimeout(600); // (ouverte depuis les Réglages : « Retour » revient aux Réglages)
+    const retourReglages = await page.evaluate(() => ({ regles: getComputedStyle(document.getElementById("ecranRegles")).display !== "none", reglages: getComputedStyle(document.getElementById("ecranReglages")).display !== "none" }));
+    await page.click("#btnFermerReglages"); await page.waitForTimeout(500);
+    await page.click("#btnRegles"); await page.waitForTimeout(500);
+    await page.click("#btnFaqDepuisRegles"); await page.waitForTimeout(500);
+    await page.click("#btnFermerRegles"); await page.waitForTimeout(600); // (ouverte depuis les Règles : « Retour » revient aux Règles, sans fermer la page)
+    const retourRegles = await page.evaluate(() => ({ titre: document.querySelector("#ecranRegles h2").textContent, ouverte: getComputedStyle(document.getElementById("ecranRegles")).display !== "none", faq: document.getElementById("ecranRegles").classList.contains("faq"), regles: document.querySelectorAll("#listeRegles .ligneRegle").length }));
+    await page.click("#btnFermerRegles"); await page.waitForTimeout(600);
+    const ferme = await page.evaluate(() => getComputedStyle(document.getElementById("ecranRegles")).display === "none");
     await ctx.close();
     verifier(lienVisible && avant.titre === "Questions fréquentes" && avant.n >= 7 && avant.images === 0 && avant.lien === "none" && !avant.tele && apres && apres.charge && !apres.deborde &&
-      regles.titre === "Règles du jeu" && !regles.faq && regles.tele && depuisReglages === "Questions fréquentes" && erreurs.length === 0,
-      `FAQ : ${JSON.stringify({ lienVisible, avant, apres, regles, depuisReglages, erreurs })}`);
+      regles.titre === "Règles du jeu" && !regles.faq && regles.tele && depuisReglages === "Questions fréquentes" && erreurs.length === 0 &&
+      sonPropre && !retourReglages.regles && retourReglages.reglages && retourRegles.titre === "Règles du jeu" && retourRegles.ouverte && !retourRegles.faq && retourRegles.regles === 12 && ferme,
+      `FAQ : ${JSON.stringify({ lienVisible, avant, apres, regles, depuisReglages, sonPropre, retourReglages, retourRegles, ferme, erreurs })}`);
   }
 
   await nav.close();

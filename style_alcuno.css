@@ -8493,6 +8493,9 @@ html.reglages-en-partie :is([data-cle="faces-cachees"], [data-cle="mode-pj"], [d
 #ecranTele .tele-regles-ligne ul{ margin: 0.3vh 0 0; padding-left: 2.4vh; font-size: 2.2vh; font-weight: 700; line-height: 1.25; color: #fff; }
 #ecranTele .tele-regles-ligne em{ color: #ffe680; font-style: normal; font-weight: 900; }
 /* Soleil couchant : fond de l'écran en dégradé pêche -> mauve : textes foncés */
+#ecranTele .tele-faq-q .tele-regles-nom{ font-size: 2.5vh; }
+#ecranTele .tele-faq-ouverte{ padding-bottom: 1.2vh; }
+#ecranTele .tele-faq-image{ display: block; margin-top: 1vh; max-width: 100%; max-height: 24vh; width: auto; height: auto; border-radius: 1.2vh; border: 1px solid rgba(255,215,0,0.35); }
 html[data-theme="soleil"] #ecranTele .tele-regles-partie{ color: #4a1d4a; border-bottom-color: rgba(74, 29, 74, 0.4); }
 html[data-theme="soleil"] #ecranTele .tele-regles-nom{ color: #7a1f45; }
 html[data-theme="soleil"] #ecranTele :is(.tele-regles-ligne ul, .tele-regles-pj){ color: #2b1640; }
