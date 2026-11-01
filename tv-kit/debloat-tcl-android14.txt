@@ -1,0 +1,31 @@
+# TCL Smart TV Pro, Android 14 — LISTE CANDIDATE (non testée sur ton modèle).
+# Basée sur la liste d'un TCL Google TV (Android 11). Les noms de paquets peuvent différer :
+# après backup.sh, envoie-moi backup-*/packages-all.txt et je la corrige. Un paquet absent donne
+# juste une erreur inoffensive. Tout est DÉSACTIVÉ (pm disable-user), jamais désinstallé.
+# Mets un # devant toute ligne dont tu utilises la fonction.
+
+# Pubs / télémétrie / comptes TCL
+com.tcl.ttvs
+com.tcl.usercenter
+com.tcl.messagebox
+com.tcl.esticker
+com.tcl.partnercustomizer
+# Contenu TCL
+com.tcl.channelplus
+com.tcl.waterfall.overseas
+com.tcl.tv.tclhome_passive
+# Divers en arrière-plan
+com.tcl.guard
+com.tcl.notereminder
+com.tcl.hotelmenu
+# À VÉRIFIER avant de désactiver (décommente si tu ne les utilises pas) :
+#com.tcl.miracast                   # recopie d'écran
+#com.tcl.MultiScreenInteraction_TV  # T-Cast
+#com.tcl.ui_mediaCenter             # lecteur USB
+#com.tcl.gallery                    # photos USB
+#com.google.android.apps.mediashell # Chromecast intégré (casser = plus de "caster" vers la TV)
+#com.google.android.apps.tv.dreamx  # économiseur d'écran
+com.google.android.videos
+com.google.android.play.games
+com.google.android.feedback
+android.autoinstalls.config.google.gtvpai   # installe des apps sponsorisées en douce
