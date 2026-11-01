@@ -1091,6 +1091,25 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
+  // 42. Joueur mis en pause pendant son tour : s'il revient avant que quelqu'un ait joué, son tour lui est rendu
+  {
+    const { ctx, page, erreurs } = await ouvrir();
+    await page.click("#btnModeClassique"); await page.waitForTimeout(500);
+    for (const nom of ["Tom", "Lea", "Max"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(200); }
+    await page.click("#jouer"); await page.waitForTimeout(1200);
+    const idx = () => page.evaluate(() => indexJoueur % joueurs.length);
+    const r = { depart: await idx() };
+    await page.evaluate(() => basculerPauseJoueur("Tom")); r.pause = await idx();
+    await page.evaluate(() => basculerPauseJoueur("Tom")); r.retourAussitot = await idx();
+    await page.evaluate(() => basculerPauseJoueur("Tom"));
+    await page.evaluate(() => document.querySelector("#plateau .Carte:not(.retournee)").click()); await page.waitForTimeout(700);
+    r.apresCarte = await idx();
+    await page.evaluate(() => basculerPauseJoueur("Tom")); r.retourApres = await idx();
+    verifier(r.depart === 0 && r.pause === 1 && r.retourAussitot === 0 && r.apresCarte === 2 && r.retourApres === 2 && erreurs.length === 0,
+      `pause du joueur dont c'est le tour : ${JSON.stringify(r)} (retour aussitôt = tour rendu ; retour après une carte = tour inchangé)`);
+    await ctx.close();
+  }
+
   await nav.close();
   serveur.close();
   console.log(echecs ? `\n${echecs} ÉCHEC(S)` : "\nTOUT EST OK");

@@ -676,6 +676,9 @@ function nextPlayerIndex(fromIdx){
 // pour la reprise après un plantage. Il reste toujours au moins 2 joueurs pas en pause.
 let joueursEnPause = new Set();
 function estEnPause(nom){ return joueursEnPause.has(nom); }
+// Joueur mis en pause alors que c'était son tour : le tour est passé au suivant, mais s'il revient avant que quelqu'un ait
+// retourné une carte, son tour lui est rendu (sinon il perdait sa carte pour avoir été mis en pause un instant)
+let tourSautePourPause = null; // { nom, vers (index du joueur à qui le tour est passé), cartes (cartes restantes à ce moment) }
 function indexJoueursActifs(){ return joueurs.map((_, i) => i).filter(i => !estEnPause(joueurs[i])); }
 
 function basculerPauseJoueur(nom){
@@ -683,7 +686,11 @@ function basculerPauseJoueur(nom){
   const discret = rattrapageEnCours; // (rejeu accéléré : pas de notif)
   if(estEnPause(nom)){
     joueursEnPause.delete(nom);
-    if(!discret) afficherNotificationHaut("", `${nom} est de retour !`, true);
+    const tourRendu = !!tourSautePourPause && tourSautePourPause.nom === nom && partieLancee &&
+      indexJoueur % joueurs.length === tourSautePourPause.vers && cartesRestantes() === tourSautePourPause.cartes;
+    tourSautePourPause = null;
+    if(tourRendu) indexJoueur = joueurs.indexOf(nom);
+    if(!discret) afficherNotificationHaut("", tourRendu ? `${nom} est de retour : c'est son tour !` : `${nom} est de retour !`, true);
   } else {
     if(indexJoueursActifs().length <= 2) return;
     joueursEnPause.add(nom);
@@ -691,6 +698,7 @@ function basculerPauseJoueur(nom){
     const courant = indexJoueur % joueurs.length;
     if(joueurs[courant] === nom){
       indexJoueur = nextPlayerIndex(courant); // c'était son tour : au suivant
+      tourSautePourPause = { nom, vers: indexJoueur, cartes: cartesRestantes() };
       if(!discret) afficherNotificationHaut("", `${nom} est en pause : au tour de ${joueurs[indexJoueur]}`, true);
     } else if(!discret){
       afficherNotificationHaut("", `${nom} est en pause`, true);

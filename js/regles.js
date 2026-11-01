@@ -1803,6 +1803,7 @@ function lancerPartie(){
   if(avecCarteDoree) noterDoreeStats("doreesEnJeu"); // statistiques (js/stats.js)
   reinitialiserGorgees();
   joueursEnPause = new Set(); // (personne en pause au début d'une partie)
+  tourSautePourPause = null;
   pauseEnCours = false;
   ecranPause.style.display = "none";
 
