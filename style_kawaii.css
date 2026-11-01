@@ -917,6 +917,12 @@ html[data-theme="kawaii"] #ecranTele .tele-ecran-cartes .Carte{ box-shadow: 0 0 
 /* Règle de couleur : fond clair de la couleur, plus de gris foncé */
 html[data-theme="kawaii"] #ecranTele .tele-couleur{ background: color-mix(in srgb, var(--c) 16%, #ffffff); text-shadow: none; color: var(--kawaii-prune); border-width: 0.4vh; border-radius: 2vh; }
 html[data-theme="kawaii"] #ecranTele .tele-couleur b{ color: var(--c); text-shadow: 0 0 0.3vh #fff, 0 0.2vh 0 rgba(80, 13, 80, 0.35); }
+/* Écrans PAUSE (téléphone et télé) : voile pastel transparent et flou (on devine la partie derrière), PAUSE rose bonbon */
+html[data-theme="kawaii"][data-theme] body #ecranPause{ background: linear-gradient(125deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 227, 243, 0.72) 30%, rgba(227, 235, 255, 0.72) 58%, rgba(220, 255, 242, 0.72) 82%, rgba(255, 248, 220, 0.72) 100%) !important; -webkit-backdrop-filter: blur(9px) !important; backdrop-filter: blur(9px) !important; }
+html[data-theme="kawaii"] #ecranTele .tele-pause{ background: linear-gradient(125deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 227, 243, 0.72) 30%, rgba(227, 235, 255, 0.72) 58%, rgba(220, 255, 242, 0.72) 82%, rgba(255, 248, 220, 0.72) 100%); }
+html[data-theme="kawaii"] #ecranTele .tele-pause svg{ fill: var(--kawaii-rose); }
+html[data-theme="kawaii"] #ecranTele .tele-pause-titre{ color: var(--kawaii-rose); -webkit-text-stroke: 0.4vh #fff; paint-order: stroke fill; text-shadow: 0 1vh 0 var(--kawaii-rose-fonce); }
+html[data-theme="kawaii"] #ecranTele .tele-pause-texte{ color: var(--kawaii-prune); }
 /* GÉNÉRÉ par outils/generer_cartes_kawaii.py : faces de cartes du thème Kawaii */
 html[data-theme="kawaii"] .zero_vert { background-image: url("Cartes/kawaii/zero_vert.svg"); }
 html[data-theme="kawaii"] .zero_jaune { background-image: url("Cartes/kawaii/zero_jaune.svg"); }
