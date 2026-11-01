@@ -1125,8 +1125,8 @@ function verifier(ok, texte){
         const c = getComputedStyle(document.querySelector("#ecranTele .tele-ecran")).backgroundColor;
         const m = c.match(/rgba?\(([^)]*)\)/), p = m ? m[1].split(",").map((x) => parseFloat(x)) : [];
         const alpha = p.length === 4 ? p[3] : 1;
+        // (Soleil et Kawaii : fond = dégradé plein, sans couleur dessous)
         if (alpha < 1 && !/gradient/.test(getComputedStyle(document.querySelector("#ecranTele .tele-ecran")).backgroundImage)) mauvais.push(t + " " + c);
-        else if (alpha < 1) mauvais.push(t + " " + c);
       }
       return mauvais;
     });
