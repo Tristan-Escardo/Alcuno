@@ -568,7 +568,7 @@ html[data-theme="kawaii"] #ecranTele .tele-prepa-joueur{
 }
 html[data-theme="kawaii"] #ecranTele .tele-pied{ color: rgba(80, 13, 80, 0.45); }
 html[data-theme="kawaii"] #ecranReglages .lienBug{ color: var(--givre-doux); }
-html[data-theme="kawaii"] #ecranReglages #btnSignalerBug{ color: var(--givre-accent); }
+html[data-theme="kawaii"] #ecranReglages :is(#btnSignalerBug, #btnFaq){ color: var(--givre-accent); }
 html[data-theme="kawaii"] #ecranBug .bugFeuille{
   color: var(--givre-texte);
   box-shadow: 0 -12px 32px rgba(80, 13, 80, 0.25), inset 0 1px 0 var(--givre-bord);

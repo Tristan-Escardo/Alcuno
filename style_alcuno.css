@@ -6222,7 +6222,7 @@ html[data-theme="givre"] #ecranTele .tele-pied{ color: rgba(13,53,80,0.45); }
   font-weight: 700;
   color: rgba(255,255,255,0.55);
 }
-#ecranReglages #btnSignalerBug{
+#ecranReglages :is(#btnSignalerBug, #btnFaq){
   /* zone de toucher plus grande que le texte (sans le décaler) */
   padding: 10px 6px;
   margin: -10px -6px;
@@ -6236,7 +6236,7 @@ html[data-theme="givre"] #ecranTele .tele-pied{ color: rgba(13,53,80,0.45); }
   touch-action: manipulation;
 }
 html[data-theme="givre"] #ecranReglages .lienBug{ color: var(--givre-doux); }
-html[data-theme="givre"] #ecranReglages #btnSignalerBug{ color: var(--givre-accent); }
+html[data-theme="givre"] #ecranReglages :is(#btnSignalerBug, #btnFaq){ color: var(--givre-accent); }
 /* Demi-page qui monte du bas, par-dessus les Réglages (assombris derrière) ; avec le clavier ouvert, elle
    se pose juste au-dessus (--bas-cache, js/en-ligne.js) et défile si elle ne tient pas */
 #ecranBug{
@@ -6902,7 +6902,7 @@ html[data-theme="prestige"] :is(#annulerChoix, #bandeauMiseAJour){ --bandeau-fon
    dégradé : textes en prune foncé, lien en framboise souligné */
 html[data-theme="soleil"] body #ecranReglages :is(.blocPartage, .aPropos) .aProposTitre{ color: #5a1f45 !important; opacity: 1 !important; }
 html[data-theme="soleil"] #ecranReglages :is(.lienJeu, .lienBug, .versionJeu){ color: #3a1f4a !important; text-shadow: none !important; }
-html[data-theme="soleil"] #ecranReglages #btnSignalerBug{ color: #a8264f !important; text-decoration: underline; text-underline-offset: 3px; }
+html[data-theme="soleil"] #ecranReglages :is(#btnSignalerBug, #btnFaq){ color: #a8264f !important; text-decoration: underline; text-underline-offset: 3px; }
 html[data-theme="soleil"] #ecranReglages .btnDiagnostic{ color: #3a1f4a !important; border-color: rgba(58, 31, 74, 0.45) !important; background: rgba(255, 255, 255, 0.25) !important; }
 /* (Signaler un bug : « Importer une photo/vidéo » en bas de la demi-page, sur le pêche) */
 html[data-theme="soleil"] #ecranBug #btnAjouterPieceBug{ color: #3a1f4a !important; border-color: rgba(58, 31, 74, 0.5) !important; background: rgba(255, 255, 255, 0.25) !important; }
@@ -6990,6 +6990,15 @@ html[data-theme="noir"] :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btn
   #btnConfirmerAccueilOui, #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon,
   #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie,
   #termineSuppression, #btnInstallationInstaller){
+  background-image: linear-gradient(180deg, #0d0b06, #030302);
+  color: #ffd426;
+  border: 1px solid rgba(255, 210, 38, 0.6);
+  box-shadow: none;
+  text-shadow: none;
+}
+
+/* « Partager le lien » (Réglages) : sa règle propre (blanc, sans liseré) passait devant celle du thème : même style noir et doré que les autres boutons */
+html[data-theme="noir"] #ecranReglages #btnPartagerJeu{
   background-image: linear-gradient(180deg, #0d0b06, #030302);
   color: #ffd426;
   border: 1px solid rgba(255, 210, 38, 0.6);
@@ -7734,7 +7743,7 @@ html[data-theme="galaxie"] #choixMode .titreAccueilBarre, html[data-theme="galax
   box-shadow: 0 0 4px #fff, 0 0 10px #39a0ff, 0 0 22px #1f7bff, 0 0 40px rgba(31,123,255,.6) !important; animation:none !important;
 }
 /* Boutons : lame bleue, « Jouer » et le mode classique en rouge */
-html[data-theme="galaxie"] button:not(.pastilleTheme):not(#btnRemonter):not(#btnPause):not(#btnHistorique):not(#btnReglagesJeu):not(.btnPauseJoueur):not(.btnLivre):not(#btnReglages):not(.btnAccueilTexte):not(#btnSignalerBug):not(.fenetrePrestige-essayer):not(.fenetreKawaii-essayer):not(.fenetreKawaii-plusTard):not(.fenetrePrestige-plusTard):not(.fenetreGalaxie-ok):not(.fenetreGalaxie-plusTard):not(#overlayDuel .duel-boutons button:disabled){
+html[data-theme="galaxie"] button:not(.pastilleTheme):not(#btnRemonter):not(#btnPause):not(#btnHistorique):not(#btnReglagesJeu):not(.btnPauseJoueur):not(.btnLivre):not(#btnReglages):not(.btnAccueilTexte):not(#btnSignalerBug):not(#btnFaq):not(.fenetrePrestige-essayer):not(.fenetreKawaii-essayer):not(.fenetreKawaii-plusTard):not(.fenetrePrestige-plusTard):not(.fenetreGalaxie-ok):not(.fenetreGalaxie-plusTard):not(#overlayDuel .duel-boutons button:disabled){
   background: linear-gradient(180deg, rgba(14,22,44,.92), rgba(6,10,22,.92)) !important; color:#eaf3ff !important; text-shadow:none !important;
   border: 1.5px solid #8fd0ff !important; letter-spacing:.04em;
   box-shadow: 0 0 6px #4aa8ff, 0 0 16px rgba(40,140,255,.55), inset 0 0 10px rgba(80,170,255,.22) !important;
@@ -7892,7 +7901,7 @@ html[data-theme="galaxie"] #haloSabre::after{ content: ""; position: absolute; l
   image-rendering: pixelated; animation: nyanImages 0.84s steps(12) infinite;
   -webkit-mask-image: linear-gradient(to right, transparent 0, #000 55%); mask-image: linear-gradient(to right, transparent 0, #000 55%); }
 @keyframes nyanImages{ from{ background-position-y: 0; } to{ background-position-y: var(--fin); } }
-html[data-theme="galaxie"] #ecranReglages #btnSignalerBug{ color: #8fd0ff; text-shadow: 0 0 8px rgba(80,170,255,.6); }
+html[data-theme="galaxie"] #ecranReglages :is(#btnSignalerBug, #btnFaq){ color: #8fd0ff; text-shadow: 0 0 8px rgba(80,170,255,.6); }
 
 /* ===== Récap de fin de partie (construireRecap, js/plateau.js) : téléphone et télé ===== */
 #overlayFinUnRestants.overlay-recap{ gap: 10px !important; padding: calc(18px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom)) !important; }
@@ -8493,9 +8502,10 @@ html.reglages-en-partie :is([data-cle="faces-cachees"], [data-cle="mode-pj"], [d
 #ecranTele .tele-regles-ligne ul{ margin: 0.3vh 0 0; padding-left: 2.4vh; font-size: 2.2vh; font-weight: 700; line-height: 1.25; color: #fff; }
 #ecranTele .tele-regles-ligne em{ color: #ffe680; font-style: normal; font-weight: 900; }
 /* Soleil couchant : fond de l'écran en dégradé pêche -> mauve : textes foncés */
-#ecranTele .tele-faq-q .tele-regles-nom{ font-size: 2.5vh; }
-#ecranTele .tele-faq-ouverte{ padding-bottom: 1.2vh; }
-#ecranTele .tele-faq-image{ display: block; margin-top: 1vh; max-width: 100%; max-height: 24vh; width: auto; height: auto; border-radius: 1.2vh; border: 1px solid rgba(255,215,0,0.35); }
+#ecranTele .tele-faq-q .tele-regles-nom{ font-size: 3.3vh; }
+#ecranTele .tele-faq-q ul{ font-size: 2.8vh; line-height: 1.3; }
+#ecranTele .tele-faq-ouverte{ padding-bottom: 1.6vh; }
+#ecranTele .tele-faq-image{ display: block; margin-top: 1.2vh; max-width: 100%; max-height: 30vh; width: auto; height: auto; border-radius: 1.2vh; border: 1px solid rgba(255,215,0,0.35); }
 html[data-theme="soleil"] #ecranTele .tele-regles-partie{ color: #4a1d4a; border-bottom-color: rgba(74, 29, 74, 0.4); }
 html[data-theme="soleil"] #ecranTele .tele-regles-nom{ color: #7a1f45; }
 html[data-theme="soleil"] #ecranTele :is(.tele-regles-ligne ul, .tele-regles-pj){ color: #2b1640; }
