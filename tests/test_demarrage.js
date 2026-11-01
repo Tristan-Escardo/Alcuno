@@ -988,7 +988,7 @@ function verifier(ok, texte){
     const ctx = await nav.newContext({ viewport: { width: 390, height: 780 } });
     const page = await ctx.newPage();
     await page.addInitScript(() => { try { localStorage.setItem("alcuno_config_distante", JSON.stringify({ annonce: { texte: "Soirée samedi !", maj: 1 } })); } catch (e) {} });
-    await page.goto(url); await page.waitForTimeout(700);
+    await page.goto(url + "?vraistats=1"); await page.waitForTimeout(700);
     const cartes = await page.evaluate(() => {
       const visible = (el) => !!el && el.getBoundingClientRect().height > 0 && getComputedStyle(el).display !== "none";
       const reglages = document.querySelector("#ecranReglages [data-annonce-relais] .annonceAccueil"), credits = document.querySelector("#ecranCredits [data-annonce-relais] .annonceAccueil");
@@ -1058,7 +1058,7 @@ function verifier(ok, texte){
       await ctx.close();
       return r;
     };
-    const vrai = await ecritures(url), essai = await ecritures(url + "?modetest=1");
+    const vrai = await ecritures(url + "?vraistats=1"), essai = await ecritures(url + "?modetest=1");
     verifier(!vrai.test && !/TEST/.test(vrai.version) && vrai.ecr.length > 0 && essai.test && / · TEST$/.test(essai.version) && essai.ecr.length === 0,
       `appli de test : vraie appli ${vrai.ecr.length} écritures de stats, version « ${vrai.version} » ; test ${essai.ecr.length} écriture, version « ${essai.version} »`);
   }

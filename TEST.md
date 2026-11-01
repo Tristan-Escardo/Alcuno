@@ -32,3 +32,8 @@ Sur téléphone : ouvre l'adresse, puis « Ajouter à l'écran d'accueil » : tu
 ## Envoyer en ligne
 
 Quand le test est bon, demande « mets en ligne » : la branche `test` est fusionnée dans `main`.
+
+## Les tests automatiques de Claude ne comptent pas dans les stats
+
+Un navigateur piloté par un programme (Playwright : `navigator.webdriver`) passe lui aussi en « mode test » : aucune visite, partie ni plantage envoyé.
+Seule exception : l'adresse avec `?vraistats`, utilisée par le test qui vérifie justement l'envoi des statistiques.
