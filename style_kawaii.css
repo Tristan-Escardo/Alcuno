@@ -642,6 +642,7 @@ html[data-theme="kawaii"]{ --album-silhouette: brightness(0) opacity(0.22); --al
 html[data-theme="kawaii"] #ecranRegles .albumTexte{ color: var(--givre-doux); }
 html[data-theme="kawaii"]{ --actif-haut: #ff7fbf; --actif-bas: #f02a8d; --actif-texte: #450345; --actif-halo: #ff3f9f; }
 html[data-theme="kawaii"] .ctrlReglage button{ border-color: rgba(110, 60, 85, 0.4); background: rgba(255, 255, 255, 0.75); }
+html[data-theme="kawaii"] #stickyJoueurActif #btnReglagesJeu svg{ stroke: #e01a7d; }
 
 /* ===== Décors et formes du thème Kawaii ===== */
 /* Décors et formes du thème Kawaii (ajoutés après les règles tirées de Givre, voir outils/generer_kawaii.py) */
@@ -850,6 +851,11 @@ html[data-theme="kawaii"] #ecranTele .tele-puce{ background: linear-gradient(180
 html[data-theme="kawaii"] #ecranTele .tele-historique-ligne{ color: var(--kawaii-prune); border-top-color: rgba(150, 70, 140, 0.28); }
 html[data-theme="kawaii"] #ecranTele .tele-historique-quoi{ color: var(--kawaii-prune); }
 html[data-theme="kawaii"] #ecranTele .tele-historique-quoi em{ color: var(--kawaii-rose); }
+/* Règles du jeu lues sur le téléphone (js/tele.js) : fond clair, donc textes foncés */
+html[data-theme="kawaii"] #ecranTele .tele-regles-partie{ color: var(--kawaii-rose); border-bottom-color: rgba(150, 70, 140, 0.35); }
+html[data-theme="kawaii"] #ecranTele .tele-regles-nom{ color: var(--kawaii-rose); }
+html[data-theme="kawaii"] #ecranTele :is(.tele-regles-ligne ul, .tele-regles-pj){ color: var(--kawaii-prune); }
+html[data-theme="kawaii"] #ecranTele .tele-regles-ligne em{ color: var(--kawaii-rose); }
 /* GÉNÉRÉ par outils/generer_cartes_kawaii.py : faces de cartes du thème Kawaii */
 html[data-theme="kawaii"] .zero_vert { background-image: url("Cartes/kawaii/zero_vert.svg"); }
 html[data-theme="kawaii"] .zero_jaune { background-image: url("Cartes/kawaii/zero_jaune.svg"); }

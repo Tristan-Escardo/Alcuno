@@ -204,3 +204,8 @@ html[data-theme="kawaii"] #ecranTele .tele-puce{ background: linear-gradient(180
 html[data-theme="kawaii"] #ecranTele .tele-historique-ligne{ color: var(--kawaii-prune); border-top-color: rgba(150, 70, 140, 0.28); }
 html[data-theme="kawaii"] #ecranTele .tele-historique-quoi{ color: var(--kawaii-prune); }
 html[data-theme="kawaii"] #ecranTele .tele-historique-quoi em{ color: var(--kawaii-rose); }
+/* Règles du jeu lues sur le téléphone (js/tele.js) : fond clair, donc textes foncés */
+html[data-theme="kawaii"] #ecranTele .tele-regles-partie{ color: var(--kawaii-rose); border-bottom-color: rgba(150, 70, 140, 0.35); }
+html[data-theme="kawaii"] #ecranTele .tele-regles-nom{ color: var(--kawaii-rose); }
+html[data-theme="kawaii"] #ecranTele :is(.tele-regles-ligne ul, .tele-regles-pj){ color: var(--kawaii-prune); }
+html[data-theme="kawaii"] #ecranTele .tele-regles-ligne em{ color: var(--kawaii-rose); }

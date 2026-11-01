@@ -8428,3 +8428,22 @@ html.reglages-en-partie :is([data-cle="faces-cachees"], [data-cle="mode-pj"], [d
 #stickyJoueurActif .sticky-bonus, .bonus-annulation{ white-space: nowrap; }
 @media (max-width: 360px){ html #listeJoueurs .joueur-ligne-actif:has(.btnPauseJoueur){ padding-left: 36px; padding-right: 36px; } }
 #stickyJoueurActif .sticky-label[hidden]{ display: none; }
+
+/* ===== Télé : les règles du jeu lues sur le téléphone (js/tele.js, dessinerReglesTele) ===== */
+#ecranTele .tele-ecran.tele-ecran-regles{ justify-content: flex-start; padding: 3vh 3vw 2vh; gap: 1vh; }
+#ecranTele .tele-ecran-regles .tele-ecran-texte{ width: 100%; }
+#ecranTele .tele-ecran-regles .tele-ecran-titre{ font-size: 5.2vh; margin-bottom: 1.6vh; }
+#ecranTele .tele-regles-pj{ font-size: 2.6vh; font-weight: 800; color: #ffe680; margin-bottom: 1vh; }
+#ecranTele .tele-regles-colonnes{ column-count: 2; column-gap: 4vw; text-align: left; }
+#ecranTele .tele-regles-bloc{ margin-bottom: 1.6vh; } /* (un bloc peut passer d'une colonne à l'autre ; une règle, jamais coupée) */
+#ecranTele .tele-regles-partie{ font-size: 3vh; font-weight: 900; color: #FFD700; border-bottom: 1px solid rgba(255,215,0,0.4); padding-bottom: 0.5vh; margin-bottom: 0.8vh; break-after: avoid; text-transform: uppercase; letter-spacing: 0.08em; }
+#ecranTele .tele-regles-ligne{ display: flex; align-items: flex-start; gap: 1.6vh; padding: 0.7vh 0; break-inside: avoid; }
+#ecranTele .tele-regles-ligne .Carte{ width: 5.4vh; flex: none; margin: 0; }
+#ecranTele .tele-regles-nom{ font-size: 2.7vh; font-weight: 900; color: #FFD700; line-height: 1.15; }
+#ecranTele .tele-regles-ligne ul{ margin: 0.3vh 0 0; padding-left: 2.4vh; font-size: 2.2vh; font-weight: 700; line-height: 1.25; color: #fff; }
+#ecranTele .tele-regles-ligne em{ color: #ffe680; font-style: normal; font-weight: 900; }
+/* Soleil couchant : fond de l'écran en dégradé pêche -> mauve : textes foncés */
+html[data-theme="soleil"] #ecranTele .tele-regles-partie{ color: #4a1d4a; border-bottom-color: rgba(74, 29, 74, 0.4); }
+html[data-theme="soleil"] #ecranTele .tele-regles-nom{ color: #7a1f45; }
+html[data-theme="soleil"] #ecranTele :is(.tele-regles-ligne ul, .tele-regles-pj){ color: #2b1640; }
+html[data-theme="soleil"] #ecranTele .tele-regles-ligne em{ color: #a8203f; }

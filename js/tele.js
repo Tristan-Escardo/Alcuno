@@ -194,7 +194,21 @@ function voletPourTele(){
   return null;
 }
 
+// Règles du jeu lues sur le téléphone (bouton livre) : la télé les affiche en grand (l'album de stickers, ouvert dans le même
+// écran, n'est pas envoyé). Courtes (12 règles), envoyées d'un bloc.
+function reglesPourTele(){
+  const page = document.getElementById("ecranRegles");
+  if (!estAffiche(page) || page.classList.contains("album") || page.classList.contains("page-sortie")) return null;
+  const parties = reglesDuJeu().map((partie) => ({
+    t: partie.titre,
+    r: partie.regles.map((r) => ({ c: r.carte || "", n: r.nom, l: Array.isArray(r.texte) ? r.texte : [r.texte] }))
+  }));
+  return { id: "ecranRegles", texte: "", cartes: [], choix: [], regles: { pj: !!estModeSoft(), parties } };
+}
+
 function ecranPourTele(){
+  const reglesOuvertes = reglesPourTele();
+  if (reglesOuvertes) return reglesOuvertes;
   const overlays = Array.from(document.querySelectorAll('body > [id^="overlay"]')).filter(estAffiche);
   const o = overlays[overlays.length - 1];
   if (!o) return voletPourTele();
@@ -937,6 +951,7 @@ function dessinerTele(ecran, etat){
   document.documentElement.classList.toggle("tele-ecran-ouvert", !!e); // (pas de reflet Prestige dessus)
   surEcran.classList.toggle("tele-ecran-historique", !!e && e.id === "voletHistorique");
   surEcran.classList.toggle("tele-ecran-recap", !!(e && e.recap));
+  surEcran.classList.toggle("tele-ecran-regles", !!(e && e.id === "ecranRegles" && e.regles));
   if (e && e.recap) {
     surEcran.querySelector(".tele-ecran-cartes").innerHTML = "";
     surEcran.querySelector(".tele-ecran-choix").innerHTML = "";
@@ -946,7 +961,11 @@ function dessinerTele(ecran, etat){
     return;
   }
   delete surEcran.querySelector(".tele-ecran-texte").dataset.recap;
-  if (e && e.id === "voletHistorique") {
+  if (e && e.id === "ecranRegles" && e.regles) {
+    surEcran.querySelector(".tele-ecran-cartes").innerHTML = "";
+    surEcran.querySelector(".tele-ecran-choix").innerHTML = "";
+    dessinerReglesTele(surEcran.querySelector(".tele-ecran-texte"), e.regles);
+  } else if (e && e.id === "voletHistorique") {
     surEcran.querySelector(".tele-ecran-cartes").innerHTML = "";
     surEcran.querySelector(".tele-ecran-choix").innerHTML = "";
     dessinerHistoriqueTele(surEcran.querySelector(".tele-ecran-texte"), etat.h || []);
@@ -971,6 +990,63 @@ function dessinerTele(ecran, etat){
       zoneChoix.appendChild(puce);
     });
   }
+}
+
+// Texte avec <b> / <em> (les seules balises des règles) : construit à la main, sans innerHTML
+function remplirBalisesTele(parent, texte){
+  let cible = parent;
+  String(texte).split(/(<\/?(?:b|em)>)/).forEach((morceau) => {
+    const m = morceau.match(/^<(\/?)(b|em)>$/);
+    if (!m) { if (morceau) cible.appendChild(document.createTextNode(morceau)); return; }
+    if (m[1]) { if (cible !== parent) cible = cible.parentNode; return; }
+    const el = document.createElement(m[2]);
+    cible.appendChild(el);
+    cible = el;
+  });
+}
+
+// Les règles du jeu en grand, sur deux colonnes (ouvertes sur le téléphone : voir reglesPourTele)
+function dessinerReglesTele(zone, regles){
+  const cle = JSON.stringify(regles);
+  if (zone.dataset.regles === cle) return;
+  zone.dataset.regles = cle;
+  zone.innerHTML = "";
+  const titre = document.createElement("div");
+  titre.className = "tele-ecran-titre";
+  titre.innerText = "Règles du jeu";
+  zone.appendChild(titre);
+  if (regles.pj) {
+    const note = document.createElement("div");
+    note.className = "tele-regles-pj";
+    note.innerText = "Mode PJ activé : moins de gorgées.";
+    zone.appendChild(note);
+  }
+  const colonnes = document.createElement("div");
+  colonnes.className = "tele-regles-colonnes";
+  (regles.parties || []).forEach((partie) => {
+    const bloc = document.createElement("div");
+    bloc.className = "tele-regles-bloc";
+    const h = document.createElement("div");
+    h.className = "tele-regles-partie";
+    h.innerText = partie.t;
+    bloc.appendChild(h);
+    (partie.r || []).forEach((r) => {
+      const ligne = document.createElement("div");
+      ligne.className = "tele-regles-ligne";
+      ligne.appendChild(creerCarteTele(r.c));
+      const texte = document.createElement("div");
+      const nom = document.createElement("div");
+      nom.className = "tele-regles-nom";
+      nom.innerText = r.n;
+      const liste = document.createElement("ul");
+      (r.l || []).forEach((l) => { const li = document.createElement("li"); remplirBalisesTele(li, l); liste.appendChild(li); });
+      texte.append(nom, liste);
+      ligne.appendChild(texte);
+      bloc.appendChild(ligne);
+    });
+    colonnes.appendChild(bloc);
+  });
+  zone.appendChild(colonnes);
 }
 
 // Sous le plateau : « Dernières cartes tirées », en petit avec le prénom (la plus récente entourée)

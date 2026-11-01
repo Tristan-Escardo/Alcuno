@@ -1134,6 +1134,31 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
+  // 44. Règles du jeu lues sur le téléphone (mode classique, relié à une télé) : envoyées à la télé, qui les affiche en grand ; fermées : plus rien
+  {
+    const { ctx, page, erreurs } = await ouvrir();
+    await page.click("#btnModeClassique"); await page.waitForTimeout(500);
+    for (const nom of ["Tom", "Lea"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(150); }
+    await page.click("#jouer"); await page.waitForTimeout(1200);
+    const avant = await page.evaluate(() => etatPourTele().ecran);
+    await page.click("#btnReglesJeu"); await page.waitForTimeout(600);
+    const etat = await page.evaluate(() => etatPourTele());
+    await page.click("#btnFermerRegles"); await page.waitForTimeout(600);
+    const apres = await page.evaluate(() => etatPourTele().ecran);
+    await ctx.close();
+    const tv = await nav.newContext({ viewport: { width: 1280, height: 720 } });
+    const t = await tv.newPage();
+    await t.goto(url + "?tele"); await t.waitForTimeout(900);
+    const r = await t.evaluate((etat) => {
+      dessinerTele(document.getElementById("ecranTele"), etat);
+      const z = document.querySelector(".tele-ecran-texte"), sc = document.querySelector(".tele-ecran");
+      return { lignes: document.querySelectorAll(".tele-regles-ligne").length, deborde: z.getBoundingClientRect().bottom > sc.clientHeight, visible: !sc.hidden, titre: (document.querySelector(".tele-ecran-titre") || {}).innerText };
+    }, etat);
+    await tv.close();
+    verifier(avant === null && etat.ecran && etat.ecran.id === "ecranRegles" && apres === null && r.lignes === 12 && !r.deborde && r.visible && r.titre === "Règles du jeu" && erreurs.length === 0,
+      `règles sur la télé : envoyées ouvertes (${etat.ecran && etat.ecran.id}), plus rien fermées (${apres}), ${r.lignes} règles affichées ${r.deborde ? "qui débordent" : "sans déborder"}`);
+  }
+
   await nav.close();
   serveur.close();
   console.log(echecs ? `\n${echecs} ÉCHEC(S)` : "\nTOUT EST OK");
