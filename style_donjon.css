@@ -205,9 +205,102 @@ html[data-theme="donjon"] #ecranReglages .pastilleTheme[aria-pressed="true"] .ro
 /* Règles et annonces du jeu : puces et mots en gras (gorgées…) en rouge */
 html[data-theme="donjon"] .lignesRegle li::before{ background: #ff3b4e !important; box-shadow: 0 0 6px rgba(255, 42, 61, 0.7); }
 html[data-theme="donjon"] :is(.detailRegle, #voletCarte .voletPause-texte, .regleBloc) em{ color: #ff6b7c !important; }
+html[data-theme="donjon"] .regleBloc-titre{ color: #ff6b7c; }
 /* Survol à la souris : halo rouge au lieu de blanc et jaune (le :is avec un id l'emporte sur la règle générale, qui vise des id) */
 @media (hover: hover){
   html[data-theme="donjon"] button:is(#__, *):not(.btnPauseJoueur):not(.btnLivre):not(#btnReglages):not(.btnAccueilTexte):not(#btnPause):not(#btnHistorique):not(#btnReglagesJeu):not(.bloc-hot-btn):not(.pastilleTheme):not(.annonceFermer):not(.btnInstaller):not(#btnSignalerBug):not(#btnFaq):not(#btnFaqDepuisRegles):not(#btnDiagnostic):not(.optionLien):not(.btnDiagnostic):not(#btnAnnonceFermer):hover:not(:disabled){
     box-shadow: 0 0 0 2px #ff2a3d, 0 0 20px rgba(255, 42, 61, 0.75) !important;
   }
 }
+
+/* ===== Mode télé (page ?tele) : rouge et noir comme le téléphone, plus de jaune ===== */
+html[data-theme="donjon"] #ecranTele{
+  background: radial-gradient(ellipse 90% 45% at 50% 108%, rgba(200, 20, 30, 0.38), transparent 70%),
+              radial-gradient(ellipse 70% 40% at 50% -5%, rgba(255, 42, 61, 0.14), transparent 70%), #08050a !important;
+  color: #ffe3e6;
+}
+/* Titres « ALCUNO » : chrome blanc qui vire au rouge, comme l'accueil */
+html[data-theme="donjon"] #ecranTele :is(.tele-titre, .tele-prepa-titre, .tele-pause-titre){
+  background: linear-gradient(#ffffff, #ffc2c9 38%, #ff3b4e 72%, #c2102a) !important;
+  -webkit-background-clip: text !important; background-clip: text !important;
+  color: transparent !important; -webkit-text-fill-color: transparent !important; text-shadow: none !important;
+  filter: drop-shadow(0 0 1.4vh rgba(255, 42, 61, 0.9)) drop-shadow(0 0.4vh 0 #000);
+}
+/* Attente (QR code) */
+html[data-theme="donjon"] #ecranTele .tele-sous-titre{ color: #ff6b7c; }
+html[data-theme="donjon"] #ecranTele .tele-etape{ color: #ffd0d6; }
+html[data-theme="donjon"] #ecranTele .tele-etape .tele-num{ background: linear-gradient(#ff5a6b, #c2102a); color: #fff; box-shadow: 0 0 1.4vh rgba(255, 42, 61, 0.7); }
+html[data-theme="donjon"] #ecranTele .tele-plein-ecran{ background: rgba(255, 42, 61, 0.14); color: #ffd0d6; box-shadow: 0 0 0 1px rgba(255, 42, 61, 0.7) inset, 0 0 1.6vh rgba(255, 42, 61, 0.35); }
+html[data-theme="donjon"] #ecranTele .tele-qr{ box-shadow: 0 0 0 0.7vh #ff2a3d, 0 0 4vh rgba(255, 42, 61, 0.6), 0 2.6vh 7vh rgba(0, 0, 0, 0.5); }
+html[data-theme="donjon"] #ecranTele .tele-code{ color: #ff3b4e; text-shadow: 0 0 1.6vh rgba(255, 42, 61, 0.6); }
+html[data-theme="donjon"] #ecranTele .tele-code small{ color: #ff8a96; text-shadow: none; }
+/* Bandeau, blocs de droite : verre fumé rouge, contour néon */
+html[data-theme="donjon"] #ecranTele :is(.tele-entete, .tele-bloc){
+  background: linear-gradient(160deg, rgba(40, 6, 12, 0.94) 0%, rgba(8, 8, 10, 0.96) 55%, rgba(60, 4, 16, 0.94) 100%) !important;
+  border: 2px solid #ff2a3d !important;
+  box-shadow: 0 0 1.6vh rgba(255, 42, 61, 0.55), inset 0 0 2vh rgba(255, 42, 61, 0.18) !important;
+}
+html[data-theme="donjon"] #ecranTele :is(.tele-bloc-titre, .tele-tour-label, .tele-dernieres-titre){ color: #ff8a96; }
+html[data-theme="donjon"] #ecranTele .tele-tour-nom{ color: #ff3b4e; text-shadow: 0 0.4vh 0 #000, 0 0 1.6vh rgba(255, 42, 61, 0.7); }
+html[data-theme="donjon"] #ecranTele .tele-tour.tele-pigeon .tele-tour-nom{ color: #ff9ad0; }
+html[data-theme="donjon"] #ecranTele .tele-joueur{ color: #ffb3bc; }
+html[data-theme="donjon"] #ecranTele .tele-joueur-actif{ color: var(--actif-texte); }
+html[data-theme="donjon"] #ecranTele .tele-badge{ background: #ff2a3d; color: #fff; }
+html[data-theme="donjon"] #ecranTele .tele-regles{ color: #ffd0d6; }
+html[data-theme="donjon"] #ecranTele .tele-regles.regleBloc{ color: #ffe3e6; }
+html[data-theme="donjon"] #ecranTele :is(.tele-son-coupe, .tele-prepa-info){ color: #ff8a96; }
+html[data-theme="donjon"] #ecranTele .tele-pied{ color: rgba(255, 179, 188, 0.45); }
+html[data-theme="donjon"] #ecranTele .tele-dernieres-titre + .tele-dernieres-item{ color: #ff6b7c; }
+html[data-theme="donjon"] #ecranTele .tele-dernieres-titre + .tele-dernieres-item .Carte{ outline-color: #ff2a3d; }
+/* Avant la partie : les joueurs en pilules rouge et noir */
+html[data-theme="donjon"] #ecranTele .tele-prepa-joueur{
+  color: #ffd0d6; background: linear-gradient(#3a0a14 0%, #0a0a0c 48%, #2a0610 52%, #5a0a1c 100%);
+  border: 2px solid #ff2a3d; box-shadow: 0 0 1.6vh rgba(255, 42, 61, 0.6);
+}
+/* Écrans en grand (annonces, duel, +4, pari, règles, FAQ, historique…) */
+html[data-theme="donjon"] #ecranTele .tele-ecran{
+  background: radial-gradient(ellipse 100% 70% at 50% 45%, rgba(110, 6, 22, 0.55), transparent 75%), #070708 !important;
+}
+html[data-theme="donjon"] #ecranTele .tele-ecran-titre{ color: #ff3b4e; text-shadow: 0 0.3vh 0 #000, 0 0 2vh rgba(255, 42, 61, 0.7); }
+html[data-theme="donjon"] #ecranTele .tele-ecran-detail{ color: #ffd0d6; }
+html[data-theme="donjon"] #ecranTele .tele-puce{ background: linear-gradient(#3a0a14, #0a0a0c); border: 2px solid #ff2a3d; color: #ffd0d6; box-shadow: 0 0 1.2vh rgba(255, 42, 61, 0.5); }
+html[data-theme="donjon"] #ecranTele :is(.tele-regles-partie){ color: #ff3b4e; border-bottom-color: rgba(255, 42, 61, 0.5); }
+html[data-theme="donjon"] #ecranTele .tele-regles-nom{ color: #ff6b7c; }
+html[data-theme="donjon"] #ecranTele :is(.tele-regles-ligne em, .tele-historique-quoi em){ color: #ff6b7c; }
+html[data-theme="donjon"] #ecranTele .tele-regles-pj{ color: #ff8a96; }
+html[data-theme="donjon"] #ecranTele .tele-faq-image{ border-color: rgba(255, 42, 61, 0.6); }
+html[data-theme="donjon"] #ecranTele .tele-historique-ligne{ border-top-color: rgba(255, 42, 61, 0.25); }
+/* Pause */
+html[data-theme="donjon"] #ecranTele .tele-pause{ background: rgba(20, 0, 6, 0.7); }
+html[data-theme="donjon"] #ecranTele .tele-pause svg{ fill: #ff2a3d; filter: drop-shadow(0 0 2vh rgba(255, 42, 61, 0.8)); }
+html[data-theme="donjon"] #ecranTele .tele-ecran-recap{ background: radial-gradient(circle at top, rgba(255, 42, 61, 0.18), transparent 55%), #070708 !important; }
+
+/* ===== Récap de fin de partie (téléphone et télé) ===== */
+html[data-theme="donjon"] .recap-titre{ color: #ff3b4e; text-shadow: 0 3px 0 #000, 0 0 18px rgba(255, 42, 61, 0.6); }
+html[data-theme="donjon"] :is(.recap-g, .recap-ligne em, .recap-doree-t, .recap-eclats, .recap-t, .recap-restants){ color: #ff6b7c; }
+html[data-theme="donjon"] .recap-doree-q b{ color: #ffb3bc; }
+html[data-theme="donjon"] .recap-marche{ background: linear-gradient(180deg, rgba(255, 42, 61, 0.3), rgba(255, 42, 61, 0.06)); border-color: rgba(255, 42, 61, 0.6); }
+html[data-theme="donjon"] :is(.recap-liste, .recap-bloc){ background: rgba(20, 2, 6, 0.6); border-color: rgba(255, 42, 61, 0.45); }
+html[data-theme="donjon"] .recap-doree{ background: linear-gradient(135deg, rgba(255, 42, 61, 0.22), rgba(255, 42, 61, 0.05)); border-color: rgba(255, 42, 61, 0.7); box-shadow: 0 0 12px rgba(255, 42, 61, 0.3); }
+
+/* ===== Fenêtres de la partie sur le téléphone (duel, +4, Cupidon, couleur, pari) et bandeaux : rouge au lieu du jaune.
+   Restent dorés exprès : la carte dorée (citation de Célien, étincelles) et le carré jaune du choix de couleur ===== */
+html[data-theme="donjon"] :is(#overlayDuel, #overlayPlus4, #overlayCupidon, #overlayPigeon, #overlayFinUnRestants) .titre-pigeon,
+html[data-theme="donjon"] #overlayCouleur div.titre-couleur{ color: #ff3b4e !important; text-shadow: 0 2px 0 #000, 0 0 14px rgba(255, 42, 61, 0.7) !important; }
+html[data-theme="donjon"] :is(#overlayPlus4, #overlayCupidon) .plus4-total,
+html[data-theme="donjon"] #overlayDuel :is(.duel-info, .duel-label),
+html[data-theme="donjon"] #overlayPredictionFin :is(.fin-choix-turn, .fin-choix-resultat, .prediction-subtitle, strong, .choix){ color: #ff8a96 !important; }
+html[data-theme="donjon"] #overlayCouleur .explication-couleur b{ color: #ff6b7c; }
+html[data-theme="donjon"] #overlayPredictionFin .prediction-header{
+  background: linear-gradient(160deg, rgba(60, 6, 16, 0.94), rgba(8, 8, 10, 0.96)) !important;
+  border-color: #ff2a3d !important; box-shadow: 0 0 16px rgba(255, 42, 61, 0.5) !important;
+}
+html[data-theme="donjon"] #overlayPredictionFin .prediction-header :is(h2, h1, .titre-pigeon, .prediction-title){ color: #ff3b4e !important; text-shadow: 0 2px 0 #000, 0 0 14px rgba(255, 42, 61, 0.7) !important; }
+html[data-theme="donjon"] #stickyJoueurActif .sticky-nom{ color: #ff6b7c; }
+html[data-theme="donjon"] .rappelTour{ color: #ff6b7c !important; }
+html[data-theme="donjon"] .btnPauseJoueur{ border-color: rgba(255, 42, 61, 0.6) !important; color: #ff6b7c !important; }
+html[data-theme="donjon"] :is(#annulerChoix, #bandeauMiseAJour){
+  --bandeau-fond: #14040a; --bandeau-bord: rgba(255, 42, 61, 0.7); --bandeau-bouton: #ff2a3d; --bandeau-bouton-texte: #fff;
+}
+html[data-theme="donjon"] .fin-choix-numeros b{ background: #ff2a3d; color: #fff; box-shadow: 0 0 8px rgba(255, 42, 61, 0.7); }
+html[data-theme="donjon"] #ecranReglages .qrJeu{ box-shadow: 0 0 0 3px #ff2a3d, 0 0 18px rgba(255, 42, 61, 0.5), 0 10px 24px rgba(0, 0, 0, 0.35); }
