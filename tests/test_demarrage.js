@@ -1221,8 +1221,7 @@ function verifier(ok, texte){
       lien: getComputedStyle(document.getElementById("btnFaqDepuisRegles")).display, tele: !!reglesPourTele() }));
     await page.click(".faqItem:nth-child(2) summary"); await page.waitForTimeout(700);
     const apres = await page.evaluate(() => { const i = document.querySelector(".faqItem[open] .faqImage"); return i ? { charge: i.complete && i.naturalWidth > 0, largeur: Math.round(i.getBoundingClientRect().width), deborde: i.getBoundingClientRect().right > innerWidth } : null; });
-    await page.click("#btnFermerRegles"); await page.waitForTimeout(500);
-    await page.click("#btnRegles"); await page.waitForTimeout(500); // (les Règles reviennent normalement, sans la FAQ)
+    await page.click("#btnFermerRegles"); await page.waitForTimeout(500); // (« Retour » depuis la FAQ ouverte des Règles : retour aux Règles, sans la FAQ ; la page reste ouverte)
     const regles = await page.evaluate(() => ({ titre: document.querySelector("#ecranRegles h2").textContent, faq: document.getElementById("ecranRegles").classList.contains("faq"), tele: !!reglesPourTele() }));
     await page.click("#btnFermerRegles"); await page.waitForTimeout(500);
     await page.click("#btnReglages"); await page.waitForTimeout(500);

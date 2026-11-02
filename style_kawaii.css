@@ -25,6 +25,9 @@ html[data-theme="kawaii"] #listeJoueurs .joueur-ligne{ background: #ffffff; bord
 html[data-theme="kawaii"] #listeJoueurs .joueur-ligne-actif{ background: #fbdfed; border-color: var(--givre-accent); color: var(--givre-accent); }
 }
 html[data-theme="kawaii"] #enLigne .iconeBouton{ filter: none; }
+html[data-theme="kawaii"] .couronne-argent{
+  filter: grayscale(1) brightness(0.8) contrast(1.25) drop-shadow(0 0 1px rgba(0, 0, 0, 0.4));
+}
 html[data-theme="kawaii"] #haloRappel{ --halo-ecran: rgba(224, 26, 125, 0.6); }
 html[data-theme="kawaii"] #stickyJoueurActif.rappel-tour{
   animation-name: rappelTourKawaii;
@@ -305,7 +308,7 @@ html[data-theme="kawaii"] #ecranCredits .photoVide{
   color: var(--givre-accent);
   border-color: rgba(214, 26, 120, 0.45);
 }
-html[data-theme="kawaii"] #ecranCredits .credits-pied{
+html[data-theme="kawaii"] #ecranCredits .credits-honneur-titre{
   color: var(--givre-doux);
 }
 html[data-theme="kawaii"] #choixMode .btnInstaller{

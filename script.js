@@ -158,16 +158,66 @@ function estCreateur(nom){
   return PSEUDOS_CREATEURS.includes(String(nom || "").trim().toLocaleLowerCase("fr-FR"));
 }
 
-function avecCouronne(nom){
-  return estCreateur(nom) ? `${nom} 👑` : nom;
+// Couronne argentée à côté du nom de Li-Mèi (design des cartes). Accents, majuscules, tiret, espace et ponctuation ignorés :
+// « Li-Mèi », « limei », « LI MEI », « Lï-Mëï »… comptent.
+function estLiMei(nom){
+  const simple = String(nom || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("fr-FR").replace(/[\s\-_.'’]/g, "");
+  return simple === "limei";
 }
+
+// Le texte garde un simple « 👑 » suivi d'un espace sans largeur (marque) : partout où un nom est affiché en texte (liste des
+// joueurs, télé, fenêtres de règles…), argenterCouronnes() remplace cette marque par une couronne grise (classe .couronne-argent)
+const MARQUE_COURONNE_ARGENT = "👑\u200B";
+
+function avecCouronne(nom){
+  if (estCreateur(nom)) return `${nom} 👑`;
+  return estLiMei(nom) ? `${nom} ${MARQUE_COURONNE_ARGENT}` : nom;
+}
+
+function argenterCouronnes(racine){
+  const parcours = document.createTreeWalker(racine, NodeFilter.SHOW_TEXT);
+  const noeuds = [];
+  for (let n = parcours.nextNode(); n; n = parcours.nextNode()) {
+    if (n.nodeValue.includes(MARQUE_COURONNE_ARGENT)) noeuds.push(n);
+  }
+  noeuds.forEach((n) => {
+    if (!n.parentNode) return;
+    const morceaux = n.nodeValue.split(MARQUE_COURONNE_ARGENT);
+    const lot = document.createDocumentFragment();
+    morceaux.forEach((morceau, i) => {
+      if (i > 0) {
+        const couronne = document.createElement("span");
+        couronne.className = "couronne-argent";
+        couronne.textContent = "👑";
+        lot.appendChild(couronne);
+      }
+      if (morceau) lot.appendChild(document.createTextNode(morceau));
+    });
+    n.parentNode.replaceChild(lot, n);
+  });
+}
+
+try {
+  new MutationObserver((mutations) => {
+    for (const m of mutations) {
+      if (m.type === "characterData") {
+        if (m.target.parentNode && m.target.nodeValue.includes(MARQUE_COURONNE_ARGENT)) argenterCouronnes(m.target.parentNode);
+        continue;
+      }
+      m.addedNodes.forEach((n) => {
+        if (n.nodeType === 3) { if (n.parentNode && n.nodeValue.includes(MARQUE_COURONNE_ARGENT)) argenterCouronnes(n.parentNode); }
+        else if (n.nodeType === 1 && n.textContent.includes(MARQUE_COURONNE_ARGENT)) argenterCouronnes(n);
+      });
+    }
+  }).observe(document.body, { childList: true, subtree: true, characterData: true });
+} catch (e) {}
 
 // À augmenter (+1) à chaque mise en ligne qui touche au mode en ligne : un téléphone qui a
 // gardé une ancienne version ne pourra pas rejoindre (sinon les parties se désynchronisent)
 // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
 // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
 // Numérotation : +0.0.1 à chaque mise en ligne, et après x.y.9 on passe à x.(y+1).0 (ex. 9.5.9 => 9.6.0)
-const VERSION_AFFICHEE = "9.72.3";
+const VERSION_AFFICHEE = "9.73.0";
 // Appli de test (adresse autre que GitHub Pages et que le poste de dev, ou « ?modetest ») : même jeu, même Firebase, mais
 // elle n'envoie ni statistiques ni plantages (les chiffres restent ceux de la vraie appli) et affiche « TEST » dans les Réglages
 // Un navigateur piloté par un programme (tests automatiques de Claude : navigator.webdriver) est aussi en mode test, pour que

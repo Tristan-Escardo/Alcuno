@@ -2470,10 +2470,45 @@ header h1{
   text-shadow: 1px 1px 2px #000;
 }
 
-#ecranCredits .credits-pied{
-  margin: 4px 0 0;
+#ecranCredits .credits-honneur{
+  width: min(420px, 88vw);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+  text-align: center;
+}
+
+#ecranCredits .credits-honneur-titre{
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.22em;
+  color: #c3cad3;
+}
+
+/* La ligne de Li-Mèi : comme celles des créateurs, avec un liseré argenté */
+#ecranCredits .credits-nom.credits-nom-argent{
+  color: #e6eaf0;
+  box-shadow: 0 0 0 1px rgba(195,202,211,0.6) inset;
+}
+
+#ecranCredits .credits-nom-detail{
+  display: block;
+  margin-top: 3px;
   font-size: 13px;
-  color: rgba(255,255,255,0.5);
+  font-weight: 700;
+  opacity: 0.75;
+  text-shadow: none;
+}
+
+/* Couronne argentée (Li-Mèi) : la couronne 👑 passée en gris clair, avec un fin contour sombre pour rester lisible sur les thèmes clairs.
+   Le texte porte 👑 suivie d'un espace sans largeur (voir avecCouronne, script.js) ; argenterCouronnes() l'enveloppe dans ce span. */
+.couronne-argent{
+  filter: grayscale(1) brightness(1.5) drop-shadow(0 0 1px rgba(0,0,0,0.55));
+}
+/* Thèmes clairs (Givre, et Kawaii qui en dérive) : un gris plus foncé, sinon la couronne se perd sur le fond blanc */
+html[data-theme="givre"] .couronne-argent{
+  filter: grayscale(1) brightness(0.8) contrast(1.25) drop-shadow(0 0 1px rgba(0,0,0,0.4));
 }
 
 #ecranCredits .btnRetour{
@@ -4725,7 +4760,7 @@ html[data-theme="givre"] #ecranCredits .photoVide{
   color: var(--givre-accent);
   border-color: rgba(26, 146, 214, 0.45);
 }
-html[data-theme="givre"] #ecranCredits .credits-pied{
+html[data-theme="givre"] #ecranCredits .credits-honneur-titre{
   color: var(--givre-doux);
 }
 
@@ -7799,6 +7834,25 @@ html[data-theme="galaxie"] #ecranReglages .blocReglage .optionReglage{ backgroun
 html[data-theme="galaxie"] :is(#ecranReglages .optionTitre, #ecranRegles h3, #ecranReglages h2, #ecranRegles h2){ color:#FFE81F !important; }
 html[data-theme="galaxie"] #ecranReglages .optionReglage input:checked + .interrupteur{ background:#1a7bff !important; box-shadow: 0 0 10px #39a0ff !important; }
 html[data-theme="galaxie"] :is(.btnRetour){ border-radius: 8px !important; }
+/* Créateurs (écran des crédits) : comme les Règles et les Réglages, sabre bleu, titre jaune Star Wars, ciel étoilé */
+html[data-theme="galaxie"] #ecranCredits{ background-color:#02030a !important; background-image:
+    radial-gradient(1.6px 1.6px at 23px 41px, #fff 60%, transparent 61%), radial-gradient(1px 1px at 87px 133px, #fff 60%, transparent 61%),
+    radial-gradient(2.2px 2.2px at 151px 67px, #fff 60%, transparent 61%), radial-gradient(1.4px 1.4px at 302px 92px, #fff 60%, transparent 61%),
+    radial-gradient(2px 2px at 343px 205px, #ffeeb0 60%, transparent 61%), radial-gradient(1px 1px at 52px 222px, #fff 60%, transparent 61%),
+    radial-gradient(1.6px 1.6px at 262px 18px, #fff 60%, transparent 61%) !important;
+  background-size: 370px 250px !important; }
+html[data-theme="galaxie"] #ecranCredits .credits-titre{
+  font-family: "Arial Black", Impact, Arial, sans-serif; color:#000; -webkit-text-stroke: 2.4px #FFE81F; paint-order: stroke fill;
+  letter-spacing: .06em; text-shadow: 0 0 18px rgba(255,232,31,.35); }
+html[data-theme="galaxie"] #ecranCredits .credits-phrase{ color:#bfe6ff; }
+html[data-theme="galaxie"] #ecranCredits .credits-phrase strong{ color:#FFE81F; text-shadow: 0 0 10px rgba(255,232,31,.35); }
+html[data-theme="galaxie"] #ecranCredits .cadrePhoto{ background: rgba(6,10,22,.9); border: 1.5px solid #8fd0ff;
+  box-shadow: 0 0 6px #4aa8ff, 0 0 16px rgba(40,140,255,.55), inset 0 0 10px rgba(80,170,255,.22); }
+html[data-theme="galaxie"] #ecranCredits .photoVide{ border-color: rgba(143,208,255,.5); color:#8fd0ff; }
+html[data-theme="galaxie"] #ecranCredits .credits-nom{
+  background: linear-gradient(180deg, rgba(14,22,44,.92), rgba(6,10,22,.92)); border: 1.5px solid #8fd0ff; color:#FFE81F; text-shadow:none;
+  box-shadow: 0 0 6px #4aa8ff, 0 0 16px rgba(40,140,255,.55), inset 0 0 10px rgba(80,170,255,.22); }
+html[data-theme="galaxie"] #ecranCredits .credits-honneur-titre{ color: rgba(143,208,255,.8); }
 html[data-theme="galaxie"] .lignesRegle li::before{ background:#4aa8ff !important; box-shadow: 0 0 6px #39a0ff; }
 html[data-theme="galaxie"] .regleBloc em, html[data-theme="galaxie"] .detailRegle em{ color:#FFE81F !important; }
 /* Bloc Règles en partie : hologramme bleu */
