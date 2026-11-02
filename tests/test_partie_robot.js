@@ -64,8 +64,8 @@ const FILTRE = process.argv[2] || "";
     await page.addInitScript(prelude);
     await page.addInitScript(robot);
     await page.addInitScript(([theme, acc, express, hot, pj]) => {
-      try { if (hot) localStorage.setItem("alcuno_mode_hot", "1"); if (pj) localStorage.setItem("alcuno_mode_soft", "1"); } catch (e) {}
-      try { localStorage.setItem("alcuno_theme", theme); localStorage.setItem("alcuno_theme_kawaii", "1"); localStorage.setItem("alcuno_theme_donjon", "1"); if (acc) localStorage.setItem("alcuno_accessibilite", "1"); if (express) localStorage.setItem("alcuno_partie_express", "1"); } catch (e) {}
+      window.__optionsRobot = [hot && "optionModeHot", pj && "optionModeSoft", express && "optionPartieExpress"].filter(Boolean); // (cochées dans « Ta partie »)
+      try { localStorage.setItem("alcuno_theme", theme); localStorage.setItem("alcuno_theme_kawaii", "1"); localStorage.setItem("alcuno_theme_donjon", "1"); if (acc) localStorage.setItem("alcuno_accessibilite", "1"); } catch (e) {}
     }, [c.theme, !!c.accessibilite, !!c.express, !!c.hot, !!c.pj]);
     await page.goto(url);
     let rapport = null;

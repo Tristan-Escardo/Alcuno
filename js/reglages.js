@@ -40,6 +40,10 @@ document.getElementById("btnReglagesJeu").addEventListener("click", ouvrirReglag
 let suiteOptionsPartie = null; // ce que fait « Continuer » (donné par js/en-ligne.js)
 function ouvrirOptionsPartie(suite){
   suiteOptionsPartie = suite;
+  // Chaque nouvelle partie repart sans option : rien n'est gardé d'une partie à l'autre (la revanche et la reprise
+  // d'une partie interrompue gardent, elles, le mode de la partie en cours)
+  [caseModeSoft, casePartieExpress, caseModeHot].forEach((c) => { c.checked = false; });
+  majTitrePJ();
   ecranReglages.classList.add("vue-options");
   document.getElementById("titreReglages").textContent = "Ta partie";
   ecranReglages.scrollTop = 0;
@@ -816,9 +820,8 @@ document.querySelectorAll(".pastilleTheme").forEach((pastille) => {
 // plus jusqu'à la fin (même si l'hôte change ou si quelqu'un touche à son réglage).
 const CLE_MODE_SOFT = "alcuno_mode_soft";
 const caseModeSoft = document.getElementById("optionModeSoft");
-caseModeSoft.checked = lireReglage(CLE_MODE_SOFT, false);
+caseModeSoft.checked = false; // (choisi à chaque partie, dans « Ta partie » : plus enregistré, voir ouvrirOptionsPartie)
 caseModeSoft.addEventListener("change", () => {
-  ecrireReglage(CLE_MODE_SOFT, caseModeSoft.checked);
   majTitrePJ();
   if (caseModeSoft.checked) jouerSon("sons_on");
 });
@@ -828,9 +831,8 @@ caseModeSoft.addEventListener("change", () => {
 // la personne qui lance la manche, transmis dans la graine du mélange (voir lancerMancheEnLigne).
 const CLE_PARTIE_EXPRESS = "alcuno_partie_express";
 const casePartieExpress = document.getElementById("optionPartieExpress");
-casePartieExpress.checked = lireReglage(CLE_PARTIE_EXPRESS, false);
+casePartieExpress.checked = false;
 casePartieExpress.addEventListener("change", () => {
-  ecrireReglage(CLE_PARTIE_EXPRESS, casePartieExpress.checked);
   if (casePartieExpress.checked) jouerSon("sons_on");
 });
 function estPartieExpress(){ return casePartieExpress.checked; }
@@ -838,10 +840,11 @@ function estPartieExpress(){ return casePartieExpress.checked; }
 // ===== Mode hot : un défi osé à la place des gorgées (voir MODE_HOT.md) =====
 // Classique : le réglage de ce téléphone. En ligne : le réglage de l'hôte au moment où il a créé la partie.
 const CLE_MODE_HOT = "alcuno_mode_hot";
+// (anciennes versions : ces trois choix étaient enregistrés sur le téléphone ; on efface ce qui reste)
+try { [CLE_MODE_SOFT, CLE_PARTIE_EXPRESS, CLE_MODE_HOT].forEach((cle) => localStorage.removeItem(cle)); } catch (e) {}
 const caseModeHot = document.getElementById("optionModeHot");
-caseModeHot.checked = lireReglage(CLE_MODE_HOT, false);
+caseModeHot.checked = false;
 caseModeHot.addEventListener("change", () => {
-  ecrireReglage(CLE_MODE_HOT, caseModeHot.checked);
   majTitrePJ();
   if (caseModeHot.checked) jouerSon("sons_on");
 });

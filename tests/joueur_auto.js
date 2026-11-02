@@ -24,7 +24,9 @@
 
   window.addEventListener("load", () => {
     $("#btnModeClassique").click();
-    if ($("#btnContinuerOptions")) $("#btnContinuerOptions").click(); // (écran « Ta partie » : Mode PJ, express, hot)
+    // Écran « Ta partie » (Mode PJ, express, hot) : les cases à cocher données par le test (window.__optionsRobot, liste d'id)
+    (window.__optionsRobot || []).forEach((id) => { const c = document.getElementById(id); if (c && !c.checked) c.click(); });
+    if ($("#btnContinuerOptions")) $("#btnContinuerOptions").click();
     for (const n of ["Tris", "Ylana", "Celien"]) {
       $("#nomJoueur").value = n;
       pd($("#ajouterJoueur"));

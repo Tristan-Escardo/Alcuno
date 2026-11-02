@@ -314,8 +314,8 @@ function verifier(ok, texte){
   {
     const resultats = [];
     for (const express of [false, true]) {
-      const { ctx, page, erreurs } = await ouvrir({}, express ? `try{localStorage.setItem("alcuno_partie_express","1")}catch(e){}` : "");
-      await page.click("#btnModeClassique"); await page.click("#btnContinuerOptions"); await page.waitForTimeout(800);
+      const { ctx, page, erreurs } = await ouvrir();
+      await page.click("#btnModeClassique"); if (express) await page.click("label[for=optionPartieExpress]"); await page.click("#btnContinuerOptions"); await page.waitForTimeout(800);
       for (const nom of ["Tom", "Lea", "Max"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(250); }
       await page.click("#jouer"); await page.waitForTimeout(1200);
       resultats.push(await page.evaluate(() => ({ cartes: document.querySelectorAll("#plateau .Carte").length, restantes: cartesRestantes(),
@@ -1274,8 +1274,9 @@ function verifier(ok, texte){
 
   // 48. Mode hot : flamme dans le titre, paquet (plus de « 1 », Cupidon selon le nombre de joueurs, toujours 52 cartes ; 28 en express)
   for (const [nb, express] of [[3, false], [4, false], [6, false], [8, false], [4, true], [2, false]]) {
-    const { ctx, page, erreurs } = await ouvrir({}, `try{localStorage.setItem("alcuno_mode_hot","1");${express ? 'localStorage.setItem("alcuno_partie_express","1");' : ""}}catch(e){}`);
+    const { ctx, page, erreurs } = await ouvrir();
     await page.click("#btnModeClassique");
+    await page.click("label[for=optionModeHot]"); if (express) await page.click("label[for=optionPartieExpress]");
     const coche = await page.evaluate(() => document.getElementById("optionModeHot").checked);
     await page.click("#btnContinuerOptions"); await page.waitForTimeout(600);
     for (let i = 1; i <= nb; i++) { await page.fill("#nomJoueur", "J" + i); await page.click("#ajouterJoueur"); await page.waitForTimeout(120); }
@@ -1292,10 +1293,29 @@ function verifier(ok, texte){
       `mode hot, ${nb} joueurs${express ? ", express" : ""} : ${JSON.stringify(e)} (Cupidon attendues : ${nb < 3 ? 0 : attenduCupidon})`);
   }
 
+  // 48b. « Ta partie » : Mode PJ, express et hot ne sont plus enregistrés ; décochés au chargement (anciennes clés effacées) et à chaque ouverture
+  {
+    const { ctx, page, erreurs } = await ouvrir({}, `try{["alcuno_mode_hot","alcuno_mode_soft","alcuno_partie_express"].forEach((c) => localStorage.setItem(c, "1"))}catch(e){}`);
+    const ids = ["optionModeSoft", "optionPartieExpress", "optionModeHot"];
+    const lire = () => page.evaluate((ids) => ({ cases: ids.map((i) => document.getElementById(i).checked),
+      cles: ["alcuno_mode_hot", "alcuno_mode_soft", "alcuno_partie_express"].map((c) => localStorage.getItem(c)) }), ids);
+    await page.click("#btnModeClassique");
+    const ouverture = await lire();
+    for (const i of ids) await page.click(`label[for=${i}]`);
+    const cochees = await lire();
+    await page.click("#btnContinuerOptions"); await page.waitForTimeout(500);
+    await page.evaluate(() => ouvrirOptionsPartie(() => {})); await page.waitForTimeout(300);
+    const reouverture = await lire();
+    await ctx.close();
+    const aucune = (r) => r.cases.every((c) => !c) && r.cles.every((c) => c === null);
+    verifier(aucune(ouverture) && cochees.cases.every(Boolean) && cochees.cles.every((c) => c === null) && aucune(reouverture) && erreurs.length === 0,
+      `« Ta partie » : options décochées à l'ouverture, jamais enregistrées ${JSON.stringify({ ouverture, cochees, reouverture, erreurs })}`);
+  }
+
   // 49. Mode hot : une seule personne boit => bloc du défi dans l'annonce de la règle (« Je le fais » : rien à boire ; « Je bois » : les gorgées) ; jamais deux fois le même défi
   {
-    const { ctx, page, erreurs } = await ouvrir({}, `try{localStorage.setItem("alcuno_mode_hot","1")}catch(e){}`);
-    await page.click("#btnModeClassique"); await page.click("#btnContinuerOptions"); await page.waitForTimeout(600);
+    const { ctx, page, erreurs } = await ouvrir();
+    await page.click("#btnModeClassique"); await page.click("label[for=optionModeHot]"); await page.click("#btnContinuerOptions"); await page.waitForTimeout(600);
     for (const nom of ["Tom", "Lea", "Max"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(150); }
     await page.click("#jouer"); await page.waitForTimeout(900);
     const boire = (n) => page.evaluate((n) => { annoncerBoireAvecAnnulation(0, n, "plus_2_vert", `Tom boit ${n}`); }, n);
@@ -1345,8 +1365,8 @@ function verifier(ok, texte){
     const sansHot = await b.page.evaluate(() => ({ cle: localStorage.getItem("alcuno_theme_donjon"), cachee: document.getElementById("pastilleDonjon").hidden }));
     await b.ctx.close();
     // partie en mode hot : débloqué, pastille visible avec « NOUVEAU », puis thème appliqué
-    const c = await ouvrir({}, `try{localStorage.setItem("alcuno_mode_hot","1")}catch(e){}`);
-    await c.page.click("#btnModeClassique"); await c.page.click("#btnContinuerOptions"); await c.page.waitForTimeout(600);
+    const c = await ouvrir();
+    await c.page.click("#btnModeClassique"); await c.page.click("label[for=optionModeHot]"); await c.page.click("#btnContinuerOptions"); await c.page.waitForTimeout(600);
     for (const nom of ["Tom", "Lea"]) { await c.page.fill("#nomJoueur", nom); await c.page.click("#ajouterJoueur"); await c.page.waitForTimeout(150); }
     await c.page.click("#jouer"); await c.page.waitForTimeout(900);
     const apresHot = await c.page.evaluate(() => ({ cle: localStorage.getItem("alcuno_theme_donjon"), cachee: document.getElementById("pastilleDonjon").hidden,

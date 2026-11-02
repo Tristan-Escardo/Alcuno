@@ -796,6 +796,8 @@ function reprendrePartieClassique(s){
   repriseClassiqueEnCours = true;
   if(caseModeSoft.checked !== !!s.soft) caseModeSoft.checked = !!s.soft; // (même mode que pendant la partie)
   if(caseModeHot.checked !== !!s.hot) caseModeHot.checked = !!s.hot;
+  casePartieExpress.checked = !!s.express; // (rien n'est gardé sur le téléphone : la revanche refera une partie du même type)
+  majTitrePJ();
   ouvrirModeClassique(); // (js/en-ligne.js) sans passer par l'écran « Ta partie »
   document.activeElement && document.activeElement.blur && document.activeElement.blur(); // (pas de clavier)
   joueurs = s.joueurs.slice();
