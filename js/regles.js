@@ -1292,8 +1292,8 @@ function afficherOverlayPlus4(joueurActuel, classeCartePlus4){
       const idx = Number(btn.dataset.idx);
       const n = dist[idx];
       btn.innerHTML = n > 0
-      ? `${echapperHtml(joueurs[idx])} <span class="plus4-badge">+ ${n}</span>`
-      : echapperHtml(joueurs[idx]);
+      ? `${echapperHtml(avecCouronne(joueurs[idx]))} <span class="plus4-badge">+ ${n}</span>`
+      : echapperHtml(avecCouronne(joueurs[idx]));
 
       // Total atteint : plus possible d'en ajouter, les joueurs ne réagissent plus (même apparence)
       // jusqu'à « Retour » ou « Annuler »
@@ -1315,7 +1315,7 @@ function afficherOverlayPlus4(joueurActuel, classeCartePlus4){
     const btn = document.createElement("button");
     btn.className = "bouton-pigeon plus4-joueur-btn";
     btn.dataset.idx = String(idx);
-    btn.innerText = nom;
+    btn.innerText = avecCouronne(nom);
 
     surAction(btn, "plus4:joueur:" + idx, { owner: choisisseur }, ()=>{
       const total = totalDistribue();

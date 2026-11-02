@@ -1751,7 +1751,7 @@ btnSupprimer.addEventListener("click", ()=>{
     ligne.innerHTML = `
         <label class="supp-item">
           <input class="supp-check" type="checkbox" value="${i}">
-          <span class="supp-name">${echapperHtml(j)}</span>
+          <span class="supp-name">${echapperHtml(avecCouronne(j))}</span>
         </label>
       `;
 

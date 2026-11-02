@@ -2471,25 +2471,20 @@ header h1{
 }
 
 #ecranCredits .credits-honneur{
-  width: min(420px, 88vw);
+  /* même largeur qu'une case de créateur, centrée : la mention reste discrète */
+  width: calc((min(420px, 88vw) - 10px) / 2);
   display: flex;
   flex-direction: column;
   gap: 6px;
-  margin-top: 4px;
+  margin-top: 2px;
   text-align: center;
 }
 
 #ecranCredits .credits-honneur-titre{
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 0.22em;
-  color: #c3cad3;
-}
-
-/* La ligne de Li-Mèi : comme celles des créateurs, avec un liseré argenté */
-#ecranCredits .credits-nom.credits-nom-argent{
-  color: #e6eaf0;
-  box-shadow: 0 0 0 1px rgba(195,202,211,0.6) inset;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  color: rgba(255,255,255,0.5);
 }
 
 #ecranCredits .credits-nom-detail{
@@ -7852,7 +7847,7 @@ html[data-theme="galaxie"] #ecranCredits .photoVide{ border-color: rgba(143,208,
 html[data-theme="galaxie"] #ecranCredits .credits-nom{
   background: linear-gradient(180deg, rgba(14,22,44,.92), rgba(6,10,22,.92)); border: 1.5px solid #8fd0ff; color:#FFE81F; text-shadow:none;
   box-shadow: 0 0 6px #4aa8ff, 0 0 16px rgba(40,140,255,.55), inset 0 0 10px rgba(80,170,255,.22); }
-html[data-theme="galaxie"] #ecranCredits .credits-honneur-titre{ color: rgba(143,208,255,.8); }
+html[data-theme="galaxie"] #ecranCredits .credits-honneur-titre{ color: rgba(143,208,255,.6); }
 html[data-theme="galaxie"] .lignesRegle li::before{ background:#4aa8ff !important; box-shadow: 0 0 6px #39a0ff; }
 html[data-theme="galaxie"] .regleBloc em, html[data-theme="galaxie"] .detailRegle em{ color:#FFE81F !important; }
 /* Bloc Règles en partie : hologramme bleu */
