@@ -5280,6 +5280,14 @@ body.partie-hot header h1 .badgeHot{
   border: none;
   padding: 6px 0 0;
 }
+/* La ligne du bouton n'est pas un bloc de réglage : jamais de cadre, quel que soit le thème (les thèmes habillent toutes les
+   .optionReglage en !important : sans ça, un deuxième contour décalé apparaissait autour de « Continuer ») */
+html[data-theme] #ecranReglages .optionsPartie .optionReglage.optionsSuite.optionsSuite{
+  background: none !important; border: none !important; box-shadow: none !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+  padding: 6px 0 0 !important; overflow: visible !important;
+}
+html[data-theme] #ecranReglages .optionsPartie .optionReglage.optionsSuite.optionsSuite::before,
+html[data-theme] #ecranReglages .optionsPartie .optionReglage.optionsSuite.optionsSuite::after{ display: none !important; }
 #ecranReglages .optionsPartie .optionsSuite button{
   width: 100%;
   padding: 16px;
