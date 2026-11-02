@@ -4223,7 +4223,8 @@ html[data-theme="cerisier"] #petalesCerisier{
 #notifHaut.notifHaut-sobre{
   padding: 14px 18px;
   background: linear-gradient(180deg, var(--pastille-haut), var(--pastille-bas));
-  box-shadow: 0 12px 28px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(255, 215, 0, 0.35),
+  /* couleurs du joueur actif de chaque thème (--actif-*) : jaune en Bordeaux, vert en Casino, bleu en Nuit, rouge en BDSM… */
+  box-shadow: 0 12px 28px rgba(0,0,0,0.45), inset 0 0 0 1px color-mix(in srgb, var(--actif-halo) 45%, transparent),
               inset 0 1px 0 rgba(255,255,255,0.08);
 }
 #notifHaut.notifHaut-sobre::before{
@@ -4232,11 +4233,11 @@ html[data-theme="cerisier"] #petalesCerisier{
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #fff6bf 0%, #FFD700 45%, #d6a900 100%);
-  box-shadow: 0 0 10px rgba(255,215,0,0.35);
+  background: radial-gradient(circle at 35% 35%, #fff 0%, var(--actif-haut) 30%, var(--actif-bas) 100%);
+  box-shadow: 0 0 10px var(--actif-halo);
 }
 #notifHaut.notifHaut-sobre .notifHaut-texte strong{
-  color: #FFE36B;
+  color: var(--actif-haut);
   text-shadow: none;
 }
 html[data-theme="givre"] #notifHaut.notifHaut-sobre{

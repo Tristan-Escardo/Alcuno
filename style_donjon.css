@@ -11,8 +11,10 @@ html[data-theme="donjon"]{
   --pastille-haut: rgba(60, 8, 18, 0.95);
   --pastille-bas: rgba(10, 10, 12, 0.95);
   --actif-haut: #ffb3bc; --actif-bas: #ff2a3d; --actif-texte: #2a0008; --actif-halo: #ff2a3d;
-  --overlay-fond: #070708;
-  --overlay-bord: #070708;
+  /* Fond des fenêtres (duel, +4, pari…) : halo rouge au milieu, flammes sombres en bas, sur du noir */
+  --overlay-fond: linear-gradient(rgba(7, 5, 8, 0) 70%, rgba(7, 5, 8, 0.55)), url("donjon/flammes.svg") bottom / 200px 100px repeat-x,
+    radial-gradient(ellipse 115% 42% at 50% 45%, rgba(150, 10, 30, 0.5) 0%, transparent 100%), #070508;
+  --overlay-bord: #070508;
 }
 
 /* ----- Fond : l'accueil devient transparent pour laisser voir les chaînes et les flammes (derrière tout) ----- */
@@ -90,7 +92,10 @@ html[data-theme="donjon"] #ecranRegles .ligneRegle .Carte.retournee:not([class*=
 }
 
 /* ----- Annonces : titres rouges ----- */
-html[data-theme="donjon"] #overlayRegleUnique{ background: #070708 !important; }
+html[data-theme="donjon"] :is(#overlayCouleur, #overlayPlus4, #overlayCupidon, #overlayPigeon, #overlayCarteDoree, #overlayFinUnRestants, #overlayDuel,
+  #overlayRegleUnique, #overlayAnnulation, #overlayResultatAnnulation, #overlayPredictionFin, .overlay-opaque){ background: var(--overlay-fond) !important; }
+html[data-theme="donjon"].overlay-ouvert, html[data-theme="donjon"].overlay-ouvert body, html[data-theme="donjon"] #voileOverlays{ background: var(--overlay-bord); }
+html[data-theme="donjon"] .plus4-actions{ background: transparent; }
 html[data-theme="donjon"] #overlayRegleUnique .regle-titre{ color: #ff3b4e !important; text-shadow: 0 0 12px rgba(255, 42, 61, 0.55) !important; }
 
 /* ----- Pastille du thème dans les Réglages ----- */
@@ -304,3 +309,16 @@ html[data-theme="donjon"] :is(#annulerChoix, #bandeauMiseAJour){
 }
 html[data-theme="donjon"] .fin-choix-numeros b{ background: #ff2a3d; color: #fff; box-shadow: 0 0 8px rgba(255, 42, 61, 0.7); }
 html[data-theme="donjon"] #ecranReglages .qrJeu{ box-shadow: 0 0 0 3px #ff2a3d, 0 0 18px rgba(255, 42, 61, 0.5), 0 10px 24px rgba(0, 0, 0, 0.35); }
+
+/* Pari sur la dernière carte : cadre du récap et ligne de celui qui choisit en rouge */
+html[data-theme="donjon"] .fin-choix-recap{ background: rgba(20, 2, 6, 0.6); border-color: rgba(255, 42, 61, 0.45); }
+html[data-theme="donjon"] .fin-choix-recap .ligne{ border-bottom-color: rgba(255, 42, 61, 0.2); }
+html[data-theme="donjon"] .fin-choix-recap .ligne.en-cours{ background: rgba(255, 42, 61, 0.2); box-shadow: inset 0 0 0 1px rgba(255, 42, 61, 0.55); }
+/* Défi du mode hot : bandeau rouge et noir verni (au lieu du rose) */
+:root:root:root[data-theme="donjon"] #overlayRegleUnique#overlayRegleUnique .bloc-hot{
+  background: linear-gradient(160deg, #4a0612, #0c0608 60%, #3a0410) !important; border-color: #ff2a3d !important; box-shadow: 0 0 22px rgba(255, 42, 61, 0.6) !important;
+}
+:root:root:root[data-theme="donjon"] #overlayRegleUnique#overlayRegleUnique .bloc-hot-puce{ background: linear-gradient(90deg, #c2102a, #ff3b4e) !important; }
+:root:root:root[data-theme="donjon"] #overlayRegleUnique#overlayRegleUnique .bloc-hot-lien{ color: #ff8a96 !important; }
+:root:root:root[data-theme="donjon"] #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn.fait{ background: linear-gradient(#ff4a5c, #c2102a) !important; box-shadow: 0 3px 0 #6a0614, 0 0 14px rgba(255, 42, 61, 0.6) !important; }
+:root:root:root[data-theme="donjon"] #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn.bois{ background: #120408 !important; border-color: rgba(255, 42, 61, 0.6) !important; color: #ffd0d6 !important; }
