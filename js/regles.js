@@ -41,6 +41,7 @@ function afficherOverlayFinUnRestants(){
   overlay.style.overflowY = "auto";
   recapActuel = calculerRecap(restants);
   try { stickersFinDePartie(); } catch (e) {} // (album de stickers, js/stickers.js)
+  try { if(partieHot) proposerFenetreBdsm(); } catch (e) {} // (thème secret BDSM, js/reglages.js)
   overlay.appendChild(construireRecap(recapActuel));
 
   const btnTerminer = document.createElement("button");

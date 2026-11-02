@@ -1939,6 +1939,7 @@ header h1{
 
 #choixMode button,
 #ecranNouvellePartie button,
+#btnContinuerOptions,
 #ecranConfirmerHote button,
 #ecranConfirmerRetrait button,
 #ecranReprise button,
@@ -1968,6 +1969,7 @@ header h1{
 @media (hover: hover){ /* survol : seulement avec une souris (sur téléphone il reste collé après un tap) */
   #choixMode button:hover,
   #ecranNouvellePartie button:hover,
+  #btnContinuerOptions:hover,
   #ecranConfirmerHote button:hover,
   #ecranConfirmerRetrait button:hover,
   #ecranReprise button:hover,
@@ -1982,6 +1984,7 @@ header h1{
 
 #choixMode button:active,
 #ecranNouvellePartie button:active,
+#btnContinuerOptions:active,
 #ecranConfirmerHote button:active,
 #ecranConfirmerRetrait button:active,
 #ecranReprise button:active,
@@ -3484,6 +3487,7 @@ html.accessibilite #toastEnLigne{
 html.accessibilite #choixMode button:not(#btnReglages):not(.btnInstaller),
 html.accessibilite #enLigne button:not(.btnAccueilTexte):not(.btnRetour):not(.btnExclure),
 html.accessibilite #ecranNouvellePartie button:not(.btnAccueilTexte):not(.btnRetour),
+html.accessibilite #btnContinuerOptions:not(.btnAccueilTexte):not(.btnRetour),
 html.accessibilite #ecranConfirmerHote button,
 html.accessibilite #ecranConfirmerRetrait button,
 html.accessibilite #ecranReprise button,
@@ -4556,6 +4560,7 @@ html[data-theme="givre"] #ecranCaster .texteConfirmation{
 /* Boutons : cyan glacé, texte blanc */
 html[data-theme="givre"] #choixMode button:not(#btnReglages):not(.btnAccueilTexte),
 html[data-theme="givre"] #ecranNouvellePartie button:not(.btnAccueilTexte),
+html[data-theme="givre"] #btnContinuerOptions:not(.btnAccueilTexte),
 html[data-theme="givre"] #ecranConfirmerHote button,
 html[data-theme="givre"] #ecranConfirmerRetrait button,
 html[data-theme="givre"] #ecranReprise button,
@@ -5267,13 +5272,13 @@ body.partie-hot header h1 .badgeHot{
 #ecranReglages.vue-options #btnParDefautReglages{
   display: none !important;
 }
-#ecranReglages .optionsPartie .optionAction{
+#ecranReglages .optionsPartie .optionsSuite{
   justify-content: center;
   background: none;
   border: none;
   padding: 6px 0 0;
 }
-#ecranReglages .optionsPartie .optionAction button{
+#ecranReglages .optionsPartie .optionsSuite button{
   width: 100%;
   padding: 16px;
   font-size: clamp(18px, 4.4vw, 22px);
@@ -5448,7 +5453,7 @@ html.accessibilite #ecranInstallation #btnInstallationPlusTard{ font-size: 19px;
 /* ===== Boutons jaunes à texte blanc : plus lisibles (thèmes sombres ; Givre a ses boutons cyan) =====
    Léger dégradé doré (le jaune du haut reste celui d'avant) et ombre du texte plus marquée.
    Mêmes boutons dans les overlays des règles (règle suivante). */
-html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu,
+html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu,
   #btnCreerPartie, #btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR,
   #lancerPartieEnLigne, #btnRejouerMemes, #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button,
   #btnConfirmerAccueilOui, #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon,
@@ -5513,6 +5518,7 @@ html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#overlayPi
   #choixMode button:not(#btnReglages):not(.btnAccueilTexte):not(.btnInstaller),
   #enLigne button:not(.btnAccueilTexte):not(.btnRetour):not(.btnExclure),
   #ecranNouvellePartie button:not(.btnAccueilTexte):not(.btnRetour),
+  #btnContinuerOptions:not(.btnAccueilTexte):not(.btnRetour),
   #ecranConfirmerHote button,
   #ecranConfirmerRetrait button,
   #ecranReprise button,
@@ -5628,7 +5634,7 @@ html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#overlayPi
    Luminosité plutôt que couleur : marche sur le jaune comme sur le cyan de Givre.
    Au doigt : plus sombre et un peu plus petit pendant l'appui. À la souris : un peu plus clair au survol
    (seulement si l'appareil a une souris, sinon l'effet reste « collé » après un tap). */
-:is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
+:is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
   #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
   #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
   #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
@@ -5639,7 +5645,7 @@ html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#overlayPi
   transition: transform 0.12s ease, filter 0.12s ease, translate 0.12s ease, box-shadow 0.12s ease;
 }
 @media (hover: hover){
-  html body :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
+  html body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
     #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
     #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
     #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
@@ -5655,7 +5661,7 @@ html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#overlayPi
 
 /* Sombre : au survol à la souris, anneau doré fin au lieu du gros anneau blanc éclatant */
 @media (hover: hover){
-  html[data-theme="noir"] body :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
+  html[data-theme="noir"] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
   #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
   #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
   #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
@@ -5668,7 +5674,7 @@ html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#overlayPi
 
 /* Givre : anneau et lueur bleus (le blanc et le jaune ne se voient pas sur le fond clair) */
 @media (hover: hover){
-  html[data-theme="givre"] body :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
+  html[data-theme="givre"] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
   #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
   #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
   #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
@@ -6750,7 +6756,7 @@ html[data-theme="soleil"] header::after{
   box-shadow: 0 0 14px rgba(255,150,110,0.45) !important;
 }
 /* Boutons : dégradé soleil, texte blanc */
-html[data-theme="soleil"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu, #ajouterJoueur, #jouer, #supprimerJoueur,
+html[data-theme="soleil"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #ajouterJoueur, #jouer, #supprimerJoueur,
   #nouvellePartie, #btnRejouerMemes, #btnModifierJoueurs, #btnReprendrePause,
   #btnCreerPartie, #btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR,
   #lancerPartieEnLigne, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui, #btnConfirmerAccueilNon,
@@ -7066,7 +7072,7 @@ html[data-theme="noir"] #ecranReglages .blocReglage .optionReglage{ background: 
 /* ===== Thème Sombre « Braise » : boutons noirs au texte et au liseré dorés bien nets (sombre, pas terne : un doré
    éteint donnait l'impression que la luminosité de l'écran était basse)
    Les boutons de partie des overlays (pigeon, duel, +4…) ne changent pas : ils restent bien lisibles en jeu. ===== */
-html[data-theme="noir"] :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu,
+html[data-theme="noir"] :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu,
   #btnCreerPartie, #btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR,
   #lancerPartieEnLigne, #btnRejouerMemes, #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button,
   #btnConfirmerAccueilOui, #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon,
@@ -8707,3 +8713,7 @@ html[data-theme="soleil"] #ecranTele .tele-regles-ligne em{ color: #a8203f; }
   color: #b3123f !important;
   border: 2px solid #ff8fa8 !important;
 }
+
+/* « Continuer » de l'écran « Ta partie » : même apparence que les boutons du menu dans chaque thème (listes de « Nouvelle partie » ci-dessus),
+   mais pleine largeur */
+#btnContinuerOptions{ width: 100%; max-width: none; padding: 16px; font-size: clamp(18px, 4.4vw, 22px); border-radius: 14px; }

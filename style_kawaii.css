@@ -116,6 +116,7 @@ html[data-theme="kawaii"] #ecranCaster .texteConfirmation{
 }
 html[data-theme="kawaii"] #choixMode button:not(#btnReglages):not(.btnAccueilTexte),
 html[data-theme="kawaii"] #ecranNouvellePartie button:not(.btnAccueilTexte),
+html[data-theme="kawaii"] #btnContinuerOptions:not(.btnAccueilTexte),
 html[data-theme="kawaii"] #ecranConfirmerHote button,
 html[data-theme="kawaii"] #ecranConfirmerRetrait button,
 html[data-theme="kawaii"] #ecranReprise button,
@@ -490,7 +491,7 @@ html[data-theme="kawaii"] #ecranInstallation #btnInstallationInstaller{
 }
 html[data-theme="kawaii"] #ecranInstallation #btnInstallationPlusTard{ color: var(--givre-texte); }
 @media (hover: hover){
-html[data-theme="kawaii"] body :is(#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
+html[data-theme="kawaii"] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
   #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
   #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
   #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,

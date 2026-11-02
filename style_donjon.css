@@ -16,7 +16,8 @@ html[data-theme="donjon"]{
 }
 
 /* ----- Fond : l'accueil devient transparent pour laisser voir les chaînes et les flammes (derrière tout) ----- */
-html[data-theme="donjon"] #choixMode{ background: transparent !important; }
+/* (une bande pleine tout en haut cache la barre du plateau, qui est dessous : le reste est transparent) */
+html[data-theme="donjon"] #choixMode{ background: linear-gradient(var(--couleur-barre) 0, var(--couleur-barre) 80px, transparent 80px) !important; }
 html[data-theme="donjon"]::before{
   content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
   background: url("donjon/chaine.svg") 6px 0 / 44px 112px repeat-y, url("donjon/chaine.svg") calc(100% - 6px) 0 / 44px 112px repeat-y;
@@ -72,7 +73,7 @@ html[data-theme="donjon"] header h1{
 }
 
 /* ----- Boutons : pilules vernies rouge et noir ----- */
-html[data-theme="donjon"] button:not(.btnPauseJoueur):not(.btnLivre):not(#btnReglages):not(.btnAccueilTexte):not(#btnPause):not(#btnReglagesJeu):not(.bloc-hot-btn):not(.pastilleTheme):not(.btnRetour):not(.annonceFermer):not(.btnInstaller){
+html[data-theme="donjon"] button:not(.btnPauseJoueur):not(.btnLivre):not(#btnReglages):not(.btnAccueilTexte):not(#btnPause):not(#btnReglagesJeu):not(.bloc-hot-btn):not(.pastilleTheme):not(.btnRetour):not(.annonceFermer):not(.btnInstaller):not(#btnSignalerBug):not(#btnFaq):not(#btnFaqDepuisRegles):not(#btnDiagnostic):not(.optionLien):not(.btnDiagnostic){
   background: linear-gradient(#3a0a14 0%, #0a0a0c 48%, #2a0610 52%, #5a0a1c 100%) !important; color: #ffd0d6 !important;
   border: 2px solid #ff2a3d !important; border-radius: 999px !important;
   box-shadow: 0 0 16px rgba(255, 42, 61, 0.75), inset 0 2px 0 rgba(255, 255, 255, 0.35) !important;
@@ -94,3 +95,79 @@ html[data-theme="donjon"] #overlayRegleUnique .regle-titre{ color: #ff3b4e !impo
 /* ----- Pastille du thème dans les Réglages ----- */
 html[data-theme="donjon"] .pastilleTheme[data-theme="donjon"] .rond{ box-shadow: 0 0 0 3px #ff2a3d; }
 .pastilleTheme .rondDonjon{ background: radial-gradient(circle at 50% 120%, #ff9a00 0 18%, #e01616 36%, transparent 60%), linear-gradient(135deg, #1b1b20, #050506) !important; }
+
+/* ----- Fenêtre « Thème BDSM débloqué » (ses propres couleurs, dans tous les thèmes) ----- */
+#fenetreBdsm{
+  position: fixed; inset: 0; z-index: 2147483500; display: flex; align-items: center; justify-content: center; padding: 22px;
+  background: rgba(20, 0, 6, 0.72); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  animation: fenetrePrestigeVoile 0.3s ease both;
+}
+#fenetreBdsm.fenetreBdsm-sortie{ animation: fenetrePrestigeVoile 0.25s ease reverse both; }
+.fenetreBdsm-carte{
+  width: min(340px, 100%); box-sizing: border-box; padding: 26px 22px 22px; text-align: center; border-radius: 22px; overflow: hidden;
+  background: url("donjon/flammes.svg") bottom / 200px 100px repeat-x, linear-gradient(165deg, #3a0612, #0a0a0c 60%);
+  background-blend-mode: normal; border: 3px solid #ff2a3d; color: #ffe3e6;
+  box-shadow: 0 0 26px rgba(255, 42, 61, 0.8), inset 0 0 22px rgba(255, 42, 61, 0.25);
+  animation: fenetrePrestigeArrive 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+.fenetreBdsm-secret{ font: 900 12px Arial, sans-serif; letter-spacing: 0.12em; text-transform: uppercase; color: #ff8a96; }
+.fenetreBdsm-titre{ margin-top: 10px; font: 900 28px/1.15 Arial, sans-serif; color: #fff; text-shadow: 0 0 14px #ff2a3d, 0 3px 0 #8a0618; }
+.fenetreBdsm-texte{ font: 700 15px/1.4 Arial, sans-serif; color: #ffd0d6; margin: 12px 0 20px; }
+.fenetreBdsm-carte button{ display: block; width: 100%; position: relative; border-radius: 999px; cursor: pointer; font: 900 17px Arial, sans-serif; padding: 14px; }
+.fenetreBdsm-essayer{ color: #fff; border: 2px solid #ff7a86; background: linear-gradient(#ff6a90, #ff2d62); text-shadow: 0 2px 0 #8a0618; box-shadow: 0 4px 0 #a31238, 0 0 14px rgba(255, 42, 61, 0.7); }
+.fenetreBdsm-plusTard{ margin-top: 12px; color: #ffd0d6; background: #1a0a10; border: 2px solid #7a4a6c; }
+.fenetreBdsm-carte button:active{ filter: brightness(0.95); transform: scale(0.98); }
+@media (prefers-reduced-motion: reduce){ #fenetreBdsm, .fenetreBdsm-carte{ animation: none; } }
+
+/* ===== Écrans annexes (Réglages, « Ta partie », Règles, FAQ, signalement) : rouge et noir, comme le reste ===== */
+html[data-theme="donjon"] :is(#ecranReglages, #ecranRegles, #ecranBug){
+  background: radial-gradient(ellipse 120% 40% at 50% 100%, rgba(110, 6, 20, 0.55), transparent 70%), linear-gradient(var(--fond-theme), var(--fond-theme)) var(--couleur-barre) !important;
+}
+html[data-theme="donjon"] :is(#ecranReglages .optionReglage, #ecranReglages .blocReglage, #ecranRegles .blocRegles, #ecranBug .blocBug){
+  background: linear-gradient(160deg, rgba(40, 6, 12, 0.94), rgba(8, 8, 10, 0.96)) !important;
+  border: 2px solid rgba(255, 42, 61, 0.6) !important;
+  box-shadow: 0 0 12px rgba(255, 42, 61, 0.35), inset 0 0 14px rgba(255, 42, 61, 0.12) !important;
+}
+html[data-theme="donjon"] #ecranReglages .blocReglage .optionReglage{ background: transparent !important; border: none !important; box-shadow: none !important; }
+html[data-theme="donjon"] :is(#ecranReglages h2, #ecranRegles h2, #ecranBug h2){
+  color: #ff4458 !important; text-shadow: 0 0 14px rgba(255, 42, 61, 0.85), 0 2px 0 #000 !important;
+}
+html[data-theme="donjon"] :is(#ecranReglages .optionTitre, #ecranRegles .blocRegles h3, #ecranRegles .nomRegle, #ecranReglages .aProposTitre, #ecranReglages .titrePartage){
+  color: #ff6b7c !important;
+}
+html[data-theme="donjon"] #ecranReglages .optionReglage input:checked + .interrupteur{ background: #ff2a3d !important; box-shadow: 0 0 10px rgba(255, 42, 61, 0.7) !important; }
+html[data-theme="donjon"] #ecranRegles .faqItem + .faqItem{ border-top: 1px solid rgba(255, 42, 61, 0.3) !important; }
+
+/* Boutons « Retour » / « Modifier » : pilules rouge et noir */
+html[data-theme="donjon"] .btnRetour{
+  background: linear-gradient(#3a0a14 0%, #0a0a0c 48%, #2a0610 52%, #5a0a1c 100%) !important; color: #ffd0d6 !important;
+  border: 2px solid #ff2a3d !important; border-radius: 999px !important;
+  box-shadow: 0 0 14px rgba(255, 42, 61, 0.7), inset 0 2px 0 rgba(255, 255, 255, 0.3) !important; text-shadow: 0 0 8px #ff2a3d !important;
+}
+
+/* Lignes cliquables (écran télé) et liens du bas des Réglages (Signaler un bug, Aide, Diagnostic) : pas de pilule */
+html[data-theme="donjon"] #ecranReglages .optionLien{
+  background: linear-gradient(160deg, rgba(40, 6, 12, 0.94), rgba(8, 8, 10, 0.96)) !important; border: 2px solid rgba(255, 42, 61, 0.6) !important;
+  border-radius: 16px !important; box-shadow: 0 0 12px rgba(255, 42, 61, 0.35) !important; color: #ffe3e6 !important;
+}
+html[data-theme="donjon"] :is(#btnSignalerBug, #btnFaq, #btnFaqDepuisRegles){
+  background: none !important; border: none !important; box-shadow: none !important; border-radius: 0 !important;
+  color: #ff6b7c !important; text-decoration: underline; text-shadow: none !important;
+}
+html[data-theme="donjon"] :is(#btnDiagnostic, .btnDiagnostic){
+  background: none !important; color: #ff8a96 !important; border: 1px solid rgba(255, 42, 61, 0.6) !important; box-shadow: none !important; border-radius: 12px !important;
+}
+
+/* Annonce du jeu (bandeau « Annonce ») et champ du nom : rouge, plus de blanc ni de bleu */
+html[data-theme="donjon"] .annonceAccueil{
+  background: linear-gradient(160deg, #3a0612, #0a0a0c) !important; border: 2px solid #ff2a3d !important; box-shadow: 0 0 16px rgba(255, 42, 61, 0.6) !important;
+}
+html[data-theme="donjon"] .annonceAccueil .annonceTexte{ color: #ffe3e6 !important; }
+html[data-theme="donjon"] .annonceAccueil .annonceEtiquette{ color: #ff8a96 !important; }
+html[data-theme="donjon"] .annonceAccueil button{ background: #1a0a10 !important; color: #ffd0d6 !important; border: 1px solid #ff2a3d !important; }
+html[data-theme="donjon"] :is(#nomJoueur, #pseudoCreateur, #pseudoRejoindre, #codeRejoindre){
+  background: #060608 !important; color: #ffe3e6 !important; border: 2px solid rgba(255, 42, 61, 0.7) !important; caret-color: #ff2a3d;
+}
+html[data-theme="donjon"] :is(#nomJoueur, #pseudoCreateur, #pseudoRejoindre, #codeRejoindre):focus{
+  outline: none !important; border-color: #ff2a3d !important; box-shadow: 0 0 14px rgba(255, 42, 61, 0.8) !important;
+}

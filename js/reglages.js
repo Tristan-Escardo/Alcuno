@@ -211,13 +211,48 @@ function vuNouveauDonjon(){
   try { localStorage.removeItem(CLE_DONJON_NOUVEAU); } catch (e) {}
   document.documentElement.classList.remove("donjon-nouveau");
 }
-// Appelé au lancement d'une partie en mode hot : la première fois, le thème apparaît dans les Réglages (rien n'est dit avant)
+// Appelé au lancement d'une partie en mode hot : la première fois, le thème apparaît dans les Réglages (rien n'est dit avant).
+// La fenêtre « débloqué » vient à la fin de la partie (proposerFenetreBdsm, appelée par le récap de fin).
+let fenetreBdsmEnAttente = false;
 function debloquerDonjon(){
   if (donjonDebloque()) return;
   try { localStorage.setItem(CLE_DONJON, "1"); localStorage.setItem(CLE_DONJON_NOUVEAU, "1"); } catch (e) {}
   majPastilleDonjon();
   document.documentElement.classList.add("donjon-nouveau");
-  setTimeout(() => { try { afficherNotificationHaut("", "Nouveau thème débloqué : Réglages › Thèmes", true); } catch (e) {} }, 2500);
+  fenetreBdsmEnAttente = true;
+}
+function proposerFenetreBdsm(){
+  if (!fenetreBdsmEnAttente) return;
+  fenetreBdsmEnAttente = false;
+  setTimeout(afficherFenetreBdsm, 3200); // (après le récap de fin de partie, comme pour Kawaii)
+}
+// Fenêtre « Thème BDSM débloqué » : « L'essayer maintenant » met le thème, « Plus tard » ferme
+function afficherFenetreBdsm(){
+  if (document.getElementById("fenetreBdsm")) return;
+  const voile = document.createElement("div");
+  voile.id = "fenetreBdsm";
+  voile.setAttribute("role", "dialog");
+  voile.setAttribute("aria-label", "Thème BDSM débloqué");
+  voile.innerHTML = `
+    <div class="fenetreBdsm-carte">
+      <div class="fenetreBdsm-secret">🔥 Partie hot lancée !</div>
+      <div class="fenetreBdsm-titre">Thème BDSM<br>débloqué !</div>
+      <div class="fenetreBdsm-texte">Il est maintenant dans<br>Réglages › Thèmes</div>
+      <button type="button" class="fenetreBdsm-essayer">L'essayer maintenant</button>
+      <button type="button" class="fenetreBdsm-plusTard">Plus tard</button>
+    </div>`;
+  const fermer = () => {
+    voile.classList.add("fenetreBdsm-sortie");
+    setTimeout(() => voile.remove(), 250);
+  };
+  voile.querySelector(".fenetreBdsm-essayer").addEventListener("click", () => {
+    fermer();
+    const pastille = document.getElementById("pastilleDonjon");
+    if (pastille) pastille.click(); // comme dans les réglages (thème gardé, barre du téléphone…)
+  });
+  voile.querySelector(".fenetreBdsm-plusTard").addEventListener("click", fermer);
+  vibrer([60, 40, 60]);
+  document.body.appendChild(voile);
 }
 // ===== Thème secret « Kawaii » : débloqué avec les 11 stickers de l'album (js/stickers.js) =====
 const CLE_KAWAII = "alcuno_theme_kawaii";
@@ -743,9 +778,8 @@ for (let i = 0; i < 46; i++) {
 
 // Donjon : objets qui tombent sur l'écran d'accueil, du haut vers le bas, en sortant de dessous le bandeau du haut
 const zoneDonjon = document.getElementById("donjonFlotteurs");
-const OBJETS_DONJON = ["dixhuit", "vibro1", "levres", "menottes", "vibro3", "baillon", "vibro2", "cravache", "bandeau", "dixhuit",
-  "fouet", "collier", "flamme"];
-const TAILLES_DONJON = { dixhuit: 72, vibro1: 84, levres: 92, menottes: 96, vibro3: 76, baillon: 92, vibro2: 64, cravache: 86, bandeau: 96, fouet: 84, collier: 96, flamme: 44 };
+const OBJETS_DONJON = ["dixhuit", "vibro1", "levres", "menottes", "vibro3", "baillon", "fouet", "bandeau"];
+const TAILLES_DONJON = { dixhuit: 72, vibro1: 84, levres: 92, menottes: 96, vibro3: 76, baillon: 92, fouet: 84, bandeau: 96 };
 OBJETS_DONJON.forEach((nom, i) => {
   const objet = document.createElement("span");
   const taille = TAILLES_DONJON[nom] || 80;

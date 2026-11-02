@@ -1363,7 +1363,7 @@ function verifier(ok, texte){
     await c.ctx.close();
     verifier(sansDeblocage.theme === "bordeaux" && sansDeblocage.cachee && sansHot.cle === null && sansHot.cachee &&
       apresHot.cle === "1" && !apresHot.cachee && apresHot.nouveau &&
-      applique.theme === "donjon" && !applique.nouveau && applique.objets === 13 && applique.zone !== "none" && applique.barre === "#12040a" && applique.stocke === "donjon" && c.erreurs.length === 0,
+      applique.theme === "donjon" && !applique.nouveau && applique.objets === 8 && applique.zone !== "none" && applique.barre === "#12040a" && applique.stocke === "donjon" && c.erreurs.length === 0,
       `thème Donjon : ${JSON.stringify({ sansDeblocage, sansHot, apresHot, applique, erreurs: c.erreurs })}`);
   }
 
