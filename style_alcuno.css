@@ -8393,7 +8393,7 @@ html[data-theme="galaxie"] .switch_bleu, html[data-theme="galaxie"] .switch_bleu
 /* Joueur dont c'est le tour : plein, vif et propre à chaque thème (avant : un voile jaune à 12 %, difficile à voir). Les
    couleurs sont des variables (--actif-*), reprises aussi par la télé ; le thème Kawaii a déjà son jaune, plus spécifique. */
 :root{ --actif-haut: #fff27a; --actif-bas: #ffd400; --actif-texte: #3b2a00; --actif-halo: #ffd400; }
-html[data-theme="noir"]{ --actif-haut: #ffffff; --actif-bas: #c9ced9; --actif-texte: #0b0b12; --actif-halo: #ffffff; }
+html[data-theme="noir"]{ --actif-haut: #fff3a0; --actif-bas: #ffd400; --actif-texte: #3a2a00; --actif-halo: #ffd700; }
 html[data-theme="vert"]{ --actif-haut: #8dffb4; --actif-bas: #19d964; --actif-texte: #04301a; --actif-halo: #3dff8a; }
 html[data-theme="bleu"]{ --actif-haut: #9fe0ff; --actif-bas: #2f9bff; --actif-texte: #03203f; --actif-halo: #5ab4ff; }
 html[data-theme="soleil"]{ --actif-haut: #ffd9a8; --actif-bas: #ff8a5c; --actif-texte: #4a1500; --actif-halo: #ff9a6b; }
@@ -8544,6 +8544,12 @@ html[data-theme] .annonceAccueil .annonceFermer, html[data-theme] .annonceAccuei
   border-radius: 50%; font-size: 14px; font-weight: 800; color: #6a5a7a; background: rgba(0,0,0,.06);
 }
 html[data-theme] .annonceAccueil .annonceFermer:active, html[data-theme] .annonceAccueil #btnAnnonceFermer:active{ background: rgba(0,0,0,.18); }
+/* Croix de l'annonce sur l'accueil : « #choixMode button » (padding, largeur, ombres, survol) la déformait en ovale dans tous les thèmes */
+html #choixMode .annonceAccueil #btnAnnonceFermer{
+  width: 30px; height: 30px; padding: 0; margin: 0; min-width: 0; border-radius: 50%; box-shadow: none; text-shadow: none; transform: none;
+  background: rgba(0,0,0,.06); color: #6a5a7a; border: none; font-size: 14px;
+}
+html #choixMode .annonceAccueil #btnAnnonceFermer:active{ background: rgba(0,0,0,.18); transform: none; }
 @media (prefers-reduced-motion: reduce){ .annonceAccueil, .annonceAccueil .annonceIcone{ animation: none; } }
 /* La même carte dans les Réglages et les Crédits */
 .annonceRelais{ display: flex; justify-content: center; margin: 4px 0 14px; }

@@ -73,7 +73,7 @@ html[data-theme="donjon"] header h1{
 }
 
 /* ----- Boutons : pilules vernies rouge et noir ----- */
-html[data-theme="donjon"] button:not(.btnPauseJoueur):not(.btnLivre):not(#btnReglages):not(.btnAccueilTexte):not(#btnPause):not(#btnReglagesJeu):not(.bloc-hot-btn):not(.pastilleTheme):not(.btnRetour):not(.annonceFermer):not(.btnInstaller):not(#btnSignalerBug):not(#btnFaq):not(#btnFaqDepuisRegles):not(#btnDiagnostic):not(.optionLien):not(.btnDiagnostic){
+html[data-theme="donjon"] button:not(.btnPauseJoueur):not(.btnLivre):not(#btnReglages):not(.btnAccueilTexte):not(#btnPause):not(#btnReglagesJeu):not(.bloc-hot-btn):not(.pastilleTheme):not(.btnRetour):not(.annonceFermer):not(.btnInstaller):not(#btnSignalerBug):not(#btnFaq):not(#btnFaqDepuisRegles):not(#btnDiagnostic):not(.optionLien):not(.btnDiagnostic):not(#btnAnnonceFermer){
   background: linear-gradient(#3a0a14 0%, #0a0a0c 48%, #2a0610 52%, #5a0a1c 100%) !important; color: #ffd0d6 !important;
   border: 2px solid #ff2a3d !important; border-radius: 999px !important;
   box-shadow: 0 0 16px rgba(255, 42, 61, 0.75), inset 0 2px 0 rgba(255, 255, 255, 0.35) !important;
@@ -164,7 +164,8 @@ html[data-theme="donjon"] .annonceAccueil{
 }
 html[data-theme="donjon"] .annonceAccueil .annonceTexte{ color: #ffe3e6 !important; }
 html[data-theme="donjon"] .annonceAccueil .annonceEtiquette{ color: #ff8a96 !important; }
-html[data-theme="donjon"] .annonceAccueil button{ background: #1a0a10 !important; color: #ffd0d6 !important; border: 1px solid #ff2a3d !important; }
+html[data-theme="donjon"] .annonceAccueil button:not(#btnAnnonceFermer){ background: #1a0a10 !important; color: #ffd0d6 !important; border: 1px solid #ff2a3d !important; }
+html[data-theme="donjon"] #choixMode .annonceAccueil #btnAnnonceFermer{ background: rgba(255, 42, 61, 0.15) !important; color: #ff8a96 !important; border: none !important; }
 html[data-theme="donjon"] :is(#nomJoueur, #pseudoCreateur, #pseudoRejoindre, #codeRejoindre){
   background: #060608 !important; color: #ffe3e6 !important; border: 2px solid rgba(255, 42, 61, 0.7) !important; caret-color: #ff2a3d;
 }
