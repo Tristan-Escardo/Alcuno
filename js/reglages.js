@@ -633,7 +633,7 @@ function appliquerTheme(nom, sansMusique = false){
   if (nom === "prestige") vuNouveauPrestige(); // thème essayé : le rappel « NOUVEAU » s'en va
   if (nom === "galaxie") vuNouveauGalaxie();
   if (nom === "kawaii") vuNouveauKawaii();
-  if (nom === "donjon") { vuNouveauDonjon(); majFlotteursDonjon(); }
+  if (nom === "donjon") vuNouveauDonjon();
   peindreBarreTelephone();
   document.querySelectorAll(".pastilleTheme").forEach((b) => {
     b.setAttribute("aria-pressed", b.dataset.theme === nom ? "true" : "false");
@@ -776,7 +776,7 @@ for (let i = 0; i < 46; i++) {
   zoneFlotteurs.appendChild(paillette);
 }
 
-// Donjon : objets qui tombent sur l'écran d'accueil, du haut vers le bas, en sortant de dessous le bandeau du haut
+// Donjon : objets qui tombent sur l'écran d'accueil, du haut vers le bas
 const zoneDonjon = document.getElementById("donjonFlotteurs");
 const OBJETS_DONJON = ["dixhuit", "vibro1", "levres", "menottes", "vibro3", "baillon", "fouet", "bandeau"];
 const TAILLES_DONJON = { dixhuit: 72, vibro1: 84, levres: 92, menottes: 96, vibro3: 76, baillon: 92, fouet: 84, bandeau: 96 };
@@ -793,17 +793,6 @@ OBJETS_DONJON.forEach((nom, i) => {
   objet.style.animationDelay = `${-((i * 7.3) % 11)}s`;
   zoneDonjon.appendChild(objet);
 });
-// La zone commence juste sous le bandeau du haut : les objets en sortent, au lieu de passer devant
-function majFlotteursDonjon(){
-  try { // (try : appelée aussi pendant le chargement, avant que la zone existe)
-    const bandeau = document.querySelector("header");
-    if (!bandeau || !zoneDonjon) return;
-    const bas = Math.round(bandeau.getBoundingClientRect().bottom);
-    if (bas > 0) zoneDonjon.style.top = `${bas}px`;
-  } catch (e) {}
-}
-window.addEventListener("resize", majFlotteursDonjon);
-window.addEventListener("load", () => setTimeout(majFlotteursDonjon, 100));
 
 document.querySelectorAll(".pastilleTheme").forEach((pastille) => {
   pastille.addEventListener("click", () => {

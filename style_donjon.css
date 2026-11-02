@@ -16,8 +16,9 @@ html[data-theme="donjon"]{
 }
 
 /* ----- Fond : l'accueil devient transparent pour laisser voir les chaînes et les flammes (derrière tout) ----- */
-/* (une bande pleine tout en haut cache la barre du plateau, qui est dessous : le reste est transparent) */
-html[data-theme="donjon"] #choixMode{ background: linear-gradient(var(--couleur-barre) 0, var(--couleur-barre) 80px, transparent 80px) !important; }
+/* Le bandeau et le plateau du jeu sont dessous : on les cache tant que l'accueil est ouvert (sinon ils se voient au travers) */
+html[data-theme="donjon"] #choixMode{ background: transparent !important; }
+html[data-theme="donjon"] body:has(#choixMode:not([style*="none"])) :is(header, #menu, #messages, #jeu){ visibility: hidden; }
 html[data-theme="donjon"]::before{
   content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
   background: url("donjon/chaine.svg") 6px 0 / 44px 112px repeat-y, url("donjon/chaine.svg") calc(100% - 6px) 0 / 44px 112px repeat-y;
@@ -36,8 +37,8 @@ html[data-theme="donjon"]::after{
 html[data-theme="donjon"] :is(#menu, #messages, #jeu){ position: relative; z-index: 1; }
 html[data-theme="donjon"] header{ position: relative; z-index: 2; }
 
-/* ----- Objets qui tombent sur l'accueil (remplis par js/reglages.js) : ils sortent de dessous le bandeau du haut ----- */
-#donjonFlotteurs{ display: none; position: absolute; left: 0; right: 0; bottom: 0; top: 80px; overflow: hidden; pointer-events: none; z-index: -1; }
+/* ----- Objets qui tombent sur l'accueil (remplis par js/reglages.js) : ils arrivent par le haut de l'écran ----- */
+#donjonFlotteurs{ display: none; position: absolute; left: 0; right: 0; bottom: 0; top: 0; overflow: hidden; pointer-events: none; z-index: -1; }
 html[data-theme="donjon"] #donjonFlotteurs{ display: block; }
 #donjonFlotteurs span{
   position: absolute; top: -18vh; background: center / contain no-repeat; opacity: 0.95;
@@ -171,4 +172,42 @@ html[data-theme="donjon"] :is(#nomJoueur, #pseudoCreateur, #pseudoRejoindre, #co
 }
 html[data-theme="donjon"] :is(#nomJoueur, #pseudoCreateur, #pseudoRejoindre, #codeRejoindre):focus{
   outline: none !important; border-color: #ff2a3d !important; box-shadow: 0 0 14px rgba(255, 42, 61, 0.8) !important;
+}
+
+/* ===== Plus de jaune : icônes du haut (Règles, Réglages, Accueil, Pause), bouton Album, notifications ===== */
+html[data-theme="donjon"] :is(#choixMode #btnRegles, header #btnReglesJeu) path,
+html[data-theme="donjon"] #choixMode #btnReglages :is(path, circle),
+html[data-theme="donjon"] #stickyJoueurActif :is(#btnPause, #btnHistorique, #btnReglagesJeu) svg,
+html[data-theme="donjon"] :is(#ecranPause .pauseIcone, #ecranTele .tele-pause) svg{ stroke: #ff3b4e !important; }
+html[data-theme="donjon"] :is(#choixMode #btnRegles, header #btnReglesJeu, #choixMode #btnReglages) svg{
+  filter: drop-shadow(0 2px 0 rgba(90, 0, 14, 0.95)) drop-shadow(0 0 8px rgba(255, 42, 61, 0.65)) !important;
+}
+html[data-theme="donjon"] :is(#btnAccueilClassique, #enLigne #btnAccueilEnLigne, #ecranNouvellePartie #btnAccueil){
+  color: #ff3b4e !important; -webkit-text-stroke-color: #ff3b4e !important;
+  text-shadow: 0 2px 0 rgba(90, 0, 14, 0.95), 0 0 10px rgba(255, 42, 61, 0.65) !important;
+}
+html[data-theme="donjon"] #choixMode .btnInstaller{
+  color: #ffd0d6 !important; background: rgba(255, 42, 61, 0.14) !important; border: 1px solid rgba(255, 42, 61, 0.7) !important;
+  box-shadow: 0 0 10px rgba(255, 42, 61, 0.35) !important; text-shadow: none !important;
+}
+html[data-theme="donjon"] #ecranRegles .albumBarre{ background: rgba(255, 42, 61, 0.15) !important; }
+html[data-theme="donjon"] #ecranRegles .albumBarre span{ background: linear-gradient(90deg, #c2102a, #ff3b4e) !important; }
+html[data-theme="donjon"] #toastEnLigne{
+  background: linear-gradient(160deg, #3a0612, #0a0a0c) !important; color: #ffd0d6 !important;
+  box-shadow: 0 0 0 2px #ff2a3d inset, 0 0 16px rgba(255, 42, 61, 0.6), 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+}
+/* Réglages : curseurs de volume, pourcentage, pastille du thème choisi */
+html[data-theme="donjon"] #ecranReglages .ligneVolume input[type="range"]{ accent-color: #ff2a3d !important; }
+html[data-theme="donjon"] #ecranReglages .volumeValeur{ color: #ff6b7c !important; }
+html[data-theme="donjon"] #ecranReglages .pastilleTheme[aria-pressed="true"] .rond{
+  border-color: #ff2a3d !important; box-shadow: 0 0 0 3px rgba(255, 42, 61, 0.35), 0 0 14px rgba(255, 42, 61, 0.6) !important;
+}
+/* Règles et annonces du jeu : puces et mots en gras (gorgées…) en rouge */
+html[data-theme="donjon"] .lignesRegle li::before{ background: #ff3b4e !important; box-shadow: 0 0 6px rgba(255, 42, 61, 0.7); }
+html[data-theme="donjon"] :is(.detailRegle, #voletCarte .voletPause-texte, .regleBloc) em{ color: #ff6b7c !important; }
+/* Survol à la souris : halo rouge au lieu de blanc et jaune (le :is avec un id l'emporte sur la règle générale, qui vise des id) */
+@media (hover: hover){
+  html[data-theme="donjon"] button:is(#__, *):not(.btnPauseJoueur):not(.btnLivre):not(#btnReglages):not(.btnAccueilTexte):not(#btnPause):not(#btnHistorique):not(#btnReglagesJeu):not(.bloc-hot-btn):not(.pastilleTheme):not(.annonceFermer):not(.btnInstaller):not(#btnSignalerBug):not(#btnFaq):not(#btnFaqDepuisRegles):not(#btnDiagnostic):not(.optionLien):not(.btnDiagnostic):not(#btnAnnonceFermer):hover:not(:disabled){
+    box-shadow: 0 0 0 2px #ff2a3d, 0 0 20px rgba(255, 42, 61, 0.75) !important;
+  }
 }
