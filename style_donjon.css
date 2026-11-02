@@ -27,12 +27,12 @@ html[data-theme="donjon"]::before{
   opacity: 0.9;
 }
 html[data-theme="donjon"]::after{
-  content: ""; position: fixed; left: -10px; right: -10px; bottom: 0; height: 150px; z-index: -1; pointer-events: none;
+  content: ""; position: fixed; left: 0; right: 0; bottom: 0; height: 150px; /* (pas plus large que l'écran : sinon on pouvait faire glisser la page sur le côté) */ z-index: -1; pointer-events: none;
   background: url("donjon/flammes.svg") bottom / 260px 130px repeat-x;
   transform-origin: bottom; animation: donjonFlamme 1.3s ease-in-out infinite alternate;
   filter: drop-shadow(0 -6px 18px rgba(255, 80, 0, 0.75));
 }
-@keyframes donjonFlamme{ 0%{ transform: scaleY(0.93) scaleX(1.01); } 100%{ transform: scaleY(1.06) scaleX(0.99); } }
+@keyframes donjonFlamme{ 0%{ transform: scaleY(0.93); } 100%{ transform: scaleY(1.06); } }
 
 /* Chaînes : z-index 0 (au-dessus du décor de fond du jeu, body::before, qui est à -1 et qui les cacherait) ; flammes : -1, après body::before dans la page,
    donc devant lui mais derrière les annonces. Le contenu passe devant les chaînes. */
