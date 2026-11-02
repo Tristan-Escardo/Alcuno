@@ -134,7 +134,7 @@ function arreterTele(){
 
 // Classe de la face d'une carte parmi ses autres classes : « trois_rouge1 », « plus_4_3 », « couleur2 »,
 // « carte_doree »… (les doubles d'une même carte ont un numéro à la fin, voir « classes » dans plateau.js)
-const FACE_CARTE = /^((zero|un|deux|trois|quatre|cinq|six|sept|huit|neuf|plus_2|interdit|switch)_(vert|jaune|rouge|bleu)\d*|plus_4(_\d+)?|couleur\d*|carte_doree)$/;
+const FACE_CARTE = /^((zero|un|deux|trois|quatre|cinq|six|sept|huit|neuf|plus_2|interdit|switch)_(vert|jaune|rouge|bleu)\d*|plus_4(_\d+)?|couleur\d*|cupidon_[abc]|carte_doree)$/;
 function faceCarte(el){
   return Array.from(el.classList).find(c => FACE_CARTE.test(c)) || "";
 }

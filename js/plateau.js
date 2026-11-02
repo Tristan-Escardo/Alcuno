@@ -120,7 +120,7 @@ function prechargerImagesCartes(){
   test.style.display = "none";
   document.body.appendChild(test);
   const urls = new Set();
-  [...classes, "carte_doree"].forEach(c => {
+  [...classes, "carte_doree", "cupidon_a"].forEach(c => {
     test.className = "Carte " + c;
     const m = getComputedStyle(test).backgroundImage.match(/url\("?([^")]+)"?\)/);
     if(m) urls.add(m[1]);
@@ -140,6 +140,7 @@ const GORGEES_CUL_SEC = 5;
 
 // Récap de fin de partie (afficherOverlayFinUnRestants, js/regles.js) : ce qui s'est passé pendant la
 // partie. Tous les téléphones jouent les mêmes actions : en ligne, chacun a le même récap.
+let partieHot = false; // la partie en cours est en mode hot (voir lancerPartie ; js/mode-hot.js)
 let partieExpress = false; // la partie en cours est une partie express (voir lancerPartie, js/regles.js ; album de stickers, js/stickers.js)
 let statsPartie = null;
 function reinitialiserStatsPartie(){
@@ -317,19 +318,40 @@ function graineExpress(seed){ return Math.floor(seed / GRAINE_EXPRESS) % 2 === 1
 
 // Partie express : combien de cartes de chaque famille on garde (28 au lieu de 52 : 7 rangées de 4 sur téléphone)
 const CARTES_EXPRESS = { zero: 2, un: 4, trois: 4, quatre: 6, interdit: 2, couleur: 2, plus_2: 4, plus_4: 2, switch: 2 };
+// Mode hot : plus de cartes « 1 » ; à leur place 1 Cupidon, 1 changement de sens en plus et 2 « +2 » en plus (28 cartes aussi)
+const CARTES_EXPRESS_HOT = { zero: 2, cupidon: 1, trois: 4, quatre: 6, interdit: 2, couleur: 2, plus_2: 6, plus_4: 2, switch: 3 };
 function familleCarte(classe){
   if(classe.startsWith("plus_4")) return "plus_4";
   if(classe.startsWith("couleur")) return "couleur";
+  if(classe.startsWith("cupidon")) return "cupidon";
   return classe.replace(/_(vert|jaune|rouge|bleu)\d*$/, "");
 }
 // Paquet déjà mélangé : on garde les premières cartes de chaque famille (même résultat chez tout le monde, sans tirage en plus)
-function reduirePaquetExpress(paquetMelange){
+function reduirePaquetExpress(paquetMelange, hot = false){
   const gardees = {};
+  // Hot sans Cupidon (moins de 3 joueurs) : un « +2 » de plus à sa place, pour garder 28 cartes
+  const table = !hot ? CARTES_EXPRESS
+    : paquetMelange.some(c => c.startsWith("cupidon")) ? CARTES_EXPRESS_HOT : Object.assign({}, CARTES_EXPRESS_HOT, { cupidon: 0, plus_2: 7 });
   return paquetMelange.filter(c => {
     const f = familleCarte(c);
     gardees[f] = (gardees[f] || 0) + 1;
-    return gardees[f] <= (CARTES_EXPRESS[f] || 0);
+    return gardees[f] <= (table[f] || 0);
   });
+}
+
+// ===== Mode hot : le paquet (voir MODE_HOT.md) =====
+// Les 8 cartes « 1 » (annulation) disparaissent : 1 à 3 cartes Cupidon (selon le nombre de joueurs), 2 changements
+// de sens en plus, le reste en « +2 » en plus : toujours 52 cartes. En ligne, le mode hot voyage dans la graine du
+// mélange (bit suivant de la graine : voir graineExpress).
+const GRAINE_HOT = 17179869184; // 2^34
+function graineHot(seed){ return Math.floor(seed / GRAINE_HOT) % 2 === 1; }
+function nbCartesCupidon(nbJoueurs){ return nbJoueurs >= 6 ? 3 : nbJoueurs >= 4 ? 2 : nbJoueurs === 3 ? 1 : 0; }
+const PLUS_2_EN_PLUS_HOT = ["plus_2_vert2", "plus_2_jaune2", "plus_2_rouge2", "plus_2_bleu2", "plus_2_vert3", "plus_2_jaune3"];
+const SWITCH_EN_PLUS_HOT = ["switch_jaune1", "switch_bleu1"];
+function paquetHot(paquetBase, nbJoueurs){
+  const cupidon = ["cupidon_a", "cupidon_b", "cupidon_c"].slice(0, nbCartesCupidon(nbJoueurs));
+  const plus2 = PLUS_2_EN_PLUS_HOT.slice(0, PLUS_2_EN_PLUS_HOT.length - cupidon.length);
+  return [...paquetBase.filter(c => !c.startsWith("un_")), ...cupidon, ...SWITCH_EN_PLUS_HOT, ...plus2];
 }
 
 function premierePartieJouee(){
@@ -1565,12 +1587,13 @@ function afficherJoueurs(){
     const bonus = n > 0 ? ` <span class="bonus-annulation">+${n}</span>` : "";
 
     const pause = estEnPause(j) ? ` <span class="badge-pause">EN PAUSE</span>` : "";
+    const lien = partenaireHot(j) ? ` <span class="badge-lien" title="Lié par Cupidon">💘</span>` : ""; // (mode hot)
     const classePause = estEnPause(j) ? " joueur-en-pause" : "";
     if(i === indexPigeon){
-      return `<div class="joueur-ligne joueur-ligne-pigeon${classePause}"><span class="joueur-nom${classeNomLong(nomPigeonOriginal)}"><strong>PIGEON</strong> (${echapperHtml(avecCouronne(nomPigeonOriginal))})</span>${bonus}${pause}${badgeDeconnecte(j)}</div>`;
+      return `<div class="joueur-ligne joueur-ligne-pigeon${classePause}"><span class="joueur-nom${classeNomLong(nomPigeonOriginal)}"><strong>PIGEON</strong> (${echapperHtml(avecCouronne(nomPigeonOriginal))})</span>${lien}${bonus}${pause}${badgeDeconnecte(j)}</div>`;
     }
 
-    return `<div class="joueur-ligne${classePause}"><span class="joueur-nom${classeNomLong(j)}">${echapperHtml(avecCouronne(j))}</span>${bonus}${pause}${badgeDeconnecte(j)}</div>`;
+    return `<div class="joueur-ligne${classePause}"><span class="joueur-nom${classeNomLong(j)}">${echapperHtml(avecCouronne(j))}</span>${lien}${bonus}${pause}${badgeDeconnecte(j)}</div>`;
   }).join("");
 
   // En partie : bouton ⏸ (ou ▶ s'il est en pause) à droite de chaque nom

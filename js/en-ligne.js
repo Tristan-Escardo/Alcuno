@@ -252,14 +252,17 @@ function ouvrirClavier(champ){
   try { champ.focus({ preventScroll: true }); } catch (e) { champ.focus(); }
 }
 
-document.getElementById("btnModeClassique").addEventListener("click", () => {
+// « Mode classique » : d'abord l'écran « Ta partie » (Mode PJ, express, hot), puis les joueurs
+document.getElementById("btnModeClassique").addEventListener("click", () => ouvrirOptionsPartie(ouvrirModeClassique));
+
+function ouvrirModeClassique(){
   document.getElementById("choixMode").style.display = "none";
   document.getElementById("menu").style.display = "";
   document.getElementById("messages").style.display = "";
   document.getElementById("jeu").style.display = "";
   ["menu", "messages", "jeu"].forEach((id) => animerArrivee(document.getElementById(id)));
   ouvrirClavier(document.getElementById("nomJoueur")); // clavier ouvert pour ajouter les joueurs
-});
+}
 
 // Connexion à Firebase ouverte à l'avance (dès « Mode en ligne », ou au chargement si une partie
 // est en mémoire) : sinon le 1er tap « Créer » / « Rejoindre » attend aussi la connexion
@@ -312,11 +315,12 @@ document.getElementById("btnModeEnLigne").addEventListener("click", () => {
   document.getElementById("enLigne").style.display = "";
 });
 
-document.getElementById("btnCreerPartie").addEventListener("click", () => {
+// « Créer une partie » : d'abord l'écran « Ta partie » (les options de l'hôte valent pour toute la partie)
+document.getElementById("btnCreerPartie").addEventListener("click", () => ouvrirOptionsPartie(() => {
   document.getElementById("enLigneChoix").style.display = "none";
   document.getElementById("enLigneCreer").style.display = "";
   ouvrirClavier(document.getElementById("pseudoCreateur"));
-});
+}));
 
 document.getElementById("btnRejoindrePartie").addEventListener("click", () => {
   document.getElementById("enLigneChoix").style.display = "none";
@@ -896,12 +900,14 @@ function lancerMancheEnLigne(listeJoueurs, depuisSalle){
 
     // Partie express : réglage de celui qui lance depuis la salle ; « Rejouer » garde celui de la manche
     const express = depuisSalle ? estPartieExpress() : graineExpress(e.seed || 0);
+    // Mode hot : même principe (réglage de celui qui lance, gardé par « Rejouer »)
+    const hot = depuisSalle ? caseModeHot.checked : graineHot(e.seed || 0);
     return {
       demarree: true,
       manche: (e.manche || 0) + 1,
       // (+ GRAINE_SANS_CARTE_DOREE : première partie de l'hôte, sans carte dorée pour personne ;
-      // + GRAINE_EXPRESS : partie express, voir graineExpress)
-      seed: Math.floor(Math.random() * 4294967296) + (premierePartieJouee() ? 0 : GRAINE_SANS_CARTE_DOREE) + (express ? GRAINE_EXPRESS : 0),
+      // + GRAINE_EXPRESS : partie express, voir graineExpress ; + GRAINE_HOT : mode hot, voir graineHot)
+      seed: Math.floor(Math.random() * 4294967296) + (premierePartieJouee() ? 0 : GRAINE_SANS_CARTE_DOREE) + (express ? GRAINE_EXPRESS : 0) + (hot ? GRAINE_HOT : 0),
       joueurs: listeJoueurs,
       hote: e.hote || pseudoActuel
     };
@@ -1308,6 +1314,7 @@ function quitterPartieEnLigne(){
   estHote = false;
   hotePartie = null;
   choisirModeSoftEnLigne(false);
+  choisirModeHotEnLigne(false);
   deconnectes = new Set();
   enLigneActif = false;
   mancheCourante = null;

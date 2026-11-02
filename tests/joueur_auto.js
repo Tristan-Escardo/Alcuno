@@ -5,6 +5,8 @@
   const journal = [];
   const pd = (el) => el.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
   let nbPlus4 = 0;
+  let nbDefis = 0;
+  const visible = (el) => cliquable(el) && el.style.display !== "none";
   const cliquable = (el) => el && el.isConnected && !el.disabled &&
     getComputedStyle(el).pointerEvents !== "none" && !el.classList.contains("disabled");
 
@@ -22,6 +24,7 @@
 
   window.addEventListener("load", () => {
     $("#btnModeClassique").click();
+    if ($("#btnContinuerOptions")) $("#btnContinuerOptions").click(); // (écran « Ta partie » : Mode PJ, express, hot)
     for (const n of ["Tris", "Ylana", "Celien"]) {
       $("#nomJoueur").value = n;
       pd($("#ajouterJoueur"));
@@ -42,6 +45,31 @@
         if (cliquable(valider)) { journal.push("+4 valider"); pd(valider); }
         else { const b = $$("#overlayPlus4 .plus4-joueur-btn")[(nbPlus4++) % 3]; journal.push("+4 " + b.innerText.split(" ")[0]); pd(b); }
         return setTimeout(tick, 40);
+      }
+
+      // Mode hot : défi dans l'annonce (un coup « Je le fais », un coup « Je bois »)
+      if ($("#overlayRegleUnique .bloc-hot-btn")) {
+        const boutons = $$("#overlayRegleUnique .bloc-hot-btn").filter(cliquable);
+        if (boutons.length) { journal.push("defi " + (nbDefis % 2 ? "bois" : "fait")); pd(boutons[nbDefis++ % 2] || boutons[0]); }
+        return setTimeout(tick, 60);
+      }
+      // Mode hot : Cupidon (lier deux joueurs, puis valider ; sinon briser un lien)
+      if ($("#overlayCupidon")) {
+        const btns = $$("#overlayCupidon button").filter(visible);
+        const texte = (b) => b.innerText.trim();
+        const lier = btns.find(b => texte(b) === "Lier deux joueurs");
+        const valider = btns.find(b => texte(b) === "Valider");
+        const joueursLier = btns.filter(b => b.dataset.nom);
+        if (lier) { journal.push("cupidon lier"); pd(lier); }
+        else if (joueursLier.length) {
+          const aChoisir = joueursLier.find(b => !b.innerText.includes("💘") && !b.disabled);
+          if (valider && cliquable(valider)) { journal.push("cupidon valider"); pd(valider); }
+          else if (aChoisir) { journal.push("cupidon joueur " + aChoisir.dataset.nom); pd(aChoisir); }
+        } else {
+          const lien = btns.find(b => b.innerText.includes("💘"));
+          if (lien) { journal.push("cupidon briser"); pd(lien); }
+        }
+        return setTimeout(tick, 60);
       }
 
       const choix = [

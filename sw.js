@@ -7,7 +7,7 @@
 //
 // Changer CACHE (ex. "alcuno-v2") force les téléphones à repartir d'une copie locale propre.
 
-const CACHE = "alcuno-v15"; // v15 : 4 sons de sabre retirés ; v14 : FAQ (js/faq.js) ; // v13 : musique d'ambiance gardée en cache à la première écoute (hors connexion) ; v12 : trois dos Star Wars qui alternent ; v11 : dos Star Wars en acier (dos_galaxie_argent.svg) ; v10 : faces de cartes Star Wars (Cartes/galaxie/) ; v9 : faces de cartes Kawaii (Cartes/kawaii/) ; v8 : dos Kawaii renommés (dos_kawaii_alcuno_*) pour sortir des anciens caches ; v7 : dos Kawaii avec « ALC UNO » ; v6 : dos de cartes Kawaii ; v5 : petits personnages flottants du thème Kawaii ; v4 : album de stickers et thème Kawaii ; v3 : QR code de la partie (js/qrcode.js) ; v2 : cartes HD en WebP (les anciennes .jpg sont supprimées du cache)
+const CACHE = "alcuno-v18"; // v18 : dos des cartes du thème Donjon (cœur masqué) ; v17 : thème Donjon (style_donjon.css, donjon/) ; v16 : mode hot (js/mode-hot.js, carte Cupidon) ; v15 : 4 sons de sabre retirés ; v14 : FAQ (js/faq.js) ; // v13 : musique d'ambiance gardée en cache à la première écoute (hors connexion) ; v12 : trois dos Star Wars qui alternent ; v11 : dos Star Wars en acier (dos_galaxie_argent.svg) ; v10 : faces de cartes Star Wars (Cartes/galaxie/) ; v9 : faces de cartes Kawaii (Cartes/kawaii/) ; v8 : dos Kawaii renommés (dos_kawaii_alcuno_*) pour sortir des anciens caches ; v7 : dos Kawaii avec « ALC UNO » ; v6 : dos de cartes Kawaii ; v5 : petits personnages flottants du thème Kawaii ; v4 : album de stickers et thème Kawaii ; v3 : QR code de la partie (js/qrcode.js) ; v2 : cartes HD en WebP (les anciennes .jpg sont supprimées du cache)
 
 // Copié dès l'installation : de quoi jouer en classique sans réseau
 const A_PRECHARGER = [
@@ -20,6 +20,7 @@ const A_PRECHARGER = [
   "./js/en-ligne.js",
   "./js/plateau.js",
   "./js/regles.js",
+  "./js/mode-hot.js",
   "./js/synchro-en-ligne.js",
   "./js/retour-demarrage.js",
   "./js/tele.js",
@@ -30,6 +31,7 @@ const A_PRECHARGER = [
   "./js/mouchard.js",
   "./style_alcuno.css",
   "./style_kawaii.css",
+  "./style_donjon.css",
   "./stickers/cupcake.svg",
   "./stickers/chat.svg",
   "./stickers/lapin.svg",
@@ -59,6 +61,21 @@ const A_PRECHARGER = [
   "./icones/icone-180.png",
   "./icones/qr_alcuno.svg",
   "./Cartes/carte_doree.svg",
+  "./donjon/baillon.svg",
+  "./donjon/bandeau.svg",
+  "./donjon/chaine.svg",
+  "./donjon/collier.svg",
+  "./donjon/cravache.svg",
+  "./donjon/dixhuit.svg",
+  "./donjon/flamme.svg",
+  "./donjon/flammes.svg",
+  "./donjon/fouet.svg",
+  "./donjon/levres.svg",
+  "./donjon/menottes.svg",
+  "./donjon/vibro1.svg",
+  "./donjon/vibro2.svg",
+  "./donjon/vibro3.svg",
+  "./Cartes/dos_donjon.svg",
   "./Cartes/dos_galaxie_argent.svg",
   "./Cartes/dos_galaxie_hyperespace.svg",
   "./Cartes/dos_galaxie_planete.svg",
@@ -67,6 +84,7 @@ const A_PRECHARGER = [
   "./Cartes/galaxie/cinq_rouge.svg",
   "./Cartes/galaxie/cinq_vert.svg",
   "./Cartes/galaxie/couleur.svg",
+  "./Cartes/galaxie/cupidon.svg",
   "./Cartes/galaxie/deux_bleu.svg",
   "./Cartes/galaxie/deux_jaune.svg",
   "./Cartes/galaxie/deux_rouge.svg",
@@ -121,6 +139,7 @@ const A_PRECHARGER = [
   "./Cartes/kawaii/cinq_rouge.svg",
   "./Cartes/kawaii/cinq_vert.svg",
   "./Cartes/kawaii/couleur.svg",
+  "./Cartes/kawaii/cupidon.svg",
   "./Cartes/kawaii/deux_bleu.svg",
   "./Cartes/kawaii/deux_jaune.svg",
   "./Cartes/kawaii/deux_rouge.svg",
@@ -175,6 +194,7 @@ const A_PRECHARGER = [
   "./Cartes/cinq_rouge.webp",
   "./Cartes/cinq_vert.webp",
   "./Cartes/couleur.webp",
+  "./Cartes/cupidon.webp",
   "./Cartes/deux_bleu.webp",
   "./Cartes/deux_jaune.webp",
   "./Cartes/deux_rouge.webp",

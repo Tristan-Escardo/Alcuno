@@ -111,7 +111,7 @@ html[data-theme="kawaii"] .blocMessages:nth-child(3)::before{ animation-delay: 3
 html[data-theme="kawaii"] :is(.menu, .blocMessages) :is(input){ background: #fff; }
 html[data-theme="kawaii"] .titreAccueilBarre{ background: linear-gradient(90deg, #ff4f9a, #ffb12e, #35c9a6, #5aa8ff, #b46bff) !important; }
 /* Annonces et carte dorée sur le fond à pois */
-html[data-theme="kawaii"] :is(#overlayCouleur, #overlayPlus4, #overlayPigeon, #overlayFinUnRestants, #overlayDuel, #overlayRegleUnique, #overlayRegleUnique.overlay-doree, #overlayCarteDoree, #overlayAnnulation, #overlayResultatAnnulation, #overlayPredictionFin){
+html[data-theme="kawaii"] :is(#overlayCouleur, #overlayPlus4, #overlayCupidon, #overlayPigeon, #overlayFinUnRestants, #overlayDuel, #overlayRegleUnique, #overlayRegleUnique.overlay-doree, #overlayCarteDoree, #overlayAnnulation, #overlayResultatAnnulation, #overlayPredictionFin){
   background: var(--overlay-fond) !important;
 }
 html[data-theme="kawaii"].overlay-ouvert, html[data-theme="kawaii"].overlay-ouvert body, html[data-theme="kawaii"] #voileOverlays{ background: #ffd0e8; }
@@ -125,7 +125,7 @@ html[data-theme="kawaii"] :is(#ecranNouvellePartie, #ecranConfirmerAccueil, #ecr
   background: linear-gradient(180deg, #f9a6cb, #ee70a9) !important; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) !important;
   box-shadow: 0 6px 0 var(--kawaii-rose-bouton), 0 10px 14px rgba(150, 30, 90, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.55) !important;
 }
-html[data-theme="kawaii"] :is(#overlayAnnulation button, #overlayDuel button:not(:disabled), #overlayPlus4 button, #overlayPigeon .bouton-pigeon, #overlayCarteDoree .bouton-doree, #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation, .bouton-doree){
+html[data-theme="kawaii"] :is(#overlayAnnulation button, #overlayDuel button:not(:disabled), #overlayPlus4 button, #overlayCupidon button, #overlayPigeon .bouton-pigeon, #overlayCarteDoree .bouton-doree, #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation, .bouton-doree){
   border: 3px solid #fff !important; border-radius: 999px !important; color: #6b1450 !important; font-weight: 900;
   background: linear-gradient(180deg, #f9a6cb, #ee70a9) !important; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) !important;
   box-shadow: 0 6px 0 var(--kawaii-rose-bouton), 0 10px 14px rgba(150, 30, 90, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.55) !important;
@@ -159,7 +159,7 @@ html[data-theme="kawaii"] #kawaiiFlotteurs{ display: block; }
 @media (prefers-reduced-motion: reduce){ #kawaiiFlotteurs span, #kawaiiFlotteurs i, .tele-decor-kawaii span, .tele-decor-kawaii i{ animation: none; } }
 
 /* Fenêtre +4 : pas de rectangle de fond derrière les boutons (le fond à pois reste visible) */
-html[data-theme="kawaii"] #overlayPlus4 :is(.plus4-actions, .plus4-container-joueurs){ background: transparent !important; }
+html[data-theme="kawaii"] #overlayPlus4 :is(.plus4-actions, .plus4-container-joueurs),html[data-theme="kawaii"] #overlayCupidon :is(.plus4-actions, .plus4-container-joueurs){ background: transparent !important; }
 
 /* Réglages : de l'air entre le titre d'un bloc (Thèmes, Sons système…) et ce qu'il y a dessous (pastilles, curseur) */
 html[data-theme="kawaii"] #ecranReglages .blocReglage > .optionReglage:not(:last-child){ margin-bottom: 14px !important; }
@@ -276,3 +276,26 @@ html[data-theme="kawaii"] #ecranTele .tele-pause{ background: linear-gradient(12
 html[data-theme="kawaii"] #ecranTele .tele-pause svg{ fill: var(--kawaii-rose); }
 html[data-theme="kawaii"] #ecranTele .tele-pause-titre{ color: var(--kawaii-rose); -webkit-text-stroke: 0.4vh #fff; paint-order: stroke fill; text-shadow: 0 1vh 0 var(--kawaii-rose-fonce); }
 html[data-theme="kawaii"] #ecranTele .tele-pause-texte{ color: var(--kawaii-prune); }
+
+/* Boutons des joueurs du +4 et de Cupidon : l'ombre « 3D » des boutons dépassait du conteneur (qui défile) et la rangée du bas
+   était coupée. Un peu de marge dedans, pour que l'ombre reste visible. */
+html[data-theme="kawaii"] :is(#overlayPlus4, #overlayCupidon) .plus4-container-joueurs{ box-sizing: content-box; padding: 4px 10px 18px; }
+
+/* Bannière du défi (mode hot) : rose clair en Kawaii, boutons rouge / rose */
+:root:root:root[data-theme="kawaii"] #overlayRegleUnique#overlayRegleUnique .bloc-hot{
+  background: linear-gradient(#ffc4d8, #ff9dbb) !important;
+  border: 2px solid #ff3d71 !important;
+  box-shadow: 0 0 18px rgba(255, 61, 113, 0.35) !important;
+}
+:root:root:root[data-theme="kawaii"] #overlayRegleUnique#overlayRegleUnique .bloc-hot-texte{ color: #5a0a26 !important; }
+:root:root:root[data-theme="kawaii"] #overlayRegleUnique#overlayRegleUnique .bloc-hot-lien{ color: #c2185b !important; }
+:root:root:root[data-theme="kawaii"] #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn.fait{
+  background: linear-gradient(#ff6a90, #ff2d62) !important;
+  color: #fff !important;
+  box-shadow: 0 3px 0 #a31238 !important;
+}
+:root:root:root[data-theme="kawaii"] #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn.bois{
+  background: #ffffff !important;
+  color: #b3123f !important;
+  border: 2px solid #ff8fa8 !important;
+}

@@ -504,6 +504,7 @@ function annoncerBoireAvecAnnulation(joueurIndex, nbGorgees, classeCarte = "", p
 
     montrerOverlayRegle(`${msg}\n\n${message17}`, classeCarte);
     habillerOverlayCelien(msg, citationCelien, signatureCelien);
+    const defiHotCelien = montrerDefiHot(joueurIndex, nbGorgees); // (mode hot : bloc défi sous la carte, js/mode-hot.js)
 
     // Ce message contient l'avertissement "interdit de vomir" => +2s d'affichage
     if (overlayRegleTimeout) {
@@ -524,8 +525,7 @@ function annoncerBoireAvecAnnulation(joueurIndex, nbGorgees, classeCarte = "", p
             () => { if(typeof onFinish === "function") onFinish(); }
           );
         } else {
-          noterGorgees(nom, nbGorgees);
-          if(typeof onFinish === "function") onFinish();
+          finirBoireHot(defiHotCelien, joueurIndex, nbGorgees, onFinish);
         }
       };
       executerApresOverlayRegleUnique(ensuite);
@@ -537,6 +537,7 @@ function annoncerBoireAvecAnnulation(joueurIndex, nbGorgees, classeCarte = "", p
   zeroEnCours = true;
 
   montrerOverlayRegle(msg, classeCarte);
+  const defiHot = montrerDefiHot(joueurIndex, nbGorgees); // (mode hot : bloc défi sous la carte, js/mode-hot.js)
 
   const ensuite = () => {
     if(joueurPeutAnnuler(joueurIndex, nbGorgees)){
@@ -547,8 +548,7 @@ function annoncerBoireAvecAnnulation(joueurIndex, nbGorgees, classeCarte = "", p
         () => { if(typeof onFinish === "function") onFinish(); }
       );
     } else {
-      noterGorgees(nom, nbGorgees);
-      if(typeof onFinish === "function") onFinish();
+      finirBoireHot(defiHot, joueurIndex, nbGorgees, onFinish);
     }
   };
 
@@ -1407,21 +1407,23 @@ function textePlus4(choisisseur, resultats){
 }
 
 // onAnnulation(joueurIndex, gorgéesRestantes) : appelé quand un joueur a choisi combien il en annule
-function distribuerFilePlus4(file, classeCartePlus4, onAnnulation = null){
+function distribuerFilePlus4(file, classeCartePlus4, onAnnulation = null, seul = file.length === 1){
   if(file.length === 0) return;
 
   const item = file.shift();
   demanderAnnulationPlus4(item.idx, item.n, classeCartePlus4, () => {
-    distribuerFilePlus4(file, classeCartePlus4, onAnnulation);
-  }, onAnnulation);
+    distribuerFilePlus4(file, classeCartePlus4, onAnnulation, seul);
+  }, onAnnulation, seul);
 }
 
-function demanderAnnulationPlus4(joueurIndex, nbGorgees, classeCartePlus4, onFinish, onAnnulation = null){
+// seul : une seule personne reçoit tout le +4 (en mode hot, elle peut alors relever un défi)
+function demanderAnnulationPlus4(joueurIndex, nbGorgees, classeCartePlus4, onFinish, onAnnulation = null, seul = false){
   compterStat("plus4", joueurs[joueurIndex], nbGorgees); // (récap de fin : gorgées reçues par des +4)
   const nom = joueurs[joueurIndex];
   const msg = `${nom} boit ${texteGorgees(nbGorgees)} (+4)`;
 
   montrerOverlayRegle(msg, classeCartePlus4);
+  const defiHot = montrerDefiHot(joueurIndex, nbGorgees, seul); // (mode hot : bloc défi sous la carte, js/mode-hot.js)
 
   executerApresOverlayRegleUnique(() => {
     if(joueurPeutAnnuler(joueurIndex, nbGorgees)){
@@ -1432,8 +1434,7 @@ function demanderAnnulationPlus4(joueurIndex, nbGorgees, classeCartePlus4, onFin
         () => { if(typeof onFinish === "function") onFinish(); }
       );
     } else {
-      noterGorgees(nom, nbGorgees);
-      if(typeof onFinish === "function") onFinish();
+      finirBoireHot(defiHot, joueurIndex, nbGorgees, onFinish);
     }
   });
 }
@@ -1606,6 +1607,20 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
     return;
   }
 
+  // Mode hot : carte Cupidon (lier deux joueurs ou briser un lien : js/mode-hot.js)
+  if(carteTiree.startsWith("cupidon")){
+    const entete = "CUPIDON !\nLie 2 joueurs : quand l'un boit, l'autre aussi.";
+    afficherRegleBloc(regleZero, entete);
+    regleZero.style.display = "block";
+    zeroEnCours = true;
+    choixPigeonEnCours = true; // plateau bloqué jusqu'au choix
+    montrerOverlayRegle(entete, carteTiree);
+    executerApresOverlayRegleUnique(() => afficherOverlayCupidon(joueurActuel, carteTiree, () => {
+      appliquerBonusCouleurSiBesoin(carteTiree, { couleur: couleurBue, joueur: joueurActuel, preserveRuleMessage: true });
+    }));
+    return;
+  }
+
   // Cartes "boire"
   if(carteTiree.startsWith("interdit")){
     const entete = "SOCIAAALE ! \nTout le monde boit 1 gorgée";
@@ -1774,13 +1789,22 @@ function lancerPartie(){
 
   // Plateau principal = toutes les cartes SAUF 2/5/6/7/8/9 (paquet duel)
   const paquetPrincipal = classes.filter(c => !duelCartes.includes(c));
-  paquet = [...paquetPrincipal];
+  // Mode hot (réglage ; en ligne, celui de la graine de la manche ; partie reprise : celui de la partie)
+  const hot = enLigneActif
+    ? !!dernierEtatManche && graineHot(dernierEtatManche.seed)
+    : sauvegardeClassique ? !!sauvegardeClassique.hot : estModeHot();
+  partieHot = hot;
+  if(enLigneActif) choisirModeHotEnLigne(hot);
+  else if(caseModeHot.checked !== hot) caseModeHot.checked = hot; // (partie reprise : même mode que pendant la partie)
+  initialiserModeHot(); // (js/mode-hot.js : défis vus, liens Cupidon, hasard des défis)
+  if(hot && !rattrapageEnCours) debloquerDonjon(); // thème secret « Donjon » (js/reglages.js)
+  paquet = hot ? paquetHot(paquetPrincipal, joueurs.length) : [...paquetPrincipal];
   melangerPaquet(paquet);
   const express = enLigneActif
     ? !!dernierEtatManche && graineExpress(dernierEtatManche.seed)
     : sauvegardeClassique ? !!sauvegardeClassique.express : estPartieExpress();
   partieExpress = express;
-  if(express) paquet = reduirePaquetExpress(paquet);
+  if(express) paquet = reduirePaquetExpress(paquet, hot);
 
   // Paquet duel (réutilisable à l'infini via resetPaquetDuelSiBesoin)
   paquetDuel = [...duelCartes];

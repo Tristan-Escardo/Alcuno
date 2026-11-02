@@ -725,7 +725,7 @@ function rendreToastGlissable(toast){
 // en ligne. Oubliée quand la partie est finie ou quittée exprès (⌂), ou au bout de 12 h.
 const CLE_PARTIE_CLASSIQUE = "alcuno_partie_classique";
 const DUREE_PARTIE_CLASSIQUE = 12 * 60 * 60 * 1000;
-let sauvegardeClassique = null; // { v, date, seed, sansDoree, soft, express, joueurs, actions }
+let sauvegardeClassique = null; // { v, date, seed, sansDoree, soft, express, hot, joueurs, actions }
 let repriseClassiqueEnCours = false;
 
 function enregistrerPartieClassique(){
@@ -743,7 +743,7 @@ function demarrerSauvegardeClassique(){
   }
   const seed = Math.floor(Math.random() * 4294967296);
   sauvegardeClassique = {
-    v: VERSION_JEU, date: Date.now(), seed, sansDoree: !premierePartieJouee(), soft: estModeSoft(), express: estPartieExpress(),
+    v: VERSION_JEU, date: Date.now(), seed, sansDoree: !premierePartieJouee(), soft: estModeSoft(), express: estPartieExpress(), hot: estModeHot(),
     joueurs: joueurs.slice(), actions: []
   };
   aleatoire = generateurAleatoire(seed);
@@ -795,7 +795,8 @@ function reprendrePartieClassique(s){
   sauvegardeClassique = s;
   repriseClassiqueEnCours = true;
   if(caseModeSoft.checked !== !!s.soft) caseModeSoft.checked = !!s.soft; // (même mode que pendant la partie)
-  document.getElementById("btnModeClassique").click();
+  if(caseModeHot.checked !== !!s.hot) caseModeHot.checked = !!s.hot;
+  ouvrirModeClassique(); // (js/en-ligne.js) sans passer par l'écran « Ta partie »
   document.activeElement && document.activeElement.blur && document.activeElement.blur(); // (pas de clavier)
   joueurs = s.joueurs.slice();
   annulations = {};

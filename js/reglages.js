@@ -7,9 +7,9 @@
 // Chaque réglage est retenu sur le téléphone (stockage local du navigateur)
 const ecranReglages = document.getElementById("ecranReglages");
 
-// Réglages ouverts pendant une partie : ceux qui pourraient la casser (faces cachées, Mode PJ, partie express,
+// Réglages ouverts pendant une partie : ceux qui pourraient la casser (faces cachées,
 // écran télé, partie en mémoire) sont grisés et bloqués ; tout le reste (thème, sons, voix, gaucher…) marche
-const REGLAGES_BLOQUES_EN_PARTIE = ["faces-cachees", "mode-pj", "express", "ecran-tele", "partie-memoire"];
+const REGLAGES_BLOQUES_EN_PARTIE = ["faces-cachees", "ecran-tele", "partie-memoire"];
 function majReglagesEnPartie(){
   const enPartie = partieLancee;
   document.documentElement.classList.toggle("reglages-en-partie", enPartie);
@@ -34,7 +34,33 @@ function ouvrirReglages(){
 document.getElementById("btnReglages").addEventListener("click", ouvrirReglages);
 document.getElementById("btnReglagesJeu").addEventListener("click", ouvrirReglages);
 
-activerMemePendantElan(document.getElementById("btnFermerReglages"), () => fermerPage(ecranReglages));
+// Vue « Ta partie » (Mode PJ, Partie express, Mode hot) : le même écran que les Réglages, avec seulement ces
+// trois lignes et « Continuer ». Ouverte après « Mode classique » ou « Créer une partie » (js/en-ligne.js) ;
+// « ← Retour » revient à l'écran d'avant (l'accueil reste affiché dessous).
+let suiteOptionsPartie = null; // ce que fait « Continuer » (donné par js/en-ligne.js)
+function ouvrirOptionsPartie(suite){
+  suiteOptionsPartie = suite;
+  ecranReglages.classList.add("vue-options");
+  document.getElementById("titreReglages").textContent = "Ta partie";
+  ecranReglages.scrollTop = 0;
+  ouvrirPage(ecranReglages);
+}
+function finVueOptions(){
+  ecranReglages.classList.remove("vue-options");
+  document.getElementById("titreReglages").textContent = "Réglages";
+}
+function fermerReglages(){
+  const vueOptions = ecranReglages.classList.contains("vue-options");
+  fermerPage(ecranReglages);
+  if (vueOptions) setTimeout(finVueOptions, 300); // (après le fondu de fermeture)
+}
+activerMemePendantElan(document.getElementById("btnFermerReglages"), fermerReglages);
+document.getElementById("btnContinuerOptions").addEventListener("click", () => {
+  const suite = suiteOptionsPartie;
+  suiteOptionsPartie = null;
+  fermerReglages();
+  if (suite) suite();
+});
 
 function lireReglage(cle, parDefaut){
   try {
@@ -65,7 +91,7 @@ const CLE_THEME = "alcuno_theme";
 // Couleur de la barre du téléphone pour chaque thème (= --couleur-barre du CSS, le tout haut de la page).
 // Mêmes couleurs dans le script du <head> de index.html, qui la pose dès le premier affichage.
 const THEMES = { bordeaux: "#2b001d", noir: "#000000", vert: "#08301e", bleu: "#0a1634", soleil: "#1f3566",
-                 cerisier: "#5a1740", givre: "#e4f5fc", prestige: "#937810", galaxie: "#02030a", kawaii: "#ffd6ec" };
+                 cerisier: "#5a1740", givre: "#e4f5fc", prestige: "#937810", galaxie: "#02030a", kawaii: "#ffd6ec", donjon: "#12040a" };
 
 // Thème secret « Prestige » : débloqué en découvrant l'écran des créateurs (4 taps sur le titre)
 const CLE_PRESTIGE = "alcuno_theme_prestige";
@@ -168,6 +194,30 @@ function debloquerGalaxie(){
   try { localStorage.setItem(CLE_GALAXIE, "1"); } catch (e) {}
   majPastilleGalaxie();
   afficherGeneriqueGalaxie(premiere);
+}
+// ===== Thème secret « Donjon » (noir et rouge, mode hot) : débloqué en lançant une partie en mode hot (js/regles.js) =====
+const CLE_DONJON = "alcuno_theme_donjon";
+const CLE_DONJON_NOUVEAU = "alcuno_donjon_nouveau";
+function donjonDebloque(){
+  try { return localStorage.getItem(CLE_DONJON) === "1"; } catch (e) { return false; }
+}
+function majPastilleDonjon(){
+  const pastille = document.getElementById("pastilleDonjon");
+  if (pastille) pastille.hidden = !donjonDebloque();
+}
+// « NOUVEAU » sur la pastille et point rouge sur les Réglages, jusqu'à ce qu'on ait essayé le thème (comme Prestige)
+try { if (localStorage.getItem(CLE_DONJON_NOUVEAU) && donjonDebloque()) document.documentElement.classList.add("donjon-nouveau"); } catch (e) {}
+function vuNouveauDonjon(){
+  try { localStorage.removeItem(CLE_DONJON_NOUVEAU); } catch (e) {}
+  document.documentElement.classList.remove("donjon-nouveau");
+}
+// Appelé au lancement d'une partie en mode hot : la première fois, le thème apparaît dans les Réglages (rien n'est dit avant)
+function debloquerDonjon(){
+  if (donjonDebloque()) return;
+  try { localStorage.setItem(CLE_DONJON, "1"); localStorage.setItem(CLE_DONJON_NOUVEAU, "1"); } catch (e) {}
+  majPastilleDonjon();
+  document.documentElement.classList.add("donjon-nouveau");
+  setTimeout(() => { try { afficherNotificationHaut("", "Nouveau thème débloqué : Réglages › Thèmes", true); } catch (e) {} }, 2500);
 }
 // ===== Thème secret « Kawaii » : débloqué avec les 11 stickers de l'album (js/stickers.js) =====
 const CLE_KAWAII = "alcuno_theme_kawaii";
@@ -543,11 +593,12 @@ function peindreBarreTelephone(couleur){
 }
 
 function appliquerTheme(nom, sansMusique = false){
-  if (!THEMES[nom] || (typeof themeBloqueADistance === "function" && themeBloqueADistance(nom)) || (nom === "prestige" && !prestigeDebloque()) || (nom === "galaxie" && !galaxieDebloquee()) || (nom === "kawaii" && !kawaiiDebloque())) nom = "bordeaux";
+  if (!THEMES[nom] || (typeof themeBloqueADistance === "function" && themeBloqueADistance(nom)) || (nom === "prestige" && !prestigeDebloque()) || (nom === "galaxie" && !galaxieDebloquee()) || (nom === "kawaii" && !kawaiiDebloque()) || (nom === "donjon" && !donjonDebloque())) nom = "bordeaux";
   document.documentElement.dataset.theme = nom;
   if (nom === "prestige") vuNouveauPrestige(); // thème essayé : le rappel « NOUVEAU » s'en va
   if (nom === "galaxie") vuNouveauGalaxie();
   if (nom === "kawaii") vuNouveauKawaii();
+  if (nom === "donjon") { vuNouveauDonjon(); majFlotteursDonjon(); }
   peindreBarreTelephone();
   document.querySelectorAll(".pastilleTheme").forEach((b) => {
     b.setAttribute("aria-pressed", b.dataset.theme === nom ? "true" : "false");
@@ -620,6 +671,7 @@ document.documentElement.classList.remove("rouvrir-reglages");
 majPastillePrestige();
 majPastilleGalaxie();
 majPastilleKawaii();
+majPastilleDonjon();
 let themeChoisi = "bordeaux";
 try { themeChoisi = localStorage.getItem(CLE_THEME) || "bordeaux"; } catch (e) {}
 if (themeChoisi === "violet") themeChoisi = "soleil"; // ancien thème, remplacé par Soleil couchant
@@ -689,6 +741,36 @@ for (let i = 0; i < 46; i++) {
   zoneFlotteurs.appendChild(paillette);
 }
 
+// Donjon : objets qui tombent sur l'écran d'accueil, du haut vers le bas, en sortant de dessous le bandeau du haut
+const zoneDonjon = document.getElementById("donjonFlotteurs");
+const OBJETS_DONJON = ["dixhuit", "vibro1", "levres", "menottes", "vibro3", "baillon", "vibro2", "cravache", "bandeau", "dixhuit",
+  "fouet", "collier", "flamme"];
+const TAILLES_DONJON = { dixhuit: 72, vibro1: 84, levres: 92, menottes: 96, vibro3: 76, baillon: 92, vibro2: 64, cravache: 86, bandeau: 96, fouet: 84, collier: 96, flamme: 44 };
+OBJETS_DONJON.forEach((nom, i) => {
+  const objet = document.createElement("span");
+  const taille = TAILLES_DONJON[nom] || 80;
+  const duree = 9 + (i % 5) * 1.2; // ni trop vite ni trop lentement : 9 à 14 s pour traverser l'écran
+  objet.style.width = objet.style.height = `${taille}px`;
+  objet.style.left = `${(i * 29 + 7) % 84 + 3}%`;
+  objet.style.backgroundImage = `url("donjon/${nom}.svg")`;
+  objet.style.setProperty("--dx", `${(i % 2 ? 1 : -1) * (18 + i * 3)}px`);
+  objet.style.setProperty("--r0", `${(i * 37) % 50 - 25}deg`);
+  objet.style.animationDuration = `${duree}s`;
+  objet.style.animationDelay = `${-((i * 7.3) % 11)}s`;
+  zoneDonjon.appendChild(objet);
+});
+// La zone commence juste sous le bandeau du haut : les objets en sortent, au lieu de passer devant
+function majFlotteursDonjon(){
+  try { // (try : appelée aussi pendant le chargement, avant que la zone existe)
+    const bandeau = document.querySelector("header");
+    if (!bandeau || !zoneDonjon) return;
+    const bas = Math.round(bandeau.getBoundingClientRect().bottom);
+    if (bas > 0) zoneDonjon.style.top = `${bas}px`;
+  } catch (e) {}
+}
+window.addEventListener("resize", majFlotteursDonjon);
+window.addEventListener("load", () => setTimeout(majFlotteursDonjon, 100));
+
 document.querySelectorAll(".pastilleTheme").forEach((pastille) => {
   pastille.addEventListener("click", () => {
     // Changement de thème : la musique d'ambiance se coupe (on la réactive soi-même dans les réglages)
@@ -730,6 +812,21 @@ casePartieExpress.addEventListener("change", () => {
 });
 function estPartieExpress(){ return casePartieExpress.checked; }
 
+// ===== Mode hot : un défi osé à la place des gorgées (voir MODE_HOT.md) =====
+// Classique : le réglage de ce téléphone. En ligne : le réglage de l'hôte au moment où il a créé la partie.
+const CLE_MODE_HOT = "alcuno_mode_hot";
+const caseModeHot = document.getElementById("optionModeHot");
+caseModeHot.checked = lireReglage(CLE_MODE_HOT, false);
+caseModeHot.addEventListener("change", () => {
+  ecrireReglage(CLE_MODE_HOT, caseModeHot.checked);
+  majTitrePJ();
+  if (caseModeHot.checked) jouerSon("sons_on");
+});
+let hotPartieEnLigne = false;
+function estModeHot(){
+  return codePartieActuel ? hotPartieEnLigne : caseModeHot.checked;
+}
+
 let softPartieEnLigne = false;
 
 function estModeSoft(){
@@ -740,6 +837,7 @@ function estModeSoft(){
 // pas seulement au lancement d'une partie (classe « partie-soft » sur body)
 function majTitrePJ(){
   document.body.classList.toggle("partie-soft", estModeSoft());
+  document.body.classList.toggle("partie-hot", estModeHot());
 }
 
 // Gorgées selon le mode (normal | soft)
@@ -784,6 +882,11 @@ caseFacesFermees.addEventListener("change", () => {
   if (caseFacesFermees.checked) jouerSon("cartes"); // le son des cartes qui se retournent
 });
 majFacesFermees();
+
+function choisirModeHotEnLigne(hot){
+  hotPartieEnLigne = !!hot;
+  majTitrePJ();
+}
 
 function choisirModeSoftEnLigne(soft){
   softPartieEnLigne = !!soft;
@@ -2504,6 +2607,7 @@ const ecranRegles = document.getElementById("ecranRegles");
 // écrit ici (rien qui vient d'un joueur) : <b> le mot important, <em> les gorgées (en doré).
 function reglesDuJeu(){
   const pj = estModeSoft();
+  const hot = estModeHot(); // mode hot : pas de « 1 » (annulation), une carte Cupidon, des défis
   const g = (n) => `<em>${texteGorgees(n)}</em>`;
   const parties = [
     { titre: "Comment on joue", regles: [
@@ -2515,7 +2619,12 @@ function reglesDuJeu(){
     ]},
     { titre: "Les cartes", regles: [
       { carte: "zero_bleu", nom: "0", texte: `Tout le monde boit ${g(1)}, sauf toi.` },
-      { carte: "un_rouge", nom: "1 : annulation", texte: `Tu gardes la carte : quand tu dois boire, tu peux t'en servir pour annuler ${g(1)}.` },
+      hot
+        ? { carte: "cupidon_a", nom: "Cupidon", texte: [
+            "Tu lies <b>2 joueurs</b> : quand l'un boit, l'autre aussi (💘)",
+            "À la carte Cupidon suivante : lier 2 autres joueurs, ou briser un lien"
+          ]}
+        : { carte: "un_rouge", nom: "1 : annulation", texte: `Tu gardes la carte : quand tu dois boire, tu peux t'en servir pour annuler ${g(1)}.` },
       { carte: "plus_2_jaune", nom: "+2", texte: `Tu bois ${g(gorgeesPlus2())}.` },
       { carte: "plus_4", nom: "+4", texte: `Tu distribues ${g(gorgeesPlus4())} comme tu veux.` },
       { carte: "trois_vert", nom: "3 : le Pigeon", texte: [
@@ -2538,9 +2647,19 @@ function reglesDuJeu(){
         "Quand il ne reste qu'<b>une carte</b>, chacun parie sur son type",
         `Ceux qui trouvent distribuent <em>${texteCulSec()}</em>`
       ]},
-      { carte: "un_jaune", nom: "Les 1 restants", texte: `Chaque 1 gardé jusqu'à la fin se transforme en gorgée à boire (${g(1)} par carte).` }
+      ...(hot ? [] : [{ carte: "un_jaune", nom: "Les 1 restants", texte: `Chaque 1 gardé jusqu'à la fin se transforme en gorgée à boire (${g(1)} par carte).` }])
     ]}
   ];
+  if(hot){
+    // Mode hot : le défi à la place des gorgées (décisions : MODE_HOT.md)
+    parties.splice(2, 0, { titre: "Mode hot 🔥", regles: [
+      { carte: "", nom: "Le défi", texte: [
+        "Quand <b>une seule personne</b> doit boire, elle peut relever un défi à la place",
+        "<b>Je le fais</b> : rien à boire. <b>Je bois</b> : les gorgées prévues",
+        "Deux joueurs liés par Cupidon comptent pour une personne : le défi se fait entre eux"
+      ]}
+    ]});
+  }
   return parties;
 }
 

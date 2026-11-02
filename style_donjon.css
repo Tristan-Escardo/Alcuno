@@ -1,0 +1,96 @@
+/* =============================================================================================
+   Thème secret « Donjon » (nom interne : donjon) : noir et rouge, chaînes, flammes, objets qui tombent.
+   Débloqué en lançant une partie en mode hot (voir debloquerDonjon dans js/reglages.js).
+   Tout est sous html[data-theme="donjon"] : rien ne change pour les autres thèmes.
+   Images : dossier donjon/ (objets), Cartes/dos_donjon.svg (dos des cartes).
+   ============================================================================================= */
+
+html[data-theme="donjon"]{
+  --fond-theme: #08050a;
+  --couleur-barre: #12040a;
+  --pastille-haut: rgba(60, 8, 18, 0.95);
+  --pastille-bas: rgba(10, 10, 12, 0.95);
+  --actif-haut: #ffb3bc; --actif-bas: #ff2a3d; --actif-texte: #2a0008; --actif-halo: #ff2a3d;
+  --overlay-fond: #070708;
+  --overlay-bord: #070708;
+}
+
+/* ----- Fond : l'accueil devient transparent pour laisser voir les chaînes et les flammes (derrière tout) ----- */
+html[data-theme="donjon"] #choixMode{ background: transparent !important; }
+html[data-theme="donjon"]::before{
+  content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background: url("donjon/chaine.svg") 6px 0 / 44px 112px repeat-y, url("donjon/chaine.svg") calc(100% - 6px) 0 / 44px 112px repeat-y;
+  opacity: 0.9;
+}
+html[data-theme="donjon"]::after{
+  content: ""; position: fixed; left: -10px; right: -10px; bottom: 0; height: 150px; z-index: -1; pointer-events: none;
+  background: url("donjon/flammes.svg") bottom / 260px 130px repeat-x;
+  transform-origin: bottom; animation: donjonFlamme 1.3s ease-in-out infinite alternate;
+  filter: drop-shadow(0 -6px 18px rgba(255, 80, 0, 0.75));
+}
+@keyframes donjonFlamme{ 0%{ transform: scaleY(0.93) scaleX(1.01); } 100%{ transform: scaleY(1.06) scaleX(0.99); } }
+
+/* Chaînes : z-index 0 (au-dessus du décor de fond du jeu, body::before, qui est à -1 et qui les cacherait) ; flammes : -1, après body::before dans la page,
+   donc devant lui mais derrière les annonces. Le contenu passe devant les chaînes. */
+html[data-theme="donjon"] :is(#menu, #messages, #jeu){ position: relative; z-index: 1; }
+html[data-theme="donjon"] header{ position: relative; z-index: 2; }
+
+/* ----- Objets qui tombent sur l'accueil (remplis par js/reglages.js) : ils sortent de dessous le bandeau du haut ----- */
+#donjonFlotteurs{ display: none; position: absolute; left: 0; right: 0; bottom: 0; top: 80px; overflow: hidden; pointer-events: none; z-index: -1; }
+html[data-theme="donjon"] #donjonFlotteurs{ display: block; }
+#donjonFlotteurs span{
+  position: absolute; top: -18vh; background: center / contain no-repeat; opacity: 0.95;
+  filter: drop-shadow(0 0 10px rgba(255, 42, 61, 0.55)); animation: donjonTombe linear infinite;
+}
+@keyframes donjonTombe{
+  0%{ transform: translate(0, 0) rotate(var(--r0, 0deg)); }
+  50%{ transform: translate(var(--dx, 0px), 60vh) rotate(calc(var(--r0, 0deg) + 40deg)); }
+  100%{ transform: translate(calc(var(--dx, 0px) * -0.5), 130vh) rotate(calc(var(--r0, 0deg) - 25deg)); }
+}
+@media (prefers-reduced-motion: reduce){
+  #donjonFlotteurs span, html[data-theme="donjon"]::after{ animation: none; }
+}
+
+/* ----- Blocs : verre fumé rouge, contour néon ----- */
+html[data-theme="donjon"] :is(header, #menu, .blocMessages, .messages, #stickyJoueurActif){
+  background: linear-gradient(160deg, rgba(40, 6, 12, 0.94) 0%, rgba(8, 8, 10, 0.96) 55%, rgba(60, 4, 16, 0.94) 100%) !important;
+  border: 2px solid #ff2a3d !important; border-radius: 14px !important;
+  box-shadow: 0 0 16px rgba(255, 42, 61, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.28), inset 0 0 22px rgba(255, 42, 61, 0.22) !important;
+  color: #ffe3e6 !important;
+}
+html[data-theme="donjon"] :is(.joueur-nom, .titreBloc){ color: #ff6b7c !important; }
+html[data-theme="donjon"] .joueur-ligne-actif .joueur-nom{ color: var(--actif-texte) !important; }
+
+/* ----- Titres : chrome blanc qui vire au rouge, halo rouge (le texte est transparent : pas d'ombre de texte, elle se verrait au travers) ----- */
+html[data-theme="donjon"] #choixMode #titreAccueil,
+html[data-theme="donjon"] header h1{
+  background: linear-gradient(#ffffff, #ffc2c9 38%, #ff3b4e 72%, #c2102a) !important;
+  -webkit-background-clip: text !important; background-clip: text !important;
+  color: transparent !important; -webkit-text-fill-color: transparent !important; text-shadow: none !important;
+  filter: drop-shadow(0 0 14px rgba(255, 42, 61, 1)) drop-shadow(0 0 3px #000) drop-shadow(0 3px 0 #000) !important;
+  letter-spacing: 0.07em;
+}
+
+/* ----- Boutons : pilules vernies rouge et noir ----- */
+html[data-theme="donjon"] button:not(.btnPauseJoueur):not(.btnLivre):not(#btnReglages):not(.btnAccueilTexte):not(#btnPause):not(#btnReglagesJeu):not(.bloc-hot-btn):not(.pastilleTheme):not(.btnRetour):not(.annonceFermer):not(.btnInstaller){
+  background: linear-gradient(#3a0a14 0%, #0a0a0c 48%, #2a0610 52%, #5a0a1c 100%) !important; color: #ffd0d6 !important;
+  border: 2px solid #ff2a3d !important; border-radius: 999px !important;
+  box-shadow: 0 0 16px rgba(255, 42, 61, 0.75), inset 0 2px 0 rgba(255, 255, 255, 0.35) !important;
+  text-shadow: 0 0 8px #ff2a3d !important; letter-spacing: 0.04em;
+}
+
+/* ----- Dos des cartes : cœur rouge sur noir brillant (les faces ont un « _ » ou « couleur ») ----- */
+html[data-theme="donjon"] .Carte:not(.retournee):not([class*="_"]):not([class*="couleur"]),
+html.faces-fermees[data-theme="donjon"] #plateau .Carte.retournee.recachee,
+html[data-theme="donjon"] .tele-plateau .Carte.carte-recachee,
+html[data-theme="donjon"] #ecranRegles .ligneRegle .Carte.retournee:not([class*="_"]):not([class*="couleur"]){
+  background-image: url("Cartes/dos_donjon.svg") !important;
+}
+
+/* ----- Annonces : titres rouges ----- */
+html[data-theme="donjon"] #overlayRegleUnique{ background: #070708 !important; }
+html[data-theme="donjon"] #overlayRegleUnique .regle-titre{ color: #ff3b4e !important; text-shadow: 0 0 12px rgba(255, 42, 61, 0.55) !important; }
+
+/* ----- Pastille du thème dans les Réglages ----- */
+html[data-theme="donjon"] .pastilleTheme[data-theme="donjon"] .rond{ box-shadow: 0 0 0 3px #ff2a3d; }
+.pastilleTheme .rondDonjon{ background: radial-gradient(circle at 50% 120%, #ff9a00 0 18%, #e01616 36%, transparent 60%), linear-gradient(135deg, #1b1b20, #050506) !important; }

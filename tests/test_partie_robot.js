@@ -3,6 +3,7 @@
 // Vérifie que chaque partie va jusqu'à l'écran de fin, sans erreur dans la console, et que la page ne déborde pas en largeur.
 //   npm i playwright && npx playwright install chromium     (une seule fois)
 //   node tests/test_partie_robot.js
+//   node tests/test_partie_robot.js hot      (seulement les configurations dont le nom contient « hot »)
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
@@ -39,8 +40,16 @@ const CONFIGS = [
   // Autres thèmes (couleur du joueur actif propre à chacun)
   { nom: "téléphone debout, Casino", largeur: 390, hauteur: 780, theme: "vert" },
   { nom: "téléphone debout, Cerisier", largeur: 390, hauteur: 780, theme: "cerisier" },
-  { nom: "téléphone debout, Soleil couchant", largeur: 390, hauteur: 780, theme: "soleil" }
+  { nom: "téléphone debout, Soleil couchant", largeur: 390, hauteur: 780, theme: "soleil" },
+  // Mode hot : défis à la place des gorgées, carte Cupidon, plus de cartes « 1 »
+  { nom: "mode hot, téléphone debout, Bordeaux", largeur: 390, hauteur: 780, theme: "bordeaux", hot: true },
+  { nom: "mode hot + Mode PJ, Givre, partie express", largeur: 390, hauteur: 780, theme: "givre", hot: true, pj: true, express: true },
+  { nom: "mode hot, Star Wars", largeur: 390, hauteur: 780, theme: "galaxie", hot: true },
+  { nom: "mode hot, Kawaii, en paysage", largeur: 844, hauteur: 390, theme: "kawaii", hot: true },
+  { nom: "mode hot, thème Donjon", largeur: 390, hauteur: 780, theme: "donjon", hot: true },
+  { nom: "mode hot, thème Donjon, en paysage, accessibilité", largeur: 844, hauteur: 390, theme: "donjon", hot: true, accessibilite: true }
 ];
+const FILTRE = process.argv[2] || "";
 
 (async () => {
   await new Promise((r) => serveur.listen(0, r));
@@ -54,9 +63,10 @@ const CONFIGS = [
     const page = await nav.newPage({ viewport: { width: c.largeur, height: c.hauteur } });
     await page.addInitScript(prelude);
     await page.addInitScript(robot);
-    await page.addInitScript(([theme, acc, express]) => {
-      try { localStorage.setItem("alcuno_theme", theme); localStorage.setItem("alcuno_theme_kawaii", "1"); if (acc) localStorage.setItem("alcuno_accessibilite", "1"); if (express) localStorage.setItem("alcuno_partie_express", "1"); } catch (e) {}
-    }, [c.theme, !!c.accessibilite, !!c.express]);
+    await page.addInitScript(([theme, acc, express, hot, pj]) => {
+      try { if (hot) localStorage.setItem("alcuno_mode_hot", "1"); if (pj) localStorage.setItem("alcuno_mode_soft", "1"); } catch (e) {}
+      try { localStorage.setItem("alcuno_theme", theme); localStorage.setItem("alcuno_theme_kawaii", "1"); localStorage.setItem("alcuno_theme_donjon", "1"); if (acc) localStorage.setItem("alcuno_accessibilite", "1"); if (express) localStorage.setItem("alcuno_partie_express", "1"); } catch (e) {}
+    }, [c.theme, !!c.accessibilite, !!c.express, !!c.hot, !!c.pj]);
     await page.goto(url);
     let rapport = null;
     try {
@@ -69,7 +79,7 @@ const CONFIGS = [
     return { c, rapport, debordement };
   };
 
-  const resultats = await Promise.all(CONFIGS.map(jouer));
+  const resultats = await Promise.all(CONFIGS.filter((c) => c.nom.includes(FILTRE)).map(jouer));
   let echecs = 0;
   for (const { c, rapport, debordement } of resultats) {
     const ok = !!rapport && rapport.fin === "ok" && rapport.erreurs.length === 0 && rapport.cartesRetournees >= rapport.cartesTotal - 1 && debordement <= 0;

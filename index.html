@@ -17,7 +17,7 @@
         // Fichiers du jeu, dans l'ordre (aussi dans sw.js, pour le hors connexion). Téléchargés tout de suite
         // et en parallèle : en bas de la page, ils s'exécutent d'affilée, sans attente entre deux fichiers
         // (aucun bouton ni minuteur ne peut se déclencher avant que tout le jeu soit là).
-        window.FICHIERS_JEU = ["script.js", "js/qrcode.js", "js/config-lib.js", "js/reglages.js", "js/en-ligne.js", "js/plateau.js", "js/regles.js",
+        window.FICHIERS_JEU = ["script.js", "js/qrcode.js", "js/config-lib.js", "js/reglages.js", "js/en-ligne.js", "js/plateau.js", "js/regles.js", "js/mode-hot.js",
                                "js/synchro-en-ligne.js", "js/retour-demarrage.js", "js/tele.js", "js/stats.js", "js/config-distante.js", "js/stickers.js", "js/faq.js", "js/mouchard.js"];
         window.FICHIERS_JEU.forEach(function (f) {
             document.write('<link rel="preload" as="script" href="' + f + '?t=' + window.ANTI_CACHE + '">');
@@ -76,13 +76,14 @@
         try { var theme = localStorage.getItem("alcuno_theme"); if (theme === "violet") { theme = "soleil"; localStorage.setItem("alcuno_theme", theme); } if (theme) document.documentElement.dataset.theme = theme; } catch (e) {}
         // Barre du téléphone à la couleur du thème dès le premier affichage (mêmes couleurs que THEMES dans script.js)
         var couleursBarre = { bordeaux: "#2b001d", noir: "#000000", vert: "#08301e", bleu: "#0a1634", soleil: "#1f3566",
-                              cerisier: "#5a1740", givre: "#e4f5fc", prestige: "#937810", galaxie: "#02030a", kawaii: "#ffd6ec" };
+                              cerisier: "#5a1740", givre: "#e4f5fc", prestige: "#937810", galaxie: "#02030a", kawaii: "#ffd6ec", donjon: "#12040a" };
         document.write('<meta name="theme-color" content="' + (couleursBarre[theme] || couleursBarre.bordeaux) + '">');
         // iPhone : page rechargée après un changement de thème (voir rafraichirBarreIphone dans script.js) :
         // on rouvre les Réglages dès le premier affichage
         try { if (sessionStorage.getItem("alcuno_rouvrir_reglages") !== null) document.documentElement.classList.add("rouvrir-reglages"); } catch (e) {}
         document.write('<link rel="stylesheet" href="style_alcuno.css?t=' + window.ANTI_CACHE + '" />');
         document.write('<link rel="stylesheet" href="style_kawaii.css?t=' + window.ANTI_CACHE + '" />'); // thème Kawaii (généré : outils/generer_kawaii.py)
+        document.write('<link rel="stylesheet" href="style_donjon.css?t=' + window.ANTI_CACHE + '" />'); // thème secret Donjon (débloqué par une partie en mode hot)
     </script>
     <title>Alcuno</title>
 
@@ -132,7 +133,7 @@
          le JS, elle arrivait trop tard et la barre restait noire) -->
     <div id="haloSabre" aria-hidden="true"></div>
     <header>
-        <h1>ALCUNO<span class="badgeSoft" aria-label="Mode PJ">PJ</span></h1>
+        <h1>ALCUNO<span class="badgeSoft" aria-label="Mode PJ">PJ</span><span class="badgeHot" aria-label="Mode hot">🔥</span></h1>
         <button type="button" id="btnReglesJeu" class="btnAccueilTexte" title="Règles du jeu" aria-label="Règles du jeu">
             <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path class="couverture" d="M12 6.6C9.9 5 7 4.5 3.2 4.9v13.6c3.8-.4 6.7.1 8.8 1.7 2.1-1.6 5-2.1 8.8-1.7V4.9C17 4.5 14.1 5 12 6.6z" />
@@ -170,6 +171,8 @@
             <div id="etincellesPrestige" aria-hidden="true"></div>
             <!-- Thème Kawaii : petits personnages qui lévitent sur l'accueil (remplis par js/reglages.js) -->
             <div id="kawaiiFlotteurs" aria-hidden="true"></div>
+            <!-- Thème Donjon : objets qui tombent sur l'accueil (remplis par js/reglages.js) -->
+            <div id="donjonFlotteurs" aria-hidden="true"></div>
             <!-- Réglages : seulement sur l'écran d'accueil -->
             <button type="button" id="btnReglages" title="Réglages" aria-label="Réglages">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -219,7 +222,7 @@
             <button type="button" id="btnParDefautReglages" class="btnRetour btnModifierReglages" hidden>Par défaut</button>
             <button type="button" id="btnModifierReglages" class="btnRetour btnModifierReglages">Modifier</button>
             <div class="reglages-contenu">
-                <h2>Réglages</h2>
+                <h2 id="titreReglages">Réglages</h2>
                 <!-- Même annonce que sur l'accueil (js/config-distante.js) -->
                 <div class="annonceRelais" data-annonce-relais hidden></div>
 
@@ -242,6 +245,8 @@
                         <!-- Thème secret : débloqué avec les 11 stickers de l'album (js/stickers.js) -->
                         <button type="button" class="pastilleTheme" data-theme="kawaii" style="--c:#ff8fc2;--c-givre:#c2276f" id="pastilleKawaii" hidden><span class="rond" style="background:linear-gradient(135deg,#ffb3d9 20%,#d9b8ff 55%,#b3e5ff)"></span><span class="nomTheme">Kawaii</span></button>
                         <button type="button" class="pastilleTheme" data-theme="galaxie" style="--c:#FFE81F;--c-givre:#1a3f8a" id="pastilleGalaxie" hidden><span class="rond rondGalaxie"></span><span class="nomTheme">Star Wars</span></button>
+                        <!-- Thème secret : débloqué en lançant une partie en mode hot (js/reglages.js) -->
+                        <button type="button" class="pastilleTheme" data-theme="donjon" style="--c:#ff2a3d;--c-givre:#a3101f" id="pastilleDonjon" hidden><span class="rond rondDonjon"></span><span class="nomTheme">Donjon</span></button>
                     </div>
                 </div>
 
@@ -333,7 +338,10 @@
                     <label class="interrupteur" for="optionAccessibilite" aria-hidden="true"></label>
                 </div>
 
-                <div class="optionReglage" data-cle="mode-pj">
+                <!-- « Ta partie » : mêmes lignes que les Réglages, mais ouvertes seulement après « Mode classique » ou
+                     « Créer une partie » (classe vue-options sur l'écran, voir js/reglages.js) -->
+                <div class="optionsPartie">
+                <div class="optionReglage">
                     <span class="optionTexte">
                         <span class="optionTitre">Mode PJ</span>
                         <span class="optionNote">Tu prends 2x moins cher que dans la version normale.<br><br>En ligne : c'est le réglage de l'hôte qui compte, quand il crée la partie.</span>
@@ -342,13 +350,26 @@
                     <label class="interrupteur" for="optionModeSoft" aria-hidden="true"></label>
                 </div>
 
-                <div class="optionReglage" data-cle="express">
+                <div class="optionReglage">
                     <span class="optionTexte">
                         <span class="optionTitre">Partie express</span>
                         <span class="optionNote">Environ 2x moins de cartes (28 au lieu de 52) : une partie plus courte.<br><br>En ligne : c'est le réglage de celui qui lance la partie qui compte.</span>
                     </span>
                     <input type="checkbox" id="optionPartieExpress" aria-label="Partie express">
                     <label class="interrupteur" for="optionPartieExpress" aria-hidden="true"></label>
+                </div>
+
+                <div class="optionReglage">
+                    <span class="optionTexte">
+                        <span class="optionTitre">Mode hot 🔥</span>
+                        <span class="optionNote">Des défis osés pendant la partie.<br><br>En ligne : c'est le réglage de celui qui lance la partie qui compte.</span>
+                    </span>
+                    <input type="checkbox" id="optionModeHot" aria-label="Mode hot">
+                    <label class="interrupteur" for="optionModeHot" aria-hidden="true"></label>
+                </div>
+                    <div class="optionReglage optionAction">
+                        <button type="button" id="btnContinuerOptions">Continuer</button>
+                    </div>
                 </div>
 
                 <div class="blocReglage" data-cle="eau">

@@ -44,12 +44,13 @@ html[data-theme="kawaii"] .interdit_jaune { background-image: url("Cartes/kawaii
 html[data-theme="kawaii"] .interdit_rouge { background-image: url("Cartes/kawaii/interdit_rouge.svg"); }
 html[data-theme="kawaii"] .interdit_bleu { background-image: url("Cartes/kawaii/interdit_bleu.svg"); }
 html[data-theme="kawaii"] .couleur, html[data-theme="kawaii"] .couleur1, html[data-theme="kawaii"] .couleur2, html[data-theme="kawaii"] .couleur3 { background-image: url("Cartes/kawaii/couleur.svg"); }
-html[data-theme="kawaii"] .plus_2_vert, html[data-theme="kawaii"] .plus_2_vert1 { background-image: url("Cartes/kawaii/plus_2_vert.svg"); }
-html[data-theme="kawaii"] .plus_2_jaune, html[data-theme="kawaii"] .plus_2_jaune1 { background-image: url("Cartes/kawaii/plus_2_jaune.svg"); }
-html[data-theme="kawaii"] .plus_2_rouge, html[data-theme="kawaii"] .plus_2_rouge1 { background-image: url("Cartes/kawaii/plus_2_rouge.svg"); }
-html[data-theme="kawaii"] .plus_2_bleu, html[data-theme="kawaii"] .plus_2_bleu1 { background-image: url("Cartes/kawaii/plus_2_bleu.svg"); }
+html[data-theme="kawaii"] .cupidon_a, html[data-theme="kawaii"] .cupidon_b, html[data-theme="kawaii"] .cupidon_c { background-image: url("Cartes/kawaii/cupidon.svg"); }
+html[data-theme="kawaii"] .plus_2_vert, html[data-theme="kawaii"] .plus_2_vert1, html[data-theme="kawaii"] .plus_2_vert2, html[data-theme="kawaii"] .plus_2_vert3 { background-image: url("Cartes/kawaii/plus_2_vert.svg"); }
+html[data-theme="kawaii"] .plus_2_jaune, html[data-theme="kawaii"] .plus_2_jaune1, html[data-theme="kawaii"] .plus_2_jaune2, html[data-theme="kawaii"] .plus_2_jaune3 { background-image: url("Cartes/kawaii/plus_2_jaune.svg"); }
+html[data-theme="kawaii"] .plus_2_rouge, html[data-theme="kawaii"] .plus_2_rouge1, html[data-theme="kawaii"] .plus_2_rouge2, html[data-theme="kawaii"] .plus_2_rouge3 { background-image: url("Cartes/kawaii/plus_2_rouge.svg"); }
+html[data-theme="kawaii"] .plus_2_bleu, html[data-theme="kawaii"] .plus_2_bleu1, html[data-theme="kawaii"] .plus_2_bleu2, html[data-theme="kawaii"] .plus_2_bleu3 { background-image: url("Cartes/kawaii/plus_2_bleu.svg"); }
 html[data-theme="kawaii"] .plus_4, html[data-theme="kawaii"] .plus_4_1, html[data-theme="kawaii"] .plus_4_2, html[data-theme="kawaii"] .plus_4_3 { background-image: url("Cartes/kawaii/plus_4.svg"); }
-html[data-theme="kawaii"] .switch_vert { background-image: url("Cartes/kawaii/switch_vert.svg"); }
-html[data-theme="kawaii"] .switch_jaune { background-image: url("Cartes/kawaii/switch_jaune.svg"); }
-html[data-theme="kawaii"] .switch_rouge { background-image: url("Cartes/kawaii/switch_rouge.svg"); }
-html[data-theme="kawaii"] .switch_bleu { background-image: url("Cartes/kawaii/switch_bleu.svg"); }
+html[data-theme="kawaii"] .switch_vert, html[data-theme="kawaii"] .switch_vert1 { background-image: url("Cartes/kawaii/switch_vert.svg"); }
+html[data-theme="kawaii"] .switch_jaune, html[data-theme="kawaii"] .switch_jaune1 { background-image: url("Cartes/kawaii/switch_jaune.svg"); }
+html[data-theme="kawaii"] .switch_rouge, html[data-theme="kawaii"] .switch_rouge1 { background-image: url("Cartes/kawaii/switch_rouge.svg"); }
+html[data-theme="kawaii"] .switch_bleu, html[data-theme="kawaii"] .switch_bleu1 { background-image: url("Cartes/kawaii/switch_bleu.svg"); }

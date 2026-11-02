@@ -130,7 +130,7 @@ function verifier(ok, texte){
   {
     const { ctx, page, erreurs } = await ouvrir();
     await page.evaluate(() => { document.documentElement.dataset.theme = "galaxie"; });
-    await page.click("#btnModeClassique"); await page.waitForTimeout(800);
+    await page.click("#btnModeClassique"); await page.click("#btnContinuerOptions"); await page.waitForTimeout(800);
     for (const nom of ["Tom", "Lea", "Max"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(250); }
     await page.click("#jouer"); await page.waitForTimeout(1200);
     await page.evaluate(() => { window.__sons = []; const origine = jouerSon; jouerSon = (nom, ...reste) => { window.__sons.push(nom); return origine(nom, ...reste); }; lancerOverlayChoixDuel(0, ""); });
@@ -148,7 +148,7 @@ function verifier(ok, texte){
   // 7. Fin de partie : « Terminer » ramène à l'accueil
   {
     const { ctx, page, erreurs } = await ouvrir();
-    await page.click("#btnModeClassique"); await page.waitForTimeout(800);
+    await page.click("#btnModeClassique"); await page.click("#btnContinuerOptions"); await page.waitForTimeout(800);
     for (const nom of ["Tom", "Lea"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(250); }
     await page.click("#jouer"); await page.waitForTimeout(1200);
     await page.evaluate(() => finDePartie());
@@ -166,7 +166,7 @@ function verifier(ok, texte){
   // 8. Pari de la fin : une carte se choisit au doigt levé (pas en faisant défiler), avec un petit numéro dessus
   {
     const { ctx, page, erreurs } = await ouvrir();
-    await page.click("#btnModeClassique"); await page.waitForTimeout(800);
+    await page.click("#btnModeClassique"); await page.click("#btnContinuerOptions"); await page.waitForTimeout(800);
     for (const nom of ["Tom", "Lea", "Max"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(250); }
     await page.click("#jouer"); await page.waitForTimeout(1200);
     await page.evaluate(() => { paquet.splice(1); carteDoreeEnJeu = false; lancerOverlayPrediction(0); });
@@ -196,7 +196,7 @@ function verifier(ok, texte){
   //    pas en ouvrant les Réglages, seulement en essayant le thème
   {
     const { ctx, page, erreurs } = await ouvrir();
-    await page.click("#btnModeClassique"); await page.waitForTimeout(800);
+    await page.click("#btnModeClassique"); await page.click("#btnContinuerOptions"); await page.waitForTimeout(800);
     for (const nom of ["Tom", "Lea"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(250); }
     await page.click("#jouer"); await page.waitForTimeout(1200);
     await page.evaluate(() => { indexPigeon = 0; afficherMenuPigeon(); }); // (2 joueurs : un seul autre joueur possible)
@@ -207,7 +207,7 @@ function verifier(ok, texte){
     verifier(!menu2 && annonce2.pigeon === "Lea" && /nouveau PIGEON/.test(annonce2.texte), `pigeon à 2 joueurs : pas de choix (${menu2}), pigeon = ${annonce2.pigeon}, annonce « ${annonce2.texte.slice(0, 40)} »`);
     await ctx.close();
     const t3 = await ouvrir();
-    await t3.page.click("#btnModeClassique"); await t3.page.waitForTimeout(800);
+    await t3.page.click("#btnModeClassique"); await t3.page.click("#btnContinuerOptions"); await t3.page.waitForTimeout(800);
     for (const nom of ["Tom", "Lea", "Max"]) { await t3.page.fill("#nomJoueur", nom); await t3.page.click("#ajouterJoueur"); await t3.page.waitForTimeout(250); }
     await t3.page.click("#jouer"); await t3.page.waitForTimeout(1200);
     await t3.page.evaluate(() => { indexPigeon = 0; afficherMenuPigeon(); });
@@ -237,7 +237,7 @@ function verifier(ok, texte){
   {
     const ouvrirDuel = async (noms) => {
       const o = await ouvrir();
-      await o.page.click("#btnModeClassique"); await o.page.waitForTimeout(800);
+      await o.page.click("#btnModeClassique"); await o.page.click("#btnContinuerOptions"); await o.page.waitForTimeout(800);
       for (const nom of noms) { await o.page.fill("#nomJoueur", nom); await o.page.click("#ajouterJoueur"); await o.page.waitForTimeout(250); }
       await o.page.click("#jouer"); await o.page.waitForTimeout(1200);
       await o.page.evaluate(() => lancerOverlayChoixDuel(0, ""));
@@ -256,7 +256,7 @@ function verifier(ok, texte){
   // 11. Thème Sombre : les boutons des fenêtres de jeu sont sombres comme ceux des menus (pas le dégradé jaune)
   {
     const { ctx, page, erreurs } = await ouvrir();
-    await page.click("#btnModeClassique"); await page.waitForTimeout(800);
+    await page.click("#btnModeClassique"); await page.click("#btnContinuerOptions"); await page.waitForTimeout(800);
     for (const nom of ["Tom", "Lea", "Max"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(250); }
     await page.click("#jouer"); await page.waitForTimeout(1200);
     const fond = async (theme) => page.evaluate((theme) => {
@@ -275,7 +275,7 @@ function verifier(ok, texte){
   //     (ou à côté de « Caster » si ça tient), et la disposition revient après « Supprimer »
   {
     const { ctx, page, erreurs } = await ouvrir();
-    await page.click("#btnModeClassique"); await page.waitForTimeout(800);
+    await page.click("#btnModeClassique"); await page.click("#btnContinuerOptions"); await page.waitForTimeout(800);
     for (const nom of ["Tom", "Lea"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(250); }
     const disposition = () => page.evaluate(() => {
       const haut = (id) => Math.round(document.getElementById(id).getBoundingClientRect().top);
@@ -294,7 +294,7 @@ function verifier(ok, texte){
   // 14. Haut de partie : joueurs en pastilles, celle du joueur actif est marquée et suit le tour, le plateau est remonté
   {
     const { ctx, page, erreurs } = await ouvrir();
-    await page.click("#btnModeClassique"); await page.waitForTimeout(800);
+    await page.click("#btnModeClassique"); await page.click("#btnContinuerOptions"); await page.waitForTimeout(800);
     for (const nom of ["Tom", "Lea", "Max"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(250); }
     await page.click("#jouer"); await page.waitForTimeout(1200);
     const etat = () => page.evaluate(() => ({
@@ -315,7 +315,7 @@ function verifier(ok, texte){
     const resultats = [];
     for (const express of [false, true]) {
       const { ctx, page, erreurs } = await ouvrir({}, express ? `try{localStorage.setItem("alcuno_partie_express","1")}catch(e){}` : "");
-      await page.click("#btnModeClassique"); await page.waitForTimeout(800);
+      await page.click("#btnModeClassique"); await page.click("#btnContinuerOptions"); await page.waitForTimeout(800);
       for (const nom of ["Tom", "Lea", "Max"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(250); }
       await page.click("#jouer"); await page.waitForTimeout(1200);
       resultats.push(await page.evaluate(() => ({ cartes: document.querySelectorAll("#plateau .Carte").length, restantes: cartesRestantes(),
@@ -334,7 +334,7 @@ function verifier(ok, texte){
   // 16. Carte dorée : étincelles derrière l'annonce et le choix de la victime ; bleues (étoiles du titre comprises) en Star Wars
   {
     const { ctx, page, erreurs } = await ouvrir({}, `try{localStorage.setItem("alcuno_theme","galaxie");localStorage.setItem("alcuno_theme_galaxie","1")}catch(e){}`);
-    await page.click("#btnModeClassique"); await page.waitForTimeout(800);
+    await page.click("#btnModeClassique"); await page.click("#btnContinuerOptions"); await page.waitForTimeout(800);
     for (const nom of ["Tom", "Lea", "Max"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(250); }
     await page.click("#jouer"); await page.waitForTimeout(1200);
     const lire = () => page.evaluate(() => {
@@ -358,7 +358,7 @@ function verifier(ok, texte){
   // 17. Thème Sombre : boutons de la fenêtre de pause presque noirs au texte doré, champ de texte sans contour bleu du navigateur
   {
     const { ctx, page, erreurs } = await ouvrir({}, `try{localStorage.setItem("alcuno_theme","noir")}catch(e){}`);
-    await page.click("#btnModeClassique"); await page.waitForTimeout(800);
+    await page.click("#btnModeClassique"); await page.click("#btnContinuerOptions"); await page.waitForTimeout(800);
     await page.focus("#nomJoueur");
     const champ = await page.evaluate(() => { const c = getComputedStyle(document.getElementById("nomJoueur")); return { contour: c.outlineStyle, bord: c.borderColor }; });
     for (const nom of ["Tom", "Lea", "Max"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(250); }
@@ -439,7 +439,7 @@ function verifier(ok, texte){
     const themeRefuse = await refus.page.evaluate(() => document.documentElement.dataset.theme);
     await refus.ctx.close();
     const { ctx, page, erreurs } = await ouvrir({}, `try{localStorage.setItem("alcuno_theme","kawaii");localStorage.setItem("alcuno_theme_kawaii","1")}catch(e){}`);
-    await page.click("#btnModeClassique"); await page.waitForTimeout(800);
+    await page.click("#btnModeClassique"); await page.click("#btnContinuerOptions"); await page.waitForTimeout(800);
     for (const nom of ["Tom", "Lea", "Max"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(250); }
     await page.click("#jouer"); await page.waitForTimeout(1200);
     const k = await page.evaluate(() => {
@@ -492,7 +492,7 @@ function verifier(ok, texte){
     const faibles = [];
     const verifierEcran = async (nom) => { const bas = await page.evaluate(() => window.verifierContraste(3).map((x) => x.ratio.toFixed(1) + " " + x.cle)); if (bas.length) faibles.push(nom + " : " + bas.slice(0, 3).join(" | ")); };
     await page.waitForTimeout(500); await verifierEcran("accueil");
-    await page.click("#btnModeClassique"); await page.waitForTimeout(800);
+    await page.click("#btnModeClassique"); await page.click("#btnContinuerOptions"); await page.waitForTimeout(800);
     for (const nom of ["Tom", "Lea", "Max"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(200); }
     await verifierEcran("préparation");
     await page.click("#jouer"); await page.waitForTimeout(1200); await verifierEcran("partie");
@@ -517,7 +517,7 @@ function verifier(ok, texte){
     const positions = [];
     for (const theme of [...THEMES, "prestige", "galaxie", "kawaii"]) {
       const { ctx, page } = await ouvrir({}, `try{localStorage.setItem("alcuno_theme","${theme}");localStorage.setItem("alcuno_theme_galaxie","1");localStorage.setItem("alcuno_theme_prestige","1");localStorage.setItem("alcuno_theme_kawaii","1")}catch(e){}`);
-      await page.click("#btnModeClassique"); await page.waitForTimeout(700);
+      await page.click("#btnModeClassique"); await page.click("#btnContinuerOptions"); await page.waitForTimeout(700);
       for (const nom of ["Tom", "Lea", "Max"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(150); }
       await page.click("#jouer"); await page.waitForTimeout(1200);
       const debut = await page.evaluate(() => Math.round(document.getElementById("stickyJoueurActif").getBoundingClientRect().top));
@@ -533,7 +533,7 @@ function verifier(ok, texte){
   // 23. Mot secret du créateur : tapé comme nom de joueur, il débloque le thème Kawaii (pas ajouté comme joueur), fenêtre « débloqué », thème essayable
   {
     const { ctx, page, erreurs } = await ouvrir();
-    await page.click("#btnModeClassique"); await page.waitForTimeout(800);
+    await page.click("#btnModeClassique"); await page.click("#btnContinuerOptions"); await page.waitForTimeout(800);
     await page.fill("#nomJoueur", "testkawaiidev"); await page.click("#ajouterJoueur"); await page.waitForTimeout(900);
     const r = await page.evaluate(() => ({ debloque: kawaiiDebloque(), pastille: !document.getElementById("pastilleKawaii").hidden, joueurs: joueurs.length, champ: document.getElementById("nomJoueur").value, fenetre: !!document.getElementById("fenetreKawaii") }));
     await page.click(".fenetreKawaii-essayer"); await page.waitForTimeout(700);
@@ -573,7 +573,7 @@ function verifier(ok, texte){
     const TOUS_LES_THEMES = [...THEMES, "prestige", "galaxie", "kawaii"];
     for (const theme of TOUS_LES_THEMES) {
       const { ctx, page, erreurs } = await ouvrir({}, `try{localStorage.setItem("alcuno_theme","${theme}");localStorage.setItem("alcuno_theme_prestige","1");localStorage.setItem("alcuno_theme_galaxie","1");localStorage.setItem("alcuno_theme_kawaii","1")}catch(e){}`);
-      await page.click("#btnModeClassique"); await page.waitForTimeout(700);
+      await page.click("#btnModeClassique"); await page.click("#btnContinuerOptions"); await page.waitForTimeout(700);
       for (const nom of ["Tom", "Lea", "Max"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(200); }
       await page.click("#jouer"); await page.waitForTimeout(1000);
       const mesure = () => page.evaluate(() => {
@@ -612,7 +612,7 @@ function verifier(ok, texte){
     const restes = [];
     for (const theme of ["kawaii", "galaxie"]) {
       const { ctx, page, erreurs } = await ouvrir({}, `try{localStorage.setItem("alcuno_theme","${theme}");localStorage.setItem("alcuno_theme_kawaii","1");localStorage.setItem("alcuno_theme_galaxie","1");localStorage.setItem("alcuno_album_decouvert","1")}catch(e){}`);
-      await page.click("#btnModeClassique"); await page.waitForTimeout(600);
+      await page.click("#btnModeClassique"); await page.click("#btnContinuerOptions"); await page.waitForTimeout(600);
       for (const nom of ["Tom", "Lea", "Max"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(150); }
       await page.click("#jouer"); await page.waitForTimeout(900);
       const anciennes = (nom) => page.evaluate((nom) => {
@@ -852,7 +852,7 @@ function verifier(ok, texte){
     const monte = apresGlisse.split(",").indexOf("voix") < apresFleche.split(",").indexOf("voix") && apresGlisse.split(",").sort().join() === apresFleche.split(",").sort().join();
     const attendueGlisse = apresGlisse;
     verifier(avant.defaut === "none" && avant.texte === "Modifier" && avant.poignees === 0 && pendant.edition && pendant.texte === "OK" && pendant.defaut !== "none" &&
-      pendant.poignees >= 15 && pendant.fleches === 0 && pendant.tremble === "none" && pendant.poigneesVisibles === pendant.visibles && pendant.desalignees === 0 && pendant.poignees === 15 && apresFleche === attendueFleche && monte &&
+      pendant.poignees >= 13 && pendant.fleches === 0 && pendant.tremble === "none" && pendant.poigneesVisibles === pendant.visibles && pendant.desalignees === 0 && pendant.poignees === 13 && apresFleche === attendueFleche && monte &&
       !fini.edition && fini.controles === 0 && fini.texte === "Modifier" && rechargee === attendueGlisse && parDefaut === origine && stocke === null && interrupteur && queue === "blocPartage,aPropos" && fixesSansPoignee && erreurs.length === 0,
       `réglages réorganisables : avant ${JSON.stringify(avant)}, pendant ${JSON.stringify(pendant)}, flèche ${apresFleche === attendueFleche}, glisser monté ${monte} (${apresGlisse}), fini ${JSON.stringify(fini)}, rechargé ${rechargee === attendueGlisse}, par défaut ${parDefaut === origine}, stocké ${stocke}, interrupteur ${interrupteur}, fin de page ${queue}, fixes sans poignée ${fixesSansPoignee} ${erreurs.join("|")}`);
     await ctx.close();
@@ -1023,14 +1023,14 @@ function verifier(ok, texte){
   // 38. Réglages pendant une partie : bouton ⚙ en haut à droite, réglages à risque grisés et bloqués, les autres libres
   {
     const { ctx, page, erreurs } = await ouvrir();
-    await page.click("#btnModeClassique"); await page.waitForTimeout(600);
+    await page.click("#btnModeClassique"); await page.click("#btnContinuerOptions"); await page.waitForTimeout(600);
     for (const nom of ["Tom", "Lea"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(250); }
     const avantPartie = await page.evaluate(() => document.getElementById("btnReglagesJeu").hidden);
     await page.click("#jouer"); await page.waitForTimeout(1200);
     await page.click("#btnReglagesJeu"); await page.waitForTimeout(600);
     const e = await page.evaluate(() => ({
       dansBandeau: document.getElementById("btnReglagesJeu").parentElement.id === "stickyJoueurActif",
-      bloques: ["faces-cachees", "mode-pj", "express", "ecran-tele", "partie-memoire"].every((c) => { const l = document.querySelector(`#ecranReglages [data-cle="${c}"]`); return [l, ...l.querySelectorAll("input, button")].filter((x) => x.matches("input, button")).every((x) => x.disabled); }),
+      bloques: ["faces-cachees", "ecran-tele", "partie-memoire"].every((c) => { const l = document.querySelector(`#ecranReglages [data-cle="${c}"]`); return [l, ...l.querySelectorAll("input, button")].filter((x) => x.matches("input, button")).every((x) => x.disabled); }),
       libres: ["optionSons", "optionMusique", "optionVoix", "optionGaucher", "optionVibrations"].every((i) => !document.getElementById(i).disabled) }));
     await page.click("#btnFermerReglages"); await page.waitForTimeout(500);
     await page.evaluate(() => { document.getElementById("btnAccueilClassique").click(); });
@@ -1098,7 +1098,7 @@ function verifier(ok, texte){
   // 42. Joueur mis en pause pendant son tour : s'il revient avant que quelqu'un ait joué, son tour lui est rendu
   {
     const { ctx, page, erreurs } = await ouvrir();
-    await page.click("#btnModeClassique"); await page.waitForTimeout(500);
+    await page.click("#btnModeClassique"); await page.click("#btnContinuerOptions"); await page.waitForTimeout(500);
     for (const nom of ["Tom", "Lea", "Max"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(200); }
     await page.click("#jouer"); await page.waitForTimeout(1200);
     const idx = () => page.evaluate(() => indexJoueur % joueurs.length);
@@ -1141,7 +1141,7 @@ function verifier(ok, texte){
   // 44. Règles du jeu lues sur le téléphone (mode classique, relié à une télé) : envoyées à la télé, qui les affiche en grand ; fermées : plus rien
   {
     const { ctx, page, erreurs } = await ouvrir();
-    await page.click("#btnModeClassique"); await page.waitForTimeout(500);
+    await page.click("#btnModeClassique"); await page.click("#btnContinuerOptions"); await page.waitForTimeout(500);
     for (const nom of ["Tom", "Lea"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(150); }
     await page.click("#jouer"); await page.waitForTimeout(1200);
     const avant = await page.evaluate(() => etatPourTele().ecran);
@@ -1243,6 +1243,128 @@ function verifier(ok, texte){
       regles.titre === "Règles du jeu" && !regles.faq && regles.tele && depuisReglages === "Questions fréquentes" && erreurs.length === 0 &&
       sonPropre && !retourReglages.regles && retourReglages.reglages && retourRegles.titre === "Règles du jeu" && retourRegles.ouverte && !retourRegles.faq && retourRegles.regles === 12 && ferme,
       `FAQ : ${JSON.stringify({ lienVisible, avant, apres, regles, depuisReglages, sonPropre, retourReglages, retourRegles, ferme, erreurs })}`);
+  }
+
+  // 47. Écran « Ta partie » (après « Mode classique ») : Mode PJ, Partie express, Mode hot ; plus dans les Réglages
+  {
+    const { ctx, page, erreurs } = await ouvrir();
+    await page.click("#btnModeClassique"); await page.waitForTimeout(700);
+    const ecran = await page.evaluate(() => {
+      const r = document.getElementById("ecranReglages");
+      const visible = (el) => el.offsetHeight > 0;
+      return { ouvert: getComputedStyle(r).display !== "none", vue: r.classList.contains("vue-options"), titre: document.getElementById("titreReglages").textContent,
+        options: ["optionModeSoft", "optionPartieExpress", "optionModeHot"].every((i) => visible(document.getElementById(i).closest(".optionReglage"))),
+        continuer: visible(document.getElementById("btnContinuerOptions")),
+        themesCaches: !visible(r.querySelector('[data-cle="themes"]')), modifierCache: !visible(document.getElementById("btnModifierReglages")) };
+    });
+    await page.click("#btnFermerReglages"); await page.waitForTimeout(700);
+    const retour = await page.evaluate(() => ({ accueil: getComputedStyle(document.getElementById("choixMode")).display !== "none",
+      menu: getComputedStyle(document.getElementById("menu")).display !== "none", reglagesFermes: getComputedStyle(document.getElementById("ecranReglages")).display === "none",
+      titre: document.getElementById("titreReglages").textContent, vue: document.getElementById("ecranReglages").classList.contains("vue-options") }));
+    await page.click("#btnReglages"); await page.waitForTimeout(600);
+    const normal = await page.evaluate(() => ({ titre: document.getElementById("titreReglages").textContent,
+      sansOptions: ["optionModeSoft", "optionPartieExpress", "optionModeHot"].every((i) => document.getElementById(i).closest(".optionReglage").offsetHeight === 0),
+      themes: document.querySelector('#ecranReglages [data-cle="themes"]').offsetHeight > 0 }));
+    await ctx.close();
+    verifier(ecran.ouvert && ecran.vue && ecran.titre === "Ta partie" && ecran.options && ecran.continuer && ecran.themesCaches && ecran.modifierCache &&
+      retour.accueil && !retour.menu && retour.reglagesFermes && retour.titre === "Réglages" && !retour.vue &&
+      normal.titre === "Réglages" && normal.sansOptions && normal.themes && erreurs.length === 0,
+      `écran « Ta partie » : ${JSON.stringify({ ecran, retour, normal, erreurs })}`);
+  }
+
+  // 48. Mode hot : flamme dans le titre, paquet (plus de « 1 », Cupidon selon le nombre de joueurs, toujours 52 cartes ; 28 en express)
+  for (const [nb, express] of [[3, false], [4, false], [6, false], [8, false], [4, true], [2, false]]) {
+    const { ctx, page, erreurs } = await ouvrir({}, `try{localStorage.setItem("alcuno_mode_hot","1");${express ? 'localStorage.setItem("alcuno_partie_express","1");' : ""}}catch(e){}`);
+    await page.click("#btnModeClassique");
+    const coche = await page.evaluate(() => document.getElementById("optionModeHot").checked);
+    await page.click("#btnContinuerOptions"); await page.waitForTimeout(600);
+    for (let i = 1; i <= nb; i++) { await page.fill("#nomJoueur", "J" + i); await page.click("#ajouterJoueur"); await page.waitForTimeout(120); }
+    await page.click("#jouer"); await page.waitForTimeout(900);
+    const e = await page.evaluate(() => {
+      const compte = {}; paquet.forEach((c) => { const f = familleCarte(c); compte[f] = (compte[f] || 0) + 1; });
+      return { cartes: document.querySelectorAll("#plateau .Carte").length, un: paquet.filter((c) => c.startsWith("un_")).length, cupidon: compte.cupidon || 0,
+        plus2: compte.plus_2 || 0, switch: compte.switch || 0, hot: partieHot, flamme: getComputedStyle(document.querySelector("header h1 .badgeHot")).display !== "none" };
+    });
+    await ctx.close();
+    const attenduCupidon = express ? 1 : nb >= 6 ? 3 : nb >= 4 ? 2 : nb === 3 ? 1 : 0;
+    const attenduCartes = express ? 28 : 52;
+    verifier(coche && e.hot && e.flamme && e.un === 0 && e.cupidon === (nb < 3 ? 0 : attenduCupidon) && e.cartes === attenduCartes && erreurs.length === 0,
+      `mode hot, ${nb} joueurs${express ? ", express" : ""} : ${JSON.stringify(e)} (Cupidon attendues : ${nb < 3 ? 0 : attenduCupidon})`);
+  }
+
+  // 49. Mode hot : une seule personne boit => bloc du défi dans l'annonce de la règle (« Je le fais » : rien à boire ; « Je bois » : les gorgées) ; jamais deux fois le même défi
+  {
+    const { ctx, page, erreurs } = await ouvrir({}, `try{localStorage.setItem("alcuno_mode_hot","1")}catch(e){}`);
+    await page.click("#btnModeClassique"); await page.click("#btnContinuerOptions"); await page.waitForTimeout(600);
+    for (const nom of ["Tom", "Lea", "Max"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(150); }
+    await page.click("#jouer"); await page.waitForTimeout(900);
+    const boire = (n) => page.evaluate((n) => { annoncerBoireAvecAnnulation(0, n, "plus_2_vert", `Tom boit ${n}`); }, n);
+    // Le défi est dans l'annonce de la règle, sous la carte ; l'annonce attend le choix (elle ne se ferme pas toute seule)
+    const defi = async (bouton) => {
+      await page.waitForSelector("#overlayRegleUnique .bloc-hot", { timeout: 4000 });
+      const lu = await page.evaluate(() => ({ texte: document.querySelector("#overlayRegleUnique .bloc-hot-texte").innerText,
+        lien: (document.querySelector("#overlayRegleUnique .bloc-hot-lien") || {}).innerText || "",
+        boutons: [...document.querySelectorAll("#overlayRegleUnique .bloc-hot-btn")].map((b) => b.innerText) }));
+      await page.waitForTimeout(5000); // (plus longtemps que la durée habituelle d'une annonce : elle doit rester)
+      const restee = await page.evaluate(() => !!document.querySelector("#overlayRegleUnique .bloc-hot"));
+      await page.dispatchEvent(`#overlayRegleUnique .bloc-hot-btn >> nth=${bouton}`, "pointerdown");
+      await page.waitForSelector("#overlayRegleUnique", { state: "detached", timeout: 4000 });
+      return Object.assign(lu, { restee });
+    };
+    await boire(2);
+    const d1 = await defi(0); // « Je le fais »
+    const apres1 = await page.evaluate(() => gorgeesBues["Tom"]);
+    await boire(2);
+    const d2 = await defi(1); // « Je bois »
+    const apres2 = await page.evaluate(() => gorgeesBues["Tom"]);
+    // 20 défis du groupe A pour Tom : tous différents (27 en tout)
+    const vus = await page.evaluate(() => { const tires = []; for (let i = 0; i < 25; i++) tires.push(tirerDefiHot("Tom", 2, null).id); return { uniques: new Set(tires).size, total: tires.length }; });
+    // couple lié : le défi vise le partenaire et le titre dit « boivent »
+    await page.evaluate(() => { liensHot.push(["Tom", "Lea"]); });
+    await boire(7);
+    const d3 = await defi(1);
+    const couple = await page.evaluate(() => ({ tom: gorgeesBues["Tom"], lea: gorgeesBues["Lea"] }));
+    await ctx.close();
+    verifier(d1.restee && d1.boutons[0] === "Je le fais" && d1.boutons[1] === "Je bois 2" && !/\{|\}/.test(d1.texte) && !d1.texte.includes("Tom") && apres1 === 0 && apres2 === 2 &&
+      vus.uniques === vus.total && /Tom.*et Lea.*boivent ensemble/.test(d3.lien) && d3.boutons[1] === "Je bois 7" && !/\{|\}/.test(d3.texte) && d3.texte.includes("Lea") &&
+      couple.tom === 9 && couple.lea === 7 && erreurs.length === 0,
+      `défi hot : ${JSON.stringify({ d1, d2: d2.texte, apres1, apres2, vus, d3, couple, erreurs })}`);
+  }
+
+  // 50. Thème secret « Donjon » : caché tant qu'on n'a pas lancé de partie en mode hot, débloqué ensuite (avec « NOUVEAU »)
+  {
+    // thème gardé mais pas débloqué : on retombe sur Bordeaux
+    const a = await ouvrir({}, `try{localStorage.setItem("alcuno_theme","donjon")}catch(e){}`);
+    const sansDeblocage = await a.page.evaluate(() => ({ theme: document.documentElement.dataset.theme, cachee: document.getElementById("pastilleDonjon").hidden }));
+    await a.ctx.close();
+    // partie normale (sans mode hot) : rien ne se débloque
+    const b = await ouvrir();
+    await b.page.click("#btnModeClassique"); await b.page.click("#btnContinuerOptions"); await b.page.waitForTimeout(600);
+    for (const nom of ["Tom", "Lea"]) { await b.page.fill("#nomJoueur", nom); await b.page.click("#ajouterJoueur"); await b.page.waitForTimeout(150); }
+    await b.page.click("#jouer"); await b.page.waitForTimeout(900);
+    const sansHot = await b.page.evaluate(() => ({ cle: localStorage.getItem("alcuno_theme_donjon"), cachee: document.getElementById("pastilleDonjon").hidden }));
+    await b.ctx.close();
+    // partie en mode hot : débloqué, pastille visible avec « NOUVEAU », puis thème appliqué
+    const c = await ouvrir({}, `try{localStorage.setItem("alcuno_mode_hot","1")}catch(e){}`);
+    await c.page.click("#btnModeClassique"); await c.page.click("#btnContinuerOptions"); await c.page.waitForTimeout(600);
+    for (const nom of ["Tom", "Lea"]) { await c.page.fill("#nomJoueur", nom); await c.page.click("#ajouterJoueur"); await c.page.waitForTimeout(150); }
+    await c.page.click("#jouer"); await c.page.waitForTimeout(900);
+    const apresHot = await c.page.evaluate(() => ({ cle: localStorage.getItem("alcuno_theme_donjon"), cachee: document.getElementById("pastilleDonjon").hidden,
+      nouveau: document.documentElement.classList.contains("donjon-nouveau") }));
+    await c.page.evaluate(() => { document.getElementById("btnAccueilClassique").click(); });
+    await c.page.waitForTimeout(500);
+    await c.page.evaluate(() => { document.getElementById("pastilleDonjon").click(); });
+    await c.page.waitForTimeout(500);
+    const applique = await c.page.evaluate(() => ({ theme: document.documentElement.dataset.theme, nouveau: document.documentElement.classList.contains("donjon-nouveau"),
+      objets: document.querySelectorAll("#donjonFlotteurs span").length,
+      zone: getComputedStyle(document.getElementById("donjonFlotteurs")).display,
+      barre: (document.querySelector('meta[name="theme-color"]') || {}).content,
+      stocke: localStorage.getItem("alcuno_theme") }));
+    await c.ctx.close();
+    verifier(sansDeblocage.theme === "bordeaux" && sansDeblocage.cachee && sansHot.cle === null && sansHot.cachee &&
+      apresHot.cle === "1" && !apresHot.cachee && apresHot.nouveau &&
+      applique.theme === "donjon" && !applique.nouveau && applique.objets === 13 && applique.zone !== "none" && applique.barre === "#12040a" && applique.stocke === "donjon" && c.erreurs.length === 0,
+      `thème Donjon : ${JSON.stringify({ sansDeblocage, sansHot, apresHot, applique, erreurs: c.erreurs })}`);
   }
 
   await nav.close();
