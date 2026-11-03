@@ -202,6 +202,15 @@ function debloquerGalaxie(){
 // ===== Thème secret « Donjon » (noir et rouge, mode hot) : débloqué en lançant une partie en mode hot (js/regles.js) =====
 const CLE_DONJON = "alcuno_theme_donjon";
 const CLE_DONJON_NOUVEAU = "alcuno_donjon_nouveau";
+// Lien de test : « …/?reinit_bdsm » efface le déblocage du thème BDSM (pour revoir la fenêtre « débloqué » à la prochaine partie hot) ;
+// le thème repasse à Bordeaux s'il était en BDSM. Le paramètre est retiré de l'adresse : un rechargement ne recommence pas.
+try {
+  if (/[?&]reinit_bdsm(=|&|$)/.test(location.search)) {
+    localStorage.removeItem(CLE_DONJON); localStorage.removeItem(CLE_DONJON_NOUVEAU);
+    if (localStorage.getItem(CLE_THEME) === "donjon") localStorage.removeItem(CLE_THEME);
+    history.replaceState(null, "", location.pathname + location.search.replace(/([?&])reinit_bdsm(=[^&]*)?&?/, "$1").replace(/[?&]$/, "") + location.hash);
+  }
+} catch (e) {}
 function donjonDebloque(){
   try { return localStorage.getItem(CLE_DONJON) === "1"; } catch (e) { return false; }
 }
