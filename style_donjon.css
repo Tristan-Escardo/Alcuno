@@ -85,6 +85,7 @@ html[data-theme="donjon"] button:not(.btnPauseJoueur):not(.btnLivre):not(#btnReg
 
 /* ----- Dos des cartes : cœur rouge sur noir brillant (les faces ont un « _ » ou « couleur ») ----- */
 html[data-theme="donjon"] .Carte:not(.retournee):not([class*="_"]):not([class*="couleur"]),
+html[data-theme="donjon"] .Carte.dos_dore:not(.retournee), /* (case de la carte dorée : même dos, plus le reflet doré qui passe) */
 html.faces-fermees[data-theme="donjon"] #plateau .Carte.retournee.recachee,
 html[data-theme="donjon"] .tele-plateau .Carte.carte-recachee,
 html[data-theme="donjon"] #ecranRegles .ligneRegle .Carte.retournee:not([class*="_"]):not([class*="couleur"]){
