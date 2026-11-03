@@ -224,6 +224,8 @@ function debloquerDonjon(){
   majPastilleDonjon();
   document.documentElement.classList.add("donjon-nouveau");
   fenetreBdsmEnAttente = true;
+  // Tout de suite : une notification (la fenêtre « L'essayer maintenant » ne vient qu'à la fin de la partie)
+  setTimeout(() => { try { afficherNotificationHaut("", "🔥 Thème BDSM débloqué ! Il est dans Réglages › Thèmes", true); } catch (e) {} }, 1500);
 }
 function proposerFenetreBdsm(){
   if (!fenetreBdsmEnAttente) return;
