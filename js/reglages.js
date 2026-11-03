@@ -2805,6 +2805,7 @@ activerMemePendantElan(document.getElementById("btnFermerRegles"), () => {
 // côté). Le sens du geste est décidé dès le premier mouvement : vertical, on laisse défiler ; horizontal, on bloque.
 // Les curseurs (volume…) gardent leur geste. Accueil : depuis le bord droit de l'écran, glisser vers la gauche ouvre les Réglages ;
 // depuis le bord gauche, glisser vers la droite ouvre les Règles (un geste parti du milieu de l'écran n'ouvre rien).
+// Autres pages : glisser vers la droite, depuis n'importe où, fait « ← Retour » (retourParGlissement, plus bas).
 (() => {
   let depart = null, sens = null;
   document.addEventListener("touchstart", (e) => {
@@ -2823,10 +2824,30 @@ activerMemePendantElan(document.getElementById("btnFermerRegles"), () => {
     if (!d || sens !== "h" || !e.changedTouches.length) return;
     const dx = e.changedTouches[0].clientX - d.x, dy = e.changedTouches[0].clientY - d.y;
     if (Math.abs(dx) < 70 || Math.abs(dy) > Math.abs(dx) * 0.6 || Date.now() - d.moment > 800) return; // (un vrai glissement, net et rapide)
+    if (!d.cible.closest) return;
     const accueil = document.getElementById("choixMode");
-    if (!accueil || accueil.style.display === "none" || !d.cible.closest || !accueil.contains(d.cible)) return;
-    const BORD = 40; // (px : la bande, le long du bord, où le geste doit commencer)
-    if (dx < 0 && d.x >= innerWidth - BORD) ouvrirReglages();
-    else if (dx > 0 && d.x <= BORD) ouvrirRegles();
+    if (accueil && accueil.style.display !== "none" && accueil.contains(d.cible)) {
+      const BORD = 40; // (px : la bande, le long du bord, où le geste doit commencer)
+      if (dx < 0 && d.x >= innerWidth - BORD) ouvrirReglages();
+      else if (dx > 0 && d.x <= BORD) ouvrirRegles();
+      return;
+    }
+    if (dx > 0) retourParGlissement(d.cible);
   }, { passive: true });
+  // Pages (Réglages, Règles, Crédits, FAQ, bug, écrans du mode en ligne, Nouvelle partie, confirmations, pause, volets) :
+  // glisser vers la droite, depuis n'importe où (pas besoin du bord, que Safari prend parfois pour son « page précédente »),
+  // fait « ← Retour » (actionRetour, js/retour-demarrage.js). Rien sur le plateau ni dans les fenêtres de la partie,
+  // rien en mode édition des Réglages, rien si le geste part d'un bouton, d'un curseur, d'un interrupteur ou d'une carte.
+  function retourParGlissement(cible){
+    if (cible.closest('button, a, input, select, textarea, label, [role="button"], .interrupteur, .Carte, .pastilleTheme')) return;
+    if (typeof actionRetour !== "function") return;
+    if ([...document.querySelectorAll('[id^="overlay"]')].some((o) => o.getClientRects().length)) return;
+    if (estOuverte(ecranReglages) && !estOuverte(ecranBug) && ecranReglages.classList.contains("reglages-edition")) return;
+    const pageOuverte = [ecranCredits, ecranRegles, ecranBug, ecranReglages, ecranInstallation].some(estOuverte)
+      || ["voletCarte", "voletPause", "voletHistorique"].some((id) => document.getElementById(id))
+      || ECRANS_RETOUR.some(([id]) => estVisible(document.getElementById(id)));
+    if (!pageOuverte) return;
+    const action = actionRetour();
+    if (action) action();
+  }
 })();
