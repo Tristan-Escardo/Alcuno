@@ -1429,10 +1429,13 @@ document.addEventListener("visibilitychange", () => {
 //   tiens_gueule.mp3 : le cul sec de la carte dorée (« TIENS DANS TA GUEULE »)
 //   regles.mp3 : on ouvre les Règles du jeu (boutons « Règles du jeu » de l'accueil et de la partie)
 //   accessibilite_on.mp3 : on active « Accessibilité pour les gens bourrés » dans les réglages
-const SONS = ["cartes", "doree", "tiens_gueule", "bouton", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees", "regles", "accessibilite_on", "etoile"]; // (les sons de sabre ne se chargent que dans le thème Star Wars, voir morceauSabre)
+const SONS = ["cartes", "doree", "tiens_gueule", "bouton", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees", "regles", "accessibilite_on", "etoile"]; // (les sons de sabre et du thème BDSM ne se chargent que dans leur thème, voir morceauClicTheme)
 // Sons de sabre : Sons/sabre/sabre_01.mp3 à sabre_54.mp3 (0,8 s chacun). Le clic des boutons en joue un au
 // hasard (jouerSon("bouton")). Si tu en supprimes, retire aussi leur nom de cette liste (et de SONS_A_PRECHARGER dans sw.js) ; un nom sans fichier est simplement ignoré (404).
 const SONS_SABRE = ["sabre/sabre_01", "sabre/sabre_02", "sabre/sabre_05", "sabre/sabre_07", "sabre/sabre_09", "sabre/sabre_11", "sabre/sabre_14", "sabre/sabre_15", "sabre/sabre_18", "sabre/sabre_22", "sabre/sabre_26", "sabre/sabre_31", "sabre/sabre_33", "sabre/sabre_37", "sabre/sabre_40", "sabre/sabre_41", "sabre/sabre_48"];
+// Même chose dans le thème BDSM : Sons/bdsm_buttons/*.mp3 (0,5 à 1,9 s), un au hasard au clic des boutons (même liste dans sw.js)
+const SONS_BDSM = ["bdsm_buttons/bdsm_sound_effect", "bdsm_buttons/bdsm_sound_effect1_01", "bdsm_buttons/bdsm_sound_effect1_07", "bdsm_buttons/bdsm_sound_effect1_12", "bdsm_buttons/bdsm_sound_effect1_17", "bdsm_buttons/bdsm_sound_effect1_23", "bdsm_buttons/bdsm_sound_effect1_25", "bdsm_buttons/bdsm_sound_effect1_27", "bdsm_buttons/bdsm_sound_effect1_30", "bdsm_buttons/bdsm_sound_effect1_37", "bdsm_buttons/bdsm_sound_effect1_46"];
+const SONS_CLIC_THEME = { galaxie: SONS_SABRE, donjon: SONS_BDSM };
 // Sons coupés au bout de N secondes (avec un petit fondu), même si le fichier est plus long
 const DUREE_MAX_SONS = { doree: 3, pigeon: 2, distribuer_gorgees: 0.8, bouton: 0.3 };
 const sonsCharges = {}; // nom -> son décodé (ou null si le fichier n'existe pas)
@@ -1483,24 +1486,25 @@ document.addEventListener("click", (e) => {
   if (Date.now() - sonBoutonJoueLe < 500) return; // déjà joué au doigt levé (activerMemePendantElan)
   const bouton = e.target && e.target.closest && e.target.closest("button, [role='button']");
   if (!bouton || bouton.disabled || bouton.matches(BOUTONS_AVEC_LEUR_SON)) return;
-  // (choix d'un thème : toujours le clic normal, même dans le thème Star Wars)
+  // (choix d'un thème : toujours le clic normal, même dans les thèmes Star Wars et BDSM)
   jouerSon("bouton", bouton.classList.contains("pastilleTheme"));
 }, { capture: true, passive: true });
 
-// Thème Star Wars seulement : un son de sabre au hasard, parmi ceux qui existent encore dans Sons/sabre/
-// (ou pas encore chargés). Dans les autres thèmes, le clic reste le son « bouton ».
-function morceauSabre(){
-  if (document.documentElement.dataset.theme !== "galaxie") return "bouton";
+// Thèmes Star Wars et BDSM seulement : un son de leur liste au hasard (sabre, ou son de Sons/bdsm_buttons/), parmi ceux
+// qui existent encore (ou pas encore chargés). Dans les autres thèmes, le clic reste le son « bouton ».
+function morceauClicTheme(){
+  const liste = SONS_CLIC_THEME[document.documentElement.dataset.theme];
+  if (!liste) return "bouton";
   const ctx = contexteAudio();
-  if (ctx) SONS_SABRE.forEach((n) => chargerSon(ctx, n));
-  const dispo = SONS_SABRE.filter((n) => sonsCharges[n] !== null);
+  if (ctx) liste.forEach((n) => chargerSon(ctx, n));
+  const dispo = liste.filter((n) => sonsCharges[n] !== null);
   return dispo.length ? dispo[Math.floor(Math.random() * dispo.length)] : "bouton";
 }
 
-// clicNormal : le son « bouton » d'origine, jamais remplacé par un sabre
+// clicNormal : le son « bouton » d'origine, jamais remplacé par un sabre ou un son du thème BDSM
 function jouerSon(nom, clicNormal = false){
   sonPourTele(nom);
-  if (nom === "bouton" && !clicNormal) nom = morceauSabre(); // le clic des boutons = un son de sabre au hasard // mode télé : la télé le joue aussi (même si le son de ce téléphone est coupé)
+  if (nom === "bouton" && !clicNormal) nom = morceauClicTheme(); // le clic des boutons = un son de sabre (ou du thème BDSM) au hasard // mode télé : la télé le joue aussi (même si le son de ce téléphone est coupé)
   if (!caseSons.checked || volumeSons <= 0) return;
   if (rattrapageEnCours) return; // reconnexion : pas de sons pour les actions déjà passées
   const ctx = contexteAudio();
@@ -1525,7 +1529,7 @@ function lireSon(nom, son){
   lecture.connect(sortie);
   const debut = ctx.currentTime;
   lecture.start(debut);
-  if (nom === "bouton" || nom.startsWith("sabre/")) dernierClicJoueA = Date.now();
+  if (nom === "bouton" || nom.startsWith("sabre/") || nom.startsWith("bdsm_buttons/")) dernierClicJoueA = Date.now();
 
   const dureeMax = DUREE_MAX_SONS[nom];
   if (SONS_QUI_BAISSENT_LA_MUSIQUE.includes(nom)) attenuerMusique(Math.min(son.duration, dureeMax || son.duration));
