@@ -234,6 +234,7 @@ function passageEtoileFilante(force){
     const r = bouton.getBoundingClientRect();
     vol.cancel();
     bouton.remove();
+    jouerSon("etoile"); // (Sons/etoile.mp3)
     paillettesVoeu(accueil, r.left + r.width / 2, r.top + r.height / 2);
     decouvrirAlbum("Vœu exaucé ✨ Album de stickers découvert !");
   }, { once: true });

@@ -17,6 +17,7 @@ Un fichier MP3 par moment du jeu, avec exactement ces noms :
   annuler_0_gorgees.mp3  quelqu'un tape « Annuler 0 » (il n'annule rien)
   regles.mp3   on ouvre les Règles du jeu
   accessibilite_on.mp3  on active « Accessibilité pour les gens bourrés » dans les réglages
+  etoile.mp3   on touche l'étoile filante de l'accueil (découverte de l'album de stickers)
 
   tiens_gueule.mp3  le cul sec de la carte dorée (« TIENS DANS TA GUEULE »)
   bouton.mp3   petit clic quand on touche un bouton (sauf ceux qui ont déjà leur son ; coupé à 0,3 seconde par le jeu)
@@ -32,6 +33,7 @@ MUSIQUE D'AMBIANCE (en boucle, réglage « Musique d'ambiance ») :
   musique_ambiance_sombre.mp3    thème Sombre (boucle exacte, voir BOUCLES_EXACTES dans js/reglages.js)
   musique_ambiance_galaxie.mp3   thème Star Wars (boucle exacte de 2 min 59, voir BOUCLES_EXACTES)
   musique_ambiance_kawaii.mp3    thème secret Kawaii (boucle exacte de 1 min 33, voir BOUCLES_EXACTES)
+  musique_ambiance_bdsm.mp3      thème secret BDSM (boucle exacte de 1 min 42, voir BOUCLES_EXACTES)
   Jusqu'à 3-4 minutes, 128 kbit/s (environ 1 Mo par minute) : elle se lance plus vite.
 
 GÉNÉRIQUE DU THÈME SECRET STAR WARS (au volume des sons, la musique d'ambiance se tait pendant) :

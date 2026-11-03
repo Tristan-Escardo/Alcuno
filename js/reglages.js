@@ -957,13 +957,14 @@ curseurVolume.addEventListener("input", () => {
 curseurVolume.addEventListener("change", () => jouerSon("reglage_son")); // essai au relâchement (Sons/reglage_son.mp3)
 
 // ===== Musique d'ambiance : Sons/musique_ambiance_<thème>.mp3 (givre, cerisier, prestige, soleil, galaxie, sombre,
-// kawaii),
+// kawaii, bdsm),
 // sinon Sons/musique_ambiance.mp3 (bordeaux, casino, nuit). En boucle, à son propre volume.
 // Quand ce téléphone caste, c'est la télé qui la joue (à ce volume, avec le thème du téléphone).
 const CLE_MUSIQUE = "alcuno_musique";
 const CLE_VOLUME_MUSIQUE = "alcuno_volume_musique";
-const THEMES_AVEC_MUSIQUE = ["givre", "cerisier", "prestige", "soleil", "galaxie", "noir", "kawaii"];
-const NOM_FICHIER_MUSIQUE = { noir: "sombre" }; // thème « noir » (affiché Sombre) : musique_ambiance_sombre.mp3
+const THEMES_AVEC_MUSIQUE = ["givre", "cerisier", "prestige", "soleil", "galaxie", "noir", "kawaii", "donjon"];
+// thème « noir » (affiché Sombre) : musique_ambiance_sombre.mp3 ; thème « donjon » (affiché BDSM) : musique_ambiance_bdsm.mp3
+const NOM_FICHIER_MUSIQUE = { noir: "sombre", donjon: "bdsm" };
 const caseMusique = document.getElementById("optionMusique");
 const curseurMusique = document.getElementById("volumeMusique");
 const ligneVolumeMusique = document.getElementById("ligneVolumeMusique");
@@ -1010,6 +1011,7 @@ const BOUCLES_EXACTES = {
   musique_ambiance_soleil: { avant: 0.3, longueur: 903552 / 44100 }, // 8 mesures à 93,7 BPM
   musique_ambiance_sombre: { avant: 0.3, longueur: 2903870 / 44100 }, // 65,85 s (de 11 s à 1 min 17 du morceau, qui se répète)
   musique_ambiance_kawaii: { avant: 0.3, longueur: 4111952 / 44100 }, // 93,24 s = 64 mesures à 164,7 BPM (de 25,5 s à 1 min 58,8 du morceau)
+  musique_ambiance_bdsm: { avant: 0.3, longueur: 4492064 / 44100 }, // 101,86 s à 172 BPM (de 4 min 15,1 à 5 min 56,97 du morceau : fin de phrase du drop, puis 25 mesures avant le drop)
   musique_ambiance_galaxie: { avant: 0.3, longueur: 7898850 / 44100 }, // 179,11 s (de 10,7 s à 3 min 10 du morceau, qui se répète)
   debloquage_theme_galaxie: { avant: 0.3, longueur: 4201001 / 44100 }, // 95,26 s (générique du thème Star Wars)
 };
@@ -1235,10 +1237,11 @@ function majMusique(){
 
 // Les autres morceaux sont téléchargés et décodés en arrière-plan, l'un après l'autre
 let musiquesPreparees = false;
-// Les morceaux à avoir : pas la musique des thèmes secrets Star Wars et Kawaii tant qu'ils ne sont pas débloqués (3-4 Mo pour rien)
+// Les morceaux à avoir : pas la musique des thèmes secrets Star Wars, Kawaii et BDSM tant qu'ils ne sont pas débloqués (2-4 Mo pour rien)
 function nomsMusiquesAPreparer(){
   return ["musique_ambiance"].concat(THEMES_AVEC_MUSIQUE
-    .filter(t => (t !== "galaxie" || galaxieDebloquee()) && (t !== "kawaii" || kawaiiDebloque())).map(fichierMusique));
+    .filter(t => (t !== "galaxie" || galaxieDebloquee()) && (t !== "kawaii" || kawaiiDebloque()) && (t !== "donjon" || donjonDebloque()))
+    .map(fichierMusique));
 }
 function preparerToutesLesMusiques(ctx){
   if (musiquesPreparees) return;
@@ -1423,7 +1426,7 @@ document.addEventListener("visibilitychange", () => {
 //   tiens_gueule.mp3 : le cul sec de la carte dorée (« TIENS DANS TA GUEULE »)
 //   regles.mp3 : on ouvre les Règles du jeu (boutons « Règles du jeu » de l'accueil et de la partie)
 //   accessibilite_on.mp3 : on active « Accessibilité pour les gens bourrés » dans les réglages
-const SONS = ["cartes", "doree", "tiens_gueule", "bouton", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees", "regles", "accessibilite_on"]; // (les sons de sabre ne se chargent que dans le thème Star Wars, voir morceauSabre)
+const SONS = ["cartes", "doree", "tiens_gueule", "bouton", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees", "regles", "accessibilite_on", "etoile"]; // (les sons de sabre ne se chargent que dans le thème Star Wars, voir morceauSabre)
 // Sons de sabre : Sons/sabre/sabre_01.mp3 à sabre_54.mp3 (0,8 s chacun). Le clic des boutons en joue un au
 // hasard (jouerSon("bouton")). Si tu en supprimes, retire aussi leur nom de cette liste (et de SONS_A_PRECHARGER dans sw.js) ; un nom sans fichier est simplement ignoré (404).
 const SONS_SABRE = ["sabre/sabre_01", "sabre/sabre_02", "sabre/sabre_05", "sabre/sabre_07", "sabre/sabre_09", "sabre/sabre_11", "sabre/sabre_14", "sabre/sabre_15", "sabre/sabre_18", "sabre/sabre_22", "sabre/sabre_26", "sabre/sabre_31", "sabre/sabre_33", "sabre/sabre_37", "sabre/sabre_40", "sabre/sabre_41", "sabre/sabre_48"];
@@ -1471,7 +1474,7 @@ function chargerSons(){
 // (annuler des gorgées, distribuer au +4, choisir le pigeon ou la victime de la carte dorée), et sauf
 // « Signaler un bug » et « Copier le diagnostic » (silencieux)
 const BOUTONS_AVEC_LEUR_SON = ".bouton-annulation, .plus4-joueur-btn, #overlayPigeon .bouton-pigeon, .bouton-doree, " +
-  "#btnSignalerBug, #btnDiagnostic, #btnRegles, #btnReglesJeu, #btnFaq, #btnFaqDepuisRegles, #bandeauMiseAJour .maj, .fenetreGalaxie-ok";
+  "#btnSignalerBug, #btnDiagnostic, #btnRegles, #btnReglesJeu, #btnFaq, #btnFaqDepuisRegles, #bandeauMiseAJour .maj, .fenetreGalaxie-ok, .etoileFilante";
 document.addEventListener("click", (e) => {
   if (!e.isTrusted || document.documentElement.classList.contains("mode-tele")) return;
   if (Date.now() - sonBoutonJoueLe < 500) return; // déjà joué au doigt levé (activerMemePendantElan)
