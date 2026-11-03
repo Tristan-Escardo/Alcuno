@@ -2799,3 +2799,31 @@ activerMemePendantElan(document.getElementById("btnFermerRegles"), () => {
 });
 
 // #endregion
+
+// ===== Glissements horizontaux au doigt =====
+// Partout : un geste surtout horizontal ne fait jamais bouger la page (sur iPhone, l'accueil et le plateau glissaient sur le
+// côté). Le sens du geste est décidé dès le premier mouvement : vertical, on laisse défiler ; horizontal, on bloque.
+// Les curseurs (volume…) gardent leur geste. Accueil : glisser vers la droite ouvre les Réglages, vers la gauche les Règles.
+(() => {
+  let depart = null, sens = null;
+  document.addEventListener("touchstart", (e) => {
+    if (e.touches.length !== 1) { depart = null; return; } // (deux doigts : on ne touche à rien)
+    depart = { x: e.touches[0].clientX, y: e.touches[0].clientY, moment: Date.now(), cible: e.target };
+    sens = null;
+  }, { passive: true });
+  document.addEventListener("touchmove", (e) => {
+    if (!depart || e.touches.length !== 1) return;
+    const dx = e.touches[0].clientX - depart.x, dy = e.touches[0].clientY - depart.y;
+    if (!sens && (dx || dy)) sens = Math.abs(dx) > Math.abs(dy) ? "h" : "v";
+    if (sens === "h" && e.cancelable && !(depart.cible.closest && depart.cible.closest('input[type="range"]'))) e.preventDefault();
+  }, { passive: false });
+  document.addEventListener("touchend", (e) => {
+    const d = depart; depart = null;
+    if (!d || sens !== "h" || !e.changedTouches.length) return;
+    const dx = e.changedTouches[0].clientX - d.x, dy = e.changedTouches[0].clientY - d.y;
+    if (Math.abs(dx) < 70 || Math.abs(dy) > Math.abs(dx) * 0.6 || Date.now() - d.moment > 800) return; // (un vrai glissement, net et rapide)
+    const accueil = document.getElementById("choixMode");
+    if (!accueil || accueil.style.display === "none" || !d.cible.closest || !accueil.contains(d.cible)) return;
+    if (dx > 0) ouvrirReglages(); else ouvrirRegles();
+  }, { passive: true });
+})();
