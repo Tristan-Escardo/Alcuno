@@ -215,22 +215,14 @@ function vuNouveauDonjon(){
   try { localStorage.removeItem(CLE_DONJON_NOUVEAU); } catch (e) {}
   document.documentElement.classList.remove("donjon-nouveau");
 }
-// Appelé au lancement d'une partie en mode hot : la première fois, le thème apparaît dans les Réglages (rien n'est dit avant).
-// La fenêtre « débloqué » vient à la fin de la partie (proposerFenetreBdsm, appelée par le récap de fin).
-let fenetreBdsmEnAttente = false;
+// Appelé au lancement d'une partie en mode hot : la première fois, le thème se débloque et la fenêtre « débloqué » s'ouvre aussitôt.
 function debloquerDonjon(){
   if (donjonDebloque()) return;
   try { localStorage.setItem(CLE_DONJON, "1"); localStorage.setItem(CLE_DONJON_NOUVEAU, "1"); } catch (e) {}
   majPastilleDonjon();
   document.documentElement.classList.add("donjon-nouveau");
-  fenetreBdsmEnAttente = true;
-  // Tout de suite : une notification (la fenêtre « L'essayer maintenant » ne vient qu'à la fin de la partie)
-  setTimeout(() => { try { afficherNotificationHaut("", "🔥 Thème BDSM débloqué ! Il est dans Réglages › Thèmes", true); } catch (e) {} }, 1500);
-}
-function proposerFenetreBdsm(){
-  if (!fenetreBdsmEnAttente) return;
-  fenetreBdsmEnAttente = false;
-  setTimeout(afficherFenetreBdsm, 3200); // (après le récap de fin de partie, comme pour Kawaii)
+  // La fenêtre « débloqué » s'ouvre juste après avoir appuyé sur Jouer (le plateau se met en place derrière)
+  setTimeout(afficherFenetreBdsm, 700);
 }
 // Fenêtre « Thème BDSM débloqué » : « L'essayer maintenant » met le thème, « Plus tard » ferme
 function afficherFenetreBdsm(){
