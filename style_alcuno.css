@@ -7399,12 +7399,13 @@ html.faces-fermees #plateau .Carte.retournee.recachee,
 }
 #btnCaster .casterIcone circle{ fill: currentColor; }
 html[data-theme="givre"] #btnCaster .casterIcone{ background: linear-gradient(180deg, #4fc3f7, #1a92d6); color: #fff; }
-/* Bouton « Album de stickers » de l'accueil : le jaune se perdait sur le fond pêche et rose. Panneau bleu crépuscule, texte crème. */
+/* Bouton « Album de stickers » de l'accueil : le jaune se perdait sur le fond pêche et rose. Pilule crème, texte framboise,
+   avec le même petit rebord en bas que les gros boutons du thème. */
 html[data-theme="soleil"] #choixMode .btnInstaller{
-  color: var(--soleil-creme); background: rgba(22, 32, 72, 0.62); border: 1px solid rgba(255, 220, 190, 0.7);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45); box-shadow: 0 4px 12px rgba(30, 20, 60, 0.3);
+  color: #8a1f4a; background: linear-gradient(#fff7ea, #ffe0c2); border: 1px solid rgba(255, 255, 255, 0.9); text-shadow: none;
+  box-shadow: 0 3px 0 rgba(184, 69, 106, 0.55), 0 8px 14px rgba(120, 40, 70, 0.22);
 }
-html[data-theme="soleil"] #choixMode .btnInstaller:active{ background: rgba(22, 32, 72, 0.78); }
+html[data-theme="soleil"] #choixMode .btnInstaller:active{ transform: translateY(2px); box-shadow: 0 1px 0 rgba(184, 69, 106, 0.55); }
 html[data-theme="soleil"] #btnCaster .casterIcone{ background: linear-gradient(180deg, #ffb35c, #f2775c); color: #fff; }
 html[data-theme="prestige"] #btnCaster .casterIcone{ background: linear-gradient(180deg, #fff2b0, #f5c842 45%, #c8880a); }
 
@@ -8744,3 +8745,22 @@ html[data-theme="soleil"] #ecranTele .tele-regles-ligne em{ color: #a8203f; }
 /* « Continuer » de l'écran « Ta partie » : même apparence que les boutons du menu dans chaque thème (listes de « Nouvelle partie » ci-dessus),
    mais pleine largeur */
 #btnContinuerOptions{ width: 100%; max-width: none; padding: 16px; font-size: clamp(18px, 4.4vw, 22px); border-radius: 14px; }
+
+/* ===== Soleil couchant : textes jaunes ou blancs des fenêtres illisibles sur le fond pêche (contraste mesuré : 1,1 à 3,6 sur 21) ===== */
+/* Pari sur la dernière carte : sous-titre, « Au tour de… », noms et choix en prune foncé / framboise */
+html[data-theme="soleil"] #overlayPredictionFin :is(.prediction-subtitle, .fin-choix-resultat){ color: #3a1f4a !important; text-shadow: none !important; }
+html[data-theme="soleil"] #overlayPredictionFin .fin-choix-turn{ color: #8a1f4a !important; text-shadow: 0 1px 0 rgba(255, 240, 220, 0.55) !important; }
+html[data-theme="soleil"] #overlayPredictionFin .fin-choix-recap :is(.ligne, strong, .choix){ color: #2a1a44 !important; text-shadow: none !important; }
+html[data-theme="soleil"] #overlayPredictionFin .fin-choix-recap .ligne.en-cours{ background: rgba(138, 31, 74, 0.16); box-shadow: inset 0 0 0 1px rgba(138, 31, 74, 0.45); }
+html[data-theme="soleil"] .fin-choix-numeros b{ background: #8a1f4a; color: #fff1df; }
+/* Récap de fin de partie (téléphone) : titre framboise ; podium et blocs en bleu crépuscule plus sombre, texte crème, détails pêche */
+html[data-theme="soleil"] #overlayFinUnRestants .recap-titre{ color: #8a1f4a; text-shadow: 0 2px 0 rgba(255, 240, 220, 0.7); }
+html[data-theme="soleil"] #overlayFinUnRestants :is(.recap-marche, .recap-liste, .recap-bloc){ background: rgba(22, 32, 72, 0.8); border-color: rgba(255, 205, 170, 0.55); color: #fff1df; }
+html[data-theme="soleil"] #overlayFinUnRestants :is(.recap-nom, .recap-q, .recap-ligne, .recap-medaille){ color: #fff1df; }
+html[data-theme="soleil"] #overlayFinUnRestants :is(.recap-g, .recap-t, .recap-ligne em, .recap-doree-t, .recap-doree-q b){ color: #ffcf9e; }
+html[data-theme="soleil"] #overlayFinUnRestants .recap-p{ color: rgba(255, 241, 223, 0.85); }
+html[data-theme="soleil"] #overlayFinUnRestants .recap-doree{ background: linear-gradient(135deg, rgba(255, 215, 0, .2), rgba(255, 215, 0, .05)), rgba(22, 32, 72, 0.82); border-color: rgba(255, 215, 0, 0.55); }
+html[data-theme="soleil"] #overlayFinUnRestants .recap-doree-q{ color: #fff1df; }
+/* Défi du mode hot : puce et bouton « Je le fais » plus foncés pour porter du texte blanc */
+:root:root:root[data-theme="soleil"] #overlayRegleUnique#overlayRegleUnique .bloc-hot-puce{ background: linear-gradient(90deg, #c4204f, #d9561f) !important; }
+:root:root:root[data-theme="soleil"] #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn.fait{ background: linear-gradient(#cc3260, #9c1c44) !important; box-shadow: 0 3px 0 #6a1030 !important; }
