@@ -7399,6 +7399,12 @@ html.faces-fermees #plateau .Carte.retournee.recachee,
 }
 #btnCaster .casterIcone circle{ fill: currentColor; }
 html[data-theme="givre"] #btnCaster .casterIcone{ background: linear-gradient(180deg, #4fc3f7, #1a92d6); color: #fff; }
+/* Bouton « Album de stickers » de l'accueil : le jaune se perdait sur le fond pêche et rose. Panneau bleu crépuscule, texte crème. */
+html[data-theme="soleil"] #choixMode .btnInstaller{
+  color: var(--soleil-creme); background: rgba(22, 32, 72, 0.62); border: 1px solid rgba(255, 220, 190, 0.7);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45); box-shadow: 0 4px 12px rgba(30, 20, 60, 0.3);
+}
+html[data-theme="soleil"] #choixMode .btnInstaller:active{ background: rgba(22, 32, 72, 0.78); }
 html[data-theme="soleil"] #btnCaster .casterIcone{ background: linear-gradient(180deg, #ffb35c, #f2775c); color: #fff; }
 html[data-theme="prestige"] #btnCaster .casterIcone{ background: linear-gradient(180deg, #fff2b0, #f5c842 45%, #c8880a); }
 
