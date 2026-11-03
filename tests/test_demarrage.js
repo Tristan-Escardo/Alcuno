@@ -401,17 +401,26 @@ function verifier(ok, texte){
       o.album = document.querySelectorAll(".albumLigne").length + "/" + document.querySelectorAll(".albumGagne").length + "/" + document.querySelector("#ecranRegles h2").textContent;
       ouvrirRegles();
       o.regles = document.querySelector("#ecranRegles h2").textContent + "/" + document.querySelectorAll(".albumLigne").length + "/" + document.getElementById("ecranRegles").classList.contains("album");
-      // 3 parties d'affilée : Chat (3 parties) et Nuage (3 en 6 h)
+      // parties d'affilée : Nuage dès la 2e (2 en 6 h), Chat à la 3e (3 parties)
       localStorage.removeItem("alcuno_stickers"); partieExpress = false;
       statsPartie = { pigeon: {}, plusGros: {}, annulees: {}, duels: {}, plus4: {}, doree: null };
-      stickersFinDePartie(); stickersFinDePartie();
-      o.deux = trier();
       stickersFinDePartie();
-      o.cinq = trier(); // (3 parties de suite : Chat et Nuage)
+      o.une = trier(); // (1 partie : Cupcake seulement)
+      stickersFinDePartie();
+      o.deux = trier(); // (2 parties de suite : Nuage)
+      stickersFinDePartie();
+      o.cinq = trier(); // (3 parties de suite : Chat en plus)
       // 3 parties étalées sur plus de 6 h : Chat, mais pas Nuage
       localStorage.setItem("alcuno_stickers", JSON.stringify({ gagnes: [], parties: 2, fins: [Date.now() - 20 * 3600 * 1000, Date.now() - 19 * 3600 * 1000] }));
       stickersFinDePartie();
       o.etalees = trier();
+      // 2 parties à moins de 6 h d'écart (la première il y a 5 h) : Nuage ; à plus de 6 h : pas de Nuage
+      localStorage.setItem("alcuno_stickers", JSON.stringify({ gagnes: [], parties: 1, fins: [Date.now() - 5 * 3600 * 1000] }));
+      stickersFinDePartie();
+      o.cinqHeures = trier();
+      localStorage.setItem("alcuno_stickers", JSON.stringify({ gagnes: [], parties: 1, fins: [Date.now() - 7 * 3600 * 1000] }));
+      stickersFinDePartie();
+      o.septHeures = trier();
       // en ligne : seulement ce qui arrive à soi
       localStorage.removeItem("alcuno_stickers");
       enLigneActif = true; pseudoActuel = "Zoe"; partieExpress = false;
@@ -428,7 +437,7 @@ function verifier(ok, texte){
     });
     verifier(r.sansAlbum === '{"gagnes":[],"parties":0,"fins":[]}' && r.avantKawaii === "false/true" && r.partie1 === "chou,cupcake,etoile,lapin,licorne,poussin,sushi" && r.kawaii7 === false &&
       r.partie1b.split(",").length === 8 && r.kawaii8 === "false/true" && r.kawaii11 === "true/false" && r.album === "11/11/Album de stickers" && r.regles === "Règles du jeu/0/false" &&
-      r.deux === "cupcake" && r.cinq === "chat,cupcake,nuage" && r.etalees === "chat,cupcake" && r.enLigneAutre === "cupcake,etoile,macaron" && r.enLigneMoi === "cupcake,etoile,macaron,poussin" && r.fenetre && erreurs.length === 0,
+      r.une === "cupcake" && r.deux === "cupcake,nuage" && r.cinq === "chat,cupcake,nuage" && r.etalees === "chat,cupcake" && r.cinqHeures === "cupcake,nuage" && r.septHeures === "cupcake" && r.enLigneAutre === "cupcake,etoile,macaron" && r.enLigneMoi === "cupcake,etoile,macaron,poussin" && r.fenetre && erreurs.length === 0,
       `album de stickers : ${JSON.stringify(r)}`);
     await ctx.close();
   }
