@@ -346,3 +346,61 @@ html[data-theme="donjon"] #ecranCredits .credits-nom{
 }
 html[data-theme="donjon"] #ecranCredits .credits-honneur-titre{ color: rgba(255, 138, 150, 0.7); }
 html[data-theme="donjon"] #ecranCredits .credits-nom-detail{ color: #ff8a96; text-shadow: none; }
+
+/* ===== Faces de cartes BDSM (généré par outils/generer_cartes_donjon.py) ===== */
+html[data-theme="donjon"] .zero_vert { background-image: url("Cartes/donjon/zero_vert.svg"); }
+html[data-theme="donjon"] .zero_jaune { background-image: url("Cartes/donjon/zero_jaune.svg"); }
+html[data-theme="donjon"] .zero_rouge { background-image: url("Cartes/donjon/zero_rouge.svg"); }
+html[data-theme="donjon"] .zero_bleu { background-image: url("Cartes/donjon/zero_bleu.svg"); }
+html[data-theme="donjon"] .un_vert, html[data-theme="donjon"] .un_vert1 { background-image: url("Cartes/donjon/un_vert.svg"); }
+html[data-theme="donjon"] .un_jaune, html[data-theme="donjon"] .un_jaune1 { background-image: url("Cartes/donjon/un_jaune.svg"); }
+html[data-theme="donjon"] .un_rouge, html[data-theme="donjon"] .un_rouge1 { background-image: url("Cartes/donjon/un_rouge.svg"); }
+html[data-theme="donjon"] .un_bleu, html[data-theme="donjon"] .un_bleu1 { background-image: url("Cartes/donjon/un_bleu.svg"); }
+html[data-theme="donjon"] .deux_vert, html[data-theme="donjon"] .deux_vert1 { background-image: url("Cartes/donjon/deux_vert.svg"); }
+html[data-theme="donjon"] .deux_jaune, html[data-theme="donjon"] .deux_jaune1 { background-image: url("Cartes/donjon/deux_jaune.svg"); }
+html[data-theme="donjon"] .deux_rouge, html[data-theme="donjon"] .deux_rouge1 { background-image: url("Cartes/donjon/deux_rouge.svg"); }
+html[data-theme="donjon"] .deux_bleu, html[data-theme="donjon"] .deux_bleu1 { background-image: url("Cartes/donjon/deux_bleu.svg"); }
+html[data-theme="donjon"] .trois_vert, html[data-theme="donjon"] .trois_vert1 { background-image: url("Cartes/donjon/trois_vert.svg"); }
+html[data-theme="donjon"] .trois_jaune, html[data-theme="donjon"] .trois_jaune1 { background-image: url("Cartes/donjon/trois_jaune.svg"); }
+html[data-theme="donjon"] .trois_rouge, html[data-theme="donjon"] .trois_rouge1 { background-image: url("Cartes/donjon/trois_rouge.svg"); }
+html[data-theme="donjon"] .trois_bleu, html[data-theme="donjon"] .trois_bleu1 { background-image: url("Cartes/donjon/trois_bleu.svg"); }
+html[data-theme="donjon"] .quatre_vert, html[data-theme="donjon"] .quatre_vert1 { background-image: url("Cartes/donjon/quatre_vert.svg"); }
+html[data-theme="donjon"] .quatre_jaune, html[data-theme="donjon"] .quatre_jaune1 { background-image: url("Cartes/donjon/quatre_jaune.svg"); }
+html[data-theme="donjon"] .quatre_rouge, html[data-theme="donjon"] .quatre_rouge1 { background-image: url("Cartes/donjon/quatre_rouge.svg"); }
+html[data-theme="donjon"] .quatre_bleu, html[data-theme="donjon"] .quatre_bleu1 { background-image: url("Cartes/donjon/quatre_bleu.svg"); }
+html[data-theme="donjon"] .cinq_vert, html[data-theme="donjon"] .cinq_vert1 { background-image: url("Cartes/donjon/cinq_vert.svg"); }
+html[data-theme="donjon"] .cinq_jaune, html[data-theme="donjon"] .cinq_jaune1 { background-image: url("Cartes/donjon/cinq_jaune.svg"); }
+html[data-theme="donjon"] .cinq_rouge, html[data-theme="donjon"] .cinq_rouge1 { background-image: url("Cartes/donjon/cinq_rouge.svg"); }
+html[data-theme="donjon"] .cinq_bleu, html[data-theme="donjon"] .cinq_bleu1 { background-image: url("Cartes/donjon/cinq_bleu.svg"); }
+html[data-theme="donjon"] .six_vert, html[data-theme="donjon"] .six_vert1 { background-image: url("Cartes/donjon/six_vert.svg"); }
+html[data-theme="donjon"] .six_jaune, html[data-theme="donjon"] .six_jaune1 { background-image: url("Cartes/donjon/six_jaune.svg"); }
+html[data-theme="donjon"] .six_rouge, html[data-theme="donjon"] .six_rouge1 { background-image: url("Cartes/donjon/six_rouge.svg"); }
+html[data-theme="donjon"] .six_bleu, html[data-theme="donjon"] .six_bleu1 { background-image: url("Cartes/donjon/six_bleu.svg"); }
+html[data-theme="donjon"] .sept_vert, html[data-theme="donjon"] .sept_vert1 { background-image: url("Cartes/donjon/sept_vert.svg"); }
+html[data-theme="donjon"] .sept_jaune, html[data-theme="donjon"] .sept_jaune1 { background-image: url("Cartes/donjon/sept_jaune.svg"); }
+html[data-theme="donjon"] .sept_rouge, html[data-theme="donjon"] .sept_rouge1 { background-image: url("Cartes/donjon/sept_rouge.svg"); }
+html[data-theme="donjon"] .sept_bleu, html[data-theme="donjon"] .sept_bleu1 { background-image: url("Cartes/donjon/sept_bleu.svg"); }
+html[data-theme="donjon"] .huit_vert, html[data-theme="donjon"] .huit_vert1 { background-image: url("Cartes/donjon/huit_vert.svg"); }
+html[data-theme="donjon"] .huit_jaune, html[data-theme="donjon"] .huit_jaune1 { background-image: url("Cartes/donjon/huit_jaune.svg"); }
+html[data-theme="donjon"] .huit_rouge, html[data-theme="donjon"] .huit_rouge1 { background-image: url("Cartes/donjon/huit_rouge.svg"); }
+html[data-theme="donjon"] .huit_bleu, html[data-theme="donjon"] .huit_bleu1 { background-image: url("Cartes/donjon/huit_bleu.svg"); }
+html[data-theme="donjon"] .neuf_vert, html[data-theme="donjon"] .neuf_vert1 { background-image: url("Cartes/donjon/neuf_vert.svg"); }
+html[data-theme="donjon"] .neuf_jaune, html[data-theme="donjon"] .neuf_jaune1 { background-image: url("Cartes/donjon/neuf_jaune.svg"); }
+html[data-theme="donjon"] .neuf_rouge, html[data-theme="donjon"] .neuf_rouge1 { background-image: url("Cartes/donjon/neuf_rouge.svg"); }
+html[data-theme="donjon"] .neuf_bleu, html[data-theme="donjon"] .neuf_bleu1 { background-image: url("Cartes/donjon/neuf_bleu.svg"); }
+html[data-theme="donjon"] .interdit_vert { background-image: url("Cartes/donjon/interdit_vert.svg"); }
+html[data-theme="donjon"] .interdit_jaune { background-image: url("Cartes/donjon/interdit_jaune.svg"); }
+html[data-theme="donjon"] .interdit_rouge { background-image: url("Cartes/donjon/interdit_rouge.svg"); }
+html[data-theme="donjon"] .interdit_bleu { background-image: url("Cartes/donjon/interdit_bleu.svg"); }
+html[data-theme="donjon"] .couleur, html[data-theme="donjon"] .couleur1, html[data-theme="donjon"] .couleur2, html[data-theme="donjon"] .couleur3 { background-image: url("Cartes/donjon/couleur.svg"); }
+html[data-theme="donjon"] .cupidon_a, html[data-theme="donjon"] .cupidon_b, html[data-theme="donjon"] .cupidon_c { background-image: url("Cartes/donjon/cupidon.svg"); }
+html[data-theme="donjon"] .plus_2_vert, html[data-theme="donjon"] .plus_2_vert1, html[data-theme="donjon"] .plus_2_vert2, html[data-theme="donjon"] .plus_2_vert3 { background-image: url("Cartes/donjon/plus_2_vert.svg"); }
+html[data-theme="donjon"] .plus_2_jaune, html[data-theme="donjon"] .plus_2_jaune1, html[data-theme="donjon"] .plus_2_jaune2, html[data-theme="donjon"] .plus_2_jaune3 { background-image: url("Cartes/donjon/plus_2_jaune.svg"); }
+html[data-theme="donjon"] .plus_2_rouge, html[data-theme="donjon"] .plus_2_rouge1, html[data-theme="donjon"] .plus_2_rouge2, html[data-theme="donjon"] .plus_2_rouge3 { background-image: url("Cartes/donjon/plus_2_rouge.svg"); }
+html[data-theme="donjon"] .plus_2_bleu, html[data-theme="donjon"] .plus_2_bleu1, html[data-theme="donjon"] .plus_2_bleu2, html[data-theme="donjon"] .plus_2_bleu3 { background-image: url("Cartes/donjon/plus_2_bleu.svg"); }
+html[data-theme="donjon"] .plus_4, html[data-theme="donjon"] .plus_4_1, html[data-theme="donjon"] .plus_4_2, html[data-theme="donjon"] .plus_4_3 { background-image: url("Cartes/donjon/plus_4.svg"); }
+html[data-theme="donjon"] .switch_vert, html[data-theme="donjon"] .switch_vert1 { background-image: url("Cartes/donjon/switch_vert.svg"); }
+html[data-theme="donjon"] .switch_jaune, html[data-theme="donjon"] .switch_jaune1 { background-image: url("Cartes/donjon/switch_jaune.svg"); }
+html[data-theme="donjon"] .switch_rouge, html[data-theme="donjon"] .switch_rouge1 { background-image: url("Cartes/donjon/switch_rouge.svg"); }
+html[data-theme="donjon"] .switch_bleu, html[data-theme="donjon"] .switch_bleu1 { background-image: url("Cartes/donjon/switch_bleu.svg"); }
+/* ===== fin des faces de cartes BDSM ===== */
