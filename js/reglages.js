@@ -2803,7 +2803,8 @@ activerMemePendantElan(document.getElementById("btnFermerRegles"), () => {
 // ===== Glissements horizontaux au doigt =====
 // Partout : un geste surtout horizontal ne fait jamais bouger la page (sur iPhone, l'accueil et le plateau glissaient sur le
 // côté). Le sens du geste est décidé dès le premier mouvement : vertical, on laisse défiler ; horizontal, on bloque.
-// Les curseurs (volume…) gardent leur geste. Accueil : glisser vers la gauche ouvre les Réglages, vers la droite les Règles.
+// Les curseurs (volume…) gardent leur geste. Accueil : depuis le bord droit de l'écran, glisser vers la gauche ouvre les Réglages ;
+// depuis le bord gauche, glisser vers la droite ouvre les Règles (un geste parti du milieu de l'écran n'ouvre rien).
 (() => {
   let depart = null, sens = null;
   document.addEventListener("touchstart", (e) => {
@@ -2824,6 +2825,8 @@ activerMemePendantElan(document.getElementById("btnFermerRegles"), () => {
     if (Math.abs(dx) < 70 || Math.abs(dy) > Math.abs(dx) * 0.6 || Date.now() - d.moment > 800) return; // (un vrai glissement, net et rapide)
     const accueil = document.getElementById("choixMode");
     if (!accueil || accueil.style.display === "none" || !d.cible.closest || !accueil.contains(d.cible)) return;
-    if (dx < 0) ouvrirReglages(); else ouvrirRegles();
+    const BORD = 40; // (px : la bande, le long du bord, où le geste doit commencer)
+    if (dx < 0 && d.x >= innerWidth - BORD) ouvrirReglages();
+    else if (dx > 0 && d.x <= BORD) ouvrirRegles();
   }, { passive: true });
 })();
