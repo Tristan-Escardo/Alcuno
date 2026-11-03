@@ -11,6 +11,7 @@ body{
   font-family: Arial, sans-serif;
   color: white;
   overflow-x: hidden;
+  touch-action: pan-y; /* (voir html) */
   padding-left: calc(20px + env(safe-area-inset-left));
   padding-right: calc(20px + env(safe-area-inset-right));
 }
@@ -23,6 +24,10 @@ html{
   overflow-x: hidden;
   overflow-x: clip; /* (navigateurs récents : coupe vraiment ce qui dépasse sur les côtés, même un élément fixe ; repli : hidden) */
   overscroll-behavior: none;
+  /* Le doigt ne fait défiler que de haut en bas : sur iPhone, la page pouvait encore glisser sur le côté. Aucun écran du jeu ne
+     défile à l'horizontale ; les zones qu'on balaie (notifications, toasts) ont leur propre touch-action: none. Bloque aussi le
+     zoom à deux doigts, comme le demande déjà la balise viewport (user-scalable=no, que l'iPhone ignore). */
+  touch-action: pan-y;
   scrollbar-gutter: stable;
 }
 
