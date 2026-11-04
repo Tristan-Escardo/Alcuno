@@ -8759,3 +8759,23 @@ html[data-theme="soleil"] #overlayFinUnRestants .recap-doree-q{ color: #fff1df; 
 /* Défi du mode hot : puce et bouton « Je le fais » plus foncés pour porter du texte blanc */
 :root:root:root[data-theme="soleil"] #overlayRegleUnique#overlayRegleUnique .bloc-hot-puce{ background: linear-gradient(90deg, #c4204f, #d9561f) !important; }
 :root:root:root[data-theme="soleil"] #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn.fait{ background: linear-gradient(#cc3260, #9c1c44) !important; box-shadow: 0 3px 0 #6a1030 !important; }
+
+/* ===== Télé, Soleil couchant : joueur dont c'est le tour (texte crème sur pastille pêche : illisible) et boutons de choix des fenêtres ===== */
+html[data-theme="soleil"] #ecranTele .tele-joueur-actif{ color: var(--actif-texte); }
+html[data-theme="soleil"] #ecranTele .tele-puce{ background: linear-gradient(180deg, #fff1df, #ffcf9e); border: 0.3vh solid #fff; color: #8a1f4a; box-shadow: 0 0.4vh 1vh rgba(58, 31, 74, 0.25); }
+html[data-theme="soleil"] #ecranTele .tele-dernieres-item span{ color: #3a1f4a; }
+
+/* ===== Télé, Givre : les écrans plein écran (fenêtres de la partie, défi, règles, FAQ, historique) restaient sur fond noir ===== */
+html[data-theme="givre"] #ecranTele .tele-ecran{ background: var(--fond-theme); }
+html[data-theme="givre"] #ecranTele .tele-ecran-titre{ color: var(--givre-accent); text-shadow: 0 0.3vh 0 rgba(255, 255, 255, 0.8); }
+html[data-theme="givre"] #ecranTele .tele-ecran-detail{ color: var(--givre-texte); }
+html[data-theme="givre"] #ecranTele .tele-puce{ background: linear-gradient(180deg, #ffffff, #dff3fb); border: 0.3vh solid var(--givre-accent); color: var(--givre-accent); }
+html[data-theme="givre"] #ecranTele :is(.tele-regles-partie, .tele-regles-nom){ color: var(--givre-accent); border-bottom-color: rgba(15, 106, 166, 0.35); }
+html[data-theme="givre"] #ecranTele :is(.tele-regles-ligne ul, .tele-regles-pj){ color: var(--givre-texte); }
+html[data-theme="givre"] #ecranTele .tele-regles-ligne em{ color: #c2185b; }
+html[data-theme="givre"] #ecranTele .tele-faq-image{ border-color: var(--givre-bord); }
+html[data-theme="givre"] #ecranTele .tele-historique-ligne{ color: var(--givre-texte); border-top-color: rgba(13, 53, 80, 0.15); }
+html[data-theme="givre"] #ecranTele .tele-historique-quoi{ color: var(--givre-doux); }
+html[data-theme="givre"] #ecranTele .tele-historique-quoi em{ color: var(--givre-accent); }
+html[data-theme="givre"] #ecranTele .tele-pause-titre{ color: #fff; text-shadow: 0 0 0.6vh #fff, 0 0 2vh #3fb8ff, 0 0 4vh #2aa6f0; }
+html[data-theme="givre"] #ecranTele .tele-pause svg{ fill: #fff; filter: drop-shadow(0 0 1.4vh #3fb8ff); }

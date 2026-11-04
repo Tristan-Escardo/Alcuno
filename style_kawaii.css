@@ -667,6 +667,19 @@ html[data-theme="kawaii"] #stickyJoueurActif #btnReglagesJeu svg{ stroke: #e01a7
   color: #b3123f !important;
   border: 2px solid #ff8fa8 !important;
 }
+html[data-theme="kawaii"] #ecranTele .tele-ecran{ background: var(--fond-theme); }
+html[data-theme="kawaii"] #ecranTele .tele-ecran-titre{ color: var(--givre-accent); text-shadow: 0 0.3vh 0 rgba(255, 255, 255, 0.8); }
+html[data-theme="kawaii"] #ecranTele .tele-ecran-detail{ color: var(--givre-texte); }
+html[data-theme="kawaii"] #ecranTele .tele-puce{ background: linear-gradient(180deg, #ffffff, #fbdfed); border: 0.3vh solid var(--givre-accent); color: var(--givre-accent); }
+html[data-theme="kawaii"] #ecranTele :is(.tele-regles-partie, .tele-regles-nom){ color: var(--givre-accent); border-bottom-color: rgba(166, 15, 91, 0.35); }
+html[data-theme="kawaii"] #ecranTele :is(.tele-regles-ligne ul, .tele-regles-pj){ color: var(--givre-texte); }
+html[data-theme="kawaii"] #ecranTele .tele-regles-ligne em{ color: #c2185b; }
+html[data-theme="kawaii"] #ecranTele .tele-faq-image{ border-color: var(--givre-bord); }
+html[data-theme="kawaii"] #ecranTele .tele-historique-ligne{ color: var(--givre-texte); border-top-color: rgba(80, 13, 80, 0.15); }
+html[data-theme="kawaii"] #ecranTele .tele-historique-quoi{ color: var(--givre-doux); }
+html[data-theme="kawaii"] #ecranTele .tele-historique-quoi em{ color: var(--givre-accent); }
+html[data-theme="kawaii"] #ecranTele .tele-pause-titre{ color: #ffffff; text-shadow: 0 0 0.6vh #ffffff, 0 0 2vh #ff3f9f, 0 0 4vh #f02a8d; }
+html[data-theme="kawaii"] #ecranTele .tele-pause svg{ fill: #ffffff; filter: drop-shadow(0 0 1.4vh #ff3f9f); }
 
 /* ===== Décors et formes du thème Kawaii ===== */
 /* Décors et formes du thème Kawaii (ajoutés après les règles tirées de Givre, voir outils/generer_kawaii.py) */
