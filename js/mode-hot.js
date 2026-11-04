@@ -85,6 +85,14 @@ let hasardHot = Math.random; // hasard des défis : à graine (voir initialiserM
 // Le hasard est à part de celui du paquet : les défis ne changent jamais l'ordre des cartes.
 function initialiserModeHot(){
   defisVusHot = {};
+  // Défis ajoutés depuis le pilotage (stats.html → config.defisHot, js/config-lib.js) : figés pour toute la partie,
+  // triés par identifiant pour que le tirage à graine reste le même en reprise de partie
+  const ajoutes = (typeof configDistante === "object" && configDistante && configDistante.defisHot) || {};
+  defisAjoutesHot = { A: [], B: [], C: [] };
+  Object.keys(ajoutes).sort().forEach((id) => {
+    const d = ajoutes[id];
+    if (defisAjoutesHot[d.n]) defisAjoutesHot[d.n].push({ id: "P" + id, t: d.t, deux: /\{nom1\}/.test(d.t) });
+  });
   liensHot = [];
   const graine = enLigneActif
     ? (dernierEtatManche ? dernierEtatManche.seed : 0)
@@ -109,6 +117,8 @@ function joueursLibresHot(){
 }
 
 // ----- Défis -----
+let defisAjoutesHot = { A: [], B: [], C: [] };
+function defisDuNiveauHot(groupe){ return DEFIS_HOT[groupe].concat(defisAjoutesHot[groupe] || []); }
 function groupeDefiHot(nbGorgees){
   return nbGorgees > 10 ? "C" : nbGorgees >= 5 ? "B" : "A";
 }
@@ -121,10 +131,11 @@ function tirerDefiHot(nom, nbGorgees, partenaire){
   if(cibles.length === 0) return null;
   const vus = defisVusHot[nom] || (defisVusHot[nom] = new Set());
   const possible = (d) => !vus.has(d.id) && (!d.deux || autres.length >= 2);
-  let pool = DEFIS_HOT[groupe].filter(possible);
+  const tous = defisDuNiveauHot(groupe);
+  let pool = tous.filter(possible);
   if(pool.length === 0){ // (tous vus : on repart de zéro plutôt que de ne rien proposer)
-    DEFIS_HOT[groupe].forEach(d => vus.delete(d.id));
-    pool = DEFIS_HOT[groupe].filter(possible);
+    tous.forEach(d => vus.delete(d.id));
+    pool = tous.filter(possible);
   }
   const defi = pool[Math.floor(hasardHot() * pool.length)];
   vus.add(defi.id);

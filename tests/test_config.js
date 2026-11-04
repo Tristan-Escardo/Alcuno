@@ -111,4 +111,23 @@ verifier(/auth\.uid/.test(regles.sante[".read"]) && regles.sante.jours.$jour.$si
 // la lecture des statistiques, de la santé et de la présence est réservée à l'administrateur (sauf les compteurs que les transactions du jeu lisent)
 verifier(["stats", "presence", "sante"].every((n) => /auth\.uid/.test(regles[n][".read"])) && regles.stats.jours.$jour.visites[".read"] === true && regles.stats.jours.$jour.heures.$h[".read"] === true && regles.stats.appareils[".read"] === undefined && regles.stats.jours.$jour.visiteurs.$id[".read"] === undefined, "règles Firebase : stats, santé et présence lisibles par l'administrateur seulement");
 verifier(regles.config[".read"] === true && /auth\.uid/.test(regles.config[".write"]) && /auth\.uid/.test(regles.config_hist[".write"]) && regles.config_hist[".read"] !== true, "règles Firebase : config lisible par tous, écriture réservée au compte administrateur");
+// défis hot ajoutés depuis le pilotage
+{
+  const a1 = L.appliquer({}, { op: "defi_ajout", texte: "  Fais un compliment à {nom}.  ", niveau: "A" }, 1000);
+  const a2 = L.appliquer(a1.config, { op: "defi_ajout", texte: "Tiens la main de {nom1} et regarde {nom2}.", niveau: "C" }, 1000);
+  const ids = Object.keys(a2.config.defisHot);
+  verifier(ids.length === 2 && a1.config.defisHot[(1000).toString(36)].t === "Fais un compliment à {nom}." && a2.config.defisHot[ids[1]].n === "C" && /ajouté/.test(a1.resume),
+    "défis hot : ajout (deux défis à la même milliseconde ne s'écrasent pas) " + JSON.stringify(a2.config));
+  const err = (t, n = "A") => L.appliquer({}, { op: "defi_ajout", texte: t, niveau: n }, 1).erreur;
+  verifier(err("") && err("Danse.") && err("Danse avec {nom1}.") && err("Danse avec {nom} et {nom1} {nom2}.") && err("Salut {prenom}") && err("x {nom}".repeat(40)) && err("Danse avec {nom}.", "D") && !err("Danse avec {nom}."),
+    "défis hot : textes refusés (vide, sans joueur, {nom1} seul, mélange, accolade inconnue, trop long, niveau inconnu)");
+  const s1 = L.appliquer(a2.config, { op: "defi_suppr", id: ids[0] }, 2), s2 = L.appliquer(s1.config, { op: "defi_suppr", id: ids[1] }, 3);
+  verifier(Object.keys(s1.config.defisHot).length === 1 && !s2.config.defisHot && L.appliquer({}, { op: "defi_suppr", id: "zz" }, 0).erreur, "défis hot : retrait, sans laisser de résidu");
+  const t = L.appliquer(Object.assign({ coupures: { voix: true } }, a2.config), { op: "tout_remettre" }, 0).config;
+  verifier(!t.coupures && Object.keys(t.defisHot).length === 2, "défis hot : « tout remettre par défaut » les garde");
+  const v = L.valider({ defisHot: { ok: { t: "Danse avec {nom}.", n: "B" }, "Pas-Bon": { t: "Danse avec {nom}.", n: "B" }, sansNom: { t: "Danse.", n: "A" }, niveau: { t: "Danse avec {nom}.", n: "Z" }, autre: "x" } });
+  verifier(JSON.stringify(v) === '{"defisHot":{"ok":{"t":"Danse avec {nom}.","n":"B"}}}', "défis hot : validation de ce qui vient de Firebase " + JSON.stringify(v));
+  verifier(L.decrire(a2.config).join() === "2 défis hot ajoutés", "défis hot : description");
+}
+verifier(regles.config.defisHot && regles.config.defisHot.$id.t && regles.config.defisHot.$id.n && regles.config.themes.$theme[".validate"].includes("donjon"), "règles Firebase : défis hot et thème BDSM pilotables");
 console.log(process.exitCode ? "\nÉCHEC(S)" : `\nTOUT EST OK (${ok})`);

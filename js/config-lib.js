@@ -11,6 +11,8 @@
 //   themes    : { <thème>: { actif, debut, fin } }   actif:false = thème caché ; debut/fin = « MM-JJ » (chaque année)
 //   majMin    : "9.64.0"                       version minimale : en dessous, bandeau « mets à jour »
 //   defauts   : { volumeMusique, vitesseVoix } valeurs de départ (seulement pour ceux qui n'ont jamais touché au curseur)
+//   defisHot  : { <id>: { t, n } }           défis du mode hot ajoutés depuis le pilotage, mélangés à ceux du jeu
+//                                              (t : texte avec {nom}, ou {nom1} et {nom2} ; n : niveau A, B ou C, comme dans js/mode-hot.js)
 //   v         : date de la dernière modification (ms) : les appareils la renvoient dans stats/appareils (voyant du pilotage)
 // =============================================================================================
 (function (global) {
@@ -26,6 +28,23 @@
   const MOIS = ["janvier", "fevrier", "mars", "avril", "mai", "juin", "juillet", "aout", "septembre", "octobre", "novembre", "decembre"];
   const MOIS_AFFICHES = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
   const TEXTE_MAX = 140;
+  const DEFI_MAX = 160, DEFIS_MAX = 300;
+  const NIVEAUX_DEFIS = { A: "Léger (moins de 5 gorgées)", B: "Moyen (5 à 10 gorgées)", C: "Osé (plus de 10 gorgées)" };
+  const motifIdDefi = /^[a-z0-9]{1,30}$/;
+
+  // Texte d'un défi hot : null s'il est bon, sinon ce qui ne va pas.
+  // {nom} : un autre joueur ; {nom1} et {nom2} : deux autres joueurs différents (jamais mélangés avec {nom}).
+  function erreurDefi(t) {
+    if (typeof t !== "string" || !t.trim()) return "Il manque le texte du défi.";
+    if (t.trim().length > DEFI_MAX) return `Défi trop long (${DEFI_MAX} caractères max).`;
+    const autres = t.replace(/\{nom[12]?\}/g, "");
+    if (/[{}]/.test(autres)) return "Accolade inattendue : seuls {nom}, {nom1} et {nom2} sont permis.";
+    const un = /\{nom\}/.test(t), n1 = /\{nom1\}/.test(t), n2 = /\{nom2\}/.test(t);
+    if (n1 !== n2) return "Avec deux joueurs, il faut {nom1} et {nom2}.";
+    if (un && n1) return "Choisis : {nom} (un joueur) ou {nom1} et {nom2} (deux joueurs), pas les deux.";
+    if (!un && !n1) return "Le défi doit viser quelqu'un : ajoute {nom}, ou {nom1} et {nom2}.";
+    return null;
+  }
 
   const estObjet = (x) => x !== null && typeof x === "object" && !Array.isArray(x);
   const md = (m, j) => `${String(m).padStart(2, "0")}-${String(j).padStart(2, "0")}`;
@@ -60,6 +79,13 @@
       const d = brut.defauts;
       if (typeof d.volumeMusique === "number" && d.volumeMusique >= 0 && d.volumeMusique <= 100) (c.defauts = c.defauts || {}).volumeMusique = Math.round(d.volumeMusique / 5) * 5;
       if (typeof d.vitesseVoix === "number" && d.vitesseVoix >= 0.6 && d.vitesseVoix <= 1.6) (c.defauts = c.defauts || {}).vitesseVoix = Math.round(d.vitesseVoix * 10) / 10;
+    }
+    if (estObjet(brut.defisHot)) {
+      Object.keys(brut.defisHot).sort().slice(0, DEFIS_MAX).forEach((id) => {
+        const d = brut.defisHot[id];
+        if (!motifIdDefi.test(id) || !estObjet(d) || !NIVEAUX_DEFIS[d.n] || erreurDefi(d.t)) return;
+        (c.defisHot = c.defisHot || {})[id] = { t: d.t.trim(), n: d.n };
+      });
     }
     if (typeof brut.v === "number" && isFinite(brut.v)) c.v = brut.v;
     if (typeof brut.majMin === "string" && /^\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(brut.majMin)) c.majMin = brut.majMin;
@@ -175,8 +201,27 @@
         (c.defauts = c.defauts || {})[cmd.cible] = x;
         return { config: c, resume: `${bornes[3]} par défaut : ${String(x).replace(".", ",")}${bornes[4]} (pour ceux qui n'ont jamais touché au curseur)` };
       }
-      case "tout_remettre":
-        return { config: {}, resume: "Tout remettre par défaut (aucun réglage à distance)" };
+      case "defi_ajout": {
+        const texte = String(cmd.texte || "").trim();
+        const e = erreurDefi(texte);
+        if (e) return { erreur: e };
+        if (!NIVEAUX_DEFIS[cmd.niveau]) return { erreur: "Niveau du défi inconnu." };
+        c.defisHot = c.defisHot || {};
+        if (Object.keys(c.defisHot).length >= DEFIS_MAX) return { erreur: `Déjà ${DEFIS_MAX} défis : retires-en avant d'en ajouter.` };
+        let id = Math.floor(maintenant).toString(36);
+        while (c.defisHot[id]) id += "x";
+        c.defisHot[id] = { t: texte, n: cmd.niveau };
+        return { config: c, resume: `Défi hot ajouté (${NIVEAUX_DEFIS[cmd.niveau].split(" (")[0].toLowerCase()}) : « ${texte} »` };
+      }
+      case "defi_suppr": {
+        const d = c.defisHot && c.defisHot[cmd.id];
+        if (!d) return { erreur: "Ce défi n'existe plus." };
+        delete c.defisHot[cmd.id];
+        if (!Object.keys(c.defisHot).length) delete c.defisHot;
+        return { config: c, resume: `Défi hot retiré : « ${d.t} »` };
+      }
+      case "tout_remettre": // (les défis ajoutés ne sont pas des réglages : ils restent)
+        return { config: c.defisHot ? { defisHot: c.defisHot } : {}, resume: "Tout remettre par défaut (aucun réglage à distance)" + (c.defisHot ? ", en gardant les défis hot ajoutés" : "") };
       default:
         return { erreur: "Commande inconnue." };
     }
@@ -412,6 +457,7 @@
     });
     if (c.majMin) l.push(`mise à jour obligatoire sous la version ${c.majMin}`);
     if (c.defauts && c.defauts.volumeMusique !== undefined) l.push(`volume de la musique par défaut : ${c.defauts.volumeMusique} %`);
+    if (c.defisHot) { const n = Object.keys(c.defisHot).length; l.push(`${n} défi${n > 1 ? "s" : ""} hot ajouté${n > 1 ? "s" : ""}`); }
     if (c.defauts && c.defauts.vitesseVoix !== undefined) l.push(`vitesse de la voix par défaut : ${String(c.defauts.vitesseVoix).replace(".", ",")}×`);
     return l.length ? l : ["rien : le jeu est réglé par défaut"];
   }
@@ -487,7 +533,7 @@
   }
 
   global.ConfigLib = {
-    THEMES_CONNUS, NOMS_THEMES, COUPURES_CONNUES, NOMS_COUPURES, TEXTE_MAX,
+    THEMES_CONNUS, NOMS_THEMES, COUPURES_CONNUES, NOMS_COUPURES, TEXTE_MAX, DEFI_MAX, DEFIS_MAX, NIVEAUX_DEFIS, erreurDefi,
     valider, versionPlusVieille, themeDisponible, coupee, annonceVisible, appliquer, interpreter, decrire, dansPeriode, dateEnTexte,
     SCENARIOS, MODELES_ANNONCES, repondreQuestion
   };

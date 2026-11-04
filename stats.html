@@ -389,6 +389,20 @@
                 <button type="button" class="pilBtn" id="pilPublierAnnonce">Publier l'annonce</button>
                 <button type="button" class="pilBtn sec" id="pilRetirerAnnonce">Retirer l'annonce</button>
 
+                <div class="pilSous">Défis hot</div>
+                <p class="pilNote">Tes défis s'ajoutent à ceux du jeu en mode hot 🔥, au niveau choisi. Ils arrivent chez les joueurs à leur prochaine ouverture du jeu, et comptent dès la partie suivante.</p>
+                <textarea id="pilDefiTexte" maxlength="160" placeholder="Ex : Fais un massage des épaules à {nom} pendant 1 minute."></textarea>
+                <div class="pilExemples" id="pilDefiNoms">
+                    <button type="button" data-nom="{nom}">👤 un joueur</button>
+                    <button type="button" data-nom="{nom1}">👤 joueur 1</button>
+                    <button type="button" data-nom="{nom2}">👤 joueur 2</button>
+                </div>
+                <p class="pilNote" id="pilDefiApercu"></p>
+                <label class="pilLabel" for="pilDefiNiveau">Niveau</label>
+                <select id="pilDefiNiveau"></select>
+                <button type="button" class="pilBtn" id="pilAjouterDefi">Ajouter le défi</button>
+                <div id="pilDefis"></div>
+
                 <div class="pilSous">Valeurs de départ</div>
                 <p class="pilNote">Pour ceux qui n'ont jamais touché au curseur. Les autres gardent leur choix.</p>
                 <label class="pilLabel" for="pilDefVolume">Volume de la musique</label>
@@ -469,9 +483,10 @@
                         <li><b>Fonctions</b> : couper la voix, la musique ou le mode en ligne pour tout le monde (utile en cas de bug ou de maintenance). Pense à les remettre.</li>
                         <li><b>Thèmes</b> : cacher un thème, ou ne le montrer que sur une période chaque année (ex. Star Wars début mai).</li>
                         <li><b>Annonce</b> : un message sur l'accueil, les Réglages et les Crédits (140 caractères). Tu peux la programmer (début + durée) ou la viser aux versions plus anciennes qu'une version donnée.</li>
+                        <li><b>Défis hot</b> : tes propres défis, ajoutés à ceux du jeu en mode hot au niveau choisi. {nom} devient le prénom d'un autre joueur ; {nom1} et {nom2}, deux autres joueurs. 160 caractères, 300 défis au plus. Une partie déjà commencée garde les défis qu'elle avait au départ.</li>
                         <li><b>Valeurs de départ</b> : volume de la musique et vitesse de la voix pour ceux qui n'ont jamais touché au curseur.</li>
                         <li><b>Mise à jour demandée</b> : invite les joueurs d'une version trop ancienne à recharger le jeu.</li>
-                        <li><b>Historique</b> et <b>Annuler la dernière modification</b> : tout se défait. « Tout remettre par défaut » efface tous les réglages.</li>
+                        <li><b>Historique</b> et <b>Annuler la dernière modification</b> : tout se défait. « Tout remettre par défaut » efface tous les réglages (pas les défis hot).</li>
                         <li><b>Lecture par les joueurs</b> : combien d'appareils ont lu tes réglages (seuls ceux en 9.65.0 ou plus le signalent).</li>
                     </ul>
                     <p>Le Pilotage ne peut pas bloquer le jeu : sans réseau, il reste réglé par défaut. Un changement arrive chez les joueurs à leur prochaine ouverture du jeu.</p>
@@ -546,7 +561,7 @@
         });
         const authPorte = getAuth(app);
         // Version de la page de stats (à part de celle du jeu : +0.0.1 à chaque modification de cette page)
-        const VERSION_STATS = "1.16.3";
+        const VERSION_STATS = "1.17.0";
         document.getElementById("versionStats").textContent = VERSION_STATS;
         document.getElementById("versionStats2").textContent = VERSION_STATS;
         document.getElementById("versionStats3").textContent = VERSION_STATS;
@@ -808,6 +823,19 @@
                     const saison = x.debut ? ` · du ${ConfigLib.dateEnTexte(x.debut)} au ${ConfigLib.dateEnTexte(x.fin)}` : "";
                     return `<div class="pilLigne"><span>${ecape(ConfigLib.NOMS_THEMES[t])}${cache ? " <b>(caché)</b>" : ""}${ecape(saison)}</span><button type="button" class="${cache ? "" : "coupe"}" data-theme="${t}" data-actif="${cache ? 1 : 0}">${cache ? "Remettre" : "Cacher"}</button></div>`;
                 }).join("");
+                dessinerDefis();
+            }
+
+            // Défis hot ajoutés : liste par niveau, chacun avec « Retirer »
+            function dessinerDefis(){
+                const defis = config.defisHot || {};
+                const html = Object.keys(ConfigLib.NIVEAUX_DEFIS).map((n) => {
+                    const ids = Object.keys(defis).filter((id) => defis[id].n === n).sort();
+                    if (!ids.length) return "";
+                    return `<p class="pilNote" style="margin:12px 0 4px"><b>${ecape(ConfigLib.NIVEAUX_DEFIS[n])} · ${ids.length}</b></p>` +
+                        ids.map((id) => `<div class="pilLigne"><span>${ecape(defis[id].t)}</span><button type="button" class="coupe" data-defi="${id}">Retirer</button></div>`).join("");
+                }).join("");
+                $("pilDefis").innerHTML = html || '<p class="pilNote" style="margin-top:10px">Aucun défi ajouté pour l\'instant : seuls ceux du jeu sortent.</p>';
             }
 
             // Écrit la nouvelle config en gardant l'ancienne dans « config_hist » (pour pouvoir annuler)
@@ -866,6 +894,32 @@
             $("pilAppliquerDefauts").addEventListener("click", () => {
                 const v = $("pilDefVolume").value, t = $("pilDefVitesse").value;
                 lancer([{ op: "defaut", cible: "volumeMusique", valeur: v === "" ? null : Number(v) }, { op: "defaut", cible: "vitesseVoix", valeur: t === "" ? null : Number(t) }]);
+            });
+            // défis hot
+            $("pilDefiNiveau").innerHTML = Object.entries(ConfigLib.NIVEAUX_DEFIS).map(([n, nom]) => `<option value="${n}">${ecape(nom)}</option>`).join("");
+            const apercuDefi = () => {
+                const t = $("pilDefiTexte").value, e = t.trim() ? ConfigLib.erreurDefi(t) : null;
+                const ex = t.replace(/\{nom\}|\{nom1\}/g, "Léa").replace(/\{nom2\}/g, "Tom");
+                $("pilDefiApercu").className = "pilNote" + (e ? " erreur" : "");
+                $("pilDefiApercu").textContent = !t.trim() ? "{nom} sera remplacé par le prénom d'un autre joueur, tiré au sort. {nom1} et {nom2} : deux autres joueurs différents." : e || `Aperçu : ${ex}`;
+            };
+            $("pilDefiTexte").addEventListener("input", apercuDefi); apercuDefi();
+            $("pilDefiNoms").addEventListener("click", (ev) => {
+                const b = ev.target.closest("button[data-nom]"); if (!b) return;
+                const z = $("pilDefiTexte"), d = z.selectionStart ?? z.value.length, f = z.selectionEnd ?? d;
+                const avant = z.value.slice(0, d), apres = z.value.slice(f);
+                const ajout = (avant && !/\s$/.test(avant) ? " " : "") + b.dataset.nom + (apres && !/^[\s.,!?]/.test(apres) ? " " : "");
+                z.value = (avant + ajout + apres).slice(0, 160); z.focus();
+                const pos = Math.min(avant.length + ajout.length, z.value.length); z.setSelectionRange(pos, pos);
+                apercuDefi();
+            });
+            $("pilAjouterDefi").addEventListener("click", async () => {
+                if (await lancer([{ op: "defi_ajout", texte: $("pilDefiTexte").value, niveau: $("pilDefiNiveau").value }])) { $("pilDefiTexte").value = ""; apercuDefi(); }
+            });
+            $("pilDefis").addEventListener("click", (ev) => {
+                const b = ev.target.closest("button[data-defi]"); if (!b) return;
+                const d = (config.defisHot || {})[b.dataset.defi];
+                if (d && confirm(`Retirer ce défi ?\n\n${d.t}`)) lancer([{ op: "defi_suppr", id: b.dataset.defi }]);
             });
             $("pilRetirerAnnonce").addEventListener("click", () => lancer([{ op: "annonce_off" }]));
             $("pilToutRemettre").addEventListener("click", () => { if (confirm("Tout remettre par défaut ?")) lancer([{ op: "tout_remettre" }]); });

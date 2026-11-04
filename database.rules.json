@@ -60,7 +60,7 @@
       },
       "themes": {
         "$theme": {
-          ".validate": "$theme.matches(/^(bordeaux|noir|vert|bleu|soleil|cerisier|givre|prestige|galaxie|kawaii)$/)",
+          ".validate": "$theme.matches(/^(bordeaux|noir|vert|bleu|soleil|cerisier|givre|prestige|galaxie|kawaii|donjon)$/)",
           "actif": { ".validate": "newData.isBoolean()" },
           "debut": { ".validate": "newData.isString() && newData.val().matches(/^[01][0-9]-[0-3][0-9]$/)" },
           "fin": { ".validate": "newData.isString() && newData.val().matches(/^[01][0-9]-[0-3][0-9]$/)" },
@@ -68,6 +68,14 @@
         }
       },
       "majMin": { ".validate": "newData.isString() && newData.val().matches(/^[0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}$/)" },
+      "defisHot": {
+        "$id": {
+          ".validate": "$id.matches(/^[a-z0-9]{1,30}$/) && newData.hasChildren(['t', 'n'])",
+          "t": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 160" },
+          "n": { ".validate": "newData.isString() && newData.val().matches(/^[ABC]$/)" },
+          "$autre": { ".validate": false }
+        }
+      },
       "$autre": { ".validate": false }
     },
     "config_hist": {
