@@ -429,7 +429,7 @@ function verifier(ok, texte){
       o.enLigneAutre = trier();
       statsPartie = { pigeon: { Zoe: 1 }, plusGros: {}, annulees: {}, duels: {}, plus4: {}, doree: { tireur: "Zoe", victime: "Lea" } };
       stickersFinDePartie();
-      o.enLigneMoi = trier();
+      o.enLigneMoi = trier(); // (2e partie finie juste après la 1re : Nuage)
       enLigneActif = false; pseudoActuel = null;
       await new Promise((res) => setTimeout(res, 3600));
       o.fenetre = !!document.getElementById("fenetreKawaii");
@@ -437,7 +437,7 @@ function verifier(ok, texte){
     });
     verifier(r.sansAlbum === '{"gagnes":[],"parties":0,"fins":[]}' && r.avantKawaii === "false/true" && r.partie1 === "chou,cupcake,etoile,lapin,licorne,poussin,sushi" && r.kawaii7 === false &&
       r.partie1b.split(",").length === 8 && r.kawaii8 === "false/true" && r.kawaii11 === "true/false" && r.album === "11/11/Album de stickers" && r.regles === "Règles du jeu/0/false" &&
-      r.une === "cupcake" && r.deux === "cupcake,nuage" && r.cinq === "chat,cupcake,nuage" && r.etalees === "chat,cupcake" && r.cinqHeures === "cupcake,nuage" && r.septHeures === "cupcake" && r.enLigneAutre === "cupcake,etoile,macaron" && r.enLigneMoi === "cupcake,etoile,macaron,poussin" && r.fenetre && erreurs.length === 0,
+      r.une === "cupcake" && r.deux === "cupcake,nuage" && r.cinq === "chat,cupcake,nuage" && r.etalees === "chat,cupcake" && r.cinqHeures === "cupcake,nuage" && r.septHeures === "cupcake" && r.enLigneAutre === "cupcake,etoile,macaron" && r.enLigneMoi === "cupcake,etoile,macaron,nuage,poussin" && r.fenetre && erreurs.length === 0,
       `album de stickers : ${JSON.stringify(r)}`);
     await ctx.close();
   }
