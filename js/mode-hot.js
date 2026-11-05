@@ -197,6 +197,7 @@ function montrerDefiHot(joueurIndex, nbGorgees, defiPossible = true){
 
   const choisir = (choix, messageRegle) => {
     etat.choix = choix;
+    try { noterDefiStats(defi.id, choix); } catch (e) {} // (stats : défi relevé ou refusé, js/stats.js)
     bloc.dataset.netFerme = "1";
     afficherRegleBloc(regleZero, messageRegle);
     regleZero.style.display = "block";

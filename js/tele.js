@@ -103,6 +103,8 @@ function relierTele(code, silencieux = false){
   }
   codeTele = code;
   try { sessionStorage.setItem(CLE_CODE_TELE, code); } catch (e) {}
+  // stats : télé reliée pendant une partie (classique, ou l'hôte en ligne : js/stats.js)
+  if (partieLancee && (!enLigneActif || estHote) && typeof noterTelePartieStats === "function") noterTelePartieStats();
   dernierEtatTele = "";
   pauseTeleJusqua = 0;
   erreurTeleSignalee = false;

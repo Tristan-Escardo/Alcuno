@@ -14,9 +14,23 @@
           "visiteurs": {
             "$id": { ".write": true, ".validate": "$id.matches(/^[a-z0-9]{12}$/) && newData.val() === true" }
           },
+          "finies": { ".read": true, ".write": true, ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" },
+          "joueurs": { ".read": true, ".write": true, ".validate": "newData.isNumber() && newData.val() >= (data.exists() ? data.val() : 0) + 1 && newData.val() <= (data.exists() ? data.val() : 0) + 20" },
+          "minutes": { ".read": true, ".write": true, ".validate": "newData.isNumber() && newData.val() >= (data.exists() ? data.val() : 0) + 1 && newData.val() <= (data.exists() ? data.val() : 0) + 300" },
+          "modes": {
+            "$m": { ".read": true, ".write": true, ".validate": "$m.matches(/^(hot|pj|express|tele)$/) && newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" }
+          },
           "heures": {
             "$h": { ".read": true, ".write": true, ".validate": "$h.matches(/^([01][0-9]|2[0-3])$/) && newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" }
           },
+          "$autre": { ".validate": false }
+        }
+      },
+      "defis": {
+        "$id": {
+          ".validate": "$id.matches(/^[A-Za-z0-9]{1,32}$/)",
+          "fait": { ".read": true, ".write": true, ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" },
+          "bois": { ".read": true, ".write": true, ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" },
           "$autre": { ".validate": false }
         }
       },
@@ -30,6 +44,8 @@
           "vu": { ".validate": "newData.isNumber()" },
           "confVu": { ".validate": "newData.isNumber()" },
           "confV": { ".validate": "newData.isNumber()" },
+          "installe": { ".validate": "newData.val() === true" },
+          "joue": { ".validate": "newData.val() === true" },
           "$autre": { ".validate": false }
         }
       }

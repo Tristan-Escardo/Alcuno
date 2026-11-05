@@ -41,6 +41,7 @@ function afficherOverlayFinUnRestants(){
   overlay.style.overflowY = "auto";
   recapActuel = calculerRecap(restants);
   try { stickersFinDePartie(); } catch (e) {} // (album de stickers, js/stickers.js)
+  try { noterFinStats(recapActuel); } catch (e) {} // (stats : partie finie, joueurs, durée ; js/stats.js)
   overlay.appendChild(construireRecap(recapActuel));
 
   const btnTerminer = document.createElement("button");
@@ -1782,7 +1783,8 @@ function lancerPartie(){
   // « Partie classique gardée en mémoire » dans js/synchro-en-ligne.js)
   if(!enLigneActif) demarrerSauvegardeClassique();
   // Statistiques : partie classique lancée (pas une reprise ni un retour en arrière rejoués)
-  if(!enLigneActif && !repriseClassiqueEnCours && !rattrapageEnCours) noterPartieStats(false);
+  if(!enLigneActif && !repriseClassiqueEnCours && !rattrapageEnCours) noterPartieStats(false, { hot: estModeHot(), pj: estModeSoft(), express: estPartieExpress() });
+  if(!rattrapageEnCours) noterJeuAppareilStats(); // (stats : ce téléphone joue, js/stats.js)
   majTitrePJ(); // « ALCUNO PJ » dans le bandeau
   majFacesFermees(); // faces ouvertes / fermées (réglage, ou celui de l'hôte en ligne)
   garderEcranAllume(); // pas de mise en veille pendant la partie

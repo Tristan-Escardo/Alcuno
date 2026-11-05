@@ -129,5 +129,10 @@ verifier(regles.config[".read"] === true && /auth\.uid/.test(regles.config[".wri
   verifier(JSON.stringify(v) === '{"defisHot":{"ok":{"t":"Danse avec {nom}.","n":"B"}}}', "défis hot : validation de ce qui vient de Firebase " + JSON.stringify(v));
   verifier(L.decrire(a2.config).join() === "2 défis hot ajoutés", "défis hot : description");
 }
+{
+  const j = regles.stats.jours.$jour;
+  verifier(j.finies && /\+ 20/.test(j.joueurs[".validate"]) && /\+ 300/.test(j.minutes[".validate"]) && /hot\|pj\|express\|tele/.test(j.modes.$m[".validate"]) && regles.stats.defis.$id.fait && regles.stats.defis.$id.bois && regles.stats.appareils.$id.installe && regles.stats.appareils.$id.joue,
+    "règles Firebase : parties finies, joueurs, durée, modes, défis relevés, installations qui jouent");
+}
 verifier(regles.config.defisHot && regles.config.defisHot.$id.t && regles.config.defisHot.$id.n && regles.config.themes.$theme[".validate"].includes("donjon"), "règles Firebase : défis hot et thème BDSM pilotables");
 console.log(process.exitCode ? "\nÉCHEC(S)" : `\nTOUT EST OK (${ok})`);

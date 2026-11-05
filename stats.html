@@ -292,6 +292,39 @@
         <section class="bloc"><div class="titre">Versions en circulation</div><div id="barresVersions"></div></section>
         <section class="bloc"><div class="titre">Thèmes choisis</div><div id="barresThemes"></div></section>
 
+        <section class="bloc">
+            <div class="titre">Déroulé des parties · 30 jours</div>
+            <div class="cases">
+                <div class="case"><b class="chiffre" id="tauxFinies">–</b><span>des parties vont jusqu'au bout</span></div>
+                <div class="case"><b class="chiffre" id="moyJoueurs">–</b><span>joueurs par partie</span></div>
+                <div class="case"><b class="chiffre" id="moyDuree">–</b><span>durée d'une partie</span></div>
+            </div>
+            <div class="legende" id="legendeFinies"></div>
+        </section>
+        <section class="bloc">
+            <div class="titre">Modes de jeu · 30 jours</div>
+            <div id="barresModes"></div>
+            <div class="legende">Part des parties lancées dans chaque mode (une partie peut en cumuler plusieurs).</div>
+        </section>
+        <section class="bloc">
+            <div class="titre">Fidélité</div>
+            <div class="cases" style="grid-template-columns: 1fr 1fr">
+                <div class="case"><b class="chiffre" id="tauxRetour">–</b><span>reviennent la semaine suivante</span></div>
+                <div class="case"><b class="chiffre" id="tauxInstallJoue">–</b><span>des installations ont lancé une partie</span></div>
+            </div>
+            <div class="legende" id="legendeFidelite"></div>
+        </section>
+        <section class="bloc">
+            <div class="titre">Défis hot</div>
+            <div class="gros chiffre" id="tauxDefis">–</div>
+            <div class="legende" id="legendeDefis">des défis sont relevés plutôt que bus</div>
+            <div class="pilSous" style="margin-top:14px">Les plus refusés</div>
+            <div id="defisRefuses"></div>
+            <div class="pilSous" style="margin-top:14px">Les plus relevés</div>
+            <div id="defisReleves"></div>
+            <div class="legende">Seuls les défis sortis au moins 3 fois sont classés. ✍️ : ajouté depuis le Pilotage.</div>
+        </section>
+
         <div class="zoneReset">
             <button type="button" id="btnReset" class="btnReset">Réinitialiser toutes les statistiques</button>
             <div id="confirmeReset" hidden>
@@ -452,6 +485,11 @@
                 <details><summary>Comment lire la page Stats ?</summary>
                     <ul>
                         <li><b>En temps réel</b> : les personnes qui ont le jeu ouvert maintenant, réparties entre partie classique, partie en ligne et télé castée.</li>
+                        <li><b>Déroulé des parties</b> : part des parties lancées qui arrivent au récap de fin (les autres ont été abandonnées), nombre de joueurs et durée moyens des parties finies. En ligne, c'est l'hôte qui compte.</li>
+                        <li><b>Modes de jeu</b> : part des parties lancées en mode hot, PJ, express ou affichées sur une télé.</li>
+                        <li><b>Fidélité</b> : parmi les visiteurs d'il y a 8 à 14 jours, combien sont revenus ces 7 derniers jours ; et parmi les appareils où le jeu est installé (ouvert depuis l'icône), combien ont lancé ou rejoint une partie.</li>
+                        <li><b>Défis hot</b> : à chaque défi, relevé (« Je le fais ») ou bu (« Je bois »). Les plus refusés sont de bons candidats à retirer ou réécrire.</li>
+                        <li>Ces quatre blocs sont suivis depuis la version 9.80.0 du jeu : les jours d'avant ne comptent pas.</li>
                         <li><b>Fréquentation</b> : « visites » compte chaque ouverture du jeu ; « visiteurs » compte les personnes différentes (un joueur qui ouvre dix fois = 1 visiteur).</li>
                         <li><b>Parties</b> : celles qui ont vraiment été lancées, classiques et en ligne.</li>
                         <li><b>Heures de jeu</b> et <b>jours de la semaine</b> : quand on joue le plus (heure de pointe).</li>
@@ -543,6 +581,7 @@
     </main>
 
     <script src="js/config-lib.js"></script>
+    <script src="js/mode-hot.js"></script><!-- (seulement pour les textes des défis : DEFIS_HOT) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
         import { getDatabase, ref, onValue, get, update, set, query, orderByKey, limitToLast, remove } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
@@ -561,7 +600,7 @@
         });
         const authPorte = getAuth(app);
         // Version de la page de stats (à part de celle du jeu : +0.0.1 à chaque modification de cette page)
-        const VERSION_STATS = "1.17.0";
+        const VERSION_STATS = "1.18.0";
         document.getElementById("versionStats").textContent = VERSION_STATS;
         document.getElementById("versionStats2").textContent = VERSION_STATS;
         document.getElementById("versionStats3").textContent = VERSION_STATS;
@@ -680,6 +719,74 @@
                 zone.appendChild(ligne);
             });
         }
+
+        // Barres en part d'un total commun (chaque ligne indépendante) : [[nom, n]], total
+        function barresTaux(idZone, lignes, total){
+            const zone = document.getElementById(idZone);
+            if (!total) { zone.innerHTML = '<div class="vide">Pas encore de données</div>'; return; }
+            zone.innerHTML = "";
+            lignes.forEach(([nom, n]) => {
+                const pc = Math.round(n / total * 100);
+                const ligne = document.createElement("div");
+                ligne.className = "barre";
+                ligne.innerHTML = '<span class="nom"></span><span class="piste"><span class="rempli"></span></span><span class="pc"></span>';
+                ligne.querySelector(".nom").textContent = nom;
+                ligne.querySelector(".rempli").style.width = `${Math.max(pc, 1)}%`;
+                ligne.querySelector(".pc").textContent = `${pc} %`;
+                zone.appendChild(ligne);
+            });
+        }
+        const pourcent = (a, b) => b ? `${Math.round(a / b * 100)} %` : "–";
+
+        // Parties finies, joueurs, durée, modes : seulement les jours où le jeu envoyait déjà ces chiffres (9.80.0 et plus),
+        // sinon les parties lancées avant compteraient comme abandonnées
+        function dessinerDeroule(jours){
+            const suivis = joursPasses(30).filter((j) => jours[j] && (jours[j].finies !== undefined || jours[j].modes !== undefined));
+            const somme = (nom) => suivis.reduce((a, j) => a + Number(jours[j][nom] || 0), 0);
+            const lancees = somme("parties") + somme("partiesEnLigne"), finies = somme("finies");
+            document.getElementById("tauxFinies").textContent = pourcent(Math.min(finies, lancees), lancees);
+            document.getElementById("moyJoueurs").textContent = finies ? (somme("joueurs") / finies).toFixed(1).replace(".", ",") : "–";
+            document.getElementById("moyDuree").textContent = finies ? `${Math.round(somme("minutes") / finies)} min` : "–";
+            document.getElementById("legendeFinies").textContent = lancees
+                ? `${nombre(finies)} finie${finies > 1 ? "s" : ""} sur ${nombre(lancees)} lancée${lancees > 1 ? "s" : ""}, donc ${nombre(Math.max(0, lancees - finies))} abandonnée${lancees - finies > 1 ? "s" : ""} en route (sur ${suivis.length} jour${suivis.length > 1 ? "s" : ""} suivi${suivis.length > 1 ? "s" : ""}).`
+                : "Pas encore de données : ces chiffres arrivent avec la version 9.80.0 du jeu.";
+            const mode = (m) => suivis.reduce((a, j) => a + Number((jours[j].modes || {})[m] || 0), 0);
+            barresTaux("barresModes", [["Mode hot 🔥", mode("hot")], ["Mode PJ", mode("pj")], ["Partie express", mode("express")], ["Sur la télé 📺", mode("tele")]], lancees);
+        }
+
+        // Joueurs qui reviennent : visiteurs d'il y a 8 à 14 jours revenus ces 7 derniers jours
+        function dessinerRetour(jours){
+            const ids = (liste) => { const e = new Set(); liste.forEach((j) => Object.keys((jours[j] || {}).visiteurs || {}).forEach((id) => e.add(id))); return e; };
+            const recents = ids(joursPasses(7)), avant = ids(joursPasses(14).slice(7));
+            const revenus = [...avant].filter((id) => recents.has(id)).length;
+            document.getElementById("tauxRetour").textContent = pourcent(revenus, avant.size);
+            return avant.size ? `${nombre(revenus)} des ${nombre(avant.size)} visiteurs de la semaine d'avant sont revenus ces 7 derniers jours.` : "Pas encore assez de recul (il faut deux semaines de visites).";
+        }
+        function dessinerInstalls(appareils){
+            const installes = Object.values(appareils || {}).filter((a) => a && a.installe);
+            const jouent = installes.filter((a) => a.joue).length;
+            document.getElementById("tauxInstallJoue").textContent = pourcent(jouent, installes.length);
+            return installes.length ? `${nombre(jouent)} des ${nombre(installes.length)} appareils où le jeu est installé ont lancé ou rejoint une partie (suivi depuis la version 9.80.0).` : "Pas encore d'installation repérée (suivi depuis la version 9.80.0).";
+        }
+
+        // Défis hot : relevés (« fait ») ou bus (« bois »), textes du jeu (js/mode-hot.js) et du pilotage (config/defisHot)
+        function dessinerDefisStats(defis, ajoutes){
+            const texte = (id) => {
+                if (id[0] === "P") { const d = (ajoutes || {})[id.slice(1)]; return d ? "✍️ " + d.t : "✍️ (défi retiré du pilotage)"; }
+                for (const n of ["A", "B", "C"]) { const d = (typeof DEFIS_HOT !== "undefined" ? DEFIS_HOT[n] : []).find((x) => x.id === id); if (d) return d.t; }
+                return `(défi ${id})`;
+            };
+            const lignes = Object.entries(defis || {}).map(([id, d]) => ({ id, fait: Number((d || {}).fait || 0), bois: Number((d || {}).bois || 0) }))
+                .map((l) => Object.assign(l, { n: l.fait + l.bois, taux: l.fait / Math.max(1, l.fait + l.bois) }));
+            const fait = lignes.reduce((a, l) => a + l.fait, 0), total = lignes.reduce((a, l) => a + l.n, 0);
+            document.getElementById("tauxDefis").textContent = pourcent(fait, total);
+            document.getElementById("legendeDefis").textContent = total ? `des défis sont relevés plutôt que bus (${nombre(fait)} sur ${nombre(total)})` : "Pas encore de défi joué (suivi depuis la version 9.80.0).";
+            const classes = lignes.filter((l) => l.n >= 3);
+            const html = (liste) => liste.length ? liste.map((l) => `<div class="pilLigne"><span>${echapperStats(texte(l.id).replace(/\{nom2\}/g, "quelqu'un d'autre").replace(/\{nom1?\}/g, "quelqu'un"))}</span><b style="flex:none">${Math.round(l.taux * 100)} % · ${l.n}×</b></div>`).join("") : '<div class="vide">Pas encore assez de défis joués</div>';
+            document.getElementById("defisRefuses").innerHTML = html(classes.filter((l) => l.taux < 0.5).sort((a, b) => a.taux - b.taux || b.n - a.n).slice(0, 6));
+            document.getElementById("defisReleves").innerHTML = html(classes.filter((l) => l.taux >= 0.5).sort((a, b) => b.taux - a.taux || b.n - a.n).slice(0, 6));
+        }
+        const echapperStats = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
         function courbe(valeurs, premierJour){
             const L = 330, H = 120;
@@ -1376,6 +1483,7 @@ Données (stats ; « jours » = les 45 derniers jours, « visiteurs » du jour =
             const cheminsAEffacer = (stats) => {
                 const chemins = [];
                 feuilles((stats || {}).jours || {}, "jours", chemins);
+                feuilles((stats || {}).defis || {}, "defis", chemins);
                 Object.keys((stats || {}).appareils || {}).forEach((id) => chemins.push(`appareils/${id}`));
                 return chemins;
             };
@@ -1423,6 +1531,8 @@ Données (stats ; « jours » = les 45 derniers jours, « visiteurs » du jour =
             onValue(ref(db, "presence"), (s) => { presences = s.val() || {}; majDirect(); });
             setInterval(majDirect, 15000);
 
+            let legendeRetour = "", legendeInstalls = "";
+            const majLegendeFidelite = () => { document.getElementById("legendeFidelite").textContent = [legendeRetour, legendeInstalls].filter(Boolean).join(" "); };
             // ----- Fréquentation + courbe -----
             onValue(ref(db, "stats/jours"), (s) => {
                 const jours = s.val() || {};
@@ -1453,7 +1563,13 @@ Données (stats ; « jours » = les 45 derniers jours, « visiteurs » du jour =
                 barresParties(chrono, jours);
                 barresHeures(derniers30, jours);
                 barresJours(jours);
+                dessinerDeroule(jours);
+                legendeRetour = dessinerRetour(jours); majLegendeFidelite();
             });
+            // Fidélité (retours + installations qui jouent) et défis hot
+            let statsDefis = {}, defisAjoutes = {};
+            onValue(ref(db, "stats/defis"), (s) => { statsDefis = s.val() || {}; dessinerDefisStats(statsDefis, defisAjoutes); }, () => {});
+            onValue(ref(db, "config/defisHot"), (s) => { defisAjoutes = s.val() || {}; dessinerDefisStats(statsDefis, defisAjoutes); }, () => {});
 
             // ----- Téléphones, thèmes, versions (appareils vus ces 30 derniers jours) -----
             onValue(ref(db, "stats/appareils"), (s) => {
@@ -1468,6 +1584,7 @@ Données (stats ; « jours » = les 45 derniers jours, « visiteurs » du jour =
                 barres("barresOs", os, NOMS_OS);
                 barres("barresThemes", themes, NOMS_THEMES, 9);
                 barres("barresVersions", versions, {}, 4);
+                legendeInstalls = dessinerInstalls(s.val()); majLegendeFidelite();
             });
         }
 

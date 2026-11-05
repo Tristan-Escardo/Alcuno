@@ -8,9 +8,13 @@
 // Dans Firebase :
 // - stats/jours/AAAA-MM-JJ : visites, installs, parties, partiesEnLigne, doreesEnJeu, doreesTirees
 //   (compteurs), heures/{HH} (parties
-//   lancées à chaque heure) et visiteurs/{id} ;
+//   lancées à chaque heure) et visiteurs/{id} ; modes/{hot|pj|express|tele} (parties lancées dans ce mode) ;
+//   finies (parties allées jusqu'au récap), joueurs et minutes (sommes sur les parties finies : moyennes de la page stats) ;
+// - stats/defis/{id}/{fait|bois} : choix des joueurs devant chaque défi du mode hot (id de js/mode-hot.js, « P… » : ajouté
+//   depuis le pilotage) ;
 // - stats/appareils/{id} : os, thème, version, dernière visite (répartitions de la page stats), et la dernière lecture des
 //   réglages à distance : confVu (quand) et confV (quelle modification) : voyant de l'onglet Pilotage de stats.html ;
+//   installe (ouvert depuis l'icône de l'appli) et joue (au moins une partie lancée) : « installations qui jouent » ;
 // - presence/{id} : ce que fait ce téléphone en ce moment (menu, classique, enligne, tele), retiré
 //   par Firebase dès que le téléphone se déconnecte (« en ce moment » de la page stats).
 const CLE_ID_STATS = "alcuno_id_stats";
@@ -39,11 +43,11 @@ function systemeStats(){
 
 function refStats(chemin){ return window.fbRef(window.firebaseDB, chemin); }
 
-// Compteur du jour + 1 (transaction : deux téléphones au même instant comptent tous les deux)
-function compterStats(nom){
+// Compteur du jour + n (transaction : deux téléphones au même instant comptent tous les deux)
+function compterStats(nom, n = 1){
   if (MODE_TEST) return; // (appli de test : pas de statistiques)
   attendreFirebase(() => {
-    window.fbRunTransaction(refStats(`stats/jours/${jourStats()}/${nom}`), (n) => (n || 0) + 1).catch(() => {});
+    window.fbRunTransaction(refStats(`stats/jours/${jourStats()}/${nom}`), (v) => (v || 0) + n).catch(() => {});
   });
 }
 
@@ -51,21 +55,59 @@ function noterAppareilStats(){
   if (MODE_TEST) return;
   attendreFirebase(() => {
     // (update et non set : la fiche garde confVu / confV, écrits par js/config-distante.js)
-    window.fbUpdate(refStats(`stats/appareils/${idStats}`), {
+    const fiche = {
       os: systemeStats(),
       theme: document.documentElement.dataset.theme || "bordeaux",
       version: VERSION_AFFICHEE,
       vu: window.fbServerTimestamp()
-    }).catch(() => {});
+    };
+    if (window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true) fiche.installe = true;
+    window.fbUpdate(refStats(`stats/appareils/${idStats}`), fiche).catch(() => {});
   });
 }
 
 // Partie lancée (classique : ce téléphone ; en ligne : seulement l'hôte, une fois par manche), et son
 // heure (heure du téléphone, « 00 » à « 23 » : « À quelle heure on joue » de la page stats)
-function noterPartieStats(enLigne){
+// modes : { hot, pj, express } de la partie lancée (« tele » : une télé est reliée, ici ou plus tard dans la partie)
+let teleCompteePartie = false;
+function noterPartieStats(enLigne, modes = {}){
   if (estPageTele) return;
   compterStats(enLigne ? "partiesEnLigne" : "parties");
   compterStats(`heures/${String(new Date().getHours()).padStart(2, "0")}`);
+  ["hot", "pj", "express"].forEach((m) => { if (modes[m]) compterStats("modes/" + m); });
+  teleCompteePartie = false;
+  noterTelePartieStats();
+}
+function noterTelePartieStats(){
+  if (estPageTele || teleCompteePartie || typeof codeTele === "undefined" || !codeTele) return;
+  teleCompteePartie = true;
+  compterStats("modes/tele");
+}
+// Ce téléphone a lancé ou rejoint une partie (une seule écriture par ouverture du jeu)
+let jeuNoteStats = false;
+function noterJeuAppareilStats(){
+  if (MODE_TEST || estPageTele || jeuNoteStats) return;
+  jeuNoteStats = true;
+  attendreFirebase(() => { window.fbUpdate(refStats(`stats/appareils/${idStats}`), { joue: true }).catch(() => {}); });
+}
+
+// Partie finie (récap) : nombre de joueurs et durée, pour les moyennes. Classique : ce téléphone ; en ligne : l'hôte.
+function noterFinStats(recap){
+  if (estPageTele || rattrapageEnCours || repriseClassiqueEnCours || !recap) return;
+  if (enLigneActif && !estHote) return;
+  compterStats("finies");
+  compterStats("joueurs", Math.min(20, Math.max(1, Number(recap.nbJoueurs) || 1)));
+  compterStats("minutes", Math.min(300, Math.max(1, Number(recap.minutes) || 1)));
+}
+
+// Défi du mode hot : relevé (« fait ») ou refusé (« bois »). Classique : ce téléphone ; en ligne : l'hôte.
+function noterDefiStats(id, choix){
+  if (MODE_TEST || estPageTele || rattrapageEnCours || repriseClassiqueEnCours) return;
+  if (enLigneActif && !estHote) return;
+  if (!/^[A-Za-z0-9]{1,32}$/.test(String(id)) || (choix !== "fait" && choix !== "bois")) return;
+  attendreFirebase(() => {
+    window.fbRunTransaction(refStats(`stats/defis/${id}/${choix}`), (v) => (v || 0) + 1).catch(() => {});
+  });
 }
 
 // Carte dorée : partie où elle est cachée sur le plateau (« doreesEnJeu »), et quelqu'un qui la tire

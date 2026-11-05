@@ -912,7 +912,10 @@ function lancerMancheEnLigne(listeJoueurs, depuisSalle){
       hote: e.hote || pseudoActuel
     };
   }).then((resultat) => {
-    if (resultat && resultat.committed) noterPartieStats(true); // statistiques : une fois par manche (l'hôte)
+    if (resultat && resultat.committed) { // statistiques : une fois par manche (celui qui lance)
+      const seed = (resultat.snapshot && resultat.snapshot.val() || {}).seed || 0;
+      noterPartieStats(true, { hot: graineHot(seed), express: graineExpress(seed), pj: estModeSoft() });
+    }
     marquerActivite(codePartieActuel);
   }).catch(erreurFirebase);
 }
