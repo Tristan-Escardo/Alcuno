@@ -13,6 +13,7 @@
 //   defauts   : { volumeMusique, vitesseVoix } valeurs de départ (seulement pour ceux qui n'ont jamais touché au curseur)
 //   defisHot  : { <id>: { t, n } }           défis du mode hot ajoutés depuis le pilotage, mélangés à ceux du jeu
 //                                              (t : texte avec {nom}, ou {nom1} et {nom2} ; n : niveau A, B ou C, comme dans js/mode-hot.js)
+//   defisMasques : { <id>: true }              défis du jeu (A1, B12… de js/mode-hot.js) qui ne sortent plus
 //   v         : date de la dernière modification (ms) : les appareils la renvoient dans stats/appareils (voyant du pilotage)
 // =============================================================================================
 (function (global) {
@@ -31,6 +32,7 @@
   const DEFI_MAX = 160, DEFIS_MAX = 300;
   const NIVEAUX_DEFIS = { A: "Léger (moins de 5 gorgées)", B: "Moyen (5 à 10 gorgées)", C: "Osé (plus de 10 gorgées)" };
   const motifIdDefi = /^[a-z0-9]{1,30}$/;
+  const motifIdDefiJeu = /^[ABC][0-9]{1,3}$/;
 
   // Texte d'un défi hot : null s'il est bon, sinon ce qui ne va pas.
   // {nom} : un autre joueur ; {nom1} et {nom2} : deux autres joueurs différents (jamais mélangés avec {nom}).
@@ -86,6 +88,10 @@
         if (!motifIdDefi.test(id) || !estObjet(d) || !NIVEAUX_DEFIS[d.n] || erreurDefi(d.t)) return;
         (c.defisHot = c.defisHot || {})[id] = { t: d.t.trim(), n: d.n };
       });
+    }
+    if (estObjet(brut.defisMasques)) {
+      Object.keys(brut.defisMasques).filter((id) => motifIdDefiJeu.test(id) && brut.defisMasques[id] === true).sort().slice(0, 500)
+        .forEach((id) => { (c.defisMasques = c.defisMasques || {})[id] = true; });
     }
     if (typeof brut.v === "number" && isFinite(brut.v)) c.v = brut.v;
     if (typeof brut.majMin === "string" && /^\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(brut.majMin)) c.majMin = brut.majMin;
@@ -220,8 +226,19 @@
         if (!Object.keys(c.defisHot).length) delete c.defisHot;
         return { config: c, resume: `Défi hot retiré : « ${d.t} »` };
       }
-      case "tout_remettre": // (les défis ajoutés ne sont pas des réglages : ils restent)
-        return { config: c.defisHot ? { defisHot: c.defisHot } : {}, resume: "Tout remettre par défaut (aucun réglage à distance)" + (c.defisHot ? ", en gardant les défis hot ajoutés" : "") };
+      case "defi_masquer": case "defi_remettre": {
+        if (!motifIdDefiJeu.test(String(cmd.id))) return { erreur: "Défi du jeu inconnu." };
+        const texte = cmd.texte ? ` : « ${String(cmd.texte).slice(0, 160)} »` : "";
+        if (cmd.op === "defi_masquer") { (c.defisMasques = c.defisMasques || {})[cmd.id] = true; return { config: c, resume: `Défi du jeu masqué (${cmd.id})${texte}` }; }
+        if (c.defisMasques) { delete c.defisMasques[cmd.id]; if (!Object.keys(c.defisMasques).length) delete c.defisMasques; }
+        return { config: c, resume: `Défi du jeu remis (${cmd.id})${texte}` };
+      }
+      case "tout_remettre": { // (les défis ajoutés ou masqués ne sont pas des réglages : ils restent)
+        const garde = {};
+        if (c.defisHot) garde.defisHot = c.defisHot;
+        if (c.defisMasques) garde.defisMasques = c.defisMasques;
+        return { config: garde, resume: "Tout remettre par défaut (aucun réglage à distance)" + (Object.keys(garde).length ? ", en gardant les défis hot ajoutés et masqués" : "") };
+      }
       default:
         return { erreur: "Commande inconnue." };
     }
@@ -458,6 +475,7 @@
     if (c.majMin) l.push(`mise à jour obligatoire sous la version ${c.majMin}`);
     if (c.defauts && c.defauts.volumeMusique !== undefined) l.push(`volume de la musique par défaut : ${c.defauts.volumeMusique} %`);
     if (c.defisHot) { const n = Object.keys(c.defisHot).length; l.push(`${n} défi${n > 1 ? "s" : ""} hot ajouté${n > 1 ? "s" : ""}`); }
+    if (c.defisMasques) { const n = Object.keys(c.defisMasques).length; l.push(`${n} défi${n > 1 ? "s" : ""} du jeu masqué${n > 1 ? "s" : ""}`); }
     if (c.defauts && c.defauts.vitesseVoix !== undefined) l.push(`vitesse de la voix par défaut : ${String(c.defauts.vitesseVoix).replace(".", ",")}×`);
     return l.length ? l : ["rien : le jeu est réglé par défaut"];
   }

@@ -89,9 +89,11 @@ function initialiserModeHot(){
   // triés par identifiant pour que le tirage à graine reste le même en reprise de partie.
   // En ligne : ceux que la manche emporte (téléphone qui l'a lancée, js/en-ligne.js), les mêmes pour tous ;
   // une manche sans liste (lancée par une ancienne version) : ceux de ce téléphone.
-  const deLaManche = enLigneActif && dernierEtatManche && dernierEtatManche.defisHot;
-  const ajoutes = deLaManche ? (ConfigLib.valider({ defisHot: deLaManche }).defisHot || {})
-    : (typeof configDistante === "object" && configDistante && configDistante.defisHot) || {};
+  const manche = enLigneActif && dernierEtatManche && (dernierEtatManche.defisHot || dernierEtatManche.defisMasques) ? dernierEtatManche : null;
+  const source = manche ? ConfigLib.valider({ defisHot: manche.defisHot, defisMasques: manche.defisMasques })
+    : (typeof configDistante === "object" && configDistante) || {};
+  const ajoutes = source.defisHot || {};
+  defisMasquesHot = Object.assign({}, source.defisMasques || {}); // (défis du jeu retirés depuis le pilotage)
   defisAjoutesHot = { A: [], B: [], C: [] };
   Object.keys(ajoutes).sort().forEach((id) => {
     const d = ajoutes[id];
@@ -122,7 +124,8 @@ function joueursLibresHot(){
 
 // ----- Défis -----
 let defisAjoutesHot = { A: [], B: [], C: [] };
-function defisDuNiveauHot(groupe){ return DEFIS_HOT[groupe].concat(defisAjoutesHot[groupe] || []); }
+let defisMasquesHot = {};
+function defisDuNiveauHot(groupe){ return DEFIS_HOT[groupe].filter((d) => !defisMasquesHot[d.id]).concat(defisAjoutesHot[groupe] || []); }
 function groupeDefiHot(nbGorgees){
   return nbGorgees > 10 ? "C" : nbGorgees >= 5 ? "B" : "A";
 }
@@ -141,6 +144,7 @@ function tirerDefiHot(nom, nbGorgees, partenaire){
     tous.forEach(d => vus.delete(d.id));
     pool = tous.filter(possible);
   }
+  if(pool.length === 0) return null; // (tout est masqué à ce niveau : pas de défi, on boit)
   const defi = pool[Math.floor(hasardHot() * pool.length)];
   vus.add(defi.id);
   let nom1 = null, nom2 = null, cible = null;
@@ -163,13 +167,14 @@ function tirerDefiHot(nom, nbGorgees, partenaire){
 // avec le défi et deux boutons. L'annonce reste jusqu'au choix (elle ne se ferme plus toute seule).
 // À appeler juste après montrerOverlayRegle, quand UNE SEULE personne (ou un couple lié) doit boire.
 // Renvoie null (hors mode hot, ou pas de défi à proposer) ou l'état du défi : { choix: null | "fait" | "bois", partenaire }.
-function montrerDefiHot(joueurIndex, nbGorgees, defiPossible = true){
+// defiImpose : { id, texte } déjà prêt (aperçu du pilotage, voir apercuDefiHot)
+function montrerDefiHot(joueurIndex, nbGorgees, defiPossible = true, defiImpose = null){
   if(!partieHot || !defiPossible || !partieLancee) return null;
   const overlay = document.getElementById("overlayRegleUnique");
   if(!overlay) return null;
   const nom = joueurs[joueurIndex];
   const partenaire = partenaireHot(nom);
-  const defi = tirerDefiHot(nom, nbGorgees, partenaire);
+  const defi = defiImpose || tirerDefiHot(nom, nbGorgees, partenaire);
   if(!defi) return null;
   const etat = { choix: null, partenaire };
   const qui = partenaire ? `${avecCouronne(nom)} et ${avecCouronne(partenaire)}` : avecCouronne(nom);
@@ -361,3 +366,27 @@ function afficherOverlayCupidon(joueurActuel, classeCarte, suite = null){
   refresh();
 }
 // #endregion
+
+// ----- Aperçu d'un défi depuis le pilotage (stats.html → « Voir comme en jeu ») -----
+// index.html?apercu_defi=<texte>&niveau=A|B|C : l'annonce telle qu'en partie (Léa boit, Tom et Max visés), boutons sans effet.
+// L'adresse met le jeu en appli de test (MODE_TEST, script.js) : rien n'est compté dans les statistiques.
+function apercuDefiHot(texte, niveau){
+  const gorgees = { A: 3, B: 7, C: 12 }[niveau] || 3;
+  joueurs = ["Léa", "Tom", "Max"];
+  partieHot = true; partieLancee = true;
+  const t = String(texte).replace(/\{nom1\}|\{nom\}/g, "Tom").replace(/\{nom2\}/g, "Max");
+  montrerOverlayRegle(`Léa boit ${texteGorgees(gorgees)}`, niveau === "A" ? "trois_rouge" : niveau === "B" ? "plus_2_bleu" : "plus_4");
+  montrerDefiHot(0, gorgees, true, { id: "apercu", texte: t });
+  document.querySelectorAll("#overlayRegleUnique .bloc-hot-btn").forEach((b) => {
+    const copie = b.cloneNode(true); // (sans ses actions : l'aperçu ne joue pas)
+    copie.addEventListener("click", () => { copie.animate([{ transform: "scale(.94)" }, { transform: "scale(1)" }], 160); });
+    b.replaceWith(copie);
+  });
+}
+(() => {
+  const p = new URLSearchParams(location.search);
+  if (!p.has("apercu_defi")) return;
+  document.documentElement.classList.add("apercu-defi");
+  const lancer = () => setTimeout(() => { try { apercuDefiHot(p.get("apercu_defi"), p.get("niveau")); } catch (e) { console.error(e); } }, 600);
+  if (document.readyState === "complete") lancer(); else window.addEventListener("load", lancer);
+})();

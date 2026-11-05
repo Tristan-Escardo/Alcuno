@@ -217,13 +217,13 @@ try {
 // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
 // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
 // Numérotation : +0.0.1 à chaque mise en ligne, et après x.y.9 on passe à x.(y+1).0 (ex. 9.5.9 => 9.6.0)
-const VERSION_AFFICHEE = "9.81.0";
+const VERSION_AFFICHEE = "9.82.0";
 // Appli de test (adresse autre que GitHub Pages et que le poste de dev, ou « ?modetest ») : même jeu, même Firebase, mais
 // elle n'envoie ni statistiques ni plantages (les chiffres restent ceux de la vraie appli) et affiche « TEST » dans les Réglages
 // Un navigateur piloté par un programme (tests automatiques de Claude : navigator.webdriver) est aussi en mode test, pour que
 // ses passages ne comptent pas dans les stats ; « ?vraistats » force le comptage (le test qui vérifie justement les stats).
 const MODE_TEST = !/(^|\.)github\.io$|^localhost$|^127\.0\.0\.1$|^\[?::1\]?$|^$/i.test(location.hostname) || /[?&]modetest(=|&|$)/.test(location.search) ||
-  (navigator.webdriver === true && !/[?&]vraistats(=|&|$)/.test(location.search));
+  (navigator.webdriver === true && !/[?&]vraistats(=|&|$)/.test(location.search)) || /[?&]apercu_defi=/.test(location.search);
 const VERSION_JEU = VERSION_AFFICHEE.split(".")
   .reduce((total, partie, i) => total + Number(partie) * [10000, 100, 1][i], 0);
 // À l'écran : le numéro complet, pour voir d'un coup d'œil si un téléphone est à jour

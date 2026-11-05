@@ -180,6 +180,14 @@
         .bulle{ max-width: 90%; padding: 8px 12px; border-radius: 14px; font-size: 15px; line-height: 1.35; white-space: pre-wrap; overflow-wrap: anywhere; }
         .bulle.moi{ align-self: flex-end; background: rgba(0, 229, 255, .16); border: 1px solid rgba(0, 229, 255, .4); color: var(--cyan-clair); }
         .bulle.assistant{ align-self: flex-start; background: rgba(255, 79, 216, .12); border: 1px solid rgba(255, 79, 216, .4); color: #ffe0f8; }
+        /* Aperçu d'un défi dans le vrai jeu (Pilotage → Défis hot → « Voir comme en jeu ») */
+        #apercuJeu{ position: fixed; inset: 0; z-index: 50; background: rgba(0, 6, 12, .85); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 16px; }
+        #apercuJeu[hidden]{ display: none; }
+        #apercuJeu iframe{ width: min(390px, 100%); height: min(720px, calc(100vh - 110px)); border: 2px solid var(--cyan); border-radius: 22px; background: #000; box-shadow: 0 0 24px rgba(0, 229, 255, .35); }
+        #apercuJeu .pilBtn{ width: min(390px, 100%); margin: 0; }
+        .pilLigne .voir{ min-width: 0; padding: 6px 10px; }
+        .pilLigne .boutonsDefi{ display: flex; gap: 6px; flex: none; }
+        .pilLigne.masque span{ opacity: .45; text-decoration: line-through; }
         .pilVariantes{ display: flex; flex-direction: column; gap: 6px; margin: 0 0 10px; }
         .pilVariantes:empty{ display: none; }
         .pilVariantes button{ text-align: left; font: 600 14px "Rajdhani", Arial, sans-serif; line-height: 1.3; padding: 9px 11px; border-radius: 10px; border: 1px solid rgba(255, 79, 216, .5); background: rgba(255, 79, 216, .08); color: #ffe0f8; cursor: pointer; }
@@ -433,8 +441,14 @@
                 <p class="pilNote" id="pilDefiApercu"></p>
                 <label class="pilLabel" for="pilDefiNiveau">Niveau</label>
                 <select id="pilDefiNiveau"></select>
+                <button type="button" class="pilBtn sec" id="pilVoirDefi">👁 Voir comme en jeu</button>
                 <button type="button" class="pilBtn" id="pilAjouterDefi">Ajouter le défi</button>
                 <div id="pilDefis"></div>
+                <details id="pilDefisJeu">
+                    <summary>Défis du jeu (masquer ceux qui ne marchent pas)</summary>
+                    <p class="pilNote" style="margin-top:8px">Un défi masqué ne sort plus, dès la partie suivante. « Remettre » le fait revenir. Le pourcentage : part des fois où il a été relevé plutôt que bu (Stats → Défis hot).</p>
+                    <div id="pilDefisJeuListe"></div>
+                </details>
 
                 <div class="pilSous">Valeurs de départ</div>
                 <p class="pilNote">Pour ceux qui n'ont jamais touché au curseur. Les autres gardent leur choix.</p>
@@ -522,6 +536,7 @@
                         <li><b>Thèmes</b> : cacher un thème, ou ne le montrer que sur une période chaque année (ex. Star Wars début mai).</li>
                         <li><b>Annonce</b> : un message sur l'accueil, les Réglages et les Crédits (140 caractères). Tu peux la programmer (début + durée) ou la viser aux versions plus anciennes qu'une version donnée.</li>
                         <li><b>Défis hot</b> : tes propres défis, ajoutés à ceux du jeu en mode hot au niveau choisi. {nom} devient le prénom d'un autre joueur ; {nom1} et {nom2}, deux autres joueurs. 160 caractères, 300 défis au plus. Une partie déjà commencée garde les défis qu'elle avait au départ ; en ligne, tous les téléphones prennent ceux de celui qui lance la partie.</li>
+                        <li><b>Défis du jeu</b> (sous Défis hot) : masque un défi du jeu qui ne marche pas, sans republier le jeu. 👁 montre un défi tel qu'il apparaît en partie.</li>
                         <li><b>Valeurs de départ</b> : volume de la musique et vitesse de la voix pour ceux qui n'ont jamais touché au curseur.</li>
                         <li><b>Mise à jour demandée</b> : invite les joueurs d'une version trop ancienne à recharger le jeu.</li>
                         <li><b>Historique</b> et <b>Annuler la dernière modification</b> : tout se défait. « Tout remettre par défaut » efface tous les réglages (pas les défis hot).</li>
@@ -600,7 +615,7 @@
         });
         const authPorte = getAuth(app);
         // Version de la page de stats (à part de celle du jeu : +0.0.1 à chaque modification de cette page)
-        const VERSION_STATS = "1.18.1";
+        const VERSION_STATS = "1.19.0";
         document.getElementById("versionStats").textContent = VERSION_STATS;
         document.getElementById("versionStats2").textContent = VERSION_STATS;
         document.getElementById("versionStats3").textContent = VERSION_STATS;
@@ -940,9 +955,26 @@
                     const ids = Object.keys(defis).filter((id) => defis[id].n === n).sort();
                     if (!ids.length) return "";
                     return `<p class="pilNote" style="margin:12px 0 4px"><b>${ecape(ConfigLib.NIVEAUX_DEFIS[n])} · ${ids.length}</b></p>` +
-                        ids.map((id) => `<div class="pilLigne"><span>${ecape(defis[id].t)}</span><button type="button" class="coupe" data-defi="${id}">Retirer</button></div>`).join("");
+                        ids.map((id) => `<div class="pilLigne"><span>${ecape(defis[id].t)}</span><span class="boutonsDefi"><button type="button" class="voir" data-voir="${ecape(defis[id].t)}" data-niveau="${n}" aria-label="Voir comme en jeu">👁</button><button type="button" class="coupe" data-defi="${id}">Retirer</button></span></div>`).join("");
                 }).join("");
                 $("pilDefis").innerHTML = html || '<p class="pilNote" style="margin-top:10px">Aucun défi ajouté pour l\'instant : seuls ceux du jeu sortent.</p>';
+                dessinerDefisJeu();
+            }
+            // Défis du jeu (js/mode-hot.js) : masquer / remettre, avec leur taux de défis relevés
+            var statsDefisPil = {}; // (var : dessiner() peut passer avant cette ligne)
+            function dessinerDefisJeu(){
+                if (typeof DEFIS_HOT === "undefined") return;
+                const masques = config.defisMasques || {};
+                $("pilDefisJeuListe").innerHTML = Object.keys(ConfigLib.NIVEAUX_DEFIS).map((n) => {
+                    const liste = DEFIS_HOT[n] || [];
+                    const nb = liste.filter((d) => masques[d.id]).length;
+                    return `<p class="pilNote" style="margin:12px 0 4px"><b>${ecape(ConfigLib.NIVEAUX_DEFIS[n])} · ${liste.length - nb} actif${liste.length - nb > 1 ? "s" : ""}${nb ? ` · ${nb} masqué${nb > 1 ? "s" : ""}` : ""}</b></p>` + liste.map((d) => {
+                        const st = statsDefisPil[d.id] || {}, f = Number(st.fait || 0), b = Number(st.bois || 0);
+                        const taux = f + b ? ` <b>${Math.round(f / (f + b) * 100)} % · ${f + b}×</b>` : "";
+                        const m = !!masques[d.id];
+                        return `<div class="pilLigne${m ? " masque" : ""}"><span>${ecape(d.t)}${taux}</span><span class="boutonsDefi"><button type="button" class="voir" data-voir="${ecape(d.t)}" data-niveau="${n}" aria-label="Voir comme en jeu">👁</button><button type="button" class="${m ? "" : "coupe"}" data-jeu="${d.id}" data-masque="${m ? 0 : 1}">${m ? "Remettre" : "Masquer"}</button></span></div>`;
+                    }).join("");
+                }).join("");
             }
 
             // Écrit la nouvelle config en gardant l'ancienne dans « config_hist » (pour pouvoir annuler)
@@ -1023,6 +1055,27 @@
             $("pilAjouterDefi").addEventListener("click", async () => {
                 if (await lancer([{ op: "defi_ajout", texte: $("pilDefiTexte").value, niveau: $("pilDefiNiveau").value }])) { $("pilDefiTexte").value = ""; apercuDefi(); }
             });
+            // aperçu dans le vrai jeu (index.html?apercu_defi=… : voir apercuDefiHot dans js/mode-hot.js ; rien n'y est compté)
+            const voirEnJeu = (texte, niveau) => {
+                $("apercuJeuCadre").src = `index.html?apercu_defi=${encodeURIComponent(texte)}&niveau=${encodeURIComponent(niveau)}`;
+                $("apercuJeu").hidden = false;
+            };
+            $("apercuJeuFermer").addEventListener("click", () => { $("apercuJeu").hidden = true; $("apercuJeuCadre").src = "about:blank"; });
+            $("pilVoirDefi").addEventListener("click", () => {
+                const t = $("pilDefiTexte").value, e = ConfigLib.erreurDefi(t);
+                if (e) { message(e, true); return; }
+                voirEnJeu(t.trim(), $("pilDefiNiveau").value);
+            });
+            $("blocPilotage").addEventListener("click", (ev) => {
+                const v = ev.target.closest("button[data-voir]");
+                if (v) voirEnJeu(v.dataset.voir, v.dataset.niveau);
+            });
+            $("pilDefisJeuListe").addEventListener("click", (ev) => {
+                const b = ev.target.closest("button[data-jeu]"); if (!b) return;
+                const d = ["A", "B", "C"].map((n) => DEFIS_HOT[n].find((x) => x.id === b.dataset.jeu)).find(Boolean);
+                lancer([{ op: b.dataset.masque === "1" ? "defi_masquer" : "defi_remettre", id: b.dataset.jeu, texte: d ? d.t : "" }]);
+            });
+            onValue(ref(db, "stats/defis"), (sn) => { statsDefisPil = sn.val() || {}; dessinerDefisJeu(); }, () => {});
             $("pilDefis").addEventListener("click", (ev) => {
                 const b = ev.target.closest("button[data-defi]"); if (!b) return;
                 const d = (config.defisHot || {})[b.dataset.defi];
@@ -1595,5 +1648,9 @@ Données (stats ; « jours » = les 45 derniers jours, « visiteurs » du jour =
             else if (ouvert) location.reload();
         });
     </script>
+    <div id="apercuJeu" hidden role="dialog" aria-label="Aperçu du défi dans le jeu">
+        <iframe id="apercuJeuCadre" title="Aperçu du défi dans le jeu"></iframe>
+        <button type="button" class="pilBtn" id="apercuJeuFermer">Fermer l'aperçu</button>
+    </div>
 </body>
 </html>

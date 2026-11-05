@@ -889,7 +889,7 @@ function ecouterEtatPartie(code){
 
 // Écrit une nouvelle manche (transaction : si deux joueurs relancent en même temps, une seule passe)
 // depuisSalle : lancement depuis la salle d'attente ; sinon « Rejouer » pendant une manche
-// avecDefis : la manche emporte les défis hot ajoutés depuis le pilotage (ceux du téléphone qui lance ; « Rejouer » garde
+// avecDefis : la manche emporte les défis hot ajoutés et masqués depuis le pilotage (ceux du téléphone qui lance ; « Rejouer » garde
 // ceux de la manche), pour que tous les téléphones tirent dans la même liste. Si Firebase refuse (règles pas encore
 // publiées), on relance sans eux : chacun prend alors les siens (voir initialiserModeHot).
 function lancerMancheEnLigne(listeJoueurs, depuisSalle, avecDefis = true){
@@ -905,7 +905,8 @@ function lancerMancheEnLigne(listeJoueurs, depuisSalle, avecDefis = true){
     const express = depuisSalle ? estPartieExpress() : graineExpress(e.seed || 0);
     // Mode hot : même principe (réglage de celui qui lance, gardé par « Rejouer »)
     const hot = depuisSalle ? caseModeHot.checked : graineHot(e.seed || 0);
-    const defis = !hot || !avecDefis ? null : depuisSalle ? (configDistante && configDistante.defisHot) : e.defisHot;
+    const source = !hot || !avecDefis ? {} : depuisSalle ? (configDistante || {}) : e;
+    const defis = source.defisHot, masques = source.defisMasques;
     return Object.assign({
       demarree: true,
       manche: (e.manche || 0) + 1,
@@ -914,7 +915,7 @@ function lancerMancheEnLigne(listeJoueurs, depuisSalle, avecDefis = true){
       seed: Math.floor(Math.random() * 4294967296) + (premierePartieJouee() ? 0 : GRAINE_SANS_CARTE_DOREE) + (express ? GRAINE_EXPRESS : 0) + (hot ? GRAINE_HOT : 0),
       joueurs: listeJoueurs,
       hote: e.hote || pseudoActuel
-    }, defis && Object.keys(defis).length ? { defisHot: defis } : {});
+    }, defis && Object.keys(defis).length ? { defisHot: defis } : {}, masques && Object.keys(masques).length ? { defisMasques: masques } : {});
   }).then((resultat) => {
     if (resultat && resultat.committed) { // statistiques : une fois par manche (celui qui lance)
       const seed = (resultat.snapshot && resultat.snapshot.val() || {}).seed || 0;

@@ -84,6 +84,9 @@
         }
       },
       "majMin": { ".validate": "newData.isString() && newData.val().matches(/^[0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}$/)" },
+      "defisMasques": {
+        "$id": { ".validate": "$id.matches(/^[ABC][0-9]{1,3}$/) && newData.val() === true" }
+      },
       "defisHot": {
         "$id": {
           ".validate": "$id.matches(/^[a-z0-9]{1,30}$/) && newData.hasChildren(['t', 'n'])",
@@ -185,6 +188,9 @@
           "hote": { ".validate": "newData.isString() && newData.val().length <= 20" },
           "message": { ".validate": "newData.isString() && newData.val().length <= 100" },
           "joueurs": { "$i": { ".validate": "newData.isString() && newData.val().length <= 20" } },
+          "defisMasques": {
+            "$id": { ".validate": "$id.matches(/^[ABC][0-9]{1,3}$/) && newData.val() === true" }
+          },
           "defisHot": {
             "$id": {
               ".validate": "$id.matches(/^[a-z0-9]{1,30}$/) && newData.hasChildren(['t', 'n'])",

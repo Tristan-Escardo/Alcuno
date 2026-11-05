@@ -134,6 +134,14 @@ verifier(regles.config[".read"] === true && /auth\.uid/.test(regles.config[".wri
   verifier(j.finies && /\+ 20/.test(j.joueurs[".validate"]) && /\+ 300/.test(j.minutes[".validate"]) && /hot\|pj\|express\|tele/.test(j.modes.$m[".validate"]) && regles.stats.defis.$id.fait && regles.stats.defis.$id.bois && regles.stats.appareils.$id.installe && regles.stats.appareils.$id.joue,
     "règles Firebase : parties finies, joueurs, durée, modes, défis relevés, installations qui jouent");
 }
+{
+  const m1 = L.appliquer({}, { op: "defi_masquer", id: "A4", texte: "Fais un clin d'œil" }, 0), m2 = L.appliquer(m1.config, { op: "defi_remettre", id: "A4" }, 0);
+  verifier(m1.config.defisMasques.A4 === true && /masqué \(A4\)/.test(m1.resume) && !m2.config.defisMasques && L.appliquer({}, { op: "defi_masquer", id: "Z9" }, 0).erreur &&
+    JSON.stringify(L.valider({ defisMasques: { A4: true, B12: true, Z1: true, C3: "oui" } }).defisMasques) === '{"A4":true,"B12":true}' &&
+    L.appliquer(m1.config, { op: "tout_remettre" }, 0).config.defisMasques.A4 && L.decrire(m1.config).join() === "1 défi du jeu masqué",
+    "défis du jeu masqués : masquer, remettre, validation, gardés par « tout remettre »");
+}
+verifier(regles.config.defisMasques.$id && regles.parties.$code.etatJeu.defisMasques.$id, "règles Firebase : défis du jeu masqués (config et manche en ligne)");
 verifier(regles.parties.$code.etatJeu.defisHot.$id.t && regles.parties.$code.etatJeu.defisHot.$id.n, "règles Firebase : une manche en ligne emporte les défis hot de celui qui la lance");
 verifier(regles.config.defisHot && regles.config.defisHot.$id.t && regles.config.defisHot.$id.n && regles.config.themes.$theme[".validate"].includes("donjon"), "règles Firebase : défis hot et thème BDSM pilotables");
 console.log(process.exitCode ? "\nÉCHEC(S)" : `\nTOUT EST OK (${ok})`);
