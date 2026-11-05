@@ -185,6 +185,14 @@
           "hote": { ".validate": "newData.isString() && newData.val().length <= 20" },
           "message": { ".validate": "newData.isString() && newData.val().length <= 100" },
           "joueurs": { "$i": { ".validate": "newData.isString() && newData.val().length <= 20" } },
+          "defisHot": {
+            "$id": {
+              ".validate": "$id.matches(/^[a-z0-9]{1,30}$/) && newData.hasChildren(['t', 'n'])",
+              "t": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 160" },
+              "n": { ".validate": "newData.isString() && newData.val().matches(/^[ABC]$/)" },
+              "$autre": { ".validate": false }
+            }
+          },
           "$autre": { ".validate": false }
         },
         "manches": {

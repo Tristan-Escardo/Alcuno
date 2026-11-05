@@ -521,7 +521,7 @@
                         <li><b>Fonctions</b> : couper la voix, la musique ou le mode en ligne pour tout le monde (utile en cas de bug ou de maintenance). Pense à les remettre.</li>
                         <li><b>Thèmes</b> : cacher un thème, ou ne le montrer que sur une période chaque année (ex. Star Wars début mai).</li>
                         <li><b>Annonce</b> : un message sur l'accueil, les Réglages et les Crédits (140 caractères). Tu peux la programmer (début + durée) ou la viser aux versions plus anciennes qu'une version donnée.</li>
-                        <li><b>Défis hot</b> : tes propres défis, ajoutés à ceux du jeu en mode hot au niveau choisi. {nom} devient le prénom d'un autre joueur ; {nom1} et {nom2}, deux autres joueurs. 160 caractères, 300 défis au plus. Une partie déjà commencée garde les défis qu'elle avait au départ.</li>
+                        <li><b>Défis hot</b> : tes propres défis, ajoutés à ceux du jeu en mode hot au niveau choisi. {nom} devient le prénom d'un autre joueur ; {nom1} et {nom2}, deux autres joueurs. 160 caractères, 300 défis au plus. Une partie déjà commencée garde les défis qu'elle avait au départ ; en ligne, tous les téléphones prennent ceux de celui qui lance la partie.</li>
                         <li><b>Valeurs de départ</b> : volume de la musique et vitesse de la voix pour ceux qui n'ont jamais touché au curseur.</li>
                         <li><b>Mise à jour demandée</b> : invite les joueurs d'une version trop ancienne à recharger le jeu.</li>
                         <li><b>Historique</b> et <b>Annuler la dernière modification</b> : tout se défait. « Tout remettre par défaut » efface tous les réglages (pas les défis hot).</li>
@@ -600,7 +600,7 @@
         });
         const authPorte = getAuth(app);
         // Version de la page de stats (à part de celle du jeu : +0.0.1 à chaque modification de cette page)
-        const VERSION_STATS = "1.18.0";
+        const VERSION_STATS = "1.18.1";
         document.getElementById("versionStats").textContent = VERSION_STATS;
         document.getElementById("versionStats2").textContent = VERSION_STATS;
         document.getElementById("versionStats3").textContent = VERSION_STATS;

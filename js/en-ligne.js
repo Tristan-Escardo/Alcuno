@@ -889,7 +889,10 @@ function ecouterEtatPartie(code){
 
 // Écrit une nouvelle manche (transaction : si deux joueurs relancent en même temps, une seule passe)
 // depuisSalle : lancement depuis la salle d'attente ; sinon « Rejouer » pendant une manche
-function lancerMancheEnLigne(listeJoueurs, depuisSalle){
+// avecDefis : la manche emporte les défis hot ajoutés depuis le pilotage (ceux du téléphone qui lance ; « Rejouer » garde
+// ceux de la manche), pour que tous les téléphones tirent dans la même liste. Si Firebase refuse (règles pas encore
+// publiées), on relance sans eux : chacun prend alors les siens (voir initialiserModeHot).
+function lancerMancheEnLigne(listeJoueurs, depuisSalle, avecDefis = true){
   const mancheAttendue = mancheCourante;
   const refEtat = window.fbRef(window.firebaseDB, `parties/${codePartieActuel}/etatJeu`);
 
@@ -902,7 +905,8 @@ function lancerMancheEnLigne(listeJoueurs, depuisSalle){
     const express = depuisSalle ? estPartieExpress() : graineExpress(e.seed || 0);
     // Mode hot : même principe (réglage de celui qui lance, gardé par « Rejouer »)
     const hot = depuisSalle ? caseModeHot.checked : graineHot(e.seed || 0);
-    return {
+    const defis = !hot || !avecDefis ? null : depuisSalle ? (configDistante && configDistante.defisHot) : e.defisHot;
+    return Object.assign({
       demarree: true,
       manche: (e.manche || 0) + 1,
       // (+ GRAINE_SANS_CARTE_DOREE : première partie de l'hôte, sans carte dorée pour personne ;
@@ -910,14 +914,17 @@ function lancerMancheEnLigne(listeJoueurs, depuisSalle){
       seed: Math.floor(Math.random() * 4294967296) + (premierePartieJouee() ? 0 : GRAINE_SANS_CARTE_DOREE) + (express ? GRAINE_EXPRESS : 0) + (hot ? GRAINE_HOT : 0),
       joueurs: listeJoueurs,
       hote: e.hote || pseudoActuel
-    };
+    }, defis && Object.keys(defis).length ? { defisHot: defis } : {});
   }).then((resultat) => {
     if (resultat && resultat.committed) { // statistiques : une fois par manche (celui qui lance)
       const seed = (resultat.snapshot && resultat.snapshot.val() || {}).seed || 0;
       noterPartieStats(true, { hot: graineHot(seed), express: graineExpress(seed), pj: estModeSoft() });
     }
     marquerActivite(codePartieActuel);
-  }).catch(erreurFirebase);
+  }).catch((erreur) => {
+    if (avecDefis && /permission/i.test(String(erreur && (erreur.code || erreur.message)))) return lancerMancheEnLigne(listeJoueurs, depuisSalle, false);
+    erreurFirebase(erreur);
+  });
 }
 
 // Date de dernière activité (heure du serveur) : une partie sans activité depuis 3 h

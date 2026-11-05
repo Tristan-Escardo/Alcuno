@@ -86,8 +86,12 @@ let hasardHot = Math.random; // hasard des défis : à graine (voir initialiserM
 function initialiserModeHot(){
   defisVusHot = {};
   // Défis ajoutés depuis le pilotage (stats.html → config.defisHot, js/config-lib.js) : figés pour toute la partie,
-  // triés par identifiant pour que le tirage à graine reste le même en reprise de partie
-  const ajoutes = (typeof configDistante === "object" && configDistante && configDistante.defisHot) || {};
+  // triés par identifiant pour que le tirage à graine reste le même en reprise de partie.
+  // En ligne : ceux que la manche emporte (téléphone qui l'a lancée, js/en-ligne.js), les mêmes pour tous ;
+  // une manche sans liste (lancée par une ancienne version) : ceux de ce téléphone.
+  const deLaManche = enLigneActif && dernierEtatManche && dernierEtatManche.defisHot;
+  const ajoutes = deLaManche ? (ConfigLib.valider({ defisHot: deLaManche }).defisHot || {})
+    : (typeof configDistante === "object" && configDistante && configDistante.defisHot) || {};
   defisAjoutesHot = { A: [], B: [], C: [] };
   Object.keys(ajoutes).sort().forEach((id) => {
     const d = ajoutes[id];
