@@ -179,12 +179,15 @@ function verifier(ok, texte){
     const compteur = () => page.evaluate(() => [...document.querySelectorAll("#overlayPredictionFin .fin-choix-card .fin-choix-numeros b")].map((b) => b.textContent).join(","));
     await cartes[0].click(); await page.waitForTimeout(200);
     const un = await compteur();
+    // le joueur suivant fait défiler en posant le doigt sur « Retour » : le choix du joueur d'avant ne doit pas sauter
+    await page.dispatchEvent("#overlayPredictionFin .fin-choix-retour", "pointerdown"); await page.waitForTimeout(200);
+    const apresDefilement = await compteur(), libelleRetour = await page.textContent("#overlayPredictionFin .fin-choix-retour");
     await cartes[0].click(); await page.waitForTimeout(200); // (même carte pour le 2e joueur : le 1 devient 2)
     const deux = await compteur();
     await cartes[1].click(); await page.waitForTimeout(200); // (autre carte pour le 3e : un 1 dessus)
     const trois = await compteur();
-    verifier(sousTitreSurDeuxLignes && apresPose === 0 && un === "1" && deux === "2" && trois === "2,1" && erreurs.length === 0,
-      `pari de la fin : phrase à la ligne (${sousTitreSurDeuxLignes}), rien au doigt posé (${apresPose}), compteur ${un} puis ${deux} puis ${trois}`);
+    verifier(sousTitreSurDeuxLignes && apresPose === 0 && un === "1" && apresDefilement === "1" && libelleRetour === "Retour (Tom)" && deux === "2" && trois === "2,1" && erreurs.length === 0,
+      `pari de la fin : phrase à la ligne (${sousTitreSurDeuxLignes}), rien au doigt posé (${apresPose}), compteur ${un}, doigt posé sur « ${libelleRetour} » sans effet (${apresDefilement}), puis ${deux} puis ${trois}`);
     // Sur la télé : le nom du joueur et la carte qu'il a choisie ne sont pas collés
     const texteTele = await page.evaluate(() => ecranPourTele().texte);
     const collee = /(Tom|Lea|Max)[A-Za-zÀ-ÿ]/.test(texteTele.replace(/Tom ←/g, "Tom "));

@@ -21,7 +21,8 @@ function estOuverte(page){
 }
 
 function taper(el){
-  el.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
+  if(el._net && el._net.evenement === "click") el.click(); // (boutons qui agissent au doigt levé : pari de la fin…)
+  else el.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
 }
 
 // Certains boutons réagissent au tap (pointerdown), d'autres au clic
@@ -72,7 +73,7 @@ function actionRetour(){
   if(overlays.length){
     const dessus = overlays[overlays.length - 1];
     const btnRetour = Array.from(dessus.querySelectorAll("button"))
-      .find(b => b.innerText.trim() === "Retour");
+      .find(b => /^Retour( \(.+\))?$/.test(b.innerText.trim())); // (« Retour (Tom) » : pari de la fin)
     return () => {
       if(!btnRetour) taper(dessus);
       else if(!btnRetour.disabled) taper(btnRetour);

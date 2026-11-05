@@ -1093,7 +1093,11 @@ function lancerOverlayPrediction(startIndex){
   btnReveler.type = "button";
   btnReveler.className = "bouton-pigeon fin-choix-reveler";
   btnReveler.innerText = "Valider";
+  // (« Valider » et « Retour » : au doigt levé, comme les cartes. Au doigt posé, faire défiler la page en partant du
+  // bouton « Retour », juste au-dessus des cartes, annulait le choix du joueur d'avant sans qu'on le voie, et le joueur
+  // suivant remplaçait alors la carte de l'autre.)
   surAction(btnReveler, "pred:reveler", {
+    evenement: "click",
     once: true,
     unique: true,
     valide: () => curPos >= ordre.length && !revele
@@ -1107,6 +1111,7 @@ function lancerOverlayPrediction(startIndex){
   btnRetourPari.className = "bouton-pigeon fin-choix-retour";
   btnRetourPari.innerText = "Retour";
   surAction(btnRetourPari, "pred:retour", {
+    evenement: "click",
     owner: () => curPos > 0 ? joueurs[ordre[curPos - 1]] : null, // celui qui vient de choisir
     valide: () => curPos > 0 && !revele
   }, () => {
@@ -1122,6 +1127,7 @@ function lancerOverlayPrediction(startIndex){
     btnReveler.disabled = !peutReveler;
     btnReveler.classList.toggle("cache", !peutReveler);
     btnRetourPari.disabled = !peutRevenir;
+    btnRetourPari.innerText = peutRevenir ? `Retour (${joueurs[ordre[curPos - 1]]})` : "Retour"; // (on voit quel choix il annule)
     btnRetourPari.classList.toggle("cache", !peutRevenir);
   }
 
@@ -1220,7 +1226,7 @@ function lancerOverlayPrediction(startIndex){
       const btn = document.createElement('button');
       btn.className = 'bouton-pigeon';
       btn.innerText = 'Terminer';
-      surAction(btn, "pred:terminer", { once: true, unique: true }, () => {
+      surAction(btn, "pred:terminer", { evenement: "click", once: true, unique: true }, () => { // (au doigt levé, comme le reste du pari)
         if(overlay._cleanup) overlay._cleanup();
         overlay.remove();
         unlockScroll();

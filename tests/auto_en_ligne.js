@@ -21,7 +21,7 @@
     const choix = ["#overlayCouleur .carre-couleur", "#overlayPigeon .bouton-pigeon", "#overlayDuel .duel-boutons .bouton-pigeon",
       "#overlayDuel .duel-cartes .Carte", "#overlayAnnulation .bouton-annulation", "#overlayCarteDoree .bouton-doree",
       "#overlayPredictionFin .fin-choix-card", "#overlayPredictionFin .bouton-pigeon", "#overlayFinUnRestants .bouton-pigeon"];
-    for (const sel of choix) { const el = $$(sel).filter(cliquable)[0]; if (el) { pd(el); return setTimeout(tick, 300); } }
+    for (const sel of choix) { const el = $$(sel).filter(cliquable)[0]; if (el) { if (sel.includes("#overlayPredictionFin")) el.click(); else pd(el); return setTimeout(tick, 300); } } // (pari : au doigt levé)
     const msg = $("#overlayRegleUnique") || $("#overlayResultatAnnulation");
     if (msg) { pd(msg); return setTimeout(tick, 300); }
     const label = $("#stickyJoueurActif .sticky-label");
