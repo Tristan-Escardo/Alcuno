@@ -980,6 +980,7 @@ function lancerOverlayChoixDuel(joueurActuel, carteDuel = ""){
       btn.style.cursor = "not-allowed";
 
       if(picks.length === 2){
+        if(aleatoire() < 0.5) picks.reverse(); // qui commence : au hasard (avant : le 1er joueur touché)
         // Les autres joueurs ne réagissent plus (même aspect) : un 3e tap rapide n'envoie plus d'action
         containerBoutons.style.pointerEvents = "none";
         if(nbDuellistes > 2) proposerAnnulerChoix(choisisseur, debutChoix); // « Mauvais joueur ? Annuler » quelques secondes
@@ -1001,6 +1002,7 @@ function lancerOverlayChoixDuel(joueurActuel, carteDuel = ""){
   // Seulement 2 joueurs en jeu : le choix est forcé, on passe directement au tirage (sans demander quoi que ce soit)
   if(nbDuellistes === 2){
     const duellistes = joueurs.map((nom, idx) => idx).filter(idx => !estEnPause(joueurs[idx]));
+    if(aleatoire() < 0.5) duellistes.reverse(); // qui commence : au hasard
     overlay.innerHTML = "";
     afficherOverlayTirageDuel(overlay, duellistes[0], duellistes[1], carteDuel);
   }

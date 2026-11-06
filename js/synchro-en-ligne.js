@@ -511,6 +511,11 @@ function majRattrapage(){
 }
 
 function finirRattrapage(){
+  if(ecranAttenduApresRetour){ // (retour en arrière : d'abord jusqu'à l'écran du choix annulé)
+    const id = ecranAttenduApresRetour;
+    ecranAttenduApresRetour = null;
+    return avancerJusquAEcran(id, finirRattrapage);
+  }
   rattrapageEnCours = false;
   seqFinRattrapage = 0;
   document.body.classList.remove("rattrapage");
@@ -808,7 +813,8 @@ function reprendrePartieClassique(s){
 }
 
 // Relance la partie (même graine) et rejoue ces taps en accéléré, derrière un écran d'attente
-function rejouerActionsClassiques(actions, texte, apres = null){
+// ecranAttendu : écran à retrouver après la dernière action (retour en arrière : voir avancerJusquAEcran)
+function rejouerActionsClassiques(actions, texte, apres = null, ecranAttendu = null){
   rattrapageEnCours = true; // annonces et animations quasi instantanées (voir delai)
   document.body.classList.add("rattrapage");
   const ecran = document.createElement("div");
@@ -820,7 +826,7 @@ function rejouerActionsClassiques(actions, texte, apres = null){
   let attente = 0;
   const etape = () => {
     ecran.innerText = `${texte}\n${i} / ${actions.length}`;
-    if(i >= actions.length) return terminer();
+    if(i >= actions.length) return ecranAttendu ? avancerJusquAEcran(ecranAttendu, terminer) : terminer();
     const resultat = rejouerActionClassique(actions[i]);
     if(resultat === "attendre" && attente < 6000){
       attente += 20;
@@ -974,6 +980,29 @@ function actionAppliquee(position){
   if(choixAnnulable && position > choixAnnulable.fin) masquerAnnulerChoix();
 }
 
+// Écran où se fait chaque choix annulable. Après un retour en arrière, la partie est rejouée jusqu'à l'action
+// d'avant le choix ; entre elle et l'écran du choix, il peut y avoir des étapes sans action (fin du duel, annonce
+// « X boit N gorgées »…) : on les fait défiler vite, pour revenir directement sur l'écran du choix (avant : on
+// revoyait la fin du duel, puis l'annonce, avant de retrouver « Annuler 0, 1, 2… »).
+const ECRANS_DES_CHOIX = [[/^annul:/, "overlayAnnulation"], [/^duel:choix:/, "overlayDuel"], [/^pigeon:/, "overlayPigeon"],
+  [/^doree:/, "overlayCarteDoree"], [/^plus4:/, "overlayPlus4"]];
+let ecranAttenduApresRetour = null; // en ligne : écran à retrouver à la fin du rejeu (voir finirRattrapage)
+function ecranDuChoix(idAction){
+  const e = ECRANS_DES_CHOIX.find(([motif]) => motif.test(String(idAction || "")));
+  return e ? e[1] : null;
+}
+// Pendant le rejeu (rattrapageEnCours : annonces et animations quasi instantanées), jusqu'à ce que l'écran soit là
+// (8 s au plus : si le choix ne revient pas, on s'arrête là où on en est)
+function avancerJusquAEcran(id, fin){
+  const depart = Date.now();
+  const tour = () => {
+    if(!id || document.getElementById(id) || Date.now() - depart > 8000) return fin();
+    if(document.getElementById("overlayRegleUnique")) fermerOverlayRegleUnique(); // (annonce qui attend un tap)
+    setTimeout(tour, 40);
+  };
+  tour();
+}
+
 function defaireChoix(choix){
   if(enLigneActif){
     ecrireAction(`defaire:${choix.debut}`).catch(() => afficherToast("Connexion perdue, réessaie"));
@@ -986,7 +1015,7 @@ function defaireChoix(choix){
   retourMenu();
   joueurs = s.joueurs.slice();
   annulations = {};
-  rejouerActionsClassiques(s.actions.slice(0, choix.debut), "Retour en arrière…");
+  rejouerActionsClassiques(s.actions.slice(0, choix.debut), "Retour en arrière…", null, ecranDuChoix(s.actions[choix.debut]));
 }
 
 // Valable si le choix a été fait par le même joueur et que rien d'autre n'a été joué entre-temps
@@ -1010,6 +1039,7 @@ function appliquerDefaireEnLigne(action){
     return "ignorer";
   }
   for(let s = debut; s <= fin; s++) seqsAnnulees.add(s);
+  ecranAttenduApresRetour = ecranDuChoix((toutesActionsManche.get(debut) || {}).id);
   // Le choix est déjà appliqué ici : la manche est rejouée depuis le serveur, sans lui
   setTimeout(() => resynchroniserManche(true), 0);
   return "ok";
