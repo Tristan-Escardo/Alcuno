@@ -1019,6 +1019,16 @@ function afficherOverlayTirageDuel(overlay, j1, j2, carteDuel = ""){
   titre.innerText = "DUEL";
   content.appendChild(titre);
 
+  // « Tris VS Ylana » : qui s'affronte, sous le titre, pendant tout le duel (égalités comprises)
+  const vs = document.createElement("div");
+  vs.className = "duel-vs";
+  const nomVs = (idx) => { const s = document.createElement("span"); s.className = "duel-vs-nom"; s.textContent = joueurs[idx]; return s; };
+  const motVs = document.createElement("b");
+  motVs.className = "duel-vs-mot";
+  motVs.textContent = "VS";
+  vs.append(nomVs(j1), " ", motVs, " ", nomVs(j2)); // (espaces : la télé lit « Tris VS Ylana »)
+  content.appendChild(vs);
+
   const info = document.createElement("div");
   info.className = "duel-info";
   content.appendChild(info);

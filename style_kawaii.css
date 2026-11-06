@@ -681,6 +681,7 @@ html[data-theme="kawaii"] #ecranTele .tele-historique-quoi{ color: var(--givre-d
 html[data-theme="kawaii"] #ecranTele .tele-historique-quoi em{ color: var(--givre-accent); }
 html[data-theme="kawaii"] #ecranTele .tele-pause-titre{ color: #ffffff; text-shadow: 0 0 0.6vh #ffffff, 0 0 2vh #ff3f9f, 0 0 4vh #f02a8d; }
 html[data-theme="kawaii"] #ecranTele .tele-pause svg{ fill: #ffffff; filter: drop-shadow(0 0 1.4vh #ff3f9f); }
+html[data-theme="kawaii"] #overlayDuel .duel-vs-nom{ color: var(--givre-texte); }
 
 /* ===== Décors et formes du thème Kawaii ===== */
 /* Décors et formes du thème Kawaii (ajoutés après les règles tirées de Givre, voir outils/generer_kawaii.py) */
