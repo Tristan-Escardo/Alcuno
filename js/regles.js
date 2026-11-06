@@ -454,6 +454,7 @@ function afficherOverlayAnnulation(joueurIndex, nbGorgees, onDone = null, afterC
     surAction(btn, `annul:${nom}:${i}`, { owner: nom, once: true }, () => {
       // Overlay en train de se fermer : ses autres boutons ne doivent plus recevoir d'action
       overlay.dataset.netFerme = "1";
+      proposerAnnulerChoix(nom, positionActionCourante(), "Mauvais bouton ?"); // (retour au choix « Annuler 0, 1, 2… »)
       const utilise = i;
       const reste = nbGorgees - utilise;
       jouerSon(utilise > 0 ? "annuler_gorgees" : "annuler_0_gorgees");

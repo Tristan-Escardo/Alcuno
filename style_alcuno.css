@@ -8797,13 +8797,10 @@ html[data-theme="givre"] #ecranTele .tele-pause svg{ fill: #fff; filter: drop-sh
   margin: -4px 0 8px; max-width: 92vw;
   font: 900 22px/1.2 Arial, sans-serif; text-align: center;
 }
-#overlayDuel .duel-vs-nom{ color: #fff; overflow-wrap: anywhere; }
-#overlayDuel .duel-vs-mot{
-  font-size: 17px; letter-spacing: 0.06em; padding: 3px 10px; border-radius: 999px;
-  background: linear-gradient(180deg, var(--actif-haut), var(--actif-bas)); color: var(--actif-texte);
-  box-shadow: 0 0 12px var(--actif-halo);
-}
+#overlayDuel .duel-vs{ color: #fff; }
+#overlayDuel .duel-vs-nom{ overflow-wrap: anywhere; }
+#overlayDuel .duel-vs-mot{ font-size: 0.8em; color: inherit; opacity: 0.8; } /* (comme le texte : pas de bulle) */
 html.accessibilite #overlayDuel .duel-vs{ zoom: 1.25; }
-html[data-theme="soleil"] #overlayDuel .duel-vs-nom{ color: #2a1a44; }
-html[data-theme="givre"] #overlayDuel .duel-vs-nom{ color: var(--givre-texte); }
+html[data-theme="soleil"] #overlayDuel .duel-vs{ color: #2a1a44; }
+html[data-theme="givre"] #overlayDuel .duel-vs{ color: var(--givre-texte); }
 html[data-theme="soleil"] #overlayDuel .duel-info{ color: #8a1f4a; text-shadow: none; } /* (jaune sur pêche : peu lisible) */
