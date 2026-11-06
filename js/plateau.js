@@ -507,6 +507,8 @@ function appliquerBonusCouleurSiBesoin(carteTiree, options = {}){
       afficherRegleBloc(regleZero, msgCouleur);
       regleZero.style.display = "block";
       zeroEnCours = true;
+    } else {
+      ajouterLigneCouleurRegles(msgCouleur); // (sous la règle de la carte, qui reste affichée)
     }
     montrerOverlayRegle(msgCouleur, carteTiree);
   };
@@ -518,6 +520,29 @@ function appliquerBonusCouleurSiBesoin(carteTiree, options = {}){
   }
 
   return true;
+}
+
+// La carte tirée avait sa propre règle (+2, sociale, pigeon…) : la gorgée pour la couleur s'ajoute en dernière ligne
+// du bloc Règles où cette règle est affichée (avant : seulement dans l'annonce et les dernières cartes, on ne la
+// voyait plus ensuite, ni sur la télé, qui recopie ce bloc).
+function ajouterLigneCouleurRegles(texte){
+  const bloc = [reglePigeon, regleZero].find((el) => el.style.display !== "none" && el.textContent.trim());
+  if(!bloc){
+    afficherRegleBloc(regleZero, texte);
+    regleZero.style.display = "block";
+    zeroEnCours = true;
+    return;
+  }
+  let liste = bloc.querySelector("ul.lignesRegle");
+  if(!liste){
+    liste = document.createElement("ul");
+    liste.className = "lignesRegle";
+    bloc.appendChild(liste);
+  }
+  const li = document.createElement("li");
+  li.className = "ligne-couleur";
+  remplirAvecGorgees(li, texte);
+  liste.appendChild(li);
 }
 
 function lockScroll(){

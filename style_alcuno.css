@@ -6042,6 +6042,15 @@ html.tele-ecran-ouvert #refletPrestige{
 #ecranTele .tele-badge.tele-badge-pulse{
   animation: pulseBonus 0.6s ease-out;
 }
+/* « Il reste 18 cartes » sous le plateau (comme sur le téléphone) */
+#ecranTele .tele-compteur{
+  margin-top: 1.6vh;
+  font: 700 2.6vh Arial, sans-serif;
+  color: inherit;
+  opacity: 0.75;
+  text-align: center;
+}
+#ecranTele .tele-compteur[hidden]{ display: none; }
 #ecranTele .tele-restantes{
   margin-top: 2vh;
   font-size: 2.4vh;
@@ -7787,8 +7796,10 @@ html.accessibilite #notifChambrage > div{ zoom: 1.2; }
 #ecranTele .tele-dernieres-titre + .tele-dernieres-item .Carte{ outline: 0.3vh solid #FFD700; outline-offset: 0.2vh; }
 html[data-theme="givre"] #ecranTele .tele-dernieres-item{ color: var(--givre-texte); }
 html[data-theme="givre"] #ecranTele .tele-dernieres-titre{ color: var(--givre-accent); }
+html[data-theme="givre"] #ecranTele .tele-compteur{ color: var(--givre-accent); opacity: 0.85; }
 html[data-theme="soleil"] #ecranTele .tele-dernieres-item{ color: #3a1f4a; }
 html[data-theme="soleil"] #ecranTele .tele-dernieres-titre{ color: #3a1f4a; }
+html[data-theme="soleil"] #ecranTele .tele-compteur{ color: #3a1f4a; opacity: 0.85; }
 /* En grand, quand le téléphone ouvre ses dernières cartes */
 #ecranTele .tele-ecran-historique .tele-ecran-texte{ width: min(70vw, 110vh); text-align: left; }
 #ecranTele .tele-ecran-historique .tele-ecran-titre{ font-size: 5.5vh; margin-bottom: 1.5vh; }

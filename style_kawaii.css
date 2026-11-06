@@ -632,6 +632,7 @@ html[data-theme="kawaii"] .historique-recente{ background: var(--givre-accent); 
 html[data-theme="kawaii"] .historique-ligne{ border-color: rgba(80, 13, 80, 0.12); }
 html[data-theme="kawaii"] #ecranTele .tele-dernieres-item{ color: var(--givre-texte); }
 html[data-theme="kawaii"] #ecranTele .tele-dernieres-titre{ color: var(--givre-accent); }
+html[data-theme="kawaii"] #ecranTele .tele-compteur{ color: var(--givre-accent); opacity: 0.85; }
 html[data-theme="kawaii"] .recap{ color: var(--givre-texte); }
 html[data-theme="kawaii"] :is(.recap-titre, .recap-g, .recap-t, .recap-ligne em, .recap-restants){ color: var(--givre-accent); text-shadow: none; }
 html[data-theme="kawaii"] :is(.recap-sous, .recap-p, .recap-chiffres){ color: rgba(80, 13, 80, .7); }

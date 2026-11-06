@@ -509,6 +509,7 @@ function demarrerPageTele(){
       </div>
       <div class="tele-gauche">
         <div class="tele-plateau"></div>
+        <div class="tele-compteur" hidden></div>
         <div class="tele-restantes"></div>
       </div>
       <div class="tele-droite">
@@ -927,6 +928,12 @@ function dessinerTele(ecran, etat){
     nouvelle.dataset.valeur = valeur;
     if (actuelle) actuelle.replaceWith(nouvelle); else plateauTele.appendChild(nouvelle);
   });
+  // « Il reste 18 cartes », comme sous le plateau du téléphone
+  const compteur = ecran.querySelector(".tele-compteur");
+  const n = etat.partie ? Number(etat.restantes) || 0 : 0;
+  const texteCompteur = n > 0 ? `Il reste ${n} carte${n > 1 ? "s" : ""}` : "";
+  if (compteur.textContent !== texteCompteur) compteur.textContent = texteCompteur;
+  compteur.hidden = !texteCompteur;
   dessinerDernieresTele(ecran.querySelector(".tele-restantes"), etat.partie ? etat.h : []);
 
   // Tour de…

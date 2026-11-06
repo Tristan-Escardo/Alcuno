@@ -1131,6 +1131,8 @@ function afficherOverlayTirageDuel(overlay, j1, j2, carteDuel = ""){
       // retiré dessous qu'une fois l'annonce affichée (avant : le plateau apparaissait entre les deux)
       // (avec la carte du perdant, celle qui fixe ses gorgées, plutôt que le 4 qui a lancé le duel)
       annoncerBoireAvecAnnulation(perdant, gorg, cartePerdant, msg);
+      // gorgée pour la couleur de celui qui a tiré le 4 (annoncée avant le duel) : gardée en dernière ligne des Règles
+      if(couleurDuelEnAttente){ ajouterLigneCouleurRegles(couleurDuelEnAttente); couleurDuelEnAttente = null; }
       setTimeout(() => {
         overlay.remove();
         unlockScroll();
@@ -1764,8 +1766,10 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
   if(couleurBue && carteTiree.startsWith("quatre")){
     const msgCouleur = `${joueurs[joueurActuel]} boit 1 gorgée pour la couleur (${couleurBue})`;
     annoncerBoireAvecAnnulation(joueurActuel, 1, carteTiree, msgCouleur);
+    couleurDuelEnAttente = msgCouleur; // (remise sous le résultat du duel, qui remplace le bloc Règles : voir resoudreDuel)
   }
 }
+let couleurDuelEnAttente = null;
 
 /* ===== JEU ===== */
 function lancerPartie(){
@@ -1773,6 +1777,7 @@ function lancerPartie(){
     alert("Il faut au moins 2 joueurs");
     return;
   }
+  couleurDuelEnAttente = null;
 
   plateau.innerHTML = "";
   prechargerImagesCartes(); // (déjà fait à l'ouverture, en principe)
