@@ -8815,3 +8815,4 @@ html #ecranTele .tele-puce.tele-puce-couleur.tele-puce-vert{ background: #43a047
 html #ecranTele .tele-puce.tele-puce-couleur.tele-puce-jaune{ background: #fdd835; color: #3b2a00; text-shadow: none; }
 html #ecranTele .tele-puce.tele-puce-couleur.tele-puce-rouge{ background: #e53935; }
 html #ecranTele .tele-puce.tele-puce-couleur.tele-puce-bleu{ background: #1e88e5; }
+html #ecranTele .tele-puce.tele-puce-calme{ opacity: 0.5; box-shadow: none; }

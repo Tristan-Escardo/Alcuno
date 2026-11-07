@@ -1066,9 +1066,13 @@ function dessinerTele(ecran, etat){
     });
     const zoneChoix = surEcran.querySelector(".tele-ecran-choix");
     zoneChoix.innerHTML = "";
+    // +4 : dès que quelqu'un reçoit des gorgées, ceux qui n'en reçoivent pas sont atténués (en Kawaii ou Soleil
+    // couchant, leur étiquette normale ressortait autant que celles mises en avant)
+    const unActif = (e.choix || []).some((c) => c.actif);
     (e.choix || []).forEach((c) => {
       const puce = document.createElement("span");
       puce.className = "tele-puce" + (c.pris ? " tele-puce-prise" : "") + (c.actif ? " tele-puce-active" : "") +
+        (unActif && c.actif === false ? " tele-puce-calme" : "") +
         (/^(vert|jaune|rouge|bleu)$/.test(c.c || "") ? " tele-puce-couleur tele-puce-" + c.c : "");
       puce.innerText = c.t;
       zoneChoix.appendChild(puce);
