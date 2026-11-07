@@ -8804,3 +8804,14 @@ html.accessibilite #overlayDuel .duel-vs{ zoom: 1.25; }
 html[data-theme="soleil"] #overlayDuel .duel-vs{ color: #2a1a44; }
 html[data-theme="givre"] #overlayDuel .duel-vs{ color: var(--givre-texte); }
 html[data-theme="soleil"] #overlayDuel .duel-info{ color: #8a1f4a; text-shadow: none; } /* (jaune sur pêche : peu lisible) */
+
+/* ===== Télé : choix du +4 (ceux qui reçoivent des gorgées) et carte Couleur (les 4 couleurs) ===== */
+html #ecranTele .tele-puce.tele-puce-active.tele-puce-active{
+  background: linear-gradient(180deg, var(--actif-haut), var(--actif-bas)); color: var(--actif-texte);
+  border-color: #fff; box-shadow: 0 0 1.6vh var(--actif-halo);
+}
+html #ecranTele .tele-puce.tele-puce-couleur.tele-puce-couleur{ min-width: 14vh; text-align: center; border: 0.35vh solid #fff; color: #fff; text-shadow: 0 0.2vh 0.4vh rgba(0,0,0,0.5); box-shadow: 0 0.6vh 1.6vh rgba(0,0,0,0.4); }
+html #ecranTele .tele-puce.tele-puce-couleur.tele-puce-vert{ background: #43a047; }
+html #ecranTele .tele-puce.tele-puce-couleur.tele-puce-jaune{ background: #fdd835; color: #3b2a00; text-shadow: none; }
+html #ecranTele .tele-puce.tele-puce-couleur.tele-puce-rouge{ background: #e53935; }
+html #ecranTele .tele-puce.tele-puce-couleur.tele-puce-bleu{ background: #1e88e5; }

@@ -249,11 +249,24 @@ function ecranPourTele(){
   }
   // Boutons visibles (joueurs du +4 avec leurs gorgées, « Annuler 1 »…) : affichés en petites étiquettes,
   // sauf les boutons d'action, qui ne servent à rien sur la télé (Retour / Annuler / Valider / Terminer)
-  const choix = Array.from(o.querySelectorAll("button"))
+  // +4 : une fois tout distribué, le téléphone désactive tous les joueurs ; sur la télé, ils restaient tous grisés
+  // (« Sam + 2 » compris) : ceux qui reçoivent des gorgées sont mis en avant, les autres restent normaux
+  const estPlus4 = o.id === "overlayPlus4";
+  let choix = Array.from(o.querySelectorAll("button"))
     .filter(b => estAffiche(b) && !b.classList.contains("cache") && b.innerText.trim() &&
                  !b.matches(BOUTONS_ACTION_TELE) && b.innerText.trim() !== "Terminer")
     .slice(0, 12)
-    .map(b => ({ t: b.innerText.replace(/\s+/g, " ").trim().slice(0, 40), pris: !!b.disabled }));
+    .map(b => {
+      const t = b.innerText.replace(/\s+/g, " ").trim().slice(0, 40);
+      return estPlus4 ? { t, actif: /\+\s*\d+$/.test(t) } : { t, pris: !!b.disabled };
+    });
+  // Carte Couleur : les 4 couleurs à choisir (des carrés, pas des boutons : la télé n'en montrait aucune)
+  if (o.id === "overlayCouleur") {
+    choix = Array.from(o.querySelectorAll(".carre-couleur")).map((c) => {
+      const nom = (c.className.match(/carre-(vert|jaune|rouge|bleu)/) || [])[1] || "";
+      return { t: nom.toUpperCase(), c: nom };
+    }).filter((c) => c.c);
+  }
   return {
     id: o.id,
     texte: texteSansBoutons(o),
@@ -274,6 +287,8 @@ function etatPourTele(){
     partie: !!partieLancee,
     cartes: Array.from(plateau.children).map(carteTele),
     restantes: enJeu ? cartesRestantes() : 0,
+    pj: enJeu && estModeSoft() ? 1 : 0,   // (« ALCUNO PJ » : sans ça, on ne comprenait pas pourquoi le +4 ne distribue que 2 gorgées)
+    hot: enJeu && partieHot ? 1 : 0,
     joueurs: joueurs.map((nom, i) => ({
       n: avecCouronne(nom),
       a: Number(annulations[nom] || 0),
@@ -928,6 +943,10 @@ function dessinerTele(ecran, etat){
     nouvelle.dataset.valeur = valeur;
     if (actuelle) actuelle.replaceWith(nouvelle); else plateauTele.appendChild(nouvelle);
   });
+  // Titre « ALCUNO PJ 🔥 », comme le bandeau du téléphone (mode PJ : moitié moins de gorgées ; mode hot)
+  const titreJeu = ecran.querySelector(".tele-entete .tele-titre");
+  const texteTitre = "ALCUNO" + (etat.pj ? " PJ" : "") + (etat.hot ? " 🔥" : "");
+  if (titreJeu && titreJeu.textContent !== texteTitre) titreJeu.textContent = texteTitre;
   // « Il reste 18 cartes », comme sous le plateau du téléphone
   const compteur = ecran.querySelector(".tele-compteur");
   const n = etat.partie ? Number(etat.restantes) || 0 : 0;
@@ -1049,7 +1068,8 @@ function dessinerTele(ecran, etat){
     zoneChoix.innerHTML = "";
     (e.choix || []).forEach((c) => {
       const puce = document.createElement("span");
-      puce.className = "tele-puce" + (c.pris ? " tele-puce-prise" : "");
+      puce.className = "tele-puce" + (c.pris ? " tele-puce-prise" : "") + (c.actif ? " tele-puce-active" : "") +
+        (/^(vert|jaune|rouge|bleu)$/.test(c.c || "") ? " tele-puce-couleur tele-puce-" + c.c : "");
       puce.innerText = c.t;
       zoneChoix.appendChild(puce);
     });
