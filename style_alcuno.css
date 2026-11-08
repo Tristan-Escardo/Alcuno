@@ -7404,10 +7404,10 @@ html.faces-fermees #plateau .Carte.retournee.recachee,
 }
 #btnCaster .casterIcone circle{ fill: currentColor; }
 html[data-theme="givre"] #btnCaster .casterIcone{ background: linear-gradient(180deg, #4fc3f7, #1a92d6); color: #fff; }
-/* Bouton « Album de stickers » de l'accueil : le jaune se perdait sur le fond pêche et rose. Pilule crème, texte framboise,
+/* Bouton « Album de stickers » de l'accueil : le jaune se perdait sur le fond pêche et rose. Pilule corail comme les gros boutons,
    avec le même petit rebord en bas que les gros boutons du thème. */
 html[data-theme="soleil"] #choixMode .btnInstaller{
-  color: #8a1f4a; background: linear-gradient(#fff7ea, #ffe0c2); border: 1px solid rgba(255, 255, 255, 0.9); text-shadow: none;
+  color: #fff; background: linear-gradient(180deg, #ffb35c, #f2775c); border: 0; text-shadow: 0 1px 0 rgba(150, 50, 40, 0.8);
   box-shadow: 0 3px 0 rgba(184, 69, 106, 0.55), 0 8px 14px rgba(120, 40, 70, 0.22);
 }
 html[data-theme="soleil"] #choixMode .btnInstaller:active{ transform: translateY(2px); box-shadow: 0 1px 0 rgba(184, 69, 106, 0.55); }
