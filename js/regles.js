@@ -758,6 +758,8 @@ const TITRE_CARTE_DOREE = '<span class="doree-etincelle">✦</span> CARTE DORÉE
 // facteur = null : il reste affiché jusqu'à ce qu'on tape dessus.
 // Annonce d'un pigeon (premier pigeon ou nouveau pigeon choisi) : 2 fois le temps de lecture normal
 const DUREE_ANNONCE_PIGEON = 2;
+// Première annonce du pigeon (elle explique la règle) : 1,2 fois (avant : 2 fois, jusqu'à 8,6 s à lire, trop long)
+const DUREE_PREMIER_PIGEON = 1.2;
 
 function reglerDureeOverlayRegle(message, facteur){
   if(overlayRegleTimeout){
@@ -1733,7 +1735,8 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
       compterStat("pigeon", joueurs[joueurActuel]);
       nomPigeonOriginal=joueurs[joueurActuel];
       const nPigeon = gorgeesPigeon();
-      const msgPigeon = `${joueurs[joueurActuel]} est le PIGEON !\nIl/elle boit ${texteGorgees(nPigeon)}.\nÀ chaque 3 tiré, le PIGEON boit 1 gorgée.\nPour s'en débarrasser : tirer un 3 et choisir le prochain PIGEON.`;
+      // (3 lignes : avant, une 4e ligne « Pour s'en débarrasser… » rallongeait beaucoup l'annonce ; l'écran « Choisis le nouveau PIGEON » l'explique tout seul quand le pigeon tire un 3)
+      const msgPigeon = `${joueurs[joueurActuel]} est le PIGEON !\nIl/elle boit ${texteGorgees(nPigeon)}.\nÀ chaque 3 tiré, le PIGEON boit 1 gorgée.`;
       annoncerBoireAvecAnnulation(
         joueurActuel,
         nPigeon,
@@ -1743,7 +1746,7 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
           appliquerBonusCouleurSiBesoin(carteTiree, { couleur: couleurBue, joueur: joueurActuel, preserveRuleMessage: true });
         }
       );
-      reglerDureeOverlayRegle(msgPigeon, DUREE_ANNONCE_PIGEON); // annonce du pigeon : affichée 2 fois plus longtemps
+      reglerDureeOverlayRegle(msgPigeon, DUREE_PREMIER_PIGEON); // première annonce : un peu plus longue que la normale (c'est la règle du jeu)
       jouerSon("pigeon");
     
     } else if(indexPigeon===joueurActuel){
