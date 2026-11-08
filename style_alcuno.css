@@ -8828,3 +8828,8 @@ html[data-theme="soleil"] body :is(#ecranCaster button:not(.btnRetour), #btnFerm
   background: linear-gradient(180deg, #ffb35c, #f2775c) !important; color: #fff !important; border: 0 !important;
   text-shadow: 0 1px 0 rgba(150, 50, 40, 0.8) !important;
 }
+
+/* Annonce du premier pigeon : « Il/elle boit 2 gorgées » bien visible, la règle en petit et plus discrète en dessous */
+#overlayRegleUnique .regle-detail.regle-boit{ font-size: 0.95em; font-weight: 900; margin-top: 0.3em; }
+#overlayRegleUnique .regle-detail.regle-note{ font-size: 0.42em; font-weight: 600; opacity: 0.8; margin-top: 0.35em; line-height: 1.3; }
+#overlayRegleUnique .regle-detail.regle-boit + .regle-note{ margin-top: 1.4em; padding-top: 0.8em; border-top: 1px solid rgba(255, 255, 255, 0.25); }

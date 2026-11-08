@@ -563,16 +563,19 @@ function annoncerBoireAvecAnnulation(joueurIndex, nbGorgees, classeCarte = "", p
 // (avant, tout s'affichait d'un bloc dans la même grosse taille : illisible dès 3-4 lignes)
 function remplirTexteRegle(boxTexte, message){
   boxTexte.innerHTML = "";
-  String(message || "")
-    .split("\n")
-    .map(l => l.trim())
-    .filter(Boolean)
-    .forEach((texte, i) => {
-      const el = document.createElement("div");
-      el.className = i === 0 ? "regle-titre" : "regle-detail";
-      el.innerText = texte;
-      boxTexte.appendChild(el);
-    });
+  const lignes = String(message || "").split("\n").map(l => l.trim()).filter(Boolean);
+  // Annonce du premier pigeon : l'essentiel (qui boit, combien) en gros, la règle en petit dessous
+  // (avant : 4 lignes de même taille, pénible à lire en soirée)
+  const estNote = (l) => /^(À chaque 3|Pour s'en débarrasser)/.test(l);
+  const avecNotes = lignes.some(estNote);
+  lignes.forEach((texte, i) => {
+    const el = document.createElement("div");
+    el.className = i === 0 ? "regle-titre" : "regle-detail";
+    if (estNote(texte)) el.classList.add("regle-note");
+    else if (avecNotes && i > 0) el.classList.add("regle-boit");
+    el.innerText = texte;
+    boxTexte.appendChild(el);
+  });
 }
 
 // Carte tirée, affichée en haut des overlays de choix (+4, duel, nouveau pigeon)
