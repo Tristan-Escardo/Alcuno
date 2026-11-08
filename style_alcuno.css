@@ -8816,3 +8816,14 @@ html #ecranTele .tele-puce.tele-puce-couleur.tele-puce-jaune{ background: #fdd83
 html #ecranTele .tele-puce.tele-puce-couleur.tele-puce-rouge{ background: #e53935; }
 html #ecranTele .tele-puce.tele-puce-couleur.tele-puce-bleu{ background: #1e88e5; }
 html #ecranTele .tele-puce.tele-puce-calme{ opacity: 0.5; box-shadow: none; }
+
+/* ===== Écran « Caster sur la télé » (Scanner la télé, OK, Arrêter de caster) et bouton Annuler de la caméra de scan :
+   Sombre et Soleil couchant les laissaient en jaune par défaut, alors que « Retour » était bien dans le thème ===== */
+html[data-theme="noir"] body :is(#ecranCaster button:not(.btnRetour), #btnFermerScanner){
+  background: linear-gradient(180deg, #0d0b06, #030302) !important; color: #ffd426 !important;
+  border: 1px solid rgba(255, 210, 38, 0.6) !important; box-shadow: none !important; text-shadow: none !important;
+}
+html[data-theme="soleil"] body :is(#ecranCaster button:not(.btnRetour), #btnFermerScanner){
+  background: linear-gradient(180deg, #ffb35c, #f2775c) !important; color: #fff !important; border: 0 !important;
+  text-shadow: 0 1px 0 rgba(150, 50, 40, 0.8) !important;
+}
