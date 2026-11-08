@@ -33,6 +33,22 @@ Parties complètes du robot (1 à 2 minutes, Linux / macOS / Windows)
   téléphone en paysage, avec le réglage d'accessibilité, et très petit écran. Chaque partie doit arriver à
   l'écran de fin sans erreur et sans que la page déborde. Lancé aussi par GitHub (job « partie-robot »).
 
+Compatibilité des thèmes (boutons oubliés par un thème, environ 10 minutes avec la partie du robot)
+----------------------------------------------------------------------------------------------------
+  (le jeu doit être servi sur http://localhost:8765 : python3 -m http.server 8765 depuis le dossier du jeu)
+  node tests/test_themes.js                 tout : écrans + fenêtres de jeu (pigeon, duel, +4…) jouées par le robot
+  node tests/test_themes.js --sans-partie   écrans seulement (environ 1 minute)
+  node tests/test_themes.js --themes=montheme   un seul thème (nouveau thème : l'ajouter aussi dans la liste THEMES du script)
+
+  Ouvre chaque écran du jeu dans chaque thème (la liste des écrans est lue dans index.html : un écran ajouté plus tard est
+  visité tout seul) et compare chaque bouton plein à son apparence SANS thème (le jaune de base). Si le thème a habillé ses
+  boutons principaux mais qu'un bouton est resté exactement au style de base, il est signalé : « OUBLI thème · écran · bouton ».
+  Limites : les thèmes dont les boutons principaux restent jaunes (Bordeaux, Vert, Bleu, Cerisier, Prestige) ne sont pas
+  concernés ; les icônes, liens et champs de saisie ne sont pas comparés ; un bouton « habillé » avec une mauvaise couleur n'est
+  pas détecté (la lisibilité des textes, elle, est dans test_contraste.ps1) ; les fenêtres de jeu que le robot ne rencontre pas
+  (carte dorée, annulation…) sont listées en fin de test, à regarder à la main. Un bouton volontairement resté au style de
+  base se déclare dans la liste EXCEPTIONS du script, avec la raison.
+
 Partie classique (le plus important, environ 1 minute)
 ------------------------------------------------------
   bash tests/generer.sh          (depuis le dossier du jeu, dans Git Bash)
