@@ -1735,8 +1735,8 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
       compterStat("pigeon", joueurs[joueurActuel]);
       nomPigeonOriginal=joueurs[joueurActuel];
       const nPigeon = gorgeesPigeon();
-      // (3 lignes : avant, une 4e ligne « Pour s'en débarrasser… » rallongeait beaucoup l'annonce ; l'écran « Choisis le nouveau PIGEON » l'explique tout seul quand le pigeon tire un 3)
-      const msgPigeon = `${joueurs[joueurActuel]} est le PIGEON !\nIl/elle boit ${texteGorgees(nPigeon)}.\nÀ chaque 3 tiré, le PIGEON boit 1 gorgée.`;
+      // (la ligne « Pour s'en débarrasser » reste : c'est la règle ; mais plus courte qu'avant. Les lignes qui commencent par « À chaque 3 » / « Pour s'en débarrasser » sont filtrées de l'historique, noterHistorique)
+      const msgPigeon = `${joueurs[joueurActuel]} est le PIGEON !\nIl/elle boit ${texteGorgees(nPigeon)}.\nÀ chaque 3 tiré, le PIGEON boit 1 gorgée.\nPour s'en débarrasser : tirer un 3.`;
       annoncerBoireAvecAnnulation(
         joueurActuel,
         nPigeon,
