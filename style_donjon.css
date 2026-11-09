@@ -121,7 +121,7 @@ html[data-theme="donjon"] .pastilleTheme[data-theme="donjon"] .rond{ box-shadow:
 .fenetreBdsm-titre{ margin-top: 10px; font: 900 28px/1.15 Arial, sans-serif; color: #fff; text-shadow: 0 0 14px #ff2a3d, 0 3px 0 #8a0618; }
 .fenetreBdsm-texte{ font: 700 15px/1.4 Arial, sans-serif; color: #ffd0d6; margin: 12px 0 20px; }
 .fenetreBdsm-carte button{ display: block; width: 100%; position: relative; border-radius: 999px; cursor: pointer; font: 900 17px Arial, sans-serif; padding: 14px; }
-.fenetreBdsm-essayer{ color: #fff; border: 2px solid #ff7a86; background: linear-gradient(#ff6a90, #ff2d62); text-shadow: 0 2px 0 #8a0618; box-shadow: 0 4px 0 #a31238, 0 0 14px rgba(255, 42, 61, 0.7); }
+.fenetreBdsm-essayer{ color: #ffd0d6; border: 2px solid #ff2a3d; background: linear-gradient(#3a0a14 0%, #0a0a0c 48%, #2a0610 52%, #5a0a1c 100%); text-shadow: 0 0 8px #ff2a3d; letter-spacing: 0.04em; box-shadow: 0 0 16px rgba(255, 42, 61, 0.75), inset 0 2px 0 rgba(255, 255, 255, 0.35); }
 .fenetreBdsm-plusTard{ margin-top: 12px; color: #ffd0d6; background: #1a0a10; border: 2px solid #7a4a6c; }
 .fenetreBdsm-carte button:active{ filter: brightness(0.95); transform: scale(0.98); }
 @media (prefers-reduced-motion: reduce){ #fenetreBdsm, .fenetreBdsm-carte{ animation: none; } }
