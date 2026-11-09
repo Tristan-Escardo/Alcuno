@@ -33,6 +33,28 @@ Parties complètes du robot (1 à 2 minutes, Linux / macOS / Windows)
   téléphone en paysage, avec le réglage d'accessibilité, et très petit écran. Chaque partie doit arriver à
   l'écran de fin sans erreur et sans que la page déborde. Lancé aussi par GitHub (job « partie-robot »).
 
+Tout l'affichage dans UN thème : téléphone et télé (pour vérifier un nouveau thème, ex. un thème de fête)
+-------------------------------------------------------------------------------------------------------
+  (le jeu doit être servi sur http://localhost:8765 : python3 -m http.server 8765 depuis le dossier du jeu)
+  node tests/test_affichage_telephone.js kawaii    tous les écrans du téléphone (environ 3 minutes)
+  node tests/test_affichage_tele.js kawaii         tous les écrans de la télé (environ 2 minutes)
+
+  Téléphone : ouvre chacun des écrans et des fenêtres du jeu (accueil, réglages, règles, FAQ, album, en ligne, caster,
+  scan, bug, installation, confirmations, plateau, volets, pigeon, duel, +4, couleur, Cupidon, défi hot, carte dorée,
+  annulation, pari, fin de partie… : environ 60). Télé : un robot joue une partie en mode hot, chaque écran qu'il
+  enverrait à la télé est redessiné sur une vraie page télé, plus les écrans rares forcés (carte dorée, annulation,
+  pause, mode PJ…). Pour chaque écran, comparé au même écran SANS thème, il signale :
+     MOINS LISIBLE   un texte que le thème rend moins lisible (contraste sous 3)
+     BOUTON OUBLIÉ   un bouton resté au jaune de base alors que le thème habille les autres (téléphone)
+     DÉBORDE         la page défile en largeur (téléphone), du texte sort de l'écran (télé)
+     ERREUR JS       une erreur JavaScript
+  Un écran ajouté plus tard dans index.html est visité tout seul ; une fenêtre que le test ne sait pas ouvrir est signalée.
+  Chaque écran est photographié : ouvrir tests/resultats/affichage_telephone/<thème>/index.html (ou affichage_tele) dans
+  un navigateur pour tout voir d'un coup. Le test dit si c'est cassé, oublié ou illisible, pas si c'est joli : la planche
+  est faite pour ça. Exceptions voulues (bouton ou texte volontairement comme ça) : dans tests/affichage_commun.js.
+  Limites : l'écran d'attente de la télé est toujours en Bordeaux (voulu) ; le contraste est calculé sur les couleurs
+  (une ombre de texte ou un flou d'arrière-plan qui aide à lire n'est pas pris en compte).
+
 Compatibilité des thèmes (boutons oubliés par un thème, environ 10 minutes avec la partie du robot)
 ----------------------------------------------------------------------------------------------------
   (le jeu doit être servi sur http://localhost:8765 : python3 -m http.server 8765 depuis le dossier du jeu)
