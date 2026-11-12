@@ -15,18 +15,24 @@ function fichiers(dossier){
   parcourir(dossier);
   return sortie;
 }
-// Les morceaux de musique (Sons/musique*.mp3) sont gardés en cache d'abord (sw.js) : ils comptent aussi
+// Les morceaux de musique (Sons/musique*.mp3) sont dans un cache à part (CACHE_MUSIQUES, sw.js) : leur empreinte aussi
 const MUSIQUES = () => fichiers("Sons").filter((f) => /^Sons\/musique[^/]*\.mp3$/.test(f));
-function empreinte(){
+function empreinteDe(liste){
   const h = crypto.createHash("sha1");
-  for (const f of DOSSIERS.flatMap(fichiers).concat(MUSIQUES()).sort()) {
+  for (const f of liste.sort()) {
     h.update(f + "\0"); h.update(crypto.createHash("sha1").update(fs.readFileSync(path.join(RACINE, f))).digest("hex") + "\n");
   }
   return h.digest("hex");
 }
+function empreinte(){ return empreinteDe(DOSSIERS.flatMap(fichiers)); }
+function empreinteMusiques(){ return empreinteDe(MUSIQUES()); }
 function nomDuCache(){
   const m = fs.readFileSync(path.join(RACINE, "sw.js"), "utf8").match(/const CACHE = "([^"]+)"/);
   return m ? m[1] : null;
 }
+function nomCacheMusiques(){
+  const m = fs.readFileSync(path.join(RACINE, "sw.js"), "utf8").match(/const CACHE_MUSIQUES = "([^"]+)"/);
+  return m ? m[1] : null;
+}
 const FICHIER = path.join(__dirname, "empreinte_cache.json");
-module.exports = { empreinte, nomDuCache, fichiers, DOSSIERS, FICHIER, RACINE };
+module.exports = { empreinte, empreinteMusiques, nomDuCache, nomCacheMusiques, fichiers, DOSSIERS, FICHIER, RACINE };

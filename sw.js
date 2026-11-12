@@ -7,7 +7,12 @@
 //
 // Changer CACHE (ex. "alcuno-v2") force les téléphones à repartir d'une copie locale propre.
 
-const CACHE = "alcuno-v28"; // v28 : accueil sans sélection de texte à l'appui long (écran bleu sur iPhone), thème BDSM sans carré autour des noms au +4 ; v27 : crédits, mentions honorables côte à côte ; v26 : couronne argentée pour Jojo ; v25 : mode hard (défis sexuels à 2 joueurs, débloqué par un mot secret, js/zizi-coptere.js, Sons/mode_hard.mp3, Sons/zizicoptere.mp3), zizi-coptère du thème BDSM, chaîne sous le titre BDSM ; v24 : calendrier des thèmes de fête (dates par défaut, changeables depuis le pilotage) ; v23 : thèmes de fête (Noël, Chandeleur, Saint-Valentin, Saint-Patrick, Just Rosé, Fête de la musique, Halloween), feux du Nouvel An et de la Fête nationale, poisson d'avril, piano de l'accueil, musiques et sons, carte Coup de foudre ; v22 : sons des boutons BDSM retouchés (le test du cache était en échec) ; v21 : sons des boutons du thème BDSM (Sons/bdsm_buttons/) ; v20 : musique du thème BDSM, son de l'étoile filante ; v19 : faces de cartes du thème BDSM (Cartes/donjon/) ; v18 : dos des cartes du thème Donjon (cœur masqué) ; v17 : thème Donjon (style_donjon.css, donjon/) ; v16 : mode hot (js/mode-hot.js, carte Cupidon) ; v15 : 4 sons de sabre retirés ; v14 : FAQ (js/faq.js) ; // v13 : musique d'ambiance gardée en cache à la première écoute (hors connexion) ; v12 : trois dos Star Wars qui alternent ; v11 : dos Star Wars en acier (dos_galaxie_argent.svg) ; v10 : faces de cartes Star Wars (Cartes/galaxie/) ; v9 : faces de cartes Kawaii (Cartes/kawaii/) ; v8 : dos Kawaii renommés (dos_kawaii_alcuno_*) pour sortir des anciens caches ; v7 : dos Kawaii avec « ALC UNO » ; v6 : dos de cartes Kawaii ; v5 : petits personnages flottants du thème Kawaii ; v4 : album de stickers et thème Kawaii ; v3 : QR code de la partie (js/qrcode.js) ; v2 : cartes HD en WebP (les anciennes .jpg sont supprimées du cache)
+const CACHE = "alcuno-v29"; // v29 : musiques hors connexion gardées dans un cache à part (plus supprimées à chaque mise en ligne) ; v28 : accueil sans sélection de texte à l'appui long (écran bleu sur iPhone), thème BDSM sans carré autour des noms au +4 ; v27 : crédits, mentions honorables côte à côte ; v26 : couronne argentée pour Jojo ; v25 : mode hard (défis sexuels à 2 joueurs, débloqué par un mot secret, js/zizi-coptere.js, Sons/mode_hard.mp3, Sons/zizicoptere.mp3), zizi-coptère du thème BDSM, chaîne sous le titre BDSM ; v24 : calendrier des thèmes de fête (dates par défaut, changeables depuis le pilotage) ; v23 : thèmes de fête (Noël, Chandeleur, Saint-Valentin, Saint-Patrick, Just Rosé, Fête de la musique, Halloween), feux du Nouvel An et de la Fête nationale, poisson d'avril, piano de l'accueil, musiques et sons, carte Coup de foudre ; v22 : sons des boutons BDSM retouchés (le test du cache était en échec) ; v21 : sons des boutons du thème BDSM (Sons/bdsm_buttons/) ; v20 : musique du thème BDSM, son de l'étoile filante ; v19 : faces de cartes du thème BDSM (Cartes/donjon/) ; v18 : dos des cartes du thème Donjon (cœur masqué) ; v17 : thème Donjon (style_donjon.css, donjon/) ; v16 : mode hot (js/mode-hot.js, carte Cupidon) ; v15 : 4 sons de sabre retirés ; v14 : FAQ (js/faq.js) ; // v13 : musique d'ambiance gardée en cache à la première écoute (hors connexion) ; v12 : trois dos Star Wars qui alternent ; v11 : dos Star Wars en acier (dos_galaxie_argent.svg) ; v10 : faces de cartes Star Wars (Cartes/galaxie/) ; v9 : faces de cartes Kawaii (Cartes/kawaii/) ; v8 : dos Kawaii renommés (dos_kawaii_alcuno_*) pour sortir des anciens caches ; v7 : dos Kawaii avec « ALC UNO » ; v6 : dos de cartes Kawaii ; v5 : petits personnages flottants du thème Kawaii ; v4 : album de stickers et thème Kawaii ; v3 : QR code de la partie (js/qrcode.js) ; v2 : cartes HD en WebP (les anciennes .jpg sont supprimées du cache)
+
+// Cache des MUSIQUES d'ambiance (Sons/musique*.mp3), à part de CACHE : CACHE change à chaque mise en ligne et l'ancien cache est
+// supprimé (voir « activate »), ce qui effaçait les musiques téléchargées pour le hors connexion (à retélécharger ensuite).
+// Celui-ci ne change QUE si un morceau change (alors : changer son nom, ex. -v2, puis « node outils/maj_empreinte_cache.js »).
+const CACHE_MUSIQUES = "alcuno-musiques-v1";
 
 // Copié dès l'installation : de quoi jouer en classique sans réseau
 const A_PRECHARGER = [
@@ -378,7 +383,16 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys()
-      .then((cles) => Promise.all(cles.filter((cle) => cle !== CACHE).map((cle) => caches.delete(cle))))
+      // Les musiques déjà gardées dans l'ancien cache (avant CACHE_MUSIQUES) passent dans le cache des musiques, puis les anciens
+      // caches sont supprimés (sauf CACHE_MUSIQUES : il garde les musiques d'une version à l'autre)
+      .then((cles) => caches.open(CACHE_MUSIQUES).then((musiques) =>
+        Promise.all(cles.filter((cle) => cle !== CACHE && cle !== CACHE_MUSIQUES).map((cle) =>
+          caches.open(cle)
+            .then((ancien) => ancien.keys().then((requetes) => Promise.all(requetes
+              .filter((r) => new URL(r.url).pathname.includes("/Sons/musique"))
+              .map((r) => musiques.match(r).then((deja) => deja ? null : ancien.match(r).then((rep) => rep && musiques.put(r, rep)))))))
+            .catch(() => {})
+            .then(() => caches.delete(cle))))))
       .then(() => self.clients.claim())
   );
 });
@@ -395,14 +409,15 @@ self.addEventListener("fetch", (event) => {
 
   // Musique d'ambiance : le jeu la télécharge en entier (Web Audio). Fichiers lourds (1 à 3 Mo) qui ne changent pas : on ne les garde
   // qu'à la première écoute (pas de préchargement des 10 morceaux), et ensuite on les sert d'abord depuis le cache, pour que la musique
-  // marche hors connexion (mode avion). Un morceau modifié = changer CACHE ci-dessus (tests/test_cache.js le vérifie).
+  // marche hors connexion (mode avion). Gardées dans CACHE_MUSIQUES (elles survivent aux mises à jour du jeu). Un morceau modifié =
+  // changer CACHE_MUSIQUES ci-dessus (tests/test_cache.js le vérifie).
   if (url.pathname.includes("/Sons/musique")) {
     if (requete.headers.has("range")) return; // (lecture en flux par morceaux : réseau, comme avant)
     event.respondWith(
       caches.match(cle).then((enCache) => enCache || fetch(requete).then((reponse) => {
         if (reponse.ok && reponse.status === 200) {
           const copie = reponse.clone();
-          caches.open(CACHE).then((cache) => cache.put(cle, copie));
+          caches.open(CACHE_MUSIQUES).then((cache) => cache.put(cle, copie));
         }
         return reponse;
       }))
