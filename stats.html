@@ -187,6 +187,8 @@
         #apercuJeu .pilBtn{ width: min(390px, 100%); margin: 0; }
         .pilLigne .voir{ min-width: 0; padding: 6px 10px; }
         .pilLigne .boutonsDefi{ display: flex; gap: 6px; flex: none; }
+        .pilLigne .boutonsTheme{ display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; flex: 0 1 auto; max-width: 58%; }
+        .pilLigne .boutonsTheme button{ min-width: 0; }
         .pilLigne.masque span{ opacity: .45; text-decoration: line-through; }
         .pilVariantes{ display: flex; flex-direction: column; gap: 6px; margin: 0 0 10px; }
         .pilVariantes:empty{ display: none; }
@@ -407,7 +409,7 @@
 
                 <div class="pilSous">Thèmes</div>
                 <div id="pilThemes"></div>
-                <p class="pilNote" style="margin-top:8px">Thème de saison (visible seulement sur une période, chaque année) :</p>
+                <p class="pilNote" style="margin-top:8px">Dates d'un thème (visible seulement sur cette période, chaque année ; « Dates » ci-dessus remplit le formulaire). Les thèmes de fête n'apparaissent qu'à leurs dates ; un joueur qui l'avait choisi revient à Bordeaux après la fin :</p>
                 <select id="pilThemePeriode"></select>
                 <input id="pilDebut" type="date" aria-label="Début">
                 <input id="pilFin" type="date" aria-label="Fin">
@@ -916,9 +918,10 @@
                 html += `<div class="apBtn${ConfigLib.coupee(cfg, "enligne") ? " coupe" : ""}">Mode en ligne${ConfigLib.coupee(cfg, "enligne") ? " (coupé)" : ""}</div><div class="apBtn">Mode classique (Hors connexion)</div>`;
                 const themes = ConfigLib.THEMES_CONNUS.map((t) => {
                     const x = (cfg.themes || {})[t];
-                    if (!x) return null;
+                    const p = ConfigLib.periodeTheme(cfg, t);
+                    if (!x && !(p && ConfigLib.themeDisponible(cfg, t, new Date()))) return null; // (fête pas en cours, rien de changé : rien à dire)
                     const dispo = ConfigLib.themeDisponible(cfg, t, new Date());
-                    return `${ConfigLib.NOMS_THEMES[t]} : ${x.actif === false ? "caché" : dispo ? "visible aujourd'hui" : "pas aujourd'hui"}${x.debut ? " (du " + ConfigLib.dateEnTexte(x.debut) + " au " + ConfigLib.dateEnTexte(x.fin) + ")" : ""}`;
+                    return `${ConfigLib.NOMS_THEMES[t]} : ${x && x.actif === false ? "caché" : dispo ? "visible aujourd'hui" : "pas aujourd'hui"}${p ? " (du " + ConfigLib.dateEnTexte(p.debut) + " au " + ConfigLib.dateEnTexte(p.fin) + ")" : ""}`;
                 }).filter(Boolean);
                 themes.forEach((l) => lignes.push("Thème " + l));
                 if (ConfigLib.coupee(cfg, "voix")) lignes.push("Annonces à voix haute : coupées (réglage masqué)");
@@ -939,11 +942,19 @@
                     const nom = ConfigLib.NOMS_COUPURES[n];
                     return `<div class="pilLigne"><span>${ecape(nom[0].toUpperCase() + nom.slice(1))} : <b>${coupe ? "coupé" : "actif"}</b></span><button type="button" class="${coupe ? "" : "coupe"}" data-coupure="${n}" data-etat="${coupe ? 0 : 1}">${coupe ? "Remettre" : "Couper"}</button></div>`;
                 }).join("");
-                $("pilThemes").innerHTML = ConfigLib.THEMES_CONNUS.map((t) => {
+                // Thèmes de fête d'abord (avec leurs dates : par défaut celles de FETES.md), puis les autres
+                const fetes = Object.keys(ConfigLib.PERIODES_FETES);
+                const ordre = [...ConfigLib.THEMES_CONNUS.filter((t) => fetes.includes(t)), ...ConfigLib.THEMES_CONNUS.filter((t) => !fetes.includes(t))];
+                $("pilThemes").innerHTML = ordre.map((t) => {
                     const x = (config.themes || {})[t] || {};
                     const cache = x.actif === false;
-                    const saison = x.debut ? ` · du ${ConfigLib.dateEnTexte(x.debut)} au ${ConfigLib.dateEnTexte(x.fin)}` : "";
-                    return `<div class="pilLigne"><span>${ecape(ConfigLib.NOMS_THEMES[t])}${cache ? " <b>(caché)</b>" : ""}${ecape(saison)}</span><button type="button" class="${cache ? "" : "coupe"}" data-theme="${t}" data-actif="${cache ? 1 : 0}">${cache ? "Remettre" : "Cacher"}</button></div>`;
+                    const p = ConfigLib.periodeTheme(config, t);
+                    const fete = fetes.includes(t);
+                    const etat = cache ? " <b>(caché)</b>" : p && ConfigLib.themeDisponible(config, t, new Date()) ? " <b>· visible aujourd'hui</b>" : "";
+                    const dates = p ? `<br><small>du ${ecape(ConfigLib.dateEnTexte(p.debut))} au ${ecape(ConfigLib.dateEnTexte(p.fin))}${fete ? (p.parDefaut ? " (dates par défaut)" : " (dates changées)") : ""}</small>` : "";
+                    const autres = (fete || p ? `<button type="button" data-dates="${t}">Dates</button>` : "") +
+                        (p && !p.parDefaut ? `<button type="button" data-defaut="${t}">${fete ? "Par défaut" : "Toute l'année"}</button>` : "");
+                    return `<div class="pilLigne"><span>${ecape(ConfigLib.NOMS_THEMES[t])}${etat}${dates}</span><span class="boutonsTheme">${autres}<button type="button" class="${cache ? "" : "coupe"}" data-theme="${t}" data-actif="${cache ? 1 : 0}">${cache ? "Remettre" : "Cacher"}</button></span></div>`;
                 }).join("");
                 dessinerDefis();
             }
@@ -1014,6 +1025,14 @@
             });
             $("pilThemes").addEventListener("click", (ev) => {
                 const b = ev.target.closest("button"); if (!b) return;
+                if (b.dataset.dates) { // « Dates » : le formulaire de période ci-dessous, prérempli avec les dates actuelles
+                    const p = ConfigLib.periodeTheme(config, b.dataset.dates), an = new Date().getFullYear();
+                    $("pilThemePeriode").value = b.dataset.dates;
+                    $("pilDebut").value = p ? `${an}-${p.debut}` : ""; $("pilFin").value = p ? `${an}-${p.fin}` : "";
+                    $("pilThemePeriode").scrollIntoView({ behavior: "smooth", block: "center" });
+                    return;
+                }
+                if (b.dataset.defaut) { lancer([{ op: "theme_periode_off", id: b.dataset.defaut }]); return; }
                 lancer([{ op: "theme", id: b.dataset.theme, actif: b.dataset.actif === "1" }]);
             });
             $("pilAppliquerPeriode").addEventListener("click", () => {
@@ -1180,7 +1199,7 @@
 {"op":"coupure","cible":"voix"|"musique"|"enligne","etat":true (couper)|false (remettre)}
 {"op":"theme","id":"${ConfigLib.THEMES_CONNUS.join('"|"')}","actif":true|false}
 {"op":"theme","id":"…","debut":"MM-JJ","fin":"MM-JJ"} (thème de saison, chaque année)
-{"op":"theme_periode_off","id":"…"}
+{"op":"theme_periode_off","id":"…"} (thème de fête : retour à ses dates par défaut ; autre thème : toute l'année)
 {"op":"majmin","version":"x.y.z"|null}
 {"op":"tout_remettre"}
 Tu parles à Tristan, le créateur du jeu. Réponds comme un analyste qui connaît le jeu : réponse utile, chiffrée, en français simple, sans jargon. Tu peux écrire jusqu'à une dizaine de lignes si la question le demande (« reponse » peut contenir des retours à la ligne \n).
@@ -1189,6 +1208,7 @@ Une phrase vague ou une conversation (« salut », « et hier ? », « pourquoi 
 Plantages : « n » = nombre sur 7 jours, « n24 » = sur 24 h ; beaucoup de « is not defined » juste après une mise en ligne viennent surtout de pages pas encore à jour, pas forcément d'un vrai bug.
 Si la demande est impossible avec ces commandes, « commandes » est vide et « reponse » l'explique.
 Noms des thèmes : ${ConfigLib.THEMES_CONNUS.map((t) => t + "=" + ConfigLib.NOMS_THEMES[t]).join(", ")}.
+Thèmes de fête (disponibles seulement à leurs dates, chaque année ; dates par défaut, sauf autres dates dans la config) : ${Object.entries(ConfigLib.PERIODES_FETES).map(([t, p]) => t + " du " + ConfigLib.dateEnTexte(p[0]) + " au " + ConfigLib.dateEnTexte(p[1])).join(", ")}.
 Réglages actuels : ${ConfigLib.decrire(config).join(" ; ")}.
 Date du jour : ${new Date().toISOString().slice(0, 10)}.
 Données (stats ; « jours » = les 45 derniers jours, « visiteurs » du jour = personnes différentes ; os/themes/versions = appareils vus ces 30 jours) : ${JSON.stringify((() => { const r = construireResume(); const jours = {}; joursPasses(45).forEach((j) => { if (r.jours[j]) jours[j] = { ...r.jours[j], jour: ["dim", "lun", "mar", "mer", "jeu", "ven", "sam"][new Date(j + "T12:00:00").getDay()] }; }); return { ...r, jours }; })())}`;

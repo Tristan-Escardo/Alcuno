@@ -9,6 +9,7 @@
 //                                              avantVersion : seulement pour les versions du jeu plus anciennes que celle-ci)
 //   coupures  : { voix, musique, enligne }     true = fonction coupée pour tout le monde
 //   themes    : { <thème>: { actif, debut, fin } }   actif:false = thème caché ; debut/fin = « MM-JJ » (chaque année)
+//                                              (thèmes de fête : sans debut/fin, ce sont leurs dates par défaut, PERIODES_FETES)
 //   majMin    : "9.64.0"                       version minimale : en dessous, bandeau « mets à jour »
 //   defauts   : { volumeMusique, vitesseVoix } valeurs de départ (seulement pour ceux qui n'ont jamais touché au curseur)
 //   defisHot  : { <id>: { t, n } }           défis du mode hot ajoutés depuis le pilotage, mélangés à ceux du jeu
@@ -24,6 +25,20 @@
     bordeaux: "Bordeaux", noir: "Sombre", vert: "Casino", bleu: "Nuit", soleil: "Soleil couchant",
     cerisier: "Cerisier", givre: "Givre", prestige: "Prestige", galaxie: "Star Wars", kawaii: "Kawaii", donjon: "BDSM", noel: "Noël", chandeleur: "Chandeleur", valentin: "Saint-Valentin", patrick: "Saint-Patrick", justrose: "Just Rosé", musique: "Musique", halloween: "Halloween"
   };
+  // Thèmes de fête : disponibles seulement pendant ces dates (« MM-JJ », chaque année, de 0 h le premier jour à minuit le
+  // dernier), sauf si le pilotage leur en donne d'autres. Ce sont les dates validées de FETES.md : ne pas les changer ici,
+  // les changer depuis le pilotage (stats.html).
+  const PERIODES_FETES = {
+    chandeleur: ["01-28", "02-03"], valentin: ["02-07", "02-15"], patrick: ["03-14", "03-18"], justrose: ["05-04", "05-12"],
+    musique: ["06-18", "06-22"], halloween: ["10-20", "11-01"], noel: ["12-18", "12-26"]
+  };
+  // Période d'un thème : celle du pilotage, sinon celle de la fête par défaut, sinon null (toute l'année)
+  function periodeTheme(config, theme) {
+    const t = config && config.themes && config.themes[theme];
+    if (t && t.debut && t.fin) return { debut: t.debut, fin: t.fin, parDefaut: false };
+    const f = PERIODES_FETES[theme];
+    return f ? { debut: f[0], fin: f[1], parDefaut: true } : null;
+  }
   const COUPURES_CONNUES = ["voix", "musique", "enligne"];
   const NOMS_COUPURES = { voix: "les annonces à voix haute", musique: "la musique", enligne: "le mode en ligne" };
   const MOIS = ["janvier", "fevrier", "mars", "avril", "mai", "juin", "juillet", "aout", "septembre", "octobre", "novembre", "decembre"];
@@ -111,10 +126,9 @@
 
   function themeDisponible(config, theme, date) {
     const t = config && config.themes && config.themes[theme];
-    if (!t) return true;
-    if (t.actif === false) return false;
-    if (t.debut && t.fin) return dansPeriode(t.debut, t.fin, date || new Date());
-    return true;
+    if (t && t.actif === false) return false;
+    const p = periodeTheme(config, theme);
+    return p ? dansPeriode(p.debut, p.fin, date || new Date()) : true;
   }
 
   const coupee = (config, nom) => !!(config && config.coupures && config.coupures[nom]);
@@ -186,7 +200,8 @@
           if (!Object.keys(c.themes[cmd.id]).length) delete c.themes[cmd.id];
           if (!Object.keys(c.themes).length) delete c.themes;
         }
-        return { config: c, resume: `Thème ${NOMS_THEMES[cmd.id]} : plus de dates (disponible toute l'année)` };
+        const f = PERIODES_FETES[cmd.id];
+        return { config: c, resume: f ? `Thème ${NOMS_THEMES[cmd.id]} : retour à ses dates par défaut (du ${dateEnTexte(f[0])} au ${dateEnTexte(f[1])})` : `Thème ${NOMS_THEMES[cmd.id]} : plus de dates (disponible toute l'année)` };
       }
       case "majmin": {
         if (cmd.version === null || cmd.version === undefined) { delete c.majMin; return { config: c, resume: "Plus de mise à jour obligatoire" }; }
@@ -447,7 +462,7 @@
       const d1 = du >= 0 ? dateDans(t, du) : null;
       const d2 = d1 ? dateDans(t, d1.fin) : null;
       if (d1 && d2) cmds.push({ op: "theme", id: theme, debut: d1.md, fin: d2.md });
-      else if (/toute l'annee|sans date|plus de date|n'importe quand/.test(t)) cmds.push({ op: "theme_periode_off", id: theme });
+      else if (/toute l'annee|sans date|plus de date|n'importe quand|dates? (par defaut|d'origine|normales?)/.test(t)) cmds.push({ op: "theme_periode_off", id: theme });
       else if (/(desactive|cache|masque|retire|supprime|enleve|coupe|bloque|ferme|vire)/.test(t)) cmds.push({ op: "theme", id: theme, actif: false });
       else if (/(active|reactive|remets?|affiche|montre|reouvre|rouvre|debloque)/.test(t)) cmds.push({ op: "theme", id: theme, actif: true });
     }
@@ -551,7 +566,7 @@
   }
 
   global.ConfigLib = {
-    THEMES_CONNUS, NOMS_THEMES, COUPURES_CONNUES, NOMS_COUPURES, TEXTE_MAX, DEFI_MAX, DEFIS_MAX, NIVEAUX_DEFIS, erreurDefi,
+    THEMES_CONNUS, NOMS_THEMES, PERIODES_FETES, periodeTheme, COUPURES_CONNUES, NOMS_COUPURES, TEXTE_MAX, DEFI_MAX, DEFIS_MAX, NIVEAUX_DEFIS, erreurDefi,
     valider, versionPlusVieille, themeDisponible, coupee, annonceVisible, appliquer, interpreter, decrire, dansPeriode, dateEnTexte,
     SCENARIOS, MODELES_ANNONCES, repondreQuestion
   };

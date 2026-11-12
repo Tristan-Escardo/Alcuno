@@ -373,8 +373,7 @@ function nbCartesCupidon(nbJoueurs){ return nbJoueurs >= 6 ? 3 : nbJoueurs >= 4 
 const GRAINE_VALENTIN = 34359738368; // 2^35
 function graineValentin(seed){ return Math.floor(seed / GRAINE_VALENTIN) % 2 === 1; }
 function saintValentinEnCours(){
-  const d = new Date();
-  if(d.getMonth() === 1 && d.getDate() >= 7 && d.getDate() <= 15) return true;
+  if(feteEnCours() === "valentin") return true; // (dates de la fête, ou celles du pilotage : js/reglages.js)
   return document.documentElement.dataset.theme === "valentin";
 }
 let partieValentin = false; // la partie en cours a la carte Coup de foudre (voir lancerPartie, js/regles.js)

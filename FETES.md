@@ -1,9 +1,10 @@
 # Thèmes de fêtes : dates (à NOTER seulement)
 
-Les thèmes ne sont pas encore automatiques : chacun est créé et testé un par un dans l'appli TEST.
-(Les fêtes qui ne sont PAS des thèmes — Nouvel An, Fête nationale, 1er avril — se déclenchent déjà toutes seules à la bonne date.)
-Le calendrier automatique (le thème apparaît puis disparaît aux dates ci-dessous) ne sera codé
-qu'une fois **tous** les thèmes validés.
+Calendrier automatique : chaque thème de fête n'est disponible dans les Réglages que pendant ses dates ci-dessous, puis
+disparaît (un joueur qui l'avait choisi revient à Bordeaux). Ces dates sont écrites dans `PERIODES_FETES` (js/config-lib.js) ;
+on peut en donner d'autres, ou cacher un thème, depuis le pilotage de stats.html (« Dates », « Dates par défaut », « Cacher »),
+sans republier le jeu. L'annonce de la fête et la carte Coup de foudre de la Saint-Valentin suivent ces mêmes dates.
+(Les fêtes qui ne sont PAS des thèmes — Nouvel An, Fête nationale, 1er avril — se déclenchent toutes seules à leurs dates fixes.)
 
 Dates incluses, heure du téléphone. « du X au Y » = du X à 0 h au Y à 23 h 59, sauf mention contraire.
 
@@ -30,9 +31,8 @@ Fête nationale, 1er avril — n'en ont aucune : elles sont actives d'office pen
 de base, qui n'apparaît dans les Réglages que pendant leur période et ne sert qu'à les couper ; le 1er avril
 n'a pas de réglage du tout.
 
-Ces trois-là sont les seules fêtes déjà **automatiques** : elles se déclenchent à la date du téléphone (voir le
-script du `<head>` de index.html pour les feux, js/poisson.js pour le 1er avril). Les vrais thèmes attendent
-toujours le calendrier général.
+Ces trois-là se déclenchent à la date du téléphone (voir le script du `<head>` de index.html pour les feux,
+js/poisson.js pour le 1er avril), à dates fixes : le pilotage ne les change pas.
 
 
 Au premier lancement du jeu pendant la période d'une fête (Noël, Chandeleur, Saint-Valentin, Saint-Patrick, Just Rosé, Fête de la musique, Halloween pour l'instant), une fenêtre du

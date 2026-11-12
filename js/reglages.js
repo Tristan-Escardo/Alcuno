@@ -184,24 +184,25 @@ function afficherFenetrePrestige(){
 // annonce le thème, aux couleurs de CETTE fête (quel que soit le thème choisi). Une seule fois par période et par appareil.
 // « L'essayer » met le thème (comme un clic sur sa pastille dans les Réglages), « Plus tard » ferme.
 // Pour la voir hors période (tests) : ouvrir le jeu avec ?annonce_fete=<thème>, ou appeler afficherAnnonceFete("<thème>").
-// mois : 0 = janvier ; Noël est à cheval sur aucune année (18 au 26 décembre).
+// Dates : PERIODES_FETES de js/config-lib.js (celles de FETES.md), ou celles données depuis le pilotage.
 // « nom » est celui écrit dans l'annonce (« Nouveau thème … disponible ») : c'est le nom complet de la fête,
 // même quand la pastille des Réglages en montre un plus court (Fête de la musique -> Musique, faute de place).
 const FETES_ANNONCE = {
-  noel:       { nom: "Noël",           debut: [11, 18], fin: [11, 26], essayer: "Joyeux Noël",           image: "noel/boule_neige.svg" },
-  chandeleur: { nom: "Chandeleur",     debut: [0, 28],  fin: [1, 3],   essayer: "L'essayer maintenant", image: "chandeleur/crepe.svg" },
-  valentin:   { nom: "Saint-Valentin", debut: [1, 7],   fin: [1, 15],  essayer: "L'essayer maintenant", image: "valentin/coeur_o.svg" },
-  patrick:    { nom: "Saint-Patrick",  debut: [2, 14],  fin: [2, 18],  essayer: "Sláinte is táinte !",  image: "patrick/trefle_apercu.svg" },
-  justrose:   { nom: "Just Rosé",      debut: [4, 4],   fin: [4, 12],  essayer: "L'essayer maintenant", image: "justrose/verre_apercu.svg" },
-  musique:    { nom: "Fête de la musique", debut: [5, 18], fin: [5, 22], essayer: "L'essayer maintenant", image: "musique/note_apercu.svg" },
-  halloween:  { nom: "Halloween",       debut: [9, 20],  fin: [10, 1], essayer: "L'essayer maintenant", image: "halloween/citrouille_apercu.svg" }
+  noel:       { nom: "Noël",           essayer: "Joyeux Noël",           image: "noel/boule_neige.svg" },
+  chandeleur: { nom: "Chandeleur",     essayer: "L'essayer maintenant", image: "chandeleur/crepe.svg" },
+  valentin:   { nom: "Saint-Valentin", essayer: "L'essayer maintenant", image: "valentin/coeur_o.svg" },
+  patrick:    { nom: "Saint-Patrick",  essayer: "Sláinte is táinte !",  image: "patrick/trefle_apercu.svg" },
+  justrose:   { nom: "Just Rosé",      essayer: "L'essayer maintenant", image: "justrose/verre_apercu.svg" },
+  musique:    { nom: "Fête de la musique", essayer: "L'essayer maintenant", image: "musique/note_apercu.svg" },
+  halloween:  { nom: "Halloween",       essayer: "L'essayer maintenant", image: "halloween/citrouille_apercu.svg" }
 };
-// Fête en cours à cette date (null si aucune) : du jour de début à 0 h au jour de fin à 23 h 59
+// Fête en cours à cette date (null si aucune) : du jour de début à 0 h au jour de fin à 23 h 59, thème pas caché
+// depuis le pilotage. (Les dates seulement : pas le passe-droit des tests de themeBloqueADistance, js/config-distante.js.)
 function feteEnCours(date = new Date()){
-  const jour = date.getMonth() * 100 + date.getDate();
   for (const cle of Object.keys(FETES_ANNONCE)) {
-    const f = FETES_ANNONCE[cle];
-    if (jour >= f.debut[0] * 100 + f.debut[1] && jour <= f.fin[0] * 100 + f.fin[1]) return cle;
+    const t = configDistante.themes && configDistante.themes[cle];
+    const p = ConfigLib.periodeTheme(configDistante, cle);
+    if (!(t && t.actif === false) && p && ConfigLib.dansPeriode(p.debut, p.fin, date)) return cle;
   }
   return null;
 }

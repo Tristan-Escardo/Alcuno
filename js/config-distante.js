@@ -12,8 +12,16 @@ let configLueLe = 0;
 
 try { configDistante = ConfigLib.valider(JSON.parse(localStorage.getItem(CLE_CONFIG_DISTANTE) || "{}")); } catch (e) { configDistante = {}; }
 
-// Utilisée par appliquerTheme (js/reglages.js) : le thème est caché ou hors de sa période
-function themeBloqueADistance(nom){ return !ConfigLib.themeDisponible(configDistante, nom, new Date()); }
+// Utilisée par appliquerTheme (js/reglages.js) : le thème est caché ou hors de sa période (thèmes de fête : leurs dates
+// par défaut, ConfigLib.PERIODES_FETES, sauf autres dates données depuis le pilotage).
+// Navigateur piloté par un programme (tests automatiques : navigator.webdriver) : les thèmes de fête sont disponibles toute
+// l'année quand le pilotage ne leur a pas donné de dates, sinon les tests d'un thème de fête ne marcheraient qu'à sa date.
+// « ?calendrier » enlève ce passe-droit (le test qui vérifie justement le calendrier). Jamais le cas chez un joueur.
+function themeBloqueADistance(nom){
+  const passeDroit = navigator.webdriver === true && !/[?&]calendrier(=|&|$)/.test(location.search) && !!ConfigLib.PERIODES_FETES[nom];
+  if (passeDroit) { const t = configDistante.themes && configDistante.themes[nom]; if (!t || !t.debut) return !!(t && t.actif === false); }
+  return !ConfigLib.themeDisponible(configDistante, nom, new Date());
+}
 
 function appliquerConfigDistante(){
   const racine = document.documentElement;
