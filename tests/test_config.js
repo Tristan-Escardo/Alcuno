@@ -107,6 +107,11 @@ for (const nom of ["stats.html"]) {
 // les règles Firebase restent un JSON valide qui protège « config » en écriture
 const regles = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "database.rules.json"), "utf8")).rules;
 verifier(regles.stats.appareils.$id.confVu && regles.stats.appareils.$id.confV && regles.config.v && regles.config.defauts && regles.config.annonce.debut && regles.config.annonce.avantVersion, "règles Firebase : champs des nouveaux réglages");
+{ // chaque thème que le pilotage peut régler doit être accepté par les règles (sinon « Refusé par Firebase » : arrivé avec les thèmes de fête)
+  const motif = new RegExp(regles.config.themes.$theme[".validate"].match(/matches\((\/.*\/)\)/)[1].slice(1, -1));
+  const refuses = ConfigLib.THEMES_CONNUS.filter((t) => !motif.test(t));
+  verifier(!refuses.length && !motif.test("inconnu"), "règles Firebase : tous les thèmes du pilotage acceptés" + (refuses.length ? " (refusés : " + refuses.join(", ") + ")" : ""));
+}
 verifier(/auth\.uid/.test(regles.sante[".read"]) && regles.sante.jours.$jour.$sig.n[".read"] === true && regles.sante.jours[".write"].includes("auth.uid") && regles.sante.ignores.$sig[".write"].includes("auth.uid") && regles.sante.jours.$jour.$sig[".write"] === "newData.exists()" && regles.sante.jours.$jour.$sig.n[".validate"].includes("data.exists()"), "règles Firebase : journal de santé (écriture des erreurs ouverte mais sans suppression ; effacer et ignorer réservés à l'administrateur)");
 // la lecture des statistiques, de la santé et de la présence est réservée à l'administrateur (sauf les compteurs que les transactions du jeu lisent)
 verifier(["stats", "presence", "sante"].every((n) => /auth\.uid/.test(regles[n][".read"])) && regles.stats.jours.$jour.visites[".read"] === true && regles.stats.jours.$jour.heures.$h[".read"] === true && regles.stats.appareils[".read"] === undefined && regles.stats.jours.$jour.visiteurs.$id[".read"] === undefined, "règles Firebase : stats, santé et présence lisibles par l'administrateur seulement");

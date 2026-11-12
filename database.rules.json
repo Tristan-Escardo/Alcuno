@@ -76,7 +76,7 @@
       },
       "themes": {
         "$theme": {
-          ".validate": "$theme.matches(/^(bordeaux|noir|vert|bleu|soleil|cerisier|givre|prestige|galaxie|kawaii|donjon)$/)",
+          ".validate": "$theme.matches(/^(bordeaux|noir|vert|bleu|soleil|cerisier|givre|prestige|galaxie|kawaii|donjon|noel|chandeleur|valentin|patrick|justrose|musique|halloween)$/)",
           "actif": { ".validate": "newData.isBoolean()" },
           "debut": { ".validate": "newData.isString() && newData.val().matches(/^[01][0-9]-[0-3][0-9]$/)" },
           "fin": { ".validate": "newData.isString() && newData.val().matches(/^[01][0-9]-[0-3][0-9]$/)" },
