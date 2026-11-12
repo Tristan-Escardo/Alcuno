@@ -900,7 +900,15 @@
             // exemples cliquables, listes de thèmes
             $("pilExemples").innerHTML = EXEMPLES.map((e) => `<button type="button">${ecape(e)}</button>`).join("");
             $("pilExemples").addEventListener("click", (ev) => { if (ev.target.tagName === "BUTTON") { $("pilTexte").value = ev.target.textContent; $("pilTexte").focus(); } });
-            $("pilThemePeriode").innerHTML = ConfigLib.THEMES_CONNUS.map((t) => `<option value="${t}">${ecape(ConfigLib.NOMS_THEMES[t])}</option>`).join("");
+            // (thèmes de fête d'abord ; choisir un thème remplit les dates avec celles qui sont en vigueur : par défaut ou changées)
+            const fetesPil = Object.keys(ConfigLib.PERIODES_FETES);
+            $("pilThemePeriode").innerHTML = [...ConfigLib.THEMES_CONNUS.filter((t) => fetesPil.includes(t)), ...ConfigLib.THEMES_CONNUS.filter((t) => !fetesPil.includes(t))].map((t) => `<option value="${t}">${ecape(ConfigLib.NOMS_THEMES[t])}</option>`).join("");
+            const remplirDates = () => {
+                const p = ConfigLib.periodeTheme(config, $("pilThemePeriode").value), an = new Date().getFullYear();
+                $("pilDebut").value = p ? `${an}-${p.debut}` : ""; $("pilFin").value = p ? `${an}-${p.fin}` : "";
+            };
+            $("pilThemePeriode").addEventListener("change", remplirDates);
+            remplirDates();
 
             // Aperçu : l'accueil tel qu'un joueur le verrait avec cette config (annonce, bouton en ligne, thèmes, fonctions coupées)
             function apercu(cfg, el){
@@ -945,6 +953,7 @@
                 // Thèmes de fête d'abord (avec leurs dates : par défaut celles de FETES.md), puis les autres
                 const fetes = Object.keys(ConfigLib.PERIODES_FETES);
                 const ordre = [...ConfigLib.THEMES_CONNUS.filter((t) => fetes.includes(t)), ...ConfigLib.THEMES_CONNUS.filter((t) => !fetes.includes(t))];
+                if (!$("pilDebut").value || document.activeElement !== $("pilDebut")) remplirDates();
                 $("pilThemes").innerHTML = ordre.map((t) => {
                     const x = (config.themes || {})[t] || {};
                     const cache = x.actif === false;
@@ -1026,9 +1035,7 @@
             $("pilThemes").addEventListener("click", (ev) => {
                 const b = ev.target.closest("button"); if (!b) return;
                 if (b.dataset.dates) { // « Dates » : le formulaire de période ci-dessous, prérempli avec les dates actuelles
-                    const p = ConfigLib.periodeTheme(config, b.dataset.dates), an = new Date().getFullYear();
-                    $("pilThemePeriode").value = b.dataset.dates;
-                    $("pilDebut").value = p ? `${an}-${p.debut}` : ""; $("pilFin").value = p ? `${an}-${p.fin}` : "";
+                    $("pilThemePeriode").value = b.dataset.dates; remplirDates();
                     $("pilThemePeriode").scrollIntoView({ behavior: "smooth", block: "center" });
                     return;
                 }
