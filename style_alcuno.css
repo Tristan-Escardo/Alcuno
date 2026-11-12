@@ -2508,16 +2508,22 @@ header h1{
 }
 
 #ecranCredits .credits-honneur{
-  /* même largeur qu'une case de créateur, centrée : la mention reste discrète */
-  width: calc((min(420px, 88vw) - 10px) / 2);
+  /* comme les créateurs : 2 cases par rangée (une mention seule reste centrée, à la taille d'une case) */
+  width: min(420px, 88vw);
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
   margin-top: 2px;
   text-align: center;
 }
+#ecranCredits .credits-honneur .credits-nom{
+  flex: 0 0 calc((100% - 10px) / 2);
+  box-sizing: border-box;
+}
 
 #ecranCredits .credits-honneur-titre{
+  flex: 0 0 100%;
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.2em;
