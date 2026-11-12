@@ -5399,6 +5399,15 @@ html #ecranReglages #ligneModeHard .badgeOrangeHard{
   filter: drop-shadow(0 0 6px rgba(255, 42, 61, 0.85)) drop-shadow(0 4px 6px rgba(0, 0, 0, 0.6));
 }
 #ziziCoptere[hidden]{ display: none !important; }
+/* Écran d'accueil : jamais de sélection de texte. Un appui long (sur le zizi-coptère ou ailleurs) lançait la sélection de l'iPhone :
+   écran teinté de bleu, poignées de sélection. Les champs de saisie des autres écrans gardent leur sélection. */
+#choixMode, #choixMode *, #ziziCoptere, #ziziCoptere *, #bulleZizi,
+body:has(#choixMode:not([style*="none"])), body:has(#choixMode:not([style*="none"])) :is(main, #choixMode, #choixMode *, header, #menu, #messages, #jeu){
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+#choixMode input, #choixMode textarea{ -webkit-user-select: text; user-select: text; }
 /* Bulle « Tapote-moi » au-dessus du zizi-coptère, tant que le son du jeu est bloqué (js/zizi-coptere.js) */
 #bulleZizi{
   position: fixed; z-index: 51; transform: translate(-50%, -100%); pointer-events: none; white-space: nowrap;
