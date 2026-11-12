@@ -7,7 +7,7 @@
 //
 // Changer CACHE (ex. "alcuno-v2") force les téléphones à repartir d'une copie locale propre.
 
-const CACHE = "alcuno-v24"; // v24 : calendrier des thèmes de fête (dates par défaut, changeables depuis le pilotage) ; v23 : thèmes de fête (Noël, Chandeleur, Saint-Valentin, Saint-Patrick, Just Rosé, Fête de la musique, Halloween), feux du Nouvel An et de la Fête nationale, poisson d'avril, piano de l'accueil, musiques et sons, carte Coup de foudre ; v22 : sons des boutons BDSM retouchés (le test du cache était en échec) ; v21 : sons des boutons du thème BDSM (Sons/bdsm_buttons/) ; v20 : musique du thème BDSM, son de l'étoile filante ; v19 : faces de cartes du thème BDSM (Cartes/donjon/) ; v18 : dos des cartes du thème Donjon (cœur masqué) ; v17 : thème Donjon (style_donjon.css, donjon/) ; v16 : mode hot (js/mode-hot.js, carte Cupidon) ; v15 : 4 sons de sabre retirés ; v14 : FAQ (js/faq.js) ; // v13 : musique d'ambiance gardée en cache à la première écoute (hors connexion) ; v12 : trois dos Star Wars qui alternent ; v11 : dos Star Wars en acier (dos_galaxie_argent.svg) ; v10 : faces de cartes Star Wars (Cartes/galaxie/) ; v9 : faces de cartes Kawaii (Cartes/kawaii/) ; v8 : dos Kawaii renommés (dos_kawaii_alcuno_*) pour sortir des anciens caches ; v7 : dos Kawaii avec « ALC UNO » ; v6 : dos de cartes Kawaii ; v5 : petits personnages flottants du thème Kawaii ; v4 : album de stickers et thème Kawaii ; v3 : QR code de la partie (js/qrcode.js) ; v2 : cartes HD en WebP (les anciennes .jpg sont supprimées du cache)
+const CACHE = "alcuno-v25"; // v25 : mode hard (défis sexuels à 2 joueurs, débloqué par un mot secret, js/zizi-coptere.js, Sons/mode_hard.mp3, Sons/zizicoptere.mp3), zizi-coptère du thème BDSM, chaîne sous le titre BDSM ; v24 : calendrier des thèmes de fête (dates par défaut, changeables depuis le pilotage) ; v23 : thèmes de fête (Noël, Chandeleur, Saint-Valentin, Saint-Patrick, Just Rosé, Fête de la musique, Halloween), feux du Nouvel An et de la Fête nationale, poisson d'avril, piano de l'accueil, musiques et sons, carte Coup de foudre ; v22 : sons des boutons BDSM retouchés (le test du cache était en échec) ; v21 : sons des boutons du thème BDSM (Sons/bdsm_buttons/) ; v20 : musique du thème BDSM, son de l'étoile filante ; v19 : faces de cartes du thème BDSM (Cartes/donjon/) ; v18 : dos des cartes du thème Donjon (cœur masqué) ; v17 : thème Donjon (style_donjon.css, donjon/) ; v16 : mode hot (js/mode-hot.js, carte Cupidon) ; v15 : 4 sons de sabre retirés ; v14 : FAQ (js/faq.js) ; // v13 : musique d'ambiance gardée en cache à la première écoute (hors connexion) ; v12 : trois dos Star Wars qui alternent ; v11 : dos Star Wars en acier (dos_galaxie_argent.svg) ; v10 : faces de cartes Star Wars (Cartes/galaxie/) ; v9 : faces de cartes Kawaii (Cartes/kawaii/) ; v8 : dos Kawaii renommés (dos_kawaii_alcuno_*) pour sortir des anciens caches ; v7 : dos Kawaii avec « ALC UNO » ; v6 : dos de cartes Kawaii ; v5 : petits personnages flottants du thème Kawaii ; v4 : album de stickers et thème Kawaii ; v3 : QR code de la partie (js/qrcode.js) ; v2 : cartes HD en WebP (les anciennes .jpg sont supprimées du cache)
 
 // Copié dès l'installation : de quoi jouer en classique sans réseau
 const A_PRECHARGER = [
@@ -21,6 +21,7 @@ const A_PRECHARGER = [
   "./js/plateau.js",
   "./js/regles.js",
   "./js/mode-hot.js",
+  "./js/zizi-coptere.js",
   "./js/poisson.js",
   "./js/synchro-en-ligne.js",
   "./js/retour-demarrage.js",
@@ -116,6 +117,7 @@ const A_PRECHARGER = [
   "./donjon/baillon.svg",
   "./donjon/bandeau.svg",
   "./donjon/chaine.svg",
+  "./donjon/chaine_h.svg",
   "./donjon/collier.svg",
   "./donjon/cravache.svg",
   "./donjon/dixhuit.svg",
@@ -357,7 +359,7 @@ const A_PRECHARGER = [
 
 // Sons (dossier Sons/) : copiés aussi, pour en avoir hors connexion. Un par un et sans bloquer :
 // un fichier absent (son pas encore ajouté) n'empêche pas l'installation du reste.
-const SONS_A_PRECHARGER = ["cartes", "doree", "tiens_gueule", "bouton", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees", "regles", "accessibilite_on", "etoile", "traineau_noel"]
+const SONS_A_PRECHARGER = ["zizicoptere", "mode_hard", "cartes", "doree", "tiens_gueule", "bouton", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees", "regles", "accessibilite_on", "etoile", "traineau_noel"]
   .concat(["sabre/sabre_01", "sabre/sabre_02", "sabre/sabre_05", "sabre/sabre_07", "sabre/sabre_09", "sabre/sabre_11", "sabre/sabre_14", "sabre/sabre_15", "sabre/sabre_18", "sabre/sabre_22", "sabre/sabre_26", "sabre/sabre_31", "sabre/sabre_33", "sabre/sabre_37", "sabre/sabre_40", "sabre/sabre_41", "sabre/sabre_48"])
   .concat(["bdsm_buttons/bdsm_sound_effect", "bdsm_buttons/bdsm_sound_effect1_01", "bdsm_buttons/bdsm_sound_effect1_07", "bdsm_buttons/bdsm_sound_effect1_12", "bdsm_buttons/bdsm_sound_effect1_17", "bdsm_buttons/bdsm_sound_effect1_23", "bdsm_buttons/bdsm_sound_effect1_25", "bdsm_buttons/bdsm_sound_effect1_27", "bdsm_buttons/bdsm_sound_effect1_30", "bdsm_buttons/bdsm_sound_effect1_37", "bdsm_buttons/bdsm_sound_effect1_46"])
   .concat(["saxo/saxo_03", "saxo/saxo_07", "saxo/saxo_08", "saxo/saxo_15", "saxo/saxo_26", "saxo/saxo_32", "saxo/saxo_37", "saxo/saxo_38"])

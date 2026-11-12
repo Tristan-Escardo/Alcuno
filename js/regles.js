@@ -42,6 +42,7 @@ function afficherOverlayFinUnRestants(){
   recapActuel = calculerRecap(restants);
   try { stickersFinDePartie(); } catch (e) {} // (album de stickers, js/stickers.js)
   try { noterFinStats(recapActuel); } catch (e) {} // (stats : partie finie, joueurs, durée ; js/stats.js)
+  if(partieHard) try { debloquerZiziCoptere(); } catch (e) {} // (partie hard finie : zizi-coptère du thème Donjon, js/zizi-coptere.js)
   overlay.appendChild(construireRecap(recapActuel));
 
   const btnTerminer = document.createElement("button");
@@ -1646,7 +1647,8 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
 
   // Mode hot, période Saint-Valentin : carte Coup de foudre (un bisou sur la bouche… ou un cul sec : js/mode-hot.js)
   if(carteTiree === "coup_de_foudre"){
-    const entete = `COUP DE FOUDRE ⚡\nChoisis quelqu'un : un bisou sur la bouche… ou ${estModeSoft() ? "4 gorgées" : "un CUL SEC"} !`;
+    // (mode hard : un doigt dans le cul à la place du bisou)
+    const entete = `COUP DE FOUDRE ⚡\nChoisis quelqu'un : ${partieHard ? "un doigt dans le cul" : "un bisou sur la bouche"}… ou ${estModeSoft() ? "4 gorgées" : "un CUL SEC"} !`;
     afficherRegleBloc(regleZero, entete);
     regleZero.style.display = "block";
     zeroEnCours = true;
@@ -1657,7 +1659,7 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
     if(titreAnnonce && !titreAnnonce.previousElementSibling?.classList.contains("foudre-badge")){
       const badge = document.createElement("div");
       badge.className = "foudre-badge";
-      badge.innerHTML = '🔥 Défi hot spécial <span class="foudre-nowrap">Saint-Valentin</span> 💘';
+      badge.innerHTML = (partieHard ? SVG_18_BARRE + " Défi hard" : "🔥 Défi hot") + ' spécial <span class="foudre-nowrap">Saint-Valentin</span> 💘';
       titreAnnonce.before(badge);
     }
     executerApresOverlayRegleUnique(() => afficherOverlayCoupDeFoudre(joueurActuel, carteTiree, () => {
@@ -1820,6 +1822,11 @@ function lancerPartie(){
     alert("Il faut au moins 2 joueurs");
     return;
   }
+  // Mode hard : seulement à 2 (en ligne : vérifié au lancement de la manche, js/en-ligne.js)
+  if(!enLigneActif && !repriseClassiqueEnCours && estModeHard() && joueurs.length !== 2){
+    alert("Le mode hard se joue à 2 joueurs seulement.");
+    return;
+  }
   couleurDuelEnAttente = null;
 
   plateau.innerHTML = "";
@@ -1831,7 +1838,7 @@ function lancerPartie(){
   // « Partie classique gardée en mémoire » dans js/synchro-en-ligne.js)
   if(!enLigneActif) demarrerSauvegardeClassique();
   // Statistiques : partie classique lancée (pas une reprise ni un retour en arrière rejoués)
-  if(!enLigneActif && !repriseClassiqueEnCours && !rattrapageEnCours) noterPartieStats(false, { hot: estModeHot(), pj: estModeSoft(), express: estPartieExpress() });
+  if(!enLigneActif && !repriseClassiqueEnCours && !rattrapageEnCours) noterPartieStats(false, { hot: estModeHot(), hard: estModeHard(), pj: estModeSoft(), express: estPartieExpress() });
   if(!rattrapageEnCours) noterJeuAppareilStats(); // (stats : ce téléphone joue, js/stats.js)
   majTitrePJ(); // « ALCUNO PJ » dans le bandeau
   majFacesFermees(); // faces ouvertes / fermées (réglage, ou celui de l'hôte en ligne)
@@ -1840,18 +1847,27 @@ function lancerPartie(){
   // Plateau principal = toutes les cartes SAUF 2/5/6/7/8/9 (paquet duel)
   const paquetPrincipal = classes.filter(c => !duelCartes.includes(c));
   // Mode hot (réglage ; en ligne, celui de la graine de la manche ; partie reprise : celui de la partie)
-  const hot = enLigneActif
+  const hotSeul = enLigneActif
     ? !!dernierEtatManche && graineHot(dernierEtatManche.seed)
     : sauvegardeClassique ? !!sauvegardeClassique.hot : estModeHot();
+  // Mode hard (MODE_HARD.md) : la mécanique du mode hot (paquet, défis), avec ses propres défis. Jamais avec le hot.
+  const hard = !hotSeul && (enLigneActif
+    ? !!dernierEtatManche && graineHard(dernierEtatManche.seed)
+    : sauvegardeClassique ? !!sauvegardeClassique.hard : estModeHard());
+  const hot = hotSeul || hard;
   partieHot = hot;
-  if(enLigneActif) choisirModeHotEnLigne(hot);
-  else if(caseModeHot.checked !== hot) caseModeHot.checked = hot; // (partie reprise : même mode que pendant la partie)
+  partieHard = hard;
+  if(enLigneActif){ choisirModeHotEnLigne(hotSeul); choisirModeHardEnLigne(hard); }
+  else { // (partie reprise : même mode que pendant la partie)
+    if(caseModeHot.checked !== hotSeul) caseModeHot.checked = hotSeul;
+    if(caseModeHard.checked !== hard) caseModeHard.checked = hard;
+  }
   initialiserModeHot(); // (js/mode-hot.js : défis vus, liens Cupidon, hasard des défis)
   // Période Saint-Valentin : carte Coup de foudre dans le paquet hot (en ligne : celle de la graine ; reprise : celle de la partie)
   partieValentin = hot && (enLigneActif
     ? !!dernierEtatManche && graineValentin(dernierEtatManche.seed)
     : sauvegardeClassique ? !!sauvegardeClassique.valentin : saintValentinEnCours());
-  if(hot && !rattrapageEnCours) debloquerDonjon(); // thème secret « Donjon » (js/reglages.js)
+  if(hot && !rattrapageEnCours) debloquerDonjon(hard); // thème secret « Donjon » (js/reglages.js ; hot ou hard)
   paquet = hot ? paquetHot(paquetPrincipal, joueurs.length, partieValentin) : [...paquetPrincipal];
   melangerPaquet(paquet);
   const express = enLigneActif

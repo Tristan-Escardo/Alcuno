@@ -74,7 +74,7 @@ function noterPartieStats(enLigne, modes = {}){
   if (estPageTele) return;
   compterStats(enLigne ? "partiesEnLigne" : "parties");
   compterStats(`heures/${String(new Date().getHours()).padStart(2, "0")}`);
-  ["hot", "pj", "express"].forEach((m) => { if (modes[m]) compterStats("modes/" + m); });
+  ["hot", "hard", "pj", "express"].forEach((m) => { if (modes[m]) compterStats("modes/" + m); });
   teleCompteePartie = false;
   noterTelePartieStats();
 }

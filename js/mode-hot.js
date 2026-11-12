@@ -74,6 +74,50 @@ const DEFIS_HOT = {
     { id: "C13", t: "Échange un vêtement avec {nom} jusqu'à la fin de la partie." },
     { id: "C14", t: "Chante une petite chanson à {nom} pendant 20 secondes." },
     { id: "C15", t: "Tiens le visage de {nom} entre tes mains et dis-lui que tu adores te marteler les fesses avec un cactus nain 2 à 3 soirs par semaine et que tu as pris l'habitude de retirer les épines avec une pince à épiler, ce qui a nettement amélioré ta dextérité et ta mobilité des doigts." }
+  ],
+  // ===== Mode hard (2 joueurs, voir MODE_HARD.md) : HA jusqu'à 4 gorgées (2 en PJ), HB au-dessus =====
+  HA: [
+    { id: "HA1", t: "Roule une pelle à {nom}." },
+    { id: "HA2", t: "Mordille la lèvre de {nom}." },
+    { id: "HA3", t: "Embrasse {nom} où il ou elle veut, sauf sur la bouche." },
+    { id: "HA4", t: "Assieds-toi nu(e) sur les genoux de {nom}, face à lui ou elle, jusqu'au prochain tour." },
+    { id: "HA5", t: "Enlève un vêtement de {nom}, avec les dents." },
+    { id: "HA6", t: "Enlève 4 vêtements, au choix de {nom}." },
+    { id: "HA7", t: "Glisse ta main sous le haut de {nom}." },
+    { id: "HA8", t: "Embrasse {nom} en partant de l'oreille jusqu'à la clavicule." },
+    { id: "HA9", t: "Lèche une goutte de ton verre sur le cou de {nom}." },
+    { id: "HA10", t: "Murmure à {nom} ce que tu as envie de lui faire ce soir." },
+    { id: "HA11", t: "Caresse {nom} par-dessus ses vêtements, là où il ou elle te guide." },
+    { id: "HA12", t: "Bande les yeux de {nom} et embrasse-le ou la 3 fois, où tu veux." },
+    { id: "HA13", t: "Fais un suçon à {nom}, à l'endroit de son choix." },
+    { id: "HA14", t: "Embrasse le ventre de {nom}, en descendant jusqu'à la ceinture." },
+    { id: "HA15", t: "Fais un strip-tease à {nom}." },
+    { id: "HA16", t: "Laisse {nom} t'embrasser où il ou elle veut pendant 20 secondes, sans bouger." },
+    { id: "HA17", t: "Embrasse {nom} les yeux bandés, et devine quelle partie de son corps il ou elle t'a présentée." },
+    { id: "HA18", t: "Mordille le téton de {nom}." },
+    { id: "HA19", t: "Fais asseoir {nom} et embrasse l'intérieur de ses cuisses." },
+    { id: "HA20", t: "Passe un glaçon sur le corps de {nom}, où tu veux. Pas de glaçon : ta langue." }
+  ],
+  HB: [
+    { id: "HB1", t: "Caresse le sexe de {nom}, sous ses vêtements." },
+    { id: "HB2", t: "Fais un cunni ou une fellation à {nom}." },
+    { id: "HB3", t: "Laisse {nom} te caresser le sexe, sans bouger les mains." },
+    { id: "HB4", t: "Fais un 69 avec {nom}." },
+    { id: "HB5", t: "Masturbe {nom} jusqu'au prochain tour." },
+    { id: "HB6", t: "Lèche {nom} de la poitrine jusqu'au sexe, puis lèche le sexe." },
+    { id: "HB7", t: "Laisse {nom} choisir une position, et prenez-la, nus." },
+    { id: "HB8", t: "Masturbe {nom} avec tes pieds, ou mets ton gros orteil dans la ****** de {nom} (propres, bien sûr)." },
+    { id: "HB9", t: "Attache les mains de {nom} et fais-lui ce que tu veux." },
+    { id: "HB10", t: "Masturbe-toi devant {nom}." },
+    { id: "HB11", t: "Prends {nom} en levrette, ou laisse-toi prendre." },
+    { id: "HB12", t: "Chevauche {nom}." },
+    { id: "HB13", t: "Faites une levrette debout dans une pièce où il y a une machine à laver." },
+    { id: "HB14", t: "Utilise un jouet sur {nom}. Pas de jouet ? Tu bois les gorgées de ce défi." },
+    { id: "HB15", t: "Réalise le fantasme de {nom}." },
+    { id: "HB16", t: "Mets de la chantilly (ou autre chose, pourvu que ce soit comestible) sur la poitrine de {nom}, et lèche tout." },
+    { id: "HB17", t: "Fais un cunni ou une fellation à {nom} avec un glaçon dans la bouche." },
+    { id: "HB18", t: "Faites une position de votre choix en silence total : le premier qui fait un bruit boit les gorgées de ce défi." },
+    { id: "HB19", t: "Fais l'amour à {nom} pendant qu'il ou elle récite l'alphabet à l'envers. S'il ou elle se trompe, il ou elle boit les gorgées de ce défi." }
   ]
 };
 
@@ -94,7 +138,7 @@ function initialiserModeHot(){
     : (typeof configDistante === "object" && configDistante) || {};
   const ajoutes = source.defisHot || {};
   defisMasquesHot = Object.assign({}, source.defisMasques || {}); // (défis du jeu retirés depuis le pilotage)
-  defisAjoutesHot = { A: [], B: [], C: [] };
+  defisAjoutesHot = { A: [], B: [], C: [], HA: [], HB: [] };
   Object.keys(ajoutes).sort().forEach((id) => {
     const d = ajoutes[id];
     if (defisAjoutesHot[d.n]) defisAjoutesHot[d.n].push({ id: "P" + id, t: d.t, deux: /\{nom1\}/.test(d.t) });
@@ -123,10 +167,12 @@ function joueursLibresHot(){
 }
 
 // ----- Défis -----
-let defisAjoutesHot = { A: [], B: [], C: [] };
+let defisAjoutesHot = { A: [], B: [], C: [], HA: [], HB: [] };
 let defisMasquesHot = {};
 function defisDuNiveauHot(groupe){ return DEFIS_HOT[groupe].filter((d) => !defisMasquesHot[d.id]).concat(defisAjoutesHot[groupe] || []); }
 function groupeDefiHot(nbGorgees){
+  // Mode hard : HA jusqu'à 4 gorgées (jusqu'à 2 en mode PJ), HB au-dessus
+  if(partieHard) return nbGorgees > (estModeSoft() ? 2 : 4) ? "HB" : "HA";
   return nbGorgees > 10 ? "C" : nbGorgees >= 5 ? "B" : "A";
 }
 
@@ -185,7 +231,8 @@ function montrerDefiHot(joueurIndex, nbGorgees, defiPossible = true, defiImpose 
 
   const puce = document.createElement("span");
   puce.className = "bloc-hot-puce";
-  puce.innerText = "🔥 MODE HOT";
+  if(partieHard) puce.innerHTML = `${SVG_18_BARRE} MODE HARD`;
+  else puce.innerText = "🔥 MODE HOT";
   bloc.appendChild(puce);
 
   if(partenaire){
@@ -262,6 +309,8 @@ function afficherOverlayCoupDeFoudre(joueurActuel, classeCarte, suite = null){
   choixPigeonEnCours = true;
   lockScroll();
   const culSec = estModeSoft() ? "4 gorgées" : "CUL SEC";
+  // Mode hard : un doigt dans le cul à la place du bisou (le reste pareil)
+  const geste = partieHard ? "Un doigt dans le cul" : "Bisou sur la bouche";
   let etape = "choix", elu = null;
 
   const overlay = document.createElement("div");
@@ -307,10 +356,10 @@ function afficherOverlayCoupDeFoudre(joueurActuel, classeCarte, suite = null){
     });
   });
   // 2) bisou ou cul sec
-  nouveau(actions, "💋 Bisou sur la bouche", "foudre:bisou", ["action"], () => {
-    compterCouple(choisisseur, elu, 0, 1);
+  nouveau(actions, `${partieHard ? "👉" : "💋"} ${geste}`, "foudre:bisou", ["action"], () => {
+    if(!partieHard) compterCouple(choisisseur, elu, 0, 1);
     jouerSon("annuler_gorgees");
-    terminer(`💋 ${avecCouronne(choisisseur)} et ${avecCouronne(elu)} : coup de foudre !`);
+    terminer(`${partieHard ? "👉" : "💋"} ${avecCouronne(choisisseur)} et ${avecCouronne(elu)} : coup de foudre !`);
   }, { once: true });
   nouveau(actions, `🥃 ${culSec}`, "foudre:culsec", ["action"], () => {
     noterGorgees(choisisseur, estModeSoft() ? 4 : GORGEES_CUL_SEC);
@@ -321,9 +370,9 @@ function afficherOverlayCoupDeFoudre(joueurActuel, classeCarte, suite = null){
   function refresh(){
     // « Défi hot spécial Saint-Valentin », puis le titre, puis la consigne, bien séparés (style_alcuno.css : .foudre-*)
     // (des <div> et pas des <span> : la télé, js/tele.js, met chaque bloc sur sa ligne)
-    titre.innerHTML = `<div class="foudre-badge">🔥 Défi hot spécial <span class="foudre-nowrap">Saint-Valentin</span> 💘</div><div class="foudre-titre">COUP DE FOUDRE ⚡</div>`
+    titre.innerHTML = `<div class="foudre-badge">${partieHard ? SVG_18_BARRE + " Défi hard" : "🔥 Défi hot"} spécial <span class="foudre-nowrap">Saint-Valentin</span> 💘</div><div class="foudre-titre">COUP DE FOUDRE ⚡</div>`
       + `<div class="foudre-consigne">${etape === "choix" ? "Choisis quelqu'un"
-        : `${echapperHtml(avecCouronne(elu))} : un bisou sur la bouche… ou ${culSec} ?`}</div>`;
+        : `${echapperHtml(avecCouronne(elu))} : ${partieHard ? "un doigt dans le cul" : "un bisou sur la bouche"}… ou ${culSec} ?`}</div>`;
     boutons.forEach(({ el, etapes }) => { el.style.display = etapes.includes(etape) ? "" : "none"; });
   }
   document.body.appendChild(overlay);
@@ -453,14 +502,15 @@ function afficherOverlayCupidon(joueurActuel, classeCarte, suite = null){
 // #endregion
 
 // ----- Aperçu d'un défi depuis le pilotage (stats.html → « Voir comme en jeu ») -----
-// index.html?apercu_defi=<texte>&niveau=A|B|C : l'annonce telle qu'en partie (Léa boit, Tom et Max visés), boutons sans effet.
+// index.html?apercu_defi=<texte>&niveau=A|B|C|HA|HB : l'annonce telle qu'en partie (Léa boit, Tom et Max visés), boutons sans effet.
 // L'adresse met le jeu en appli de test (MODE_TEST, script.js) : rien n'est compté dans les statistiques.
 function apercuDefiHot(texte, niveau){
-  const gorgees = { A: 3, B: 7, C: 12 }[niveau] || 3;
-  joueurs = ["Léa", "Tom", "Max"];
+  const gorgees = { A: 3, B: 7, C: 12, HA: 3, HB: 6 }[niveau] || 3;
+  partieHard = niveau === "HA" || niveau === "HB"; // (mode hard : 2 joueurs)
+  joueurs = partieHard ? ["Léa", "Tom"] : ["Léa", "Tom", "Max"];
   partieHot = true; partieLancee = true;
   const t = String(texte).replace(/\{nom1\}|\{nom\}/g, "Tom").replace(/\{nom2\}/g, "Max");
-  montrerOverlayRegle(`Léa boit ${texteGorgees(gorgees)}`, niveau === "A" ? "trois_rouge" : niveau === "B" ? "plus_2_bleu" : "plus_4");
+  montrerOverlayRegle(`Léa boit ${texteGorgees(gorgees)}`, /A$/.test(niveau) ? "trois_rouge" : /B$/.test(niveau) ? "plus_2_bleu" : "plus_4");
   montrerDefiHot(0, gorgees, true, { id: "apercu", texte: t });
   document.querySelectorAll("#overlayRegleUnique .bloc-hot-btn").forEach((b) => {
     const copie = b.cloneNode(true); // (sans ses actions : l'aperçu ne joue pas)

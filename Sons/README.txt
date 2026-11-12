@@ -49,6 +49,9 @@ MUSIQUE D'AMBIANCE (en boucle, réglage « Musique d'ambiance ») :
 GÉNÉRIQUE DU THÈME SECRET STAR WARS (au volume des sons, la musique d'ambiance se tait pendant) :
   debloquage_theme_galaxie.mp3  boucle exacte (voir BOUCLES_EXACTES dans js/reglages.js)
 
+  mode_hard.mp3                  on active le Mode hard dans « Ta partie »
+  zizicoptere.mp3                zizi-coptère du thème BDSM : en boucle tant qu'il tourne (js/zizi-coptere.js)
+
 - Fichier absent = pas de son à ce moment-là.
 - Pour changer un son : remplace le fichier en gardant le même nom, puis commit + push.
 - Des sons courts et pas trop lourds (moins de 200 Ko si possible).

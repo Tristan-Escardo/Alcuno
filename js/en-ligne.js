@@ -587,6 +587,7 @@ document.getElementById("btnQuitterSalle").addEventListener("click", quitterPart
 
 document.getElementById("validerCreation").addEventListener("click", () => {
   const pseudo = document.getElementById("pseudoCreateur").value.replace(/\s+/g, " ").trim();
+  if (estCodeHard(pseudo)) debloquerHard(); // (« Jojo » : mode hard débloqué, js/reglages.js)
   if (!pseudo) { alert("Entre un pseudo."); return; }
   if (PSEUDO_INVALIDE.test(pseudo)) { alert("Pseudo invalide (pas de . # $ [ ] /)."); return; }
 
@@ -650,6 +651,7 @@ document.getElementById("validerCreation").addEventListener("click", () => {
 document.getElementById("validerRejoindre").addEventListener("click", () => {
   const code = document.getElementById("codeRejoindre").value.trim().toUpperCase();
   const pseudo = document.getElementById("pseudoRejoindre").value.replace(/\s+/g, " ").trim();
+  if (estCodeHard(pseudo)) debloquerHard(); // (« Jojo » : mode hard débloqué, js/reglages.js)
   if (!code || !pseudo) {
     alert("Entre le code et ton pseudo.\n\n" +
           "Tu as été déconnecté d'une partie ? Entre le code et le même pseudo qu'avant : tu reprendras ta place.");
@@ -894,10 +896,12 @@ function ecouterEtatPartie(code){
 // publiées), on relance sans eux : chacun prend alors les siens (voir initialiserModeHot).
 function lancerMancheEnLigne(listeJoueurs, depuisSalle, avecDefis = true){
   const mancheAttendue = mancheCourante;
+  let hardRefuse = false; // (mode hard avec un autre nombre de joueurs que 2 : rien n'est lancé)
   const refEtat = window.fbRef(window.firebaseDB, `parties/${codePartieActuel}/etatJeu`);
 
   return window.fbRunTransaction(refEtat, (etat) => {
     const e = etat || {};
+    hardRefuse = false;
     const possible = depuisSalle ? !e.demarree : (e.demarree && e.manche === mancheAttendue);
     if (!possible) return; // quelqu'un a déjà relancé => abandon
 
@@ -905,6 +909,9 @@ function lancerMancheEnLigne(listeJoueurs, depuisSalle, avecDefis = true){
     const express = depuisSalle ? estPartieExpress() : graineExpress(e.seed || 0);
     // Mode hot : même principe (réglage de celui qui lance, gardé par « Rejouer »)
     const hot = depuisSalle ? caseModeHot.checked : graineHot(e.seed || 0);
+    // Mode hard (jamais avec le hot) : même principe ; seulement à 2 joueurs
+    const hard = !hot && (depuisSalle ? caseModeHard.checked : graineHard(e.seed || 0));
+    if (hard && listeJoueurs.length !== 2) { hardRefuse = true; return; }
     // Période Saint-Valentin (carte Coup de foudre) : celle de celui qui lance, gardée par « Rejouer »
     const valentin = depuisSalle ? saintValentinEnCours() : graineValentin(e.seed || 0);
     const source = !hot || !avecDefis ? {} : depuisSalle ? (configDistante || {}) : e;
@@ -914,14 +921,15 @@ function lancerMancheEnLigne(listeJoueurs, depuisSalle, avecDefis = true){
       manche: (e.manche || 0) + 1,
       // (+ GRAINE_SANS_CARTE_DOREE : première partie de l'hôte, sans carte dorée pour personne ;
       // + GRAINE_EXPRESS : partie express, voir graineExpress ; + GRAINE_HOT : mode hot, voir graineHot)
-      seed: Math.floor(Math.random() * 4294967296) + (premierePartieJouee() ? 0 : GRAINE_SANS_CARTE_DOREE) + (express ? GRAINE_EXPRESS : 0) + (hot ? GRAINE_HOT : 0) + (valentin ? GRAINE_VALENTIN : 0),
+      seed: Math.floor(Math.random() * 4294967296) + (premierePartieJouee() ? 0 : GRAINE_SANS_CARTE_DOREE) + (express ? GRAINE_EXPRESS : 0) + (hot ? GRAINE_HOT : 0) + (hard ? GRAINE_HARD : 0) + (valentin ? GRAINE_VALENTIN : 0),
       joueurs: listeJoueurs,
       hote: e.hote || pseudoActuel
     }, defis && Object.keys(defis).length ? { defisHot: defis } : {}, masques && Object.keys(masques).length ? { defisMasques: masques } : {});
   }).then((resultat) => {
+    if (hardRefuse) { alert("Le mode hard se joue à 2 joueurs seulement."); return; }
     if (resultat && resultat.committed) { // statistiques : une fois par manche (celui qui lance)
       const seed = (resultat.snapshot && resultat.snapshot.val() || {}).seed || 0;
-      noterPartieStats(true, { hot: graineHot(seed), express: graineExpress(seed), pj: estModeSoft() });
+      noterPartieStats(true, { hot: graineHot(seed), hard: graineHard(seed), express: graineExpress(seed), pj: estModeSoft() });
     }
     marquerActivite(codePartieActuel);
   }).catch((erreur) => {
@@ -1328,6 +1336,7 @@ function quitterPartieEnLigne(){
   hotePartie = null;
   choisirModeSoftEnLigne(false);
   choisirModeHotEnLigne(false);
+  choisirModeHardEnLigne(false);
   deconnectes = new Set();
   enLigneActif = false;
   mancheCourante = null;

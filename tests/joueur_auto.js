@@ -25,9 +25,12 @@
   window.addEventListener("load", () => {
     $("#btnModeClassique").click();
     // Écran « Ta partie » (Mode PJ, express, hot) : les cases à cocher données par le test (window.__optionsRobot, liste d'id)
+    // Mode hard (caché tant qu'il n'est pas débloqué) : débloqué pour le test, et 2 joueurs seulement
+    const hard = (window.__optionsRobot || []).includes("optionModeHard");
+    if (hard) { try { localStorage.setItem("alcuno_hard_debloque", "1"); } catch (e) {} }
     (window.__optionsRobot || []).forEach((id) => { const c = document.getElementById(id); if (c && !c.checked) c.click(); });
     if ($("#btnContinuerOptions")) $("#btnContinuerOptions").click();
-    for (const n of ["Tris", "Ylana", "Celien"]) {
+    for (const n of (hard ? ["Tris", "Ylana"] : ["Tris", "Ylana", "Celien"])) {
       $("#nomJoueur").value = n;
       pd($("#ajouterJoueur"));
     }
@@ -45,7 +48,7 @@
       if ($("#overlayPlus4")) {
         const valider = $$("#overlayPlus4 .plus4-action-btn").find(b => b.innerText.includes("Valider"));
         if (cliquable(valider)) { journal.push("+4 valider"); pd(valider); }
-        else { const b = $$("#overlayPlus4 .plus4-joueur-btn")[(nbPlus4++) % 3]; journal.push("+4 " + b.innerText.split(" ")[0]); pd(b); }
+        else { const liste = $$("#overlayPlus4 .plus4-joueur-btn"); const b = liste[(nbPlus4++) % liste.length]; journal.push("+4 " + b.innerText.split(" ")[0]); pd(b); }
         return setTimeout(tick, 40);
       }
 
@@ -58,7 +61,7 @@
       // Mode hot, période Saint-Valentin : Coup de foudre (choisir quelqu'un, puis bisou ou cul sec, en alternance)
       if ($("#overlayCoupDeFoudre")) {
         const btns = $$("#overlayCoupDeFoudre button").filter(visible);
-        const bisou = btns.find(b => b.innerText.includes("Bisou")), culsec = btns.find(b => b.innerText.includes("🥃"));
+        const bisou = btns.find(b => b.innerText.includes("Bisou") || b.innerText.includes("doigt")), culsec = btns.find(b => b.innerText.includes("🥃"));
         if (bisou && culsec) { const b = nbDefis++ % 2 ? culsec : bisou; journal.push("coup de foudre " + b.innerText.trim()); pd(b); }
         else if (btns.length) { journal.push("coup de foudre joueur"); pd(btns[0]); }
         return setTimeout(tick, 60);

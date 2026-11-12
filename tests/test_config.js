@@ -136,7 +136,7 @@ verifier(regles.config[".read"] === true && /auth\.uid/.test(regles.config[".wri
 }
 {
   const j = regles.stats.jours.$jour;
-  verifier(j.finies && /\+ 20/.test(j.joueurs[".validate"]) && /\+ 300/.test(j.minutes[".validate"]) && /hot\|pj\|express\|tele/.test(j.modes.$m[".validate"]) && regles.stats.defis.$id.fait && regles.stats.defis.$id.bois && regles.stats.appareils.$id.installe && regles.stats.appareils.$id.joue,
+  verifier(j.finies && /\+ 20/.test(j.joueurs[".validate"]) && /\+ 300/.test(j.minutes[".validate"]) && /hot\|hard\|pj\|express\|tele/.test(j.modes.$m[".validate"]) && regles.stats.defis.$id.fait && regles.stats.defis.$id.bois && regles.stats.appareils.$id.installe && regles.stats.appareils.$id.joue,
     "règles Firebase : parties finies, joueurs, durée, modes, défis relevés, installations qui jouent");
 }
 {

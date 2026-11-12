@@ -140,7 +140,10 @@ const GORGEES_CUL_SEC = 5;
 
 // Récap de fin de partie (afficherOverlayFinUnRestants, js/regles.js) : ce qui s'est passé pendant la
 // partie. Tous les téléphones jouent les mêmes actions : en ligne, chacun a le même récap.
-let partieHot = false; // la partie en cours est en mode hot (voir lancerPartie ; js/mode-hot.js)
+let partieHot = false; // la partie en cours est en mode hot (voir lancerPartie ; js/mode-hot.js) ; vrai aussi en mode hard
+let partieHard = false; // la partie en cours est en mode hard (mécanique du hot, défis HA / HB : MODE_HARD.md)
+// « 18 barré » du mode hard (bandeau, télé, bloc du défi) : dessiné, pas l'emoji 🔞 (« UNDER 18 » en anglais sur Android)
+const SVG_18_BARRE = '<svg class="svg18" viewBox="0 0 40 40" aria-label="interdit aux moins de 18 ans" role="img"><circle cx="20" cy="20" r="17" fill="#fff" stroke="#d00" stroke-width="5"/><text x="20" y="27.5" text-anchor="middle" font-family="Arial, sans-serif" font-weight="900" font-size="19" fill="#000">18</text><line x1="8" y1="32" x2="32" y2="8" stroke="#d00" stroke-width="5"/></svg>';
 let partieExpress = false; // la partie en cours est une partie express (voir lancerPartie, js/regles.js ; album de stickers, js/stickers.js)
 let statsPartie = null;
 function reinitialiserStatsPartie(){
@@ -188,7 +191,7 @@ function calculerRecap(restants = []){
   ajouter("⚔️", "Duelliste", meilleurs(st.duels), v => `${v} duel${v > 1 ? "s" : ""} gagné${v > 1 ? "s" : ""}`);
   ajouter("🎯", "Aimant à +4", meilleurs(st.plus4), v => `${pluriel(v, "gorgée")} de +4`);
   // Mode hot : le couple de la soirée (un bisou compte comme un cul sec ; égalité : le premier par ordre alphabétique)
-  if(partieHot && st.couples){
+  if(partieHot && !partieHard && st.couples){ // (pas en mode hard : 2 joueurs, toujours le même couple)
     const couples = Object.entries(st.couples).map(([cle, c]) => ({ noms: cle.split("\u0001"), c, score: c.g + c.b * GORGEES_CUL_SEC }))
       .filter(x => x.score > 0 && x.noms.every(n => joueurs.includes(n))).sort((x, y) => y.score - x.score);
     if(couples.length){
@@ -372,6 +375,9 @@ function nbCartesCupidon(nbJoueurs){ return nbJoueurs >= 6 ? 3 : nbJoueurs >= 4 
 // En ligne : c'est la période de celui qui lance la partie, transmise dans la graine (bit suivant : 2^35).
 const GRAINE_VALENTIN = 34359738368; // 2^35
 function graineValentin(seed){ return Math.floor(seed / GRAINE_VALENTIN) % 2 === 1; }
+// Mode hard : en ligne, dans le bit suivant de la graine (2^36), réglage de celui qui lance la partie
+const GRAINE_HARD = 68719476736; // 2^36
+function graineHard(seed){ return Math.floor(seed / GRAINE_HARD) % 2 === 1; }
 function saintValentinEnCours(){
   if(feteEnCours() === "valentin") return true; // (dates de la fête, ou celles du pilotage : js/reglages.js)
   return document.documentElement.dataset.theme === "valentin";
@@ -1804,6 +1810,7 @@ function ajouterJoueur(){
       return;
   }
 
+  if(estCodeHard(nom)) debloquerHard(); // « Jojo » : débloque le mode hard (js/reglages.js), et reste un joueur
   joueurs.push(nom);
   nomJoueurInput.value = "";
   afficherJoueurs();

@@ -42,7 +42,8 @@ function ouvrirOptionsPartie(suite){
   suiteOptionsPartie = suite;
   // Chaque nouvelle partie repart sans option : rien n'est gardé d'une partie à l'autre (la revanche et la reprise
   // d'une partie interrompue gardent, elles, le mode de la partie en cours)
-  [caseModeSoft, casePartieExpress, caseModeHot].forEach((c) => { c.checked = false; });
+  [caseModeSoft, casePartieExpress, caseModeHot, caseModeHard].forEach((c) => { c.checked = false; });
+  majOptionHard(); // (ligne « Mode hard » : seulement une fois débloqué)
   majTitrePJ();
   ecranReglages.classList.add("vue-options");
   document.getElementById("titreReglages").textContent = "Ta partie";
@@ -317,8 +318,10 @@ function vuNouveauDonjon(){
   document.documentElement.classList.remove("donjon-nouveau");
 }
 // Appelé au lancement d'une partie en mode hot : la première fois, le thème se débloque et la fenêtre « débloqué » s'ouvre aussitôt.
-function debloquerDonjon(){
+let donjonDebloqueParHard = false; // (fenêtre : « Partie hard lancée ! » au lieu de « Partie hot »)
+function debloquerDonjon(parHard = false){
   if (donjonDebloque()) return;
+  donjonDebloqueParHard = !!parHard;
   try { localStorage.setItem(CLE_DONJON, "1"); localStorage.setItem(CLE_DONJON_NOUVEAU, "1"); } catch (e) {}
   majPastilleDonjon();
   document.documentElement.classList.add("donjon-nouveau");
@@ -334,7 +337,7 @@ function afficherFenetreBdsm(){
   voile.setAttribute("aria-label", "Thème BDSM débloqué");
   voile.innerHTML = `
     <div class="fenetreBdsm-carte">
-      <div class="fenetreBdsm-secret">🔥 Partie hot lancée !</div>
+      <div class="fenetreBdsm-secret">${donjonDebloqueParHard ? SVG_18_BARRE + " Partie hard lancée !" : "🔥 Partie hot lancée !"}</div>
       <div class="fenetreBdsm-titre">Thème BDSM<br>débloqué !</div>
       <div class="fenetreBdsm-texte">Il est maintenant dans<br>Réglages › Thèmes</div>
       <button type="button" class="fenetreBdsm-essayer">L'essayer maintenant</button>
@@ -350,6 +353,32 @@ function afficherFenetreBdsm(){
     if (pastille) pastille.click(); // comme dans les réglages (thème gardé, barre du téléphone…)
   });
   voile.querySelector(".fenetreBdsm-plusTard").addEventListener("click", fermer);
+  vibrer([60, 40, 60]);
+  document.body.appendChild(voile);
+}
+// Fenêtre « … débloqué ! » du même style que celle du thème BDSM (style_donjon.css, dans tous les thèmes) :
+// mode hard (« Jojo ») et zizi-coptère (js/zizi-coptere.js). boutons : [{ libelle, principal, action }]
+function afficherFenetreDeblocage(id, { secret, titre, texte, boutons }){
+  if (document.getElementById(id)) return;
+  const voile = document.createElement("div");
+  voile.id = id;
+  voile.className = "fenetreDeblocage";
+  voile.setAttribute("role", "dialog");
+  voile.setAttribute("aria-label", titre.replace(/<br>/g, " "));
+  voile.innerHTML = `<div class="fenetreBdsm-carte"><div class="fenetreBdsm-secret">${secret}</div>`
+    + `<div class="fenetreBdsm-titre">${titre}</div><div class="fenetreBdsm-texte">${texte}</div></div>`;
+  const fermer = () => {
+    voile.classList.add("fenetreBdsm-sortie");
+    setTimeout(() => voile.remove(), 250);
+  };
+  boutons.forEach(({ libelle, principal, action }) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = principal ? "fenetreBdsm-essayer" : "fenetreBdsm-plusTard";
+    btn.textContent = libelle;
+    btn.addEventListener("click", () => { fermer(); if (action) action(); });
+    voile.querySelector(".fenetreBdsm-carte").appendChild(btn);
+  });
   vibrer([60, 40, 60]);
   document.body.appendChild(voile);
 }
@@ -982,14 +1011,16 @@ for (let i = 0; i < 46; i++) {
 
 // Donjon : objets qui tombent sur l'écran d'accueil, du haut vers le bas
 const zoneDonjon = document.getElementById("donjonFlotteurs");
-const OBJETS_DONJON = ["dixhuit", "vibro1", "levres", "menottes", "vibro3", "baillon", "fouet", "bandeau"];
+// (4 objets seulement, sans les vibros ni le « 18 » : on les confondait avec le zizi-coptère, js/zizi-coptere.js)
+const OBJETS_DONJON = ["menottes", "levres", "fouet", "baillon"];
+const PLACES_DONJON = [6, 30, 54, 74]; // (% depuis la gauche : répartis sur la largeur)
 const TAILLES_DONJON = { dixhuit: 72, vibro1: 84, levres: 92, menottes: 96, vibro3: 76, baillon: 92, fouet: 84, bandeau: 96 };
 OBJETS_DONJON.forEach((nom, i) => {
   const objet = document.createElement("span");
   const taille = TAILLES_DONJON[nom] || 80;
   const duree = 9 + (i % 5) * 1.2; // ni trop vite ni trop lentement : 9 à 14 s pour traverser l'écran
   objet.style.width = objet.style.height = `${taille}px`;
-  objet.style.left = `${(i * 29 + 7) % 84 + 3}%`;
+  objet.style.left = `${PLACES_DONJON[i]}%`;
   objet.style.backgroundImage = `url("donjon/${nom}.svg")`;
   objet.style.setProperty("--dx", `${(i % 2 ? 1 : -1) * (18 + i * 3)}px`);
   objet.style.setProperty("--r0", `${(i * 37) % 50 - 25}deg`);
@@ -1053,6 +1084,53 @@ function estModeHot(){
   return codePartieActuel ? hotPartieEnLigne : caseModeHot.checked;
 }
 
+// ===== Mode hard : la mécanique du mode hot, avec des défis sexuels, à 2 joueurs (voir MODE_HARD.md) =====
+// Caché tant qu'il n'est pas débloqué sur ce téléphone : en entrant « Jojo » comme nom de joueur (ou comme pseudo
+// en ligne). Jamais avec le mode hot : cocher l'un décoche l'autre. En ligne : réglage de celui qui lance la partie
+// (bit 2^36 de la graine, voir graineHard).
+const CLE_HARD_DEBLOQUE = "alcuno_hard_debloque";
+const caseModeHard = document.getElementById("optionModeHard");
+caseModeHard.checked = false;
+function hardDebloque(){
+  try { return localStorage.getItem(CLE_HARD_DEBLOQUE) === "1"; } catch (e) { return false; }
+}
+function majOptionHard(){
+  document.getElementById("ligneModeHard").hidden = !hardDebloque();
+}
+// « Jojo » (majuscules et accents ignorés) : le nom reste un joueur normal
+function estCodeHard(nom){
+  return String(nom).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z]/g, "") === "jojo";
+}
+function debloquerHard(){
+  if (hardDebloque()) return;
+  try { localStorage.setItem(CLE_HARD_DEBLOQUE, "1"); } catch (e) {}
+  majOptionHard();
+  if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); // (le clavier se ferme)
+  afficherFenetreDeblocage("fenetreHard", {
+    secret: "🤡 Mot secret trouvé !",
+    titre: "Mode hard<br>débloqué !",
+    texte: "Il est maintenant dans « Ta partie »,<br>au début de chaque partie<br>(à 2 joueurs seulement)",
+    boutons: [{ libelle: "OK", principal: true }]
+  });
+}
+majOptionHard();
+caseModeHard.addEventListener("change", () => {
+  if (caseModeHard.checked && caseModeHot.checked) caseModeHot.checked = false;
+  majTitrePJ();
+  if (caseModeHard.checked) jouerSon("mode_hard"); // (Sons/mode_hard.mp3)
+});
+caseModeHot.addEventListener("change", () => {
+  if (caseModeHot.checked && caseModeHard.checked) { caseModeHard.checked = false; majTitrePJ(); }
+});
+let hardPartieEnLigne = false;
+function estModeHard(){
+  return codePartieActuel ? hardPartieEnLigne : caseModeHard.checked;
+}
+function choisirModeHardEnLigne(hard){
+  hardPartieEnLigne = !!hard;
+  majTitrePJ();
+}
+
 let softPartieEnLigne = false;
 
 function estModeSoft(){
@@ -1064,6 +1142,7 @@ function estModeSoft(){
 function majTitrePJ(){
   document.body.classList.toggle("partie-soft", estModeSoft());
   document.body.classList.toggle("partie-hot", estModeHot());
+  document.body.classList.toggle("partie-hard", estModeHard());
 }
 
 // Gorgées selon le mode (normal | soft)
@@ -1109,7 +1188,7 @@ caseFacesFermees.addEventListener("change", () => {
 });
 majFacesFermees();
 
-function choisirModeHotEnLigne(hot){
+function choisirModeHotEnLigne(hot){ // (mode hard : choisirModeHardEnLigne, plus haut)
   hotPartieEnLigne = !!hot;
   majTitrePJ();
 }
@@ -1631,7 +1710,7 @@ document.addEventListener("visibilitychange", () => {
 //   tiens_gueule.mp3 : le cul sec de la carte dorée (« TIENS DANS TA GUEULE »)
 //   regles.mp3 : on ouvre les Règles du jeu (boutons « Règles du jeu » de l'accueil et de la partie)
 //   accessibilite_on.mp3 : on active « Accessibilité pour les gens bourrés » dans les réglages
-const SONS = ["cartes", "doree", "tiens_gueule", "bouton", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees", "regles", "accessibilite_on", "etoile"]; // (les sons de sabre, du thème BDSM et du saxophone ne se chargent que dans leur thème, voir morceauClicTheme)
+const SONS = ["cartes", "doree", "tiens_gueule", "bouton", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees", "regles", "accessibilite_on", "etoile", "mode_hard"]; // (les sons de sabre, du thème BDSM et du saxophone ne se chargent que dans leur thème, voir morceauClicTheme)
 // Sons de sabre : Sons/sabre/sabre_01.mp3 à sabre_54.mp3 (0,8 s chacun). Le clic des boutons en joue un au
 // hasard (jouerSon("bouton")). Si tu en supprimes, retire aussi leur nom de cette liste (et de SONS_A_PRECHARGER dans sw.js) ; un nom sans fichier est simplement ignoré (404).
 const SONS_SABRE = ["sabre/sabre_01", "sabre/sabre_02", "sabre/sabre_05", "sabre/sabre_07", "sabre/sabre_09", "sabre/sabre_11", "sabre/sabre_14", "sabre/sabre_15", "sabre/sabre_18", "sabre/sabre_22", "sabre/sabre_26", "sabre/sabre_31", "sabre/sabre_33", "sabre/sabre_37", "sabre/sabre_40", "sabre/sabre_41", "sabre/sabre_48"];
@@ -2930,7 +3009,8 @@ const ecranRegles = document.getElementById("ecranRegles");
 // écrit ici (rien qui vient d'un joueur) : <b> le mot important, <em> les gorgées (en doré).
 function reglesDuJeu(){
   const pj = estModeSoft();
-  const hot = estModeHot(); // mode hot : pas de « 1 » (annulation), une carte Cupidon, des défis
+  const hard = estModeHard(); // mode hard : comme le hot, sans Cupidon (2 joueurs), défis sexuels
+  const hot = estModeHot() || hard; // mode hot : pas de « 1 » (annulation), une carte Cupidon, des défis
   const g = (n) => `<em>${texteGorgees(n)}</em>`;
   const parties = [
     { titre: "Comment on joue", regles: [
@@ -2942,14 +3022,14 @@ function reglesDuJeu(){
     ]},
     { titre: "Les cartes", regles: [
       { carte: "zero_bleu", nom: "0", texte: `Tout le monde boit ${g(1)}, sauf toi.` },
-      hot
+      hard ? null : hot
         ? { carte: "cupidon_a", nom: "Cupidon", texte: [
             "Tu lies <b>2 joueurs</b> : quand l'un boit, l'autre aussi (💘)",
             "À la carte Cupidon suivante : lier 2 autres joueurs, ou briser un lien"
           ]}
         : { carte: "un_rouge", nom: "1 : annulation", texte: `Tu gardes la carte : quand tu dois boire, tu peux t'en servir pour annuler ${g(1)}.` },
       ...(hot && saintValentinEnCours() ? [{ carte: "coup_de_foudre", nom: "Coup de foudre (Saint-Valentin)", texte: [
-            "Choisis quelqu'un : <b>un bisou sur la bouche</b>…",
+            `Choisis quelqu'un : <b>${hard ? "un doigt dans le cul" : "un bisou sur la bouche"}</b>…`,
             `… ou tu prends ${pj ? g(4) : "<em>un CUL SEC</em>"}`
           ]}] : []),
       { carte: "plus_2_jaune", nom: "+2", texte: `Tu bois ${g(gorgeesPlus2())}.` },
@@ -2979,7 +3059,13 @@ function reglesDuJeu(){
   ];
   if(hot){
     // Mode hot : le défi à la place des gorgées (décisions : MODE_HOT.md)
-    parties.splice(2, 0, { titre: "Mode hot 🔥", regles: [
+    parties.splice(2, 0, hard ? { titre: "Mode hard", regles: [
+      { carte: "", nom: "Le défi", texte: [
+        "Partie <b>à 2 joueurs</b>",
+        "Quand tu dois boire, tu peux relever un défi avec l'autre joueur à la place",
+        "<b>Je le fais</b> : rien à boire. <b>Je bois</b> : les gorgées prévues"
+      ]}
+    ]} : { titre: "Mode hot 🔥", regles: [
       { carte: "", nom: "Le défi", texte: [
         "Quand <b>une seule personne</b> doit boire, elle peut relever un défi à la place",
         "<b>Je le fais</b> : rien à boire. <b>Je bois</b> : les gorgées prévues",
@@ -2987,6 +3073,7 @@ function reglesDuJeu(){
       ]}
     ]});
   }
+  parties.forEach((p) => { p.regles = p.regles.filter(Boolean); }); // (cartes absentes de ce mode)
   return parties;
 }
 

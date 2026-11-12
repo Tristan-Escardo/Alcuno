@@ -45,9 +45,10 @@
   const MOIS_AFFICHES = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
   const TEXTE_MAX = 140;
   const DEFI_MAX = 160, DEFIS_MAX = 300;
-  const NIVEAUX_DEFIS = { A: "Léger (moins de 5 gorgées)", B: "Moyen (5 à 10 gorgées)", C: "Osé (plus de 10 gorgées)" };
+  const NIVEAUX_DEFIS = { A: "Léger (moins de 5 gorgées)", B: "Moyen (5 à 10 gorgées)", C: "Osé (plus de 10 gorgées)",
+    HA: "Hard : préliminaires (jusqu'à 4 gorgées, 2 en PJ)", HB: "Hard : actes sexuels (5 gorgées et plus, 3 en PJ)" }; // (HA / HB : mode hard)
   const motifIdDefi = /^[a-z0-9]{1,30}$/;
-  const motifIdDefiJeu = /^[ABC][0-9]{1,3}$/;
+  const motifIdDefiJeu = /^(H?[AB]|C)[0-9]{1,3}$/; // (HA / HB : mode hard)
 
   // Texte d'un défi hot : null s'il est bon, sinon ce qui ne va pas.
   // {nom} : un autre joueur ; {nom1} et {nom2} : deux autres joueurs différents (jamais mélangés avec {nom}).

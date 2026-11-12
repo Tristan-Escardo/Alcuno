@@ -17,7 +17,7 @@
         // Fichiers du jeu, dans l'ordre (aussi dans sw.js, pour le hors connexion). Téléchargés tout de suite
         // et en parallèle : en bas de la page, ils s'exécutent d'affilée, sans attente entre deux fichiers
         // (aucun bouton ni minuteur ne peut se déclencher avant que tout le jeu soit là).
-        window.FICHIERS_JEU = ["script.js", "js/qrcode.js", "js/config-lib.js", "js/reglages.js", "js/en-ligne.js", "js/plateau.js", "js/regles.js", "js/mode-hot.js",
+        window.FICHIERS_JEU = ["script.js", "js/qrcode.js", "js/config-lib.js", "js/reglages.js", "js/en-ligne.js", "js/plateau.js", "js/regles.js", "js/mode-hot.js", "js/zizi-coptere.js",
                                "js/synchro-en-ligne.js", "js/retour-demarrage.js", "js/tele.js", "js/stats.js", "js/config-distante.js", "js/stickers.js", "js/faq.js", "js/mouchard.js", "js/poisson.js", "js/piano-accueil.js"];
         window.FICHIERS_JEU.forEach(function (f) {
             document.write('<link rel="preload" as="script" href="' + f + '?t=' + window.ANTI_CACHE + '">');
@@ -158,7 +158,7 @@
          le JS, elle arrivait trop tard et la barre restait noire) -->
     <div id="haloSabre" aria-hidden="true"></div>
     <header>
-        <h1>ALCUNO<span class="badgeSoft" aria-label="Mode PJ">PJ</span><span class="badgeHot" aria-label="Mode hot">🔥</span></h1>
+        <h1>ALCUNO<span class="badgeSoft" aria-label="Mode PJ">PJ</span><span class="badgeHot" aria-label="Mode hot">🔥</span><span class="badgeHard" aria-label="Mode hard"><svg class="svg18" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="#fff" stroke="#d00" stroke-width="5"/><text x="20" y="27.5" text-anchor="middle" font-family="Arial, sans-serif" font-weight="900" font-size="19" fill="#000">18</text><line x1="8" y1="32" x2="32" y2="8" stroke="#d00" stroke-width="5"/></svg></span></h1>
         <button type="button" id="btnReglesJeu" class="btnAccueilTexte" title="Règles du jeu" aria-label="Règles du jeu">
             <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path class="couverture" d="M12 6.6C9.9 5 7 4.5 3.2 4.9v13.6c3.8-.4 6.7.1 8.8 1.7 2.1-1.6 5-2.1 8.8-1.7V4.9C17 4.5 14.1 5 12 6.6z" />
@@ -417,6 +417,17 @@
                     </span>
                     <input type="checkbox" id="optionModeHot" aria-label="Mode hot">
                     <label class="interrupteur" for="optionModeHot" aria-hidden="true"></label>
+                </div>
+
+                <!-- Mode hard (js/reglages.js, MODE_HARD.md) : caché tant qu'il n'est pas débloqué (« Jojo » comme nom de joueur).
+                     Même cadre noir et « hard » noir sur orange dans tous les thèmes (style_alcuno.css : #ligneModeHard) -->
+                <div class="optionReglage" id="ligneModeHard" hidden>
+                    <span class="optionTexte">
+                        <span class="optionTitre">Mode <span class="badgeOrangeHard">hard</span></span>
+                        <span class="optionNote">On est pas là pour se titiller la bite avec des gants de boxe.<br><br>À 2 joueurs seulement. En ligne : c'est le réglage de celui qui lance la partie qui compte.</span>
+                    </span>
+                    <input type="checkbox" id="optionModeHard" aria-label="Mode hard">
+                    <label class="interrupteur" for="optionModeHard" aria-hidden="true"></label>
                 </div>
                     <div class="optionReglage optionsSuite">
                         <button type="button" id="btnContinuerOptions">Continuer</button>
@@ -724,6 +735,7 @@
                 <div class="credits-honneur">
                     <div class="credits-honneur-titre">MENTION HONORABLE</div>
                     <div class="credits-nom">Li-Mèi <span class="couronne-argent">👑</span><span class="credits-nom-detail">design des cartes</span></div>
+                    <div class="credits-nom">Jojo <span class="couronne-argent">👑</span><span class="credits-nom-detail">idée du mode hard</span></div>
                 </div>
             </div>
         </section>

@@ -288,7 +288,8 @@ function etatPourTele(){
     cartes: Array.from(plateau.children).map(carteTele),
     restantes: enJeu ? cartesRestantes() : 0,
     pj: enJeu && estModeSoft() ? 1 : 0,   // (« ALCUNO PJ » : sans ça, on ne comprenait pas pourquoi le +4 ne distribue que 2 gorgées)
-    hot: enJeu && partieHot ? 1 : 0,
+    hot: enJeu && partieHot && !partieHard ? 1 : 0,
+    hard: enJeu && partieHard ? 1 : 0, // (mode hard : « 18 barré » après ALCUNO)
     joueurs: joueurs.map((nom, i) => ({
       n: avecCouronne(nom),
       a: Number(annulations[nom] || 0),
@@ -950,7 +951,12 @@ function dessinerTele(ecran, etat){
   // Titre « ALCUNO PJ 🔥 », comme le bandeau du téléphone (mode PJ : moitié moins de gorgées ; mode hot)
   const titreJeu = ecran.querySelector(".tele-entete .tele-titre");
   const texteTitre = "ALCUNO" + (etat.pj ? " PJ" : "") + (etat.hot ? " 🔥" : "");
-  if (titreJeu && titreJeu.textContent !== texteTitre) titreJeu.textContent = texteTitre;
+  if (titreJeu && (titreJeu.dataset.texte !== texteTitre || titreJeu.dataset.hard !== String(!!etat.hard))) {
+    titreJeu.textContent = texteTitre;
+    if (etat.hard) titreJeu.insertAdjacentHTML("beforeend", " " + SVG_18_BARRE); // (mode hard : dessin fixe, rien qui vient d'un joueur)
+    titreJeu.dataset.texte = texteTitre;
+    titreJeu.dataset.hard = String(!!etat.hard);
+  }
   // « Il reste 18 cartes », comme sous le plateau du téléphone
   const compteur = ecran.querySelector(".tele-compteur");
   const n = etat.partie ? Number(etat.restantes) || 0 : 0;

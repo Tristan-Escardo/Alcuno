@@ -47,7 +47,10 @@ const CONFIGS = [
   { nom: "mode hot, Star Wars", largeur: 390, hauteur: 780, theme: "galaxie", hot: true },
   { nom: "mode hot, Kawaii, en paysage", largeur: 844, hauteur: 390, theme: "kawaii", hot: true },
   { nom: "mode hot, thème Donjon", largeur: 390, hauteur: 780, theme: "donjon", hot: true },
-  { nom: "mode hot, thème Donjon, en paysage, accessibilité", largeur: 844, hauteur: 390, theme: "donjon", hot: true, accessibilite: true }
+  { nom: "mode hot, thème Donjon, en paysage, accessibilité", largeur: 844, hauteur: 390, theme: "donjon", hot: true, accessibilite: true },
+  // Mode hard (2 joueurs, défis HA / HB)
+  { nom: "mode hard, Bordeaux", largeur: 390, hauteur: 780, theme: "bordeaux", hard: true },
+  { nom: "mode hard + Mode PJ, partie express, thème Donjon", largeur: 390, hauteur: 780, theme: "donjon", hard: true, pj: true, express: true }
 ];
 const FILTRE = process.argv[2] || "";
 
@@ -63,10 +66,10 @@ const FILTRE = process.argv[2] || "";
     const page = await nav.newPage({ viewport: { width: c.largeur, height: c.hauteur } });
     await page.addInitScript(prelude);
     await page.addInitScript(robot);
-    await page.addInitScript(([theme, acc, express, hot, pj]) => {
-      window.__optionsRobot = [hot && "optionModeHot", pj && "optionModeSoft", express && "optionPartieExpress"].filter(Boolean); // (cochées dans « Ta partie »)
+    await page.addInitScript(([theme, acc, express, hot, pj, hard]) => {
+      window.__optionsRobot = [hot && "optionModeHot", hard && "optionModeHard", pj && "optionModeSoft", express && "optionPartieExpress"].filter(Boolean); // (cochées dans « Ta partie »)
       try { localStorage.setItem("alcuno_theme", theme); localStorage.setItem("alcuno_theme_kawaii", "1"); localStorage.setItem("alcuno_theme_donjon", "1"); if (acc) localStorage.setItem("alcuno_accessibilite", "1"); } catch (e) {}
-    }, [c.theme, !!c.accessibilite, !!c.express, !!c.hot, !!c.pj]);
+    }, [c.theme, !!c.accessibilite, !!c.express, !!c.hot, !!c.pj, !!c.hard]);
     await page.goto(url);
     let rapport = null;
     try {
