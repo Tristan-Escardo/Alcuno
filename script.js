@@ -165,13 +165,19 @@ function estLiMei(nom){
   return simple === "limei";
 }
 
+// Couronne argentée aussi pour Jojo (idée du mode hard) : majuscules, accents et ponctuation ignorés (« JOJO », « jo-jo »…).
+function estJojo(nom){
+  const simple = String(nom || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("fr-FR").replace(/[\s\-_.'’]/g, "");
+  return simple === "jojo";
+}
+
 // Le texte garde un simple « 👑 » suivi d'un espace sans largeur (marque) : partout où un nom est affiché en texte (liste des
 // joueurs, télé, fenêtres de règles…), argenterCouronnes() remplace cette marque par une couronne grise (classe .couronne-argent)
 const MARQUE_COURONNE_ARGENT = "👑\u200B";
 
 function avecCouronne(nom){
   if (estCreateur(nom)) return `${nom} 👑`;
-  return estLiMei(nom) ? `${nom} ${MARQUE_COURONNE_ARGENT}` : nom;
+  return estLiMei(nom) || estJojo(nom) ? `${nom} ${MARQUE_COURONNE_ARGENT}` : nom;
 }
 
 function argenterCouronnes(racine){
@@ -217,7 +223,7 @@ try {
 // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
 // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
 // Numérotation : +0.0.1 à chaque mise en ligne, et après x.y.9 on passe à x.(y+1).0 (ex. 9.5.9 => 9.6.0)
-const VERSION_AFFICHEE = "9.88.0";
+const VERSION_AFFICHEE = "9.88.1";
 // Appli de test (adresse autre que GitHub Pages et que le poste de dev, ou « ?modetest ») : même jeu, même Firebase, mais
 // elle n'envoie ni statistiques ni plantages (les chiffres restent ceux de la vraie appli) et affiche « TEST » dans les Réglages
 // Un navigateur piloté par un programme (tests automatiques de Claude : navigator.webdriver) est aussi en mode test, pour que
