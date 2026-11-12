@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 130">
+  <!-- Père Noël dans son traîneau tiré par deux rennes (vers la droite). Thème Noël : traverse l'accueil (js/reglages.js) -->
+  <defs>
+    <linearGradient id="rouge" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff4a4a"/><stop offset="1" stop-color="#b80d1c"/></linearGradient>
+    <linearGradient id="or" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff1a0"/><stop offset=".5" stop-color="#ffcf2e"/><stop offset="1" stop-color="#c68a0a"/></linearGradient>
+    <linearGradient id="renne" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b9773f"/><stop offset="1" stop-color="#7a4520"/></linearGradient>
+    <g id="unRenne">
+      <!-- pattes (galop) -->
+      <g stroke="#5a3214" stroke-width="5" stroke-linecap="round" fill="none">
+        <path d="M-22 6 L-34 22 L-42 24"/><path d="M-14 8 L-20 26"/>
+        <path d="M16 6 L30 18 L40 14"/><path d="M22 4 L34 24"/>
+      </g>
+      <!-- corps -->
+      <ellipse cx="0" cy="0" rx="30" ry="13" fill="url(#renne)"/>
+      <ellipse cx="2" cy="5" rx="20" ry="6" fill="#e9c9a0" opacity=".7"/>
+      <!-- queue -->
+      <path d="M-29 -5 q-8 -6 -4 -10 q4 4 6 6z" fill="#f2e2c8"/>
+      <!-- cou et tête -->
+      <path d="M20 -6 Q30 -22 38 -28 L46 -22 Q36 -12 30 2z" fill="url(#renne)"/>
+      <ellipse cx="46" cy="-27" rx="11" ry="7" transform="rotate(18 46 -27)" fill="url(#renne)"/>
+      <circle cx="44" cy="-31" r="1.8" fill="#1a0d05"/>
+      <path d="M36 -33 l-6 -6 l7 1z" fill="#7a4520"/>
+      <!-- bois -->
+      <g stroke="#e8d3a8" stroke-width="3" stroke-linecap="round" fill="none">
+        <path d="M40 -34 Q38 -48 30 -54 M38 -44 L30 -44 M34 -50 L28 -56"/>
+        <path d="M45 -35 Q48 -50 56 -54 M47 -45 L54 -46"/>
+      </g>
+      <!-- harnais -->
+      <path d="M18 -10 Q24 0 18 10" stroke="#c4161c" stroke-width="4" fill="none"/>
+      <circle cx="21" cy="0" r="2.6" fill="url(#or)"/>
+    </g>
+  </defs>
+  <!-- rênes -->
+  <path d="M150 62 Q220 50 262 66 Q300 52 345 58" stroke="#ffd23f" stroke-width="2" fill="none"/>
+  <!-- rennes : celui de derrière, puis celui de devant (nez rouge) -->
+  <use href="#unRenne" transform="translate(262 78)"/>
+  <use href="#unRenne" transform="translate(348 70)"/>
+  <circle cx="403" cy="40" r="5" fill="#ff2a2a"/>
+  <circle cx="403" cy="40" r="10" fill="#ff2a2a" opacity=".3"/>
+  <!-- sac de cadeaux -->
+  <path d="M30 70 Q18 40 40 22 Q52 14 62 24 Q78 44 70 70z" fill="#8b5a2b"/>
+  <path d="M38 24 Q50 30 62 24" stroke="#5a3214" stroke-width="3" fill="none"/>
+  <rect x="40" y="6" width="18" height="16" rx="2" fill="#2fbf5a"/><rect x="47" y="6" width="4" height="16" fill="#ffd23f"/>
+  <rect x="58" y="12" width="14" height="13" rx="2" fill="#3a8cff" transform="rotate(14 65 18)"/>
+  <!-- Père Noël -->
+  <circle cx="108" cy="30" r="13" fill="#ffd9bd"/>
+  <path d="M95 34 Q108 62 121 34 Q114 40 108 38 Q102 40 95 34z" fill="#fff"/>
+  <path d="M92 26 Q100 4 122 12 Q132 16 138 30 L126 24 Q118 18 96 26z" fill="url(#rouge)"/>
+  <circle cx="139" cy="31" r="5" fill="#fff"/>
+  <rect x="91" y="22" width="34" height="7" rx="3.5" fill="#fff"/>
+  <circle cx="104" cy="31" r="1.6" fill="#1a0d05"/><circle cx="114" cy="31" r="1.6" fill="#1a0d05"/>
+  <circle cx="109" cy="35" r="2.6" fill="#ff9c8a"/>
+  <path d="M88 52 Q90 40 108 44 Q128 40 132 54 L132 70 L88 70z" fill="url(#rouge)"/>
+  <path d="M130 52 L150 60" stroke="#b80d1c" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="151" cy="61" r="4.5" fill="#fff"/>
+  <!-- traîneau -->
+  <path d="M14 64 L150 64 Q166 64 166 80 Q166 94 148 96 L40 96 Q20 96 14 80z" fill="url(#rouge)" stroke="#7a0a12" stroke-width="2"/>
+  <path d="M22 70 L156 70" stroke="url(#or)" stroke-width="4"/>
+  <path d="M60 80 q8 -8 16 0 q8 8 16 0" stroke="#ffd23f" stroke-width="2.5" fill="none"/>
+  <!-- patins -->
+  <path d="M30 96 L36 108 M136 96 L130 108" stroke="url(#or)" stroke-width="4"/>
+  <path d="M8 106 Q12 112 24 112 L176 112 Q190 112 192 98 Q194 90 186 90" stroke="url(#or)" stroke-width="5" fill="none" stroke-linecap="round"/>
+</svg>

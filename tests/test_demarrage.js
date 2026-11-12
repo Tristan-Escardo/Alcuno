@@ -123,6 +123,16 @@ function verifier(ok, texte){
     }, theme);
     const sw = await compter("galaxie"), autre = await compter("bordeaux");
     verifier(sw === 3 && autre === 0, `phrases Star Wars : ${sw}/3 dans Star Wars, ${autre} ailleurs`);
+    // Phrase de Noël : seulement dans le thème Noël (et aucune phrase Star Wars en Noël)
+    const phrasesNoel = (theme) => page.evaluate((t) => {
+      document.documentElement.dataset.theme = t;
+      const vues = new Set();
+      for (let i = 0; i < 300; i++) vues.add(phraseNotifTele({ joueurs: [{ n: "Tom", p: 0, s: 0 }] }));
+      const liste = [...vues];
+      return { hoho: liste.filter((x) => x === "HoHoHo Joyeuse cuite ! 🎅🎄").length, starWars: liste.filter((x) => /Obi-Wan|Dark Vodka|Luke, je suis/.test(x)).length };
+    }, theme);
+    const pNoel = await phrasesNoel("noel"), pAutre = await phrasesNoel("bordeaux");
+    verifier(pNoel.hoho === 1 && pNoel.starWars === 0 && pAutre.hoho === 0, `phrase de Noël : ${pNoel.hoho}/1 dans Noël (${pNoel.starWars} phrase Star Wars), ${pAutre.hoho} ailleurs`);
     await ctx.close();
   }
 
@@ -864,7 +874,7 @@ function verifier(ok, texte){
     const monte = apresGlisse.split(",").indexOf("voix") < apresFleche.split(",").indexOf("voix") && apresGlisse.split(",").sort().join() === apresFleche.split(",").sort().join();
     const attendueGlisse = apresGlisse;
     verifier(avant.defaut === "none" && avant.texte === "Modifier" && avant.poignees === 0 && pendant.edition && pendant.texte === "OK" && pendant.defaut !== "none" &&
-      pendant.poignees >= 13 && pendant.fleches === 0 && pendant.tremble === "none" && pendant.poigneesVisibles === pendant.visibles && pendant.desalignees === 0 && pendant.poignees === 13 && apresFleche === attendueFleche && monte &&
+      pendant.poignees >= 14 && pendant.fleches === 0 && pendant.tremble === "none" && pendant.poigneesVisibles === pendant.visibles && pendant.desalignees === 0 && pendant.poignees === 14 && apresFleche === attendueFleche && monte &&
       !fini.edition && fini.controles === 0 && fini.texte === "Modifier" && rechargee === attendueGlisse && parDefaut === origine && stocke === null && interrupteur && queue === "blocPartage,aPropos" && fixesSansPoignee && erreurs.length === 0,
       `réglages réorganisables : avant ${JSON.stringify(avant)}, pendant ${JSON.stringify(pendant)}, flèche ${apresFleche === attendueFleche}, glisser monté ${monte} (${apresGlisse}), fini ${JSON.stringify(fini)}, rechargé ${rechargee === attendueGlisse}, par défaut ${parDefaut === origine}, stocké ${stocke}, interrupteur ${interrupteur}, fin de page ${queue}, fixes sans poignée ${fixesSansPoignee} ${erreurs.join("|")}`);
     await ctx.close();

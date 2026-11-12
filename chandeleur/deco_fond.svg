@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <defs>
+    <g id="crepe"><circle r="22" fill="#ffd978" stroke="#b8650f" stroke-width="3"/><circle r="15" fill="none" stroke="#e9a032" stroke-width="2"/><circle cx="-7" cy="-5" r="3" fill="#b8650f"/><circle cx="6" cy="6" r="3.4" fill="#b8650f"/><circle cx="8" cy="-8" r="2.4" fill="#b8650f"/><circle cx="-8" cy="9" r="2.4" fill="#b8650f"/></g>
+    <g id="citron"><circle r="17" fill="#ffe14a" stroke="#c9a000" stroke-width="3"/><circle r="13" fill="#fff3a0"/><path d="M0 -13 V13 M-13 0 H13 M-9 -9 L9 9 M-9 9 L9 -9" stroke="#ffe14a" stroke-width="2"/></g>
+    <g id="fraise"><path d="M0 -14 C14 -14 16 4 0 18 C-16 4 -14 -14 0 -14z" fill="#e8283a" stroke="#9c0f1e" stroke-width="2.5"/><path d="M-8 -14 L0 -20 L8 -14 L0 -10z" fill="#3cb54a"/><g fill="#ffe9a0"><circle cx="-5" cy="-3" r="1.4"/><circle cx="4" cy="0" r="1.4"/><circle cx="-1" cy="7" r="1.4"/></g></g>
+    <path id="etoile" d="M0 -9 L2.6 -2.6 L9 0 L2.6 2.6 L0 9 L-2.6 2.6 L-9 0 L-2.6 -2.6z" fill="#fff"/>
+  </defs>
+  <g opacity=".5">
+    <use href="#crepe" transform="translate(62 66) rotate(-10)"/><use href="#crepe" transform="translate(178 176) rotate(14) scale(.9)"/>
+    <use href="#citron" transform="translate(172 62)"/><use href="#citron" transform="translate(58 188) scale(.85)"/>
+    <use href="#fraise" transform="translate(118 122) rotate(12)"/><use href="#fraise" transform="translate(206 120) rotate(-16) scale(.8)"/>
+    <use href="#etoile" transform="translate(112 52) scale(1.1)"/><use href="#etoile" transform="translate(30 130) scale(.8)"/><use href="#etoile" transform="translate(210 36) scale(.8)"/><use href="#etoile" transform="translate(130 214) scale(.9)"/>
+  </g>
+</svg>

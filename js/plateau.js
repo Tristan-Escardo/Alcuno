@@ -120,7 +120,7 @@ function prechargerImagesCartes(){
   test.style.display = "none";
   document.body.appendChild(test);
   const urls = new Set();
-  [...classes, "carte_doree", "cupidon_a"].forEach(c => {
+  [...classes, "carte_doree", "cupidon_a", "coup_de_foudre"].forEach(c => {
     test.className = "Carte " + c;
     const m = getComputedStyle(test).backgroundImage.match(/url\("?([^")]+)"?\)/);
     if(m) urls.add(m[1]);
@@ -144,13 +144,22 @@ let partieHot = false; // la partie en cours est en mode hot (voir lancerPartie 
 let partieExpress = false; // la partie en cours est une partie express (voir lancerPartie, js/regles.js ; album de stickers, js/stickers.js)
 let statsPartie = null;
 function reinitialiserStatsPartie(){
-  statsPartie = { pigeon: {}, plusGros: {}, annulees: {}, duels: {}, plus4: {}, doree: null };
+  statsPartie = { pigeon: {}, plusGros: {}, annulees: {}, duels: {}, plus4: {}, doree: null, couples: {} };
 }
 reinitialiserStatsPartie();
 function compterStat(cle, nom, n = 1){
   if(!nom || !statsPartie) return;
   statsPartie[cle][nom] = (statsPartie[cle][nom] || 0) + n;
   try { stickerInstantane(cle, nom, n); } catch (e) {} // (album de stickers : gagné tout de suite, js/stickers.js)
+}
+
+// « Couple de la soirée » (récap de fin, mode hot) : ce que deux joueurs se sont fait l'un à l'autre. Gorgées
+// données (+4, carte dorée), bues ensemble par un lien Cupidon, et bisous de la carte Coup de foudre.
+function compterCouple(a, b, gorgees = 0, bisous = 0){
+  if(!statsPartie || !a || !b || a === b) return;
+  const cle = [a, b].sort().join("\u0001");
+  const c = statsPartie.couples[cle] || (statsPartie.couples[cle] = { g: 0, b: 0 });
+  c.g += Number(gorgees) || 0; c.b += Number(bisous) || 0;
 }
 
 // Données du récap (envoyées telles quelles à la télé). restants : les « 1 » gardés, bus à la fin
@@ -178,6 +187,16 @@ function calculerRecap(restants = []){
   ajouter("😇", "Le plus sage", meilleurs(gorgees, 0, true), v => pluriel(v, "gorgée"));
   ajouter("⚔️", "Duelliste", meilleurs(st.duels), v => `${v} duel${v > 1 ? "s" : ""} gagné${v > 1 ? "s" : ""}`);
   ajouter("🎯", "Aimant à +4", meilleurs(st.plus4), v => `${pluriel(v, "gorgée")} de +4`);
+  // Mode hot : le couple de la soirée (un bisou compte comme un cul sec ; égalité : le premier par ordre alphabétique)
+  if(partieHot && st.couples){
+    const couples = Object.entries(st.couples).map(([cle, c]) => ({ noms: cle.split("\u0001"), c, score: c.g + c.b * GORGEES_CUL_SEC }))
+      .filter(x => x.score > 0 && x.noms.every(n => joueurs.includes(n))).sort((x, y) => y.score - x.score);
+    if(couples.length){
+      const { noms, c } = couples[0];
+      const morceaux = [c.b ? pluriel(c.b, "bisou") : "", c.g ? `${pluriel(c.g, "gorgée")} l'un pour l'autre` : ""].filter(Boolean);
+      titres.push({ e: "💞", t: "Couple de la soirée", q: `${noms.map(avecCouronne).join(" et ")} · ${morceaux.join(" · ")}` });
+    }
+  }
   const culSecs = !st.doree ? 0 : st.doree.personne ? joueurs.length : 1;
   return {
     cartes: plateau.children.length,
@@ -330,8 +349,10 @@ function familleCarte(classe){
 function reduirePaquetExpress(paquetMelange, hot = false){
   const gardees = {};
   // Hot sans Cupidon (moins de 3 joueurs) : un « +2 » de plus à sa place, pour garder 28 cartes
-  const table = !hot ? CARTES_EXPRESS
+  let table = !hot ? CARTES_EXPRESS
     : paquetMelange.some(c => c.startsWith("cupidon")) ? CARTES_EXPRESS_HOT : Object.assign({}, CARTES_EXPRESS_HOT, { cupidon: 0, plus_2: 7 });
+  // Saint-Valentin : la carte Coup de foudre reste, un changement de sens en moins (28 cartes quand même)
+  if(hot && paquetMelange.includes("coup_de_foudre")) table = Object.assign({}, table, { coup_de_foudre: 1, switch: table.switch - 1 });
   return paquetMelange.filter(c => {
     const f = familleCarte(c);
     gardees[f] = (gardees[f] || 0) + 1;
@@ -346,12 +367,24 @@ function reduirePaquetExpress(paquetMelange, hot = false){
 const GRAINE_HOT = 17179869184; // 2^34
 function graineHot(seed){ return Math.floor(seed / GRAINE_HOT) % 2 === 1; }
 function nbCartesCupidon(nbJoueurs){ return nbJoueurs >= 6 ? 3 : nbJoueurs >= 4 ? 2 : nbJoueurs === 3 ? 1 : 0; }
+// Période Saint-Valentin (7 au 15 février, voir FETES.md ; ou thème Saint-Valentin choisi à la main en attendant le
+// calendrier des fêtes) : en mode hot, une carte « Coup de foudre » remplace un des 2 changements de sens en plus.
+// En ligne : c'est la période de celui qui lance la partie, transmise dans la graine (bit suivant : 2^35).
+const GRAINE_VALENTIN = 34359738368; // 2^35
+function graineValentin(seed){ return Math.floor(seed / GRAINE_VALENTIN) % 2 === 1; }
+function saintValentinEnCours(){
+  const d = new Date();
+  if(d.getMonth() === 1 && d.getDate() >= 7 && d.getDate() <= 15) return true;
+  return document.documentElement.dataset.theme === "valentin";
+}
+let partieValentin = false; // la partie en cours a la carte Coup de foudre (voir lancerPartie, js/regles.js)
 const PLUS_2_EN_PLUS_HOT = ["plus_2_vert2", "plus_2_jaune2", "plus_2_rouge2", "plus_2_bleu2", "plus_2_vert3", "plus_2_jaune3"];
 const SWITCH_EN_PLUS_HOT = ["switch_jaune1", "switch_bleu1"];
-function paquetHot(paquetBase, nbJoueurs){
+function paquetHot(paquetBase, nbJoueurs, valentin = false){
   const cupidon = ["cupidon_a", "cupidon_b", "cupidon_c"].slice(0, nbCartesCupidon(nbJoueurs));
   const plus2 = PLUS_2_EN_PLUS_HOT.slice(0, PLUS_2_EN_PLUS_HOT.length - cupidon.length);
-  return [...paquetBase.filter(c => !c.startsWith("un_")), ...cupidon, ...SWITCH_EN_PLUS_HOT, ...plus2];
+  const switchs = valentin ? ["coup_de_foudre", ...SWITCH_EN_PLUS_HOT.slice(1)] : SWITCH_EN_PLUS_HOT; // (Coup de foudre à la place d'un changement de sens)
+  return [...paquetBase.filter(c => !c.startsWith("un_")), ...cupidon, ...switchs, ...plus2];
 }
 
 function premierePartieJouee(){

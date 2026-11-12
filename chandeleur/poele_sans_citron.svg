@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 170" width="300" height="170">
+  <defs><radialGradient id="c" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="#ffd978"/><stop offset=".7" stop-color="#f2a83a"/><stop offset="1" stop-color="#d98418"/></radialGradient>
+    <linearGradient id="cu" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0a060"/><stop offset="1" stop-color="#b5551a"/></linearGradient></defs>
+  <!-- poêle de cuivre -->
+  <path d="M168 128 L292 150 L290 160 L166 140z" fill="#8a4a1c" stroke="#5e2f10" stroke-width="2.5" stroke-linejoin="round"/>
+  <ellipse cx="116" cy="124" rx="86" ry="22" fill="#7a3a12" stroke="#5e2f10" stroke-width="3"/>
+  <path d="M30 124 Q30 156 116 158 Q202 156 202 124 Q116 146 30 124z" fill="url(#cu)" stroke="#5e2f10" stroke-width="3" stroke-linejoin="round"/>
+  <ellipse cx="116" cy="122" rx="74" ry="15" fill="#f2c36a" opacity=".55"/>
+  <path d="M52 130 Q70 142 96 146" stroke="#ffd9a0" stroke-width="3" fill="none" stroke-linecap="round" opacity=".7"/>
+</svg>

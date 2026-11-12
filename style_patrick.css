@@ -1,0 +1,580 @@
+/* =============================================================================================
+   Thème de fête « Saint-Patrick » (nom interne : patrick) : écran vert bouteille, tout en vert (cartes, panneaux, boutons,
+   joueur actif vert brillant), trèfles / chapeaux de lutin / pintes en motif de fond, un chapeau de lutin posé sur le O du
+   titre ALCUNO et deux pintes qui trinquent en bas de l'accueil.
+   Pour l'instant choisi à la main dans les Réglages (le calendrier des fêtes viendra plus tard, voir FETES.md).
+   Tout est sous html[data-theme="patrick"] : rien ne change pour les autres thèmes.
+   Images : dossier patrick/.
+   ============================================================================================= */
+
+/* === DÉBUT : doré du jeu de base teinté au thème (généré par outils/teinter_or_theme.py patrick : ne pas modifier à la main) === */
+@keyframes lueurDoree_patrick{
+  0%, 100% { box-shadow: 0 0 0 1px rgba(200,255,220,0.5), 0 10px 26px rgba(0,0,0,0.5), 0 0 18px rgba(200,255,220,0.30); }
+  50%      { box-shadow: 0 0 0 1px rgba(200,255,220,0.9), 0 10px 26px rgba(0,0,0,0.5), 0 0 38px rgba(200,255,220,0.60); }
+}
+@keyframes rappelTour_patrick{
+  0%, 100% { scale: 1; filter: none; }
+  50%      { scale: 1.14; filter: brightness(1.35) drop-shadow(0 0 10px rgba(200,255,220,0.95)); }
+}
+@keyframes rappelTourDoux_patrick{
+    0%, 100% { filter: none; }
+    50%      { filter: brightness(1.35) drop-shadow(0 0 10px rgba(200,255,220,0.95)); }
+  }
+@keyframes duelPulse_patrick{
+  0%, 100% { box-shadow: 0 0 0 2px rgba(200,255,220,0.55), 0 0 10px rgba(200,255,220,0.25); }
+  50%      { box-shadow: 0 0 0 2px rgba(200,255,220,0.95), 0 0 28px rgba(200,255,220,0.60); }
+}
+@keyframes lueurTitreAccueil_patrick{
+  0%, 100% {
+    text-shadow:
+      0 3px 0 rgba(6,70,40,0.95),
+      0 6px 16px rgba(0,0,0,0.5),
+      0 0 34px rgba(200,255,220,0.28);
+  }
+  50% {
+    text-shadow:
+      0 3px 0 rgba(6,70,40,0.95),
+      0 6px 16px rgba(0,0,0,0.5),
+      0 0 48px rgba(200,255,220,0.55);
+  }
+}
+@keyframes fenetrePrestigeBrille_patrick{
+  0%, 100%{ box-shadow: 0 0 0 4px #c7fcd9, 0 0 26px rgba(200,255,220,0.6); }
+  50%{ box-shadow: 0 0 0 4px #c7fcd9, 0 0 48px rgba(200,255,220,0.95); }
+}
+:where(html[data-theme="patrick"]) ::selection{ background: var(--selection-fond, #d9ffe5); }
+:where(html[data-theme="patrick"]) .messages::before{ background: linear-gradient(90deg, #ff5b5b 0%, #7dff9f 25%, #6eff72 50%, #58d4ff 75%, #8b7dff 100%); }
+:where(html[data-theme="patrick"]) .bonus-annulation{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) .regleZero, :where(html[data-theme="patrick"]) .reglePigeon, :where(html[data-theme="patrick"]) .rappelTour{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) .menu button, :where(html[data-theme="patrick"]) .suppression button{ background-color: #7dff9f; }
+@media (hover: hover){
+  :where(html[data-theme="patrick"]) .menu button:hover, :where(html[data-theme="patrick"]) .suppression button:hover{ background-color: #e6ffee; }
+}
+:where(html[data-theme="patrick"]) #suppression h2{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #listeSuppression{ box-shadow: 0 0 0 1px rgba(200,255,220,0.18) inset; }
+@media (hover: hover){
+  :where(html[data-theme="patrick"]) #listeSuppression .supp-item:hover{ background: rgba(200,255,220,0.10); box-shadow: 0 0 0 1px rgba(200,255,220,0.22) inset; }
+}
+:where(html[data-theme="patrick"]) #listeSuppression .supp-check{ accent-color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #termineSuppression{ background-color: #d9ffe5; }
+@media (hover: hover){
+  :where(html[data-theme="patrick"]) #termineSuppression:hover{ background-color: #e6ffee; }
+}
+:where(html[data-theme="patrick"]) #overlayCouleur div.titre-couleur{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #overlayPlus4 .titre-pigeon, :where(html[data-theme="patrick"]) #overlayCupidon .titre-pigeon, :where(html[data-theme="patrick"]) #overlayCoupDeFoudre .titre-pigeon{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #overlayPlus4 .bouton-pigeon, :where(html[data-theme="patrick"]) #overlayCupidon .bouton-pigeon, :where(html[data-theme="patrick"]) #overlayCoupDeFoudre .bouton-pigeon{ background-color: #d9ffe5; }
+@media (hover: hover){
+  :where(html[data-theme="patrick"]) #overlayPlus4 .bouton-pigeon:hover, :where(html[data-theme="patrick"]) #overlayCupidon .bouton-pigeon:hover, :where(html[data-theme="patrick"]) #overlayCoupDeFoudre .bouton-pigeon:hover{ background-color: #e6ffee; }
+}
+:where(html[data-theme="patrick"]) #overlayPlus4 .plus4-joueur-btn, :where(html[data-theme="patrick"]) #overlayCupidon .plus4-joueur-btn, :where(html[data-theme="patrick"]) #overlayCoupDeFoudre .plus4-joueur-btn{ background: rgba(200,255,220,0.94); }
+:where(html[data-theme="patrick"]) #overlayPlus4 .plus4-total, :where(html[data-theme="patrick"]) #overlayCupidon .plus4-total, :where(html[data-theme="patrick"]) #overlayCoupDeFoudre .plus4-total{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #overlayPigeon .titre-pigeon{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #overlayPigeon .bouton-pigeon{ background-color: #d9ffe5; }
+@media (hover: hover){
+  :where(html[data-theme="patrick"]) #overlayPigeon .bouton-pigeon:hover{ background-color: #e6ffee; }
+}
+:where(html[data-theme="patrick"]) #overlayDuel button{ background-color: #d9ffe5; }
+@media (hover: hover){
+  :where(html[data-theme="patrick"]) #overlayDuel button:hover{ background-color: #e6ffee; }
+}
+@media (hover: hover){
+  :where(html[data-theme="patrick"]) #overlayDuel .Carte:not(.retournee):not(.duel-selected):hover{ box-shadow: 0 0 20px #d9ffe5; }
+}
+:where(html[data-theme="patrick"]) #overlayRegleUnique .bouton-annulation{ background-color: #d9ffe5; }
+@media (hover: hover){
+  :where(html[data-theme="patrick"]) #overlayRegleUnique .bouton-annulation:hover{ background-color: #e6ffee; }
+}
+:where(html[data-theme="patrick"]) #overlayFinUnRestants .titre-pigeon, :where(html[data-theme="patrick"]) #overlayPredictionFin .titre-pigeon{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #overlayFinUnRestants .bouton-pigeon, :where(html[data-theme="patrick"]) #overlayPredictionFin .bouton-pigeon{ background-color: #d9ffe5; }
+@media (hover: hover){
+  :where(html[data-theme="patrick"]) #overlayFinUnRestants .bouton-pigeon:hover, :where(html[data-theme="patrick"]) #overlayPredictionFin .bouton-pigeon:hover{ background-color: #e6ffee; }
+}
+:where(html[data-theme="patrick"]) #overlayFinUnRestants .fin-un-ligne{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) .prediction-header{ background:
+    linear-gradient(180deg, rgba(200,255,220,0.14), rgba(255,255,255,0.04)),
+    rgba(255,255,255,0.03); border: 1px solid rgba(200,255,220,0.24); }
+:where(html[data-theme="patrick"]) .prediction-subtitle{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) .overlay-subtitle{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) .fin-choix-turn{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) .fin-choix-recap .ligne{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) .fin-choix-recap .ligne.en-cours{ background: rgba(200,255,220,0.12); }
+:where(html[data-theme="patrick"]) .fin-choix-numeros b{ background: #d9ffe5; }
+@media (max-width: 520px), (orientation: landscape) and (max-height: 520px){
+  :where(html[data-theme="patrick"]) #menu #btnCaster{ background-image: linear-gradient(180deg, #44f57f, #18f361) !important; }
+}
+@media (max-width: 520px), (orientation: landscape) and (max-height: 520px){
+  :where(html[data-theme="patrick"]) #listeJoueurs .joueur-ligne-actif{ border-color: #20f367; background: rgba(32,243,103,0.12); color: #20f367; }
+}
+:where(html[data-theme="patrick"]) .Carte.dos_dore::after{ background: linear-gradient(115deg,
+    transparent 32%,
+    rgba(140,255,175,0.55) 44%,
+    rgba(222,253,233,0.95) 50%,
+    rgba(140,255,175,0.55) 56%,
+    transparent 68%); }
+:where(html[data-theme="patrick"]) #stickyJoueurActif{ border: 1px solid rgba(200,255,220,0.22); }
+:where(html[data-theme="patrick"]) #stickyJoueurActif::before{ background: radial-gradient(circle at 35% 35%, #d6fde3 0%, #d9ffe5 45%, #0cdf52 100%); box-shadow: 0 0 10px rgba(200,255,220,0.28); }
+:where(html[data-theme="patrick"]) #stickyJoueurActif .sticky-nom{ color: #86f9ac; }
+:where(html[data-theme="patrick"]) #stickyJoueurActif .sticky-bonus{ background: rgba(200,255,220,0.16); border: 1px solid rgba(200,255,220,0.18); color: #a4fac1; }
+:where(html[data-theme="patrick"]) .fin-choix-resultat{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #overlayDuel .duel-main-title{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #overlayDuel .duel-info{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #overlayDuel .duel-label{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) header{ background:
+    linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)),
+    linear-gradient(135deg, rgba(200,255,220,0.08), rgba(255,255,255,0) 45%),
+    rgba(0,0,0,0.22); box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.08),
+    inset 0 0 0 2px rgba(200,255,220,0.10),
+    0 14px 30px rgba(0,0,0,0.20); }
+:where(html[data-theme="patrick"]) header::before{ background: linear-gradient(
+    90deg,
+    rgba(255, 70, 70, 0.14) 0%,
+    rgba(200,255,220,0.10) 35%,
+    rgba(70, 210, 110, 0.10) 68%,
+    rgba(70, 170, 255, 0.14) 100%
+  ); }
+:where(html[data-theme="patrick"]) header::after{ background: linear-gradient(90deg, #ff4d4d 0%, #d9ffe5 34%, #42d86b 67%, #42b7ff 100%); }
+:where(html[data-theme="patrick"]) header h1{ color: #d9ffe5; text-shadow:
+    0 2px 0 rgba(6,70,40,0.95),
+    0 4px 10px rgba(0,0,0,0.45),
+    0 0 18px rgba(200,255,220,0.18); }
+:where(html[data-theme="patrick"]) #menu{ box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.06),
+    inset 0 0 0 2px rgba(200,255,220,0.08); }
+:where(html[data-theme="patrick"]) #menu input{ border: 1px solid rgba(200,255,220,0.18); }
+:where(html[data-theme="patrick"]) #choixMode h2, :where(html[data-theme="patrick"]) #ecranNouvellePartie h2, :where(html[data-theme="patrick"]) #ecranConfirmerHote h2, :where(html[data-theme="patrick"]) #ecranConfirmerRetrait h2, :where(html[data-theme="patrick"]) #ecranReprise h2, :where(html[data-theme="patrick"]) #ecranConfirmerAccueil h2, :where(html[data-theme="patrick"]) #ecranChoixPseudo h2, :where(html[data-theme="patrick"]) #ecranCaster h2, :where(html[data-theme="patrick"]) #enLigne h2, :where(html[data-theme="patrick"]) #enLigne h3{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #choixMode button, :where(html[data-theme="patrick"]) #ecranNouvellePartie button, :where(html[data-theme="patrick"]) #btnContinuerOptions, :where(html[data-theme="patrick"]) #ecranConfirmerHote button, :where(html[data-theme="patrick"]) #ecranConfirmerRetrait button, :where(html[data-theme="patrick"]) #ecranReprise button, :where(html[data-theme="patrick"]) #ecranConfirmerAccueil button, :where(html[data-theme="patrick"]) #ecranChoixPseudo button, :where(html[data-theme="patrick"]) #ecranCaster button, :where(html[data-theme="patrick"]) #enLigne button{ background-color: #7dff9f; }
+@media (hover: hover){
+  :where(html[data-theme="patrick"]) #choixMode button:hover, :where(html[data-theme="patrick"]) #ecranNouvellePartie button:hover, :where(html[data-theme="patrick"]) #btnContinuerOptions:hover, :where(html[data-theme="patrick"]) #ecranConfirmerHote button:hover, :where(html[data-theme="patrick"]) #ecranConfirmerRetrait button:hover, :where(html[data-theme="patrick"]) #ecranReprise button:hover, :where(html[data-theme="patrick"]) #ecranConfirmerAccueil button:hover, :where(html[data-theme="patrick"]) #ecranChoixPseudo button:hover, :where(html[data-theme="patrick"]) #ecranCaster button:hover, :where(html[data-theme="patrick"]) #enLigne button:hover{ background-color: #e6ffee; }
+}
+:where(html[data-theme="patrick"]) #enLigne input{ border: 1px solid rgba(200,255,220,0.25); }
+:where(html[data-theme="patrick"]) #enLigne .separateurOu::before, :where(html[data-theme="patrick"]) #enLigne .separateurOu::after{ background: rgba(200,255,220,0.35); }
+:where(html[data-theme="patrick"]) #ecranScanner .cadreScanner{ border: 3px solid #7dff9f; }
+:where(html[data-theme="patrick"]) #ecranScanner button{ background: #7dff9f; }
+:where(html[data-theme="patrick"]) #listeJoueursEnLigne div{ box-shadow: 0 0 0 1px rgba(200,255,220,0.18) inset; }
+:where(html[data-theme="patrick"]) .qrPartie{ box-shadow: 0 0 0 3px rgba(200,255,220,0.55), 0 10px 24px rgba(0,0,0,0.35); }
+:where(html[data-theme="patrick"]) #btnAccueilClassique, :where(html[data-theme="patrick"]) #enLigne #btnAccueilEnLigne, :where(html[data-theme="patrick"]) #ecranNouvellePartie #btnAccueil{ -webkit-text-stroke: 1.2px #d9ffe5; color: #d9ffe5; text-shadow:
+    0 2px 0 rgba(6,70,40,0.95),
+    0 3px 8px rgba(0,0,0,0.45); }
+:where(html[data-theme="patrick"]) #toastEnLigne{ color: #d9ffe5; box-shadow: 0 0 0 1px rgba(200,255,220,0.45) inset, 0 8px 24px rgba(0,0,0,0.45); }
+:where(html[data-theme="patrick"]) #ecranCredits{ background:
+    radial-gradient(ellipse 85% 28% at 50% 30%, rgba(200,255,220,0.16), transparent 100%),
+    radial-gradient(ellipse 45% 22% at 15% 72%, rgba(255,77,77,0.10), transparent 100%),
+    radial-gradient(ellipse 45% 22% at 85% 72%, rgba(66,183,255,0.10), transparent 100%),
+    var(--deco-theme, none),
+    linear-gradient(var(--fond-theme), var(--fond-theme)) var(--couleur-barre); }
+:where(html[data-theme="patrick"]) #ecranCredits .credits-titre{ color: #d9ffe5; text-shadow:
+    0 2px 0 rgba(6,70,40,0.95),
+    0 4px 10px rgba(0,0,0,0.45),
+    0 0 26px rgba(200,255,220,0.25); }
+:where(html[data-theme="patrick"]) #ecranCredits .credits-phrase strong{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranCredits .cadrePhoto{ border: 2px solid rgba(200,255,220,0.55); }
+:where(html[data-theme="patrick"]) #ecranCredits .photoVide{ border: 2px dashed rgba(200,255,220,0.45); color: rgba(200,255,220,0.8); }
+:where(html[data-theme="patrick"]) #ecranCredits .credits-nom{ box-shadow: 0 0 0 1px rgba(200,255,220,0.25) inset; color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranCredits .btnRetour{ background-color: #7dff9f; }
+:where(html[data-theme="patrick"]) #annonceNouvellePartie{ background:
+    radial-gradient(circle at 50% 45%, rgba(200,255,220,0.16), transparent 60%),
+    rgba(20, 0, 14, 0.94); }
+:where(html[data-theme="patrick"]) #annonceNouvellePartie .annonce-titre{ color: #d9ffe5; text-shadow:
+    0 2px 0 rgba(6,70,40,0.95),
+    0 4px 10px rgba(0,0,0,0.45),
+    0 0 26px rgba(200,255,220,0.25); }
+:where(html[data-theme="patrick"]) #stickyJoueurActif.rappel-tour{ animation: rappelTour_patrick 0.8s ease-in-out 3; }
+:where(html[data-theme="patrick"]) #haloRappel{ --halo-ecran: rgba(200,255,220,0.75); }
+@media (prefers-reduced-motion: reduce){
+  :where(html[data-theme="patrick"]) #stickyJoueurActif.rappel-tour{ animation-name: rappelTourDoux_patrick; }
+}
+:where(html[data-theme="patrick"]) #overlayDuel .Carte.duel-a-choisir{ animation: duelPulse_patrick 1.6s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce){
+  :where(html[data-theme="patrick"]) #overlayDuel .Carte.duel-a-choisir{ box-shadow: 0 0 0 2px rgba(200,255,220,0.85), 0 0 18px rgba(200,255,220,0.45); }
+}
+:where(html[data-theme="patrick"]) #choixMode #btnReglages svg{ filter:
+    drop-shadow(0 2px 0 rgba(6,70,40,0.95))
+    drop-shadow(0 3px 6px rgba(0,0,0,0.45)); }
+:where(html[data-theme="patrick"]) #choixMode #btnReglages path{ stroke: #d9ffe5; }
+:where(html[data-theme="patrick"]) #choixMode #btnReglages circle{ stroke: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranReglages h2{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranReglages .btnRetour{ background-color: #7dff9f; }
+:where(html[data-theme="patrick"]) #ecranReglages .optionReglage{ border: 1px solid rgba(200,255,220,0.18); }
+:where(html[data-theme="patrick"]) #ecranReglages .optionTitre{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranReglages .optionReglage input:checked + .interrupteur{ background: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranReglages .optionReglage input:focus-visible + .interrupteur{ outline: 2px solid #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranReglages .aProposTitre{ color: rgba(200,255,220,0.7); }
+:where(html[data-theme="patrick"]) #choixMode .btnInstaller{ color: #d9ffe5; background: rgba(200,255,220,0.10); border: 1px solid rgba(200,255,220,0.45); }
+@media (hover: hover){
+  :where(html[data-theme="patrick"]) #choixMode .btnInstaller:hover{ background: rgba(200,255,220,0.18); }
+}
+:where(html[data-theme="patrick"]) #overlayRegleUnique .regle-detail{ color: #c0fcd4; }
+:where(html[data-theme="patrick"]) #overlayRegleUnique .celien-bloc{ border-top: 1px solid rgba(200,255,220,0.35); }
+:where(html[data-theme="patrick"]) #overlayRegleUnique .celien-citation{ color: #e6ffee; text-shadow: 0 0 18px rgba(200,255,220,0.35); }
+:where(html[data-theme="patrick"]) #overlayRegleUnique .celien-signature{ color: #d9ffe5; text-shadow: 0 2px 0 #6b4200, 0 0 16px rgba(200,255,220,0.35); }
+:where(html[data-theme="patrick"]) #btnCodePartie{ border: 1px solid rgba(200,255,220,0.25); color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #btnCodePartie.ouvert{ border-color: rgba(200,255,220,0.6); }
+:where(html[data-theme="patrick"]) #ecranRattrapage{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #choixMode #titreAccueil{ color: #d9ffe5; text-shadow:
+    0 3px 0 rgba(6,70,40,0.95),
+    0 6px 16px rgba(0,0,0,0.5),
+    0 0 34px rgba(200,255,220,0.28); animation: fadeIn 0.25s ease forwards, lueurTitreAccueil_patrick 3.5s ease-in-out 0.3s infinite; }
+:where(html[data-theme="patrick"]) #choixMode .titreAccueilBarre{ background: linear-gradient(90deg, #ff4d4d 0%, #d9ffe5 34%, #42d86b 67%, #42b7ff 100%); box-shadow: 0 0 14px rgba(200,255,220,0.25); }
+:where(html[data-theme="patrick"]) #ecranReglages .blocReglage{ border: 1px solid rgba(200,255,220,0.18); }
+:where(html[data-theme="patrick"]) #ecranReglages .ligneVolume input[type="range"]{ accent-color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranReglages .volumeValeur{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranReglages .optionAction button{ background: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranReglages .qrJeu{ box-shadow: 0 0 0 3px rgba(200,255,220,0.55), 0 10px 24px rgba(0,0,0,0.35); }
+:where(html[data-theme="patrick"]) #ecranReglages #btnPartagerJeu{ background-color: #7dff9f; }
+:where(html[data-theme="patrick"]) #ecranReglages .btnDiagnostic:active{ color: #d9ffe5; border-color: rgba(200,255,220,0.5); }
+:where(html[data-theme="patrick"]) #notifHaut{ background: linear-gradient(135deg, #09a63d 0%, #3ceb77 18%, #c0fcd4 36%, #4ff486 52%,
+                              #0ac749 74%, #6df79b 100%); box-shadow: 0 12px 28px rgba(0,0,0,0.5), 0 0 22px rgba(140,255,175,0.55),
+              inset 0 0 0 1.5px rgba(222,253,233,0.85), inset 0 -3px 0 rgba(6,70,40,0.45); }
+:where(html[data-theme="patrick"]) #notifHaut .notifHaut-icone{ filter: drop-shadow(0 1px 0 rgba(236,254,242,0.8)); }
+:where(html[data-theme="patrick"]) #notifHaut .notifHaut-eclats span{ text-shadow: 0 0 4px #fff, 0 0 10px rgba(222,253,233,0.95); }
+:where(html[data-theme="patrick"]) #notifHaut .notifHaut-texte strong{ text-shadow: 0 1px 0 rgba(236,254,242,0.85); }
+:where(html[data-theme="patrick"]) #etincellesPrestige span{ color: #d8fde5; text-shadow: 0 0 6px #c9ffd9, 0 0 14px rgba(200,255,220,0.9), 0 0 24px rgba(70,245,129,0.6); }
+:where(html[data-theme="patrick"]) #refletPrestige::before{ background: linear-gradient(90deg, transparent 0%, rgba(175,251,200,0.08) 30%,
+                              rgba(222,253,233,0.38) 50%, rgba(175,251,200,0.08) 70%, transparent 100%); }
+:where(html[data-theme="patrick"]) body::before{ background:
+    var(--deco-theme, radial-gradient(circle at top center, rgba(200,255,220,0.08) 0%, rgba(200,255,220,0) 26%) no-repeat),
+    var(--fond-theme); }
+:where(html[data-theme="patrick"]) #choixMode #btnRegles svg, :where(html[data-theme="patrick"]) header #btnReglesJeu svg{ filter: drop-shadow(0 2px 0 rgba(6,70,40,0.95)) drop-shadow(0 3px 6px rgba(0,0,0,0.45)); }
+:where(html[data-theme="patrick"]) #choixMode #btnRegles path, :where(html[data-theme="patrick"]) header #btnReglesJeu path{ stroke: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranRegles .btnRetour{ background-color: #7dff9f; }
+:where(html[data-theme="patrick"]) #ecranRegles h2{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranRegles .blocRegles{ border: 1px solid rgba(200,255,220,0.18); }
+:where(html[data-theme="patrick"]) #ecranRegles .blocRegles h3{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranRegles .btnFaqLien{ border: 1px solid rgba(200,255,220,0.45); background: rgba(200,255,220,0.10); color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranRegles .faqImage{ border: 1px solid rgba(200,255,220,0.30); }
+:where(html[data-theme="patrick"]) #ecranInstallation h2{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranInstallation .etapeInstallation{ border: 1px solid rgba(200,255,220,0.25); }
+:where(html[data-theme="patrick"]) #ecranInstallation .etapeInstallation b{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranInstallation .numeroEtape{ background: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranInstallation #btnInstallationInstaller{ background: #7dff9f; box-shadow: inset 0 -3px 0 rgba(0,0,0,0.18), 0 0 26px rgba(200,255,220,0.45); }
+@media (hover: hover){
+  :where(html[data-theme="patrick"]) body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
+    #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
+    #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
+    #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
+    #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+    #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayDuel button,
+    #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
+    #overlayAnnulation button):hover:not(:disabled), :where(html[data-theme="patrick"]) body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
+    #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
+    #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
+    #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
+    #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+    #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCoupDeFoudre .bouton-pigeon, #overlayDuel button,
+    #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
+    #overlayAnnulation button):hover:not(:disabled){ box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9), 0 6px 20px rgba(200,255,220,0.55) !important; }
+}
+:where(html[data-theme="patrick"]) #overlayDuel .duel-boutons button:disabled{ background: #c0fcd4 !important; }
+:where(html[data-theme="patrick"]) #menu #btnCaster{ box-shadow: 0 0 0 1px rgba(200,255,220,0.45) inset; }
+:where(html[data-theme="patrick"]) #menu #btnCaster.caster-actif{ box-shadow: 0 0 0 2px #d9ffe5 inset, 0 0 14px rgba(200,255,220,0.35); }
+:where(html[data-theme="patrick"]) #ecranCaster .adresseTele{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranCaster .casterCode input{ border: 1px solid rgba(200,255,220,0.35); }
+:where(html[data-theme="patrick"]) #ecranCaster #btnCasterArreter{ box-shadow: 0 0 0 1px rgba(200,255,220,0.45) inset; }
+:where(html[data-theme="patrick"]) #ecranTele{ background:
+    var(--deco-theme, radial-gradient(circle at top center, rgba(200,255,220,0.10) 0%, rgba(200,255,220,0) 30%) no-repeat),
+    var(--fond-theme); }
+:where(html[data-theme="patrick"]) #ecranTele .tele-titre{ color: #d9ffe5; text-shadow: 0 0.4vh 0 rgba(6,70,40,0.95), 0 0.6vh 1.4vh rgba(0,0,0,0.5); }
+:where(html[data-theme="patrick"]) #ecranTele .tele-sous-titre{ color: #ecfff2; }
+:where(html[data-theme="patrick"]) #ecranTele .tele-etape{ color: #c2f6d3; }
+:where(html[data-theme="patrick"]) #ecranTele .tele-etape .tele-num{ background: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranTele .tele-plein-ecran{ box-shadow: 0 0 0 1px rgba(200,255,220,0.45) inset; }
+:where(html[data-theme="patrick"]) #ecranTele .tele-qr{ box-shadow: 0 0 0 0.7vh rgba(200,255,220,0.6), 0 2.6vh 7vh rgba(0,0,0,0.5); }
+:where(html[data-theme="patrick"]) #ecranTele .tele-code{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranTele .tele-code small{ color: #b9e8cb; }
+:where(html[data-theme="patrick"]) #ecranTele .tele-entete{ border: 1px solid rgba(200,255,220,0.25); }
+:where(html[data-theme="patrick"]) #ecranTele .tele-entete::after{ background: linear-gradient(90deg, #ff5e5e, #69f799, #d9ffe5, #7dde4f, #4fc3f7); }
+:where(html[data-theme="patrick"]) #ecranTele .tele-prepa-titre{ color: #d9ffe5; text-shadow: 0 0.4vh 0 rgba(6,70,40,0.95), 0 0.6vh 1.4vh rgba(0,0,0,0.5); }
+:where(html[data-theme="patrick"]) #ecranTele .tele-prepa-joueur{ border: 1px solid rgba(200,255,220,0.4); }
+:where(html[data-theme="patrick"]) #ecranTele .tele-prepa-info{ color: #ecfff2; }
+:where(html[data-theme="patrick"]) #ecranTele .tele-restantes{ color: #b9e8cb; }
+:where(html[data-theme="patrick"]) #ecranTele .tele-bloc-titre{ color: #d6f5e0; }
+:where(html[data-theme="patrick"]) #ecranTele .tele-tour{ border-color: rgba(200,255,220,0.5); }
+:where(html[data-theme="patrick"]) #ecranTele .tele-tour.tele-rappel-tour{ --halo-bord: rgba(200,255,220,0.95); --halo: rgba(200,255,220,0.8); --halo-loin: rgba(70,245,129,0.4); }
+:where(html[data-theme="patrick"]) #ecranTele .tele-tour-label{ color: #d6f5e0; }
+:where(html[data-theme="patrick"]) #ecranTele .tele-tour-nom{ color: #d9ffe5; text-shadow: 0 0.4vh 0 rgba(6,70,40,0.9); }
+:where(html[data-theme="patrick"]) #ecranTele .tele-badge{ background: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranTele .tele-regles{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranTele .tele-son-coupe{ color: #ecfff2; }
+:where(html[data-theme="patrick"]) #ecranTele .tele-ecran-titre{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranTele .tele-ecran-detail{ color: #ecfff2; }
+:where(html[data-theme="patrick"]) #ecranTele .tele-puce{ background: rgba(200,255,220,0.16); border: 1px solid rgba(200,255,220,0.5); color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranReglages :is(#btnSignalerBug, #btnFaq){ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranBug .bugFeuille{ box-shadow: 0 -12px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(200,255,220,0.4); }
+:where(html[data-theme="patrick"]) #ecranBug h2{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranBug textarea{ border: 1px solid rgba(200,255,220,0.35); }
+:where(html[data-theme="patrick"]) #ecranBug .bugVignette img, :where(html[data-theme="patrick"]) #ecranBug .bugVignette video{ border: 1px solid rgba(200,255,220,0.4); }
+:where(html[data-theme="patrick"]) #ecranBug .bugAjouterPiece{ border: 1px dashed rgba(200,255,220,0.5); }
+:where(html[data-theme="patrick"]) #ecranReglages .optionChevron{ stroke: #d9ffe5; }
+@media (pointer: coarse){
+  :where(html[data-theme="patrick"]) #ecranTele .tele-revenir{ border: 1px solid rgba(200,255,220,0.5); }
+}
+:where(html[data-theme="patrick"]) #stickyJoueurActif #btnPause svg, :where(html[data-theme="patrick"]) #stickyJoueurActif #btnHistorique svg, :where(html[data-theme="patrick"]) #ecranPause .pauseIcone svg, :where(html[data-theme="patrick"]) #ecranTele .tele-pause svg{ stroke: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranPause .pauseIcone{ background: rgba(200,255,220,0.12); border: 2px solid rgba(200,255,220,0.6); }
+:where(html[data-theme="patrick"]) #ecranPause .pauseIcone svg{ fill: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranPause h2{ color: #d9ffe5; text-shadow: 0 4px 0 rgba(6,70,40,0.9), 0 0 30px rgba(200,255,220,0.3); }
+:where(html[data-theme="patrick"]) #ecranPause #btnReprendrePause{ background: linear-gradient(180deg, #44f57f, #18f361); }
+:where(html[data-theme="patrick"]) #ecranTele .tele-pause svg{ fill: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranTele .tele-pause-titre{ color: #d9ffe5; text-shadow: 0 1vh 0 rgba(6,70,40,0.9); }
+:where(html[data-theme="patrick"]) :is(#annulerChoix, #bandeauMiseAJour){ --bandeau-bord: rgba(200,255,220,0.45); --bandeau-bouton: #d9ffe5; }
+:where(html[data-theme="patrick"]) #overlayCouleur .explication-couleur b{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #btnCaster .casterIcone{ background: linear-gradient(180deg, #44f57f, #18f361); }
+:where(html[data-theme="patrick"]) .btnPauseJoueur{ border: 1px solid rgba(200,255,220,0.45); color: #d9ffe5; }
+:where(html[data-theme="patrick"]) .btnPauseJoueur.en-pause{ border-color: rgba(200,255,220,0.9); }
+:where(html[data-theme="patrick"]) .voletPause-feuille{ border-top: 1px solid rgba(200,255,220,0.35); }
+:where(html[data-theme="patrick"]) .voletPause-nom{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) .voletPause-ok{ background: linear-gradient(180deg, #44f57f, #18f361); }
+:where(html[data-theme="patrick"]) .aideAccueil-ombre{ fill: rgba(6,70,40,0.9); }
+:where(html[data-theme="patrick"]) .aideAccueil-repere b, :where(html[data-theme="patrick"]) .aideAccueil-bas b{ color: #d9ffe5; text-shadow: 0 2px 0 rgba(6,70,40,0.9); }
+:where(html[data-theme="patrick"]) .aideAccueil-bas b{ text-shadow: 0 3px 0 rgba(6,70,40,0.9); }
+:where(html[data-theme="patrick"]) #plateau .Carte.carte-appuyee{ box-shadow: 0 0 0 3px #d9ffe5, 0 0 22px rgba(200,255,220,0.7); }
+:where(html[data-theme="patrick"]) #enLigne #btnInviterPartie{ border: 1.5px solid rgba(200,255,220,0.7); background: rgba(200,255,220,0.08); color: #d9ffe5; }
+:where(html[data-theme="patrick"]) .lignesRegle li::before{ background: #d9ffe5; }
+:where(html[data-theme="patrick"]) :is(.detailRegle, #voletCarte .voletPause-texte) em{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) .regleBloc-titre{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) .regleBloc em{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) .historique-recente{ background: #d9ffe5; }
+:where(html[data-theme="patrick"]) .historique-quoi em{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranTele .tele-dernieres-titre{ color: #d6f5e0; }
+:where(html[data-theme="patrick"]) #ecranTele .tele-dernieres-titre + .tele-dernieres-item{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranTele .tele-dernieres-titre + .tele-dernieres-item .Carte{ outline: 0.3vh solid #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranTele .tele-historique-quoi em{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) .recap-titre{ color: #d9ffe5; text-shadow: 0 3px 0 #7a4b00, 0 0 18px rgba(200,255,220,.35); }
+:where(html[data-theme="patrick"]) .recap-marche{ background: linear-gradient(180deg, rgba(200,255,220,.22), rgba(200,255,220,.06)); border: 1px solid rgba(200,255,220,.4); }
+:where(html[data-theme="patrick"]) .recap-g{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) .recap-liste{ border: 1px solid rgba(200,255,220,.25); }
+:where(html[data-theme="patrick"]) .recap-ligne em{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) .recap-eclats{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) .recap-bloc{ border: 1px solid rgba(200,255,220,.22); }
+:where(html[data-theme="patrick"]) .recap-t{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) .recap-restants{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranTele .tele-ecran-recap{ background: radial-gradient(circle at top, rgba(200,255,220,.10), transparent 55%), var(--fond-theme) !important; }
+:where(html[data-theme="patrick"]) .etincelle{ --c: #d9ffe5; }
+:where(html[data-theme="patrick"]) .etincelle.e0{ --c: #d9ffe5; }
+:where(html[data-theme="patrick"]) .etincelle.e1{ --c: #c7fcd9; }
+:where(html[data-theme="patrick"]) .etincelle.e2{ --c: #20f367; }
+:where(html[data-theme="patrick"]){ --album-barre-plein: #d9ffe5; }
+:where(html[data-theme="patrick"]){ --actif-haut: #94f9b6; --actif-bas: #20f367; --actif-halo: #20f367; }
+:where(html[data-theme="patrick"]) .annonceAccueil{ border: 2px solid var(--actif-bas, #20f367); box-shadow: 0 8px 22px rgba(0,0,0,.35), 0 0 18px var(--actif-halo, #20f367); }
+:where(html[data-theme="patrick"]) .annonceAccueil .annonceIcone{ background: linear-gradient(180deg, var(--actif-haut, #94f9b6), var(--actif-bas, #20f367)); }
+:where(html[data-theme="patrick"]) #stickyJoueurActif #btnReglagesJeu svg{ stroke: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranTele .tele-regles-pj{ color: #ecfff2; }
+:where(html[data-theme="patrick"]) #ecranTele .tele-regles-partie{ color: #d9ffe5; border-bottom: 1px solid rgba(200,255,220,0.4); }
+:where(html[data-theme="patrick"]) #ecranTele .tele-regles-nom{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranTele .tele-regles-ligne em{ color: #ecfff2; }
+:where(html[data-theme="patrick"]) #ecranTele .tele-faq-image{ border: 1px solid rgba(200,255,220,0.35); }
+:where(html[data-theme="patrick"]) #ecranTele .tele-puce.tele-puce-couleur.tele-puce-jaune{ background: #51f688; }
+/* === FIN du doré teinté (généré) === */
+
+
+html[data-theme="patrick"]{
+  --fond-theme: #0f6a44;
+  --carte-patrick: rgba(4, 58, 36, 0.95); /* ton de TOUTES les cartes et panneaux : vert forêt franc (pas noir), quasi opaque pour cacher le motif derrière le texte */
+  --couleur-barre: #0f6a44; /* = la couleur du tout haut du décor ci-dessous (la barre du téléphone ne doit pas être plus sombre) */
+  /* Fond du jeu, des menus et des réglages : lumière douce en haut, puis le motif de trèfles, chapeaux de lutin et pintes (patrick/deco_fond.svg) */
+  --deco-theme:
+    radial-gradient(ellipse 120% 24% at 50% 24%, rgba(190,255,215,.30), transparent 100%) no-repeat,
+    linear-gradient(to top, rgba(0,60,30,.3), transparent 45%) no-repeat,
+    url("patrick/deco_fond.svg") 0 0 / 300px 300px repeat;
+  /* Accueil : deux pintes qui trinquent en bas (patrick/pintes.svg), derrière les boutons */
+  --deco-accueil:
+    url("patrick/pintes.svg") center calc(100% - 10px) / 190px 100px no-repeat,
+    radial-gradient(ellipse 120% 24% at 50% 24%, rgba(190,255,215,.32), transparent 100%) no-repeat;
+  /* Joueur dont c'est le tour : vert brillant (néon) */
+  --actif-haut: #eaffef; --actif-bas: #2dff75; --actif-texte: #02351c; --actif-halo: #5dff95;
+  /* texte sélectionné dans les champs (nom du joueur, code de la partie…) : vert clair, texte vert foncé */
+  --selection-fond: #c9ffd9; --selection-texte: #04361f;
+  /* Fenêtres du jeu (pigeon, duel, +4, pari…) : halo vert sur un vert forêt */
+  --overlay-fond: radial-gradient(ellipse 115% 42% at 50% 45%, rgba(70,220,130,.45) 0%, transparent 100%), #074a2e;
+  --overlay-bord: #074a2e;
+}
+
+/* ----- Fenêtres du jeu ----- */
+html[data-theme="patrick"] :is(#overlayCouleur, #overlayPlus4, #overlayCupidon, #overlayPigeon,
+  #overlayFinUnRestants, #overlayDuel, #overlayRegleUnique, #overlayAnnulation, #overlayResultatAnnulation,
+  #overlayPredictionFin, .overlay-opaque),
+html[data-theme="patrick"] :is(#overlayCouleur, #overlayPlus4, #overlayCoupDeFoudre, #overlayPigeon,
+  #overlayFinUnRestants, #overlayDuel, #overlayRegleUnique, #overlayAnnulation, #overlayResultatAnnulation,
+  #overlayPredictionFin, .overlay-opaque){
+  background: var(--overlay-fond) !important;
+}
+html[data-theme="patrick"].overlay-ouvert,
+html[data-theme="patrick"].overlay-ouvert body,
+html[data-theme="patrick"] #voileOverlays{ background: var(--overlay-bord); }
+html[data-theme="patrick"] .plus4-actions{ background: transparent; }
+html[data-theme="patrick"] :is(#overlayCarteDoree, #overlayRegleUnique.overlay-doree){
+  background: radial-gradient(ellipse 95% 34% at 50% 33%, rgba(255,215,0,.26), transparent 100%),
+    radial-gradient(ellipse 120% 60% at 50% 100%, rgba(70,220,130,.45), transparent 100%), #074a2e !important; box-shadow: none; }
+/* Récap de fin de partie */
+html[data-theme="patrick"] #overlayFinUnRestants.overlay-recap{ background: radial-gradient(ellipse 110% 45% at 50% 45%, rgba(70,220,130,.45), transparent 100%), #043a24 !important; }
+html[data-theme="patrick"] :is(.recap-marche, .recap-liste, .recap-bloc){ background: rgba(20,130,80,.5); border-color: rgba(255,255,255,.4); }
+html[data-theme="patrick"] .recap-marche{ background: linear-gradient(180deg, rgba(150,255,190,.3), rgba(20,130,80,.5)); }
+
+/* ----- Télé : même teinte que le thème ----- */
+html[data-theme="patrick"] #ecranTele .tele-ecran{ background: radial-gradient(ellipse 110% 70% at 50% 45%, rgba(60,210,120,.45), rgba(7,74,46,.97) 75%), rgb(7,74,46); }
+html[data-theme="patrick"] #ecranTele .tele-ecran-recap{ background: radial-gradient(ellipse 110% 60% at 50% 40%, rgba(70,220,130,.45), transparent 100%), #043a24 !important; }
+
+/* ----- Lisibilité sur l'orange (Réglages, écran des créateurs) ----- */
+/* (« #ecranReglages > .optionReglage » : les lignes de réglage posées seules, hors d'un bloc — elles
+   gardaient le blanc translucide du jeu de base et tranchaient avec les autres.)
+   Cartes : TOUTES au même ton (vert forêt, quasi opaque, liseré blanc fin) : Réglages (blocs et lignes isolées), « Ta partie »,
+   règles / FAQ / album, créateurs, étapes d'installation, salle d'attente, retrait d'un joueur. Quasi opaque pour que le motif
+   du fond ne passe jamais derrière un texte ; les noms de thèmes (chacun de sa couleur) restent lisibles. */
+html[data-theme="patrick"] :is(#ecranReglages .blocReglage, #ecranReglages .reglages-contenu > .optionReglage, #ecranReglages > .optionReglage, .optionsPartie > .optionReglage:not(.optionsSuite),
+  .blocRegles, #ecranCredits .credits-nom, #ecranInstallation .etapeInstallation, #listeJoueursEnLigne div, #listeSuppression){
+  background: var(--carte-patrick); border: 1px solid rgba(255, 255, 255, 0.22);
+}
+html[data-theme="patrick"] #ecranCredits .cadrePhoto.sansPhoto{ background: var(--carte-patrick); }
+/* Boutons secondaires (translucides dans le jeu de base) : même ton sombre que les cartes, liseré blanc */
+html[data-theme="patrick"] :is(#enLigne #btnInviterPartie, .voletPause-annuler, #ecranReglages .btnDiagnostic, #ecranBug .bugFermer){
+  background: var(--carte-patrick) !important; border: 1px solid rgba(255, 255, 255, 0.35) !important;
+}
+/* Petits textes gris : blanc cassé */
+html[data-theme="patrick"] #ecranReglages :is(.lienBug, .versionJeu){ color: #e6fff0 !important; }
+html[data-theme="patrick"] #ecranReglages .btnDiagnostic{ color: #e6fff0 !important; }
+html[data-theme="patrick"] #ecranCredits .credits-honneur-titre{ color: #e6fff0; }
+/* Télé : code de la télé, en bas de l'écran */
+html[data-theme="patrick"] #ecranTele .tele-pied{ color: rgba(230,255,240,.8); }
+
+/* ----- Boutons : or avec un anneau blanc (comme une étiquette de cadeau) et texte brun foncé, sur tous les écrans -----
+   (mêmes boutons que les autres thèmes habillés, Soleil couchant par exemple : tous les boutons du jeu doivent être aux couleurs du thème) */
+html[data-theme="patrick"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #ajouterJoueur, #jouer, #supprimerJoueur,
+  #nouvellePartie, #btnRejouerMemes, #btnModifierJoueurs, #btnReprendrePause,
+  #btnCreerPartie, #btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR,
+  #lancerPartieEnLigne, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui, #btnConfirmerAccueilNon,
+  #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #termineSuppression,
+  #btnInstallationInstaller, #ecranRegles .btnFaqLien, #choixMode .btnInstaller, #menu #btnCaster, #ecranCaster button:not(.btnRetour), #btnFermerScanner, #ecranReprise button,
+  #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayFinUnRestants .bouton-pigeon,
+  #overlayAnnulation button, #overlayRegleUnique .bouton-annulation, #overlayDuel button:not(:disabled), #overlayPredictionFin .bouton-pigeon),
+html[data-theme="patrick"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #ajouterJoueur, #jouer, #supprimerJoueur,
+  #nouvellePartie, #btnRejouerMemes, #btnModifierJoueurs, #btnReprendrePause,
+  #btnCreerPartie, #btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR,
+  #lancerPartieEnLigne, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui, #btnConfirmerAccueilNon,
+  #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #termineSuppression,
+  #btnInstallationInstaller, #ecranRegles .btnFaqLien, #choixMode .btnInstaller, #menu #btnCaster, #ecranCaster button:not(.btnRetour), #btnFermerScanner, #ecranReprise button,
+  #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCoupDeFoudre .bouton-pigeon, #overlayFinUnRestants .bouton-pigeon,
+  #overlayAnnulation button, #overlayRegleUnique .bouton-annulation, #overlayDuel button:not(:disabled), #overlayPredictionFin .bouton-pigeon){
+  background: linear-gradient(180deg, #f2fff6, #9be8b4) !important;
+  color: #04361f !important;
+  text-shadow: 0 1px 0 rgba(240, 255, 245, 0.7) !important;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.95), 0 6px 14px rgba(0,50,25,.4) !important;
+}
+@media (hover: hover){
+  html[data-theme="patrick"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #choixMode .btnInstaller):hover{ background: linear-gradient(180deg, #fbfffc, #bdf5cf) !important; }
+}
+
+/* ----- Volet « Mettre … en pause » et bandeaux du bas (« Mauvais joueur ? Annuler », « Nouvelle version ») ----- */
+html[data-theme="patrick"] .voletPause-ok{
+  background: linear-gradient(180deg, #f2fff6, #9be8b4); color: #04361f;
+  text-shadow: 0 1px 0 rgba(240, 255, 245, 0.7); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.95);
+}
+html[data-theme="patrick"] :is(#annulerChoix, #bandeauMiseAJour){
+  --bandeau-fond: #04361f; --bandeau-bord: rgba(255, 255, 255, 0.5); --bandeau-texte: #fff;
+  --bandeau-bouton: linear-gradient(180deg, #f2fff6, #9be8b4); --bandeau-bouton-texte: #04361f;
+}
+html[data-theme="patrick"] :is(#annulerChoix .annulerChoix-bouton, #bandeauMiseAJour .maj){
+  text-shadow: 0 1px 0 rgba(240, 255, 245, 0.7); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.95);
+}
+
+/* ----- Pari de fin et choix de fin : cadres brun-orangé avec un liseré blanc (au lieu du brun-doré de base) ----- */
+html[data-theme="patrick"] :is(.prediction-header, .fin-choix-recap, .fin-choix-card){
+  background: linear-gradient(180deg, rgba(10,100,60,.9), rgba(5,70,42,.9)) !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
+}
+
+/* ----- Textes secondaires un peu trop effacés sur l'orange : plus clairs ----- */
+html[data-theme="patrick"] #ecranReglages .optionNote{ color: rgba(255, 255, 255, 0.92); }
+html[data-theme="patrick"] #ecranReglages .aProposTitre{ color: #c9ffd9; }
+html[data-theme="patrick"] #ecranReglages .lienJeu{ color: #fff; }
+html[data-theme="patrick"] #enLigne .separateurOu, html[data-theme="patrick"] #ecranInstallation #btnInstallationPlusTard{ color: #fff; }
+html[data-theme="patrick"] #listeJoueursEnLigne div{ color: #b8fff6; }
+html[data-theme="patrick"] #ecranTele .tele-tour.tele-pigeon .tele-tour-nom{ color: #b8fff6; } /* « PIGEON (nom) » de la télé */
+
+/* ----- Plateau : les panneaux (titre, boutons, joueurs, règles) cachent le motif de fond derrière leur texte ----- */
+html[data-theme="patrick"] :is(header, #menu, .messages, #ecranTele .tele-bloc, #ecranTele .tele-entete, #ecranTele .tele-prepa-joueur){ background-color: var(--carte-patrick); }
+
+
+/* ----- Aperçu du thème dans les Réglages : un simple rond de la couleur du fond (pas de dessin, pas d'animation) ----- */
+.pastilleTheme .rondPatrick{ background: url("patrick/trefle_apercu.svg") center / 84% 84% no-repeat, #0f6a44 !important; } /* rond vert avec un trèfle dedans */
+
+/* ----- Télé : pastilles de choix (« Je bois 2 », noms des joueurs…) au ton des cartes : le doré reste lisible dessus ----- */
+html[data-theme="patrick"] #ecranTele .tele-puce{ background: var(--carte-patrick); border-color: rgba(255, 255, 255, 0.4); }
+
+/* ----- Télé : « Il reste N cartes » et « Dernières cartes tirées » (sous le plateau) ne sont dans aucun panneau : ils se lisaient mal sur le motif de fond.
+   Même ton que toutes les cartes. ----- */
+html[data-theme="patrick"] #ecranTele :is(.tele-restantes, .tele-compteur){ background: var(--carte-patrick); border-radius: 1.4vh; padding: 0.6vh 2vh; }
+html[data-theme="patrick"] #ecranTele .tele-compteur{ display: table; margin-left: auto; margin-right: auto; color: #e6fff0; } /* (« Il reste N cartes » : le panneau épouse le texte, centré) */
+html[data-theme="patrick"] #ecranTele .tele-compteur[hidden]{ display: none; }
+
+/* ----- Plateau : l'intérieur de l'icône Règles (le livre) prend le ton de l'en-tête (les cartes), pas l'orange de l'accueil ----- */
+html[data-theme="patrick"] header #btnReglesJeu path.couverture{ fill: var(--carte-patrick); }
+
+/* ----- Accueil : un chapeau de lutin posé sur le O du titre ALCUNO -----
+   Le chapeau est DANS la ligne du titre (pas posé par-dessus à une distance fixe) : sa position se mesure sur la ligne de base
+   et la hauteur des majuscules (unité « cap »), donc il suit n'importe quelle police (sur un téléphone sans Impact, les lettres
+   n'ont pas la même hauteur). Image : patrick/chapeau.svg */
+html[data-theme="patrick"] #choixMode #titreAccueil{ white-space: nowrap; }
+html[data-theme="patrick"] #choixMode .coeurO{
+  display: inline-block; position: relative; width: 0; height: 1cap; vertical-align: baseline;
+}
+html[data-theme="patrick"] #choixMode .coeurO::before{
+  content: ""; position: absolute; right: -0.02em; bottom: 100%;
+  width: 0.7em; height: 0.56em; transform: translateY(0.13em) rotate(14deg); transform-origin: 50% 100%;
+  background: url("patrick/chapeau.svg") center bottom / 100% 100% no-repeat;
+  filter: drop-shadow(0 2px 0 #06402a);
+}
+
+/* ----- Tout en vert : les liserés arc-en-ciel (sous le titre, autour de « Joueurs / Règles », de la télé) deviennent verts ----- */
+html[data-theme="patrick"] #choixMode .titreAccueilBarre,
+html[data-theme="patrick"] .messages::before,
+html[data-theme="patrick"] header::after,
+html[data-theme="patrick"] #ecranTele .tele-entete::after{
+  background: linear-gradient(90deg, #1fb36a 0%, #b6ffcc 35%, #2dff75 68%, #0f9a55 100%) !important;
+}
+/* Bandeau « Tour de » (qui suit le défilement) : vert forêt comme les cartes, pas le bordeaux du jeu de base */
+html[data-theme="patrick"] #stickyJoueurActif{ background: linear-gradient(rgba(8,84,52,0.97), rgba(4,58,36,0.97)); border-color: rgba(255,255,255,0.3); }
+
+/* ----- Titre ALCUNO et icônes Réglages / Règles : blancs (au lieu du jaune doré), ombre vert foncé ----- */
+html[data-theme="patrick"] :is(#choixMode #titreAccueil, header h1){
+  color: #fff;
+  text-shadow: 0 3px 0 #06402a, 0 6px 16px rgba(0, 40, 20, 0.45), 0 0 30px rgba(255, 255, 255, 0.3);
+}
+html[data-theme="patrick"] #choixMode #titreAccueil{ animation: fadeIn 0.25s ease forwards; } /* (sans la lueur dorée qui pulse) */
+html[data-theme="patrick"] :is(#choixMode #btnReglages, #choixMode #btnRegles, header #btnReglesJeu) path:not(.couverture){ stroke: #fff; }
+html[data-theme="patrick"] :is(#choixMode #btnReglages circle, #choixMode #btnRegles path.couverture, header #btnReglesJeu path.couverture){ stroke: #fff; }
+html[data-theme="patrick"] :is(#choixMode #btnReglages svg, #choixMode #btnRegles svg, header #btnReglesJeu svg){
+  filter: drop-shadow(0 2px 0 #06402a) drop-shadow(0 3px 6px rgba(0, 40, 20, 0.45));
+}
+html[data-theme="patrick"] :is(#btnAccueilClassique, #enLigne #btnAccueilEnLigne, #ecranNouvellePartie #btnAccueil){ color: #fff; -webkit-text-stroke-color: #fff; text-shadow: 0 2px 0 #06402a, 0 3px 8px rgba(0, 40, 20, 0.45); }
+html[data-theme="patrick"] :is(#ecranReglages, #ecranRegles, #ecranCaster, #ecranBug, #ecranInstallation, #ecranCredits, #ecranConfirmerAccueil, #ecranConfirmerHote, #ecranConfirmerRetrait, #ecranReprise, #ecranPause, #suppression) :is(h2, .credits-titre){
+  color: #fff;
+  text-shadow: 0 2px 0 #06402a, 0 4px 12px rgba(0, 40, 20, 0.4);
+}
+html[data-theme="patrick"] :is(.optionTitre, .aProposTitre, .titreBloc, .regleBloc-titre, .recap-titre, .annonce-titre, .regle-titre,
+  #ecranCredits .credits-phrase strong, #codePartieAffiche,
+  #overlayCouleur .titre-couleur,
+  :is(#overlayPlus4, #overlayCupidon, #overlayCoupDeFoudre, #overlayPigeon, #overlayFinUnRestants, #overlayDuel, #overlayPredictionFin, #overlayRegleUnique, #overlayAnnulation, #overlayResultatAnnulation) .titre-pigeon,
+  #ecranTele :is(.tele-titre, .tele-ecran-titre, .tele-pause-titre, .tele-prepa-titre)){
+  color: #fff;
+  text-shadow: 0 2px 0 #06402a, 0 4px 12px rgba(0, 40, 20, 0.4);
+}
+
+/* ----- Joueur dont c'est le tour : vert brillant, avec une lueur verte autour ----- */
+html[data-theme="patrick"] .joueur-ligne-actif{
+  box-shadow: 0 0 0 2px #eaffef, 0 0 12px 2px rgba(93, 255, 149, 0.95), 0 0 30px 6px rgba(45, 255, 117, 0.6) !important;
+}
+
+/* ----- Doré écrit directement par le JavaScript (passe devant le CSS du thème : d'où le !important) ----- */
+html[data-theme="patrick"] :is(#overlayAnnulation, #overlayResultatAnnulation, #overlayRegleUnique:not(.overlay-doree)){ color: #fff !important; }
+html[data-theme="patrick"] .aideAccueil-fleches path:not(.aideAccueil-ombre){ fill: #fff; }
+html[data-theme="patrick"] .aideAccueil-ombre{ fill: rgba(6, 64, 42, 0.9); }
+
+/* ----- Bannière « Tour de » : nom du joueur en blanc néon (si une couleur est choisie, le jeu garde la couleur de la carte) ----- */
+html[data-theme="patrick"] #stickyJoueurActif:not(.has-couleur):not(.is-pigeon) .sticky-nom{
+  color: #fff;
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.9), 0 0 14px rgba(93, 255, 149, 0.85);
+}
+html[data-theme="patrick"] #stickyJoueurActif::before{ background: radial-gradient(circle at 35% 35%, #fff 0%, #b6ffcc 45%, #2dff75 100%); box-shadow: 0 0 10px rgba(93, 255, 149, 0.8); }
+
+/* ----- Écran de pause : voile vert forêt (au lieu du bordeaux presque noir du jeu de base) ----- */
+html[data-theme="patrick"] :is(#ecranPause, #ecranTele .tele-pause){ background: rgba(4, 58, 36, 0.84); }

@@ -136,7 +136,7 @@ function arreterTele(){
 
 // Classe de la face d'une carte parmi ses autres classes : « trois_rouge1 », « plus_4_3 », « couleur2 »,
 // « carte_doree »… (les doubles d'une même carte ont un numéro à la fin, voir « classes » dans plateau.js)
-const FACE_CARTE = /^((zero|un|deux|trois|quatre|cinq|six|sept|huit|neuf|plus_2|interdit|switch)_(vert|jaune|rouge|bleu)\d*|plus_4(_\d+)?|couleur\d*|cupidon_[abc]|carte_doree)$/;
+const FACE_CARTE = /^((zero|un|deux|trois|quatre|cinq|six|sept|huit|neuf|plus_2|interdit|switch)_(vert|jaune|rouge|bleu)\d*|plus_4(_\d+)?|couleur\d*|cupidon_[abc]|coup_de_foudre|carte_doree)$/;
 function faceCarte(el){
   return Array.from(el.classList).find(c => FACE_CARTE.test(c)) || "";
 }
@@ -461,6 +461,7 @@ const THEME_TELE_ATTENTE = "bordeaux";
 function appliquerThemeTele(nom){
   if (!nom || !THEMES[nom] || document.documentElement.dataset.theme === nom) return;
   document.documentElement.dataset.theme = nom;
+  try { majReglageFeuxArtifice(); } catch (e) {} // (thème de fête : feux d'artifice arrêtés et effacés, js/reglages.js)
 }
 
 // Thème Kawaii : petits personnages qui lévitent et paillettes qui scintillent derrière le jeu et derrière l'écran des annonces
@@ -640,7 +641,9 @@ const PHRASES_TELE = [
   // thème Star Wars seulement : mêlées aux autres, même rythme
   { galaxie: true, sansNom: true, texte: () => `Obi-Wan Kenobière, tu es mon seul espoir.` },
   { galaxie: true, texte: n => `Dark Vodka n’est PAS ton père <b>${n}</b>.` },
-  { galaxie: true, sansNom: true, texte: () => `Luke, je suis ton verre.` }
+  { galaxie: true, sansNom: true, texte: () => `Luke, je suis ton verre.` },
+  // thème Noël seulement : mêlée aux autres, même rythme
+  { noel: true, sansNom: true, texte: () => `HoHoHo Joyeuse cuite ! 🎅🎄` }
 ];
 const PAS_NOTIFS_TELE = 5000;
 // Quelqu'un qui traîne à jouer : une fois par tour, au bout de 1 min 20 (temps sans choix ni annonce à
@@ -694,7 +697,8 @@ function phraseNotifTele(etat){
   const possibles = PHRASES_TELE
     .map((phrase, i) => ({ phrase, i }))
     .filter(({ phrase, i }) => i !== dernierePhraseTele && (!phrase.pigeon || pigeon) && (!phrase.aSec || aSecVraiment) &&
-      (!phrase.galaxie || document.documentElement.dataset.theme === "galaxie"));
+      (!phrase.galaxie || document.documentElement.dataset.theme === "galaxie") &&
+      (!phrase.noel || document.documentElement.dataset.theme === "noel"));
   const { phrase, i } = possibles[Math.floor(Math.random() * possibles.length)];
   dernierePhraseTele = i;
   let candidats = phrase.pigeon ? [pigeon] : phrase.aSec ? [aSecVraiment] : joueurs;

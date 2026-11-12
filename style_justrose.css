@@ -1,0 +1,620 @@
+/* =============================================================================================
+   Thème de fête « Just Rosé » (nom interne : justrose) : la fête du rosé de Sanary, toute la ville en rose bonbon.
+   Fond magenta (#cc3381, couleur de l'affiche de la fête), tout en blanc (aucun jaune ni bleu), cartes et panneaux prune,
+   boutons rose foncé à liseré blanc, joueur actif blanc brillant. Accueil : « Just » au-dessus du titre, un verre de rosé entre deux
+   parapluies et deux petits feux d'artifice. Tous les autres écrans : motif de verres de rosé seulement.
+   Pour l'instant choisi à la main dans les Réglages (le calendrier des fêtes viendra plus tard, voir FETES.md).
+   Tout est sous html[data-theme="justrose"] : rien ne change pour les autres thèmes.
+   Images : dossier justrose/.
+   ============================================================================================= */
+
+/* === DÉBUT : doré du jeu de base teinté au thème (généré par outils/teinter_or_theme.py justrose : ne pas modifier à la main) === */
+@keyframes lueurDoree_justrose{
+  0%, 100% { box-shadow: 0 0 0 1px rgba(255,255,255,0.5), 0 10px 26px rgba(0,0,0,0.5), 0 0 18px rgba(255,255,255,0.30); }
+  50%      { box-shadow: 0 0 0 1px rgba(255,255,255,0.9), 0 10px 26px rgba(0,0,0,0.5), 0 0 38px rgba(255,255,255,0.60); }
+}
+@keyframes rappelTour_justrose{
+  0%, 100% { scale: 1; filter: none; }
+  50%      { scale: 1.14; filter: brightness(1.35) drop-shadow(0 0 10px rgba(255,255,255,0.95)); }
+}
+@keyframes rappelTourDoux_justrose{
+    0%, 100% { filter: none; }
+    50%      { filter: brightness(1.35) drop-shadow(0 0 10px rgba(255,255,255,0.95)); }
+  }
+@keyframes duelPulse_justrose{
+  0%, 100% { box-shadow: 0 0 0 2px rgba(255,255,255,0.55), 0 0 10px rgba(255,255,255,0.25); }
+  50%      { box-shadow: 0 0 0 2px rgba(255,255,255,0.95), 0 0 28px rgba(255,255,255,0.60); }
+}
+@keyframes lueurTitreAccueil_justrose{
+  0%, 100% {
+    text-shadow:
+      0 3px 0 rgba(106,30,67,0.95),
+      0 6px 16px rgba(0,0,0,0.5),
+      0 0 34px rgba(255,255,255,0.28);
+  }
+  50% {
+    text-shadow:
+      0 3px 0 rgba(106,30,67,0.95),
+      0 6px 16px rgba(0,0,0,0.5),
+      0 0 48px rgba(255,255,255,0.55);
+  }
+}
+@keyframes fenetrePrestigeBrille_justrose{
+  0%, 100%{ box-shadow: 0 0 0 4px #fcc7e2, 0 0 26px rgba(255,255,255,0.6); }
+  50%{ box-shadow: 0 0 0 4px #fcc7e2, 0 0 48px rgba(255,255,255,0.95); }
+}
+:where(html[data-theme="justrose"]) ::selection{ background: var(--selection-fond, #ffffff); }
+:where(html[data-theme="justrose"]) .messages::before{ background: linear-gradient(90deg, #ff5b5b 0%, #ffc2de 25%, #6eff72 50%, #58d4ff 75%, #8b7dff 100%); }
+:where(html[data-theme="justrose"]) .bonus-annulation{ color: #ffffff; }
+:where(html[data-theme="justrose"]) .regleZero, :where(html[data-theme="justrose"]) .reglePigeon, :where(html[data-theme="justrose"]) .rappelTour{ color: #ffffff; }
+:where(html[data-theme="justrose"]) .menu button, :where(html[data-theme="justrose"]) .suppression button{ background-color: #ffc2de; }
+@media (hover: hover){
+  :where(html[data-theme="justrose"]) .menu button:hover, :where(html[data-theme="justrose"]) .suppression button:hover{ background-color: #ffffff; }
+}
+:where(html[data-theme="justrose"]) #suppression h2{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #listeSuppression{ box-shadow: 0 0 0 1px rgba(255,255,255,0.18) inset; }
+@media (hover: hover){
+  :where(html[data-theme="justrose"]) #listeSuppression .supp-item:hover{ background: rgba(255,255,255,0.10); box-shadow: 0 0 0 1px rgba(255,255,255,0.22) inset; }
+}
+:where(html[data-theme="justrose"]) #listeSuppression .supp-check{ accent-color: #ffffff; }
+:where(html[data-theme="justrose"]) #termineSuppression{ background-color: #ffffff; }
+@media (hover: hover){
+  :where(html[data-theme="justrose"]) #termineSuppression:hover{ background-color: #ffffff; }
+}
+:where(html[data-theme="justrose"]) #overlayCouleur div.titre-couleur{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #overlayPlus4 .titre-pigeon, :where(html[data-theme="justrose"]) #overlayCupidon .titre-pigeon, :where(html[data-theme="justrose"]) #overlayCoupDeFoudre .titre-pigeon{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #overlayPlus4 .bouton-pigeon, :where(html[data-theme="justrose"]) #overlayCupidon .bouton-pigeon, :where(html[data-theme="justrose"]) #overlayCoupDeFoudre .bouton-pigeon{ background-color: #ffffff; }
+@media (hover: hover){
+  :where(html[data-theme="justrose"]) #overlayPlus4 .bouton-pigeon:hover, :where(html[data-theme="justrose"]) #overlayCupidon .bouton-pigeon:hover, :where(html[data-theme="justrose"]) #overlayCoupDeFoudre .bouton-pigeon:hover{ background-color: #ffffff; }
+}
+:where(html[data-theme="justrose"]) #overlayPlus4 .plus4-joueur-btn, :where(html[data-theme="justrose"]) #overlayCupidon .plus4-joueur-btn, :where(html[data-theme="justrose"]) #overlayCoupDeFoudre .plus4-joueur-btn{ background: rgba(255,255,255,0.94); }
+:where(html[data-theme="justrose"]) #overlayPlus4 .plus4-total, :where(html[data-theme="justrose"]) #overlayCupidon .plus4-total, :where(html[data-theme="justrose"]) #overlayCoupDeFoudre .plus4-total{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #overlayPigeon .titre-pigeon{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #overlayPigeon .bouton-pigeon{ background-color: #ffffff; }
+@media (hover: hover){
+  :where(html[data-theme="justrose"]) #overlayPigeon .bouton-pigeon:hover{ background-color: #ffffff; }
+}
+:where(html[data-theme="justrose"]) #overlayDuel button{ background-color: #ffffff; }
+@media (hover: hover){
+  :where(html[data-theme="justrose"]) #overlayDuel button:hover{ background-color: #ffffff; }
+}
+@media (hover: hover){
+  :where(html[data-theme="justrose"]) #overlayDuel .Carte:not(.retournee):not(.duel-selected):hover{ box-shadow: 0 0 20px #ffffff; }
+}
+:where(html[data-theme="justrose"]) #overlayRegleUnique .bouton-annulation{ background-color: #ffffff; }
+@media (hover: hover){
+  :where(html[data-theme="justrose"]) #overlayRegleUnique .bouton-annulation:hover{ background-color: #ffffff; }
+}
+:where(html[data-theme="justrose"]) #overlayFinUnRestants .titre-pigeon, :where(html[data-theme="justrose"]) #overlayPredictionFin .titre-pigeon{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #overlayFinUnRestants .bouton-pigeon, :where(html[data-theme="justrose"]) #overlayPredictionFin .bouton-pigeon{ background-color: #ffffff; }
+@media (hover: hover){
+  :where(html[data-theme="justrose"]) #overlayFinUnRestants .bouton-pigeon:hover, :where(html[data-theme="justrose"]) #overlayPredictionFin .bouton-pigeon:hover{ background-color: #ffffff; }
+}
+:where(html[data-theme="justrose"]) #overlayFinUnRestants .fin-un-ligne{ color: #ffffff; }
+:where(html[data-theme="justrose"]) .prediction-header{ background:
+    linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04)),
+    rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.24); }
+:where(html[data-theme="justrose"]) .prediction-subtitle{ color: #ffffff; }
+:where(html[data-theme="justrose"]) .overlay-subtitle{ color: #ffffff; }
+:where(html[data-theme="justrose"]) .fin-choix-turn{ color: #ffffff; }
+:where(html[data-theme="justrose"]) .fin-choix-recap .ligne{ color: #ffffff; }
+:where(html[data-theme="justrose"]) .fin-choix-recap .ligne.en-cours{ background: rgba(255,255,255,0.12); }
+:where(html[data-theme="justrose"]) .fin-choix-numeros b{ background: #ffffff; }
+@media (max-width: 520px), (orientation: landscape) and (max-height: 520px){
+  :where(html[data-theme="justrose"]) #menu #btnCaster{ background-image: linear-gradient(180deg, #f5449d, #f31885) !important; }
+}
+@media (max-width: 520px), (orientation: landscape) and (max-height: 520px){
+  :where(html[data-theme="justrose"]) #listeJoueurs .joueur-ligne-actif{ border-color: #f3208a; background: rgba(243,32,138,0.12); color: #f3208a; }
+}
+:where(html[data-theme="justrose"]) .Carte.dos_dore::after{ background: linear-gradient(115deg,
+    transparent 32%,
+    rgba(255,190,220,0.55) 44%,
+    rgba(253,222,238,0.95) 50%,
+    rgba(255,190,220,0.55) 56%,
+    transparent 68%); }
+:where(html[data-theme="justrose"]) #stickyJoueurActif{ border: 1px solid rgba(255,255,255,0.22); }
+:where(html[data-theme="justrose"]) #stickyJoueurActif::before{ background: radial-gradient(circle at 35% 35%, #fdd6e9 0%, #ffffff 45%, #df0c75 100%); box-shadow: 0 0 10px rgba(255,255,255,0.28); }
+:where(html[data-theme="justrose"]) #stickyJoueurActif .sticky-nom{ color: #f986bf; }
+:where(html[data-theme="justrose"]) #stickyJoueurActif .sticky-bonus{ background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.18); color: #faa4cf; }
+:where(html[data-theme="justrose"]) .fin-choix-resultat{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #overlayDuel .duel-main-title{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #overlayDuel .duel-info{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #overlayDuel .duel-label{ color: #ffffff; }
+:where(html[data-theme="justrose"]) header{ background:
+    linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)),
+    linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0) 45%),
+    rgba(0,0,0,0.22); box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.08),
+    inset 0 0 0 2px rgba(255,255,255,0.10),
+    0 14px 30px rgba(0,0,0,0.20); }
+:where(html[data-theme="justrose"]) header::before{ background: linear-gradient(
+    90deg,
+    rgba(255, 70, 70, 0.14) 0%,
+    rgba(255,255,255,0.10) 35%,
+    rgba(70, 210, 110, 0.10) 68%,
+    rgba(70, 170, 255, 0.14) 100%
+  ); }
+:where(html[data-theme="justrose"]) header::after{ background: linear-gradient(90deg, #ff4d4d 0%, #ffffff 34%, #42d86b 67%, #42b7ff 100%); }
+:where(html[data-theme="justrose"]) header h1{ color: #ffffff; text-shadow:
+    0 2px 0 rgba(106,30,67,0.95),
+    0 4px 10px rgba(0,0,0,0.45),
+    0 0 18px rgba(255,255,255,0.18); }
+:where(html[data-theme="justrose"]) #menu{ box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.06),
+    inset 0 0 0 2px rgba(255,255,255,0.08); }
+:where(html[data-theme="justrose"]) #menu input{ border: 1px solid rgba(255,255,255,0.18); }
+:where(html[data-theme="justrose"]) #choixMode h2, :where(html[data-theme="justrose"]) #ecranNouvellePartie h2, :where(html[data-theme="justrose"]) #ecranConfirmerHote h2, :where(html[data-theme="justrose"]) #ecranConfirmerRetrait h2, :where(html[data-theme="justrose"]) #ecranReprise h2, :where(html[data-theme="justrose"]) #ecranConfirmerAccueil h2, :where(html[data-theme="justrose"]) #ecranChoixPseudo h2, :where(html[data-theme="justrose"]) #ecranCaster h2, :where(html[data-theme="justrose"]) #enLigne h2, :where(html[data-theme="justrose"]) #enLigne h3{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #choixMode button, :where(html[data-theme="justrose"]) #ecranNouvellePartie button, :where(html[data-theme="justrose"]) #btnContinuerOptions, :where(html[data-theme="justrose"]) #ecranConfirmerHote button, :where(html[data-theme="justrose"]) #ecranConfirmerRetrait button, :where(html[data-theme="justrose"]) #ecranReprise button, :where(html[data-theme="justrose"]) #ecranConfirmerAccueil button, :where(html[data-theme="justrose"]) #ecranChoixPseudo button, :where(html[data-theme="justrose"]) #ecranCaster button, :where(html[data-theme="justrose"]) #enLigne button{ background-color: #ffc2de; }
+@media (hover: hover){
+  :where(html[data-theme="justrose"]) #choixMode button:hover, :where(html[data-theme="justrose"]) #ecranNouvellePartie button:hover, :where(html[data-theme="justrose"]) #btnContinuerOptions:hover, :where(html[data-theme="justrose"]) #ecranConfirmerHote button:hover, :where(html[data-theme="justrose"]) #ecranConfirmerRetrait button:hover, :where(html[data-theme="justrose"]) #ecranReprise button:hover, :where(html[data-theme="justrose"]) #ecranConfirmerAccueil button:hover, :where(html[data-theme="justrose"]) #ecranChoixPseudo button:hover, :where(html[data-theme="justrose"]) #ecranCaster button:hover, :where(html[data-theme="justrose"]) #enLigne button:hover{ background-color: #ffffff; }
+}
+:where(html[data-theme="justrose"]) #enLigne input{ border: 1px solid rgba(255,255,255,0.25); }
+:where(html[data-theme="justrose"]) #enLigne .separateurOu::before, :where(html[data-theme="justrose"]) #enLigne .separateurOu::after{ background: rgba(255,255,255,0.35); }
+:where(html[data-theme="justrose"]) #ecranScanner .cadreScanner{ border: 3px solid #ffc2de; }
+:where(html[data-theme="justrose"]) #ecranScanner button{ background: #ffc2de; }
+:where(html[data-theme="justrose"]) #listeJoueursEnLigne div{ box-shadow: 0 0 0 1px rgba(255,255,255,0.18) inset; }
+:where(html[data-theme="justrose"]) .qrPartie{ box-shadow: 0 0 0 3px rgba(255,255,255,0.55), 0 10px 24px rgba(0,0,0,0.35); }
+:where(html[data-theme="justrose"]) #btnAccueilClassique, :where(html[data-theme="justrose"]) #enLigne #btnAccueilEnLigne, :where(html[data-theme="justrose"]) #ecranNouvellePartie #btnAccueil{ -webkit-text-stroke: 1.2px #ffffff; color: #ffffff; text-shadow:
+    0 2px 0 rgba(106,30,67,0.95),
+    0 3px 8px rgba(0,0,0,0.45); }
+:where(html[data-theme="justrose"]) #toastEnLigne{ color: #ffffff; box-shadow: 0 0 0 1px rgba(255,255,255,0.45) inset, 0 8px 24px rgba(0,0,0,0.45); }
+:where(html[data-theme="justrose"]) #ecranCredits{ background:
+    radial-gradient(ellipse 85% 28% at 50% 30%, rgba(255,255,255,0.16), transparent 100%),
+    radial-gradient(ellipse 45% 22% at 15% 72%, rgba(255,77,77,0.10), transparent 100%),
+    radial-gradient(ellipse 45% 22% at 85% 72%, rgba(66,183,255,0.10), transparent 100%),
+    var(--deco-theme, none),
+    linear-gradient(var(--fond-theme), var(--fond-theme)) var(--couleur-barre); }
+:where(html[data-theme="justrose"]) #ecranCredits .credits-titre{ color: #ffffff; text-shadow:
+    0 2px 0 rgba(106,30,67,0.95),
+    0 4px 10px rgba(0,0,0,0.45),
+    0 0 26px rgba(255,255,255,0.25); }
+:where(html[data-theme="justrose"]) #ecranCredits .credits-phrase strong{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranCredits .cadrePhoto{ border: 2px solid rgba(255,255,255,0.55); }
+:where(html[data-theme="justrose"]) #ecranCredits .photoVide{ border: 2px dashed rgba(255,255,255,0.45); color: rgba(255,255,255,0.8); }
+:where(html[data-theme="justrose"]) #ecranCredits .credits-nom{ box-shadow: 0 0 0 1px rgba(255,255,255,0.25) inset; color: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranCredits .btnRetour{ background-color: #ffc2de; }
+:where(html[data-theme="justrose"]) #annonceNouvellePartie{ background:
+    radial-gradient(circle at 50% 45%, rgba(255,255,255,0.16), transparent 60%),
+    rgba(20, 0, 14, 0.94); }
+:where(html[data-theme="justrose"]) #annonceNouvellePartie .annonce-titre{ color: #ffffff; text-shadow:
+    0 2px 0 rgba(106,30,67,0.95),
+    0 4px 10px rgba(0,0,0,0.45),
+    0 0 26px rgba(255,255,255,0.25); }
+:where(html[data-theme="justrose"]) #stickyJoueurActif.rappel-tour{ animation: rappelTour_justrose 0.8s ease-in-out 3; }
+:where(html[data-theme="justrose"]) #haloRappel{ --halo-ecran: rgba(255,255,255,0.75); }
+@media (prefers-reduced-motion: reduce){
+  :where(html[data-theme="justrose"]) #stickyJoueurActif.rappel-tour{ animation-name: rappelTourDoux_justrose; }
+}
+:where(html[data-theme="justrose"]) #overlayDuel .Carte.duel-a-choisir{ animation: duelPulse_justrose 1.6s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce){
+  :where(html[data-theme="justrose"]) #overlayDuel .Carte.duel-a-choisir{ box-shadow: 0 0 0 2px rgba(255,255,255,0.85), 0 0 18px rgba(255,255,255,0.45); }
+}
+:where(html[data-theme="justrose"]) #choixMode #btnReglages svg{ filter:
+    drop-shadow(0 2px 0 rgba(106,30,67,0.95))
+    drop-shadow(0 3px 6px rgba(0,0,0,0.45)); }
+:where(html[data-theme="justrose"]) #choixMode #btnReglages path{ stroke: #ffffff; }
+:where(html[data-theme="justrose"]) #choixMode #btnReglages circle{ stroke: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranReglages h2{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranReglages .btnRetour{ background-color: #ffc2de; }
+:where(html[data-theme="justrose"]) #ecranReglages .optionReglage{ border: 1px solid rgba(255,255,255,0.18); }
+:where(html[data-theme="justrose"]) #ecranReglages .optionTitre{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranReglages .optionReglage input:checked + .interrupteur{ background: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranReglages .optionReglage input:focus-visible + .interrupteur{ outline: 2px solid #ffffff; }
+:where(html[data-theme="justrose"]) #ecranReglages .aProposTitre{ color: rgba(255,255,255,0.7); }
+:where(html[data-theme="justrose"]) #choixMode .btnInstaller{ color: #ffffff; background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.45); }
+@media (hover: hover){
+  :where(html[data-theme="justrose"]) #choixMode .btnInstaller:hover{ background: rgba(255,255,255,0.18); }
+}
+:where(html[data-theme="justrose"]) #overlayRegleUnique .regle-detail{ color: #fcc0de; }
+:where(html[data-theme="justrose"]) #overlayRegleUnique .celien-bloc{ border-top: 1px solid rgba(255,255,255,0.35); }
+:where(html[data-theme="justrose"]) #overlayRegleUnique .celien-citation{ color: #ffffff; text-shadow: 0 0 18px rgba(255,255,255,0.35); }
+:where(html[data-theme="justrose"]) #overlayRegleUnique .celien-signature{ color: #ffffff; text-shadow: 0 2px 0 #6b4200, 0 0 16px rgba(255,255,255,0.35); }
+:where(html[data-theme="justrose"]) #btnCodePartie{ border: 1px solid rgba(255,255,255,0.25); color: #ffffff; }
+:where(html[data-theme="justrose"]) #btnCodePartie.ouvert{ border-color: rgba(255,255,255,0.6); }
+:where(html[data-theme="justrose"]) #ecranRattrapage{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #choixMode #titreAccueil{ color: #ffffff; text-shadow:
+    0 3px 0 rgba(106,30,67,0.95),
+    0 6px 16px rgba(0,0,0,0.5),
+    0 0 34px rgba(255,255,255,0.28); animation: fadeIn 0.25s ease forwards, lueurTitreAccueil_justrose 3.5s ease-in-out 0.3s infinite; }
+:where(html[data-theme="justrose"]) #choixMode .titreAccueilBarre{ background: linear-gradient(90deg, #ff4d4d 0%, #ffffff 34%, #42d86b 67%, #42b7ff 100%); box-shadow: 0 0 14px rgba(255,255,255,0.25); }
+:where(html[data-theme="justrose"]) #ecranReglages .blocReglage{ border: 1px solid rgba(255,255,255,0.18); }
+:where(html[data-theme="justrose"]) #ecranReglages .ligneVolume input[type="range"]{ accent-color: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranReglages .volumeValeur{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranReglages .optionAction button{ background: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranReglages .qrJeu{ box-shadow: 0 0 0 3px rgba(255,255,255,0.55), 0 10px 24px rgba(0,0,0,0.35); }
+:where(html[data-theme="justrose"]) #ecranReglages #btnPartagerJeu{ background-color: #ffc2de; }
+:where(html[data-theme="justrose"]) #ecranReglages .btnDiagnostic:active{ color: #ffffff; border-color: rgba(255,255,255,0.5); }
+:where(html[data-theme="justrose"]) #notifHaut{ background: linear-gradient(135deg, #a60957 0%, #eb3c94 18%, #fcc0de 36%, #f44fa2 52%,
+                              #c70a69 74%, #f76db2 100%); box-shadow: 0 12px 28px rgba(0,0,0,0.5), 0 0 22px rgba(255,190,220,0.55),
+              inset 0 0 0 1.5px rgba(253,222,238,0.85), inset 0 -3px 0 rgba(106,30,67,0.45); }
+:where(html[data-theme="justrose"]) #notifHaut .notifHaut-icone{ filter: drop-shadow(0 1px 0 rgba(254,236,245,0.8)); }
+:where(html[data-theme="justrose"]) #notifHaut .notifHaut-eclats span{ text-shadow: 0 0 4px #fff, 0 0 10px rgba(253,222,238,0.95); }
+:where(html[data-theme="justrose"]) #notifHaut .notifHaut-texte strong{ text-shadow: 0 1px 0 rgba(254,236,245,0.85); }
+:where(html[data-theme="justrose"]) #etincellesPrestige span{ color: #fdd8eb; text-shadow: 0 0 6px #ffeef6, 0 0 14px rgba(255,255,255,0.9), 0 0 24px rgba(245,70,158,0.6); }
+:where(html[data-theme="justrose"]) #refletPrestige::before{ background: linear-gradient(90deg, transparent 0%, rgba(251,175,213,0.08) 30%,
+                              rgba(253,222,238,0.38) 50%, rgba(251,175,213,0.08) 70%, transparent 100%); }
+:where(html[data-theme="justrose"]) body::before{ background:
+    var(--deco-theme, radial-gradient(circle at top center, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 26%) no-repeat),
+    var(--fond-theme); }
+:where(html[data-theme="justrose"]) #choixMode #btnRegles svg, :where(html[data-theme="justrose"]) header #btnReglesJeu svg{ filter: drop-shadow(0 2px 0 rgba(106,30,67,0.95)) drop-shadow(0 3px 6px rgba(0,0,0,0.45)); }
+:where(html[data-theme="justrose"]) #choixMode #btnRegles path, :where(html[data-theme="justrose"]) header #btnReglesJeu path{ stroke: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranRegles .btnRetour{ background-color: #ffc2de; }
+:where(html[data-theme="justrose"]) #ecranRegles h2{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranRegles .blocRegles{ border: 1px solid rgba(255,255,255,0.18); }
+:where(html[data-theme="justrose"]) #ecranRegles .blocRegles h3{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranRegles .btnFaqLien{ border: 1px solid rgba(255,255,255,0.45); background: rgba(255,255,255,0.10); color: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranRegles .faqImage{ border: 1px solid rgba(255,255,255,0.30); }
+:where(html[data-theme="justrose"]) #ecranInstallation h2{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranInstallation .etapeInstallation{ border: 1px solid rgba(255,255,255,0.25); }
+:where(html[data-theme="justrose"]) #ecranInstallation .etapeInstallation b{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranInstallation .numeroEtape{ background: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranInstallation #btnInstallationInstaller{ background: #ffc2de; box-shadow: inset 0 -3px 0 rgba(0,0,0,0.18), 0 0 26px rgba(255,255,255,0.45); }
+@media (hover: hover){
+  :where(html[data-theme="justrose"]) body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
+    #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
+    #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
+    #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
+    #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+    #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayDuel button,
+    #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
+    #overlayAnnulation button):hover:not(:disabled), :where(html[data-theme="justrose"]) body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
+    #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
+    #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
+    #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
+    #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+    #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCoupDeFoudre .bouton-pigeon, #overlayDuel button,
+    #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
+    #overlayAnnulation button):hover:not(:disabled){ box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9), 0 6px 20px rgba(255,235,244,0.55) !important; }
+}
+:where(html[data-theme="justrose"]) #overlayDuel .duel-boutons button:disabled{ background: #fcc0de !important; }
+:where(html[data-theme="justrose"]) #menu #btnCaster{ box-shadow: 0 0 0 1px rgba(255,255,255,0.45) inset; }
+:where(html[data-theme="justrose"]) #menu #btnCaster.caster-actif{ box-shadow: 0 0 0 2px #ffffff inset, 0 0 14px rgba(255,255,255,0.35); }
+:where(html[data-theme="justrose"]) #ecranCaster .adresseTele{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranCaster .casterCode input{ border: 1px solid rgba(255,255,255,0.35); }
+:where(html[data-theme="justrose"]) #ecranCaster #btnCasterArreter{ box-shadow: 0 0 0 1px rgba(255,255,255,0.45) inset; }
+:where(html[data-theme="justrose"]) #ecranTele{ background:
+    var(--deco-theme, radial-gradient(circle at top center, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0) 30%) no-repeat),
+    var(--fond-theme); }
+:where(html[data-theme="justrose"]) #ecranTele .tele-titre{ color: #ffffff; text-shadow: 0 0.4vh 0 rgba(106,30,67,0.95), 0 0.6vh 1.4vh rgba(0,0,0,0.5); }
+:where(html[data-theme="justrose"]) #ecranTele .tele-sous-titre{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranTele .tele-etape{ color: #f6c2dc; }
+:where(html[data-theme="justrose"]) #ecranTele .tele-etape .tele-num{ background: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranTele .tele-plein-ecran{ box-shadow: 0 0 0 1px rgba(255,255,255,0.45) inset; }
+:where(html[data-theme="justrose"]) #ecranTele .tele-qr{ box-shadow: 0 0 0 0.7vh rgba(255,255,255,0.6), 0 2.6vh 7vh rgba(0,0,0,0.5); }
+:where(html[data-theme="justrose"]) #ecranTele .tele-code{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranTele .tele-code small{ color: #ffd0e6; }
+:where(html[data-theme="justrose"]) #ecranTele .tele-entete{ border: 1px solid rgba(255,255,255,0.25); }
+:where(html[data-theme="justrose"]) #ecranTele .tele-entete::after{ background: linear-gradient(90deg, #ff5e5e, #f769b0, #ffffff, #7dde4f, #4fc3f7); }
+:where(html[data-theme="justrose"]) #ecranTele .tele-prepa-titre{ color: #ffffff; text-shadow: 0 0.4vh 0 rgba(106,30,67,0.95), 0 0.6vh 1.4vh rgba(0,0,0,0.5); }
+:where(html[data-theme="justrose"]) #ecranTele .tele-prepa-joueur{ border: 1px solid rgba(255,255,255,0.4); }
+:where(html[data-theme="justrose"]) #ecranTele .tele-prepa-info{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranTele .tele-restantes{ color: #ffd0e6; }
+:where(html[data-theme="justrose"]) #ecranTele .tele-bloc-titre{ color: #ffe6f1; }
+:where(html[data-theme="justrose"]) #ecranTele .tele-tour{ border-color: rgba(255,255,255,0.5); }
+:where(html[data-theme="justrose"]) #ecranTele .tele-tour.tele-rappel-tour{ --halo-bord: rgba(255,255,255,0.95); --halo: rgba(255,255,255,0.8); --halo-loin: rgba(245,70,158,0.4); }
+:where(html[data-theme="justrose"]) #ecranTele .tele-tour-label{ color: #ffe6f1; }
+:where(html[data-theme="justrose"]) #ecranTele .tele-tour-nom{ color: #ffffff; text-shadow: 0 0.4vh 0 rgba(106,30,67,0.9); }
+:where(html[data-theme="justrose"]) #ecranTele .tele-badge{ background: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranTele .tele-regles{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranTele .tele-son-coupe{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranTele .tele-ecran-titre{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranTele .tele-ecran-detail{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranTele .tele-puce{ background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.5); color: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranReglages :is(#btnSignalerBug, #btnFaq){ color: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranBug .bugFeuille{ box-shadow: 0 -12px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.4); }
+:where(html[data-theme="justrose"]) #ecranBug h2{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranBug textarea{ border: 1px solid rgba(255,255,255,0.35); }
+:where(html[data-theme="justrose"]) #ecranBug .bugVignette img, :where(html[data-theme="justrose"]) #ecranBug .bugVignette video{ border: 1px solid rgba(255,255,255,0.4); }
+:where(html[data-theme="justrose"]) #ecranBug .bugAjouterPiece{ border: 1px dashed rgba(255,255,255,0.5); }
+:where(html[data-theme="justrose"]) #ecranReglages .optionChevron{ stroke: #ffffff; }
+@media (pointer: coarse){
+  :where(html[data-theme="justrose"]) #ecranTele .tele-revenir{ border: 1px solid rgba(255,255,255,0.5); }
+}
+:where(html[data-theme="justrose"]) #stickyJoueurActif #btnPause svg, :where(html[data-theme="justrose"]) #stickyJoueurActif #btnHistorique svg, :where(html[data-theme="justrose"]) #ecranPause .pauseIcone svg, :where(html[data-theme="justrose"]) #ecranTele .tele-pause svg{ stroke: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranPause .pauseIcone{ background: rgba(255,255,255,0.12); border: 2px solid rgba(255,255,255,0.6); }
+:where(html[data-theme="justrose"]) #ecranPause .pauseIcone svg{ fill: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranPause h2{ color: #ffffff; text-shadow: 0 4px 0 rgba(106,30,67,0.9), 0 0 30px rgba(255,255,255,0.3); }
+:where(html[data-theme="justrose"]) #ecranPause #btnReprendrePause{ background: linear-gradient(180deg, #f5449d, #f31885); }
+:where(html[data-theme="justrose"]) #ecranTele .tele-pause svg{ fill: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranTele .tele-pause-titre{ color: #ffffff; text-shadow: 0 1vh 0 rgba(106,30,67,0.9); }
+:where(html[data-theme="justrose"]) :is(#annulerChoix, #bandeauMiseAJour){ --bandeau-bord: rgba(255,255,255,0.45); --bandeau-bouton: #ffffff; }
+:where(html[data-theme="justrose"]) #overlayCouleur .explication-couleur b{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #btnCaster .casterIcone{ background: linear-gradient(180deg, #f5449d, #f31885); }
+:where(html[data-theme="justrose"]) .btnPauseJoueur{ border: 1px solid rgba(255,255,255,0.45); color: #ffffff; }
+:where(html[data-theme="justrose"]) .btnPauseJoueur.en-pause{ border-color: rgba(255,255,255,0.9); }
+:where(html[data-theme="justrose"]) .voletPause-feuille{ border-top: 1px solid rgba(255,255,255,0.35); }
+:where(html[data-theme="justrose"]) .voletPause-nom{ color: #ffffff; }
+:where(html[data-theme="justrose"]) .voletPause-ok{ background: linear-gradient(180deg, #f5449d, #f31885); }
+:where(html[data-theme="justrose"]) .aideAccueil-ombre{ fill: rgba(106,30,67,0.9); }
+:where(html[data-theme="justrose"]) .aideAccueil-repere b, :where(html[data-theme="justrose"]) .aideAccueil-bas b{ color: #ffffff; text-shadow: 0 2px 0 rgba(106,30,67,0.9); }
+:where(html[data-theme="justrose"]) .aideAccueil-bas b{ text-shadow: 0 3px 0 rgba(106,30,67,0.9); }
+:where(html[data-theme="justrose"]) #plateau .Carte.carte-appuyee{ box-shadow: 0 0 0 3px #ffffff, 0 0 22px rgba(255,255,255,0.7); }
+:where(html[data-theme="justrose"]) #enLigne #btnInviterPartie{ border: 1.5px solid rgba(255,255,255,0.7); background: rgba(255,255,255,0.08); color: #ffffff; }
+:where(html[data-theme="justrose"]) .lignesRegle li::before{ background: #ffffff; }
+:where(html[data-theme="justrose"]) :is(.detailRegle, #voletCarte .voletPause-texte) em{ color: #ffffff; }
+:where(html[data-theme="justrose"]) .regleBloc-titre{ color: #ffffff; }
+:where(html[data-theme="justrose"]) .regleBloc em{ color: #ffffff; }
+:where(html[data-theme="justrose"]) .historique-recente{ background: #ffffff; }
+:where(html[data-theme="justrose"]) .historique-quoi em{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranTele .tele-dernieres-titre{ color: #ffe6f1; }
+:where(html[data-theme="justrose"]) #ecranTele .tele-dernieres-titre + .tele-dernieres-item{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranTele .tele-dernieres-titre + .tele-dernieres-item .Carte{ outline: 0.3vh solid #ffffff; }
+:where(html[data-theme="justrose"]) #ecranTele .tele-historique-quoi em{ color: #ffffff; }
+:where(html[data-theme="justrose"]) .recap-titre{ color: #ffffff; text-shadow: 0 3px 0 #7a4b00, 0 0 18px rgba(255,255,255,.35); }
+:where(html[data-theme="justrose"]) .recap-marche{ background: linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.06)); border: 1px solid rgba(255,255,255,.4); }
+:where(html[data-theme="justrose"]) .recap-g{ color: #ffffff; }
+:where(html[data-theme="justrose"]) .recap-liste{ border: 1px solid rgba(255,255,255,.25); }
+:where(html[data-theme="justrose"]) .recap-ligne em{ color: #ffffff; }
+:where(html[data-theme="justrose"]) .recap-eclats{ color: #ffffff; }
+:where(html[data-theme="justrose"]) .recap-bloc{ border: 1px solid rgba(255,255,255,.22); }
+:where(html[data-theme="justrose"]) .recap-t{ color: #ffffff; }
+:where(html[data-theme="justrose"]) .recap-restants{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranTele .tele-ecran-recap{ background: radial-gradient(circle at top, rgba(255,255,255,.10), transparent 55%), var(--fond-theme) !important; }
+:where(html[data-theme="justrose"]) .etincelle{ --c: #ffffff; }
+:where(html[data-theme="justrose"]) .etincelle.e0{ --c: #ffffff; }
+:where(html[data-theme="justrose"]) .etincelle.e1{ --c: #fcc7e2; }
+:where(html[data-theme="justrose"]) .etincelle.e2{ --c: #f3208a; }
+:where(html[data-theme="justrose"]){ --album-barre-plein: #ffffff; }
+:where(html[data-theme="justrose"]){ --actif-haut: #f994c7; --actif-bas: #f3208a; --actif-halo: #f3208a; }
+:where(html[data-theme="justrose"]) .annonceAccueil{ border: 2px solid var(--actif-bas, #f3208a); box-shadow: 0 8px 22px rgba(0,0,0,.35), 0 0 18px var(--actif-halo, #f3208a); }
+:where(html[data-theme="justrose"]) .annonceAccueil .annonceIcone{ background: linear-gradient(180deg, var(--actif-haut, #f994c7), var(--actif-bas, #f3208a)); }
+:where(html[data-theme="justrose"]) #stickyJoueurActif #btnReglagesJeu svg{ stroke: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranTele .tele-regles-pj{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranTele .tele-regles-partie{ color: #ffffff; border-bottom: 1px solid rgba(255,255,255,0.4); }
+:where(html[data-theme="justrose"]) #ecranTele .tele-regles-nom{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranTele .tele-regles-ligne em{ color: #ffffff; }
+:where(html[data-theme="justrose"]) #ecranTele .tele-faq-image{ border: 1px solid rgba(255,255,255,0.35); }
+:where(html[data-theme="justrose"]) #ecranTele .tele-puce.tele-puce-couleur.tele-puce-jaune{ background: #f651a3; }
+/* === FIN du doré teinté (généré) === */
+
+
+
+
+
+html[data-theme="justrose"]{
+  --fond-theme: #cc3381;
+  --carte-justrose: rgba(106, 30, 67, 0.95); /* ton de TOUTES les cartes et panneaux : prune franche (pas noir), quasi opaque pour cacher le motif derrière le texte */
+  --couleur-barre: #cc3381; /* = la couleur du tout haut du décor ci-dessous (la barre du téléphone ne doit pas être plus sombre) */
+  /* Fond des menus et des réglages : lumière douce en haut, puis le motif de verres de rosé et de bulles (justrose/deco_fond.svg) : QUE des verres, sur tous les écrans sauf l'accueil */
+  --deco-theme:
+    radial-gradient(ellipse 120% 24% at 50% 24%, rgba(255,255,255,.22), transparent 100%) no-repeat,
+    linear-gradient(to top, rgba(90,0,50,.3), transparent 45%) no-repeat,
+    url("justrose/deco_fond.svg") 0 0 / 300px 300px repeat;
+  /* Accueil : un verre de rosé entre deux parapluies en bas (justrose/accueil_bas.svg) et deux petits feux d'artifice (justrose/feu.svg), derrière les boutons */
+  --deco-accueil:
+    url("justrose/accueil_bas.svg") center calc(100% - 10px) / 220px 110px no-repeat,
+    url("justrose/feu.svg") 12% 150px / 80px 80px no-repeat,
+    url("justrose/feu.svg") 90% 210px / 56px 56px no-repeat,
+    radial-gradient(ellipse 120% 24% at 50% 24%, rgba(255,255,255,.26), transparent 100%) no-repeat;
+  /* Joueur dont c'est le tour : rose brillant (néon) */
+  --actif-haut: #ffffff; --actif-bas: #ffd0e6; --actif-texte: #8f0f4c; --actif-halo: #ffffff;
+  /* texte sélectionné dans les champs (nom du joueur, code de la partie…) : rose clair, texte rose foncé */
+  --selection-fond: #ffd6e9; --selection-texte: #6a1e43;
+  /* Fenêtres du jeu (pigeon, duel, +4, pari…) : halo rose sur un prune */
+  --overlay-fond: radial-gradient(ellipse 115% 42% at 50% 45%, rgba(255,120,185,.45) 0%, transparent 100%), #7d1448;
+  --overlay-bord: #7d1448;
+}
+
+/* ----- Fenêtres du jeu ----- */
+html[data-theme="justrose"] :is(#overlayCouleur, #overlayPlus4, #overlayCupidon, #overlayPigeon,
+  #overlayFinUnRestants, #overlayDuel, #overlayRegleUnique, #overlayAnnulation, #overlayResultatAnnulation,
+  #overlayPredictionFin, .overlay-opaque),
+html[data-theme="justrose"] :is(#overlayCouleur, #overlayPlus4, #overlayCoupDeFoudre, #overlayPigeon,
+  #overlayFinUnRestants, #overlayDuel, #overlayRegleUnique, #overlayAnnulation, #overlayResultatAnnulation,
+  #overlayPredictionFin, .overlay-opaque){
+  background: var(--overlay-fond) !important;
+}
+html[data-theme="justrose"].overlay-ouvert,
+html[data-theme="justrose"].overlay-ouvert body,
+html[data-theme="justrose"] #voileOverlays{ background: var(--overlay-bord); }
+html[data-theme="justrose"] .plus4-actions{ background: transparent; }
+html[data-theme="justrose"] :is(#overlayCarteDoree, #overlayRegleUnique.overlay-doree){
+  background: radial-gradient(ellipse 95% 34% at 50% 33%, rgba(255,215,0,.26), transparent 100%),
+    radial-gradient(ellipse 120% 60% at 50% 100%, rgba(255,120,185,.45), transparent 100%), #7d1448 !important; box-shadow: none; }
+/* Récap de fin de partie */
+html[data-theme="justrose"] #overlayFinUnRestants.overlay-recap{ background: radial-gradient(ellipse 110% 45% at 50% 45%, rgba(255,120,185,.45), transparent 100%), #5e0f37 !important; }
+html[data-theme="justrose"] :is(.recap-marche, .recap-liste, .recap-bloc){ background: rgba(190,50,120,.5); border-color: rgba(255,255,255,.4); }
+html[data-theme="justrose"] .recap-marche{ background: linear-gradient(180deg, rgba(255,170,210,.3), rgba(190,50,120,.5)); }
+
+/* ----- Télé : même teinte que le thème ----- */
+html[data-theme="justrose"] #ecranTele .tele-ecran{ background: radial-gradient(ellipse 110% 70% at 50% 45%, rgba(255,110,180,.45), rgba(125,20,72,.97) 75%), rgb(125,20,72); }
+html[data-theme="justrose"] #ecranTele .tele-ecran-recap{ background: radial-gradient(ellipse 110% 60% at 50% 40%, rgba(255,120,185,.45), transparent 100%), #5e0f37 !important; }
+
+/* ----- Lisibilité sur l'orange (Réglages, écran des créateurs) ----- */
+/* (« #ecranReglages > .optionReglage » : les lignes de réglage posées seules, hors d'un bloc — elles
+   gardaient le blanc translucide du jeu de base et tranchaient avec les autres.)
+   Cartes : TOUTES au même ton (prune, quasi opaque, liseré blanc fin) : Réglages (blocs et lignes isolées), « Ta partie »,
+   règles / FAQ / album, créateurs, étapes d'installation, salle d'attente, retrait d'un joueur. Quasi opaque pour que le motif
+   du fond ne passe jamais derrière un texte ; les noms de thèmes (chacun de sa couleur) restent lisibles. */
+html[data-theme="justrose"] :is(#ecranReglages .blocReglage, #ecranReglages .reglages-contenu > .optionReglage, #ecranReglages > .optionReglage, .optionsPartie > .optionReglage:not(.optionsSuite),
+  .blocRegles, #ecranCredits .credits-nom, #ecranInstallation .etapeInstallation, #listeJoueursEnLigne div, #listeSuppression){
+  background: var(--carte-justrose); border: 1px solid rgba(255, 255, 255, 0.22);
+}
+html[data-theme="justrose"] #ecranCredits .cadrePhoto.sansPhoto{ background: var(--carte-justrose); }
+/* Boutons secondaires (translucides dans le jeu de base) : même ton sombre que les cartes, liseré blanc */
+html[data-theme="justrose"] :is(#enLigne #btnInviterPartie, .voletPause-annuler, #ecranReglages .btnDiagnostic, #ecranBug .bugFermer){
+  background: var(--carte-justrose) !important; border: 1px solid rgba(255, 255, 255, 0.35) !important;
+}
+/* Petits textes gris : blanc cassé */
+html[data-theme="justrose"] #ecranReglages :is(.lienBug, .versionJeu){ color: #ffffff !important; }
+html[data-theme="justrose"] #ecranReglages .btnDiagnostic{ color: #ffffff !important; }
+html[data-theme="justrose"] #ecranCredits .credits-honneur-titre{ color: #ffffff; }
+/* Télé : code de la télé, en bas de l'écran */
+html[data-theme="justrose"] #ecranTele .tele-pied{ color: rgba(255,255,255,.85); }
+
+/* ----- Boutons : or avec un anneau blanc (comme une étiquette de cadeau) et texte brun foncé, sur tous les écrans -----
+   (mêmes boutons que les autres thèmes habillés, Soleil couchant par exemple : tous les boutons du jeu doivent être aux couleurs du thème) */
+html[data-theme="justrose"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #ajouterJoueur, #jouer, #supprimerJoueur,
+  #nouvellePartie, #btnRejouerMemes, #btnModifierJoueurs, #btnReprendrePause,
+  #btnCreerPartie, #btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR,
+  #lancerPartieEnLigne, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui, #btnConfirmerAccueilNon,
+  #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #termineSuppression,
+  #btnInstallationInstaller, #ecranRegles .btnFaqLien, #choixMode .btnInstaller, #menu #btnCaster, #ecranCaster button:not(.btnRetour), #btnFermerScanner, #ecranReprise button,
+  #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayFinUnRestants .bouton-pigeon,
+  #overlayAnnulation button, #overlayRegleUnique .bouton-annulation, #overlayDuel button:not(:disabled), #overlayPredictionFin .bouton-pigeon),
+html[data-theme="justrose"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #ajouterJoueur, #jouer, #supprimerJoueur,
+  #nouvellePartie, #btnRejouerMemes, #btnModifierJoueurs, #btnReprendrePause,
+  #btnCreerPartie, #btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR,
+  #lancerPartieEnLigne, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui, #btnConfirmerAccueilNon,
+  #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #termineSuppression,
+  #btnInstallationInstaller, #ecranRegles .btnFaqLien, #choixMode .btnInstaller, #menu #btnCaster, #ecranCaster button:not(.btnRetour), #btnFermerScanner, #ecranReprise button,
+  #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCoupDeFoudre .bouton-pigeon, #overlayFinUnRestants .bouton-pigeon,
+  #overlayAnnulation button, #overlayRegleUnique .bouton-annulation, #overlayDuel button:not(:disabled), #overlayPredictionFin .bouton-pigeon){
+  background: linear-gradient(180deg, #d4408a, #9a1052) !important;
+  color: #ffffff !important;
+  text-shadow: 0 1px 0 rgba(90, 10, 50, 0.6) !important;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.95), 0 6px 14px rgba(60,0,35,.4) !important;
+}
+@media (hover: hover){
+  html[data-theme="justrose"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #choixMode .btnInstaller):hover{ background: linear-gradient(180deg, #e0509a, #ad1860) !important; }
+}
+
+/* ----- Volet « Mettre … en pause » et bandeaux du bas (« Mauvais joueur ? Annuler », « Nouvelle version ») ----- */
+html[data-theme="justrose"] .voletPause-ok{
+  background: linear-gradient(180deg, #d4408a, #9a1052); color: #ffffff;
+  text-shadow: 0 1px 0 rgba(90, 10, 50, 0.6); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.95);
+}
+html[data-theme="justrose"] :is(#annulerChoix, #bandeauMiseAJour){
+  --bandeau-fond: #5e0f37; --bandeau-bord: rgba(255, 255, 255, 0.5); --bandeau-texte: #fff;
+  --bandeau-bouton: linear-gradient(180deg, #d4408a, #9a1052); --bandeau-bouton-texte: #ffffff;
+}
+html[data-theme="justrose"] :is(#annulerChoix .annulerChoix-bouton, #bandeauMiseAJour .maj){
+  text-shadow: 0 1px 0 rgba(90, 10, 50, 0.6); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.95);
+}
+
+/* ----- Pari de fin et choix de fin : cadres brun-orangé avec un liseré blanc (au lieu du brun-doré de base) ----- */
+html[data-theme="justrose"] :is(.prediction-header, .fin-choix-recap, .fin-choix-card){
+  background: linear-gradient(180deg, rgba(150,30,90,.9), rgba(106,30,67,.9)) !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
+}
+
+/* ----- Textes secondaires un peu trop effacés sur l'orange : plus clairs ----- */
+html[data-theme="justrose"] #ecranReglages .optionNote{ color: rgba(255, 255, 255, 0.92); }
+html[data-theme="justrose"] #ecranReglages .aProposTitre{ color: #ffffff; }
+html[data-theme="justrose"] #ecranReglages .lienJeu{ color: #fff; }
+html[data-theme="justrose"] #enLigne .separateurOu, html[data-theme="justrose"] #ecranInstallation #btnInstallationPlusTard{ color: #fff; }
+html[data-theme="justrose"] #listeJoueursEnLigne div{ color: #ffffff; }
+html[data-theme="justrose"] #ecranTele .tele-tour.tele-pigeon .tele-tour-nom{ color: #ffffff; } /* « PIGEON (nom) » de la télé */
+
+/* ----- Plateau : les panneaux (titre, boutons, joueurs, règles) cachent le motif de fond derrière leur texte ----- */
+html[data-theme="justrose"] :is(header, #menu, .messages, #ecranTele .tele-bloc, #ecranTele .tele-entete, #ecranTele .tele-prepa-joueur){ background-color: var(--carte-justrose); }
+
+
+/* ----- Aperçu du thème dans les Réglages : un simple rond de la couleur du fond (pas de dessin, pas d'animation) ----- */
+.pastilleTheme .rondJustrose{ background: url("justrose/verre_apercu.svg") center / 84% 84% no-repeat, #cc3381 !important; } /* rond rose avec un verre de rosé dedans */
+
+/* ----- Télé : pastilles de choix (« Je bois 2 », noms des joueurs…) au ton des cartes : le doré reste lisible dessus ----- */
+html[data-theme="justrose"] #ecranTele .tele-puce{ background: var(--carte-justrose); border-color: rgba(255, 255, 255, 0.4); }
+
+/* ----- Télé : « Il reste N cartes » et « Dernières cartes tirées » (sous le plateau) ne sont dans aucun panneau : ils se lisaient mal sur le motif de fond.
+   Même ton que toutes les cartes. ----- */
+html[data-theme="justrose"] #ecranTele :is(.tele-restantes, .tele-compteur){ background: var(--carte-justrose); border-radius: 1.4vh; padding: 0.6vh 2vh; }
+html[data-theme="justrose"] #ecranTele .tele-compteur{ display: table; margin-left: auto; margin-right: auto; color: #ffffff; } /* (« Il reste N cartes » : le panneau épouse le texte, centré) */
+html[data-theme="justrose"] #ecranTele .tele-compteur[hidden]{ display: none; }
+
+/* ----- Plateau : l'intérieur de l'icône Règles (le livre) prend le ton de l'en-tête (les cartes), pas l'orange de l'accueil ----- */
+html[data-theme="justrose"] header #btnReglesJeu path.couverture{ fill: var(--carte-justrose); }
+
+/* ----- Tout en rose : les liserés arc-en-ciel (sous le titre, autour de « Joueurs / Règles », de la télé) deviennent roses ----- */
+html[data-theme="justrose"] #choixMode .titreAccueilBarre,
+html[data-theme="justrose"] .messages::before,
+html[data-theme="justrose"] header::after,
+html[data-theme="justrose"] #ecranTele .tele-entete::after{
+  background: linear-gradient(90deg, #ffffff 0%, #ffc2de 50%, #ffffff 100%) !important;
+}
+/* Bandeau « Tour de » (qui suit le défilement) : prune comme les cartes, pas le bordeaux du jeu de base */
+html[data-theme="justrose"] #stickyJoueurActif{ background: linear-gradient(rgba(130,24,76,0.97), rgba(106,30,67,0.97)); border-color: rgba(255,255,255,0.3); }
+
+/* ----- Titre ALCUNO et icônes Réglages / Règles : blancs (au lieu du jaune doré), ombre rose foncé ----- */
+html[data-theme="justrose"] :is(#choixMode #titreAccueil, header h1){
+  color: #fff;
+  text-shadow: 0 3px 0 #6a1e43, 0 6px 16px rgba(60, 0, 35, 0.45), 0 0 30px rgba(255, 255, 255, 0.3);
+}
+html[data-theme="justrose"] #choixMode #titreAccueil{ animation: fadeIn 0.25s ease forwards; } /* (sans la lueur dorée qui pulse) */
+html[data-theme="justrose"] :is(#choixMode #btnReglages, #choixMode #btnRegles, header #btnReglesJeu) path:not(.couverture){ stroke: #fff; }
+html[data-theme="justrose"] :is(#choixMode #btnReglages circle, #choixMode #btnRegles path.couverture, header #btnReglesJeu path.couverture){ stroke: #fff; }
+html[data-theme="justrose"] :is(#choixMode #btnReglages svg, #choixMode #btnRegles svg, header #btnReglesJeu svg){
+  filter: drop-shadow(0 2px 0 #6a1e43) drop-shadow(0 3px 6px rgba(60, 0, 35, 0.45));
+}
+html[data-theme="justrose"] :is(#btnAccueilClassique, #enLigne #btnAccueilEnLigne, #ecranNouvellePartie #btnAccueil){ color: #fff; -webkit-text-stroke-color: #fff; text-shadow: 0 2px 0 #6a1e43, 0 3px 8px rgba(60, 0, 35, 0.45); }
+html[data-theme="justrose"] :is(#ecranReglages, #ecranRegles, #ecranCaster, #ecranBug, #ecranInstallation, #ecranCredits, #ecranConfirmerAccueil, #ecranConfirmerHote, #ecranConfirmerRetrait, #ecranReprise, #ecranPause, #suppression) :is(h2, .credits-titre){
+  color: #fff;
+  text-shadow: 0 2px 0 #6a1e43, 0 4px 12px rgba(60, 0, 35, 0.4);
+}
+html[data-theme="justrose"] :is(.optionTitre, .aProposTitre, .titreBloc, .regleBloc-titre, .recap-titre, .annonce-titre, .regle-titre,
+  #ecranCredits .credits-phrase strong, #codePartieAffiche,
+  #overlayCouleur .titre-couleur,
+  :is(#overlayPlus4, #overlayCupidon, #overlayCoupDeFoudre, #overlayPigeon, #overlayFinUnRestants, #overlayDuel, #overlayPredictionFin, #overlayRegleUnique, #overlayAnnulation, #overlayResultatAnnulation) .titre-pigeon,
+  #ecranTele :is(.tele-titre, .tele-ecran-titre, .tele-pause-titre, .tele-prepa-titre)){
+  color: #fff;
+  text-shadow: 0 2px 0 #6a1e43, 0 4px 12px rgba(60, 0, 35, 0.4);
+}
+
+/* ----- Joueur dont c'est le tour : rose brillant, avec une lueur rose autour ----- */
+html[data-theme="justrose"] .joueur-ligne-actif{
+  box-shadow: 0 0 0 2px #ffffff, 0 0 12px 2px rgba(255, 255, 255, 0.95), 0 0 30px 6px rgba(255, 170, 210, 0.7) !important;
+}
+
+/* ----- Doré écrit directement par le JavaScript (passe devant le CSS du thème : d'où le !important) ----- */
+html[data-theme="justrose"] :is(#overlayAnnulation, #overlayResultatAnnulation, #overlayRegleUnique:not(.overlay-doree)){ color: #fff !important; }
+html[data-theme="justrose"] .aideAccueil-fleches path:not(.aideAccueil-ombre){ fill: #fff; }
+html[data-theme="justrose"] .aideAccueil-ombre{ fill: rgba(106, 30, 67, 0.9); }
+
+/* ----- Bannière « Tour de » : nom du joueur en blanc néon (si une couleur est choisie, le jeu garde la couleur de la carte) ----- */
+html[data-theme="justrose"] #stickyJoueurActif:not(.has-couleur):not(.is-pigeon) .sticky-nom{
+  color: #fff;
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.9), 0 0 14px rgba(255, 160, 205, 0.85);
+}
+html[data-theme="justrose"] #stickyJoueurActif::before{ background: radial-gradient(circle at 35% 35%, #fff 0%, #ffc2de 45%, #ff77b1 100%); box-shadow: 0 0 10px rgba(255, 160, 205, 0.8); }
+
+/* ----- Écran de pause : voile prune (au lieu du bordeaux presque noir du jeu de base) ----- */
+html[data-theme="justrose"] :is(#ecranPause, #ecranTele .tele-pause){ background: rgba(106, 30, 67, 0.84); }
+
+/* ----- Accueil : « Just » au-dessus du titre ALCUNO -----
+   Un simple texte au-dessus du titre (pas de dessin posé au pixel près : sur un téléphone sans Impact, les lettres n'ont pas la même
+   taille, le texte suit). Le « O » du titre reste un O. */
+html[data-theme="justrose"] #choixMode .titreAccueil{ gap: 0; }
+html[data-theme="justrose"] #choixMode .titreAccueil::before{
+  content: "Just"; display: block; text-align: center; line-height: 1;
+  font-family: Impact, Haettenschweiler, "Arial Black", sans-serif; font-weight: 900; text-transform: uppercase;
+  font-size: clamp(30px, 9vw, 54px); letter-spacing: 0.32em; padding-left: 0.32em; margin-bottom: -2px;
+  color: #fff; text-shadow: 0 3px 0 #6a1e43, 0 6px 14px rgba(60, 0, 35, 0.4);
+}
+
+/* ----- Pas de bleu ni de turquoise : noms des joueurs (couleur du bloc « Joueurs »), « PIGEON », pastille du bandeau, lueurs du pigeon ----- */
+html[data-theme="justrose"] #listeJoueurs{ color: #fff; }
+html[data-theme="justrose"] #stickyJoueurActif.is-pigeon{ border-color: rgba(255, 255, 255, 0.35); }
+html[data-theme="justrose"] #stickyJoueurActif.is-pigeon::before{
+  background: radial-gradient(circle at 35% 35%, #fff 0%, #ffc2de 52%, #ff77b1 100%); box-shadow: 0 0 10px rgba(255, 160, 205, 0.6);
+}
+html[data-theme="justrose"] #stickyJoueurActif.is-pigeon .sticky-nom{ color: #fff; }
+html[data-theme="justrose"] #stickyJoueurActif.is-pigeon .sticky-bonus{ background: rgba(255, 255, 255, 0.14); border-color: rgba(255, 255, 255, 0.3); color: #fff; }
+html[data-theme="justrose"] #ecranTele :is(.tele-joueur, .tele-prepa-joueur){ color: #fff; }
+html[data-theme="justrose"] #ecranTele .tele-prepa-joueur{ border-color: rgba(255, 255, 255, 0.4); }
+/* Lueurs du nouveau pigeon : rose pâle au lieu de turquoise (copies des animations du jeu de base) */
+html[data-theme="justrose"] #listeJoueurs .joueur-ligne.pigeon-flash{ animation-name: pigeonFlash_justrose; }
+html[data-theme="justrose"] #ecranTele .tele-joueur.pigeon-flash{ animation-name: pigeonFlashTele_justrose; }
+@keyframes pigeonFlash_justrose{
+  0%, 100% { scale: 1; filter: none; }
+  50%      { scale: 1.12; filter: brightness(1.3) drop-shadow(0 0 10px rgba(255, 200, 225, 0.95)); }
+}
+@keyframes pigeonFlashTele_justrose{
+  0%, 100% { scale: 1; filter: none; }
+  50%      { scale: 1.08; filter: brightness(1.3) drop-shadow(0 0 1.2vh rgba(255, 200, 225, 0.95)); }
+}
+
+/* ----- Nom du thème BDSM dans les Réglages : son rouge vif se lisait mal sur le panneau prune (contraste 2,9) : rouge plus clair ----- */
+html[data-theme="justrose"] #pastilleDonjon .nomTheme{ color: #ff9aa6; }
+/* Télé : le joueur dont c'est le tour est sur fond blanc : son nom reste foncé (la règle blanche ci-dessus le rendait invisible) */
+html[data-theme="justrose"] #ecranTele .tele-joueur.tele-joueur-actif, html[data-theme="justrose"] #ecranTele .tele-joueur.tele-joueur-actif > span{ color: var(--actif-texte); }
+
+/* ----- Dos des cartes « ALC UNO » en rose (Cartes/dos_justrose.png : le dessin d'origine, ovale rose bonbon et texte blanc sur fond noir) -----
+   Mêmes endroits que pour le dos de base : cartes face cachée, mode « faces fermées », télé, exemples des Règles. Les faces gardent leur image. */
+html[data-theme="justrose"] .Carte:not(.retournee):not([class*="_"]):not([class*="couleur"]),
+html.faces-fermees[data-theme="justrose"] #plateau .Carte.retournee.recachee,
+html[data-theme="justrose"] .tele-plateau .Carte.carte-recachee,
+html[data-theme="justrose"] .Carte.dos_dore:not(.retournee), /* le dos de la carte dorée = le même dos rose (avec son reflet doré par-dessus), sinon elle se reconnaîtrait */
+html[data-theme="justrose"] #ecranRegles .ligneRegle .Carte.retournee:not([class*="_"]):not([class*="couleur"]){ background-image: url("Cartes/dos_justrose.png") !important; }
+
+/* ----- Feuille « Signaler un bug » : fond uni (le motif passait derrière le texte et le rendait illisible) ----- */
+html[data-theme="justrose"] #ecranBug .bugFeuille{ background: radial-gradient(ellipse 120% 40% at 50% 0%, rgba(255,255,255,.2), transparent 100%), var(--fond-theme); }

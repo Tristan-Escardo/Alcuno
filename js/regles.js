@@ -886,6 +886,7 @@ function afficherOverlayCarteDoree(joueurActuel){
       overlay.remove();
       unlockScroll();
       if(statsPartie) statsPartie.doree = { tireur: choisisseur, victime: nom };
+      compterCouple(choisisseur, nom, GORGEES_CUL_SEC); // (récap, mode hot : « Couple de la soirée »)
       try { stickerInstantane("doree"); } catch (e) {} // (album de stickers, js/stickers.js)
       afficherOverlayTiensGueule(nom);
 
@@ -1388,6 +1389,7 @@ function afficherOverlayPlus4(joueurActuel, classeCartePlus4){
 
     // Résultat affiché dans « Règles » tout de suite, puis mis à jour avec les annulations
     const resultats = file.map(x => ({ nom: joueurs[x.idx], n: x.n, reste: x.n }));
+    file.forEach(x => compterCouple(choisisseur, joueurs[x.idx], x.n)); // (récap, mode hot : « Couple de la soirée »)
     const afficherResultat = () => {
       afficherRegleBloc(regleZero, textePlus4(choisisseur, resultats));
       regleZero.style.display = "block";
@@ -1642,6 +1644,28 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
     return;
   }
 
+  // Mode hot, période Saint-Valentin : carte Coup de foudre (un bisou sur la bouche… ou un cul sec : js/mode-hot.js)
+  if(carteTiree === "coup_de_foudre"){
+    const entete = `COUP DE FOUDRE ⚡\nChoisis quelqu'un : un bisou sur la bouche… ou ${estModeSoft() ? "4 gorgées" : "un CUL SEC"} !`;
+    afficherRegleBloc(regleZero, entete);
+    regleZero.style.display = "block";
+    zeroEnCours = true;
+    choixPigeonEnCours = true; // plateau bloqué jusqu'au choix
+    montrerOverlayRegle(entete, carteTiree);
+    // pastille « Défi hot spécial Saint-Valentin » au-dessus du titre de l'annonce (même style que la fenêtre de choix)
+    const titreAnnonce = document.querySelector("#overlayRegleUnique .regle-titre");
+    if(titreAnnonce && !titreAnnonce.previousElementSibling?.classList.contains("foudre-badge")){
+      const badge = document.createElement("div");
+      badge.className = "foudre-badge";
+      badge.innerHTML = '🔥 Défi hot spécial <span class="foudre-nowrap">Saint-Valentin</span> 💘';
+      titreAnnonce.before(badge);
+    }
+    executerApresOverlayRegleUnique(() => afficherOverlayCoupDeFoudre(joueurActuel, carteTiree, () => {
+      appliquerBonusCouleurSiBesoin(carteTiree, { couleur: couleurBue, joueur: joueurActuel, preserveRuleMessage: true });
+    }));
+    return;
+  }
+
   // Cartes "boire"
   if(carteTiree.startsWith("interdit")){
     const entete = "SOCIAAALE ! \nTout le monde boit 1 gorgée";
@@ -1823,8 +1847,12 @@ function lancerPartie(){
   if(enLigneActif) choisirModeHotEnLigne(hot);
   else if(caseModeHot.checked !== hot) caseModeHot.checked = hot; // (partie reprise : même mode que pendant la partie)
   initialiserModeHot(); // (js/mode-hot.js : défis vus, liens Cupidon, hasard des défis)
+  // Période Saint-Valentin : carte Coup de foudre dans le paquet hot (en ligne : celle de la graine ; reprise : celle de la partie)
+  partieValentin = hot && (enLigneActif
+    ? !!dernierEtatManche && graineValentin(dernierEtatManche.seed)
+    : sauvegardeClassique ? !!sauvegardeClassique.valentin : saintValentinEnCours());
   if(hot && !rattrapageEnCours) debloquerDonjon(); // thème secret « Donjon » (js/reglages.js)
-  paquet = hot ? paquetHot(paquetPrincipal, joueurs.length) : [...paquetPrincipal];
+  paquet = hot ? paquetHot(paquetPrincipal, joueurs.length, partieValentin) : [...paquetPrincipal];
   melangerPaquet(paquet);
   const express = enLigneActif
     ? !!dernierEtatManche && graineExpress(dernierEtatManche.seed)

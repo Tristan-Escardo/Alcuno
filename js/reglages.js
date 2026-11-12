@@ -95,7 +95,26 @@ const CLE_THEME = "alcuno_theme";
 // Couleur de la barre du téléphone pour chaque thème (= --couleur-barre du CSS, le tout haut de la page).
 // Mêmes couleurs dans le script du <head> de index.html, qui la pose dès le premier affichage.
 const THEMES = { bordeaux: "#2b001d", noir: "#000000", vert: "#08301e", bleu: "#0a1634", soleil: "#1f3566",
-                 cerisier: "#5a1740", givre: "#e4f5fc", prestige: "#937810", galaxie: "#02030a", kawaii: "#ffd6ec", donjon: "#12040a" };
+                 cerisier: "#5a1740", givre: "#e4f5fc", prestige: "#937810", galaxie: "#02030a", kawaii: "#ffd6ec", donjon: "#12040a", noel: "#b3121f", chandeleur: "#bd4f10", valentin: "#c2185b", patrick: "#0f6a44", justrose: "#cc3381", musique: "#5b2bd1", halloween: "#0a0204" };
+
+// Thèmes de fête : pas de feux d'artifice dedans (ils ne tomberont jamais en même temps que le Nouvel An), et le
+// réglage « Feux d'artifice » n'apparaît pas dans les Réglages quand l'un d'eux est actif.
+// Y ajouter chaque nouveau thème de fête (Chandeleur, Saint-Valentin, Saint-Patrick, Halloween…).
+const THEMES_DE_FETE = ["noel", "chandeleur", "valentin", "patrick", "justrose", "musique", "halloween"];
+// html.feux-actifs = les feux (et le chapeau de fête du titre) sont à l'écran. Il faut les trois à la fois :
+//   - on est un jour de fête à feux : html[data-fete] (Nouvel An ou Fête nationale, posé par le <head> de index.html)
+//   - le réglage « Feux d'artifice » est coché (il l'est de base)
+//   - on n'est pas dans un thème de fête
+// Hors période, le réglage n'apparaît même pas dans les Réglages : il n'y a rien à régler.
+function majReglageFeuxArtifice(){
+  const jourDeFete = !!document.documentElement.dataset.fete;
+  const festif = THEMES_DE_FETE.includes(document.documentElement.dataset.theme);
+  const montrer = jourDeFete && !festif;
+  const bloc = document.querySelector('#ecranReglages [data-cle="feux-artifice"]');
+  if (bloc) bloc.hidden = !montrer;
+  document.documentElement.classList.toggle("feux-actifs", montrer && document.documentElement.classList.contains("feux-artifice"));
+  if (!montrer) { const zone = document.getElementById("feuxArtifice"); if (zone) zone.innerHTML = ""; } // (feux déjà partis : effacés tout de suite)
+}
 
 // Thème secret « Prestige » : débloqué en découvrant l'écran des créateurs (4 taps sur le titre)
 const CLE_PRESTIGE = "alcuno_theme_prestige";
@@ -159,6 +178,78 @@ function afficherFenetrePrestige(){
   vibrer([60, 40, 60]);
   document.body.appendChild(voile);
 }
+
+// ===== Annonce d'un thème de fête (style_annonce_fete.css) =====
+// Au début de chaque période de fête (dates de FETES.md, incluses), une fenêtre du même style que celles des thèmes débloqués
+// annonce le thème, aux couleurs de CETTE fête (quel que soit le thème choisi). Une seule fois par période et par appareil.
+// « L'essayer » met le thème (comme un clic sur sa pastille dans les Réglages), « Plus tard » ferme.
+// Pour la voir hors période (tests) : ouvrir le jeu avec ?annonce_fete=<thème>, ou appeler afficherAnnonceFete("<thème>").
+// mois : 0 = janvier ; Noël est à cheval sur aucune année (18 au 26 décembre).
+// « nom » est celui écrit dans l'annonce (« Nouveau thème … disponible ») : c'est le nom complet de la fête,
+// même quand la pastille des Réglages en montre un plus court (Fête de la musique -> Musique, faute de place).
+const FETES_ANNONCE = {
+  noel:       { nom: "Noël",           debut: [11, 18], fin: [11, 26], essayer: "Joyeux Noël",           image: "noel/boule_neige.svg" },
+  chandeleur: { nom: "Chandeleur",     debut: [0, 28],  fin: [1, 3],   essayer: "L'essayer maintenant", image: "chandeleur/crepe.svg" },
+  valentin:   { nom: "Saint-Valentin", debut: [1, 7],   fin: [1, 15],  essayer: "L'essayer maintenant", image: "valentin/coeur_o.svg" },
+  patrick:    { nom: "Saint-Patrick",  debut: [2, 14],  fin: [2, 18],  essayer: "Sláinte is táinte !",  image: "patrick/trefle_apercu.svg" },
+  justrose:   { nom: "Just Rosé",      debut: [4, 4],   fin: [4, 12],  essayer: "L'essayer maintenant", image: "justrose/verre_apercu.svg" },
+  musique:    { nom: "Fête de la musique", debut: [5, 18], fin: [5, 22], essayer: "L'essayer maintenant", image: "musique/note_apercu.svg" },
+  halloween:  { nom: "Halloween",       debut: [9, 20],  fin: [10, 1], essayer: "L'essayer maintenant", image: "halloween/citrouille_apercu.svg" }
+};
+// Fête en cours à cette date (null si aucune) : du jour de début à 0 h au jour de fin à 23 h 59
+function feteEnCours(date = new Date()){
+  const jour = date.getMonth() * 100 + date.getDate();
+  for (const cle of Object.keys(FETES_ANNONCE)) {
+    const f = FETES_ANNONCE[cle];
+    if (jour >= f.debut[0] * 100 + f.debut[1] && jour <= f.fin[0] * 100 + f.fin[1]) return cle;
+  }
+  return null;
+}
+function afficherAnnonceFete(cle){
+  const f = FETES_ANNONCE[cle];
+  if (!f || document.getElementById("fenetreFete")) return;
+  const voile = document.createElement("div");
+  voile.id = "fenetreFete";
+  voile.dataset.fete = cle;
+  voile.setAttribute("role", "dialog");
+  voile.setAttribute("aria-label", "Nouveau thème " + f.nom);
+  voile.innerHTML = `
+    <div class="fenetreFete-carte">
+      <span class="fenetreFete-image" aria-hidden="true"></span>
+      <div class="fenetreFete-titre">Nouveau thème<br>${f.nom.replace(/-/g, "\u2011")}<br>disponible pour une durée limitée !!</div>
+      <button type="button" class="fenetreFete-essayer"></button>
+      <button type="button" class="fenetreFete-plusTard">Plus tard</button>
+    </div>`;
+  voile.querySelector(".fenetreFete-essayer").textContent = f.essayer;
+  const fermer = () => {
+    voile.classList.add("fenetreFete-sortie");
+    setTimeout(() => voile.remove(), 250);
+  };
+  voile.querySelector(".fenetreFete-essayer").addEventListener("click", () => {
+    fermer();
+    const pastille = document.querySelector('.pastilleTheme[data-theme="' + cle + '"]');
+    if (pastille) pastille.click(); // comme dans les réglages (musique, thème gardé, barre du téléphone…)
+  });
+  voile.querySelector(".fenetreFete-plusTard").addEventListener("click", fermer);
+  vibrer([60, 40, 60]);
+  document.body.appendChild(voile);
+}
+// Au lancement du jeu : annonce de la fête en cours, une seule fois par période (clé = fête + année), seulement sur l'accueil
+function annoncerFeteSiBesoin(){
+  let cle = null, force = false;
+  try { cle = new URLSearchParams(location.search).get("annonce_fete"); force = !!FETES_ANNONCE[cle]; } catch (e) {}
+  if (!force) cle = feteEnCours();
+  if (!cle) return;
+  const accueil = document.getElementById("choixMode");
+  if (!accueil || getComputedStyle(accueil).display === "none") return;
+  if (document.querySelector('[id^="fenetre"], [id^="overlay"][style*="flex"]')) return; // une autre fenêtre est déjà là
+  if (!force) {
+    const cleVue = "alcuno_annonce_fete_" + cle + "_" + new Date().getFullYear();
+    try { if (localStorage.getItem(cleVue)) return; localStorage.setItem(cleVue, "1"); } catch (e) { return; }
+  }
+  afficherAnnonceFete(cle);
+}
+setTimeout(annoncerFeteSiBesoin, 1500);
 
 // ===== Thème secret « Star Wars » (nom interne : galaxie) : un mot de passe tapé comme nom de joueur (mode classique) =====
 // Le mot n'est pas écrit ici (le code du jeu est public) : seulement son empreinte (FNV-1a sur le mot en
@@ -376,6 +467,67 @@ function passageNyanCat(){
   vol.onfinish = () => zone.remove();
 }
 setTimeout(passageNyanCat, 4000);
+
+// Accueil du thème Noël : le Père Noël traverse l'écran en traîneau de temps en temps (comme le Nyan Cat de
+// Star Wars), d'un côté à l'autre, à une hauteur au hasard, derrière les boutons. Il repart du côté par où il
+// est sorti la fois d'avant. noel/traineau.svg regarde vers la droite : retourné quand il va vers la gauche.
+const TRAINEAU_L = 230, TRAINEAU_H = TRAINEAU_L * 130 / 420; // taille à l'écran (proportions de l'image)
+let dernierBordTraineau = null;
+// L'accueil est-il à l'écran, avec rien par-dessus ? Les autres écrans (réglages, règles, FAQ, album,
+// créateurs, en ligne, caster, scan, bug, installation, confirmations, pause, « Ta partie », plateau…)
+// sont des <section> posées par-dessus l'accueil sans le masquer : sans ce contrôle, le traîneau
+// continuait sa course et ses grelots derrière eux.
+function accueilDevant(){
+  const accueil = document.getElementById("choixMode");
+  if (!accueil || accueil.style.display === "none" || !accueil.clientHeight) return false;
+  if (document.documentElement.classList.contains("overlay-ouvert")) return false; // fenêtres du jeu
+  return ![...document.querySelectorAll("main > section, body > section")]
+    .some((e) => e !== accueil && getComputedStyle(e).display !== "none");
+}
+function passageTraineau(){
+  setTimeout(passageTraineau, 18000 + Math.random() * 14000);
+  // grelots du traîneau : seulement dans ce thème, chargés d'avance (sinon le son arriverait après le passage)
+  if (document.documentElement.dataset.theme === "noel" && caseSons.checked && volumeSons > 0) { const ctx = contexteAudio(); if (ctx) chargerSon(ctx, "traineau_noel"); }
+  const accueil = document.getElementById("choixMode");
+  if (document.documentElement.dataset.theme !== "noel" || document.visibilityState !== "visible" ||
+      document.documentElement.classList.contains("mode-tele") || // (pas sur la page de la télé)
+      !accueil || !accueilDevant() || accueil.querySelector(".traineauNoel")) return;
+  const W = accueil.clientWidth, H = accueil.clientHeight;
+  const zone = document.createElement("div");
+  zone.className = "traineauNoel";
+  const vol = document.createElement("div");
+  vol.className = "traineauNoel-vol";
+  vol.style.cssText = `width:${TRAINEAU_L}px;height:${TRAINEAU_H}px`;
+  vol.innerHTML = '<div class="traineauNoel-poussiere"></div><div class="traineauNoel-image"></div>';
+  zone.appendChild(vol);
+  accueil.appendChild(zone);
+  const hasard = (a, b) => a + Math.random() * (b - a);
+  const bord = dernierBordTraineau || (Math.random() < 0.5 ? "gauche" : "droite");
+  dernierBordTraineau = bord === "gauche" ? "droite" : "gauche"; // bord de sortie
+  // en haut des deux tiers de l'écran (en bas, il y a les sapins), un peu en montée : il s'envole
+  const yEntree = hasard(0.2, 0.62) * H, ySortie = yEntree - hasard(0.05, 0.2) * H;
+  const versDroite = bord === "gauche";
+  // (x : bord gauche de l'image ; la traînée dorée fait 1,6 fois sa largeur derrière lui : elle doit être sortie aussi)
+  const x0 = versDroite ? -TRAINEAU_L : W, x1 = versDroite ? W + TRAINEAU_L * 1.6 : -TRAINEAU_L * 2.6;
+  const angle = Math.atan2(ySortie - yEntree, Math.abs(x1 - x0));
+  const sens = versDroite ? "" : " scaleX(-1)";
+  const position = (x, y) => `translate(${x}px, ${y - TRAINEAU_H / 2}px)${sens} rotate(${angle}rad)`;
+  jouerSon("traineau_noel"); // grelots : une seule fois, au départ du passage (pas en boucle)
+  const anim = vol.animate([{ transform: position(x0, yEntree) }, { transform: position(x1, ySortie) }],
+    { duration: Math.abs(x1 - x0) / 0.13, easing: "linear" }); // 130 px par seconde
+  // Pendant le passage, on ouvre un autre écran (ou on quitte l'appli) : le traîneau n'est plus visible,
+  // on l'enlève et on coupe ses grelots tout de suite (avant, on l'entendait derrière les règles, les
+  // réglages, l'écran de la partie…).
+  const veille = setInterval(() => {
+    if (!zone.isConnected) { clearInterval(veille); return; }
+    if (accueilDevant() && document.visibilityState === "visible") return;
+    clearInterval(veille);
+    zone.remove();
+    arreterSonTraineau();
+  }, 150);
+  anim.onfinish = () => { clearInterval(veille); zone.remove(); };
+}
+setTimeout(passageTraineau, 2500);
 
 // Halo du sabre sous la barre de l'heure (thème Star Wars, voir le CSS) : dans index.html dès le premier
 // affichage ; créé ici seulement si une ancienne page gardée en cache ne l'a pas
@@ -637,6 +789,7 @@ function peindreBarreTelephone(couleur){
 function appliquerTheme(nom, sansMusique = false){
   if (!THEMES[nom] || (typeof themeBloqueADistance === "function" && themeBloqueADistance(nom)) || (nom === "prestige" && !prestigeDebloque()) || (nom === "galaxie" && !galaxieDebloquee()) || (nom === "kawaii" && !kawaiiDebloque()) || (nom === "donjon" && !donjonDebloque())) nom = "bordeaux";
   document.documentElement.dataset.theme = nom;
+  majReglageFeuxArtifice();
   if (nom === "prestige") vuNouveauPrestige(); // thème essayé : le rappel « NOUVEAU » s'en va
   if (nom === "galaxie") vuNouveauGalaxie();
   if (nom === "kawaii") vuNouveauKawaii();
@@ -648,6 +801,7 @@ function appliquerTheme(nom, sansMusique = false){
   // Musique du nouveau thème, tout de suite (dans le tap : sinon l'iPhone refuse de la lancer). Pas si la
   // page va se recharger juste après (voir rafraichirBarreIphone) : on entendait son début, puis plus rien
   if (!sansMusique) { try { majMusique(); } catch (e) {} } // (pas encore prête pendant le chargement de la page)
+  try { majPianoAccueil(); } catch (e) {} // petit piano jouable de l'accueil (thème Fête de la musique, js/piano-accueil.js)
 }
 
 // iPhone, barre du haut (sous l'heure) : quand le jeu ne passe pas dessous (appli ajoutée à l'écran
@@ -731,6 +885,48 @@ for (let i = 0; i < 14; i++) {
   petale.style.animationDuration = `${duree}s`;
   petale.style.animationDelay = `${-Math.random() * duree}s`; // déjà en train de tomber à l'ouverture
   zonePetales.appendChild(petale);
+}
+
+// Noël : flocons qui tombent sur l'écran d'accueil (positions, tailles et vitesses au hasard)
+const zoneNeige = document.getElementById("neigeNoel");
+for (let i = 0; i < 40; i++) {
+  const flocon = document.createElement("span");
+  const taille = 4 + Math.random() * 7;
+  const duree = 7 + Math.random() * 9;
+  flocon.style.left = `${Math.random() * 100}%`;
+  flocon.style.width = flocon.style.height = `${taille}px`;
+  flocon.style.opacity = String(0.55 + Math.random() * 0.45);
+  flocon.style.animationDuration = `${duree}s`;
+  flocon.style.animationDelay = `${-Math.random() * duree}s`; // déjà en train de tomber à l'ouverture
+  zoneNeige.appendChild(flocon);
+}
+
+// Saint-Valentin : petits cœurs rouges qui flottent sur l'écran d'accueil comme en apesanteur : chacun grossit, rapetisse
+// et dérive lentement sur un trajet à lui (3 points, en boucle), à son rythme (voir style_valentin.css)
+const zoneCoeursValentin = document.getElementById("coeursValentin");
+if (zoneCoeursValentin) {
+  const hasardCoeur = (min, max) => min + Math.random() * (max - min);
+  for (let i = 0; i < 34; i++) {
+    const coeur = document.createElement("span");
+    const taille = hasardCoeur(9, 30);
+    const duree = hasardCoeur(9, 18);
+    coeur.style.left = `${hasardCoeur(0, 96)}%`;
+    coeur.style.top = `${hasardCoeur(0, 96)}%`;
+    coeur.style.width = coeur.style.height = `${taille}px`;
+    coeur.style.animationDuration = `${duree}s`;
+    coeur.style.animationDelay = `${-Math.random() * duree}s`; // déjà en vol à l'ouverture
+    const pas = (m) => `${Math.round(hasardCoeur(-m, m))}px`;
+    coeur.style.setProperty("--x1", pas(46)); coeur.style.setProperty("--y1", pas(46));
+    coeur.style.setProperty("--x2", pas(46)); coeur.style.setProperty("--y2", pas(46));
+    coeur.style.setProperty("--x3", pas(30)); coeur.style.setProperty("--y3", pas(30));
+    coeur.style.setProperty("--s0", hasardCoeur(0.5, 0.9).toFixed(2));
+    coeur.style.setProperty("--s1", hasardCoeur(1.1, 1.7).toFixed(2));
+    coeur.style.setProperty("--s2", hasardCoeur(0.45, 0.8).toFixed(2));
+    coeur.style.setProperty("--s3", hasardCoeur(1.0, 1.5).toFixed(2));
+    coeur.style.setProperty("--r1", `${Math.round(hasardCoeur(-25, 25))}deg`);
+    coeur.style.setProperty("--r2", `${Math.round(hasardCoeur(-25, 25))}deg`);
+    zoneCoeursValentin.appendChild(coeur);
+  }
 }
 
 // Prestige : étincelles qui scintillent sur l'écran d'accueil (positions, tailles et rythmes au hasard)
@@ -960,12 +1156,12 @@ curseurVolume.addEventListener("input", () => {
 curseurVolume.addEventListener("change", () => jouerSon("reglage_son")); // essai au relâchement (Sons/reglage_son.mp3)
 
 // ===== Musique d'ambiance : Sons/musique_ambiance_<thème>.mp3 (givre, cerisier, prestige, soleil, galaxie, sombre,
-// kawaii, bdsm),
+// kawaii, bdsm, noel, valentin, patrick, justrose, musique),
 // sinon Sons/musique_ambiance.mp3 (bordeaux, casino, nuit). En boucle, à son propre volume.
 // Quand ce téléphone caste, c'est la télé qui la joue (à ce volume, avec le thème du téléphone).
 const CLE_MUSIQUE = "alcuno_musique";
 const CLE_VOLUME_MUSIQUE = "alcuno_volume_musique";
-const THEMES_AVEC_MUSIQUE = ["givre", "cerisier", "prestige", "soleil", "galaxie", "noir", "kawaii", "donjon"];
+const THEMES_AVEC_MUSIQUE = ["givre", "cerisier", "prestige", "soleil", "galaxie", "noir", "kawaii", "donjon", "noel", "valentin", "patrick", "justrose", "musique"];
 // thème « noir » (affiché Sombre) : musique_ambiance_sombre.mp3 ; thème « donjon » (affiché BDSM) : musique_ambiance_bdsm.mp3
 const NOM_FICHIER_MUSIQUE = { noir: "sombre", donjon: "bdsm" };
 const caseMusique = document.getElementById("optionMusique");
@@ -1016,6 +1212,11 @@ const BOUCLES_EXACTES = {
   musique_ambiance_kawaii: { avant: 0.3, longueur: 4111952 / 44100 }, // 93,24 s = 64 mesures à 164,7 BPM (de 25,5 s à 1 min 58,8 du morceau)
   musique_ambiance_bdsm: { avant: 0.3, longueur: 4492064 / 44100 }, // 101,86 s à 172 BPM (de 4 min 15,1 à 5 min 56,97 du morceau : fin de phrase du drop, puis 25 mesures avant le drop)
   musique_ambiance_galaxie: { avant: 0.3, longueur: 7898850 / 44100 }, // 179,11 s (de 10,7 s à 3 min 10 du morceau, qui se répète)
+  musique_ambiance_noel: { avant: 0.3, longueur: 8467448 / 44100 }, // 192,01 s = 112 mesures à 140 BPM (de 41,36 s à 3 min 53,4 du morceau). La boucle se termine dans le seul passage sans chant du morceau (3 min 50 à 3 min 53) : le retour au début ne coupe aucune parole. La dernière mesure est un fondu vers ce qui précédait 41,36 s, pour enchaîner sans saut de niveau.
+  musique_ambiance_valentin: { avant: 0.3, longueur: 5503405 / 44100 }, // 2 min 04,8 = 58 mesures à 111,5 BPM (de 0,93 s à 2 min 05,7 du morceau). Ce morceau-là ne se répète jamais à l'identique (meilleure ressemblance entre deux passages : 0,23) : le point de reprise a été choisi pour que la musique y ressemble le plus possible au départ. La dernière seconde est un fondu vers la levée qui précédait 0,93 s, pour enchaîner sans saut de niveau.
+  musique_ambiance_patrick: { avant: 0.3, longueur: 2860541 / 44100 }, // 64,86 s = 40 mesures à 148 BPM (le morceau entier, « Irish Jig »). Le fondu de fin du morceau est retiré ; sa dernière résonance (1,07 s) est repliée par-dessus le début, donc l'accord final sonne encore pendant la reprise.
+  musique_ambiance_justrose: { avant: 0.3, longueur: 4858224 / 44100 }, // 110,16 s = 56 mesures à 122 BPM (de 29,59 s à 2 min 19,75 du morceau, qui se fond ensuite). La dernière mesure est un fondu vers ce qui précédait 29,59 s : à la reprise on enchaîne sur la transition d'origine, sans saut de niveau.
+  musique_ambiance_musique: { avant: 0.3, longueur: 1629920 / 44100 }, // 36,96 s = 20 mesures à 129,87 BPM. Le morceau fourni fait 59,2 s, mais ses 22,3 dernières secondes sont exactement les 22,3 premières (il se répète toutes les 20 mesures) : la boucle garde donc toute la musique, et la reprise n'est pas un raccord mais l'endroit où le morceau recommence de lui-même.
   debloquage_theme_galaxie: { avant: 0.3, longueur: 4201001 / 44100 }, // 95,26 s (générique du thème Star Wars)
 };
 const FONDU_BOUCLE_EXACTE = 0.03;
@@ -1429,14 +1630,18 @@ document.addEventListener("visibilitychange", () => {
 //   tiens_gueule.mp3 : le cul sec de la carte dorée (« TIENS DANS TA GUEULE »)
 //   regles.mp3 : on ouvre les Règles du jeu (boutons « Règles du jeu » de l'accueil et de la partie)
 //   accessibilite_on.mp3 : on active « Accessibilité pour les gens bourrés » dans les réglages
-const SONS = ["cartes", "doree", "tiens_gueule", "bouton", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees", "regles", "accessibilite_on", "etoile"]; // (les sons de sabre et du thème BDSM ne se chargent que dans leur thème, voir morceauClicTheme)
+const SONS = ["cartes", "doree", "tiens_gueule", "bouton", "pigeon", "tour", "eau", "sons_on", "credits", "reglage_son", "no_wifi", "distribuer_gorgees", "annuler_gorgees", "annuler_0_gorgees", "regles", "accessibilite_on", "etoile"]; // (les sons de sabre, du thème BDSM et du saxophone ne se chargent que dans leur thème, voir morceauClicTheme)
 // Sons de sabre : Sons/sabre/sabre_01.mp3 à sabre_54.mp3 (0,8 s chacun). Le clic des boutons en joue un au
 // hasard (jouerSon("bouton")). Si tu en supprimes, retire aussi leur nom de cette liste (et de SONS_A_PRECHARGER dans sw.js) ; un nom sans fichier est simplement ignoré (404).
 const SONS_SABRE = ["sabre/sabre_01", "sabre/sabre_02", "sabre/sabre_05", "sabre/sabre_07", "sabre/sabre_09", "sabre/sabre_11", "sabre/sabre_14", "sabre/sabre_15", "sabre/sabre_18", "sabre/sabre_22", "sabre/sabre_26", "sabre/sabre_31", "sabre/sabre_33", "sabre/sabre_37", "sabre/sabre_40", "sabre/sabre_41", "sabre/sabre_48"];
 // Même chose dans le thème BDSM : Sons/bdsm_buttons/*.mp3 (0,5 à 1 s), un au hasard au clic des boutons (même liste dans sw.js).
 // bdsm_sound_effect est écrit deux fois : il tombe deux fois plus souvent que les autres.
 const SONS_BDSM = ["bdsm_buttons/bdsm_sound_effect", "bdsm_buttons/bdsm_sound_effect", "bdsm_buttons/bdsm_sound_effect1_01", "bdsm_buttons/bdsm_sound_effect1_07", "bdsm_buttons/bdsm_sound_effect1_12", "bdsm_buttons/bdsm_sound_effect1_17", "bdsm_buttons/bdsm_sound_effect1_23", "bdsm_buttons/bdsm_sound_effect1_25", "bdsm_buttons/bdsm_sound_effect1_27", "bdsm_buttons/bdsm_sound_effect1_30", "bdsm_buttons/bdsm_sound_effect1_37", "bdsm_buttons/bdsm_sound_effect1_46"];
-const SONS_CLIC_THEME = { galaxie: SONS_SABRE, donjon: SONS_BDSM };
+// Thème de fête « Fête de la musique » : Sons/saxo/*.mp3 (0,39 à 0,89 s), découpés dans un enregistrement de
+// saxophone. Un au hasard au clic des boutons, comme les sabres (même liste dans sw.js). Les numéros sautent :
+// ce sont ceux des 38 extraits de départ, dont seuls ces 8 ont été gardés. Un fichier supprimé est simplement ignoré (404).
+const SONS_SAXO = ["saxo/saxo_03", "saxo/saxo_07", "saxo/saxo_08", "saxo/saxo_15", "saxo/saxo_26", "saxo/saxo_32", "saxo/saxo_37", "saxo/saxo_38"];
+const SONS_CLIC_THEME = { galaxie: SONS_SABRE, donjon: SONS_BDSM, musique: SONS_SAXO };
 // Sons coupés au bout de N secondes (avec un petit fondu), même si le fichier est plus long
 const DUREE_MAX_SONS = { doree: 3, pigeon: 2, distribuer_gorgees: 0.8, bouton: 0.3 };
 const sonsCharges = {}; // nom -> son décodé (ou null si le fichier n'existe pas)
@@ -1479,19 +1684,19 @@ function chargerSons(){
 // carte | doree | culsec | pigeon | tour | eau
 // Petit son de clic (Sons/bouton.mp3) sur les boutons, sauf ceux qui ont déjà leur propre son
 // (annuler des gorgées, distribuer au +4, choisir le pigeon ou la victime de la carte dorée), et sauf
-// « Signaler un bug » et « Copier le diagnostic » (silencieux)
+// « Signaler un bug » et « Copier le diagnostic » (silencieux), et sauf les touches du petit piano de l'accueil (elles jouent leur note)
 const BOUTONS_AVEC_LEUR_SON = ".bouton-annulation, .plus4-joueur-btn, #overlayPigeon .bouton-pigeon, .bouton-doree, " +
-  "#btnSignalerBug, #btnDiagnostic, #btnRegles, #btnReglesJeu, #btnFaq, #btnFaqDepuisRegles, #bandeauMiseAJour .maj, .fenetreGalaxie-ok, .etoileFilante";
+  "#btnSignalerBug, #btnDiagnostic, #btnRegles, #btnReglesJeu, #btnFaq, #btnFaqDepuisRegles, #bandeauMiseAJour .maj, .fenetreGalaxie-ok, .etoileFilante, .pianoTouche";
 document.addEventListener("click", (e) => {
   if (!e.isTrusted || document.documentElement.classList.contains("mode-tele")) return;
   if (Date.now() - sonBoutonJoueLe < 500) return; // déjà joué au doigt levé (activerMemePendantElan)
   const bouton = e.target && e.target.closest && e.target.closest("button, [role='button']");
   if (!bouton || bouton.disabled || bouton.matches(BOUTONS_AVEC_LEUR_SON)) return;
-  // (choix d'un thème : toujours le clic normal, même dans les thèmes Star Wars et BDSM)
+  // (choix d'un thème : toujours le clic normal, même dans les thèmes Star Wars, BDSM et Fête de la musique)
   jouerSon("bouton", bouton.classList.contains("pastilleTheme"));
 }, { capture: true, passive: true });
 
-// Thèmes Star Wars et BDSM seulement : un son de leur liste au hasard (sabre, ou son de Sons/bdsm_buttons/), parmi ceux
+// Thèmes Star Wars, BDSM et Fête de la musique seulement : un son de leur liste au hasard (sabre, son de Sons/bdsm_buttons/, ou saxophone), parmi ceux
 // qui existent encore (ou pas encore chargés). Dans les autres thèmes, le clic reste le son « bouton ».
 function morceauClicTheme(){
   const liste = SONS_CLIC_THEME[document.documentElement.dataset.theme];
@@ -1505,7 +1710,7 @@ function morceauClicTheme(){
 // clicNormal : le son « bouton » d'origine, jamais remplacé par un sabre ou un son du thème BDSM
 function jouerSon(nom, clicNormal = false){
   sonPourTele(nom);
-  if (nom === "bouton" && !clicNormal) nom = morceauClicTheme(); // le clic des boutons = un son de sabre (ou du thème BDSM) au hasard // mode télé : la télé le joue aussi (même si le son de ce téléphone est coupé)
+  if (nom === "bouton" && !clicNormal) nom = morceauClicTheme(); // le clic des boutons = un son de sabre (ou du thème BDSM, ou de saxophone) au hasard // mode télé : la télé le joue aussi (même si le son de ce téléphone est coupé)
   if (!caseSons.checked || volumeSons <= 0) return;
   if (rattrapageEnCours) return; // reconnexion : pas de sons pour les actions déjà passées
   const ctx = contexteAudio();
@@ -1515,6 +1720,21 @@ function jouerSon(nom, clicNormal = false){
   if (son === undefined) sonsDemandes[nom] = Date.now(); // pas encore chargé : joué dès qu'il arrive
   if (!son) return; // (null : pas de fichier pour ce moment)
   lireSon(nom, son);
+}
+
+// Grelots du traîneau (thème Noël) en train d'être joués : on peut les arrêter avant la fin
+let lectureTraineau = null;
+function arreterSonTraineau(){
+  const L = lectureTraineau;
+  lectureTraineau = null;
+  if (!L) return;
+  try {
+    const t = L.ctx.currentTime;
+    L.sortie.gain.cancelScheduledValues(t);
+    L.sortie.gain.setValueAtTime(L.sortie.gain.value, t);
+    L.sortie.gain.linearRampToValueAtTime(0.0001, t + 0.2); // petit fondu : pas de clic
+    L.lecture.stop(t + 0.25);
+  } catch (e) {}
 }
 
 let dernierClicJoueA = 0; // moment où le dernier clic (bouton ou sabre) a vraiment commencé (voir rafraichirBarreIphone)
@@ -1530,7 +1750,13 @@ function lireSon(nom, son){
   lecture.connect(sortie);
   const debut = ctx.currentTime;
   lecture.start(debut);
-  if (nom === "bouton" || nom.startsWith("sabre/") || nom.startsWith("bdsm_buttons/")) dernierClicJoueA = Date.now();
+  // Grelots du traîneau : gardés de côté pour pouvoir les couper si on quitte l'accueil (voir passageTraineau)
+  if (nom === "traineau_noel") {
+    arreterSonTraineau();
+    lectureTraineau = { ctx, lecture, sortie };
+    lecture.onended = () => { if (lectureTraineau && lectureTraineau.lecture === lecture) lectureTraineau = null; };
+  }
+  if (nom === "bouton" || nom.startsWith("sabre/") || nom.startsWith("bdsm_buttons/") || nom.startsWith("saxo/")) dernierClicJoueA = Date.now();
 
   const dureeMax = DUREE_MAX_SONS[nom];
   if (SONS_QUI_BAISSENT_LA_MUSIQUE.includes(nom)) attenuerMusique(Math.min(son.duration, dureeMax || son.duration));
@@ -1565,6 +1791,65 @@ if (caseGaucher) {
     if (caseGaucher.checked) jouerSon("sons_on");
   });
 }
+
+// ===== Feux d'artifice du Nouvel An et de la Fête nationale : sur TOUS les écrans (téléphone et télé) et dans TOUS les thèmes =====
+// Les deux fêtes partagent exactement les mêmes feux et le même réglage, puisqu'elles ne tombent jamais en même
+// temps. La seule différence : le Nouvel An pose aussi un chapeau de fête sur le O du titre, pas la Fête
+// nationale (html[data-fete="nationale"], voir le <head> de index.html et style_feux.css).
+// Les dates sont dans le <head> de index.html (1er janvier ; 13 au 15 juillet) : hors de là, pas de feux du tout.
+// Réglage de ce téléphone, coché de base : il ne sert qu'à les couper pendant la fête.
+// Les feux sont dessinés dans la couche #feuxArtifice qui recouvre la page (style_feux.css), un toutes les
+// 0,5 à 1,5 s, à un endroit et dans des couleurs au hasard : un éclat, puis une gerbe d'étincelles qui retombent.
+// Rien quand l'appli n'est pas à l'écran, ni si le téléphone demande moins d'animations.
+const CLE_FEUX_ARTIFICE = "alcuno_feux_artifice";
+const caseFeuxArtifice = document.getElementById("optionFeuxArtifice");
+const COULEURS_FEUX = ["#ffe27a", "#ff4fa8", "#5be7ff", "#ffffff", "#7dffb0", "#ffb04a", "#b48cff", "#ff5a4a", "#4f8dff"];
+document.documentElement.classList.toggle("feux-artifice", lireReglage(CLE_FEUX_ARTIFICE, true));
+if (caseFeuxArtifice) {
+  caseFeuxArtifice.checked = lireReglage(CLE_FEUX_ARTIFICE, true);
+  caseFeuxArtifice.addEventListener("change", () => {
+    ecrireReglage(CLE_FEUX_ARTIFICE, caseFeuxArtifice.checked);
+    document.documentElement.classList.toggle("feux-artifice", caseFeuxArtifice.checked);
+    majReglageFeuxArtifice();
+    if (caseFeuxArtifice.checked) jouerSon("sons_on");
+  });
+}
+majReglageFeuxArtifice(); // (la classe html.feux-artifice vient d'être posée ci-dessus)
+
+function feuArtifice(){
+  const zone = document.getElementById("feuxArtifice");
+  if (!zone) return;
+  const W = zone.clientWidth, H = zone.clientHeight;
+  if (!W || !H) return;
+  const feu = document.createElement("div");
+  feu.className = "feuNA";
+  const couleur = COULEURS_FEUX[Math.floor(Math.random() * COULEURS_FEUX.length)];
+  const hasardCouleur = () => COULEURS_FEUX[Math.floor(Math.random() * COULEURS_FEUX.length)];
+  const secondeCouleur = hasardCouleur(), troisiemeCouleur = hasardCouleur();
+  feu.style.left = `${W * (0.08 + Math.random() * 0.84)}px`;
+  feu.style.top = `${H * (0.08 + Math.random() * 0.6)}px`;
+  feu.style.setProperty("--c", couleur);
+  const rayon = Math.min(W, H) * (0.26 + Math.random() * 0.2);
+  const nb = 34;
+  let html = "<b></b>";
+  for (let i = 0; i < nb; i++) {
+    const angle = (i / nb) * Math.PI * 2 + Math.random() * 0.2;
+    const r = rayon * (i % 2 ? 0.62 : 1) * (0.9 + Math.random() * 0.2); // deux anneaux
+    html += `<i style="--dx:${Math.round(Math.cos(angle) * r)}px;--dy:${Math.round(Math.sin(angle) * r)}px;--t:${6 + Math.round(Math.random() * 4)}px;--d:${(1.7 + Math.random() * 0.6).toFixed(2)}s;--c:${[couleur, secondeCouleur, troisiemeCouleur][i % 3]}"></i>`;
+  }
+  feu.innerHTML = html;
+  zone.appendChild(feu);
+  setTimeout(() => feu.remove(), 2600);
+}
+function prochainFeuArtifice(){
+  setTimeout(() => {
+    if (document.documentElement.classList.contains("feux-actifs") &&
+        document.visibilityState === "visible" &&
+        !matchMedia("(prefers-reduced-motion: reduce)").matches) feuArtifice();
+    prochainFeuArtifice();
+  }, 550 + Math.random() * 1000);
+}
+prochainFeuArtifice();
 
 const MINUTES_RAPPEL_EAU = 20;
 let tempsDeJeuSansEau = 0; // ms de partie (écran allumé) depuis le dernier rappel
@@ -2662,6 +2947,10 @@ function reglesDuJeu(){
             "À la carte Cupidon suivante : lier 2 autres joueurs, ou briser un lien"
           ]}
         : { carte: "un_rouge", nom: "1 : annulation", texte: `Tu gardes la carte : quand tu dois boire, tu peux t'en servir pour annuler ${g(1)}.` },
+      ...(hot && saintValentinEnCours() ? [{ carte: "coup_de_foudre", nom: "Coup de foudre (Saint-Valentin)", texte: [
+            "Choisis quelqu'un : <b>un bisou sur la bouche</b>…",
+            `… ou tu prends ${pj ? g(4) : "<em>un CUL SEC</em>"}`
+          ]}] : []),
       { carte: "plus_2_jaune", nom: "+2", texte: `Tu bois ${g(gorgeesPlus2())}.` },
       { carte: "plus_4", nom: "+4", texte: `Tu distribues ${g(gorgeesPlus4())} comme tu veux.` },
       { carte: "trois_vert", nom: "3 : le Pigeon", texte: [

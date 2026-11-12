@@ -55,6 +55,14 @@
         if (boutons.length) { journal.push("defi " + (nbDefis % 2 ? "bois" : "fait")); pd(boutons[nbDefis++ % 2] || boutons[0]); }
         return setTimeout(tick, 60);
       }
+      // Mode hot, période Saint-Valentin : Coup de foudre (choisir quelqu'un, puis bisou ou cul sec, en alternance)
+      if ($("#overlayCoupDeFoudre")) {
+        const btns = $$("#overlayCoupDeFoudre button").filter(visible);
+        const bisou = btns.find(b => b.innerText.includes("Bisou")), culsec = btns.find(b => b.innerText.includes("🥃"));
+        if (bisou && culsec) { const b = nbDefis++ % 2 ? culsec : bisou; journal.push("coup de foudre " + b.innerText.trim()); pd(b); }
+        else if (btns.length) { journal.push("coup de foudre joueur"); pd(btns[0]); }
+        return setTimeout(tick, 60);
+      }
       // Mode hot : Cupidon (lier deux joueurs, puis valider ; sinon briser un lien)
       if ($("#overlayCupidon")) {
         const btns = $$("#overlayCupidon button").filter(visible);

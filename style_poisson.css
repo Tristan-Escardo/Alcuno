@@ -1,0 +1,68 @@
+/* Poisson d'avril (js/poisson.js) : fenêtres neutres, volontairement pas aux couleurs d'un thème (le faux plantage doit avoir l'air vrai) */
+#titreAccueil.poisson-uno{ cursor: pointer; }
+
+.poisson-voile{
+  position: fixed; inset: 0; z-index: 100000;
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px; box-sizing: border-box;
+  background: rgba(20, 24, 32, .72);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  animation: poissonEntree .2s ease both;
+}
+.poisson-carte{
+  width: min(86vw, 360px); box-sizing: border-box;
+  padding: 22px 20px 20px; border-radius: 18px;
+  background: #f3f4f6; color: #1f2937; text-align: center;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, .45);
+}
+.poisson-icone{ font-size: 40px; line-height: 1.1; margin-bottom: 8px; }
+.poisson-titre{ font-size: 19px; font-weight: 800; margin-bottom: 8px; }
+.poisson-texte{ font-size: 17px; font-weight: 600; line-height: 1.35; margin-bottom: 18px; }
+.poisson-code{
+  font: 12px/1.35 ui-monospace, Menlo, Consolas, monospace; color: #6b7280;
+  background: #e5e7eb; border-radius: 8px; padding: 8px 10px; margin: -6px 0 18px; text-align: left; word-break: break-word;
+}
+.fenetrePoisson-bouton{
+  appearance: none; -webkit-appearance: none; border: 0; border-radius: 12px;
+  min-width: 150px; padding: 13px 22px; font: inherit; font-size: 17px; font-weight: 800;
+  background: #2563eb; color: #fff; cursor: pointer; touch-action: manipulation;
+}
+.poisson-plantage .fenetrePoisson-bouton{ background: #dc2626; }
+.fenetrePoisson-bouton.poisson-fuit{ position: fixed; z-index: 100001; transition: left .12s ease-out, top .12s ease-out; }
+.fenetrePoisson-bouton.poisson-aveu{ background: #16a34a; }
+@keyframes poissonEntree{ from{ opacity: 0; } to{ opacity: 1; } }
+
+/* Dos de cartes « UNO » (blague 1 : html.poisson-uno posé par js/poisson.js) */
+
+/* >>> généré par outils/poisson_dos.py : ne pas modifier à la main >>> */
+html.poisson-uno .Carte:not(.retournee):not([class*="_"]):not([class*="couleur"]),
+html.poisson-uno .Carte.dos_dore:not(.retournee){ background-image: url("Cartes/dos_uno.svg") !important; }
+html.poisson-uno.faces-fermees #plateau .Carte.retournee.recachee,
+html.poisson-uno .tele-plateau .Carte.carte-recachee{ background-image: url("Cartes/dos_uno.svg") !important; }
+html.poisson-uno[data-theme="galaxie"] .Carte:not(.retournee):not([class*="_"]):not([class*="couleur"]),
+html.poisson-uno.faces-fermees[data-theme="galaxie"] #plateau .Carte.retournee.recachee,
+html.poisson-uno[data-theme="galaxie"] .tele-plateau .Carte.carte-recachee{ background-image: url("Cartes/dos_galaxie_argent_uno.svg") !important; }
+html.poisson-uno[data-theme="galaxie"] .Carte:not(.retournee):not([class*="_"]):not([class*="couleur"]):nth-child(3n+2),
+html.poisson-uno.faces-fermees[data-theme="galaxie"] #plateau .Carte.retournee.recachee:nth-child(3n+2),
+html.poisson-uno[data-theme="galaxie"] .tele-plateau .Carte.carte-recachee:nth-child(3n+2),
+html.poisson-uno[data-theme="galaxie"] .Carte.dos_dore:not(.retournee):nth-child(3n+2){ background-image: url("Cartes/dos_galaxie_hyperespace_uno.svg") !important; }
+html.poisson-uno[data-theme="galaxie"] .Carte:not(.retournee):not([class*="_"]):not([class*="couleur"]):nth-child(3n),
+html.poisson-uno.faces-fermees[data-theme="galaxie"] #plateau .Carte.retournee.recachee:nth-child(3n),
+html.poisson-uno[data-theme="galaxie"] .tele-plateau .Carte.carte-recachee:nth-child(3n),
+html.poisson-uno[data-theme="galaxie"] .Carte.dos_dore:not(.retournee):nth-child(3n){ background-image: url("Cartes/dos_galaxie_planete_uno.svg") !important; }
+html.poisson-uno[data-theme="galaxie"] .Carte.dos_dore:not(.retournee){ background-image: url("Cartes/dos_galaxie_argent_uno.svg") !important; }
+html.poisson-uno[data-theme="galaxie"] #ecranRegles .ligneRegle .Carte.retournee:not([class*="_"]):not([class*="couleur"]){ background-image: url("Cartes/dos_galaxie_argent_uno.svg") !important; }
+html.poisson-uno[data-theme="kawaii"] .Carte:not(.retournee):not([class*="_"]):not([class*="couleur"]):nth-child(3n+1),
+html.poisson-uno.faces-fermees[data-theme="kawaii"] #plateau .Carte.retournee.recachee:nth-child(3n+1),
+html.poisson-uno[data-theme="kawaii"] .tele-plateau .Carte.carte-recachee:nth-child(3n+1){ background-image: url("Cartes/dos_kawaii_uno_licorne.svg") !important; }
+html.poisson-uno[data-theme="kawaii"] .Carte:not(.retournee):not([class*="_"]):not([class*="couleur"]):nth-child(3n+2),
+html.poisson-uno.faces-fermees[data-theme="kawaii"] #plateau .Carte.retournee.recachee:nth-child(3n+2),
+html.poisson-uno[data-theme="kawaii"] .tele-plateau .Carte.carte-recachee:nth-child(3n+2){ background-image: url("Cartes/dos_kawaii_uno_nuages.svg") !important; }
+html.poisson-uno[data-theme="kawaii"] .Carte:not(.retournee):not([class*="_"]):not([class*="couleur"]):nth-child(3n),
+html.poisson-uno.faces-fermees[data-theme="kawaii"] #plateau .Carte.retournee.recachee:nth-child(3n),
+html.poisson-uno[data-theme="kawaii"] .tele-plateau .Carte.carte-recachee:nth-child(3n){ background-image: url("Cartes/dos_kawaii_uno_gourmand.svg") !important; }
+html.poisson-uno[data-theme="kawaii"] .Carte.dos_dore:not(.retournee):nth-child(3n+1){ background-image: url("Cartes/dos_kawaii_uno_licorne.svg") !important; }
+html.poisson-uno[data-theme="kawaii"] .Carte.dos_dore:not(.retournee):nth-child(3n+2){ background-image: url("Cartes/dos_kawaii_uno_nuages.svg") !important; }
+html.poisson-uno[data-theme="kawaii"] .Carte.dos_dore:not(.retournee):nth-child(3n){ background-image: url("Cartes/dos_kawaii_uno_gourmand.svg") !important; }
+html.poisson-uno[data-theme="kawaii"] #ecranRegles .ligneRegle .Carte.retournee:not([class*="_"]):not([class*="couleur"]){ background-image: url("Cartes/dos_kawaii_uno_licorne.svg") !important; }
+/* <<< fin du bloc généré <<< */

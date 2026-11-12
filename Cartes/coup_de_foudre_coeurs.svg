@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 624" width="400" height="624">
+  <!-- Carte « Coup de foudre » (mode hot, période Saint-Valentin) : deux cœurs et l'éclair qui tombe entre eux. De dos, comme les autres cartes. -->
+<defs>
+<linearGradient id="ovR" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff4d6d"/><stop offset="1" stop-color="#a3001b"/></linearGradient>
+<linearGradient id="ovB" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#ffd6e2"/></linearGradient>
+<linearGradient id="ovN" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff7ab0"/><stop offset="1" stop-color="#c2185b"/></linearGradient>
+<linearGradient id="or" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff6b0"/><stop offset=".5" stop-color="#ffd23f"/><stop offset="1" stop-color="#f29a00"/></linearGradient>
+<linearGradient id="rose" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#ffc2d6"/></linearGradient>
+<linearGradient id="rouge" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff2f4e"/><stop offset="1" stop-color="#a8001c"/></linearGradient>
+<clipPath id="gauche"><path d="M-200 -200 L40 -200 L-30 10 L20 10 L-20 220 L-200 220 Z"/></clipPath>
+<clipPath id="droite"><path d="M200 -200 L60 -200 L-10 10 L40 10 L0 220 L200 220 Z"/></clipPath>
+</defs><rect width="400" height="624" fill="#fff"/><rect x="14" y="14" width="372" height="596" rx="26" fill="#2a0a1e"/><g transform="rotate(32 200 312)"><ellipse cx="200" cy="312" rx="166" ry="250" fill="#fff"/><ellipse cx="200" cy="312" rx="152" ry="236" fill="url(#ovN)"/></g>
+<g transform="translate(150 350) rotate(-14) scale(.62)"><path d="M0 120 C-150 20 -120 -110 0 -40 C120 -110 150 20 0 120 Z" fill="url(#rouge)" stroke="#fff" stroke-width="14"/></g>
+<g transform="translate(252 296) rotate(14) scale(.62)"><path d="M0 120 C-150 20 -120 -110 0 -40 C120 -110 150 20 0 120 Z" fill="url(#rose)" stroke="#fff" stroke-width="14"/></g>
+<g transform="translate(214 270) scale(0.6)"><path d="M30 -170 L-58 38 L4 38 L-46 250 L82 -8 L16 -8 L66 -170 Z" fill="url(#or)" stroke="#fff" stroke-width="14" stroke-linejoin="round"/><path d="M30 -170 L-58 38 L4 38 L-46 250 L82 -8 L16 -8 L66 -170 Z" fill="none" stroke="#7a3a00" stroke-width="4" stroke-linejoin="round"/></g>
+<g fill="#fff"><circle cx="128" cy="210" r="6"/><circle cx="296" cy="430" r="6"/><circle cx="300" cy="200" r="4"/></g>
+<g transform="translate(66 84)"><ellipse rx="34" ry="42" fill="#c2185b" stroke="#fff" stroke-width="7"/><path d="M-4 16 C-26 0 -18 -20 -4 -10 C10 -20 18 0 -4 16 Z" fill="#fff"/><path d="M8 -24 L-2 -2 L8 -2 L0 22" stroke="#ffd23f" stroke-width="4" fill="none" stroke-linejoin="round"/></g><g transform="translate(334 540) rotate(180)"><ellipse rx="34" ry="42" fill="#c2185b" stroke="#fff" stroke-width="7"/><path d="M-4 16 C-26 0 -18 -20 -4 -10 C10 -20 18 0 -4 16 Z" fill="#fff"/><path d="M8 -24 L-2 -2 L8 -2 L0 22" stroke="#ffd23f" stroke-width="4" fill="none" stroke-linejoin="round"/></g></svg>

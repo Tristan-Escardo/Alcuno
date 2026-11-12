@@ -10,6 +10,10 @@ Statut : première version codée (jeu 9.74.0, non poussée). Dernière mise à 
 - js/mode-hot.js : 58 défis (A 27, B 16, C 15), choix selon les gorgées affichées, cible au hasard (hasard à graine, à part de celui du paquet), pas deux fois le même défi pour un joueur, écran du défi, carte Cupidon (lier / briser), 💘 dans la liste des joueurs.
 - Pas encore fait / limites connues : lien Cupidon seulement pour les gorgées d'une seule personne (pas pour 0 / Sociale / carte dorée) ; pas de duel de regards ; pas de réglage de fréquence ; un défi par événement de gorgées (la gorgée « couleur » en plus donne un 2e défi) ; télé : le défi s'affiche comme une annonce avec ses boutons en étiquettes.
 
+## Ajouts du 10 novembre (jeu 9.86.0)
+- **« Couple de la soirée » 💞** dans le récap de fin, à TOUTES les parties hot : les deux joueurs qui se sont le plus fait boire l'un l'autre. Compté : gorgées données au +4, cul sec de la carte dorée, gorgées bues ensemble par un lien Cupidon, bisous de la carte Coup de foudre (un bisou vaut un cul sec). `compterCouple` dans js/plateau.js.
+- **Carte « Coup de foudre » ⚡💋** (Cartes/coup_de_foudre.svg ; de dos comme les autres) : pendant la période Saint-Valentin (7 au 15 février, ou thème Saint-Valentin choisi à la main en attendant le calendrier), elle remplace un des 2 changements de sens en plus du paquet hot (toujours 52 cartes ; en express aussi, à la place d'un changement de sens). Celui qui la tire choisit quelqu'un : un bisou sur la bouche… ou un cul sec (4 gorgées en mode PJ). En ligne : la période de celui qui lance la partie voyage dans la graine (bit 2^35, `graineValentin`). Fenêtre : `afficherOverlayCoupDeFoudre` (js/mode-hot.js), même style que Cupidon.
+
 ## Périmètre
 - On ajoute UNIQUEMENT un mode hot dans Alcuno. Les autres modes (Je n'ai jamais, mot interdit…) sont abandonnés.
 - Une carte normale reste une carte normale ; le hot s'ajoute dessus, via une seule fonction qui prend n'importe quelle carte et ajoute le bonus avant l'affichage, sans réécrire chaque règle.

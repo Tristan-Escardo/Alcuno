@@ -76,7 +76,7 @@ html[data-theme="donjon"] header h1{
 }
 
 /* ----- Boutons : pilules vernies rouge et noir ----- */
-html[data-theme="donjon"] button:not(.btnPauseJoueur):not(.btnLivre):not(#btnReglages):not(.btnAccueilTexte):not(#btnPause):not(#btnReglagesJeu):not(.bloc-hot-btn):not(.pastilleTheme):not(.btnRetour):not(.annonceFermer):not(.btnInstaller):not(#btnSignalerBug):not(#btnFaq):not(#btnFaqDepuisRegles):not(#btnDiagnostic):not(.optionLien):not(.btnDiagnostic):not(#btnAnnonceFermer){
+html[data-theme="donjon"] button:not(#btnInstallationInstaller):not(#btnInstallationPlusTard):not(.btnPauseJoueur):not(.btnLivre):not(#btnReglages):not(.btnAccueilTexte):not(#btnPause):not(#btnReglagesJeu):not(.bloc-hot-btn):not(.pastilleTheme):not(.btnRetour):not(.annonceFermer):not(.btnInstaller):not(#btnSignalerBug):not(#btnFaq):not(#btnFaqDepuisRegles):not(#btnDiagnostic):not(.optionLien):not(.btnDiagnostic):not(#btnAnnonceFermer){
   background: linear-gradient(#3a0a14 0%, #0a0a0c 48%, #2a0610 52%, #5a0a1c 100%) !important; color: #ffd0d6 !important;
   border: 2px solid #ff2a3d !important; border-radius: 999px !important;
   box-shadow: 0 0 16px rgba(255, 42, 61, 0.75), inset 0 2px 0 rgba(255, 255, 255, 0.35) !important;
@@ -94,6 +94,8 @@ html[data-theme="donjon"] #ecranRegles .ligneRegle .Carte.retournee:not([class*=
 
 /* ----- Annonces : titres rouges ----- */
 html[data-theme="donjon"] :is(#overlayCouleur, #overlayPlus4, #overlayCupidon, #overlayPigeon, #overlayCarteDoree, #overlayFinUnRestants, #overlayDuel,
+  #overlayRegleUnique, #overlayAnnulation, #overlayResultatAnnulation, #overlayPredictionFin, .overlay-opaque),
+html[data-theme="donjon"] :is(#overlayCouleur, #overlayPlus4, #overlayCoupDeFoudre, #overlayPigeon, #overlayCarteDoree, #overlayFinUnRestants, #overlayDuel,
   #overlayRegleUnique, #overlayAnnulation, #overlayResultatAnnulation, #overlayPredictionFin, .overlay-opaque){ background: var(--overlay-fond) !important; }
 html[data-theme="donjon"].overlay-ouvert, html[data-theme="donjon"].overlay-ouvert body, html[data-theme="donjon"] #voileOverlays{ background: var(--overlay-bord); }
 html[data-theme="donjon"] .plus4-actions{ background: transparent; }
@@ -292,8 +294,10 @@ html[data-theme="donjon"] .recap-doree{ background: linear-gradient(135deg, rgba
 /* ===== Fenêtres de la partie sur le téléphone (duel, +4, Cupidon, couleur, pari) et bandeaux : rouge au lieu du jaune.
    Restent dorés exprès : la carte dorée (citation de Célien, étincelles) et le carré jaune du choix de couleur ===== */
 html[data-theme="donjon"] :is(#overlayDuel, #overlayPlus4, #overlayCupidon, #overlayPigeon, #overlayFinUnRestants) .titre-pigeon,
+html[data-theme="donjon"] :is(#overlayDuel, #overlayPlus4, #overlayCoupDeFoudre, #overlayPigeon, #overlayFinUnRestants) .titre-pigeon,
 html[data-theme="donjon"] #overlayCouleur div.titre-couleur{ color: #ff3b4e !important; text-shadow: 0 2px 0 #000, 0 0 14px rgba(255, 42, 61, 0.7) !important; }
 html[data-theme="donjon"] :is(#overlayPlus4, #overlayCupidon) .plus4-total,
+html[data-theme="donjon"] :is(#overlayPlus4, #overlayCoupDeFoudre) .plus4-total,
 html[data-theme="donjon"] #overlayDuel :is(.duel-info, .duel-label),
 html[data-theme="donjon"] #overlayPredictionFin :is(.fin-choix-turn, .fin-choix-resultat, .prediction-subtitle, strong, .choix){ color: #ff8a96 !important; }
 html[data-theme="donjon"] #overlayCouleur .explication-couleur b{ color: #ff6b7c; }

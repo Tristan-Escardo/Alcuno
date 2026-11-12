@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 220">
+  <!-- Sapin de Noël décoré (thème Noël, accueil) -->
+  <defs>
+    <linearGradient id="v" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1f8a45"/><stop offset=".55" stop-color="#156b33"/><stop offset="1" stop-color="#0b4721"/></linearGradient>
+    <radialGradient id="boule" cx=".35" cy=".35" r=".7"><stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset=".25" stop-color="#fff" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect x="70" y="182" width="20" height="26" rx="3" fill="#6b3a17"/>
+  <path d="M80 30 L128 92 L108 92 L144 140 L120 140 L156 188 L4 188 L40 140 L16 140 L52 92 L32 92z" fill="url(#v)"/>
+  <path d="M80 30 L128 92 L108 92 L144 140 L120 140 L156 188 L80 188z" fill="#000" opacity=".12"/>
+  <!-- neige sur les branches -->
+  <g fill="#fff"><path d="M32 92 Q56 99 80 92 Q104 99 128 92 L122 86 Q100 92 80 86 Q60 92 38 86z"/>
+  <path d="M16 140 Q48 148 80 140 Q112 148 144 140 L137 133 Q108 141 80 133 Q52 141 23 133z"/>
+  <path d="M4 188 Q42 196 80 188 Q118 196 156 188 L150 181 Q114 189 80 181 Q46 189 10 181z"/></g>
+  <!-- guirlande -->
+  <g fill="none" stroke="#ffd23f" stroke-width="2.4"><path d="M56 70 Q82 84 104 66"/><path d="M38 118 Q82 136 124 112"/><path d="M24 166 Q82 184 138 160"/></g>
+  <!-- boules -->
+  <g><circle cx="64" cy="76" r="6" fill="#e3242b"/><circle cx="96" cy="74" r="6" fill="#3a8cff"/><circle cx="50" cy="124" r="7" fill="#ffd23f"/><circle cx="84" cy="130" r="7" fill="#e3242b"/><circle cx="114" cy="120" r="7" fill="#ff7bd5"/><circle cx="36" cy="170" r="7.5" fill="#3a8cff"/><circle cx="72" cy="178" r="7.5" fill="#ffd23f"/><circle cx="106" cy="176" r="7.5" fill="#e3242b"/><circle cx="132" cy="166" r="7" fill="#5bff8a"/></g>
+  <g fill="url(#boule)"><circle cx="64" cy="76" r="6"/><circle cx="96" cy="74" r="6"/><circle cx="50" cy="124" r="7"/><circle cx="84" cy="130" r="7"/><circle cx="114" cy="120" r="7"/><circle cx="36" cy="170" r="7.5"/><circle cx="72" cy="178" r="7.5"/><circle cx="106" cy="176" r="7.5"/><circle cx="132" cy="166" r="7"/></g>
+  <!-- étoile -->
+  <path d="M80 4 L87 21 L105 22 L91 33 L96 51 L80 41 L64 51 L69 33 L55 22 L73 21z" fill="#ffd23f" stroke="#c68a0a" stroke-width="2" stroke-linejoin="round"/>
+  <!-- cadeaux au pied -->
+  <rect x="18" y="194" width="30" height="22" rx="2" fill="#e3242b"/><rect x="30" y="194" width="6" height="22" fill="#ffd23f"/>
+  <rect x="112" y="198" width="28" height="18" rx="2" fill="#3a8cff"/><rect x="123" y="198" width="6" height="18" fill="#fff"/>
+</svg>

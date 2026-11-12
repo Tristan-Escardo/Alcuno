@@ -4,6 +4,13 @@ html.chargement body{
   pointer-events: none;
 }
 
+/* Texte sélectionné (nom du joueur, code de la partie, pseudo, champ du rapport de bug…) : aux couleurs du
+   jeu au lieu du bleu du navigateur. Chaque thème peut la changer avec --selection-fond / --selection-texte. */
+::selection{
+  background: var(--selection-fond, #FFD700);
+  color: var(--selection-texte, #2b001d);
+}
+
 /* Anti scroll horizontal (iOS/Android) */
 
 body{
@@ -157,8 +164,10 @@ button,
 #listeSuppression .supp-check,
 #overlayPlus4 .plus4-joueur-btn,
 #overlayCupidon .plus4-joueur-btn,
+#overlayCoupDeFoudre .plus4-joueur-btn,
 #overlayPlus4 .plus4-action-btn,
 #overlayCupidon .plus4-action-btn,
+#overlayCoupDeFoudre .plus4-action-btn,
 #overlayPigeon .bouton-pigeon,
 #overlayCarteDoree .bouton-pigeon,
 #overlayFinUnRestants .bouton-pigeon,
@@ -483,7 +492,7 @@ button,
 }
 
 /* ===== Overlay PLUS 4 ===== */
-#overlayPlus4,#overlayCupidon{
+#overlayPlus4,#overlayCupidon,#overlayCoupDeFoudre{
   z-index: 9999;
   background-color: rgb(0,0,0);
   display: flex;
@@ -504,7 +513,7 @@ button,
 }
 
 /* Titre comme pigeon */
-#overlayPlus4 .titre-pigeon,#overlayCupidon .titre-pigeon{
+#overlayPlus4 .titre-pigeon,#overlayCupidon .titre-pigeon,#overlayCoupDeFoudre .titre-pigeon{
   font-weight: bold;
   color: #FFD700;
   text-align: center;
@@ -512,8 +521,23 @@ button,
   animation: pop 0.5s ease forwards;
 }
 
+/* Carte Coup de foudre (mode hot, Saint-Valentin) : titre, mention « défi hot spécial Saint-Valentin », puis consigne, espacés */
+#overlayCoupDeFoudre .titre-pigeon .foudre-nowrap{ display: inline; white-space: nowrap; }
+#overlayCoupDeFoudre .foudre-titre{ font-size: 1.15em; line-height: 1.1; }
+#overlayCoupDeFoudre .foudre-badge, #overlayRegleUnique .foudre-badge{
+  display: inline-block !important; margin: 0 auto 0.5em; padding: 0.35em 1em; border-radius: 999px;
+  font-size: 0.68em; font-weight: 900; letter-spacing: 0.02em; text-transform: uppercase; max-width: 88%;
+  color: #c2185b !important; background: #fff; border: 3px solid #ff3d7a; text-shadow: none !important;
+  box-shadow: 0 0 0 4px rgba(255, 61, 122, 0.35), 0 0 22px rgba(255, 120, 170, 0.9);
+  animation: foudreBadge 1.4s ease-in-out infinite;
+}
+@keyframes foudreBadge{ 0%, 100%{ transform: scale(1); } 50%{ transform: scale(1.06); box-shadow: 0 0 0 6px rgba(255, 61, 122, 0.45), 0 0 34px rgba(255, 150, 190, 1); } }
+#overlayRegleUnique .foudre-badge{ font-size: 0.5em; margin-bottom: 0.6em; } #overlayRegleUnique .foudre-nowrap{ white-space: nowrap; }
+@media (prefers-reduced-motion: reduce){ #overlayCoupDeFoudre .foudre-badge, #overlayRegleUnique .foudre-badge{ animation: none; } }
+#overlayCoupDeFoudre .foudre-consigne{ margin-top: 0.75em; font-size: 0.72em; line-height: 1.3; color: #fff; }
+
 /* Boutons plus compacts pour le +4 (sinon ça déborde) */
-#overlayPlus4 .bouton-pigeon,#overlayCupidon .bouton-pigeon{
+#overlayPlus4 .bouton-pigeon,#overlayCupidon .bouton-pigeon,#overlayCoupDeFoudre .bouton-pigeon{
   max-width: 320px;
   font-weight: bold;
   border-radius: 12px;
@@ -526,30 +550,30 @@ button,
 }
 
 @media (hover: hover){ /* survol : seulement avec une souris (sur téléphone il reste collé après un tap) */
-  #overlayPlus4 .bouton-pigeon:hover,#overlayCupidon .bouton-pigeon:hover{
+  #overlayPlus4 .bouton-pigeon:hover,#overlayCupidon .bouton-pigeon:hover,#overlayCoupDeFoudre .bouton-pigeon:hover{
     background-color: #ffea70;
     transform: scale(1.10);
   }
 }
 
-#overlayPlus4 .plus4-joueur-btn,#overlayCupidon .plus4-joueur-btn{
+#overlayPlus4 .plus4-joueur-btn,#overlayCupidon .plus4-joueur-btn,#overlayCoupDeFoudre .plus4-joueur-btn{
   width: min(420px, 92vw) !important;
   background: rgba(255, 215, 0, 0.94);
   box-shadow: 0 8px 18px rgba(0,0,0,0.18);
 }
 
 @media (hover: hover){ /* survol : seulement avec une souris (sur téléphone il reste collé après un tap) */
-  #overlayPlus4 .plus4-joueur-btn:hover,#overlayCupidon .plus4-joueur-btn:hover{
+  #overlayPlus4 .plus4-joueur-btn:hover,#overlayCupidon .plus4-joueur-btn:hover,#overlayCoupDeFoudre .plus4-joueur-btn:hover{
     transform: translateY(-1px) scale(1.02);
   }
 }
 
-#overlayPlus4 .plus4-action-btn,#overlayCupidon .plus4-action-btn{
+#overlayPlus4 .plus4-action-btn,#overlayCupidon .plus4-action-btn,#overlayCoupDeFoudre .plus4-action-btn{
   width: min(420px, 92vw);
 }
 
 
-#overlayPlus4 .plus4-total,#overlayCupidon .plus4-total{
+#overlayPlus4 .plus4-total,#overlayCupidon .plus4-total,#overlayCoupDeFoudre .plus4-total{
   color: #FFD700;
   font-size: 22px;
   font-weight: 900;
@@ -574,14 +598,14 @@ button,
   padding: 12px 0;
 }
 
-#overlayPlus4 .plus4-actions,#overlayCupidon .plus4-actions{
+#overlayPlus4 .plus4-actions,#overlayCupidon .plus4-actions,#overlayCoupDeFoudre .plus4-actions{
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 12px;
 }
 
-#overlayPlus4 .plus4-badge,#overlayCupidon .plus4-badge{
+#overlayPlus4 .plus4-badge,#overlayCupidon .plus4-badge,#overlayCoupDeFoudre .plus4-badge{
   margin-left: 10px;
   font-weight: 900;
 }
@@ -604,7 +628,7 @@ button,
         grid-template-columns: repeat(2, minmax(88px, 120px));
         gap: 16px;
     }
-    #overlayPlus4 .plus4-joueur-btn,#overlayCupidon .plus4-joueur-btn{
+    #overlayPlus4 .plus4-joueur-btn,#overlayCupidon .plus4-joueur-btn,#overlayCoupDeFoudre .plus4-joueur-btn{
       width: 100% !important;
     }
 }
@@ -1057,7 +1081,7 @@ html[data-theme="galaxie"] .fin-choix-numeros b{ background: #8fd0ff; color: #02
 }
 
 /* ===== Base responsive pour tous les overlays ===== */
-#overlayPlus4,#overlayCupidon,
+#overlayPlus4,#overlayCupidon,#overlayCoupDeFoudre,
 #overlayDuel,
 #overlayPigeon,
 #overlayCarteDoree,
@@ -1071,7 +1095,7 @@ html[data-theme="galaxie"] .fin-choix-numeros b{ background: #8fd0ff; color: #02
   padding-right: calc(20px + env(safe-area-inset-right) + var(--sbw, 0px));
 }
 
-#overlayPlus4 .titre-pigeon,#overlayCupidon .titre-pigeon,
+#overlayPlus4 .titre-pigeon,#overlayCupidon .titre-pigeon,#overlayCoupDeFoudre .titre-pigeon,
 #overlayDuel .titre-pigeon,
 #overlayPigeon .titre-pigeon,
 #overlayCarteDoree .titre-pigeon,
@@ -1084,7 +1108,7 @@ html[data-theme="galaxie"] .fin-choix-numeros b{ background: #8fd0ff; color: #02
   font-size: clamp(18px, 4.5vw, 36px);
 }
 
-#overlayPlus4,#overlayCupidon,
+#overlayPlus4,#overlayCupidon,#overlayCoupDeFoudre,
 #overlayDuel,
 #overlayPigeon,
 #overlayCarteDoree,
@@ -1112,7 +1136,7 @@ html[data-theme="galaxie"] .fin-choix-numeros b{ background: #8fd0ff; color: #02
 }
 
 /* Boutons overlays: taille flexible */
-#overlayPlus4 .bouton-pigeon,#overlayCupidon .bouton-pigeon,
+#overlayPlus4 .bouton-pigeon,#overlayCupidon .bouton-pigeon,#overlayCoupDeFoudre .bouton-pigeon,
 #overlayDuel .bouton-pigeon,
 #overlayPigeon .bouton-pigeon,
 #overlayCarteDoree .bouton-pigeon,
@@ -1273,7 +1297,7 @@ html[data-theme="galaxie"] .fin-choix-numeros b{ background: #8fd0ff; color: #02
 }
 @media (max-width: 520px){
   /* moins d’espace, boutons en pleine largeur */
-  #overlayPlus4 .bouton-pigeon,#overlayCupidon .bouton-pigeon,
+  #overlayPlus4 .bouton-pigeon,#overlayCupidon .bouton-pigeon,#overlayCoupDeFoudre .bouton-pigeon,
   #overlayDuel .bouton-pigeon,
   #overlayPigeon .bouton-pigeon,
   #overlayCarteDoree .bouton-pigeon,
@@ -1346,6 +1370,7 @@ html[data-theme="galaxie"] .fin-choix-numeros b{ background: #8fd0ff; color: #02
 
 .couleur, .couleur1, .couleur2, .couleur3 { background-image: url("Cartes/couleur.webp"); }
 .cupidon_a, .cupidon_b, .cupidon_c { background-image: url("Cartes/cupidon.webp"); }
+.coup_de_foudre { background-image: url("Cartes/coup_de_foudre_coeurs.svg"); } /* mode hot, période Saint-Valentin (js/mode-hot.js) */
 
 .plus_2_vert, .plus_2_vert1, .plus_2_vert2, .plus_2_vert3 { background-image: url("Cartes/plus_2_vert.webp"); }
 .plus_2_jaune, .plus_2_jaune1, .plus_2_jaune2, .plus_2_jaune3 { background-image: url("Cartes/plus_2_jaune.webp"); }
@@ -1556,7 +1581,7 @@ html[data-theme="galaxie"] .fin-choix-numeros b{ background: #8fd0ff; color: #02
 
 
 /* ===== Override final : +4 ultra compact ===== */
-#overlayPlus4 .plus4-container-joueurs,#overlayCupidon .plus4-container-joueurs{
+#overlayPlus4 .plus4-container-joueurs,#overlayCupidon .plus4-container-joueurs,#overlayCoupDeFoudre .plus4-container-joueurs{
   grid-template-columns: repeat(2, minmax(88px, 118px));
   gap: 8px;
   width: min(250px, 74vw);
@@ -1564,9 +1589,10 @@ html[data-theme="galaxie"] .fin-choix-numeros b{ background: #8fd0ff; color: #02
   margin: 2px auto 0 auto;
 }
 
-#overlayPlus4 .plus4-container-joueurs .bouton-pigeon,#overlayCupidon .plus4-container-joueurs .bouton-pigeon,
+#overlayPlus4 .plus4-container-joueurs .bouton-pigeon,#overlayCupidon .plus4-container-joueurs .bouton-pigeon,#overlayCoupDeFoudre .plus4-container-joueurs .bouton-pigeon,
 #overlayPlus4 .plus4-joueur-btn,
-#overlayCupidon .plus4-joueur-btn{
+#overlayCupidon .plus4-joueur-btn,
+#overlayCoupDeFoudre .plus4-joueur-btn{
   width: 100%;
   max-width: none;
   min-height: 68px;
@@ -1576,12 +1602,12 @@ html[data-theme="galaxie"] .fin-choix-numeros b{ background: #8fd0ff; color: #02
   border-radius: 12px;
 }
 
-#overlayPlus4 .plus4-actions,#overlayCupidon .plus4-actions{
+#overlayPlus4 .plus4-actions,#overlayCupidon .plus4-actions,#overlayCoupDeFoudre .plus4-actions{
   width: min(300px, 88vw);
   margin-top: 10px;
 }
 
-#overlayPlus4 .plus4-actions .bouton-pigeon,#overlayCupidon .plus4-actions .bouton-pigeon{
+#overlayPlus4 .plus4-actions .bouton-pigeon,#overlayCupidon .plus4-actions .bouton-pigeon,#overlayCoupDeFoudre .plus4-actions .bouton-pigeon{
   width: 100%;
   max-width: none;
   padding: 11px 14px;
@@ -1590,37 +1616,39 @@ html[data-theme="galaxie"] .fin-choix-numeros b{ background: #8fd0ff; color: #02
 }
 
 @media (max-width: 520px){
-  #overlayPlus4 .plus4-container-joueurs,#overlayCupidon .plus4-container-joueurs{
+  #overlayPlus4 .plus4-container-joueurs,#overlayCupidon .plus4-container-joueurs,#overlayCoupDeFoudre .plus4-container-joueurs{
     grid-template-columns: repeat(2, minmax(84px, 108px));
     width: min(232px, 72vw);
     max-width: 232px;
     gap: 7px;
   }
 
-  #overlayPlus4 .plus4-container-joueurs .bouton-pigeon,#overlayCupidon .plus4-container-joueurs .bouton-pigeon,
+  #overlayPlus4 .plus4-container-joueurs .bouton-pigeon,#overlayCupidon .plus4-container-joueurs .bouton-pigeon,#overlayCoupDeFoudre .plus4-container-joueurs .bouton-pigeon,
   #overlayPlus4 .plus4-joueur-btn,
-  #overlayCupidon .plus4-joueur-btn{
+  #overlayCupidon .plus4-joueur-btn,
+  #overlayCoupDeFoudre .plus4-joueur-btn{
     min-height: 62px;
     padding: 6px 5px;
     font-size: 14px;
     border-radius: 11px;
   }
 
-  #overlayPlus4 .plus4-actions,#overlayCupidon .plus4-actions{
+  #overlayPlus4 .plus4-actions,#overlayCupidon .plus4-actions,#overlayCoupDeFoudre .plus4-actions{
     width: min(290px, 88vw);
   }
 }
 
 @media (min-width: 700px){
-  #overlayPlus4 .plus4-container-joueurs,#overlayCupidon .plus4-container-joueurs{
+  #overlayPlus4 .plus4-container-joueurs,#overlayCupidon .plus4-container-joueurs,#overlayCoupDeFoudre .plus4-container-joueurs{
     grid-template-columns: repeat(2, minmax(96px, 126px));
     width: min(268px, 40vw);
     max-width: 268px;
   }
 
-  #overlayPlus4 .plus4-container-joueurs .bouton-pigeon,#overlayCupidon .plus4-container-joueurs .bouton-pigeon,
+  #overlayPlus4 .plus4-container-joueurs .bouton-pigeon,#overlayCupidon .plus4-container-joueurs .bouton-pigeon,#overlayCoupDeFoudre .plus4-container-joueurs .bouton-pigeon,
   #overlayPlus4 .plus4-joueur-btn,
-  #overlayCupidon .plus4-joueur-btn{
+  #overlayCupidon .plus4-joueur-btn,
+  #overlayCoupDeFoudre .plus4-joueur-btn{
     min-height: 74px;
     font-size: 16px;
   }
@@ -2859,14 +2887,14 @@ html[data-theme="givre"] #stickyJoueurActif.rappel-tour{
 /* ===== +4 : correctif final (chevauchement au-dessus de 600 px + rangées trop espacées) ===== */
 /* Une vieille règle imposait width: min(420px, 92vw) !important aux boutons joueurs :
    dans la grille de 2 colonnes (~120 px), ils se chevauchaient dès 600 px de large. */
-#overlayPlus4 .plus4-container-joueurs .plus4-joueur-btn,#overlayCupidon .plus4-container-joueurs .plus4-joueur-btn{
+#overlayPlus4 .plus4-container-joueurs .plus4-joueur-btn,#overlayCupidon .plus4-container-joueurs .plus4-joueur-btn,#overlayCoupDeFoudre .plus4-container-joueurs .plus4-joueur-btn{
   width: 100% !important;
 }
 
 /* Les rangées de joueurs restent serrées au lieu de s'étirer sur toute la hauteur, et ne rétrécissent
    jamais (avant : quand l'overlay était plus haut que l'écran, cette zone était écrasée jusqu'à 0 px et
    les joueurs disparaissaient, vu sur PC) : c'est tout l'overlay qui défile */
-#overlayPlus4 .plus4-container-joueurs,#overlayCupidon .plus4-container-joueurs{
+#overlayPlus4 .plus4-container-joueurs,#overlayCupidon .plus4-container-joueurs,#overlayCoupDeFoudre .plus4-container-joueurs{
   flex: 0 0 auto;
 }
 
@@ -3529,15 +3557,16 @@ html.accessibilite #termineSuppression{
 }
 
 /* +4 : boutons des joueurs (grille de 2) plus gros, sans zoom (sinon ils se chevauchent) */
-html.accessibilite #overlayPlus4 .plus4-container-joueurs,html.accessibilite #overlayCupidon .plus4-container-joueurs{
+html.accessibilite #overlayPlus4 .plus4-container-joueurs,html.accessibilite #overlayCupidon .plus4-container-joueurs,html.accessibilite #overlayCoupDeFoudre .plus4-container-joueurs{
   grid-template-columns: repeat(2, minmax(0, 1fr));
   width: min(300px, 84vw);
   max-width: 300px;
 }
 
-html.accessibilite #overlayPlus4 .plus4-container-joueurs .bouton-pigeon,html.accessibilite #overlayCupidon .plus4-container-joueurs .bouton-pigeon,
+html.accessibilite #overlayPlus4 .plus4-container-joueurs .bouton-pigeon,html.accessibilite #overlayCupidon .plus4-container-joueurs .bouton-pigeon,html.accessibilite #overlayCoupDeFoudre .plus4-container-joueurs .bouton-pigeon,
 html.accessibilite #overlayPlus4 .plus4-joueur-btn,
-html.accessibilite #overlayCupidon .plus4-joueur-btn{
+html.accessibilite #overlayCupidon .plus4-joueur-btn,
+html.accessibilite #overlayCoupDeFoudre .plus4-joueur-btn{
   zoom: 1;
   min-height: 74px;
   font-size: 19px;
@@ -3980,11 +4009,11 @@ html.saisie-en-ligne #enLigneRejoindre .separateurOu:not(.en-sortie){
 
 /* ===== +4 : contenu centré verticalement quand il y a la place (avant : tout tassé en haut
    avec peu de joueurs) ; avec beaucoup de joueurs, il défile toujours depuis le haut ===== */
-#overlayPlus4 > :first-child,#overlayCupidon > :first-child{
+#overlayPlus4 > :first-child,#overlayCupidon > :first-child,#overlayCoupDeFoudre > :first-child{
   margin-top: auto;
 }
 
-#overlayPlus4 > :last-child,#overlayCupidon > :last-child{
+#overlayPlus4 > :last-child,#overlayCupidon > :last-child,#overlayCoupDeFoudre > :last-child{
   margin-bottom: auto;
 }
 
@@ -4368,7 +4397,7 @@ html.overlay-ouvert #refletPrestige{
 }
 
 /* ===== Carte tirée en haut des overlays de choix (+4, duel, nouveau pigeon) ===== */
-#overlayPlus4 .carte-vedette,#overlayCupidon .carte-vedette,
+#overlayPlus4 .carte-vedette,#overlayCupidon .carte-vedette,#overlayCoupDeFoudre .carte-vedette,
 #overlayPigeon .carte-vedette,
 #overlayDuel .Carte.carte-vedette{
   width: clamp(80px, 22vw, 120px);
@@ -4414,7 +4443,7 @@ html.overlay-ouvert #refletPrestige{
 }
 
 /* Ces overlays apparaissaient d'un coup : même fondu que les autres */
-#overlayPlus4,#overlayCupidon,
+#overlayPlus4,#overlayCupidon,#overlayCoupDeFoudre,
 #overlayCouleur{
   animation: fadeIn 0.3s ease;
 }
@@ -4820,6 +4849,8 @@ html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) #ecranReglages
    !important : beaucoup de ces couleurs sont posées par le JS directement sur les éléments
    (fond noir, texte or, boutons or) ; les cartes et les carrés de couleur ne changent pas. */
 html[data-theme="givre"] :is(#overlayCouleur, #overlayPlus4, #overlayCupidon, #overlayPigeon, #overlayCarteDoree, #overlayFinUnRestants,
+  #overlayDuel, #overlayRegleUnique, #overlayAnnulation, #overlayResultatAnnulation, #overlayPredictionFin, .overlay-opaque),
+html[data-theme="givre"] :is(#overlayCouleur, #overlayPlus4, #overlayCoupDeFoudre, #overlayPigeon, #overlayCarteDoree, #overlayFinUnRestants,
   #overlayDuel, #overlayRegleUnique, #overlayAnnulation, #overlayResultatAnnulation, #overlayPredictionFin, .overlay-opaque){
   background: var(--fond-theme) !important;
   color: var(--givre-accent) !important;
@@ -4835,6 +4866,9 @@ html[data-theme="givre"] .plus4-actions{
 
 /* Tous les textes : bleu glacier, sans l'ombre noire */
 html[data-theme="givre"] :is(#overlayCouleur, #overlayPlus4, #overlayCupidon, #overlayPigeon, #overlayCarteDoree, #overlayFinUnRestants,
+  #overlayDuel, #overlayRegleUnique, #overlayAnnulation, #overlayResultatAnnulation, #overlayPredictionFin, .overlay-opaque)
+  :not(button):not(button *):not(.Carte),
+html[data-theme="givre"] :is(#overlayCouleur, #overlayPlus4, #overlayCoupDeFoudre, #overlayPigeon, #overlayCarteDoree, #overlayFinUnRestants,
   #overlayDuel, #overlayRegleUnique, #overlayAnnulation, #overlayResultatAnnulation, #overlayPredictionFin, .overlay-opaque)
   :not(button):not(button *):not(.Carte){
   color: var(--givre-accent) !important;
@@ -4858,6 +4892,8 @@ html[data-theme="givre"] #overlayRegleUnique .celien-bloc{
 
 /* Boutons : cyan glacé, texte blanc (même ceux colorés par le JS) */
 html[data-theme="givre"] :is(#overlayPlus4,#overlayCupidon, #overlayPigeon, #overlayCarteDoree, #overlayFinUnRestants, #overlayDuel,
+  #overlayRegleUnique, #overlayAnnulation, #overlayPredictionFin, .overlay-opaque) button,
+html[data-theme="givre"] :is(#overlayPlus4,#overlayCoupDeFoudre, #overlayPigeon, #overlayCarteDoree, #overlayFinUnRestants, #overlayDuel,
   #overlayRegleUnique, #overlayAnnulation, #overlayPredictionFin, .overlay-opaque) button{
   background: var(--givre-bouton) !important;
   color: #fff !important;
@@ -4866,6 +4902,8 @@ html[data-theme="givre"] :is(#overlayPlus4,#overlayCupidon, #overlayPigeon, #ove
   box-shadow: inset 0 -2px 0 rgba(8, 60, 100, 0.25), 0 6px 14px rgba(26, 146, 214, 0.28) !important;
 }
 html[data-theme="givre"] :is(#overlayPlus4,#overlayCupidon, #overlayPigeon, #overlayCarteDoree, #overlayFinUnRestants, #overlayDuel,
+  #overlayRegleUnique, #overlayAnnulation, #overlayPredictionFin, .overlay-opaque) button *,
+html[data-theme="givre"] :is(#overlayPlus4,#overlayCoupDeFoudre, #overlayPigeon, #overlayCarteDoree, #overlayFinUnRestants, #overlayDuel,
   #overlayRegleUnique, #overlayAnnulation, #overlayPredictionFin, .overlay-opaque) button *{
   color: inherit !important;
 }
@@ -5426,6 +5464,40 @@ html[data-theme] #ecranReglages .optionsPartie .optionReglage.optionsSuite.optio
   cursor: pointer;
 }
 
+/* ----- « Installer Alcuno » reste au look de base (bordeaux) dans TOUS les thèmes -----
+   C'est le tout premier écran, montré avant même d'avoir choisi un thème : il ne doit pas changer de
+   couleur. Les thèmes l'habillaient par les variables (--fond-theme, --deco-theme) et par une poignée de
+   règles sur ses éléments. On remet ici les valeurs de base, en !important.
+   Pourquoi des sélecteurs aussi longs : les thèmes habillent tous les boutons du jeu d'un coup, avec une
+   liste :is(...) qui contient « #menu #btnCaster », donc deux identifiants, et en !important. Pour passer
+   devant il faut trois identifiants : d'où #ecranInstallation #installationContenu avant chaque élément
+   (c'est à ça que sert l'id installationContenu dans index.html).
+   Un thème qui habillerait un NOUVEL élément de cet écran demandera une ligne de plus ici. */
+html #ecranInstallation, html #ecranInstallation button{
+  font-family: Arial, sans-serif !important;  /* Kawaii passe tout le jeu en Arial Rounded : pas ici */
+}
+html #ecranInstallation{
+  --fond-theme: rgb(43, 0, 29) !important;    /* le bordeaux du jeu de base */
+  --couleur-barre: rgb(43, 0, 29) !important; /* (c'est elle que l'iPhone peint sous l'heure) */
+  --deco-theme: none !important;              /* pas de motif de thème derrière */
+  color: #fff !important;
+}
+html #ecranInstallation #installationContenu h2{ color: #FFD700 !important; text-shadow: 2px 2px 5px #000 !important; }
+html #ecranInstallation #installationContenu .installationPourquoi{ color: rgba(255,255,255,0.82) !important; opacity: 1 !important; }
+html #ecranInstallation #installationContenu .etapeInstallation{ background: rgba(255,255,255,0.06) !important; border: 1px solid rgba(255,215,0,0.25) !important; color: #fff !important; }
+html #ecranInstallation #installationContenu .etapeInstallation b{ color: #FFD700 !important; }
+html #ecranInstallation #installationContenu .numeroEtape{ background: #FFD700 !important; color: #2b001d !important; }
+html #ecranInstallation #installationContenu #btnInstallationInstaller{
+  background: #ffcc00 !important; color: #fff !important;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.4) !important;
+  box-shadow: inset 0 -3px 0 rgba(0,0,0,0.18), 0 0 26px rgba(255,215,0,0.45) !important;
+}
+html #ecranInstallation #installationContenu #btnInstallationPlusTard{ background: none !important; box-shadow: none !important; color: rgba(255,255,255,0.75) !important; text-shadow: none !important; }
+/* Décors que les thèmes posent par-dessus TOUS les écrans : ils se taisent pendant « Installer Alcuno »
+   (classe posée par ouvrirPage / fermerPage, script.js). La bande blanche du sabre, en Star Wars, passait
+   au-dessus de tout (z-index maximum) et barrait le haut de l'écran d'installation. */
+html.installation-ouverte #haloSabre{ display: none !important; }
+
 /* Givre (thème clair) */
 html[data-theme="givre"] #ecranInstallation{ color: var(--givre-texte); }
 html[data-theme="givre"] #ecranInstallation h2{
@@ -5479,6 +5551,9 @@ html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#btnModeEn
    boutons directement (annulations, joueurs déjà choisis du duel). Carte dorée : boutons or métallique
    inchangés. */
 html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayDuel button:not(:disabled),
+  #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
+  #overlayAnnulation button),
+html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCoupDeFoudre .bouton-pigeon, #overlayDuel button:not(:disabled),
   #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
   #overlayAnnulation button){
   background: linear-gradient(180deg, #ffd426, #f6b800) !important;
@@ -5547,7 +5622,7 @@ html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#overlayPi
 
   /* Overlays : cartes, titres et boutons plus petits */
   #overlayRegleUnique{ --card-w: 64px; font-size: 24px; }
-  #overlayPlus4 .carte-vedette,#overlayCupidon .carte-vedette,
+  #overlayPlus4 .carte-vedette,#overlayCupidon .carte-vedette,#overlayCoupDeFoudre .carte-vedette,
   #overlayPigeon .carte-vedette,
   #overlayDuel .Carte.carte-vedette,
   #overlayCarteDoree .doree-carte-vedette,
@@ -5559,10 +5634,12 @@ html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#overlayPi
   #overlayPigeon,
   #overlayCarteDoree,
   #overlayPlus4,
-  #overlayCupidon{ gap: 10px; padding-top: 14px; padding-bottom: 14px; }
+  #overlayCupidon,
+  #overlayCoupDeFoudre{ gap: 10px; padding-top: 14px; padding-bottom: 14px; }
   #overlayPigeon .titre-pigeon,
   #overlayPlus4 .titre-pigeon,
   #overlayCupidon .titre-pigeon,
+  #overlayCoupDeFoudre .titre-pigeon,
   #overlayDuel .titre-pigeon,
   #overlayFinUnRestants .titre-pigeon,
   #overlayCouleur div.titre-couleur{
@@ -5596,17 +5673,18 @@ html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#overlayPi
 
   /* +4 : les boutons Valider / Retour / Annuler sur une seule ligne (avant : empilés, ils couvraient
      la moitié de l'écran) */
-  #overlayPlus4 .plus4-total,#overlayCupidon .plus4-total{ font-size: 18px; margin-bottom: 0; }
-  #overlayPlus4 .plus4-actions,#overlayCupidon .plus4-actions{ flex-wrap: nowrap; padding: 8px 0; margin-top: 4px; }
-  #overlayPlus4 .plus4-actions .plus4-action-btn,#overlayCupidon .plus4-actions .plus4-action-btn{ flex: 1 1 0; width: auto; max-width: 220px; padding: 10px 8px; font-size: 17px; }
-  #overlayPlus4 .plus4-container-joueurs,#overlayCupidon .plus4-container-joueurs{
+  #overlayPlus4 .plus4-total,#overlayCupidon .plus4-total,#overlayCoupDeFoudre .plus4-total{ font-size: 18px; margin-bottom: 0; }
+  #overlayPlus4 .plus4-actions,#overlayCupidon .plus4-actions,#overlayCoupDeFoudre .plus4-actions{ flex-wrap: nowrap; padding: 8px 0; margin-top: 4px; }
+  #overlayPlus4 .plus4-actions .plus4-action-btn,#overlayCupidon .plus4-actions .plus4-action-btn,#overlayCoupDeFoudre .plus4-actions .plus4-action-btn{ flex: 1 1 0; width: auto; max-width: 220px; padding: 10px 8px; font-size: 17px; }
+  #overlayPlus4 .plus4-container-joueurs,#overlayCupidon .plus4-container-joueurs,#overlayCoupDeFoudre .plus4-container-joueurs{
     grid-template-columns: repeat(4, minmax(88px, 130px));
     width: min(560px, 100%);
     max-width: none;
   }
-  #overlayPlus4 .plus4-container-joueurs .bouton-pigeon,#overlayCupidon .plus4-container-joueurs .bouton-pigeon,
+  #overlayPlus4 .plus4-container-joueurs .bouton-pigeon,#overlayCupidon .plus4-container-joueurs .bouton-pigeon,#overlayCoupDeFoudre .plus4-container-joueurs .bouton-pigeon,
   #overlayPlus4 .plus4-container-joueurs .plus4-joueur-btn,
-  #overlayCupidon .plus4-container-joueurs .plus4-joueur-btn{ min-height: 46px; padding: 6px 8px; }
+  #overlayCupidon .plus4-container-joueurs .plus4-joueur-btn,
+  #overlayCoupDeFoudre .plus4-container-joueurs .plus4-joueur-btn{ min-height: 46px; padding: 6px 8px; }
 
   /* Pari de fin : en-tête moins haut */
   .prediction-title{ font-size: 30px; }
@@ -5652,6 +5730,14 @@ html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#overlayPi
   #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
   #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayDuel button,
   #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
+  #overlayAnnulation button),
+:is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
+  #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
+  #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
+  #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
+  #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+  #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCoupDeFoudre .bouton-pigeon, #overlayDuel button,
+  #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
   #overlayAnnulation button){
   transition: transform 0.12s ease, filter 0.12s ease, translate 0.12s ease, box-shadow 0.12s ease;
 }
@@ -5662,6 +5748,14 @@ html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#overlayPi
     #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
     #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
     #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayDuel button,
+    #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
+    #overlayAnnulation button):hover:not(:disabled),
+  html body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
+    #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
+    #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
+    #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
+    #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+    #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCoupDeFoudre .bouton-pigeon, #overlayDuel button,
     #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
     #overlayAnnulation button):hover:not(:disabled){
     filter: brightness(1.18);
@@ -5692,6 +5786,14 @@ html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#overlayPi
   #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
   #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayDuel button,
   #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
+  #overlayAnnulation button):hover:not(:disabled),
+  html[data-theme="givre"] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
+  #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
+  #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
+  #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
+  #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+  #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCoupDeFoudre .bouton-pigeon, #overlayDuel button,
+  #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
   #overlayAnnulation button):hover:not(:disabled){
     box-shadow: 0 0 0 3px #0f6aa6, 0 6px 20px rgba(26, 146, 214, 0.5) !important;
   }
@@ -5711,7 +5813,7 @@ html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#overlayPi
    La grille gardait ses colonnes vides : avec 2 joueurs sur une fenêtre basse de PC (4 colonnes), ils
    étaient collés à gauche ; sur téléphone (2 colonnes), un nombre impair laissait le dernier seul à
    gauche. Les boutons sont maintenant posés en ligne et centrés, même nombre par rangée qu'avant. */
-#overlayPlus4 .plus4-container-joueurs,#overlayCupidon .plus4-container-joueurs{
+#overlayPlus4 .plus4-container-joueurs,#overlayCupidon .plus4-container-joueurs,#overlayCoupDeFoudre .plus4-container-joueurs{
   display: flex;
   flex-direction: row; /* (une vieille règle les mettait en colonne) */
   flex-wrap: wrap;
@@ -5719,11 +5821,11 @@ html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#overlayPi
   align-items: stretch;
   align-content: flex-start;
 }
-#overlayPlus4 .plus4-container-joueurs .plus4-joueur-btn,#overlayCupidon .plus4-container-joueurs .plus4-joueur-btn{
+#overlayPlus4 .plus4-container-joueurs .plus4-joueur-btn,#overlayCupidon .plus4-container-joueurs .plus4-joueur-btn,#overlayCoupDeFoudre .plus4-container-joueurs .plus4-joueur-btn{
   flex: 0 0 calc(50% - 4px); /* 2 par rangée */
 }
 @media (orientation: landscape) and (max-height: 700px){
-  #overlayPlus4 .plus4-container-joueurs .plus4-joueur-btn,#overlayCupidon .plus4-container-joueurs .plus4-joueur-btn{
+  #overlayPlus4 .plus4-container-joueurs .plus4-joueur-btn,#overlayCupidon .plus4-container-joueurs .plus4-joueur-btn,#overlayCoupDeFoudre .plus4-container-joueurs .plus4-joueur-btn{
     flex: 0 0 calc(25% - 6px); /* 4 par rangée (fenêtres basses) */
   }
 }
@@ -5839,7 +5941,7 @@ html.mode-tele body{
   overflow: hidden;
   background: var(--fond-theme);
 }
-html.mode-tele body > *:not(#ecranTele):not(#refletPrestige){
+html.mode-tele body > *:not(#ecranTele):not(#refletPrestige):not(#feuxArtifice){ /* (feux d'artifice du Nouvel An : aussi sur la télé, voir style_feux.css) */
   display: none !important;
 }
 /* Prestige : le reflet doré passe aussi sur la télé, sauf sur l'écran noir des annonces (comme sur le téléphone) */
@@ -6811,6 +6913,8 @@ html[data-theme="soleil"] #stickyJoueurActif{ background: linear-gradient(180deg
 html[data-theme="soleil"] #stickyJoueurActif :is(#btnPause, #btnHistorique) svg{ stroke: var(--soleil-peche); }
 /* Overlays : « heure dorée », l'inverse du fond (chaud en haut), texte et boutons bleu nuit */
 html[data-theme="soleil"] :is(#overlayCouleur, #overlayPlus4, #overlayCupidon, #overlayPigeon, #overlayFinUnRestants, #overlayDuel, #overlayRegleUnique,
+  #overlayAnnulation, #overlayResultatAnnulation, #overlayPredictionFin),
+html[data-theme="soleil"] :is(#overlayCouleur, #overlayPlus4, #overlayCoupDeFoudre, #overlayPigeon, #overlayFinUnRestants, #overlayDuel, #overlayRegleUnique,
   #overlayAnnulation, #overlayResultatAnnulation, #overlayPredictionFin){
   background: linear-gradient(180deg, #fcc98a 0%, #f7a072 38%, #e9787a 72%, #b8657f 100%) !important;
   color: #2a1a44;
@@ -6820,6 +6924,8 @@ html[data-theme="soleil"] :is(#overlayRegleUnique .overlay-regle-texte, .titre-p
   text-shadow: 0 2px 0 rgba(255,240,220,0.6) !important;
 }
 html[data-theme="soleil"][data-theme] body :is(#overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayFinUnRestants .bouton-pigeon,
+  #overlayAnnulation button, #overlayRegleUnique .bouton-annulation, #overlayDuel button:not(:disabled), #overlayPredictionFin .bouton-pigeon),
+html[data-theme="soleil"][data-theme] body :is(#overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCoupDeFoudre .bouton-pigeon, #overlayFinUnRestants .bouton-pigeon,
   #overlayAnnulation button, #overlayRegleUnique .bouton-annulation, #overlayDuel button:not(:disabled), #overlayPredictionFin .bouton-pigeon){
   background: linear-gradient(180deg, #2c3d6b, #1c2650) !important;
   color: #fff1df !important;
@@ -6841,13 +6947,15 @@ html[data-theme="soleil"] #ecranReglages .optionReglage input:checked + .interru
 html[data-theme="soleil"] #ecranReglages input[type=range]{ accent-color: #ff9a6b; }
 /* Coucher de soleil : textes jaunes des overlays illisibles sur le fond chaud → framboise foncé */
 html[data-theme="soleil"] :is(#overlayCouleur .titre-couleur, #overlayPlus4 .plus4-total, #overlayCupidon .plus4-total, #overlayFinUnRestants .fin-un-ligne,
+  #overlayResultatAnnulation div, #overlayDuel :is(h1, h2, h3, [class*="titre"]), #overlayPredictionFin [class*="titre"]),
+html[data-theme="soleil"] :is(#overlayCouleur .titre-couleur, #overlayPlus4 .plus4-total, #overlayCoupDeFoudre .plus4-total, #overlayFinUnRestants .fin-un-ligne,
   #overlayResultatAnnulation div, #overlayDuel :is(h1, h2, h3, [class*="titre"]), #overlayPredictionFin [class*="titre"]){
   color: #8a1f4a !important;
   text-shadow: 0 1px 0 rgba(255, 240, 220, 0.55) !important;
 }
-html[data-theme="soleil"] #overlayPlus4 :is(.plus4-actions, .plus4-container-joueurs),html[data-theme="soleil"] #overlayCupidon :is(.plus4-actions, .plus4-container-joueurs){ background: transparent !important; box-shadow: none !important; }
+html[data-theme="soleil"] #overlayPlus4 :is(.plus4-actions, .plus4-container-joueurs),html[data-theme="soleil"] #overlayCupidon :is(.plus4-actions, .plus4-container-joueurs),html[data-theme="soleil"] #overlayCoupDeFoudre :is(.plus4-actions, .plus4-container-joueurs){ background: transparent !important; box-shadow: none !important; }
 /* (+4 : la liste des joueurs défile, l'ombre portée des boutons y était coupée en rectangle) */
-html[data-theme="soleil"][data-theme] body #overlayPlus4 .plus4-container-joueurs .bouton-pigeon,html[data-theme="soleil"][data-theme] body #overlayCupidon .plus4-container-joueurs .bouton-pigeon{ box-shadow: inset 0 0 0 1.5px rgba(255, 220, 190, 0.5) !important; }
+html[data-theme="soleil"][data-theme] body #overlayPlus4 .plus4-container-joueurs .bouton-pigeon,html[data-theme="soleil"][data-theme] body #overlayCupidon .plus4-container-joueurs .bouton-pigeon,html[data-theme="soleil"][data-theme] body #overlayCoupDeFoudre .plus4-container-joueurs .bouton-pigeon{ box-shadow: inset 0 0 0 1.5px rgba(255, 220, 190, 0.5) !important; }
 
 /* ===== Bordeaux, Casino, Nuit : overlays à la couleur du thème (au lieu du noir pur) =====
    Halo plus clair au centre, sur la couleur du plateau. Le halo s'arrête avant les bords : en haut et
@@ -6865,6 +6973,9 @@ html[data-theme="bordeaux"]{ --overlay-halo: #5a0c40; }
 html[data-theme="vert"]{ --overlay-halo: #177a4b; }
 html[data-theme="bleu"]{ --overlay-halo: #24438f; }
 html:is([data-theme="bordeaux"], [data-theme="vert"], [data-theme="bleu"]) :is(#overlayCouleur, #overlayPlus4, #overlayCupidon, #overlayPigeon,
+  #overlayCarteDoree, #overlayFinUnRestants, #overlayDuel, #overlayRegleUnique, #overlayAnnulation, #overlayResultatAnnulation,
+  #overlayPredictionFin, .overlay-opaque),
+html:is([data-theme="bordeaux"], [data-theme="vert"], [data-theme="bleu"]) :is(#overlayCouleur, #overlayPlus4, #overlayCoupDeFoudre, #overlayPigeon,
   #overlayCarteDoree, #overlayFinUnRestants, #overlayDuel, #overlayRegleUnique, #overlayAnnulation, #overlayResultatAnnulation,
   #overlayPredictionFin, .overlay-opaque){
   background: var(--overlay-fond) !important;
@@ -7183,6 +7294,10 @@ html[data-theme="noir"] #choixMode #titreAccueil::after{
 html[data-theme="noir"] :is(#btnRepriseOui, #btnRepriseNon, #btnFermerScanner, #overlayPigeon .bouton-pigeon,
   #overlayPlus4 .bouton-pigeon,
   #overlayCupidon .bouton-pigeon, #overlayDuel button:not(:disabled), #overlayFinUnRestants .bouton-pigeon,
+  #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation, #overlayAnnulation button),
+html[data-theme="noir"] :is(#btnRepriseOui, #btnRepriseNon, #btnFermerScanner, #overlayPigeon .bouton-pigeon,
+  #overlayPlus4 .bouton-pigeon,
+  #overlayCoupDeFoudre .bouton-pigeon, #overlayDuel button:not(:disabled), #overlayFinUnRestants .bouton-pigeon,
   #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation, #overlayAnnulation button){
   background: linear-gradient(180deg, #0d0b06, #030302) !important;
   color: #ffd426 !important;
@@ -7194,6 +7309,10 @@ html[data-theme="noir"] :is(#btnRepriseOui, #btnRepriseNon, #btnFermerScanner, #
   html[data-theme="noir"] body :is(#btnRepriseOui, #btnRepriseNon, #btnFermerScanner, #overlayPigeon .bouton-pigeon,
     #overlayPlus4 .bouton-pigeon,
     #overlayCupidon .bouton-pigeon, #overlayDuel button:not(:disabled), #overlayFinUnRestants .bouton-pigeon,
+    #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation, #overlayAnnulation button):hover:not(:disabled),
+  html[data-theme="noir"] body :is(#btnRepriseOui, #btnRepriseNon, #btnFermerScanner, #overlayPigeon .bouton-pigeon,
+    #overlayPlus4 .bouton-pigeon,
+    #overlayCoupDeFoudre .bouton-pigeon, #overlayDuel button:not(:disabled), #overlayFinUnRestants .bouton-pigeon,
     #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation, #overlayAnnulation button):hover:not(:disabled){
     filter: none;
     box-shadow: 0 0 0 2px rgba(255, 210, 38, 0.7), 0 6px 18px rgba(255, 210, 38, 0.18) !important;
@@ -7864,7 +7983,7 @@ html[data-theme="galaxie"] #choixMode .titreAccueilBarre, html[data-theme="galax
   box-shadow: 0 0 4px #fff, 0 0 10px #39a0ff, 0 0 22px #1f7bff, 0 0 40px rgba(31,123,255,.6) !important; animation:none !important;
 }
 /* Boutons : lame bleue, « Jouer » et le mode classique en rouge */
-html[data-theme="galaxie"] button:not(.pastilleTheme):not(#btnRemonter):not(#btnPause):not(#btnHistorique):not(#btnReglagesJeu):not(.btnPauseJoueur):not(.btnLivre):not(#btnReglages):not(.btnAccueilTexte):not(#btnSignalerBug):not(#btnFaq):not(.fenetrePrestige-essayer):not(.fenetreKawaii-essayer):not(.fenetreKawaii-plusTard):not(.fenetrePrestige-plusTard):not(.fenetreGalaxie-ok):not(.fenetreGalaxie-plusTard):not(.bloc-hot-btn):not(#overlayDuel .duel-boutons button:disabled){
+html[data-theme="galaxie"] button:not(#btnInstallationInstaller):not(#btnInstallationPlusTard):not(.pastilleTheme):not(#btnRemonter):not(#btnPause):not(#btnHistorique):not(#btnReglagesJeu):not(.btnPauseJoueur):not(.btnLivre):not(#btnReglages):not(.btnAccueilTexte):not(#btnSignalerBug):not(#btnFaq):not(.fenetrePrestige-essayer):not(.fenetreKawaii-essayer):not(.fenetreKawaii-plusTard):not(.fenetrePrestige-plusTard):not(.fenetreGalaxie-ok):not(.fenetreGalaxie-plusTard):not(.bloc-hot-btn):not(#overlayDuel .duel-boutons button:disabled){
   background: linear-gradient(180deg, rgba(14,22,44,.92), rgba(6,10,22,.92)) !important; color:#eaf3ff !important; text-shadow:none !important;
   border: 1.5px solid #8fd0ff !important; letter-spacing:.04em;
   box-shadow: 0 0 6px #4aa8ff, 0 0 16px rgba(40,140,255,.55), inset 0 0 10px rgba(80,170,255,.22) !important;
@@ -8139,6 +8258,9 @@ html[data-theme="soleil"] #ecranTele :is(.recap-sous, .recap-chiffres, .recap-ch
 html[data-theme="cerisier"]{ --overlay-fond: radial-gradient(ellipse 115% 42% at 50% 45%, rgba(190,60,130,.45) 0%, transparent 100%), #16040e; --overlay-bord: #16040e; }
 html[data-theme="prestige"]{ --overlay-fond: radial-gradient(ellipse 115% 42% at 50% 45%, rgba(212,160,23,.38) 0%, transparent 100%), #120d02; --overlay-bord: #120d02; }
 html:is([data-theme="cerisier"], [data-theme="prestige"]) :is(#overlayCouleur, #overlayPlus4, #overlayCupidon, #overlayPigeon,
+  #overlayFinUnRestants, #overlayDuel, #overlayRegleUnique, #overlayAnnulation, #overlayResultatAnnulation,
+  #overlayPredictionFin, .overlay-opaque),
+html:is([data-theme="cerisier"], [data-theme="prestige"]) :is(#overlayCouleur, #overlayPlus4, #overlayCoupDeFoudre, #overlayPigeon,
   #overlayFinUnRestants, #overlayDuel, #overlayRegleUnique, #overlayAnnulation, #overlayResultatAnnulation,
   #overlayPredictionFin, .overlay-opaque){
   background: var(--overlay-fond) !important;

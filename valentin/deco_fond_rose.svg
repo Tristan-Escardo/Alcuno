@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <defs>
+    <path id="c" d="M0 12 C-26 -6 -18 -26 0 -14 C18 -26 26 -6 0 12z"/>
+    <path id="etoile" d="M0 -9 L2.6 -2.6 L9 0 L2.6 2.6 L0 9 L-2.6 2.6 L-9 0 L-2.6 -2.6z" fill="#ffffff"/>
+    <g id="fleche"><path d="M-22 0 H22" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/><path d="M22 0 l-7 -5 v10z" fill="#ffffff"/><path d="M-22 0 l-6 -5 M-22 0 l-6 5 M-17 0 l-6 -5 M-17 0 l-6 5" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round"/></g>
+  </defs>
+  <g opacity=".5">
+    <use href="#c" fill="#fff" transform="translate(58 62) rotate(-14) scale(1.2)"/><use href="#c" fill="#ffd0e2" transform="translate(176 168) rotate(12)"/>
+    <use href="#c" fill="#ffb0cc" transform="translate(170 60) rotate(10) scale(.8)"/><use href="#c" fill="#fff" transform="translate(56 186) rotate(-8) scale(.7)"/>
+    <use href="#c" fill="#ff9cc0" transform="translate(116 120) rotate(6) scale(.9)"/><use href="#c" fill="#fff" transform="translate(208 118) rotate(-12) scale(.6)"/>
+    <use href="#fleche" transform="translate(122 36) rotate(-30) scale(.9)"/><use href="#fleche" transform="translate(110 206) rotate(24) scale(.8)"/>
+    <use href="#etoile" transform="translate(30 130) scale(.8)"/><use href="#etoile" transform="translate(212 30) scale(.8)"/><use href="#etoile" transform="translate(150 236) scale(.7)"/><use href="#etoile" transform="translate(96 90) scale(.7)"/>
+  </g>
+</svg>

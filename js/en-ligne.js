@@ -905,6 +905,8 @@ function lancerMancheEnLigne(listeJoueurs, depuisSalle, avecDefis = true){
     const express = depuisSalle ? estPartieExpress() : graineExpress(e.seed || 0);
     // Mode hot : même principe (réglage de celui qui lance, gardé par « Rejouer »)
     const hot = depuisSalle ? caseModeHot.checked : graineHot(e.seed || 0);
+    // Période Saint-Valentin (carte Coup de foudre) : celle de celui qui lance, gardée par « Rejouer »
+    const valentin = depuisSalle ? saintValentinEnCours() : graineValentin(e.seed || 0);
     const source = !hot || !avecDefis ? {} : depuisSalle ? (configDistante || {}) : e;
     const defis = source.defisHot, masques = source.defisMasques;
     return Object.assign({
@@ -912,7 +914,7 @@ function lancerMancheEnLigne(listeJoueurs, depuisSalle, avecDefis = true){
       manche: (e.manche || 0) + 1,
       // (+ GRAINE_SANS_CARTE_DOREE : première partie de l'hôte, sans carte dorée pour personne ;
       // + GRAINE_EXPRESS : partie express, voir graineExpress ; + GRAINE_HOT : mode hot, voir graineHot)
-      seed: Math.floor(Math.random() * 4294967296) + (premierePartieJouee() ? 0 : GRAINE_SANS_CARTE_DOREE) + (express ? GRAINE_EXPRESS : 0) + (hot ? GRAINE_HOT : 0),
+      seed: Math.floor(Math.random() * 4294967296) + (premierePartieJouee() ? 0 : GRAINE_SANS_CARTE_DOREE) + (express ? GRAINE_EXPRESS : 0) + (hot ? GRAINE_HOT : 0) + (valentin ? GRAINE_VALENTIN : 0),
       joueurs: listeJoueurs,
       hote: e.hote || pseudoActuel
     }, defis && Object.keys(defis).length ? { defisHot: defis } : {}, masques && Object.keys(masques).length ? { defisMasques: masques } : {});

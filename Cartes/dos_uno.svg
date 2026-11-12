@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 188 319">
+  <defs><clipPath id="carte"><rect x="9" y="10" width="170" height="299" rx="9"/></clipPath></defs>
+  <rect x="0.5" y="0.5" width="187" height="318" rx="14" fill="#fff" stroke="#9a9a9a" stroke-width="1"/>
+  <rect x="9" y="10" width="170" height="299" rx="9" fill="#000"/>
+  <g clip-path="url(#carte)"><ellipse cx="95" cy="159" rx="132" ry="68" transform="rotate(-49 95 159)" fill="#ff1800"/></g>
+  <g transform="rotate(-20 98 160)" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="54" text-anchor="middle" letter-spacing="1">
+    <text x="96.5" y="179.5" fill="#000">UNO</text>
+    <text x="98" y="178" fill="#fef001">UNO</text>
+  </g>
+</svg>

@@ -24,6 +24,10 @@ Un fichier MP3 par moment du jeu, avec exactement ces noms :
   sabre/sabre/*.mp3  sons de sabre de 0,6 s : un au hasard à la place du clic des boutons, dans le thème Star Wars seulement. Supprime ceux que tu n'aimes pas (fichier absent = ignoré).
   (lightsaber_sound.mp3 = le fichier d'origine de 45 s, plus utilisé par le jeu)
   bdsm_buttons/*.mp3  un au hasard à la place du clic des boutons, dans le thème BDSM seulement (liste SONS_BDSM dans js/reglages.js et dans sw.js).
+  saxo/*.mp3  sons de saxophone de 0,39 à 0,89 s (découpés dans un enregistrement) : un au hasard à la place du clic des boutons, dans le thème de fête « Fête de la musique » seulement (liste SONS_SAXO dans js/reglages.js et dans sw.js).
+  piano/piano_<touche>.mp3  les 15 notes du petit piano de l'accueil (thème Fête de la musique) : de
+    Fa 4 à Sol 5, 0,9 s chacune. « d » = dièse (piano_la4d.mp3 = La dièse 4). Un tap sur une touche joue sa note
+    (js/piano-accueil.js). Ce ne sont pas des enregistrements : elles sont synthétisées, en tempérament égal.
 
 MUSIQUE D'AMBIANCE (en boucle, réglage « Musique d'ambiance ») :
   musique_ambiance.mp3  thèmes bordeaux, casino, nuit (et les autres si leur musique manque)
@@ -35,6 +39,11 @@ MUSIQUE D'AMBIANCE (en boucle, réglage « Musique d'ambiance ») :
   musique_ambiance_galaxie.mp3   thème Star Wars (boucle exacte de 2 min 59, voir BOUCLES_EXACTES)
   musique_ambiance_kawaii.mp3    thème secret Kawaii (boucle exacte de 1 min 33, voir BOUCLES_EXACTES)
   musique_ambiance_bdsm.mp3      thème secret BDSM (boucle exacte de 1 min 42, voir BOUCLES_EXACTES)
+  musique_ambiance_valentin.mp3  thème de fête Saint-Valentin (boucle exacte de 2 min 04,8, voir BOUCLES_EXACTES)
+  musique_ambiance_noel.mp3      thème de fête Noël (boucle exacte, voir BOUCLES_EXACTES)
+  musique_ambiance_patrick.mp3   thème de fête Saint-Patrick (boucle exacte de 1 min 04,9, voir BOUCLES_EXACTES)
+  musique_ambiance_justrose.mp3  thème de fête Just Rosé (boucle exacte de 1 min 50,2, voir BOUCLES_EXACTES)
+  musique_ambiance_musique.mp3   thème de fête Fête de la musique (boucle exacte de 36,96 s, voir BOUCLES_EXACTES)
   Jusqu'à 3-4 minutes, 128 kbit/s (environ 1 Mo par minute) : elle se lance plus vite.
 
 GÉNÉRIQUE DU THÈME SECRET STAR WARS (au volume des sons, la musique d'ambiance se tait pendant) :

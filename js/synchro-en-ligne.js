@@ -748,7 +748,7 @@ function demarrerSauvegardeClassique(){
   }
   const seed = Math.floor(Math.random() * 4294967296);
   sauvegardeClassique = {
-    v: VERSION_JEU, date: Date.now(), seed, sansDoree: !premierePartieJouee(), soft: estModeSoft(), express: estPartieExpress(), hot: estModeHot(),
+    v: VERSION_JEU, date: Date.now(), seed, sansDoree: !premierePartieJouee(), soft: estModeSoft(), express: estPartieExpress(), hot: estModeHot(), valentin: saintValentinEnCours(),
     joueurs: joueurs.slice(), actions: []
   };
   aleatoire = generateurAleatoire(seed);

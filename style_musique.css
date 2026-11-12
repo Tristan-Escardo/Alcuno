@@ -1,0 +1,612 @@
+/* =============================================================================================
+   Thème de fête « Fête de la musique » (nom interne : musique) : fond violet électrique, panneaux indigo, boutons violet foncé,, notes de musique néon en motif de fond, deux faisceaux de projecteur et un égaliseur sur l'accueil, et un PIANO à
+   la place de la ligne colorée sous le titre ALCUNO. Le O du titre reste un O.
+   Pour l'instant choisi à la main dans les Réglages (le calendrier des fêtes viendra plus tard, voir FETES.md).
+   Tout est sous html[data-theme="musique"] : rien ne change pour les autres thèmes.
+   Images : dossier musique/.
+   ============================================================================================= */
+
+/* === DÉBUT : doré du jeu de base teinté au thème (généré par outils/teinter_or_theme.py musique : ne pas modifier à la main) === */
+@keyframes lueurDoree_musique{
+  0%, 100% { box-shadow: 0 0 0 1px rgba(255,255,255,0.5), 0 10px 26px rgba(0,0,0,0.5), 0 0 18px rgba(255,255,255,0.30); }
+  50%      { box-shadow: 0 0 0 1px rgba(255,255,255,0.9), 0 10px 26px rgba(0,0,0,0.5), 0 0 38px rgba(255,255,255,0.60); }
+}
+@keyframes rappelTour_musique{
+  0%, 100% { scale: 1; filter: none; }
+  50%      { scale: 1.14; filter: brightness(1.35) drop-shadow(0 0 10px rgba(255,255,255,0.95)); }
+}
+@keyframes rappelTourDoux_musique{
+    0%, 100% { filter: none; }
+    50%      { filter: brightness(1.35) drop-shadow(0 0 10px rgba(255,255,255,0.95)); }
+  }
+@keyframes duelPulse_musique{
+  0%, 100% { box-shadow: 0 0 0 2px rgba(255,255,255,0.55), 0 0 10px rgba(255,255,255,0.25); }
+  50%      { box-shadow: 0 0 0 2px rgba(255,255,255,0.95), 0 0 28px rgba(255,255,255,0.60); }
+}
+@keyframes lueurTitreAccueil_musique{
+  0%, 100% {
+    text-shadow:
+      0 3px 0 rgba(42,14,110,0.95),
+      0 6px 16px rgba(0,0,0,0.5),
+      0 0 34px rgba(255,255,255,0.28);
+  }
+  50% {
+    text-shadow:
+      0 3px 0 rgba(42,14,110,0.95),
+      0 6px 16px rgba(0,0,0,0.5),
+      0 0 48px rgba(255,255,255,0.55);
+  }
+}
+@keyframes fenetrePrestigeBrille_musique{
+  0%, 100%{ box-shadow: 0 0 0 4px #ddc7fc, 0 0 26px rgba(255,255,255,0.6); }
+  50%{ box-shadow: 0 0 0 4px #ddc7fc, 0 0 48px rgba(255,255,255,0.95); }
+}
+:where(html[data-theme="musique"]) ::selection{ background: var(--selection-fond, #ffffff); }
+:where(html[data-theme="musique"]) .messages::before{ background: linear-gradient(90deg, #ff5b5b 0%, #d9c9ff 25%, #6eff72 50%, #58d4ff 75%, #8b7dff 100%); }
+:where(html[data-theme="musique"]) .bonus-annulation{ color: #ffffff; }
+:where(html[data-theme="musique"]) .regleZero, :where(html[data-theme="musique"]) .reglePigeon, :where(html[data-theme="musique"]) .rappelTour{ color: #ffffff; }
+:where(html[data-theme="musique"]) .menu button, :where(html[data-theme="musique"]) .suppression button{ background-color: #d9c9ff; }
+@media (hover: hover){
+  :where(html[data-theme="musique"]) .menu button:hover, :where(html[data-theme="musique"]) .suppression button:hover{ background-color: #ffffff; }
+}
+:where(html[data-theme="musique"]) #suppression h2{ color: #ffffff; }
+:where(html[data-theme="musique"]) #listeSuppression{ box-shadow: 0 0 0 1px rgba(255,255,255,0.18) inset; }
+@media (hover: hover){
+  :where(html[data-theme="musique"]) #listeSuppression .supp-item:hover{ background: rgba(255,255,255,0.10); box-shadow: 0 0 0 1px rgba(255,255,255,0.22) inset; }
+}
+:where(html[data-theme="musique"]) #listeSuppression .supp-check{ accent-color: #ffffff; }
+:where(html[data-theme="musique"]) #termineSuppression{ background-color: #ffffff; }
+@media (hover: hover){
+  :where(html[data-theme="musique"]) #termineSuppression:hover{ background-color: #ffffff; }
+}
+:where(html[data-theme="musique"]) #overlayCouleur div.titre-couleur{ color: #ffffff; }
+:where(html[data-theme="musique"]) #overlayPlus4 .titre-pigeon, :where(html[data-theme="musique"]) #overlayCupidon .titre-pigeon, :where(html[data-theme="musique"]) #overlayCoupDeFoudre .titre-pigeon{ color: #ffffff; }
+:where(html[data-theme="musique"]) #overlayPlus4 .bouton-pigeon, :where(html[data-theme="musique"]) #overlayCupidon .bouton-pigeon, :where(html[data-theme="musique"]) #overlayCoupDeFoudre .bouton-pigeon{ background-color: #ffffff; }
+@media (hover: hover){
+  :where(html[data-theme="musique"]) #overlayPlus4 .bouton-pigeon:hover, :where(html[data-theme="musique"]) #overlayCupidon .bouton-pigeon:hover, :where(html[data-theme="musique"]) #overlayCoupDeFoudre .bouton-pigeon:hover{ background-color: #ffffff; }
+}
+:where(html[data-theme="musique"]) #overlayPlus4 .plus4-joueur-btn, :where(html[data-theme="musique"]) #overlayCupidon .plus4-joueur-btn, :where(html[data-theme="musique"]) #overlayCoupDeFoudre .plus4-joueur-btn{ background: rgba(255,255,255,0.94); }
+:where(html[data-theme="musique"]) #overlayPlus4 .plus4-total, :where(html[data-theme="musique"]) #overlayCupidon .plus4-total, :where(html[data-theme="musique"]) #overlayCoupDeFoudre .plus4-total{ color: #ffffff; }
+:where(html[data-theme="musique"]) #overlayPigeon .titre-pigeon{ color: #ffffff; }
+:where(html[data-theme="musique"]) #overlayPigeon .bouton-pigeon{ background-color: #ffffff; }
+@media (hover: hover){
+  :where(html[data-theme="musique"]) #overlayPigeon .bouton-pigeon:hover{ background-color: #ffffff; }
+}
+:where(html[data-theme="musique"]) #overlayDuel button{ background-color: #ffffff; }
+@media (hover: hover){
+  :where(html[data-theme="musique"]) #overlayDuel button:hover{ background-color: #ffffff; }
+}
+@media (hover: hover){
+  :where(html[data-theme="musique"]) #overlayDuel .Carte:not(.retournee):not(.duel-selected):hover{ box-shadow: 0 0 20px #ffffff; }
+}
+:where(html[data-theme="musique"]) #overlayRegleUnique .bouton-annulation{ background-color: #ffffff; }
+@media (hover: hover){
+  :where(html[data-theme="musique"]) #overlayRegleUnique .bouton-annulation:hover{ background-color: #ffffff; }
+}
+:where(html[data-theme="musique"]) #overlayFinUnRestants .titre-pigeon, :where(html[data-theme="musique"]) #overlayPredictionFin .titre-pigeon{ color: #ffffff; }
+:where(html[data-theme="musique"]) #overlayFinUnRestants .bouton-pigeon, :where(html[data-theme="musique"]) #overlayPredictionFin .bouton-pigeon{ background-color: #ffffff; }
+@media (hover: hover){
+  :where(html[data-theme="musique"]) #overlayFinUnRestants .bouton-pigeon:hover, :where(html[data-theme="musique"]) #overlayPredictionFin .bouton-pigeon:hover{ background-color: #ffffff; }
+}
+:where(html[data-theme="musique"]) #overlayFinUnRestants .fin-un-ligne{ color: #ffffff; }
+:where(html[data-theme="musique"]) .prediction-header{ background:
+    linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04)),
+    rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.24); }
+:where(html[data-theme="musique"]) .prediction-subtitle{ color: #ffffff; }
+:where(html[data-theme="musique"]) .overlay-subtitle{ color: #ffffff; }
+:where(html[data-theme="musique"]) .fin-choix-turn{ color: #ffffff; }
+:where(html[data-theme="musique"]) .fin-choix-recap .ligne{ color: #ffffff; }
+:where(html[data-theme="musique"]) .fin-choix-recap .ligne.en-cours{ background: rgba(255,255,255,0.12); }
+:where(html[data-theme="musique"]) .fin-choix-numeros b{ background: #ffffff; }
+@media (max-width: 520px), (orientation: landscape) and (max-height: 520px){
+  :where(html[data-theme="musique"]) #menu #btnCaster{ background-image: linear-gradient(180deg, #8e44f5, #7318f3) !important; }
+}
+@media (max-width: 520px), (orientation: landscape) and (max-height: 520px){
+  :where(html[data-theme="musique"]) #listeJoueurs .joueur-ligne-actif{ border-color: #7820f3; background: rgba(120,32,243,0.12); color: #7820f3; }
+}
+:where(html[data-theme="musique"]) .Carte.dos_dore::after{ background: linear-gradient(115deg,
+    transparent 32%,
+    rgba(215,200,255,0.55) 44%,
+    rgba(235,222,253,0.95) 50%,
+    rgba(215,200,255,0.55) 56%,
+    transparent 68%); }
+:where(html[data-theme="musique"]) #stickyJoueurActif{ border: 1px solid rgba(255,255,255,0.22); }
+:where(html[data-theme="musique"]) #stickyJoueurActif::before{ background: radial-gradient(circle at 35% 35%, #e6d6fd 0%, #ffffff 45%, #640cdf 100%); box-shadow: 0 0 10px rgba(255,255,255,0.28); }
+:where(html[data-theme="musique"]) #stickyJoueurActif .sticky-nom{ color: #b686f9; }
+:where(html[data-theme="musique"]) #stickyJoueurActif .sticky-bonus{ background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.18); color: #c8a4fa; }
+:where(html[data-theme="musique"]) .fin-choix-resultat{ color: #ffffff; }
+:where(html[data-theme="musique"]) #overlayDuel .duel-main-title{ color: #ffffff; }
+:where(html[data-theme="musique"]) #overlayDuel .duel-info{ color: #ffffff; }
+:where(html[data-theme="musique"]) #overlayDuel .duel-label{ color: #ffffff; }
+:where(html[data-theme="musique"]) header{ background:
+    linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)),
+    linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0) 45%),
+    rgba(0,0,0,0.22); box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.08),
+    inset 0 0 0 2px rgba(255,255,255,0.10),
+    0 14px 30px rgba(0,0,0,0.20); }
+:where(html[data-theme="musique"]) header::before{ background: linear-gradient(
+    90deg,
+    rgba(255, 70, 70, 0.14) 0%,
+    rgba(255,255,255,0.10) 35%,
+    rgba(70, 210, 110, 0.10) 68%,
+    rgba(70, 170, 255, 0.14) 100%
+  ); }
+:where(html[data-theme="musique"]) header::after{ background: linear-gradient(90deg, #ff4d4d 0%, #ffffff 34%, #42d86b 67%, #42b7ff 100%); }
+:where(html[data-theme="musique"]) header h1{ color: #ffffff; text-shadow:
+    0 2px 0 rgba(42,14,110,0.95),
+    0 4px 10px rgba(0,0,0,0.45),
+    0 0 18px rgba(255,255,255,0.18); }
+:where(html[data-theme="musique"]) #menu{ box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.06),
+    inset 0 0 0 2px rgba(255,255,255,0.08); }
+:where(html[data-theme="musique"]) #menu input{ border: 1px solid rgba(255,255,255,0.18); }
+:where(html[data-theme="musique"]) #choixMode h2, :where(html[data-theme="musique"]) #ecranNouvellePartie h2, :where(html[data-theme="musique"]) #ecranConfirmerHote h2, :where(html[data-theme="musique"]) #ecranConfirmerRetrait h2, :where(html[data-theme="musique"]) #ecranReprise h2, :where(html[data-theme="musique"]) #ecranConfirmerAccueil h2, :where(html[data-theme="musique"]) #ecranChoixPseudo h2, :where(html[data-theme="musique"]) #ecranCaster h2, :where(html[data-theme="musique"]) #enLigne h2, :where(html[data-theme="musique"]) #enLigne h3{ color: #ffffff; }
+:where(html[data-theme="musique"]) #choixMode button, :where(html[data-theme="musique"]) #ecranNouvellePartie button, :where(html[data-theme="musique"]) #btnContinuerOptions, :where(html[data-theme="musique"]) #ecranConfirmerHote button, :where(html[data-theme="musique"]) #ecranConfirmerRetrait button, :where(html[data-theme="musique"]) #ecranReprise button, :where(html[data-theme="musique"]) #ecranConfirmerAccueil button, :where(html[data-theme="musique"]) #ecranChoixPseudo button, :where(html[data-theme="musique"]) #ecranCaster button, :where(html[data-theme="musique"]) #enLigne button{ background-color: #d9c9ff; }
+@media (hover: hover){
+  :where(html[data-theme="musique"]) #choixMode button:hover, :where(html[data-theme="musique"]) #ecranNouvellePartie button:hover, :where(html[data-theme="musique"]) #btnContinuerOptions:hover, :where(html[data-theme="musique"]) #ecranConfirmerHote button:hover, :where(html[data-theme="musique"]) #ecranConfirmerRetrait button:hover, :where(html[data-theme="musique"]) #ecranReprise button:hover, :where(html[data-theme="musique"]) #ecranConfirmerAccueil button:hover, :where(html[data-theme="musique"]) #ecranChoixPseudo button:hover, :where(html[data-theme="musique"]) #ecranCaster button:hover, :where(html[data-theme="musique"]) #enLigne button:hover{ background-color: #ffffff; }
+}
+:where(html[data-theme="musique"]) #enLigne input{ border: 1px solid rgba(255,255,255,0.25); }
+:where(html[data-theme="musique"]) #enLigne .separateurOu::before, :where(html[data-theme="musique"]) #enLigne .separateurOu::after{ background: rgba(255,255,255,0.35); }
+:where(html[data-theme="musique"]) #ecranScanner .cadreScanner{ border: 3px solid #d9c9ff; }
+:where(html[data-theme="musique"]) #ecranScanner button{ background: #d9c9ff; }
+:where(html[data-theme="musique"]) #listeJoueursEnLigne div{ box-shadow: 0 0 0 1px rgba(255,255,255,0.18) inset; }
+:where(html[data-theme="musique"]) .qrPartie{ box-shadow: 0 0 0 3px rgba(255,255,255,0.55), 0 10px 24px rgba(0,0,0,0.35); }
+:where(html[data-theme="musique"]) #btnAccueilClassique, :where(html[data-theme="musique"]) #enLigne #btnAccueilEnLigne, :where(html[data-theme="musique"]) #ecranNouvellePartie #btnAccueil{ -webkit-text-stroke: 1.2px #ffffff; color: #ffffff; text-shadow:
+    0 2px 0 rgba(42,14,110,0.95),
+    0 3px 8px rgba(0,0,0,0.45); }
+:where(html[data-theme="musique"]) #toastEnLigne{ color: #ffffff; box-shadow: 0 0 0 1px rgba(255,255,255,0.45) inset, 0 8px 24px rgba(0,0,0,0.45); }
+:where(html[data-theme="musique"]) #ecranCredits{ background:
+    radial-gradient(ellipse 85% 28% at 50% 30%, rgba(255,255,255,0.16), transparent 100%),
+    radial-gradient(ellipse 45% 22% at 15% 72%, rgba(255,77,77,0.10), transparent 100%),
+    radial-gradient(ellipse 45% 22% at 85% 72%, rgba(66,183,255,0.10), transparent 100%),
+    var(--deco-theme, none),
+    linear-gradient(var(--fond-theme), var(--fond-theme)) var(--couleur-barre); }
+:where(html[data-theme="musique"]) #ecranCredits .credits-titre{ color: #ffffff; text-shadow:
+    0 2px 0 rgba(42,14,110,0.95),
+    0 4px 10px rgba(0,0,0,0.45),
+    0 0 26px rgba(255,255,255,0.25); }
+:where(html[data-theme="musique"]) #ecranCredits .credits-phrase strong{ color: #ffffff; }
+:where(html[data-theme="musique"]) #ecranCredits .cadrePhoto{ border: 2px solid rgba(255,255,255,0.55); }
+:where(html[data-theme="musique"]) #ecranCredits .photoVide{ border: 2px dashed rgba(255,255,255,0.45); color: rgba(255,255,255,0.8); }
+:where(html[data-theme="musique"]) #ecranCredits .credits-nom{ box-shadow: 0 0 0 1px rgba(255,255,255,0.25) inset; color: #ffffff; }
+:where(html[data-theme="musique"]) #ecranCredits .btnRetour{ background-color: #d9c9ff; }
+:where(html[data-theme="musique"]) #annonceNouvellePartie{ background:
+    radial-gradient(circle at 50% 45%, rgba(255,255,255,0.16), transparent 60%),
+    rgba(20, 0, 14, 0.94); }
+:where(html[data-theme="musique"]) #annonceNouvellePartie .annonce-titre{ color: #ffffff; text-shadow:
+    0 2px 0 rgba(42,14,110,0.95),
+    0 4px 10px rgba(0,0,0,0.45),
+    0 0 26px rgba(255,255,255,0.25); }
+:where(html[data-theme="musique"]) #stickyJoueurActif.rappel-tour{ animation: rappelTour_musique 0.8s ease-in-out 3; }
+:where(html[data-theme="musique"]) #haloRappel{ --halo-ecran: rgba(255,255,255,0.75); }
+@media (prefers-reduced-motion: reduce){
+  :where(html[data-theme="musique"]) #stickyJoueurActif.rappel-tour{ animation-name: rappelTourDoux_musique; }
+}
+:where(html[data-theme="musique"]) #overlayDuel .Carte.duel-a-choisir{ animation: duelPulse_musique 1.6s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce){
+  :where(html[data-theme="musique"]) #overlayDuel .Carte.duel-a-choisir{ box-shadow: 0 0 0 2px rgba(255,255,255,0.85), 0 0 18px rgba(255,255,255,0.45); }
+}
+:where(html[data-theme="musique"]) #choixMode #btnReglages svg{ filter:
+    drop-shadow(0 2px 0 rgba(42,14,110,0.95))
+    drop-shadow(0 3px 6px rgba(0,0,0,0.45)); }
+:where(html[data-theme="musique"]) #choixMode #btnReglages path{ stroke: #ffffff; }
+:where(html[data-theme="musique"]) #choixMode #btnReglages circle{ stroke: #ffffff; }
+:where(html[data-theme="musique"]) #ecranReglages h2{ color: #ffffff; }
+:where(html[data-theme="musique"]) #ecranReglages .btnRetour{ background-color: #d9c9ff; }
+:where(html[data-theme="musique"]) #ecranReglages .optionReglage{ border: 1px solid rgba(255,255,255,0.18); }
+:where(html[data-theme="musique"]) #ecranReglages .optionTitre{ color: #ffffff; }
+:where(html[data-theme="musique"]) #ecranReglages .optionReglage input:checked + .interrupteur{ background: #ffffff; }
+:where(html[data-theme="musique"]) #ecranReglages .optionReglage input:focus-visible + .interrupteur{ outline: 2px solid #ffffff; }
+:where(html[data-theme="musique"]) #ecranReglages .aProposTitre{ color: rgba(255,255,255,0.7); }
+:where(html[data-theme="musique"]) #choixMode .btnInstaller{ color: #ffffff; background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.45); }
+@media (hover: hover){
+  :where(html[data-theme="musique"]) #choixMode .btnInstaller:hover{ background: rgba(255,255,255,0.18); }
+}
+:where(html[data-theme="musique"]) #overlayRegleUnique .regle-detail{ color: #d9c0fc; }
+:where(html[data-theme="musique"]) #overlayRegleUnique .celien-bloc{ border-top: 1px solid rgba(255,255,255,0.35); }
+:where(html[data-theme="musique"]) #overlayRegleUnique .celien-citation{ color: #ffffff; text-shadow: 0 0 18px rgba(255,255,255,0.35); }
+:where(html[data-theme="musique"]) #overlayRegleUnique .celien-signature{ color: #ffffff; text-shadow: 0 2px 0 #6b4200, 0 0 16px rgba(255,255,255,0.35); }
+:where(html[data-theme="musique"]) #btnCodePartie{ border: 1px solid rgba(255,255,255,0.25); color: #ffffff; }
+:where(html[data-theme="musique"]) #btnCodePartie.ouvert{ border-color: rgba(255,255,255,0.6); }
+:where(html[data-theme="musique"]) #ecranRattrapage{ color: #ffffff; }
+:where(html[data-theme="musique"]) #choixMode #titreAccueil{ color: #ffffff; text-shadow:
+    0 3px 0 rgba(42,14,110,0.95),
+    0 6px 16px rgba(0,0,0,0.5),
+    0 0 34px rgba(255,255,255,0.28); animation: fadeIn 0.25s ease forwards, lueurTitreAccueil_musique 3.5s ease-in-out 0.3s infinite; }
+:where(html[data-theme="musique"]) #choixMode .titreAccueilBarre{ background: linear-gradient(90deg, #ff4d4d 0%, #ffffff 34%, #42d86b 67%, #42b7ff 100%); box-shadow: 0 0 14px rgba(255,255,255,0.25); }
+:where(html[data-theme="musique"]) #ecranReglages .blocReglage{ border: 1px solid rgba(255,255,255,0.18); }
+:where(html[data-theme="musique"]) #ecranReglages .ligneVolume input[type="range"]{ accent-color: #ffffff; }
+:where(html[data-theme="musique"]) #ecranReglages .volumeValeur{ color: #ffffff; }
+:where(html[data-theme="musique"]) #ecranReglages .optionAction button{ background: #ffffff; }
+:where(html[data-theme="musique"]) #ecranReglages .qrJeu{ box-shadow: 0 0 0 3px rgba(255,255,255,0.55), 0 10px 24px rgba(0,0,0,0.35); }
+:where(html[data-theme="musique"]) #ecranReglages #btnPartagerJeu{ background-color: #d9c9ff; }
+:where(html[data-theme="musique"]) #ecranReglages .btnDiagnostic:active{ color: #ffffff; border-color: rgba(255,255,255,0.5); }
+:where(html[data-theme="musique"]) #notifHaut{ background: linear-gradient(135deg, #4a09a6 0%, #853ceb 18%, #d9c0fc 36%, #944ff4 52%,
+                              #590ac7 74%, #a76df7 100%); box-shadow: 0 12px 28px rgba(0,0,0,0.5), 0 0 22px rgba(215,200,255,0.55),
+              inset 0 0 0 1.5px rgba(235,222,253,0.85), inset 0 -3px 0 rgba(42,14,110,0.45); }
+:where(html[data-theme="musique"]) #notifHaut .notifHaut-icone{ filter: drop-shadow(0 1px 0 rgba(243,236,254,0.8)); }
+:where(html[data-theme="musique"]) #notifHaut .notifHaut-eclats span{ text-shadow: 0 0 4px #fff, 0 0 10px rgba(235,222,253,0.95); }
+:where(html[data-theme="musique"]) #notifHaut .notifHaut-texte strong{ text-shadow: 0 1px 0 rgba(243,236,254,0.85); }
+:where(html[data-theme="musique"]) #etincellesPrestige span{ color: #e8d8fd; text-shadow: 0 0 6px #f3eeff, 0 0 14px rgba(255,255,255,0.9), 0 0 24px rgba(143,70,245,0.6); }
+:where(html[data-theme="musique"]) #refletPrestige::before{ background: linear-gradient(90deg, transparent 0%, rgba(206,175,251,0.08) 30%,
+                              rgba(235,222,253,0.38) 50%, rgba(206,175,251,0.08) 70%, transparent 100%); }
+:where(html[data-theme="musique"]) body::before{ background:
+    var(--deco-theme, radial-gradient(circle at top center, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 26%) no-repeat),
+    var(--fond-theme); }
+:where(html[data-theme="musique"]) #choixMode #btnRegles svg, :where(html[data-theme="musique"]) header #btnReglesJeu svg{ filter: drop-shadow(0 2px 0 rgba(42,14,110,0.95)) drop-shadow(0 3px 6px rgba(0,0,0,0.45)); }
+:where(html[data-theme="musique"]) #choixMode #btnRegles path, :where(html[data-theme="musique"]) header #btnReglesJeu path{ stroke: #ffffff; }
+:where(html[data-theme="musique"]) #ecranRegles .btnRetour{ background-color: #d9c9ff; }
+:where(html[data-theme="musique"]) #ecranRegles h2{ color: #ffffff; }
+:where(html[data-theme="musique"]) #ecranRegles .blocRegles{ border: 1px solid rgba(255,255,255,0.18); }
+:where(html[data-theme="musique"]) #ecranRegles .blocRegles h3{ color: #ffffff; }
+:where(html[data-theme="musique"]) #ecranRegles .btnFaqLien{ border: 1px solid rgba(255,255,255,0.45); background: rgba(255,255,255,0.10); color: #ffffff; }
+:where(html[data-theme="musique"]) #ecranRegles .faqImage{ border: 1px solid rgba(255,255,255,0.30); }
+:where(html[data-theme="musique"]) #ecranInstallation h2{ color: #ffffff; }
+:where(html[data-theme="musique"]) #ecranInstallation .etapeInstallation{ border: 1px solid rgba(255,255,255,0.25); }
+:where(html[data-theme="musique"]) #ecranInstallation .etapeInstallation b{ color: #ffffff; }
+:where(html[data-theme="musique"]) #ecranInstallation .numeroEtape{ background: #ffffff; }
+:where(html[data-theme="musique"]) #ecranInstallation #btnInstallationInstaller{ background: #d9c9ff; box-shadow: inset 0 -3px 0 rgba(0,0,0,0.18), 0 0 26px rgba(255,255,255,0.45); }
+@media (hover: hover){
+  :where(html[data-theme="musique"]) body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
+    #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
+    #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
+    #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
+    #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+    #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayDuel button,
+    #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
+    #overlayAnnulation button):hover:not(:disabled), :where(html[data-theme="musique"]) body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
+    #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
+    #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
+    #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
+    #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+    #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCoupDeFoudre .bouton-pigeon, #overlayDuel button,
+    #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
+    #overlayAnnulation button):hover:not(:disabled){ box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9), 0 6px 20px rgba(240,234,255,0.55) !important; }
+}
+:where(html[data-theme="musique"]) #overlayDuel .duel-boutons button:disabled{ background: #d9c0fc !important; }
+:where(html[data-theme="musique"]) #menu #btnCaster{ box-shadow: 0 0 0 1px rgba(255,255,255,0.45) inset; }
+:where(html[data-theme="musique"]) #menu #btnCaster.caster-actif{ box-shadow: 0 0 0 2px #ffffff inset, 0 0 14px rgba(255,255,255,0.35); }
+:where(html[data-theme="musique"]) #ecranCaster .adresseTele{ color: #ffffff; }
+:where(html[data-theme="musique"]) #ecranCaster .casterCode input{ border: 1px solid rgba(255,255,255,0.35); }
+:where(html[data-theme="musique"]) #ecranCaster #btnCasterArreter{ box-shadow: 0 0 0 1px rgba(255,255,255,0.45) inset; }
+:where(html[data-theme="musique"]) #ecranTele{ background:
+    var(--deco-theme, radial-gradient(circle at top center, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0) 30%) no-repeat),
+    var(--fond-theme); }
+:where(html[data-theme="musique"]) #ecranTele .tele-titre{ color: #ffffff; text-shadow: 0 0.4vh 0 rgba(42,14,110,0.95), 0 0.6vh 1.4vh rgba(0,0,0,0.5); }
+:where(html[data-theme="musique"]) #ecranTele .tele-sous-titre{ color: #ffffff; }
+:where(html[data-theme="musique"]) #ecranTele .tele-etape{ color: #d7c2f6; }
+:where(html[data-theme="musique"]) #ecranTele .tele-etape .tele-num{ background: #ffffff; }
+:where(html[data-theme="musique"]) #ecranTele .tele-plein-ecran{ box-shadow: 0 0 0 1px rgba(255,255,255,0.45) inset; }
+:where(html[data-theme="musique"]) #ecranTele .tele-qr{ box-shadow: 0 0 0 0.7vh rgba(255,255,255,0.6), 0 2.6vh 7vh rgba(0,0,0,0.5); }
+:where(html[data-theme="musique"]) #ecranTele .tele-code{ color: #ffffff; }
+:where(html[data-theme="musique"]) #ecranTele .tele-code small{ color: #d6c9ff; }
+:where(html[data-theme="musique"]) #ecranTele .tele-entete{ border: 1px solid rgba(255,255,255,0.25); }
+:where(html[data-theme="musique"]) #ecranTele .tele-entete::after{ background: linear-gradient(90deg, #ff5e5e, #a469f7, #ffffff, #7dde4f, #4fc3f7); }
+:where(html[data-theme="musique"]) #ecranTele .tele-prepa-titre{ color: #ffffff; text-shadow: 0 0.4vh 0 rgba(42,14,110,0.95), 0 0.6vh 1.4vh rgba(0,0,0,0.5); }
+:where(html[data-theme="musique"]) #ecranTele .tele-prepa-joueur{ border: 1px solid rgba(255,255,255,0.4); }
+:where(html[data-theme="musique"]) #ecranTele .tele-prepa-info{ color: #ffffff; }
+:where(html[data-theme="musique"]) #ecranTele .tele-restantes{ color: #d6c9ff; }
+:where(html[data-theme="musique"]) #ecranTele .tele-bloc-titre{ color: #ece6ff; }
+:where(html[data-theme="musique"]) #ecranTele .tele-tour{ border-color: rgba(255,255,255,0.5); }
+:where(html[data-theme="musique"]) #ecranTele .tele-tour.tele-rappel-tour{ --halo-bord: rgba(255,255,255,0.95); --halo: rgba(255,255,255,0.8); --halo-loin: rgba(143,70,245,0.4); }
+:where(html[data-theme="musique"]) #ecranTele .tele-tour-label{ color: #ece6ff; }
+:where(html[data-theme="musique"]) #ecranTele .tele-tour-nom{ color: #ffffff; text-shadow: 0 0.4vh 0 rgba(42,14,110,0.9); }
+:where(html[data-theme="musique"]) #ecranTele .tele-badge{ background: #ffffff; }
+:where(html[data-theme="musique"]) #ecranTele .tele-regles{ color: #ffffff; }
+:where(html[data-theme="musique"]) #ecranTele .tele-son-coupe{ color: #ffffff; }
+:where(html[data-theme="musique"]) #ecranTele .tele-ecran-titre{ color: #ffffff; }
+:where(html[data-theme="musique"]) #ecranTele .tele-ecran-detail{ color: #ffffff; }
+:where(html[data-theme="musique"]) #ecranTele .tele-puce{ background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.5); color: #ffffff; }
+:where(html[data-theme="musique"]) #ecranReglages :is(#btnSignalerBug, #btnFaq){ color: #ffffff; }
+:where(html[data-theme="musique"]) #ecranBug .bugFeuille{ box-shadow: 0 -12px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.4); }
+:where(html[data-theme="musique"]) #ecranBug h2{ color: #ffffff; }
+:where(html[data-theme="musique"]) #ecranBug textarea{ border: 1px solid rgba(255,255,255,0.35); }
+:where(html[data-theme="musique"]) #ecranBug .bugVignette img, :where(html[data-theme="musique"]) #ecranBug .bugVignette video{ border: 1px solid rgba(255,255,255,0.4); }
+:where(html[data-theme="musique"]) #ecranBug .bugAjouterPiece{ border: 1px dashed rgba(255,255,255,0.5); }
+:where(html[data-theme="musique"]) #ecranReglages .optionChevron{ stroke: #ffffff; }
+@media (pointer: coarse){
+  :where(html[data-theme="musique"]) #ecranTele .tele-revenir{ border: 1px solid rgba(255,255,255,0.5); }
+}
+:where(html[data-theme="musique"]) #stickyJoueurActif #btnPause svg, :where(html[data-theme="musique"]) #stickyJoueurActif #btnHistorique svg, :where(html[data-theme="musique"]) #ecranPause .pauseIcone svg, :where(html[data-theme="musique"]) #ecranTele .tele-pause svg{ stroke: #ffffff; }
+:where(html[data-theme="musique"]) #ecranPause .pauseIcone{ background: rgba(255,255,255,0.12); border: 2px solid rgba(255,255,255,0.6); }
+:where(html[data-theme="musique"]) #ecranPause .pauseIcone svg{ fill: #ffffff; }
+:where(html[data-theme="musique"]) #ecranPause h2{ color: #ffffff; text-shadow: 0 4px 0 rgba(42,14,110,0.9), 0 0 30px rgba(255,255,255,0.3); }
+:where(html[data-theme="musique"]) #ecranPause #btnReprendrePause{ background: linear-gradient(180deg, #8e44f5, #7318f3); }
+:where(html[data-theme="musique"]) #ecranTele .tele-pause svg{ fill: #ffffff; }
+:where(html[data-theme="musique"]) #ecranTele .tele-pause-titre{ color: #ffffff; text-shadow: 0 1vh 0 rgba(42,14,110,0.9); }
+:where(html[data-theme="musique"]) :is(#annulerChoix, #bandeauMiseAJour){ --bandeau-bord: rgba(255,255,255,0.45); --bandeau-bouton: #ffffff; }
+:where(html[data-theme="musique"]) #overlayCouleur .explication-couleur b{ color: #ffffff; }
+:where(html[data-theme="musique"]) #btnCaster .casterIcone{ background: linear-gradient(180deg, #8e44f5, #7318f3); }
+:where(html[data-theme="musique"]) .btnPauseJoueur{ border: 1px solid rgba(255,255,255,0.45); color: #ffffff; }
+:where(html[data-theme="musique"]) .btnPauseJoueur.en-pause{ border-color: rgba(255,255,255,0.9); }
+:where(html[data-theme="musique"]) .voletPause-feuille{ border-top: 1px solid rgba(255,255,255,0.35); }
+:where(html[data-theme="musique"]) .voletPause-nom{ color: #ffffff; }
+:where(html[data-theme="musique"]) .voletPause-ok{ background: linear-gradient(180deg, #8e44f5, #7318f3); }
+:where(html[data-theme="musique"]) .aideAccueil-ombre{ fill: rgba(42,14,110,0.9); }
+:where(html[data-theme="musique"]) .aideAccueil-repere b, :where(html[data-theme="musique"]) .aideAccueil-bas b{ color: #ffffff; text-shadow: 0 2px 0 rgba(42,14,110,0.9); }
+:where(html[data-theme="musique"]) .aideAccueil-bas b{ text-shadow: 0 3px 0 rgba(42,14,110,0.9); }
+:where(html[data-theme="musique"]) #plateau .Carte.carte-appuyee{ box-shadow: 0 0 0 3px #ffffff, 0 0 22px rgba(255,255,255,0.7); }
+:where(html[data-theme="musique"]) #enLigne #btnInviterPartie{ border: 1.5px solid rgba(255,255,255,0.7); background: rgba(255,255,255,0.08); color: #ffffff; }
+:where(html[data-theme="musique"]) .lignesRegle li::before{ background: #ffffff; }
+:where(html[data-theme="musique"]) :is(.detailRegle, #voletCarte .voletPause-texte) em{ color: #ffffff; }
+:where(html[data-theme="musique"]) .regleBloc-titre{ color: #ffffff; }
+:where(html[data-theme="musique"]) .regleBloc em{ color: #ffffff; }
+:where(html[data-theme="musique"]) .historique-recente{ background: #ffffff; }
+:where(html[data-theme="musique"]) .historique-quoi em{ color: #ffffff; }
+:where(html[data-theme="musique"]) #ecranTele .tele-dernieres-titre{ color: #ece6ff; }
+:where(html[data-theme="musique"]) #ecranTele .tele-dernieres-titre + .tele-dernieres-item{ color: #ffffff; }
+:where(html[data-theme="musique"]) #ecranTele .tele-dernieres-titre + .tele-dernieres-item .Carte{ outline: 0.3vh solid #ffffff; }
+:where(html[data-theme="musique"]) #ecranTele .tele-historique-quoi em{ color: #ffffff; }
+:where(html[data-theme="musique"]) .recap-titre{ color: #ffffff; text-shadow: 0 3px 0 #7a4b00, 0 0 18px rgba(255,255,255,.35); }
+:where(html[data-theme="musique"]) .recap-marche{ background: linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.06)); border: 1px solid rgba(255,255,255,.4); }
+:where(html[data-theme="musique"]) .recap-g{ color: #ffffff; }
+:where(html[data-theme="musique"]) .recap-liste{ border: 1px solid rgba(255,255,255,.25); }
+:where(html[data-theme="musique"]) .recap-ligne em{ color: #ffffff; }
+:where(html[data-theme="musique"]) .recap-eclats{ color: #ffffff; }
+:where(html[data-theme="musique"]) .recap-bloc{ border: 1px solid rgba(255,255,255,.22); }
+:where(html[data-theme="musique"]) .recap-t{ color: #ffffff; }
+:where(html[data-theme="musique"]) .recap-restants{ color: #ffffff; }
+:where(html[data-theme="musique"]) #ecranTele .tele-ecran-recap{ background: radial-gradient(circle at top, rgba(255,255,255,.10), transparent 55%), var(--fond-theme) !important; }
+:where(html[data-theme="musique"]) .etincelle{ --c: #ffffff; }
+:where(html[data-theme="musique"]) .etincelle.e0{ --c: #ffffff; }
+:where(html[data-theme="musique"]) .etincelle.e1{ --c: #ddc7fc; }
+:where(html[data-theme="musique"]) .etincelle.e2{ --c: #7820f3; }
+:where(html[data-theme="musique"]){ --album-barre-plein: #ffffff; }
+:where(html[data-theme="musique"]){ --actif-haut: #be94f9; --actif-bas: #7820f3; --actif-halo: #7820f3; }
+:where(html[data-theme="musique"]) .annonceAccueil{ border: 2px solid var(--actif-bas, #7820f3); box-shadow: 0 8px 22px rgba(0,0,0,.35), 0 0 18px var(--actif-halo, #7820f3); }
+:where(html[data-theme="musique"]) .annonceAccueil .annonceIcone{ background: linear-gradient(180deg, var(--actif-haut, #be94f9), var(--actif-bas, #7820f3)); }
+:where(html[data-theme="musique"]) #stickyJoueurActif #btnReglagesJeu svg{ stroke: #ffffff; }
+:where(html[data-theme="musique"]) #ecranTele .tele-regles-pj{ color: #ffffff; }
+:where(html[data-theme="musique"]) #ecranTele .tele-regles-partie{ color: #ffffff; border-bottom: 1px solid rgba(255,255,255,0.4); }
+:where(html[data-theme="musique"]) #ecranTele .tele-regles-nom{ color: #ffffff; }
+:where(html[data-theme="musique"]) #ecranTele .tele-regles-ligne em{ color: #ffffff; }
+:where(html[data-theme="musique"]) #ecranTele .tele-faq-image{ border: 1px solid rgba(255,255,255,0.35); }
+:where(html[data-theme="musique"]) #ecranTele .tele-puce.tele-puce-couleur.tele-puce-jaune{ background: #9551f6; }
+/* === FIN du doré teinté (généré) === */
+
+
+
+html[data-theme="musique"]{
+  --fond-theme: #5b2bd1;
+  --carte-musique: rgba(40, 14, 108, 0.95); /* ton de TOUTES les cartes et panneaux : indigo franc (pas noir), quasi opaque pour cacher le motif derrière le texte */
+  --couleur-barre: #5b2bd1; /* = la couleur du tout haut du décor ci-dessous (la barre du téléphone ne doit pas être plus sombre) */
+  /* Fond des menus et des réglages : lumière douce en haut, puis le motif de verres de rosé et de bulles (musique/deco_fond.svg) : QUE des verres, sur tous les écrans sauf l'accueil */
+  --deco-theme:
+    radial-gradient(ellipse 120% 24% at 50% 24%, rgba(255,255,255,.16), transparent 100%) no-repeat,
+    linear-gradient(to top, rgba(20,0,80,.3), transparent 45%) no-repeat,
+    url("musique/deco_fond.svg") 0 0 / 300px 300px repeat;
+  /* Accueil : deux faisceaux de projecteur (musique/faisceaux.svg), égaliseur en bas (musique/egaliseur.svg) et deux petites notes (note_rose.svg, notes_cyan.svg), derrière les boutons */
+  --deco-accueil:
+    url("musique/faisceaux.svg") center top / 100% 100% no-repeat,
+    url("musique/egaliseur.svg") center calc(100% - 10px) / 230px 94px no-repeat,
+    url("musique/note_rose.svg") 12% 110px / 56px 56px no-repeat,
+    url("musique/notes_cyan.svg") 86% 150px / 62px 62px no-repeat;
+  /* Joueur dont c'est le tour : blanc rosé brillant (néon) */
+  --actif-haut: #ffffff; --actif-bas: #ffd1f0; --actif-texte: #2a0e6e; --actif-halo: #ff8fd6;
+  /* texte sélectionné dans les champs (nom du joueur, code de la partie…) : violet clair, texte violet foncé */
+  --selection-fond: #e6dcff; --selection-texte: #2a0e6e;
+  /* Fenêtres du jeu (pigeon, duel, +4, pari…) : halo violet sur un indigo */
+  --overlay-fond: radial-gradient(ellipse 115% 42% at 50% 45%, rgba(150,110,255,.45) 0%, transparent 100%), #3a1599;
+  --overlay-bord: #3a1599;
+}
+
+/* ----- Fenêtres du jeu ----- */
+html[data-theme="musique"] :is(#overlayCouleur, #overlayPlus4, #overlayCupidon, #overlayPigeon,
+  #overlayFinUnRestants, #overlayDuel, #overlayRegleUnique, #overlayAnnulation, #overlayResultatAnnulation,
+  #overlayPredictionFin, .overlay-opaque),
+html[data-theme="musique"] :is(#overlayCouleur, #overlayPlus4, #overlayCoupDeFoudre, #overlayPigeon,
+  #overlayFinUnRestants, #overlayDuel, #overlayRegleUnique, #overlayAnnulation, #overlayResultatAnnulation,
+  #overlayPredictionFin, .overlay-opaque){
+  background: var(--overlay-fond) !important;
+}
+html[data-theme="musique"].overlay-ouvert,
+html[data-theme="musique"].overlay-ouvert body,
+html[data-theme="musique"] #voileOverlays{ background: var(--overlay-bord); }
+html[data-theme="musique"] .plus4-actions{ background: transparent; }
+html[data-theme="musique"] :is(#overlayCarteDoree, #overlayRegleUnique.overlay-doree){
+  background: radial-gradient(ellipse 95% 34% at 50% 33%, rgba(255,215,0,.26), transparent 100%),
+    radial-gradient(ellipse 120% 60% at 50% 100%, rgba(150,110,255,.45), transparent 100%), #3a1599 !important; box-shadow: none; }
+/* Récap de fin de partie */
+html[data-theme="musique"] #overlayFinUnRestants.overlay-recap{ background: radial-gradient(ellipse 110% 45% at 50% 45%, rgba(150,110,255,.45), transparent 100%), #240a6e !important; }
+html[data-theme="musique"] :is(.recap-marche, .recap-liste, .recap-bloc){ background: rgba(110,70,220,.5); border-color: rgba(255,255,255,.4); }
+html[data-theme="musique"] .recap-marche{ background: linear-gradient(180deg, rgba(190,160,255,.3), rgba(110,70,220,.5)); }
+
+/* ----- Télé : même teinte que le thème ----- */
+html[data-theme="musique"] #ecranTele .tele-ecran{ background: radial-gradient(ellipse 110% 70% at 50% 45%, rgba(140,100,250,.45), rgba(58,21,153,.97) 75%), rgb(58,21,153); }
+html[data-theme="musique"] #ecranTele .tele-ecran-recap{ background: radial-gradient(ellipse 110% 60% at 50% 40%, rgba(150,110,255,.45), transparent 100%), #240a6e !important; }
+
+/* ----- Lisibilité sur l'orange (Réglages, écran des créateurs) ----- */
+/* (« #ecranReglages > .optionReglage » : les lignes de réglage posées seules, hors d'un bloc — elles
+   gardaient le blanc translucide du jeu de base et tranchaient avec les autres.)
+   Cartes : TOUTES au même ton (prune, quasi opaque, liseré blanc fin) : Réglages (blocs et lignes isolées), « Ta partie »,
+   règles / FAQ / album, créateurs, étapes d'installation, salle d'attente, retrait d'un joueur. Quasi opaque pour que le motif
+   du fond ne passe jamais derrière un texte ; les noms de thèmes (chacun de sa couleur) restent lisibles. */
+html[data-theme="musique"] :is(#ecranReglages .blocReglage, #ecranReglages .reglages-contenu > .optionReglage, #ecranReglages > .optionReglage, .optionsPartie > .optionReglage:not(.optionsSuite),
+  .blocRegles, #ecranCredits .credits-nom, #ecranInstallation .etapeInstallation, #listeJoueursEnLigne div, #listeSuppression){
+  background: var(--carte-musique); border: 1px solid rgba(255, 255, 255, 0.22);
+}
+html[data-theme="musique"] #ecranCredits .cadrePhoto.sansPhoto{ background: var(--carte-musique); }
+/* Boutons secondaires (translucides dans le jeu de base) : même ton sombre que les cartes, liseré blanc */
+html[data-theme="musique"] :is(#enLigne #btnInviterPartie, .voletPause-annuler, #ecranReglages .btnDiagnostic, #ecranBug .bugFermer){
+  background: var(--carte-musique) !important; border: 1px solid rgba(255, 255, 255, 0.35) !important;
+}
+/* Petits textes gris : blanc cassé */
+html[data-theme="musique"] #ecranReglages :is(.lienBug, .versionJeu){ color: #ffffff !important; }
+html[data-theme="musique"] #ecranReglages .btnDiagnostic{ color: #ffffff !important; }
+html[data-theme="musique"] #ecranCredits .credits-honneur-titre{ color: #ffffff; }
+/* Télé : code de la télé, en bas de l'écran */
+html[data-theme="musique"] #ecranTele .tele-pied{ color: rgba(255,255,255,.85); }
+
+/* ----- Boutons : violet foncé, sans contour blanc, texte blanc, sur tous les écrans -----
+   (mêmes boutons que les autres thèmes habillés, Soleil couchant par exemple : tous les boutons du jeu doivent être aux couleurs du thème) */
+html[data-theme="musique"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #ajouterJoueur, #jouer, #supprimerJoueur,
+  #nouvellePartie, #btnRejouerMemes, #btnModifierJoueurs, #btnReprendrePause,
+  #btnCreerPartie, #btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR,
+  #lancerPartieEnLigne, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui, #btnConfirmerAccueilNon,
+  #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #termineSuppression,
+  #btnInstallationInstaller, #ecranRegles .btnFaqLien, #choixMode .btnInstaller, #menu #btnCaster, #ecranCaster button:not(.btnRetour), #btnFermerScanner, #ecranReprise button,
+  #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayFinUnRestants .bouton-pigeon,
+  #overlayAnnulation button, #overlayRegleUnique .bouton-annulation, #overlayDuel button:not(:disabled), #overlayPredictionFin .bouton-pigeon),
+html[data-theme="musique"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #ajouterJoueur, #jouer, #supprimerJoueur,
+  #nouvellePartie, #btnRejouerMemes, #btnModifierJoueurs, #btnReprendrePause,
+  #btnCreerPartie, #btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR,
+  #lancerPartieEnLigne, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui, #btnConfirmerAccueilNon,
+  #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #termineSuppression,
+  #btnInstallationInstaller, #ecranRegles .btnFaqLien, #choixMode .btnInstaller, #menu #btnCaster, #ecranCaster button:not(.btnRetour), #btnFermerScanner, #ecranReprise button,
+  #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCoupDeFoudre .bouton-pigeon, #overlayFinUnRestants .bouton-pigeon,
+  #overlayAnnulation button, #overlayRegleUnique .bouton-annulation, #overlayDuel button:not(:disabled), #overlayPredictionFin .bouton-pigeon){
+  background: linear-gradient(180deg, #4a1fb4, #2a0e6e) !important;
+  color: #ffffff !important;
+  text-shadow: 0 1px 0 rgba(20, 0, 80, 0.6) !important;
+  box-shadow: 0 6px 14px rgba(20,0,80,.4) !important;
+}
+@media (hover: hover){
+  html[data-theme="musique"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #choixMode .btnInstaller):hover{ background: linear-gradient(180deg, #5a2bd0, #33108a) !important; }
+}
+
+/* ----- Volet « Mettre … en pause » et bandeaux du bas (« Mauvais joueur ? Annuler », « Nouvelle version ») ----- */
+html[data-theme="musique"] .voletPause-ok{
+  background: linear-gradient(180deg, #4a1fb4, #2a0e6e); color: #ffffff;
+  text-shadow: 0 1px 0 rgba(20, 0, 80, 0.6); box-shadow: none;
+}
+html[data-theme="musique"] :is(#annulerChoix, #bandeauMiseAJour){
+  --bandeau-fond: #240a6e; --bandeau-bord: rgba(255, 255, 255, 0.5); --bandeau-texte: #fff;
+  --bandeau-bouton: linear-gradient(180deg, #4a1fb4, #2a0e6e); --bandeau-bouton-texte: #ffffff;
+}
+html[data-theme="musique"] :is(#annulerChoix .annulerChoix-bouton, #bandeauMiseAJour .maj){
+  text-shadow: 0 1px 0 rgba(20, 0, 80, 0.6); box-shadow: none;
+}
+
+/* ----- Pari de fin et choix de fin : cadres brun-orangé avec un liseré blanc (au lieu du brun-doré de base) ----- */
+html[data-theme="musique"] :is(.prediction-header, .fin-choix-recap, .fin-choix-card){
+  background: linear-gradient(180deg, rgba(80,40,190,.9), rgba(40,14,108,.9)) !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
+}
+
+/* ----- Textes secondaires un peu trop effacés sur l'orange : plus clairs ----- */
+html[data-theme="musique"] #ecranReglages .optionNote{ color: rgba(255, 255, 255, 0.92); }
+html[data-theme="musique"] #ecranReglages .aProposTitre{ color: #ffffff; }
+html[data-theme="musique"] #ecranReglages .lienJeu{ color: #fff; }
+html[data-theme="musique"] #enLigne .separateurOu, html[data-theme="musique"] #ecranInstallation #btnInstallationPlusTard{ color: #fff; }
+html[data-theme="musique"] #listeJoueursEnLigne div{ color: #ffffff; }
+html[data-theme="musique"] #ecranTele .tele-tour.tele-pigeon .tele-tour-nom{ color: #ffffff; } /* « PIGEON (nom) » de la télé */
+
+/* ----- Plateau : les panneaux (titre, boutons, joueurs, règles) cachent le motif de fond derrière leur texte ----- */
+html[data-theme="musique"] :is(header, #menu, .messages, #ecranTele .tele-bloc, #ecranTele .tele-entete, #ecranTele .tele-prepa-joueur){ background-color: var(--carte-musique); }
+
+
+/* ----- Aperçu du thème dans les Réglages : un simple rond de la couleur du fond (pas de dessin, pas d'animation) ----- */
+.pastilleTheme .rondMusique{ background: url("musique/note_apercu.svg") center / 84% 84% no-repeat, #5b2bd1 !important; } /* rond violet avec une note blanche dedans */
+
+/* ----- Télé : pastilles de choix (« Je bois 2 », noms des joueurs…) au ton des cartes : le doré reste lisible dessus ----- */
+html[data-theme="musique"] #ecranTele .tele-puce{ background: var(--carte-musique); border-color: rgba(255, 255, 255, 0.4); }
+
+/* ----- Télé : « Il reste N cartes » et « Dernières cartes tirées » (sous le plateau) ne sont dans aucun panneau : ils se lisaient mal sur le motif de fond.
+   Même ton que toutes les cartes. ----- */
+html[data-theme="musique"] #ecranTele :is(.tele-restantes, .tele-compteur){ background: var(--carte-musique); border-radius: 1.4vh; padding: 0.6vh 2vh; }
+html[data-theme="musique"] #ecranTele .tele-compteur{ display: table; margin-left: auto; margin-right: auto; color: #ffffff; } /* (« Il reste N cartes » : le panneau épouse le texte, centré) */
+html[data-theme="musique"] #ecranTele .tele-compteur[hidden]{ display: none; }
+
+/* ----- Plateau : l'intérieur de l'icône Règles (le livre) prend le ton de l'en-tête (les cartes), pas l'orange de l'accueil ----- */
+html[data-theme="musique"] header #btnReglesJeu path.couverture{ fill: var(--carte-musique); }
+
+/* ----- Les liserés arc-en-ciel (autour de « Joueurs / Règles », de la télé) deviennent rose / cyan / jaune néon ----- */
+html[data-theme="musique"] #choixMode .titreAccueilBarre,
+html[data-theme="musique"] .messages::before,
+html[data-theme="musique"] header::after,
+html[data-theme="musique"] #ecranTele .tele-entete::after{
+  background: linear-gradient(90deg, #ff3ea5 0%, #3de1ff 35%, #ffe14a 68%, #ff3ea5 100%) !important;
+}
+/* Bandeau « Tour de » (qui suit le défilement) : prune comme les cartes, pas le bordeaux du jeu de base */
+html[data-theme="musique"] #stickyJoueurActif{ background: linear-gradient(rgba(60,22,160,0.97), rgba(40,14,108,0.97)); border-color: rgba(255,255,255,0.3); }
+
+/* ----- Titre ALCUNO et icônes Réglages / Règles : blancs (au lieu du jaune doré), ombre violet foncé ----- */
+html[data-theme="musique"] :is(#choixMode #titreAccueil, header h1){
+  color: #fff;
+  text-shadow: 0 3px 0 #2a0e6e, 0 6px 16px rgba(20, 0, 80, 0.45), 0 0 30px rgba(255, 255, 255, 0.3);
+}
+html[data-theme="musique"] #choixMode #titreAccueil{ animation: fadeIn 0.25s ease forwards; } /* (sans la lueur dorée qui pulse) */
+html[data-theme="musique"] :is(#choixMode #btnReglages, #choixMode #btnRegles, header #btnReglesJeu) path:not(.couverture){ stroke: #fff; }
+html[data-theme="musique"] :is(#choixMode #btnReglages circle, #choixMode #btnRegles path.couverture, header #btnReglesJeu path.couverture){ stroke: #fff; }
+html[data-theme="musique"] :is(#choixMode #btnReglages svg, #choixMode #btnRegles svg, header #btnReglesJeu svg){
+  filter: drop-shadow(0 2px 0 #2a0e6e) drop-shadow(0 3px 6px rgba(20, 0, 80, 0.45));
+}
+html[data-theme="musique"] :is(#btnAccueilClassique, #enLigne #btnAccueilEnLigne, #ecranNouvellePartie #btnAccueil){ color: #fff; -webkit-text-stroke-color: #fff; text-shadow: 0 2px 0 #2a0e6e, 0 3px 8px rgba(20, 0, 80, 0.45); }
+html[data-theme="musique"] :is(#ecranReglages, #ecranRegles, #ecranCaster, #ecranBug, #ecranInstallation, #ecranCredits, #ecranConfirmerAccueil, #ecranConfirmerHote, #ecranConfirmerRetrait, #ecranReprise, #ecranPause, #suppression) :is(h2, .credits-titre){
+  color: #fff;
+  text-shadow: 0 2px 0 #2a0e6e, 0 4px 12px rgba(20, 0, 80, 0.4);
+}
+html[data-theme="musique"] :is(.optionTitre, .aProposTitre, .titreBloc, .regleBloc-titre, .recap-titre, .annonce-titre, .regle-titre,
+  #ecranCredits .credits-phrase strong, #codePartieAffiche,
+  #overlayCouleur .titre-couleur,
+  :is(#overlayPlus4, #overlayCupidon, #overlayCoupDeFoudre, #overlayPigeon, #overlayFinUnRestants, #overlayDuel, #overlayPredictionFin, #overlayRegleUnique, #overlayAnnulation, #overlayResultatAnnulation) .titre-pigeon,
+  #ecranTele :is(.tele-titre, .tele-ecran-titre, .tele-pause-titre, .tele-prepa-titre)){
+  color: #fff;
+  text-shadow: 0 2px 0 #2a0e6e, 0 4px 12px rgba(20, 0, 80, 0.4);
+}
+
+/* ----- Joueur dont c'est le tour : blanc rosé, avec une lueur rose néon autour ----- */
+html[data-theme="musique"] .joueur-ligne-actif{
+  box-shadow: 0 0 0 2px #ffffff, 0 0 12px 2px rgba(255, 255, 255, 0.95), 0 0 30px 6px rgba(255, 143, 214, 0.7) !important;
+}
+
+/* ----- Doré écrit directement par le JavaScript (passe devant le CSS du thème : d'où le !important) ----- */
+html[data-theme="musique"] :is(#overlayAnnulation, #overlayResultatAnnulation, #overlayRegleUnique:not(.overlay-doree)){ color: #fff !important; }
+html[data-theme="musique"] .aideAccueil-fleches path:not(.aideAccueil-ombre){ fill: #fff; }
+html[data-theme="musique"] .aideAccueil-ombre{ fill: rgba(40, 14, 108, 0.9); }
+
+/* ----- Bannière « Tour de » : nom du joueur en blanc néon (si une couleur est choisie, le jeu garde la couleur de la carte) ----- */
+html[data-theme="musique"] #stickyJoueurActif:not(.has-couleur):not(.is-pigeon) .sticky-nom{
+  color: #fff;
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.9), 0 0 14px rgba(255, 143, 214, 0.85);
+}
+html[data-theme="musique"] #stickyJoueurActif::before{ background: radial-gradient(circle at 35% 35%, #fff 0%, #ffc2f0 45%, #ff3ea5 100%); box-shadow: 0 0 10px rgba(255, 143, 214, 0.8); }
+
+/* ----- Écran de pause : voile prune (au lieu du bordeaux presque noir du jeu de base) ----- */
+html[data-theme="musique"] :is(#ecranPause, #ecranTele .tele-pause){ background: rgba(40, 14, 108, 0.84); }
+
+/* ----- Accueil : un piano à la place de la ligne colorée sous le titre, et on peut vraiment en jouer ----- */
+/* Le clavier (les touches) est construit par js/piano-accueil.js. L'image de fond musique/piano.svg reste
+   le dessin de secours : si ce fichier ne se charge pas, on voit toujours un piano, simplement muet. */
+html[data-theme="musique"] #choixMode .titreAccueilBarre{
+  height: 58px !important; width: min(100%, 400px) !important; /* 9 touches blanches : toute la largeur dispo, pour les garder tapables (~43 px) */ border-radius: 8px; border: 3px solid #fff; box-sizing: border-box;
+  background: url("musique/piano.svg") 0 0 / 140px 100% repeat-x !important;
+  box-shadow: 0 4px 0 #2a0e6e, 0 8px 18px rgba(20, 0, 80, 0.45);
+}
+html[data-theme="musique"] #choixMode .titreAccueilBarre.titreAccueilPiano{
+  position: relative; overflow: hidden; display: flex; padding: 0;
+  background: #2a0e6e !important; /* le fond qu'on aperçoit sous les touches noires */
+  touch-action: pan-y;            /* le glissé de côté joue les touches ; de haut en bas, la page défile */
+  -webkit-user-select: none; user-select: none;
+}
+/* Les touches sont des <button> de l'accueil : « #choixMode button » du style de base leur impose une
+   largeur de 320 px, un gros padding, du jaune et une ombre. On préfixe donc par #choixMode pour passer
+   devant (même méthode que la croix de l'annonce de l'accueil). */
+html[data-theme="musique"] #choixMode .titreAccueilPiano .pianoTouche{
+  appearance: none; -webkit-appearance: none; border: 0; margin: 0; padding: 0;
+  width: auto; min-width: 0; font-size: 0; color: transparent;
+  box-shadow: none; text-shadow: none; transform: none; transition: background 0.08s linear;
+  cursor: pointer; touch-action: pan-y; -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none; user-select: none;
+}
+html[data-theme="musique"] #choixMode .titreAccueilPiano .pianoTouche:hover,
+html[data-theme="musique"] #choixMode .titreAccueilPiano .pianoTouche:active{ transform: none; }
+html[data-theme="musique"] #choixMode .titreAccueilPiano .pianoTouche-blanche{
+  flex: 1 1 0; align-self: stretch; height: auto;
+  background: linear-gradient(180deg, #ffffff 0%, #ffffff 70%, #e6ddff 100%);
+  border-right: 1.5px solid #8a6cf5; border-radius: 0 0 3px 3px;
+}
+html[data-theme="musique"] #choixMode .titreAccueilPiano .pianoTouche-blanche.pianoTouche-fin{ border-right: 0; }
+html[data-theme="musique"] #choixMode .titreAccueilPiano .pianoTouche-noire{
+  position: absolute; top: 0; width: 26px; height: 34px; margin-left: -13px; /* centrée sur le trait entre deux blanches */
+  background: linear-gradient(180deg, #4a1fb4 0%, #2a0e6e 68%, #1b0848 100%);
+  border-radius: 0 0 4px 4px; box-shadow: 0 2px 5px rgba(10, 0, 40, 0.55); z-index: 2;
+}
+/* Touche enfoncée (150 ms, posée par js/piano-accueil.js) */
+html[data-theme="musique"] #choixMode .titreAccueilPiano .pianoTouche-blanche.pianoTouche-enfoncee{ background: linear-gradient(180deg, #d9c9ff, #ab8aff); }
+html[data-theme="musique"] #choixMode .titreAccueilPiano .pianoTouche-noire.pianoTouche-enfoncee{ background: linear-gradient(180deg, #8b5cff, #5b2bd1); }
+html[data-theme="musique"] #choixMode .titreAccueilPiano .pianoTouche:focus-visible{ outline: 2px solid #ffe14a; outline-offset: -3px; }
+
+/* ----- Feuille « Signaler un bug » : fond uni (le motif passait derrière le texte et le rendait illisible) ----- */
+html[data-theme="musique"] #ecranBug .bugFeuille{ background: radial-gradient(ellipse 120% 40% at 50% 0%, rgba(255,255,255,.18), transparent 100%), var(--fond-theme); }

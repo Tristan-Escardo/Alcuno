@@ -240,9 +240,94 @@ function montrerDefiHot(joueurIndex, nbGorgees, defiPossible = true, defiImpose 
 function finirBoireHot(etat, joueurIndex, nbGorgees, onFinish){
   if(!(etat && etat.choix === "fait")){
     noterGorgees(joueurs[joueurIndex], nbGorgees);
-    if(etat && etat.partenaire) noterGorgees(etat.partenaire, nbGorgees);
+    if(etat && etat.partenaire){
+      noterGorgees(etat.partenaire, nbGorgees);
+      compterCouple(joueurs[joueurIndex], etat.partenaire, nbGorgees); // (récap : « Couple de la soirée »)
+    }
   }
   if(typeof onFinish === "function") onFinish();
+}
+
+// ----- Carte Coup de foudre (période Saint-Valentin) : celui qui la tire choisit quelqu'un, puis
+// un bisou sur la bouche… ou un cul sec (4 gorgées en mode PJ). Synchronisé en ligne comme Cupidon (surAction).
+function afficherOverlayCoupDeFoudre(joueurActuel, classeCarte, suite = null){
+  if(document.getElementById("overlayCoupDeFoudre")) return;
+  const choisisseur = joueurs[joueurActuel];
+  const autres = joueurs.filter(n => n !== choisisseur && !estEnPause(n));
+  if(!autres.length){ // (personne d'autre : rien à faire)
+    choixPigeonEnCours = false;
+    if(typeof suite === "function") suite();
+    return;
+  }
+  choixPigeonEnCours = true;
+  lockScroll();
+  const culSec = estModeSoft() ? "4 gorgées" : "CUL SEC";
+  let etape = "choix", elu = null;
+
+  const overlay = document.createElement("div");
+  overlay.id = "overlayCoupDeFoudre";
+  const titre = document.createElement("div");
+  titre.className = "titre-pigeon";
+  overlay.appendChild(titre);
+  ajouterCarteVedette(overlay, classeCarte);
+  const container = document.createElement("div");
+  container.className = "plus4-container-joueurs";
+  overlay.appendChild(container);
+  const actions = document.createElement("div");
+  actions.className = "plus4-actions";
+  overlay.appendChild(actions);
+
+  const boutons = [];
+  const nouveau = (parent, libelle, id, etapes, action, opts = {}) => {
+    const btn = document.createElement("button");
+    btn.className = "bouton-pigeon plus4-joueur-btn";
+    btn.innerHTML = libelle;
+    surAction(btn, id, Object.assign({ owner: choisisseur, pret: () => etapes.includes(etape) }, opts), action);
+    parent.appendChild(btn);
+    boutons.push({ el: btn, etapes });
+    return btn;
+  };
+  function terminer(message){
+    overlay.remove();
+    unlockScroll();
+    choixPigeonEnCours = false;
+    afficherJoueurs();
+    afficherJoueurActif();
+    afficherRegleBloc(regleZero, message);
+    regleZero.style.display = "block";
+    zeroEnCours = true;
+    montrerOverlayRegle(message, classeCarte);
+    if(typeof suite === "function") suite();
+  }
+
+  // 1) choisir quelqu'un
+  autres.forEach((nom) => {
+    nouveau(container, echapperHtml(avecCouronne(nom)), "foudre:joueur:" + joueurs.indexOf(nom), ["choix"], () => {
+      elu = nom; etape = "action"; jouerSon("distribuer_gorgees"); refresh();
+    });
+  });
+  // 2) bisou ou cul sec
+  nouveau(actions, "💋 Bisou sur la bouche", "foudre:bisou", ["action"], () => {
+    compterCouple(choisisseur, elu, 0, 1);
+    jouerSon("annuler_gorgees");
+    terminer(`💋 ${avecCouronne(choisisseur)} et ${avecCouronne(elu)} : coup de foudre !`);
+  }, { once: true });
+  nouveau(actions, `🥃 ${culSec}`, "foudre:culsec", ["action"], () => {
+    noterGorgees(choisisseur, estModeSoft() ? 4 : GORGEES_CUL_SEC);
+    terminer(`🥃 ${avecCouronne(choisisseur)} préfère ${estModeSoft() ? "boire 4 gorgées" : "le CUL SEC"} !`);
+  }, { once: true });
+  nouveau(actions, "Retour", "foudre:retour", ["action"], () => { elu = null; etape = "choix"; refresh(); });
+
+  function refresh(){
+    // « Défi hot spécial Saint-Valentin », puis le titre, puis la consigne, bien séparés (style_alcuno.css : .foudre-*)
+    // (des <div> et pas des <span> : la télé, js/tele.js, met chaque bloc sur sa ligne)
+    titre.innerHTML = `<div class="foudre-badge">🔥 Défi hot spécial <span class="foudre-nowrap">Saint-Valentin</span> 💘</div><div class="foudre-titre">COUP DE FOUDRE ⚡</div>`
+      + `<div class="foudre-consigne">${etape === "choix" ? "Choisis quelqu'un"
+        : `${echapperHtml(avecCouronne(elu))} : un bisou sur la bouche… ou ${culSec} ?`}</div>`;
+    boutons.forEach(({ el, etapes }) => { el.style.display = etapes.includes(etape) ? "" : "none"; });
+  }
+  document.body.appendChild(overlay);
+  refresh();
 }
 
 // ----- Carte Cupidon : lier deux joueurs, ou briser un lien -----

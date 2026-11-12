@@ -17,7 +17,7 @@ const fs = require("fs"); const path = require("path");
 const { chromium } = require("playwright");
 const R = __dirname + "/";
 const URL = process.env.URL_JEU || "http://localhost:8765/index.html";
-const THEMES = ["bordeaux", "noir", "vert", "bleu", "soleil", "cerisier", "givre", "prestige", "galaxie", "kawaii", "donjon"];
+const THEMES = ["bordeaux", "noir", "vert", "bleu", "soleil", "cerisier", "givre", "prestige", "galaxie", "kawaii", "donjon", "noel", "chandeleur", "valentin", "patrick", "justrose", "musique", "halloween"];
 const args = process.argv.slice(2);
 const sansPartie = args.includes("--sans-partie"), images = args.includes("--images");
 const themes = ((args.find((a) => a.startsWith("--themes=")) || "").slice(9).split(",").filter(Boolean));

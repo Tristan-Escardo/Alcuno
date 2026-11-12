@@ -1,0 +1,77 @@
+/* =============================================================================================
+   Annonce d'un thème de fête (js/reglages.js, afficherAnnonceFete) : fenêtre du même style que les fenêtres de déblocage de thème
+   (Prestige, Kawaii…), mais aux couleurs de LA FÊTE ANNONCÉE, quel que soit le thème choisi en ce moment.
+   Tout est sous #fenetreFete[data-fete="<thème>"] : rien ne dépend de html[data-theme].
+   ============================================================================================= */
+#fenetreFete{
+  position: fixed; inset: 0; z-index: 2147483500;
+  display: flex; align-items: center; justify-content: center; padding: 24px;
+  background: rgba(0, 0, 0, 0.55);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  animation: fenetrePrestigeVoile 0.3s ease both;
+}
+#fenetreFete.fenetreFete-sortie{ animation: fenetrePrestigeVoile 0.25s ease reverse both; }
+#fenetreFete .fenetreFete-carte{
+  width: min(340px, 100%); box-sizing: border-box; border-radius: 24px; padding: 28px 22px 22px; text-align: center;
+  background: var(--ff-carte); border: 2px solid var(--ff-bord);
+  box-shadow: 0 0 40px var(--ff-halo), inset 0 0 30px rgba(255, 255, 255, 0.1);
+  font-family: Arial, sans-serif;
+  animation: fenetrePrestigeArrive 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+#fenetreFete .fenetreFete-image{
+  display: block; width: 112px; height: 112px; margin: 0 auto 18px; border-radius: 50%;
+  background: var(--ff-rond) center / 74% 74% no-repeat;
+  box-shadow: 0 0 0 4px var(--ff-bord), 0 0 34px var(--ff-halo);
+  animation: fenetreFeteBrille 2.2s ease-in-out infinite;
+}
+#fenetreFete .fenetreFete-titre{ font: 900 25px/1.2 Arial, sans-serif; color: #fff; margin: 0 0 24px; text-shadow: 0 2px 0 var(--ff-ombre), 0 0 18px var(--ff-halo); }
+#fenetreFete .fenetreFete-carte button{ display: block; width: 100%; border-radius: 999px; cursor: pointer; }
+#fenetreFete .fenetreFete-carte .fenetreFete-essayer{
+  padding: 15px; border: none !important; background: var(--ff-bouton) !important; color: var(--ff-bouton-texte) !important;
+  font: 900 18px Arial, sans-serif; text-shadow: none !important; box-shadow: 0 6px 18px var(--ff-halo) !important;
+}
+#fenetreFete .fenetreFete-carte .fenetreFete-plusTard{
+  margin-top: 10px; padding: 12px; border: 1px solid var(--ff-bord) !important; background: transparent !important;
+  color: #fff !important; font: 800 15px Arial, sans-serif; text-shadow: none !important; box-shadow: none !important;
+}
+#fenetreFete .fenetreFete-carte button:active{ filter: brightness(0.9); transform: scale(0.98); }
+@keyframes fenetreFeteBrille{
+  0%, 100%{ box-shadow: 0 0 0 4px var(--ff-bord), 0 0 24px var(--ff-halo); }
+  50%{ box-shadow: 0 0 0 4px var(--ff-bord), 0 0 46px var(--ff-halo); }
+}
+@media (prefers-reduced-motion: reduce){ #fenetreFete, #fenetreFete .fenetreFete-carte, #fenetreFete .fenetreFete-image{ animation: none; } }
+
+/* Noël : rouge Noël, blanc */
+#fenetreFete[data-fete="noel"]{
+  --ff-carte: linear-gradient(180deg, #c2182b, #7d0a14); --ff-bord: #ffffff; --ff-halo: rgba(255, 120, 120, 0.55); --ff-ombre: #5a0610;
+  --ff-rond: url("noel/boule_neige.svg"), #b3121f; --ff-bouton: linear-gradient(180deg, #ffffff, #ffd9d9); --ff-bouton-texte: #7d0a14;
+}
+/* Chandeleur : orange cuivré, crème */
+#fenetreFete[data-fete="chandeleur"]{
+  --ff-carte: linear-gradient(180deg, #c95a14, #8a3508); --ff-bord: #ffe0b0; --ff-halo: rgba(255, 170, 80, 0.55); --ff-ombre: #5a2205;
+  --ff-rond: url("chandeleur/crepe.svg"), #bd4f10; --ff-bouton: linear-gradient(180deg, #fff6d6, #ffd77a); --ff-bouton-texte: #5a2205;
+}
+/* Saint-Valentin : framboise, rose pâle */
+#fenetreFete[data-fete="valentin"]{
+  --ff-carte: linear-gradient(180deg, #d81b68, #8a1244); --ff-bord: #ffc2da; --ff-halo: rgba(255, 160, 200, 0.55); --ff-ombre: #6a0c34;
+  --ff-rond: url("valentin/coeur_o.svg"); --ff-bouton: linear-gradient(180deg, #ffffff, #ffc6dc); --ff-bouton-texte: #8a1244;
+}
+/* Saint-Valentin : le cœur seul, sans rond (comme l'aperçu des Réglages) */
+#fenetreFete[data-fete="valentin"] .fenetreFete-image{ border-radius: 0; box-shadow: none; animation: none; background-size: contain; filter: drop-shadow(0 0 14px var(--ff-halo)); }
+/* Saint-Patrick : vert */
+#fenetreFete[data-fete="patrick"]{
+  --ff-carte: linear-gradient(180deg, #14804f, #043a24); --ff-bord: #8cf0b4; --ff-halo: rgba(93, 255, 149, 0.5); --ff-ombre: #06402a;
+  --ff-rond: url("patrick/trefle_apercu.svg"), #0f6a44; --ff-bouton: linear-gradient(180deg, #f2fff6, #9be8b4); --ff-bouton-texte: #04361f;
+}
+#fenetreFete[data-fete="justrose"]{
+  --ff-carte: linear-gradient(180deg, #d9418b, #7d1448); --ff-bord: #ffffff; --ff-halo: rgba(255, 150, 200, 0.5); --ff-ombre: #6a1e43;
+  --ff-rond: url("justrose/verre_apercu.svg"), #cc3381; --ff-bouton: linear-gradient(180deg, #d4408a, #9a1052); --ff-bouton-texte: #ffffff;
+}
+#fenetreFete[data-fete="musique"]{
+  --ff-carte: linear-gradient(180deg, #8a62f4, #5b2bd1); --ff-bord: #ffffff; --ff-halo: rgba(150, 110, 255, 0.55); --ff-ombre: #2a0e6e;
+  --ff-rond: url("musique/note_apercu.svg"), #5b2bd1; --ff-bouton: linear-gradient(180deg, #4a1fb4, #2a0e6e); --ff-bouton-texte: #ffffff;
+}
+#fenetreFete[data-fete="halloween"]{
+  --ff-carte: linear-gradient(180deg, #2a0609, #0a0204); --ff-bord: #c5161c; --ff-halo: rgba(197, 22, 28, 0.6); --ff-ombre: #140102;
+  --ff-rond: url("halloween/citrouille_apercu.svg"), #0a0204; --ff-bouton: linear-gradient(180deg, #2a0609, #120203); --ff-bouton-texte: #f0dcd8;
+}

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <!-- Le cœur qui remplace le O du titre ALCUNO (thème Saint-Valentin) : à la hauteur des lettres, flèche de Cupidon en travers (sans dépasser vers le N) -->
+  <defs><radialGradient id="g" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#ff7a92"/><stop offset=".6" stop-color="#e5173a"/><stop offset="1" stop-color="#a30c28"/></radialGradient></defs>
+  <path d="M50 95 C14 70 3 47 5 29 C7 11 30 2 50 22 C70 2 93 11 95 29 C97 47 86 70 50 95 Z" fill="url(#g)" stroke="#fff" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M22 22 C14 26 12 36 16 44" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" opacity=".55"/>
+  <g transform="translate(52 52) rotate(-28)">
+    <path d="M-40 0 H34" stroke="#a87400" stroke-width="6" stroke-linecap="round"/><path d="M-40 0 H34" stroke="#ffe27a" stroke-width="3" stroke-linecap="round"/>
+    <path d="M32 -8 L49 0 L32 8z" fill="#ffe27a" stroke="#a87400" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M-40 0 l-8 -7 h6 l7 7z M-40 0 l-8 7 h6 l7 -7z M-33 0 l-8 -7 h6 l7 7z M-33 0 l-8 7 h6 l7 -7z" fill="#fff" stroke="#a88a94" stroke-width="1" stroke-linejoin="round"/>
+  </g>
+</svg>

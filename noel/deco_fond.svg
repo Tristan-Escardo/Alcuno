@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <!-- Motif répété du fond du thème Noël (plateau, menus, réglages) : cannes à sucre, cadeaux, étoiles, flocons, houx.
+       Rien à moins de 24 px des bords de la tuile : le tout haut et le tout bas de l'écran gardent la couleur unie de la barre du téléphone. -->
+  <defs>
+    <path id="canne" d="M0 44 L0 11 A9 9 0 0 1 18 11" fill="none"/>
+    <g id="cadeau">
+      <rect x="-17" y="-8" width="34" height="25" rx="2"/>
+      <rect x="-19" y="-14" width="38" height="9" rx="2"/>
+    </g>
+    <g id="flocon" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none">
+      <path d="M0 -9 V9 M-8 -4.5 L8 4.5 M-8 4.5 L8 -4.5"/><path d="M-2.5 -9 L0 -6 L2.5 -9 M-2.5 9 L0 6 L2.5 9" stroke-width="1.4"/>
+    </g>
+    <path id="etoile" d="M0 -9 L2.6 -2.6 L9 0 L2.6 2.6 L0 9 L-2.6 2.6 L-9 0 L-2.6 -2.6z" fill="#ffe27a"/>
+  </defs>
+  <g opacity=".45">
+    <!-- cannes à sucre -->
+    <g transform="translate(58 62) rotate(-24)"><use href="#canne" stroke="#fff" stroke-width="8" stroke-linecap="round"/><use href="#canne" stroke="#e3242b" stroke-width="8" stroke-dasharray="5 5"/></g>
+    <g transform="translate(70 190) rotate(22) scale(-1 1)"><use href="#canne" stroke="#fff" stroke-width="8" stroke-linecap="round"/><use href="#canne" stroke="#e3242b" stroke-width="8" stroke-dasharray="5 5"/></g>
+    <!-- cadeaux -->
+    <g transform="translate(162 52) rotate(9)"><use href="#cadeau" fill="#fff"/><rect x="-3.5" y="-14" width="7" height="31" fill="#e3242b"/><path d="M0 -14 C-12 -26 -18 -12 0 -14 C18 -12 12 -26 0 -14z" fill="none" stroke="#e3242b" stroke-width="3"/></g>
+    <g transform="translate(176 160) rotate(-12) scale(.9)"><use href="#cadeau" fill="#3a8cff"/><rect x="-3.5" y="-14" width="7" height="31" fill="#fff"/><path d="M0 -14 C-12 -26 -18 -12 0 -14 C18 -12 12 -26 0 -14z" fill="none" stroke="#fff" stroke-width="3"/></g>
+    <g transform="translate(118 112) rotate(14) scale(.7)"><use href="#cadeau" fill="#ffd23f"/><rect x="-3.5" y="-14" width="7" height="31" fill="#e3242b"/></g>
+    <!-- étoiles, flocons, houx -->
+    <use href="#etoile" transform="translate(112 46) scale(1.1)"/>
+    <use href="#etoile" transform="translate(30 134) scale(.8)"/>
+    <use href="#etoile" transform="translate(206 112) scale(.7)"/>
+    <use href="#flocon" transform="translate(122 196) scale(1.2)"/>
+    <use href="#flocon" transform="translate(34 40) scale(.85)"/>
+    <use href="#flocon" transform="translate(214 204) scale(.9)"/>
+    <g transform="translate(34 208) rotate(-18)"><path d="M0 0 C6 -12 18 -10 20 0 C12 4 4 4 0 0z" fill="#2fbf5a"/><path d="M0 0 C-6 -12 -18 -10 -20 0 C-12 4 -4 4 0 0z" fill="#1f8a45"/><circle cx="-2" cy="4" r="4" fill="#ff3b3b"/><circle cx="4" cy="3" r="4" fill="#ff3b3b"/></g>
+  </g>
+</svg>

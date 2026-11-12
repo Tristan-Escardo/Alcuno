@@ -1,0 +1,204 @@
+/* =============================================================================================
+   Thème de fête « Chandeleur » (nom interne : chandeleur) : écran orange cuivré, crêpes, citrons et fraises en
+   motif de fond, et sur l'accueil une poêle de cuivre d'où une crêpe saute et se retourne.
+   Pour l'instant choisi à la main dans les Réglages (le calendrier des fêtes viendra plus tard, voir FETES.md).
+   Tout est sous html[data-theme="chandeleur"] : rien ne change pour les autres thèmes.
+   Images : dossier chandeleur/.
+   ============================================================================================= */
+
+html[data-theme="chandeleur"]{
+  --fond-theme: #bd4f10;
+  --carte-chandeleur: rgba(92, 34, 6, 0.94); /* ton de TOUTES les cartes et panneaux : brun roux franc (pas noir), quasi opaque pour cacher le motif derrière le texte */
+  --couleur-barre: #bd4f10; /* = la couleur du tout haut du décor ci-dessous (la barre du téléphone ne doit pas être plus sombre) */
+  /* Fond du jeu, des menus et des réglages : lumière douce en haut, puis le motif de crêpes, citrons, fraises et étoiles de sucre (chandeleur/deco_fond.svg) */
+  --deco-theme:
+    radial-gradient(ellipse 120% 24% at 50% 24%, rgba(255,220,170,.34), transparent 100%) no-repeat,
+    linear-gradient(to top, rgba(110,40,0,.3), transparent 45%) no-repeat,
+    url("chandeleur/deco_fond.svg") 0 0 / 300px 300px repeat;
+  --deco-accueil:
+    radial-gradient(ellipse 120% 24% at 50% 24%, rgba(255,220,170,.36), transparent 100%) no-repeat;
+  /* Joueur dont c'est le tour : blanc et or */
+  --actif-haut: #ffffff; --actif-bas: #ffd23f; --actif-texte: #5a2205; --actif-halo: #ffe27a;
+  /* texte sélectionné dans les champs (nom du joueur, code de la partie…) : l'or du thème, texte brun foncé */
+  --selection-fond: #ffe27a; --selection-texte: #5a2205;
+  /* Fenêtres du jeu (pigeon, duel, +4, pari…) : halo orange sur un brun roux (le doré reste lisible) */
+  --overlay-fond: radial-gradient(ellipse 115% 42% at 50% 45%, rgba(255,150,60,.5) 0%, transparent 100%), #6a2a08;
+  --overlay-bord: #6a2a08;
+}
+
+/* ----- Fenêtres du jeu ----- */
+html[data-theme="chandeleur"] :is(#overlayCouleur, #overlayPlus4, #overlayCupidon, #overlayPigeon,
+  #overlayFinUnRestants, #overlayDuel, #overlayRegleUnique, #overlayAnnulation, #overlayResultatAnnulation,
+  #overlayPredictionFin, .overlay-opaque),
+html[data-theme="chandeleur"] :is(#overlayCouleur, #overlayPlus4, #overlayCoupDeFoudre, #overlayPigeon,
+  #overlayFinUnRestants, #overlayDuel, #overlayRegleUnique, #overlayAnnulation, #overlayResultatAnnulation,
+  #overlayPredictionFin, .overlay-opaque){
+  background: var(--overlay-fond) !important;
+}
+html[data-theme="chandeleur"].overlay-ouvert,
+html[data-theme="chandeleur"].overlay-ouvert body,
+html[data-theme="chandeleur"] #voileOverlays{ background: var(--overlay-bord); }
+html[data-theme="chandeleur"] .plus4-actions{ background: transparent; }
+html[data-theme="chandeleur"] :is(#overlayCarteDoree, #overlayRegleUnique.overlay-doree){
+  background: radial-gradient(ellipse 95% 34% at 50% 33%, rgba(255,215,0,.26), transparent 100%),
+    radial-gradient(ellipse 120% 60% at 50% 100%, rgba(255,150,60,.5), transparent 100%), #6a2a08 !important; box-shadow: none; }
+/* Récap de fin de partie */
+html[data-theme="chandeleur"] #overlayFinUnRestants.overlay-recap{ background: radial-gradient(ellipse 110% 45% at 50% 45%, rgba(255,150,60,.5), transparent 100%), #5a2206 !important; }
+html[data-theme="chandeleur"] :is(.recap-marche, .recap-liste, .recap-bloc){ background: rgba(150,62,14,.5); border-color: rgba(255,255,255,.4); }
+html[data-theme="chandeleur"] .recap-marche{ background: linear-gradient(180deg, rgba(255,180,110,.3), rgba(150,62,14,.5)); }
+
+/* ----- Télé : même teinte que le thème ----- */
+html[data-theme="chandeleur"] #ecranTele .tele-ecran{ background: radial-gradient(ellipse 110% 70% at 50% 45%, rgba(255,140,50,.5), rgba(106,42,8,.97) 75%), rgb(106,42,8); }
+html[data-theme="chandeleur"] #ecranTele .tele-ecran-recap{ background: radial-gradient(ellipse 110% 60% at 50% 40%, rgba(255,150,60,.5), transparent 100%), #5a2206 !important; }
+
+/* ----- Lisibilité sur l'orange (Réglages, écran des créateurs) ----- */
+/* (« #ecranReglages > .optionReglage » : les lignes de réglage posées seules, hors d'un bloc — elles
+   gardaient le blanc translucide du jeu de base et tranchaient avec les autres.)
+   Cartes : TOUTES au même ton (brun roux, quasi opaque, liseré blanc fin) : Réglages (blocs et lignes isolées), « Ta partie »,
+   règles / FAQ / album, créateurs, étapes d'installation, salle d'attente, retrait d'un joueur. Quasi opaque pour que le motif
+   du fond ne passe jamais derrière un texte ; les noms de thèmes (chacun de sa couleur) restent lisibles. */
+html[data-theme="chandeleur"] :is(#ecranReglages .blocReglage, #ecranReglages .reglages-contenu > .optionReglage, #ecranReglages > .optionReglage, .optionsPartie > .optionReglage:not(.optionsSuite),
+  .blocRegles, #ecranCredits .credits-nom, #ecranInstallation .etapeInstallation, #listeJoueursEnLigne div, #listeSuppression){
+  background: var(--carte-chandeleur); border: 1px solid rgba(255, 255, 255, 0.22);
+}
+html[data-theme="chandeleur"] #ecranCredits .cadrePhoto.sansPhoto{ background: var(--carte-chandeleur); }
+/* Boutons secondaires (translucides dans le jeu de base) : même ton sombre que les cartes, liseré blanc */
+html[data-theme="chandeleur"] :is(#enLigne #btnInviterPartie, .voletPause-annuler, #ecranReglages .btnDiagnostic, #ecranBug .bugFermer){
+  background: var(--carte-chandeleur) !important; border: 1px solid rgba(255, 255, 255, 0.35) !important;
+}
+/* Petits textes gris : blanc cassé */
+html[data-theme="chandeleur"] #ecranReglages :is(.lienBug, .versionJeu){ color: #fff1dc !important; }
+html[data-theme="chandeleur"] #ecranReglages .btnDiagnostic{ color: #fff1dc !important; }
+html[data-theme="chandeleur"] #ecranCredits .credits-honneur-titre{ color: #fff1dc; }
+/* Télé : code de la télé, en bas de l'écran */
+html[data-theme="chandeleur"] #ecranTele .tele-pied{ color: rgba(255,241,220,.8); }
+
+/* ----- Boutons : or avec un anneau blanc (comme une étiquette de cadeau) et texte brun foncé, sur tous les écrans -----
+   (mêmes boutons que les autres thèmes habillés, Soleil couchant par exemple : tous les boutons du jeu doivent être aux couleurs du thème) */
+html[data-theme="chandeleur"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #ajouterJoueur, #jouer, #supprimerJoueur,
+  #nouvellePartie, #btnRejouerMemes, #btnModifierJoueurs, #btnReprendrePause,
+  #btnCreerPartie, #btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR,
+  #lancerPartieEnLigne, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui, #btnConfirmerAccueilNon,
+  #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #termineSuppression,
+  #btnInstallationInstaller, #ecranRegles .btnFaqLien, #choixMode .btnInstaller, #menu #btnCaster, #ecranCaster button:not(.btnRetour), #btnFermerScanner, #ecranReprise button,
+  #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayFinUnRestants .bouton-pigeon,
+  #overlayAnnulation button, #overlayRegleUnique .bouton-annulation, #overlayDuel button:not(:disabled), #overlayPredictionFin .bouton-pigeon),
+html[data-theme="chandeleur"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #ajouterJoueur, #jouer, #supprimerJoueur,
+  #nouvellePartie, #btnRejouerMemes, #btnModifierJoueurs, #btnReprendrePause,
+  #btnCreerPartie, #btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR,
+  #lancerPartieEnLigne, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui, #btnConfirmerAccueilNon,
+  #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #termineSuppression,
+  #btnInstallationInstaller, #ecranRegles .btnFaqLien, #choixMode .btnInstaller, #menu #btnCaster, #ecranCaster button:not(.btnRetour), #btnFermerScanner, #ecranReprise button,
+  #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCoupDeFoudre .bouton-pigeon, #overlayFinUnRestants .bouton-pigeon,
+  #overlayAnnulation button, #overlayRegleUnique .bouton-annulation, #overlayDuel button:not(:disabled), #overlayPredictionFin .bouton-pigeon){
+  background: linear-gradient(180deg, #fff6d6, #ffd77a) !important;
+  color: #5a2205 !important;
+  text-shadow: 0 1px 0 rgba(255, 244, 190, 0.7) !important;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.95), 0 6px 14px rgba(90,30,0,.4) !important;
+}
+@media (hover: hover){
+  html[data-theme="chandeleur"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #choixMode .btnInstaller):hover{ background: linear-gradient(180deg, #fffbe8, #ffe7a0) !important; }
+}
+
+/* ----- Volet « Mettre … en pause » et bandeaux du bas (« Mauvais joueur ? Annuler », « Nouvelle version ») ----- */
+html[data-theme="chandeleur"] .voletPause-ok{
+  background: linear-gradient(180deg, #fff6d6, #ffd77a); color: #5a2205;
+  text-shadow: 0 1px 0 rgba(255, 244, 190, 0.7); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.95);
+}
+html[data-theme="chandeleur"] :is(#annulerChoix, #bandeauMiseAJour){
+  --bandeau-fond: #4e1c05; --bandeau-bord: rgba(255, 255, 255, 0.5); --bandeau-texte: #fff;
+  --bandeau-bouton: linear-gradient(180deg, #fff6d6, #ffd77a); --bandeau-bouton-texte: #5a2205;
+}
+html[data-theme="chandeleur"] :is(#annulerChoix .annulerChoix-bouton, #bandeauMiseAJour .maj){
+  text-shadow: 0 1px 0 rgba(255, 244, 190, 0.7); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.95);
+}
+
+/* ----- Pari de fin et choix de fin : cadres brun-orangé avec un liseré blanc (au lieu du brun-doré de base) ----- */
+html[data-theme="chandeleur"] :is(.prediction-header, .fin-choix-recap, .fin-choix-card){
+  background: linear-gradient(180deg, rgba(124,46,10,.9), rgba(84,30,6,.9)) !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
+}
+
+/* ----- Textes secondaires un peu trop effacés sur l'orange : plus clairs ----- */
+html[data-theme="chandeleur"] #ecranReglages .optionNote{ color: rgba(255, 255, 255, 0.92); }
+html[data-theme="chandeleur"] #ecranReglages .aProposTitre{ color: #ffe27a; }
+html[data-theme="chandeleur"] #ecranReglages .lienJeu{ color: #fff; }
+html[data-theme="chandeleur"] #enLigne .separateurOu, html[data-theme="chandeleur"] #ecranInstallation #btnInstallationPlusTard{ color: #fff; }
+html[data-theme="chandeleur"] #listeJoueursEnLigne div{ color: #b8fff6; }
+html[data-theme="chandeleur"] #ecranTele .tele-tour.tele-pigeon .tele-tour-nom{ color: #b8fff6; } /* « PIGEON (nom) » de la télé */
+
+/* ----- Plateau : les panneaux (titre, boutons, joueurs, règles) cachent le motif de fond derrière leur texte ----- */
+html[data-theme="chandeleur"] :is(header, #menu, .messages, #ecranTele .tele-bloc, #ecranTele .tele-entete, #ecranTele .tele-prepa-joueur){ background-color: var(--carte-chandeleur); }
+
+
+/* ----- Accueil : la poêle de cuivre (posée en bas) et la crêpe qui saute et se retourne -----
+   (conteneur #poeleChandeleur dans index.html ; derrière les boutons, comme les autres décors animés) */
+#poeleChandeleur{
+  display: none;
+  position: absolute;
+  left: 50%;
+  bottom: 22px;
+  width: min(92%, 360px);
+  aspect-ratio: 300 / 170;
+  transform: translateX(-50%);
+  z-index: -1;
+  pointer-events: none;
+  animation: none !important;
+}
+html[data-theme="chandeleur"] #poeleChandeleur{ display: block; }
+/* La poêle bouge avec la crêpe : elle s'abaisse (élan), donne un coup sec vers le haut au lancer, puis amortit la réception */
+#poeleChandeleur .poeleImage{
+  position: absolute; inset: 0;
+  background: url("chandeleur/poele_sans_citron.svg") center / contain no-repeat;
+  transform-origin: 90% 88%; /* vers le bout du manche */
+  animation: sautPoele 3.6s ease-in-out infinite;
+}
+@keyframes sautPoele{
+  0%, 36% { transform: translateY(0)   rotate(0); }
+  44%     { transform: translateY(7%)  rotate(3.5deg); }
+  52%     { transform: translateY(-9%) rotate(-6deg); }
+  60%     { transform: translateY(-2%) rotate(-1deg); }
+  70%, 80%{ transform: translateY(0)   rotate(0); }
+  87%     { transform: translateY(-4%) rotate(-2deg); }
+  92%     { transform: translateY(6%)  rotate(2.5deg); }
+  100%    { transform: translateY(0)   rotate(0); }
+}
+#poeleChandeleur .crepeSaute{
+  position: absolute;
+  left: 38.7%;
+  bottom: 24%;
+  width: 36.7%;
+  aspect-ratio: 110 / 36;
+  margin-left: -18.35%;
+  background: url("chandeleur/crepe.svg") center / contain no-repeat;
+  filter: drop-shadow(0 2px 0 rgba(90, 40, 0, 0.35));
+  animation: sautCrepe 3.6s ease-in-out infinite;
+}
+@keyframes sautCrepe{
+  0%, 36% { bottom: 24%;  transform: rotate(-6deg)  scaleY(1); }
+  44%     { bottom: 17%;  transform: rotate(-3deg)  scaleY(1); }
+  52%     { bottom: 31%;  transform: rotate(-8deg)  scaleY(1); }
+  58%     { bottom: 100%; transform: rotate(-14deg) scaleY(.3); }
+  70%     { bottom: 128%; transform: rotate(-20deg) scaleY(-1); }
+  84%     { bottom: 52%;  transform: rotate(-10deg) scaleY(-.6); }
+  92%     { bottom: 18%;  transform: rotate(-4deg)  scaleY(.85); }
+  100%    { bottom: 24%;  transform: rotate(-6deg)  scaleY(1); }
+}
+@media (prefers-reduced-motion: reduce){
+  #poeleChandeleur .crepeSaute, #poeleChandeleur .poeleImage{ animation: none; }
+}
+
+/* ----- Aperçu du thème dans les Réglages : un simple rond de la couleur du fond (pas de dessin, pas d'animation) ----- */
+.pastilleTheme .rondChandeleur{ background: #bd4f10 !important; }
+
+/* ----- Télé : pastilles de choix (« Je bois 2 », noms des joueurs…) au ton des cartes : le doré reste lisible dessus ----- */
+html[data-theme="chandeleur"] #ecranTele .tele-puce{ background: var(--carte-chandeleur); border-color: rgba(255, 255, 255, 0.4); }
+
+/* ----- Télé : « Il reste N cartes » et « Dernières cartes tirées » (sous le plateau) ne sont dans aucun panneau : ils se lisaient mal sur le motif de fond.
+   Même ton que toutes les cartes. ----- */
+html[data-theme="chandeleur"] #ecranTele :is(.tele-restantes, .tele-compteur){ background: var(--carte-chandeleur); border-radius: 1.4vh; padding: 0.6vh 2vh; }
+html[data-theme="chandeleur"] #ecranTele .tele-compteur{ display: table; margin-left: auto; margin-right: auto; color: #fff3dc; } /* (« Il reste N cartes » : le panneau épouse le texte, centré) */
+html[data-theme="chandeleur"] #ecranTele .tele-compteur[hidden]{ display: none; }
+
+/* ----- Plateau : l'intérieur de l'icône Règles (le livre) prend le ton de l'en-tête (les cartes), pas l'orange de l'accueil ----- */
+html[data-theme="chandeleur"] header #btnReglesJeu path.couverture{ fill: var(--carte-chandeleur); }

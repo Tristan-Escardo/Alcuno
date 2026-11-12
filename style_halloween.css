@@ -1,0 +1,691 @@
+/* =============================================================================================
+   Thème de fête « Halloween » (nom interne : halloween) : noir presque total, grain de pellicule et
+   vignette qui ferme les bords, coulures de sang en haut de tous les écrans, éclaboussures et griffures
+   en motif de fond, citrouilles sculptées qui saignent et yeux qui brillent dans le noir sur l'accueil.
+   Le titre ALCUNO est rouge sang, la ligne sous lui est une traînée qui dégouline.
+   Boutons presque noirs cernés d'un trait de sang : ils ne doivent pas éclairer l'écran.
+   Pour l'instant choisi à la main dans les Réglages (le calendrier des fêtes viendra plus tard, voir FETES.md).
+   Tout est sous html[data-theme="halloween"] : rien ne change pour les autres thèmes.
+   Images : dossier halloween/.
+   ============================================================================================= */
+
+/* === DÉBUT : doré du jeu de base teinté au thème (généré par outils/teinter_or_theme.py halloween : ne pas modifier à la main) === */
+@keyframes lueurDoree_halloween{
+  0%, 100% { box-shadow: 0 0 0 1px rgba(255,154,60,0.5), 0 10px 26px rgba(0,0,0,0.5), 0 0 18px rgba(255,154,60,0.30); }
+  50%      { box-shadow: 0 0 0 1px rgba(255,154,60,0.9), 0 10px 26px rgba(0,0,0,0.5), 0 0 38px rgba(255,154,60,0.60); }
+}
+@keyframes rappelTour_halloween{
+  0%, 100% { scale: 1; filter: none; }
+  50%      { scale: 1.14; filter: brightness(1.35) drop-shadow(0 0 10px rgba(255,154,60,0.95)); }
+}
+@keyframes rappelTourDoux_halloween{
+    0%, 100% { filter: none; }
+    50%      { filter: brightness(1.35) drop-shadow(0 0 10px rgba(255,154,60,0.95)); }
+  }
+@keyframes duelPulse_halloween{
+  0%, 100% { box-shadow: 0 0 0 2px rgba(255,154,60,0.55), 0 0 10px rgba(255,154,60,0.25); }
+  50%      { box-shadow: 0 0 0 2px rgba(255,154,60,0.95), 0 0 28px rgba(255,154,60,0.60); }
+}
+@keyframes lueurTitreAccueil_halloween{
+  0%, 100% {
+    text-shadow:
+      0 3px 0 rgba(90,30,4,0.95),
+      0 6px 16px rgba(0,0,0,0.5),
+      0 0 34px rgba(255,154,60,0.28);
+  }
+  50% {
+    text-shadow:
+      0 3px 0 rgba(90,30,4,0.95),
+      0 6px 16px rgba(0,0,0,0.5),
+      0 0 48px rgba(255,154,60,0.55);
+  }
+}
+@keyframes fenetrePrestigeBrille_halloween{
+  0%, 100%{ box-shadow: 0 0 0 4px #fcddc7, 0 0 26px rgba(255,154,60,0.6); }
+  50%{ box-shadow: 0 0 0 4px #fcddc7, 0 0 48px rgba(255,154,60,0.95); }
+}
+:where(html[data-theme="halloween"]) ::selection{ background: var(--selection-fond, #ff9a3c); }
+:where(html[data-theme="halloween"]) .messages::before{ background: linear-gradient(90deg, #ff5b5b 0%, #ff7a18 25%, #6eff72 50%, #58d4ff 75%, #8b7dff 100%); }
+:where(html[data-theme="halloween"]) .bonus-annulation{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) .regleZero, :where(html[data-theme="halloween"]) .reglePigeon, :where(html[data-theme="halloween"]) .rappelTour{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) .menu button, :where(html[data-theme="halloween"]) .suppression button{ background-color: #ff7a18; }
+@media (hover: hover){
+  :where(html[data-theme="halloween"]) .menu button:hover, :where(html[data-theme="halloween"]) .suppression button:hover{ background-color: #ffc07a; }
+}
+:where(html[data-theme="halloween"]) #suppression h2{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #listeSuppression{ box-shadow: 0 0 0 1px rgba(255,154,60,0.18) inset; }
+@media (hover: hover){
+  :where(html[data-theme="halloween"]) #listeSuppression .supp-item:hover{ background: rgba(255,154,60,0.10); box-shadow: 0 0 0 1px rgba(255,154,60,0.22) inset; }
+}
+:where(html[data-theme="halloween"]) #listeSuppression .supp-check{ accent-color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #termineSuppression{ background-color: #ff9a3c; }
+@media (hover: hover){
+  :where(html[data-theme="halloween"]) #termineSuppression:hover{ background-color: #ffc07a; }
+}
+:where(html[data-theme="halloween"]) #overlayCouleur div.titre-couleur{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #overlayPlus4 .titre-pigeon, :where(html[data-theme="halloween"]) #overlayCupidon .titre-pigeon, :where(html[data-theme="halloween"]) #overlayCoupDeFoudre .titre-pigeon{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #overlayPlus4 .bouton-pigeon, :where(html[data-theme="halloween"]) #overlayCupidon .bouton-pigeon, :where(html[data-theme="halloween"]) #overlayCoupDeFoudre .bouton-pigeon{ background-color: #ff9a3c; }
+@media (hover: hover){
+  :where(html[data-theme="halloween"]) #overlayPlus4 .bouton-pigeon:hover, :where(html[data-theme="halloween"]) #overlayCupidon .bouton-pigeon:hover, :where(html[data-theme="halloween"]) #overlayCoupDeFoudre .bouton-pigeon:hover{ background-color: #ffc07a; }
+}
+:where(html[data-theme="halloween"]) #overlayPlus4 .plus4-joueur-btn, :where(html[data-theme="halloween"]) #overlayCupidon .plus4-joueur-btn, :where(html[data-theme="halloween"]) #overlayCoupDeFoudre .plus4-joueur-btn{ background: rgba(255,154,60,0.94); }
+:where(html[data-theme="halloween"]) #overlayPlus4 .plus4-total, :where(html[data-theme="halloween"]) #overlayCupidon .plus4-total, :where(html[data-theme="halloween"]) #overlayCoupDeFoudre .plus4-total{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #overlayPigeon .titre-pigeon{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #overlayPigeon .bouton-pigeon{ background-color: #ff9a3c; }
+@media (hover: hover){
+  :where(html[data-theme="halloween"]) #overlayPigeon .bouton-pigeon:hover{ background-color: #ffc07a; }
+}
+:where(html[data-theme="halloween"]) #overlayDuel button{ background-color: #ff9a3c; }
+@media (hover: hover){
+  :where(html[data-theme="halloween"]) #overlayDuel button:hover{ background-color: #ffc07a; }
+}
+@media (hover: hover){
+  :where(html[data-theme="halloween"]) #overlayDuel .Carte:not(.retournee):not(.duel-selected):hover{ box-shadow: 0 0 20px #ff9a3c; }
+}
+:where(html[data-theme="halloween"]) #overlayRegleUnique .bouton-annulation{ background-color: #ff9a3c; }
+@media (hover: hover){
+  :where(html[data-theme="halloween"]) #overlayRegleUnique .bouton-annulation:hover{ background-color: #ffc07a; }
+}
+:where(html[data-theme="halloween"]) #overlayFinUnRestants .titre-pigeon, :where(html[data-theme="halloween"]) #overlayPredictionFin .titre-pigeon{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #overlayFinUnRestants .bouton-pigeon, :where(html[data-theme="halloween"]) #overlayPredictionFin .bouton-pigeon{ background-color: #ff9a3c; }
+@media (hover: hover){
+  :where(html[data-theme="halloween"]) #overlayFinUnRestants .bouton-pigeon:hover, :where(html[data-theme="halloween"]) #overlayPredictionFin .bouton-pigeon:hover{ background-color: #ffc07a; }
+}
+:where(html[data-theme="halloween"]) #overlayFinUnRestants .fin-un-ligne{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) .prediction-header{ background:
+    linear-gradient(180deg, rgba(255,154,60,0.14), rgba(255,255,255,0.04)),
+    rgba(255,255,255,0.03); border: 1px solid rgba(255,154,60,0.24); }
+:where(html[data-theme="halloween"]) .prediction-subtitle{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) .overlay-subtitle{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) .fin-choix-turn{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) .fin-choix-recap .ligne{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) .fin-choix-recap .ligne.en-cours{ background: rgba(255,154,60,0.12); }
+:where(html[data-theme="halloween"]) .fin-choix-numeros b{ background: #ff9a3c; }
+@media (max-width: 520px), (orientation: landscape) and (max-height: 520px){
+  :where(html[data-theme="halloween"]) #menu #btnCaster{ background-image: linear-gradient(180deg, #f58e44, #f37318) !important; }
+}
+@media (max-width: 520px), (orientation: landscape) and (max-height: 520px){
+  :where(html[data-theme="halloween"]) #listeJoueurs .joueur-ligne-actif{ border-color: #f37820; background: rgba(243,120,32,0.12); color: #f37820; }
+}
+:where(html[data-theme="halloween"]) .Carte.dos_dore::after{ background: linear-gradient(115deg,
+    transparent 32%,
+    rgba(255,140,50,0.55) 44%,
+    rgba(253,235,222,0.95) 50%,
+    rgba(255,140,50,0.55) 56%,
+    transparent 68%); }
+:where(html[data-theme="halloween"]) #stickyJoueurActif{ border: 1px solid rgba(255,154,60,0.22); }
+:where(html[data-theme="halloween"]) #stickyJoueurActif::before{ background: radial-gradient(circle at 35% 35%, #fde6d6 0%, #ff9a3c 45%, #df640c 100%); box-shadow: 0 0 10px rgba(255,154,60,0.28); }
+:where(html[data-theme="halloween"]) #stickyJoueurActif .sticky-nom{ color: #f9b686; }
+:where(html[data-theme="halloween"]) #stickyJoueurActif .sticky-bonus{ background: rgba(255,154,60,0.16); border: 1px solid rgba(255,154,60,0.18); color: #fac8a4; }
+:where(html[data-theme="halloween"]) .fin-choix-resultat{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #overlayDuel .duel-main-title{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #overlayDuel .duel-info{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #overlayDuel .duel-label{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) header{ background:
+    linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)),
+    linear-gradient(135deg, rgba(255,154,60,0.08), rgba(255,255,255,0) 45%),
+    rgba(0,0,0,0.22); box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.08),
+    inset 0 0 0 2px rgba(255,154,60,0.10),
+    0 14px 30px rgba(0,0,0,0.20); }
+:where(html[data-theme="halloween"]) header::before{ background: linear-gradient(
+    90deg,
+    rgba(255, 70, 70, 0.14) 0%,
+    rgba(255,154,60,0.10) 35%,
+    rgba(70, 210, 110, 0.10) 68%,
+    rgba(70, 170, 255, 0.14) 100%
+  ); }
+:where(html[data-theme="halloween"]) header::after{ background: linear-gradient(90deg, #ff4d4d 0%, #ff9a3c 34%, #42d86b 67%, #42b7ff 100%); }
+:where(html[data-theme="halloween"]) header h1{ color: #ff9a3c; text-shadow:
+    0 2px 0 rgba(90,30,4,0.95),
+    0 4px 10px rgba(0,0,0,0.45),
+    0 0 18px rgba(255,154,60,0.18); }
+:where(html[data-theme="halloween"]) #menu{ box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.06),
+    inset 0 0 0 2px rgba(255,154,60,0.08); }
+:where(html[data-theme="halloween"]) #menu input{ border: 1px solid rgba(255,154,60,0.18); }
+:where(html[data-theme="halloween"]) #choixMode h2, :where(html[data-theme="halloween"]) #ecranNouvellePartie h2, :where(html[data-theme="halloween"]) #ecranConfirmerHote h2, :where(html[data-theme="halloween"]) #ecranConfirmerRetrait h2, :where(html[data-theme="halloween"]) #ecranReprise h2, :where(html[data-theme="halloween"]) #ecranConfirmerAccueil h2, :where(html[data-theme="halloween"]) #ecranChoixPseudo h2, :where(html[data-theme="halloween"]) #ecranCaster h2, :where(html[data-theme="halloween"]) #enLigne h2, :where(html[data-theme="halloween"]) #enLigne h3{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #choixMode button, :where(html[data-theme="halloween"]) #ecranNouvellePartie button, :where(html[data-theme="halloween"]) #btnContinuerOptions, :where(html[data-theme="halloween"]) #ecranConfirmerHote button, :where(html[data-theme="halloween"]) #ecranConfirmerRetrait button, :where(html[data-theme="halloween"]) #ecranReprise button, :where(html[data-theme="halloween"]) #ecranConfirmerAccueil button, :where(html[data-theme="halloween"]) #ecranChoixPseudo button, :where(html[data-theme="halloween"]) #ecranCaster button, :where(html[data-theme="halloween"]) #enLigne button{ background-color: #ff7a18; }
+@media (hover: hover){
+  :where(html[data-theme="halloween"]) #choixMode button:hover, :where(html[data-theme="halloween"]) #ecranNouvellePartie button:hover, :where(html[data-theme="halloween"]) #btnContinuerOptions:hover, :where(html[data-theme="halloween"]) #ecranConfirmerHote button:hover, :where(html[data-theme="halloween"]) #ecranConfirmerRetrait button:hover, :where(html[data-theme="halloween"]) #ecranReprise button:hover, :where(html[data-theme="halloween"]) #ecranConfirmerAccueil button:hover, :where(html[data-theme="halloween"]) #ecranChoixPseudo button:hover, :where(html[data-theme="halloween"]) #ecranCaster button:hover, :where(html[data-theme="halloween"]) #enLigne button:hover{ background-color: #ffc07a; }
+}
+:where(html[data-theme="halloween"]) #enLigne input{ border: 1px solid rgba(255,154,60,0.25); }
+:where(html[data-theme="halloween"]) #enLigne .separateurOu::before, :where(html[data-theme="halloween"]) #enLigne .separateurOu::after{ background: rgba(255,154,60,0.35); }
+:where(html[data-theme="halloween"]) #ecranScanner .cadreScanner{ border: 3px solid #ff7a18; }
+:where(html[data-theme="halloween"]) #ecranScanner button{ background: #ff7a18; }
+:where(html[data-theme="halloween"]) #listeJoueursEnLigne div{ box-shadow: 0 0 0 1px rgba(255,154,60,0.18) inset; }
+:where(html[data-theme="halloween"]) .qrPartie{ box-shadow: 0 0 0 3px rgba(255,154,60,0.55), 0 10px 24px rgba(0,0,0,0.35); }
+:where(html[data-theme="halloween"]) #btnAccueilClassique, :where(html[data-theme="halloween"]) #enLigne #btnAccueilEnLigne, :where(html[data-theme="halloween"]) #ecranNouvellePartie #btnAccueil{ -webkit-text-stroke: 1.2px #ff9a3c; color: #ff9a3c; text-shadow:
+    0 2px 0 rgba(90,30,4,0.95),
+    0 3px 8px rgba(0,0,0,0.45); }
+:where(html[data-theme="halloween"]) #toastEnLigne{ color: #ff9a3c; box-shadow: 0 0 0 1px rgba(255,154,60,0.45) inset, 0 8px 24px rgba(0,0,0,0.45); }
+:where(html[data-theme="halloween"]) #ecranCredits{ background:
+    radial-gradient(ellipse 85% 28% at 50% 30%, rgba(255,154,60,0.16), transparent 100%),
+    radial-gradient(ellipse 45% 22% at 15% 72%, rgba(255,77,77,0.10), transparent 100%),
+    radial-gradient(ellipse 45% 22% at 85% 72%, rgba(66,183,255,0.10), transparent 100%),
+    var(--deco-theme, none),
+    linear-gradient(var(--fond-theme), var(--fond-theme)) var(--couleur-barre); }
+:where(html[data-theme="halloween"]) #ecranCredits .credits-titre{ color: #ff9a3c; text-shadow:
+    0 2px 0 rgba(90,30,4,0.95),
+    0 4px 10px rgba(0,0,0,0.45),
+    0 0 26px rgba(255,154,60,0.25); }
+:where(html[data-theme="halloween"]) #ecranCredits .credits-phrase strong{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranCredits .cadrePhoto{ border: 2px solid rgba(255,154,60,0.55); }
+:where(html[data-theme="halloween"]) #ecranCredits .photoVide{ border: 2px dashed rgba(255,154,60,0.45); color: rgba(255,154,60,0.8); }
+:where(html[data-theme="halloween"]) #ecranCredits .credits-nom{ box-shadow: 0 0 0 1px rgba(255,154,60,0.25) inset; color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranCredits .btnRetour{ background-color: #ff7a18; }
+:where(html[data-theme="halloween"]) #annonceNouvellePartie{ background:
+    radial-gradient(circle at 50% 45%, rgba(255,154,60,0.16), transparent 60%),
+    rgba(20, 0, 14, 0.94); }
+:where(html[data-theme="halloween"]) #annonceNouvellePartie .annonce-titre{ color: #ff9a3c; text-shadow:
+    0 2px 0 rgba(90,30,4,0.95),
+    0 4px 10px rgba(0,0,0,0.45),
+    0 0 26px rgba(255,154,60,0.25); }
+:where(html[data-theme="halloween"]) #stickyJoueurActif.rappel-tour{ animation: rappelTour_halloween 0.8s ease-in-out 3; }
+:where(html[data-theme="halloween"]) #haloRappel{ --halo-ecran: rgba(255,154,60,0.75); }
+@media (prefers-reduced-motion: reduce){
+  :where(html[data-theme="halloween"]) #stickyJoueurActif.rappel-tour{ animation-name: rappelTourDoux_halloween; }
+}
+:where(html[data-theme="halloween"]) #overlayDuel .Carte.duel-a-choisir{ animation: duelPulse_halloween 1.6s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce){
+  :where(html[data-theme="halloween"]) #overlayDuel .Carte.duel-a-choisir{ box-shadow: 0 0 0 2px rgba(255,154,60,0.85), 0 0 18px rgba(255,154,60,0.45); }
+}
+:where(html[data-theme="halloween"]) #choixMode #btnReglages svg{ filter:
+    drop-shadow(0 2px 0 rgba(90,30,4,0.95))
+    drop-shadow(0 3px 6px rgba(0,0,0,0.45)); }
+:where(html[data-theme="halloween"]) #choixMode #btnReglages path{ stroke: #ff9a3c; }
+:where(html[data-theme="halloween"]) #choixMode #btnReglages circle{ stroke: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranReglages h2{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranReglages .btnRetour{ background-color: #ff7a18; }
+:where(html[data-theme="halloween"]) #ecranReglages .optionReglage{ border: 1px solid rgba(255,154,60,0.18); }
+:where(html[data-theme="halloween"]) #ecranReglages .optionTitre{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranReglages .optionReglage input:checked + .interrupteur{ background: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranReglages .optionReglage input:focus-visible + .interrupteur{ outline: 2px solid #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranReglages .aProposTitre{ color: rgba(255,154,60,0.7); }
+:where(html[data-theme="halloween"]) #choixMode .btnInstaller{ color: #ff9a3c; background: rgba(255,154,60,0.10); border: 1px solid rgba(255,154,60,0.45); }
+@media (hover: hover){
+  :where(html[data-theme="halloween"]) #choixMode .btnInstaller:hover{ background: rgba(255,154,60,0.18); }
+}
+:where(html[data-theme="halloween"]) #overlayRegleUnique .regle-detail{ color: #fcd9c0; }
+:where(html[data-theme="halloween"]) #overlayRegleUnique .celien-bloc{ border-top: 1px solid rgba(255,154,60,0.35); }
+:where(html[data-theme="halloween"]) #overlayRegleUnique .celien-citation{ color: #ffc07a; text-shadow: 0 0 18px rgba(255,154,60,0.35); }
+:where(html[data-theme="halloween"]) #overlayRegleUnique .celien-signature{ color: #ff9a3c; text-shadow: 0 2px 0 #6b4200, 0 0 16px rgba(255,154,60,0.35); }
+:where(html[data-theme="halloween"]) #btnCodePartie{ border: 1px solid rgba(255,154,60,0.25); color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #btnCodePartie.ouvert{ border-color: rgba(255,154,60,0.6); }
+:where(html[data-theme="halloween"]) #ecranRattrapage{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #choixMode #titreAccueil{ color: #ff9a3c; text-shadow:
+    0 3px 0 rgba(90,30,4,0.95),
+    0 6px 16px rgba(0,0,0,0.5),
+    0 0 34px rgba(255,154,60,0.28); animation: fadeIn 0.25s ease forwards, lueurTitreAccueil_halloween 3.5s ease-in-out 0.3s infinite; }
+:where(html[data-theme="halloween"]) #choixMode .titreAccueilBarre{ background: linear-gradient(90deg, #ff4d4d 0%, #ff9a3c 34%, #42d86b 67%, #42b7ff 100%); box-shadow: 0 0 14px rgba(255,154,60,0.25); }
+:where(html[data-theme="halloween"]) #ecranReglages .blocReglage{ border: 1px solid rgba(255,154,60,0.18); }
+:where(html[data-theme="halloween"]) #ecranReglages .ligneVolume input[type="range"]{ accent-color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranReglages .volumeValeur{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranReglages .optionAction button{ background: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranReglages .qrJeu{ box-shadow: 0 0 0 3px rgba(255,154,60,0.55), 0 10px 24px rgba(0,0,0,0.35); }
+:where(html[data-theme="halloween"]) #ecranReglages #btnPartagerJeu{ background-color: #ff7a18; }
+:where(html[data-theme="halloween"]) #ecranReglages .btnDiagnostic:active{ color: #ff9a3c; border-color: rgba(255,154,60,0.5); }
+:where(html[data-theme="halloween"]) #notifHaut{ background: linear-gradient(135deg, #a64a09 0%, #eb853c 18%, #fcd9c0 36%, #f4944f 52%,
+                              #c7590a 74%, #f7a76d 100%); box-shadow: 0 12px 28px rgba(0,0,0,0.5), 0 0 22px rgba(255,140,50,0.55),
+              inset 0 0 0 1.5px rgba(253,235,222,0.85), inset 0 -3px 0 rgba(90,30,4,0.45); }
+:where(html[data-theme="halloween"]) #notifHaut .notifHaut-icone{ filter: drop-shadow(0 1px 0 rgba(254,243,236,0.8)); }
+:where(html[data-theme="halloween"]) #notifHaut .notifHaut-eclats span{ text-shadow: 0 0 4px #fff, 0 0 10px rgba(253,235,222,0.95); }
+:where(html[data-theme="halloween"]) #notifHaut .notifHaut-texte strong{ text-shadow: 0 1px 0 rgba(254,243,236,0.85); }
+:where(html[data-theme="halloween"]) #etincellesPrestige span{ color: #fde8d8; text-shadow: 0 0 6px #ffb469, 0 0 14px rgba(255,154,60,0.9), 0 0 24px rgba(245,143,70,0.6); }
+:where(html[data-theme="halloween"]) #refletPrestige::before{ background: linear-gradient(90deg, transparent 0%, rgba(251,206,175,0.08) 30%,
+                              rgba(253,235,222,0.38) 50%, rgba(251,206,175,0.08) 70%, transparent 100%); }
+:where(html[data-theme="halloween"]) body::before{ background:
+    var(--deco-theme, radial-gradient(circle at top center, rgba(255,154,60,0.08) 0%, rgba(255,154,60,0) 26%) no-repeat),
+    var(--fond-theme); }
+:where(html[data-theme="halloween"]) #choixMode #btnRegles svg, :where(html[data-theme="halloween"]) header #btnReglesJeu svg{ filter: drop-shadow(0 2px 0 rgba(90,30,4,0.95)) drop-shadow(0 3px 6px rgba(0,0,0,0.45)); }
+:where(html[data-theme="halloween"]) #choixMode #btnRegles path, :where(html[data-theme="halloween"]) header #btnReglesJeu path{ stroke: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranRegles .btnRetour{ background-color: #ff7a18; }
+:where(html[data-theme="halloween"]) #ecranRegles h2{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranRegles .blocRegles{ border: 1px solid rgba(255,154,60,0.18); }
+:where(html[data-theme="halloween"]) #ecranRegles .blocRegles h3{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranRegles .btnFaqLien{ border: 1px solid rgba(255,154,60,0.45); background: rgba(255,154,60,0.10); color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranRegles .faqImage{ border: 1px solid rgba(255,154,60,0.30); }
+:where(html[data-theme="halloween"]) #ecranInstallation h2{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranInstallation .etapeInstallation{ border: 1px solid rgba(255,154,60,0.25); }
+:where(html[data-theme="halloween"]) #ecranInstallation .etapeInstallation b{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranInstallation .numeroEtape{ background: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranInstallation #btnInstallationInstaller{ background: #ff7a18; box-shadow: inset 0 -3px 0 rgba(0,0,0,0.18), 0 0 26px rgba(255,154,60,0.45); }
+:where(html[data-theme="halloween"]) #ecranInstallation #installationContenu h2{ color: #ff9a3c !important; }
+:where(html[data-theme="halloween"]) #ecranInstallation #installationContenu .etapeInstallation{ border: 1px solid rgba(255,154,60,0.25) !important; }
+:where(html[data-theme="halloween"]) #ecranInstallation #installationContenu .etapeInstallation b{ color: #ff9a3c !important; }
+:where(html[data-theme="halloween"]) #ecranInstallation #installationContenu .numeroEtape{ background: #ff9a3c !important; }
+:where(html[data-theme="halloween"]) #ecranInstallation #installationContenu #btnInstallationInstaller{ background: #ff7a18 !important; box-shadow: inset 0 -3px 0 rgba(0,0,0,0.18), 0 0 26px rgba(255,154,60,0.45) !important; }
+@media (hover: hover){
+  :where(html[data-theme="halloween"]) body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
+    #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
+    #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
+    #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
+    #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+    #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayDuel button,
+    #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
+    #overlayAnnulation button):hover:not(:disabled), :where(html[data-theme="halloween"]) body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
+    #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
+    #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
+    #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
+    #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+    #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCoupDeFoudre .bouton-pigeon, #overlayDuel button,
+    #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
+    #overlayAnnulation button):hover:not(:disabled){ box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9), 0 6px 20px rgba(255,180,100,0.55) !important; }
+}
+:where(html[data-theme="halloween"]) #overlayDuel .duel-boutons button:disabled{ background: #fcd9c0 !important; }
+:where(html[data-theme="halloween"]) #menu #btnCaster{ box-shadow: 0 0 0 1px rgba(255,154,60,0.45) inset; }
+:where(html[data-theme="halloween"]) #menu #btnCaster.caster-actif{ box-shadow: 0 0 0 2px #ff9a3c inset, 0 0 14px rgba(255,154,60,0.35); }
+:where(html[data-theme="halloween"]) #ecranCaster .adresseTele{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranCaster .casterCode input{ border: 1px solid rgba(255,154,60,0.35); }
+:where(html[data-theme="halloween"]) #ecranCaster #btnCasterArreter{ box-shadow: 0 0 0 1px rgba(255,154,60,0.45) inset; }
+:where(html[data-theme="halloween"]) #ecranTele{ background:
+    var(--deco-theme, radial-gradient(circle at top center, rgba(255,154,60,0.10) 0%, rgba(255,154,60,0) 30%) no-repeat),
+    var(--fond-theme); }
+:where(html[data-theme="halloween"]) #ecranTele .tele-titre{ color: #ff9a3c; text-shadow: 0 0.4vh 0 rgba(90,30,4,0.95), 0 0.6vh 1.4vh rgba(0,0,0,0.5); }
+:where(html[data-theme="halloween"]) #ecranTele .tele-sous-titre{ color: #ffc98c; }
+:where(html[data-theme="halloween"]) #ecranTele .tele-etape{ color: #f6d7c2; }
+:where(html[data-theme="halloween"]) #ecranTele .tele-etape .tele-num{ background: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranTele .tele-plein-ecran{ box-shadow: 0 0 0 1px rgba(255,154,60,0.45) inset; }
+:where(html[data-theme="halloween"]) #ecranTele .tele-qr{ box-shadow: 0 0 0 0.7vh rgba(255,154,60,0.6), 0 2.6vh 7vh rgba(0,0,0,0.5); }
+:where(html[data-theme="halloween"]) #ecranTele .tele-code{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranTele .tele-code small{ color: #e0a86f; }
+:where(html[data-theme="halloween"]) #ecranTele .tele-entete{ border: 1px solid rgba(255,154,60,0.25); }
+:where(html[data-theme="halloween"]) #ecranTele .tele-entete::after{ background: linear-gradient(90deg, #ff5e5e, #f7a469, #ff9a3c, #7dde4f, #4fc3f7); }
+:where(html[data-theme="halloween"]) #ecranTele .tele-prepa-titre{ color: #ff9a3c; text-shadow: 0 0.4vh 0 rgba(90,30,4,0.95), 0 0.6vh 1.4vh rgba(0,0,0,0.5); }
+:where(html[data-theme="halloween"]) #ecranTele .tele-prepa-joueur{ border: 1px solid rgba(255,154,60,0.4); }
+:where(html[data-theme="halloween"]) #ecranTele .tele-prepa-info{ color: #ffc98c; }
+:where(html[data-theme="halloween"]) #ecranTele .tele-restantes{ color: #e0a86f; }
+:where(html[data-theme="halloween"]) #ecranTele .tele-bloc-titre{ color: #f0c49a; }
+:where(html[data-theme="halloween"]) #ecranTele .tele-tour{ border-color: rgba(255,154,60,0.5); }
+:where(html[data-theme="halloween"]) #ecranTele .tele-tour.tele-rappel-tour{ --halo-bord: rgba(255,154,60,0.95); --halo: rgba(255,154,60,0.8); --halo-loin: rgba(245,143,70,0.4); }
+:where(html[data-theme="halloween"]) #ecranTele .tele-tour-label{ color: #f0c49a; }
+:where(html[data-theme="halloween"]) #ecranTele .tele-tour-nom{ color: #ff9a3c; text-shadow: 0 0.4vh 0 rgba(90,30,4,0.9); }
+:where(html[data-theme="halloween"]) #ecranTele .tele-badge{ background: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranTele .tele-regles{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranTele .tele-son-coupe{ color: #ffc98c; }
+:where(html[data-theme="halloween"]) #ecranTele .tele-ecran-titre{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranTele .tele-ecran-detail{ color: #ffc98c; }
+:where(html[data-theme="halloween"]) #ecranTele .tele-puce{ background: rgba(255,154,60,0.16); border: 1px solid rgba(255,154,60,0.5); color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranReglages :is(#btnSignalerBug, #btnFaq){ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranBug .bugFeuille{ box-shadow: 0 -12px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,154,60,0.4); }
+:where(html[data-theme="halloween"]) #ecranBug h2{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranBug textarea{ border: 1px solid rgba(255,154,60,0.35); }
+:where(html[data-theme="halloween"]) #ecranBug .bugVignette img, :where(html[data-theme="halloween"]) #ecranBug .bugVignette video{ border: 1px solid rgba(255,154,60,0.4); }
+:where(html[data-theme="halloween"]) #ecranBug .bugAjouterPiece{ border: 1px dashed rgba(255,154,60,0.5); }
+:where(html[data-theme="halloween"]) #ecranReglages .optionChevron{ stroke: #ff9a3c; }
+@media (pointer: coarse){
+  :where(html[data-theme="halloween"]) #ecranTele .tele-revenir{ border: 1px solid rgba(255,154,60,0.5); }
+}
+:where(html[data-theme="halloween"]) #stickyJoueurActif #btnPause svg, :where(html[data-theme="halloween"]) #stickyJoueurActif #btnHistorique svg, :where(html[data-theme="halloween"]) #ecranPause .pauseIcone svg, :where(html[data-theme="halloween"]) #ecranTele .tele-pause svg{ stroke: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranPause .pauseIcone{ background: rgba(255,154,60,0.12); border: 2px solid rgba(255,154,60,0.6); }
+:where(html[data-theme="halloween"]) #ecranPause .pauseIcone svg{ fill: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranPause h2{ color: #ff9a3c; text-shadow: 0 4px 0 rgba(90,30,4,0.9), 0 0 30px rgba(255,154,60,0.3); }
+:where(html[data-theme="halloween"]) #ecranPause #btnReprendrePause{ background: linear-gradient(180deg, #f58e44, #f37318); }
+:where(html[data-theme="halloween"]) #ecranTele .tele-pause svg{ fill: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranTele .tele-pause-titre{ color: #ff9a3c; text-shadow: 0 1vh 0 rgba(90,30,4,0.9); }
+:where(html[data-theme="halloween"]) :is(#annulerChoix, #bandeauMiseAJour){ --bandeau-bord: rgba(255,154,60,0.45); --bandeau-bouton: #ff9a3c; }
+:where(html[data-theme="halloween"]) #overlayCouleur .explication-couleur b{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #btnCaster .casterIcone{ background: linear-gradient(180deg, #f58e44, #f37318); }
+:where(html[data-theme="halloween"]) .btnPauseJoueur{ border: 1px solid rgba(255,154,60,0.45); color: #ff9a3c; }
+:where(html[data-theme="halloween"]) .btnPauseJoueur.en-pause{ border-color: rgba(255,154,60,0.9); }
+:where(html[data-theme="halloween"]) .voletPause-feuille{ border-top: 1px solid rgba(255,154,60,0.35); }
+:where(html[data-theme="halloween"]) .voletPause-nom{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) .voletPause-ok{ background: linear-gradient(180deg, #f58e44, #f37318); }
+:where(html[data-theme="halloween"]) .aideAccueil-ombre{ fill: rgba(90,30,4,0.9); }
+:where(html[data-theme="halloween"]) .aideAccueil-repere b, :where(html[data-theme="halloween"]) .aideAccueil-bas b{ color: #ff9a3c; text-shadow: 0 2px 0 rgba(90,30,4,0.9); }
+:where(html[data-theme="halloween"]) .aideAccueil-bas b{ text-shadow: 0 3px 0 rgba(90,30,4,0.9); }
+:where(html[data-theme="halloween"]) #plateau .Carte.carte-appuyee{ box-shadow: 0 0 0 3px #ff9a3c, 0 0 22px rgba(255,154,60,0.7); }
+:where(html[data-theme="halloween"]) #enLigne #btnInviterPartie{ border: 1.5px solid rgba(255,154,60,0.7); background: rgba(255,154,60,0.08); color: #ff9a3c; }
+:where(html[data-theme="halloween"]) .lignesRegle li::before{ background: #ff9a3c; }
+:where(html[data-theme="halloween"]) :is(.detailRegle, #voletCarte .voletPause-texte) em{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) .regleBloc-titre{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) .regleBloc em{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) .historique-recente{ background: #ff9a3c; }
+:where(html[data-theme="halloween"]) .historique-quoi em{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranTele .tele-dernieres-titre{ color: #f0c49a; }
+:where(html[data-theme="halloween"]) #ecranTele .tele-dernieres-titre + .tele-dernieres-item{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranTele .tele-dernieres-titre + .tele-dernieres-item .Carte{ outline: 0.3vh solid #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranTele .tele-historique-quoi em{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) .recap-titre{ color: #ff9a3c; text-shadow: 0 3px 0 #7a4b00, 0 0 18px rgba(255,154,60,.35); }
+:where(html[data-theme="halloween"]) .recap-marche{ background: linear-gradient(180deg, rgba(255,154,60,.22), rgba(255,154,60,.06)); border: 1px solid rgba(255,154,60,.4); }
+:where(html[data-theme="halloween"]) .recap-g{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) .recap-liste{ border: 1px solid rgba(255,154,60,.25); }
+:where(html[data-theme="halloween"]) .recap-ligne em{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) .recap-eclats{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) .recap-bloc{ border: 1px solid rgba(255,154,60,.22); }
+:where(html[data-theme="halloween"]) .recap-t{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) .recap-restants{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranTele .tele-ecran-recap{ background: radial-gradient(circle at top, rgba(255,154,60,.10), transparent 55%), var(--fond-theme) !important; }
+:where(html[data-theme="halloween"]) .etincelle{ --c: #ff9a3c; }
+:where(html[data-theme="halloween"]) .etincelle.e0{ --c: #ff9a3c; }
+:where(html[data-theme="halloween"]) .etincelle.e1{ --c: #fcddc7; }
+:where(html[data-theme="halloween"]) .etincelle.e2{ --c: #f37820; }
+:where(html[data-theme="halloween"]){ --album-barre-plein: #ff9a3c; }
+:where(html[data-theme="halloween"]){ --actif-haut: #f9be94; --actif-bas: #f37820; --actif-halo: #f37820; }
+:where(html[data-theme="halloween"]) .annonceAccueil{ border: 2px solid var(--actif-bas, #f37820); box-shadow: 0 8px 22px rgba(0,0,0,.35), 0 0 18px var(--actif-halo, #f37820); }
+:where(html[data-theme="halloween"]) .annonceAccueil .annonceIcone{ background: linear-gradient(180deg, var(--actif-haut, #f9be94), var(--actif-bas, #f37820)); }
+:where(html[data-theme="halloween"]) #stickyJoueurActif #btnReglagesJeu svg{ stroke: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranTele .tele-regles-pj{ color: #ffc98c; }
+:where(html[data-theme="halloween"]) #ecranTele .tele-regles-partie{ color: #ff9a3c; border-bottom: 1px solid rgba(255,154,60,0.4); }
+:where(html[data-theme="halloween"]) #ecranTele .tele-regles-nom{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #ecranTele .tele-regles-ligne em{ color: #ffc98c; }
+:where(html[data-theme="halloween"]) #ecranTele .tele-faq-image{ border: 1px solid rgba(255,154,60,0.35); }
+:where(html[data-theme="halloween"]) #ecranTele .tele-puce.tele-puce-couleur.tele-puce-jaune{ background: #f69551; }
+/* === FIN du doré teinté (généré) === */
+
+
+
+
+
+
+html[data-theme="halloween"]{
+  /* Les trois niveaux de rouge du texte (voir le bloc « TOUT LE TEXTE EN ROUGE SANG » en bas) */
+  --hw-titre: #e8252c; --hw-texte: #ff6b6b; --hw-texte-doux: #ff9b9e;
+  --fond-theme: #0a0204;
+  --carte-halloween: rgba(22, 4, 7, 0.96); /* ton de TOUTES les cartes et panneaux : noir rougeâtre, quasi opaque pour cacher le motif derrière le texte */
+  --couleur-barre: #0a0204; /* = le fond du thème. Le haut de chaque écran commence par un fondu de cette couleur (voir --deco-theme), donc la barre du téléphone le prolonge sans rupture. */
+  /* Fond de TOUS les écrans (sauf l'accueil, voir --deco-accueil juste après), de haut en bas des couches :
+     1. la vignette qui ferme les bords, 2. le grain de pellicule, 3. les coulures de sang collées en haut,
+     4. une lueur de citrouille qui monte du bas, 5. le motif d'éclaboussures et de griffures qui se répète. */
+  --deco-theme:
+    linear-gradient(#0a0204 0, rgba(10,2,4,0) 96px) no-repeat, /* fondu du haut : l'écran commence exactement à la couleur de la barre du téléphone, et le décor n'apparaît qu'ensuite — aucune ligne de rupture */
+    radial-gradient(ellipse 95% 62% at 50% 42%, transparent 18%, rgba(0,0,0,.92) 100%) no-repeat,
+    url("halloween/grain.svg") 0 0 / 140px 140px repeat,
+    url("halloween/taches_haut.svg") center top / 100% auto no-repeat,
+    radial-gradient(ellipse 90% 34% at 50% 100%, rgba(163,21,26,.2), transparent 100%) no-repeat,
+    url("halloween/deco_fond.svg") 0 0 / 340px 340px repeat;
+  /* Accueil : les mêmes couches, avec des coulures plus épaisses, des flaques, des yeux qui brillent
+     (halloween/accueil.svg) et trois citrouilles sculptées qui saignent, dans le vide sous les boutons. */
+  --deco-accueil:
+    linear-gradient(#0a0204 0, rgba(10,2,4,0) 96px) no-repeat, /* fondu du haut : l'écran commence exactement à la couleur de la barre du téléphone, et le décor n'apparaît qu'ensuite — aucune ligne de rupture */
+    radial-gradient(ellipse 95% 62% at 50% 42%, transparent 18%, rgba(0,0,0,.92) 100%) no-repeat,
+    url("halloween/grain.svg") 0 0 / 140px 140px repeat,
+    url("halloween/accueil.svg") center top / 100% auto no-repeat,
+    /* Le dessin des citrouilles a été rallongé de 128 à 196 px pour que le sang qui coule ne soit plus coupé.
+       Ancré en pourcentage pur, un dessin plus haut remonte : les citrouilles se retrouvaient derrière les
+       boutons. Le « + 51 px » les remet exactement là où elles étaient, à n'importe quelle hauteur d'écran.
+       Un simple pourcentage ne peut pas suffire : la place libre sous les boutons ne fait que 106 px sur un
+       iPhone 13, moins que le dessin lui-même. */
+    url("halloween/citrouilles.svg") center calc(75% + 51px) / 280px 196px no-repeat,
+    radial-gradient(ellipse 90% 34% at 50% 100%, rgba(163,21,26,.2), transparent 100%) no-repeat;
+  /* Joueur dont c'est le tour : rouge sang qui luit */
+  --actif-haut: #ff6b6b; --actif-bas: #8f0b10; --actif-texte: #140102; --actif-halo: #c5161c;
+  /* texte sélectionné dans les champs (nom du joueur, code de la partie…) : rosé pâle, texte presque noir */
+  --selection-fond: #ffd9d9; --selection-texte: #140102;
+  /* Fenêtres du jeu (pigeon, duel, +4, pari…) : halo de sang sur du noir */
+  --overlay-fond: radial-gradient(ellipse 115% 42% at 50% 45%, rgba(163,21,26,.5) 0%, transparent 100%), #1a0305;
+  --overlay-bord: #1a0305;
+}
+
+/* ----- Fenêtres du jeu ----- */
+html[data-theme="halloween"] :is(#overlayCouleur, #overlayPlus4, #overlayCupidon, #overlayPigeon,
+  #overlayFinUnRestants, #overlayDuel, #overlayRegleUnique, #overlayAnnulation, #overlayResultatAnnulation,
+  #overlayPredictionFin, .overlay-opaque),
+html[data-theme="halloween"] :is(#overlayCouleur, #overlayPlus4, #overlayCoupDeFoudre, #overlayPigeon,
+  #overlayFinUnRestants, #overlayDuel, #overlayRegleUnique, #overlayAnnulation, #overlayResultatAnnulation,
+  #overlayPredictionFin, .overlay-opaque){
+  background: var(--overlay-fond) !important;
+}
+html[data-theme="halloween"].overlay-ouvert,
+html[data-theme="halloween"].overlay-ouvert body,
+html[data-theme="halloween"] #voileOverlays{ background: var(--overlay-bord); }
+html[data-theme="halloween"] .plus4-actions{ background: transparent; }
+html[data-theme="halloween"] :is(#overlayCarteDoree, #overlayRegleUnique.overlay-doree){
+  background: radial-gradient(ellipse 95% 34% at 50% 33%, rgba(255,215,0,.26), transparent 100%),
+    radial-gradient(ellipse 120% 60% at 50% 100%, rgba(163,21,26,.5), transparent 100%), #1a0305 !important; box-shadow: none; }
+/* Récap de fin de partie */
+html[data-theme="halloween"] #overlayFinUnRestants.overlay-recap{ background: radial-gradient(ellipse 110% 45% at 50% 45%, rgba(163,21,26,.5), transparent 100%), #140205 !important; }
+html[data-theme="halloween"] :is(.recap-marche, .recap-liste, .recap-bloc){ background: rgba(80,10,16,.55); border-color: rgba(255,255,255,.4); }
+html[data-theme="halloween"] .recap-marche{ background: linear-gradient(180deg, rgba(163,21,26,.35), rgba(80,10,16,.55)); }
+
+/* ----- Télé : même teinte que le thème ----- */
+html[data-theme="halloween"] #ecranTele .tele-ecran{ background: radial-gradient(ellipse 110% 70% at 50% 45%, rgba(163,21,26,.4), rgba(16,3,6,.97) 75%), rgb(16,3,6); }
+html[data-theme="halloween"] #ecranTele .tele-ecran-recap{ background: radial-gradient(ellipse 110% 60% at 50% 40%, rgba(163,21,26,.5), transparent 100%), #140205 !important; }
+
+/* ----- Lisibilité sur le noir (Réglages, écran des créateurs) ----- */
+/* (« #ecranReglages > .optionReglage » : les lignes de réglage posées seules, hors d'un bloc — elles
+   gardaient le blanc translucide du jeu de base et tranchaient avec les autres.)
+   Cartes : TOUTES au même ton (noir rougeâtre, quasi opaque, liseré blanc fin) : Réglages (blocs et lignes isolées), « Ta partie »,
+   règles / FAQ / album, créateurs, étapes d'installation, salle d'attente, retrait d'un joueur. Quasi opaque pour que le motif
+   du fond ne passe jamais derrière un texte ; les noms de thèmes (chacun de sa couleur) restent lisibles. */
+html[data-theme="halloween"] :is(#ecranReglages .blocReglage, #ecranReglages .reglages-contenu > .optionReglage, #ecranReglages > .optionReglage, .optionsPartie > .optionReglage:not(.optionsSuite),
+  .blocRegles, #ecranCredits .credits-nom, #ecranInstallation .etapeInstallation, #listeJoueursEnLigne div, #listeSuppression){
+  background: var(--carte-halloween); border: 1px solid rgba(255, 255, 255, 0.22);
+}
+html[data-theme="halloween"] #ecranCredits .cadrePhoto.sansPhoto{ background: var(--carte-halloween); }
+/* Boutons secondaires (translucides dans le jeu de base) : même ton sombre que les cartes, liseré blanc */
+html[data-theme="halloween"] :is(#enLigne #btnInviterPartie, .voletPause-annuler, #ecranReglages .btnDiagnostic, #ecranBug .bugFermer){
+  background: var(--carte-halloween) !important; border: 1px solid rgba(255, 255, 255, 0.35) !important;
+}
+/* Petits textes gris : blanc cassé */
+html[data-theme="halloween"] #ecranReglages :is(.lienBug, .versionJeu){ color: var(--hw-texte-doux) !important; }
+html[data-theme="halloween"] #ecranReglages .btnDiagnostic{ color: var(--hw-texte) !important; }
+html[data-theme="halloween"] #ecranCredits .credits-honneur-titre{ color: var(--hw-texte-doux); }
+/* Télé : code de la télé, en bas de l'écran */
+html[data-theme="halloween"] #ecranTele .tele-pied{ color: rgba(255,255,255,.85); }
+
+/* ----- Boutons : presque noirs, texte blanc, sur tous les écrans -----
+   (mêmes boutons que les autres thèmes habillés, Soleil couchant par exemple : tous les boutons du jeu doivent être aux couleurs du thème) */
+html[data-theme="halloween"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #ajouterJoueur, #jouer, #supprimerJoueur,
+  #nouvellePartie, #btnRejouerMemes, #btnModifierJoueurs, #btnReprendrePause,
+  #btnCreerPartie, #btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR,
+  #lancerPartieEnLigne, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui, #btnConfirmerAccueilNon,
+  #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #termineSuppression,
+  #btnInstallationInstaller, #ecranRegles .btnFaqLien, #choixMode .btnInstaller, #menu #btnCaster, #ecranCaster button:not(.btnRetour), #btnFermerScanner, #ecranReprise button,
+  #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayFinUnRestants .bouton-pigeon,
+  #overlayAnnulation button, #overlayRegleUnique .bouton-annulation, #overlayDuel button:not(:disabled), #overlayPredictionFin .bouton-pigeon),
+html[data-theme="halloween"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #ajouterJoueur, #jouer, #supprimerJoueur,
+  #nouvellePartie, #btnRejouerMemes, #btnModifierJoueurs, #btnReprendrePause,
+  #btnCreerPartie, #btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR,
+  #lancerPartieEnLigne, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui, #btnConfirmerAccueilNon,
+  #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #termineSuppression,
+  #btnInstallationInstaller, #ecranRegles .btnFaqLien, #choixMode .btnInstaller, #menu #btnCaster, #ecranCaster button:not(.btnRetour), #btnFermerScanner, #ecranReprise button,
+  #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCoupDeFoudre .bouton-pigeon, #overlayFinUnRestants .bouton-pigeon,
+  #overlayAnnulation button, #overlayRegleUnique .bouton-annulation, #overlayDuel button:not(:disabled), #overlayPredictionFin .bouton-pigeon){
+  background: linear-gradient(180deg, #2a0609, #120203) !important;
+  color: var(--hw-texte) !important;
+  border: 1px solid rgba(163, 21, 26, 0.9) !important; /* liseré de sang : le bouton ne doit pas éclairer l'écran, juste se détacher du noir */
+  text-shadow: 0 1px 3px #000 !important;
+  box-shadow: inset 0 0 22px rgba(0,0,0,.75), 0 0 16px rgba(163,21,26,.55), 0 6px 16px rgba(0,0,0,.6) !important;
+}
+@media (hover: hover){
+  html[data-theme="halloween"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #choixMode .btnInstaller):hover{ background: linear-gradient(180deg, #3d0a0f, #1c0305) !important; }
+}
+
+/* ----- Volet « Mettre … en pause » et bandeaux du bas (« Mauvais joueur ? Annuler », « Nouvelle version ») ----- */
+html[data-theme="halloween"] .voletPause-ok{
+  background: linear-gradient(180deg, #2a0609, #120203); color: var(--hw-texte);
+  border: 1px solid rgba(163, 21, 26, 0.9);
+  text-shadow: 0 1px 3px #000; box-shadow: 0 0 16px rgba(163,21,26,.45);
+}
+html[data-theme="halloween"] :is(#annulerChoix, #bandeauMiseAJour){
+  --bandeau-fond: #140205; --bandeau-bord: rgba(255, 255, 255, 0.5); --bandeau-texte: #fff;
+  --bandeau-bouton: linear-gradient(180deg, #2a0609, #120203); --bandeau-bouton-texte: #ffffff;
+}
+html[data-theme="halloween"] :is(#annulerChoix .annulerChoix-bouton, #bandeauMiseAJour .maj){
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.8); box-shadow: none;
+}
+
+/* ----- Pari de fin et choix de fin : cadres rouge sombre avec un liseré blanc (au lieu du brun-doré de base) ----- */
+html[data-theme="halloween"] :is(.prediction-header, .fin-choix-recap, .fin-choix-card){
+  background: linear-gradient(180deg, rgba(60,8,14,.92), rgba(22,4,7,.94)) !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
+}
+
+/* ----- Textes secondaires un peu trop effacés sur le noir : plus clairs ----- */
+html[data-theme="halloween"] #ecranReglages .optionNote{ color: rgba(255, 255, 255, 0.92); }
+html[data-theme="halloween"] #ecranReglages .aProposTitre{ color: var(--hw-texte-doux); }
+html[data-theme="halloween"] #ecranReglages .lienJeu{ color: var(--hw-texte-doux); }
+html[data-theme="halloween"] #enLigne .separateurOu{ color: var(--hw-texte-doux); }
+html[data-theme="halloween"] #listeJoueursEnLigne div{ color: var(--hw-texte); }
+html[data-theme="halloween"] #ecranTele .tele-tour.tele-pigeon .tele-tour-nom{ color: var(--hw-texte); } /* « PIGEON (nom) » de la télé */
+
+/* ----- Plateau : les panneaux (titre, boutons, joueurs, règles) cachent le motif de fond derrière leur texte ----- */
+html[data-theme="halloween"] :is(header, #menu, .messages, #ecranTele .tele-bloc, #ecranTele .tele-entete, #ecranTele .tele-prepa-joueur){ background-color: var(--carte-halloween); }
+
+
+/* ----- Aperçu du thème dans les Réglages : un simple rond de la couleur du fond (pas de dessin, pas d'animation) ----- */
+.pastilleTheme .rondHalloween{ background: url("halloween/citrouille_apercu.svg") center / 92% 92% no-repeat, #0a0204 !important; } /* rond noir avec une citrouille qui luit dedans */
+
+/* ----- Télé : pastilles de choix (« Je bois 2 », noms des joueurs…) au ton des cartes : le doré reste lisible dessus ----- */
+html[data-theme="halloween"] #ecranTele .tele-puce{ background: var(--carte-halloween); border-color: rgba(255, 255, 255, 0.4); }
+
+/* ----- Télé : « Il reste N cartes » et « Dernières cartes tirées » (sous le plateau) ne sont dans aucun panneau : ils se lisaient mal sur le motif de fond.
+   Même ton que toutes les cartes. ----- */
+html[data-theme="halloween"] #ecranTele :is(.tele-restantes, .tele-compteur){ background: var(--carte-halloween); border-radius: 1.4vh; padding: 0.6vh 2vh; }
+html[data-theme="halloween"] #ecranTele .tele-compteur{ display: table; margin-left: auto; margin-right: auto; color: var(--hw-texte); } /* (« Il reste N cartes » : le panneau épouse le texte, centré) */
+html[data-theme="halloween"] #ecranTele .tele-compteur[hidden]{ display: none; }
+
+/* ----- Plateau : l'intérieur de l'icône Règles (le livre) prend le ton de l'en-tête (les cartes) ----- */
+html[data-theme="halloween"] header #btnReglesJeu path.couverture{ fill: var(--carte-halloween); }
+
+/* ----- Les liserés arc-en-ciel (autour de « Joueurs / Règles », de la télé) deviennent sang / citrouille ----- */
+html[data-theme="halloween"] #choixMode .titreAccueilBarre,
+html[data-theme="halloween"] .messages::before,
+html[data-theme="halloween"] header::after,
+html[data-theme="halloween"] #ecranTele .tele-entete::after{
+  background: linear-gradient(90deg, #6d0a0d 0%, #c5161c 32%, #ff7a18 66%, #6d0a0d 100%) !important;
+}
+/* Bandeau « Tour de » (qui suit le défilement) : noir rougeâtre comme les cartes */
+html[data-theme="halloween"] #stickyJoueurActif{ background: linear-gradient(rgba(34,6,10,0.97), rgba(16,3,6,0.97)); border-color: rgba(255,255,255,0.3); }
+
+/* ----- Titre ALCUNO en rouge sang ; icônes Réglages / Règles en blanc (au lieu du jaune doré) ----- */
+html[data-theme="halloween"] :is(#choixMode #titreAccueil, header h1){
+  color: #e8252c;
+  text-shadow: 0 3px 0 #140102, 0 2px 10px #000, 0 0 30px rgba(232, 37, 44, 0.75);
+}
+html[data-theme="halloween"] #choixMode #titreAccueil{ animation: fadeIn 0.25s ease forwards; } /* (sans la lueur dorée qui pulse) */
+html[data-theme="halloween"] :is(#choixMode #btnReglages, #choixMode #btnRegles, header #btnReglesJeu) path:not(.couverture){ stroke: #e8252c; }
+html[data-theme="halloween"] :is(#choixMode #btnReglages circle, #choixMode #btnRegles path.couverture, header #btnReglesJeu path.couverture){ stroke: #e8252c; }
+html[data-theme="halloween"] :is(#choixMode #btnReglages svg, #choixMode #btnRegles svg, header #btnReglesJeu svg){
+  filter: drop-shadow(0 2px 0 #1a0204) drop-shadow(0 3px 6px rgba(0, 0, 0, 0.7));
+}
+html[data-theme="halloween"] :is(#btnAccueilClassique, #enLigne #btnAccueilEnLigne, #ecranNouvellePartie #btnAccueil){ color: var(--hw-texte); -webkit-text-stroke-color: #fff; text-shadow: 0 2px 0 #1a0204, 0 3px 8px rgba(0, 0, 0, 0.7); }
+html[data-theme="halloween"] :is(#ecranReglages, #ecranRegles, #ecranCaster, #ecranBug, #ecranInstallation, #ecranCredits, #ecranConfirmerAccueil, #ecranConfirmerHote, #ecranConfirmerRetrait, #ecranReprise, #ecranPause, #suppression) :is(h2, .credits-titre){
+  color: var(--hw-titre);
+  text-shadow: 0 2px 0 #1a0204, 0 4px 12px rgba(0, 0, 0, 0.65);
+}
+html[data-theme="halloween"] :is(.optionTitre, .aProposTitre, .titreBloc, .regleBloc-titre, .recap-titre, .annonce-titre, .regle-titre,
+  #ecranCredits .credits-phrase strong, #codePartieAffiche,
+  #overlayCouleur .titre-couleur,
+  :is(#overlayPlus4, #overlayCupidon, #overlayCoupDeFoudre, #overlayPigeon, #overlayFinUnRestants, #overlayDuel, #overlayPredictionFin, #overlayRegleUnique, #overlayAnnulation, #overlayResultatAnnulation) .titre-pigeon,
+  #ecranTele :is(.tele-titre, .tele-ecran-titre, .tele-pause-titre, .tele-prepa-titre)){
+  color: var(--hw-titre);
+  text-shadow: 0 2px 0 #1a0204, 0 4px 12px rgba(0, 0, 0, 0.65);
+}
+
+/* ----- Joueur dont c'est le tour : rouge sang, avec une lueur rouge autour ----- */
+html[data-theme="halloween"] .joueur-ligne-actif{
+  box-shadow: 0 0 0 2px #ffffff, 0 0 12px 2px rgba(255, 255, 255, 0.95), 0 0 30px 6px rgba(197, 22, 28, 0.85) !important;
+}
+
+/* ----- Doré écrit directement par le JavaScript (passe devant le CSS du thème : d'où le !important) ----- */
+html[data-theme="halloween"] :is(#overlayAnnulation, #overlayResultatAnnulation, #overlayRegleUnique:not(.overlay-doree)){ color: var(--hw-texte) !important; }
+html[data-theme="halloween"] .aideAccueil-fleches path:not(.aideAccueil-ombre){ fill: #fff; }
+html[data-theme="halloween"] .aideAccueil-ombre{ fill: rgba(10, 2, 4, 0.9); }
+
+/* ----- Bannière « Tour de » : nom du joueur en blanc qui luit de rouge (si une couleur est choisie, le jeu garde la couleur de la carte) ----- */
+html[data-theme="halloween"] #stickyJoueurActif:not(.has-couleur):not(.is-pigeon) .sticky-nom{
+  color: var(--hw-texte);
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.9), 0 0 14px rgba(197, 22, 28, 0.9);
+}
+html[data-theme="halloween"] #stickyJoueurActif::before{ background: radial-gradient(circle at 35% 35%, #ff9a9a 0%, #c5161c 45%, #6d0a0d 100%); box-shadow: 0 0 10px rgba(197, 22, 28, 0.9); }
+
+/* ----- Écran de pause : voile noir rougeâtre ----- */
+html[data-theme="halloween"] :is(#ecranPause, #ecranTele .tele-pause){ background: rgba(10, 2, 4, 0.88); }
+
+/* ----- Accueil : la ligne sous le titre devient une traînée de sang qui dégouline ----- */
+html[data-theme="halloween"] #choixMode .titreAccueilBarre{
+  height: 48px !important; width: min(96%, 360px) !important; border-radius: 0 !important; box-shadow: none !important;
+  background: url("halloween/trainee_titre.svg") center top / 100% 100% no-repeat !important;
+}
+
+/* ----- Pas de bleu ni de turquoise : noms des joueurs, « PIGEON », pastille du bandeau, lueurs du pigeon ----- */
+html[data-theme="halloween"] #listeJoueurs{ color: var(--hw-texte); }
+html[data-theme="halloween"] #stickyJoueurActif.is-pigeon{ border-color: rgba(197, 22, 28, 0.6); }
+html[data-theme="halloween"] #stickyJoueurActif.is-pigeon::before{
+  background: radial-gradient(circle at 35% 35%, #ff9a9a 0%, #c5161c 52%, #6d0a0d 100%); box-shadow: 0 0 10px rgba(197, 22, 28, 0.7);
+}
+html[data-theme="halloween"] #stickyJoueurActif.is-pigeon .sticky-nom{ color: var(--hw-texte); }
+html[data-theme="halloween"] #stickyJoueurActif.is-pigeon .sticky-bonus{ background: rgba(197, 22, 28, 0.2); border-color: rgba(197, 22, 28, 0.5); color: var(--hw-texte); }
+html[data-theme="halloween"] #ecranTele :is(.tele-joueur, .tele-prepa-joueur){ color: var(--hw-texte); }
+html[data-theme="halloween"] #ecranTele .tele-prepa-joueur{ border-color: rgba(197, 22, 28, 0.5); }
+/* Télé : le joueur dont c'est le tour est sur fond rouge clair : son nom reste foncé */
+html[data-theme="halloween"] #ecranTele .tele-joueur.tele-joueur-actif, html[data-theme="halloween"] #ecranTele .tele-joueur.tele-joueur-actif > span{ color: var(--actif-texte); }
+/* Lueurs du nouveau pigeon : rouge au lieu de turquoise (copies des animations du jeu de base) */
+html[data-theme="halloween"] #listeJoueurs .joueur-ligne.pigeon-flash{ animation-name: pigeonFlash_halloween; }
+html[data-theme="halloween"] #ecranTele .tele-joueur.pigeon-flash{ animation-name: pigeonFlashTele_halloween; }
+@keyframes pigeonFlash_halloween{
+  0%, 100% { scale: 1; filter: none; }
+  50%      { scale: 1.12; filter: brightness(1.3) drop-shadow(0 0 10px rgba(255, 90, 90, 0.95)); }
+}
+@keyframes pigeonFlashTele_halloween{
+  0%, 100% { scale: 1; filter: none; }
+  50%      { scale: 1.08; filter: brightness(1.3) drop-shadow(0 0 1.2vh rgba(255, 90, 90, 0.95)); }
+}
+
+/* ----- Dos des cartes « ALC UNO » ensanglanté (Cartes/dos_halloween.png : le dessin d'origine, ovale rouge sang,
+   texte orange citrouille, et du sang qui coule du bas de l'ovale) -----
+   Mêmes endroits que pour le dos de base : cartes face cachée, mode « faces fermées », télé, exemples des Règles. Les faces gardent leur image. */
+html[data-theme="halloween"] .Carte:not(.retournee):not([class*="_"]):not([class*="couleur"]),
+html.faces-fermees[data-theme="halloween"] #plateau .Carte.retournee.recachee,
+html[data-theme="halloween"] .tele-plateau .Carte.carte-recachee,
+html[data-theme="halloween"] .Carte.dos_dore:not(.retournee), /* le dos de la carte dorée = le même dos (avec son reflet par-dessus), sinon elle se reconnaîtrait */
+html[data-theme="halloween"] #ecranRegles .ligneRegle .Carte.retournee:not([class*="_"]):not([class*="couleur"]){ background-image: url("Cartes/dos_halloween.png") !important; }
+
+/* ----- Feuille « Signaler un bug » : fond uni (le motif passait derrière le texte et le rendait illisible) ----- */
+html[data-theme="halloween"] #ecranBug .bugFeuille{ background: radial-gradient(ellipse 120% 40% at 50% 0%, rgba(163,21,26,.22), transparent 100%), var(--fond-theme); }
+
+/* ============================================================================================
+   TOUT LE TEXTE EN ROUGE SANG (demandé : pas de blanc, pas de jaune, pas de bleu dans ce thème)
+   Trois niveaux, du plus foncé au plus clair, pour que les petits textes restent lisibles sur le noir :
+     --hw-titre      #e8252c  titres et gros textes        (contraste 4,5 sur les panneaux)
+     --hw-texte      #ff6b6b  texte courant et boutons     (contraste 7,2)
+     --hw-texte-doux #ff9b9e  notes, liens, petits textes  (contraste 10)
+   Les seuls textes qui restent sombres sont ceux posés SUR du rouge clair (le joueur dont c'est le
+   tour), sinon ils disparaîtraient : ils gardent --actif-texte.
+   !important parce que beaucoup de ces textes viennent de règles du jeu de base avec un identifiant.
+   ============================================================================================ */
+html[data-theme="halloween"]{ --hw-titre: #e8252c; --hw-texte: #ff6b6b; --hw-texte-doux: #ff9b9e; }
+
+/* Titres : écrans, blocs, règles */
+html[data-theme="halloween"] :is(h2, #titreReglages, .titreBloc, .aProposTitre, .nomRegle, .regleBloc-titre,
+  .recap-titre, .annonce-titre, .regle-titre, .credits-titre, .tele-titre, .tele-ecran-titre,
+  .tele-pause-titre, .tele-prepa-titre, .titre-couleur, .titre-pigeon){
+  color: var(--hw-titre) !important;
+}
+/* Texte courant et boutons */
+html[data-theme="halloween"] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, #nouvellePartie,
+  #btnPartagerJeu, #btnRejouerMemes, #btnModifierJoueurs, #btnReprendrePause, #ajouterJoueur, #jouer, #supprimerJoueur,
+  #btnCreerPartie, #btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre,
+  #btnScannerQR, #lancerPartieEnLigne, #btnChoixPseudoAnnuler, #btnConfirmerAccueilOui, #btnConfirmerAccueilNon,
+  #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #termineSuppression,
+  #btnInstallationInstaller, #btnFermerScanner, .btnRetour, .btnAccueilTexte, .btnInstaller, .btnDiagnostic,
+  .btnFaqLien, .voletPause-ok, .bouton-pigeon, .bouton-annulation, #listeChoixPseudo button, #ecranReprise button,
+  #ecranCaster button, #menu #btnCaster, #compteurCartes, #listeSuppression, #listeJoueursEnLigne div,
+  li, b, strong, .detailRegle, .mainGauche, .volumeIcone, .messages, .regleBloc, .blocRegles,
+  .optionTitre){ /* les titres des blocs de Réglages : rouge clair et pas rouge sang, ils étaient tout juste au seuil de lisibilité */
+  color: var(--hw-texte) !important;
+}
+/* Petits textes et liens */
+html[data-theme="halloween"] :is(.optionNote, .lienBug, .lienJeu, .versionJeu, .credits-phrase,
+  .credits-honneur-titre, .separateurOu, #btnInstallationPlusTard, .installationPourquoi, .tele-pied, .sticky-bonus){
+  color: var(--hw-texte-doux) !important;
+}
+/* Joueurs : le nom est rouge, sauf celui dont c'est le tour (pastille rouge clair : texte sombre) */
+html[data-theme="halloween"] #listeJoueurs{ color: var(--hw-texte); }
+html[data-theme="halloween"] .joueur-ligne:not(.joueur-ligne-actif) .joueur-nom{ color: var(--hw-texte) !important; }
+html[data-theme="halloween"] .joueur-ligne-actif .joueur-nom{ color: var(--actif-texte) !important; }
+html[data-theme="halloween"] #ecranTele .tele-joueur:not(.tele-joueur-actif){ color: var(--hw-texte) !important; }
+html[data-theme="halloween"] #stickyJoueurActif:not(.has-couleur):not(.is-pigeon) .sticky-nom{
+  color: var(--hw-texte) !important; text-shadow: 0 0 6px rgba(197, 22, 28, 0.9), 0 0 14px rgba(197, 22, 28, 0.6);
+}
+html[data-theme="halloween"] #stickyJoueurActif.is-pigeon .sticky-nom{ color: var(--hw-texte) !important; }
+
+/* ----- Noms des thèmes dans les Réglages : en orange citrouille, et plus en bleu / vert / violet -----
+   (chaque thème montrait son nom de SA couleur ; le rond coloré à gauche suffit à les reconnaître) */
+html[data-theme="halloween"] .pastilleTheme .nomTheme{ color: #ff9a3c !important; }
+
+/* Une exception au « tout en rouge » : la pastille « hors connexion » des Réglages est une pastille d'état
+   (fond gris, vert ou ROUGE). Son ✓ / ✗ doit rester blanc, sinon il disparaît sur le fond rouge. */
+html[data-theme="halloween"] #ecranReglages .pastilleHorsLigne{ color: #ffffff !important; }

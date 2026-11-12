@@ -18,7 +18,7 @@
         // et en parallèle : en bas de la page, ils s'exécutent d'affilée, sans attente entre deux fichiers
         // (aucun bouton ni minuteur ne peut se déclencher avant que tout le jeu soit là).
         window.FICHIERS_JEU = ["script.js", "js/qrcode.js", "js/config-lib.js", "js/reglages.js", "js/en-ligne.js", "js/plateau.js", "js/regles.js", "js/mode-hot.js",
-                               "js/synchro-en-ligne.js", "js/retour-demarrage.js", "js/tele.js", "js/stats.js", "js/config-distante.js", "js/stickers.js", "js/faq.js", "js/mouchard.js"];
+                               "js/synchro-en-ligne.js", "js/retour-demarrage.js", "js/tele.js", "js/stats.js", "js/config-distante.js", "js/stickers.js", "js/faq.js", "js/mouchard.js", "js/poisson.js", "js/piano-accueil.js"];
         window.FICHIERS_JEU.forEach(function (f) {
             document.write('<link rel="preload" as="script" href="' + f + '?t=' + window.ANTI_CACHE + '">');
         });
@@ -74,9 +74,24 @@
         // Thème choisi dans les réglages : appliqué tout de suite (pas de flash de bordeaux au chargement)
         // (ancien thème « violet » remplacé par « soleil »)
         try { var theme = localStorage.getItem("alcuno_theme"); if (theme === "violet") { theme = "soleil"; localStorage.setItem("alcuno_theme", theme); } if (theme) document.documentElement.dataset.theme = theme; } catch (e) {}
+        // Fêtes qui ne sont pas des thèmes (voir FETES.md), à la date du téléphone : le Nouvel An (le 1er
+        // janvier) et la Fête nationale (du 13 au 15 juillet). Les deux posent les mêmes feux d'artifice ;
+        // seul le Nouvel An ajoute en plus un chapeau de fête sur le O du titre. Hors de ces dates, rien :
+        // ni feux, ni réglage dans les Réglages.
+        // Posé ici, avant l'affichage, pour qu'aucun chapeau n'apparaisse une fraction de seconde.
+        // Pour les voir hors période (tests) : ouvrir le jeu avec ?fete=nouvel-an ou ?fete=nationale.
+        try {
+            var fete = (location.search.match(/[?&]fete=([a-z-]+)/) || [])[1];
+            if (fete !== "nouvel-an" && fete !== "nationale") {
+                var dateDuJour = new Date(), moisFete = dateDuJour.getMonth() + 1, jourFete = dateDuJour.getDate();
+                fete = (moisFete === 1 && jourFete === 1) ? "nouvel-an"
+                     : (moisFete === 7 && jourFete >= 13 && jourFete <= 15) ? "nationale" : "";
+            }
+            if (fete) document.documentElement.dataset.fete = fete;
+        } catch (e) {}
         // Barre du téléphone à la couleur du thème dès le premier affichage (mêmes couleurs que THEMES dans script.js)
         var couleursBarre = { bordeaux: "#2b001d", noir: "#000000", vert: "#08301e", bleu: "#0a1634", soleil: "#1f3566",
-                              cerisier: "#5a1740", givre: "#e4f5fc", prestige: "#937810", galaxie: "#02030a", kawaii: "#ffd6ec", donjon: "#12040a" };
+                              cerisier: "#5a1740", givre: "#e4f5fc", prestige: "#937810", galaxie: "#02030a", kawaii: "#ffd6ec", donjon: "#12040a", noel: "#b3121f", chandeleur: "#bd4f10", valentin: "#c2185b", patrick: "#0f6a44", justrose: "#cc3381", musique: "#5b2bd1", halloween: "#0a0204" };
         document.write('<meta name="theme-color" content="' + (couleursBarre[theme] || couleursBarre.bordeaux) + '">');
         // iPhone : page rechargée après un changement de thème (voir rafraichirBarreIphone dans script.js) :
         // on rouvre les Réglages dès le premier affichage
@@ -84,6 +99,16 @@
         document.write('<link rel="stylesheet" href="style_alcuno.css?t=' + window.ANTI_CACHE + '" />');
         document.write('<link rel="stylesheet" href="style_kawaii.css?t=' + window.ANTI_CACHE + '" />'); // thème Kawaii (généré : outils/generer_kawaii.py)
         document.write('<link rel="stylesheet" href="style_donjon.css?t=' + window.ANTI_CACHE + '" />'); // thème secret Donjon (débloqué par une partie en mode hot)
+        document.write('<link rel="stylesheet" href="style_feux.css?t=' + window.ANTI_CACHE + '" />'); // feux d'artifice du Nouvel An (tous écrans, tous thèmes)
+        document.write('<link rel="stylesheet" href="style_noel.css?t=' + window.ANTI_CACHE + '" />'); // thème de fête Noël
+        document.write('<link rel="stylesheet" href="style_chandeleur.css?t=' + window.ANTI_CACHE + '" />'); // thème de fête Chandeleur
+        document.write('<link rel="stylesheet" href="style_valentin.css?t=' + window.ANTI_CACHE + '" />'); // thème de fête Saint-Valentin
+        document.write('<link rel="stylesheet" href="style_patrick.css?t=' + window.ANTI_CACHE + '" />'); // thème de fête Saint-Patrick
+        document.write('<link rel="stylesheet" href="style_justrose.css?t=' + window.ANTI_CACHE + '" />'); // thème de fête Just Rosé
+        document.write('<link rel="stylesheet" href="style_musique.css?t=' + window.ANTI_CACHE + '" />'); // thème de fête Fête de la musique
+        document.write('<link rel="stylesheet" href="style_halloween.css?t=' + window.ANTI_CACHE + '" />'); // thème de fête Halloween
+        document.write('<link rel="stylesheet" href="style_annonce_fete.css?t=' + window.ANTI_CACHE + '" />'); // fenêtre d'annonce d'un thème de fête (aux couleurs de la fête)
+        document.write('<link rel="stylesheet" href="style_poisson.css?t=' + window.ANTI_CACHE + '" />'); // blagues du 1er avril (js/poisson.js)
     </script>
     <title>Alcuno</title>
 
@@ -173,6 +198,12 @@
             <div id="kawaiiFlotteurs" aria-hidden="true"></div>
             <!-- Thème Donjon : objets qui tombent sur l'accueil (remplis par js/reglages.js) -->
             <div id="donjonFlotteurs" aria-hidden="true"></div>
+            <!-- Thème Noël : neige qui tombe (remplie par js/reglages.js) -->
+            <div id="neigeNoel" aria-hidden="true"></div>
+            <!-- Thème Chandeleur : poêle de cuivre et crêpe qui saute (style_chandeleur.css) -->
+            <!-- Thème Saint-Valentin : petits cœurs rouges qui flottent (remplis par js/reglages.js) -->
+            <div id="coeursValentin" aria-hidden="true"></div>
+            <div id="poeleChandeleur" aria-hidden="true"><div class="poeleImage"></div><div class="crepeSaute"></div></div>
             <!-- Réglages : seulement sur l'écran d'accueil -->
             <button type="button" id="btnReglages" title="Réglages" aria-label="Réglages">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -190,7 +221,7 @@
                 </svg>
             </button>
             <div class="titreAccueil">
-                <h1 id="titreAccueil">ALCUNO<span class="couronneTitre" aria-hidden="true"><svg viewBox="0 0 64 48" aria-hidden="true"><defs><linearGradient id="orCouronne" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff3a8"/><stop offset="0.45" stop-color="#ffd23f"/><stop offset="1" stop-color="#c8880a"/></linearGradient></defs><path d="M6 40 L3 12 L18 24 L32 4 L46 24 L61 12 L58 40 Z" fill="url(#orCouronne)" stroke="#7a4b00" stroke-width="2.5" stroke-linejoin="round"/><rect x="5" y="38" width="54" height="8" rx="2" fill="url(#orCouronne)" stroke="#7a4b00" stroke-width="2.5"/><circle cx="3" cy="11" r="3.2" fill="#fff3a8" stroke="#7a4b00" stroke-width="1.5"/><circle cx="32" cy="4" r="3.6" fill="#fff3a8" stroke="#7a4b00" stroke-width="1.5"/><circle cx="61" cy="11" r="3.2" fill="#fff3a8" stroke="#7a4b00" stroke-width="1.5"/><circle cx="32" cy="30" r="4" fill="#e0263a" stroke="#7a4b00" stroke-width="1.2"/><circle cx="17" cy="32" r="2.8" fill="#2f7de1" stroke="#7a4b00" stroke-width="1.2"/><circle cx="47" cy="32" r="2.8" fill="#2f7de1" stroke="#7a4b00" stroke-width="1.2"/></svg></span></h1>
+                <h1 id="titreAccueil">ALCUN<span class="lettreOTitre"><span class="lettreO">O</span><span class="coeurO" aria-hidden="true"></span><span class="chapeauFeteTitre" aria-hidden="true"><svg viewBox="0 0 80 96" aria-hidden="true"><defs><linearGradient id="chapeauCorps" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ff3d9a"/><stop offset=".55" stop-color="#ff6ec0"/><stop offset="1" stop-color="#d4207d"/></linearGradient><clipPath id="chapeauForme"><path d="M40 12 L72 86 L8 86z"/></clipPath></defs><g clip-path="url(#chapeauForme)"><rect x="0" y="0" width="80" height="96" fill="url(#chapeauCorps)"/><path d="M-10 40 L90 14 L90 26 L-10 52z M-10 66 L90 40 L90 52 L-10 78z" fill="#ffe27a"/><path d="M-10 56 L90 30 L90 36 L-10 62z" fill="#5be7ff"/><circle cx="30" cy="74" r="3" fill="#fff"/><circle cx="50" cy="66" r="3" fill="#5be7ff"/><circle cx="40" cy="46" r="2.6" fill="#fff"/><circle cx="58" cy="80" r="2.6" fill="#ffe27a"/><circle cx="22" cy="82" r="2.6" fill="#ffe27a"/><path d="M40 12 L40 86" stroke="#fff" stroke-width="3" opacity=".16"/></g><path d="M40 12 L72 86 L8 86z" fill="none" stroke="#8c1a63" stroke-width="3" stroke-linejoin="round"/><rect x="4" y="82" width="72" height="9" rx="4.5" fill="#ffe27a" stroke="#8c1a63" stroke-width="3"/><path d="M40 12 Q18 6 12 18 M40 12 Q64 4 70 16 M40 12 Q30 -2 46 -2" stroke="#5be7ff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M40 12 Q58 -4 66 6 M40 12 Q22 -2 20 6" stroke="#ff3d9a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M40 12 Q50 -6 60 -2" stroke="#ffe27a" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="40" cy="12" r="8" fill="#fff" stroke="#c9d3dd" stroke-width="2.5"/><path d="M62 -2 l1.6 4 4 1.6-4 1.6-1.6 4-1.6-4-4-1.6 4-1.6z" fill="#ffe27a"/><path d="M12 8 l1.2 3 3 1.2-3 1.2-1.2 3-1.2-3-3-1.2 3-1.2z" fill="#fff"/></svg></span></span><span class="bonnetTitre" aria-hidden="true"><svg viewBox="0 0 64 56" aria-hidden="true"><path d="M8 42 Q12 14 34 8 Q52 4 58 22 Q60 30 54 36 Q52 24 44 20 Q46 34 54 42z" fill="#e3242b" stroke="#7a0a12" stroke-width="2.5" stroke-linejoin="round"/><path d="M14 30 Q20 16 34 12" stroke="#ff6a6a" stroke-width="3" fill="none" stroke-linecap="round"/><rect x="3" y="38" width="56" height="13" rx="6.5" fill="#fff" stroke="#c9d3dd" stroke-width="2"/><circle cx="55" cy="38" r="7" fill="#fff" stroke="#c9d3dd" stroke-width="2"/></svg></span><span class="couronneTitre" aria-hidden="true"><svg viewBox="0 0 64 48" aria-hidden="true"><defs><linearGradient id="orCouronne" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff3a8"/><stop offset="0.45" stop-color="#ffd23f"/><stop offset="1" stop-color="#c8880a"/></linearGradient></defs><path d="M6 40 L3 12 L18 24 L32 4 L46 24 L61 12 L58 40 Z" fill="url(#orCouronne)" stroke="#7a4b00" stroke-width="2.5" stroke-linejoin="round"/><rect x="5" y="38" width="54" height="8" rx="2" fill="url(#orCouronne)" stroke="#7a4b00" stroke-width="2.5"/><circle cx="3" cy="11" r="3.2" fill="#fff3a8" stroke="#7a4b00" stroke-width="1.5"/><circle cx="32" cy="4" r="3.6" fill="#fff3a8" stroke="#7a4b00" stroke-width="1.5"/><circle cx="61" cy="11" r="3.2" fill="#fff3a8" stroke="#7a4b00" stroke-width="1.5"/><circle cx="32" cy="30" r="4" fill="#e0263a" stroke="#7a4b00" stroke-width="1.2"/><circle cx="17" cy="32" r="2.8" fill="#2f7de1" stroke="#7a4b00" stroke-width="1.2"/><circle cx="47" cy="32" r="2.8" fill="#2f7de1" stroke="#7a4b00" stroke-width="1.2"/></svg></span></h1>
                 <div class="titreAccueilBarre" aria-hidden="true"></div>
             </div>
             <!-- Annonce pilotée à distance depuis stats.html (voir js/config-distante.js) -->
@@ -247,6 +278,26 @@
                         <!-- Thème secret : débloqué en lançant une partie en mode hot (js/reglages.js) -->
                         <button type="button" class="pastilleTheme" data-theme="donjon" style="--c:#ff2a3d;--c-givre:#a3101f" id="pastilleDonjon" hidden><span class="rond rondDonjon"></span><span class="nomTheme">BDSM</span></button>
                         <button type="button" class="pastilleTheme" data-theme="galaxie" style="--c:#FFE81F;--c-givre:#1a3f8a" id="pastilleGalaxie" hidden><span class="rond rondGalaxie"></span><span class="nomTheme">Star Wars</span></button>
+                        <!-- Thèmes de fête : TOUJOURS EN DERNIER, après Star Wars (et après les autres thèmes de fête déjà là). Choisi à la main pour l'instant (calendrier automatique plus tard, voir FETES.md) -->
+                        <button type="button" class="pastilleTheme" data-theme="noel" style="--c:#ffb0b0;--c-givre:#b3121f"><span class="rond rondNoel"></span><span class="nomTheme">Noël</span></button>
+                        <button type="button" class="pastilleTheme" data-theme="chandeleur" style="--c:#ffc58a;--c-givre:#bd4f10"><span class="rond rondChandeleur"></span><span class="nomTheme">Chandeleur</span></button>
+                        <button type="button" class="pastilleTheme" data-theme="valentin" style="--c:#ffb0cc;--c-givre:#c2185b"><span class="rond rondValentin"></span><span class="nomTheme">Saint-Valentin</span></button>
+                        <button type="button" class="pastilleTheme" data-theme="patrick" style="--c:#8cf0b4;--c-givre:#0f6a44"><span class="rond rondPatrick"></span><span class="nomTheme">Saint-Patrick</span></button>
+                        <button type="button" class="pastilleTheme" data-theme="justrose" style="--c:#ffc2de;--c-givre:#cc3381"><span class="rond rondJustrose"></span><span class="nomTheme">Just Rosé</span></button>
+                        <button type="button" class="pastilleTheme" data-theme="musique" style="--c:#cbbcff;--c-givre:#5b2bd1"><span class="rond rondMusique"></span><span class="nomTheme">Musique</span></button>
+                        <button type="button" class="pastilleTheme" data-theme="halloween" style="--c:#ff8a3c;--c-givre:#8f0b10"><span class="rond rondHalloween"></span><span class="nomTheme">Halloween</span></button>
+                    </div>
+                </div>
+
+                <!-- Fête : feux d'artifice sur tous les écrans (Nouvel An). À la main pour l'instant, le calendrier des fêtes viendra plus tard (FETES.md) -->
+                <div class="blocReglage" data-cle="feux-artifice">
+                    <div class="optionReglage">
+                        <span class="optionTexte">
+                            <span class="optionTitre">Feux d'artifice 🎆</span>
+                            <span class="optionNote">Des feux d'artifice éclatent sur tous les écrans pendant la fête.</span>
+                        </span>
+                        <input type="checkbox" id="optionFeuxArtifice" aria-label="Feux d'artifice">
+                        <label class="interrupteur" for="optionFeuxArtifice" aria-hidden="true"></label>
                     </div>
                 </div>
 
@@ -636,7 +687,7 @@
         </section>
 
         <section class="ecranInstallation" id="ecranInstallation" style="display:none;">
-            <div class="installation-contenu">
+            <div class="installation-contenu" id="installationContenu">
                 <img class="installationIcone" src="icones/icone-180.png" alt="">
                 <h2>Installer Alcuno</h2>
                 <p class="installationPourquoi">Le jeu s'ouvre en plein écran depuis ton écran d'accueil, comme une vraie appli, et le mode classique marche même sans réseau.</p>
@@ -722,5 +773,7 @@
     </script>
     <!-- Thème Prestige : reflet doré qui traverse l'écran de temps en temps (ne bloque aucun tap) -->
     <div id="refletPrestige" aria-hidden="true"></div>
+    <!-- Feux d'artifice du Nouvel An, sur tous les écrans et dans tous les thèmes (remplis par js/reglages.js ; ne bloque aucun tap) -->
+    <div id="feuxArtifice" aria-hidden="true"></div>
 </body>
 </html>

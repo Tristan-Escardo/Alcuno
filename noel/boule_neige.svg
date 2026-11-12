@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
+  <!-- Intérieur de la boule à neige (aperçu du thème Noël dans les Réglages) : nuit bleue, sapin décoré, neige qui retombe -->
+  <style>
+    .f{ fill:#fff; animation: chute 3.2s linear infinite; }
+    .f2{ animation-duration: 4.4s; } .f3{ animation-duration: 2.6s; }
+    @keyframes chute{ 0%{ transform: translateY(-4px); opacity:0 } 12%{ opacity:1 } 85%{ opacity:1 } 100%{ transform: translateY(30px); opacity:0 } }
+  </style>
+  <defs>
+    <radialGradient id="ciel" cx=".5" cy=".3" r=".85"><stop offset="0" stop-color="#2f4fa8"/><stop offset=".6" stop-color="#16276b"/><stop offset="1" stop-color="#0a1340"/></radialGradient>
+    <linearGradient id="sap" x1="0" x2="1"><stop offset="0" stop-color="#2fa354"/><stop offset="1" stop-color="#0f5a2b"/></linearGradient>
+  </defs>
+  <rect width="40" height="40" fill="url(#ciel)"/>
+  <!-- étoiles du ciel -->
+  <g fill="#fff6c8" opacity=".85"><circle cx="8" cy="9" r=".7"/><circle cx="31" cy="7" r=".6"/><circle cx="34" cy="17" r=".5"/></g>
+  <!-- sapin -->
+  <rect x="18.5" y="26" width="3" height="5" fill="#6b3a17"/>
+  <path d="M20 8 L27.5 19 L24 19 L29.5 27.5 L10.5 27.5 L16 19 L12.5 19z" fill="url(#sap)"/>
+  <path d="M20 4.5 l1.1 2.4 2.6.3-1.9 1.8.5 2.6-2.3-1.3-2.3 1.3.5-2.6-1.9-1.8 2.6-.3z" fill="#ffd23f"/>
+  <circle cx="17.5" cy="21" r="1.3" fill="#e3242b"/><circle cx="23" cy="24" r="1.3" fill="#ffd23f"/><circle cx="16" cy="26" r="1.1" fill="#4aa8ff"/><circle cx="21.5" cy="17" r="1" fill="#ff7bd5"/>
+  <!-- sol enneigé -->
+  <path d="M0 31 Q10 27.5 20 30 T40 29 L40 40 L0 40z" fill="#f4f8ff"/>
+  <path d="M0 31 Q10 27.5 20 30 T40 29" fill="none" stroke="#cfe0f3" stroke-width="1"/>
+  <!-- flocons qui retombent -->
+  <g><circle class="f" cx="9" cy="6" r="1.2"/><circle class="f f2" cx="15" cy="3" r="1" style="animation-delay:-1.3s"/><circle class="f f3" cx="26" cy="5" r="1.2" style="animation-delay:-.7s"/>
+     <circle class="f f2" cx="32" cy="2" r=".9" style="animation-delay:-2.9s"/><circle class="f" cx="22" cy="2" r="1" style="animation-delay:-2.2s"/><circle class="f f3" cx="5" cy="14" r=".9" style="animation-delay:-1.9s"/></g>
+  <!-- reflet du verre -->
+  <ellipse cx="11" cy="10" rx="6" ry="3.6" transform="rotate(-38 11 10)" fill="#fff" opacity=".35"/>
+  <circle cx="31" cy="30" r="2" fill="#fff" opacity=".12"/>
+</svg>

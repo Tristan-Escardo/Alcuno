@@ -4,6 +4,7 @@
 // de base). On signale :
 //   - MOINS LISIBLE : un texte sous le contraste 3 (contraste.js) que le thème rend moins lisible que le style de base
 //   - BOUTON OUBLIÉ : un bouton plein resté exactement au style de base alors que le thème habille ses boutons
+//   - DOS OUBLIÉ    : un dos de carte (la carte dorée par exemple) resté au dos de base alors que le thème change les autres
 //   - DÉBORDE       : la page défile en largeur (téléphone) ou du texte sort de l'écran (télé)
 //   - ERREUR JS     : une erreur JavaScript pendant l'écran
 // Chaque écran est aussi photographié : planche à regarder dans tests/resultats/affichage_<telephone|tele>/<thème>/index.html
@@ -80,7 +81,12 @@ window.__mesurerAffichage = function (mode) {
       if (r.right > innerWidth + 2 || r.bottom > innerHeight + 2 || r.left < -2 || r.top < -2) debord.push("« " + texte.slice(0, 30) + " » sort de l'écran");
     });
   }
-  return { contraste: verifierContraste(3), boutons, debord };
+  // Dos de cartes (y compris le dos de la carte dorée) : leur image, dans l'ordre, pour repérer un dos resté au dos de base
+  const dos = [...document.querySelectorAll(".Carte:not(.retournee), .Carte.retournee.recachee")].filter((el) => visible(el) && !/_|couleur|cupidon/.test(String(el.className).replace("dos_dore", ""))).map((el) => getComputedStyle(el).backgroundImage); // (les FACES montrées sans « retournee » dans les annonces — trois_rouge, carte_doree… — ne sont pas des dos)
+  // Texte sélectionné (champ du nom du joueur…) : sans règle ::selection, le navigateur le peint en bleu
+  const sel = getComputedStyle(document.documentElement, "::selection");
+  const selection = { fond: sel.backgroundColor, texte: sel.color };
+  return { contraste: verifierContraste(3), boutons, debord, selection, dos };
 };`;
 }
 
@@ -110,8 +116,16 @@ async function verifierEcran(page, theme, mode, controlerBoutons = true) {
     if (EXCEPTIONS_BOUTONS.some(([, morceau]) => x.cle.includes(morceau))) continue;
     problemes.push(`BOUTON OUBLIÉ  ${x.cle} : resté au style de base`);
   }
+  // DOS OUBLIÉ : le thème change le dos de certaines cartes (ex. un dos rose) mais l'une d'elles garde le dos de base
+  // (c'était arrivé à la carte dorée : son nom de classe « dos_dore » échappait à la règle du thème)
+  if (avec.dos.length === sans.dos.length && avec.dos.length) {
+    const changes = avec.dos.filter((d, i) => d !== sans.dos[i]).length;
+    const oublies = avec.dos.filter((d, i) => d === sans.dos[i]).length;
+    if (changes && oublies) problemes.push(`DOS OUBLIÉ     ${oublies} carte(s) de dos sur ${avec.dos.length} gardent le dos de base alors que le thème en change d'autres (carte dorée ?)`);
+  }
   for (const d of avec.debord) problemes.push(`DÉBORDE        ${d}`);
-  return { problemes, boutonsHabilles: avec.boutons.filter((x) => lookBase.has(x.cle) && lookBase.get(x.cle) !== x.look).length };
+  return { problemes, selection: avec.selection,
+    boutonsHabilles: avec.boutons.filter((x) => lookBase.has(x.cle) && lookBase.get(x.cle) !== x.look).length };
 }
 
 // Planche des captures (à ouvrir dans un navigateur) + rapport texte
