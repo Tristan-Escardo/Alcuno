@@ -617,7 +617,7 @@
         });
         const authPorte = getAuth(app);
         // Version de la page de stats (à part de celle du jeu : +0.0.1 à chaque modification de cette page)
-        const VERSION_STATS = "1.21.2";
+        const VERSION_STATS = "1.21.3";
         document.getElementById("versionStats").textContent = VERSION_STATS;
         document.getElementById("versionStats2").textContent = VERSION_STATS;
         document.getElementById("versionStats3").textContent = VERSION_STATS;
@@ -982,15 +982,19 @@
             }
             // Défis du jeu (js/mode-hot.js) : masquer / remettre, avec leur taux de défis relevés
             var statsDefisPil = {}; // (var : dessiner() peut passer avant cette ligne)
+            var SEUIL_REFUS_MIN = 5, SEUIL_REFUS_TAUX = 0.3;
             function dessinerDefisJeu(){
                 if (typeof DEFIS_HOT === "undefined") return;
                 const masques = config.defisMasques || {};
                 $("pilDefisJeuListe").innerHTML = Object.keys(ConfigLib.NIVEAUX_DEFIS).map((n) => {
                     const liste = DEFIS_HOT[n] || [];
                     const nb = liste.filter((d) => masques[d.id]).length;
-                    return `<p class="pilNote" style="margin:12px 0 4px"><b>${ecape(ConfigLib.NIVEAUX_DEFIS[n])} · ${liste.length - nb} actif${liste.length - nb > 1 ? "s" : ""}${nb ? ` · ${nb} masqué${nb > 1 ? "s" : ""}` : ""}</b></p>` + liste.map((d) => {
+                    // « Souvent refusé » : au moins SEUIL_REFUS_MIN fois proposé et relevé moins d'une fois sur SEUIL_REFUS_TAUX (seuils choisis au jugé, à ajuster)
+                    const refuse = (d) => { const s = statsDefisPil[d.id] || {}, t = Number(s.fait || 0) + Number(s.bois || 0); return t >= SEUIL_REFUS_MIN && Number(s.fait || 0) / t < SEUIL_REFUS_TAUX; };
+                    const nbRefuses = liste.filter((d) => !masques[d.id] && refuse(d)).length;
+                    return `<p class="pilNote" style="margin:12px 0 4px"><b>${ecape(ConfigLib.NIVEAUX_DEFIS[n])} · ${liste.length - nb} actif${liste.length - nb > 1 ? "s" : ""}${nb ? ` · ${nb} masqué${nb > 1 ? "s" : ""}` : ""}${nbRefuses ? ` · ⚠ ${nbRefuses} souvent refusé${nbRefuses > 1 ? "s" : ""}` : ""}</b></p>` + liste.map((d) => {
                         const st = statsDefisPil[d.id] || {}, f = Number(st.fait || 0), b = Number(st.bois || 0);
-                        const taux = f + b ? ` <b>${Math.round(f / (f + b) * 100)} % · ${f + b}×</b>` : "";
+                        const taux = f + b ? ` <b>${Math.round(f / (f + b) * 100)} % · ${f + b}×</b>${refuse(d) && !masques[d.id] ? " ⚠ souvent refusé" : ""}` : "";
                         const m = !!masques[d.id];
                         return `<div class="pilLigne${m ? " masque" : ""}"><span>${ecape(d.t)}${taux}</span><span class="boutonsDefi"><button type="button" class="voir" data-voir="${ecape(d.t)}" data-niveau="${n}" aria-label="Voir comme en jeu">👁</button><button type="button" class="${m ? "" : "coupe"}" data-jeu="${d.id}" data-masque="${m ? 0 : 1}">${m ? "Remettre" : "Masquer"}</button></span></div>`;
                     }).join("");

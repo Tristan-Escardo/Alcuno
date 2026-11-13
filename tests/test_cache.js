@@ -3,7 +3,7 @@
 //   node tests/test_cache.js
 // Si l'échec dit d'enregistrer l'empreinte :  node outils/maj_empreinte_cache.js
 const fs = require("fs"), path = require("path");
-const { empreinte, empreinteMusiques, nomDuCache, nomCacheMusiques, fichiers, FICHIER, RACINE } = require("./empreinte_cache");
+const { empreinteCode, empreinte, empreinteMusiques, nomDuCache, nomCacheMusiques, fichiers, FICHIER, RACINE } = require("./empreinte_cache");
 let echecs = 0;
 const verifier = (ok, msg) => { console.log((ok ? "OK    " : "ECHEC ") + msg); if (!ok) echecs++; };
 
@@ -29,6 +29,15 @@ verifier(cacheM !== cache, "le cache des musiques n'a pas le même nom que celui
 const sw = fs.readFileSync(path.join(RACINE, "sw.js"), "utf8");
 const manquantes = fichiers("Cartes").concat(fichiers("stickers")).filter((f) => !sw.includes(`"./${f}"`));
 verifier(manquantes.length === 0, `images absentes de A_PRECHARGER dans sw.js ${manquantes.slice(0, 8).join(", ")}${manquantes.length > 8 ? " … (" + manquantes.length + ")" : ""}`);
+
+// Le code du jeu (fichiers précachés + sw.js hors nom du cache) ne change pas sans que le nom du cache change
+{
+  const codeMaintenant = empreinteCode();
+  verifier(!(cache === notee.cache && notee.empreinteCode && codeMaintenant !== notee.empreinteCode),
+    `code du jeu modifié avec le même nom de cache (${cache}) : change CACHE dans sw.js (alcuno-v+1), puis lance « node outils/maj_empreinte_cache.js »`);
+  verifier(cache === notee.cache && codeMaintenant === notee.empreinteCode,
+    `empreinte du code non enregistrée pour ${cache} : lance « node outils/maj_empreinte_cache.js »`);
+}
 
 console.log(echecs ? `\n${echecs} ÉCHEC(S)` : "\nTOUT EST OK");
 process.exit(echecs ? 1 : 0);
