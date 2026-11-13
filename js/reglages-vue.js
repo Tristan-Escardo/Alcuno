@@ -25,12 +25,15 @@
   const lire = () => { try { const v = localStorage.getItem(CLE_VUE); return v === "sections" || v === "tuiles" ? v : "liste"; } catch (e) { return "liste"; } };
   let vue = lire();
   let actif = ""; // tuiles : le groupe ouvert ("" = la page des tuiles)
-  const ouverts = new Set(["affichage"]); // sections : les groupes ouverts
+  const ouverts = new Set(); // sections : les groupes ouverts (tout est fermé quand on lance l'appli)
   // Changer de thème recharge la page (js/reglages.js) et rouvre les Réglages : on garde donc la tuile / les sections ouvertes (sessionStorage)
   const CLE_ETAT = "alcuno_reglages_etat";
   const idsOK = GROUPES.map((g) => g.id);
+  // L'état n'est repris QUE si la page vient d'être rechargée par un changement de thème (la classe « rouvrir-vue » est posée par le <head>
+  // de index.html dans ce cas seulement) ; à un lancement normal de l'appli, tout est fermé.
+  const apresChangementDeTheme = document.documentElement.classList.contains("rouvrir-vue");
   try {
-    const e = JSON.parse(sessionStorage.getItem(CLE_ETAT) || "null");
+    const e = apresChangementDeTheme ? JSON.parse(sessionStorage.getItem(CLE_ETAT) || "null") : null;
     if (e && typeof e === "object") {
       if (idsOK.includes(e.actif)) actif = e.actif;
       if (Array.isArray(e.ouverts)) { ouverts.clear(); e.ouverts.filter((i) => idsOK.includes(i)).forEach((i) => ouverts.add(i)); }
