@@ -126,6 +126,11 @@ verifier(regles.config[".read"] === true && /auth\.uid/.test(regles.config[".wri
   const err = (t, n = "A") => L.appliquer({}, { op: "defi_ajout", texte: t, niveau: n }, 1).erreur;
   verifier(err("") && err("Danse.") && err("Danse avec {nom1}.") && err("Danse avec {nom} et {nom1} {nom2}.") && err("Salut {prenom}") && err("x {nom}".repeat(40)) && err("Danse avec {nom}.", "D") && !err("Danse avec {nom}."),
     "défis hot : textes refusés (vide, sans joueur, {nom1} seul, mélange, accolade inconnue, trop long, niveau inconnu)");
+  const dbl = (t, n) => L.appliquer(a2.config, { op: "defi_ajout", texte: t, niveau: n }, 5).erreur;
+  verifier(/existe déjà/.test(dbl("  fais un  COMPLIMENT à {nom}. ", "A")) && /existe déjà/.test(dbl("Fais un compliment à {nom}.", "B")) && !dbl("Fais un autre compliment à {nom}.", "A"),
+    "défis hot : doublon refusé (casse, espaces, autre niveau), texte différent accepté");
+  verifier(L.appliquer({}, { op: "defi_ajout", texte: "Embrasse {nom1} et {nom2}.", niveau: "HA" }, 1).erreur && !L.appliquer({}, { op: "defi_ajout", texte: "Embrasse {nom}.", niveau: "HA" }, 1).erreur && !L.appliquer({}, { op: "defi_ajout", texte: "Embrasse {nom1} et {nom2}.", niveau: "C" }, 1).erreur,
+    "défis hot : {nom1}/{nom2} refusés en hard, permis ailleurs");
   const s1 = L.appliquer(a2.config, { op: "defi_suppr", id: ids[0] }, 2), s2 = L.appliquer(s1.config, { op: "defi_suppr", id: ids[1] }, 3);
   verifier(Object.keys(s1.config.defisHot).length === 1 && !s2.config.defisHot && L.appliquer({}, { op: "defi_suppr", id: "zz" }, 0).erreur, "défis hot : retrait, sans laisser de résidu");
   const t = L.appliquer(Object.assign({ coupures: { voix: true } }, a2.config), { op: "tout_remettre" }, 0).config;

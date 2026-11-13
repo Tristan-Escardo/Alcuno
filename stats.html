@@ -617,7 +617,7 @@
         });
         const authPorte = getAuth(app);
         // Version de la page de stats (à part de celle du jeu : +0.0.1 à chaque modification de cette page)
-        const VERSION_STATS = "1.21.1";
+        const VERSION_STATS = "1.21.2";
         document.getElementById("versionStats").textContent = VERSION_STATS;
         document.getElementById("versionStats2").textContent = VERSION_STATS;
         document.getElementById("versionStats3").textContent = VERSION_STATS;
@@ -1079,6 +1079,14 @@
                 apercuDefi();
             });
             $("pilAjouterDefi").addEventListener("click", async () => {
+                // (refuse aussi un défi identique à un défi du jeu : DEFIS_HOT, que config-lib ne connaît pas)
+                const cleDefi = (x) => String(x).toLowerCase().replace(/\s+/g, " ").trim();
+                if (typeof DEFIS_HOT !== "undefined") {
+                    const voulu = cleDefi($("pilDefiTexte").value);
+                    for (const n of Object.keys(DEFIS_HOT)) {
+                        if ((DEFIS_HOT[n] || []).some((d) => cleDefi(d.t) === voulu)) { message(`Ce défi existe déjà dans le jeu (${ConfigLib.NIVEAUX_DEFIS[n] ? ConfigLib.NIVEAUX_DEFIS[n].split(" (")[0].toLowerCase() : n}).`, true); return; }
+                    }
+                }
                 if (await lancer([{ op: "defi_ajout", texte: $("pilDefiTexte").value, niveau: $("pilDefiNiveau").value }])) { $("pilDefiTexte").value = ""; apercuDefi(); }
             });
             // aperçu dans le vrai jeu (index.html?apercu_defi=… : voir apercuDefiHot dans js/mode-hot.js ; rien n'y est compté)

@@ -230,6 +230,10 @@
         if (!NIVEAUX_DEFIS[cmd.niveau]) return { erreur: "Niveau du défi inconnu." };
         c.defisHot = c.defisHot || {};
         if (Object.keys(c.defisHot).length >= DEFIS_MAX) return { erreur: `Déjà ${DEFIS_MAX} défis : retires-en avant d'en ajouter.` };
+        if (/^H[AB]$/.test(cmd.niveau) && /\{nom[12]\}/.test(texte)) return { erreur: "En hard, il n'y a que 2 joueurs : utilise {nom}, pas {nom1} et {nom2}." };
+        const cle = (x) => String(x).toLowerCase().replace(/\s+/g, " ").trim();
+        const meme = Object.values(c.defisHot).find((d) => cle(d.t) === cle(texte));
+        if (meme) return { erreur: `Ce défi existe déjà (${NIVEAUX_DEFIS[meme.n] ? NIVEAUX_DEFIS[meme.n].split(" (")[0].toLowerCase() : "autre niveau"}).` };
         let id = Math.floor(maintenant).toString(36);
         while (c.defisHot[id]) id += "x";
         c.defisHot[id] = { t: texte, n: cmd.niveau };
