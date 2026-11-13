@@ -17,7 +17,7 @@
         // Fichiers du jeu, dans l'ordre (aussi dans sw.js, pour le hors connexion). Téléchargés tout de suite
         // et en parallèle : en bas de la page, ils s'exécutent d'affilée, sans attente entre deux fichiers
         // (aucun bouton ni minuteur ne peut se déclencher avant que tout le jeu soit là).
-        window.FICHIERS_JEU = ["script.js", "js/qrcode.js", "js/config-lib.js", "js/reglages.js", "js/en-ligne.js", "js/plateau.js", "js/regles.js", "js/mode-hot.js", "js/zizi-coptere.js",
+        window.FICHIERS_JEU = ["script.js", "js/qrcode.js", "js/config-lib.js", "js/reglages.js", "js/en-ligne.js", "js/plateau.js", "js/regles.js", "js/mode-hot.js", "js/zizi-coptere.js", "js/reglages-vue.js",
                                "js/synchro-en-ligne.js", "js/retour-demarrage.js", "js/tele.js", "js/stats.js", "js/config-distante.js", "js/stickers.js", "js/faq.js", "js/mouchard.js", "js/poisson.js", "js/piano-accueil.js"];
         window.FICHIERS_JEU.forEach(function (f) {
             document.write('<link rel="preload" as="script" href="' + f + '?t=' + window.ANTI_CACHE + '">');
@@ -96,6 +96,13 @@
         // iPhone : page rechargée après un changement de thème (voir rafraichirBarreIphone dans script.js) :
         // on rouvre les Réglages dès le premier affichage
         try { if (sessionStorage.getItem("alcuno_rouvrir_reglages") !== null) document.documentElement.classList.add("rouvrir-reglages"); } catch (e) {}
+        // Les Réglages rouverts restent invisibles jusqu'à ce que leur mise en page (js/reglages-vue.js) soit prête, puis apparaissent en
+        // fondu : sans ça, on voyait la liste brute un instant, puis un saut vers les tuiles. Filet de sécurité : au bout de 2,5 s, on les montre quoi qu'il arrive.
+        if (document.documentElement.classList.contains("rouvrir-reglages")) {
+            document.documentElement.classList.add("rouvrir-vue", "rouvrir-fond");
+            setTimeout(function () { document.documentElement.classList.remove("rouvrir-vue"); }, 2500);
+            setTimeout(function () { document.documentElement.classList.remove("rouvrir-fond"); }, 3000);
+        }
         document.write('<link rel="stylesheet" href="style_alcuno.css?t=' + window.ANTI_CACHE + '" />');
         document.write('<link rel="stylesheet" href="style_kawaii.css?t=' + window.ANTI_CACHE + '" />'); // thème Kawaii (généré : outils/generer_kawaii.py)
         document.write('<link rel="stylesheet" href="style_donjon.css?t=' + window.ANTI_CACHE + '" />'); // thème secret Donjon (débloqué par une partie en mode hot)
@@ -251,7 +258,7 @@
             <button type="button" id="btnFermerReglages" class="btnRetour">← Retour</button>
             <!-- Réorganiser les blocs des Réglages (voir « Réorganiser les Réglages » dans js/reglages.js) -->
             <button type="button" id="btnParDefautReglages" class="btnRetour btnModifierReglages" hidden>Par défaut</button>
-            <button type="button" id="btnModifierReglages" class="btnRetour btnModifierReglages">Modifier</button>
+            <button type="button" id="btnModifierReglages" class="btnRetour btnModifierReglages" aria-label="Réorganiser les réglages" title="Réorganiser les réglages"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button>
             <div class="reglages-contenu">
                 <h2 id="titreReglages">Réglages</h2>
                 <!-- Même annonce que sur l'accueil (js/config-distante.js) -->
@@ -482,6 +489,17 @@
                     </span>
                     <svg class="optionChevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
                 </button>
+
+                <!-- Langue du jeu : seul le français existe pour l'instant (l'anglais viendra) -->
+                <div class="blocReglage" data-cle="langue">
+                    <div class="optionReglage">
+                        <span class="optionTexte"><span class="optionTitre">Langue</span></span>
+                        <span class="choixLangue">
+                            <button type="button" class="chipLangue actif" data-langue="fr" aria-pressed="true">Français</button>
+                            <button type="button" class="chipLangue" data-langue="en" disabled>English <small>bientôt</small></button>
+                        </span>
+                    </div>
+                </div>
 
                 <div class="blocPartage">
                     <div class="aProposTitre">Partager le jeu</div>

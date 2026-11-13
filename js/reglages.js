@@ -2435,11 +2435,19 @@ function demarrerGlisseReglage(bloc, e){
   poignee.addEventListener("pointercancel", fin, { once: true });
 }
 
+// « Modifier » est un symbole discret (crayon) ; pendant la modification il devient une coche (terminer), et « Par défaut » une flèche qui revient en arrière
+const ICONE_MODIFIER = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>';
+const ICONE_TERMINER = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+function nommerBoutonModifier(termine){
+  btnModifierReglages.innerHTML = termine ? ICONE_TERMINER : ICONE_MODIFIER;
+  const nom = termine ? "Terminer la modification" : "Réorganiser les réglages";
+  btnModifierReglages.setAttribute("aria-label", nom); btnModifierReglages.title = nom;
+}
 function entrerEditionReglages(){
   if (editionReglages) return;
   editionReglages = true;
   document.getElementById("ecranReglages").classList.add("reglages-edition");
-  btnModifierReglages.textContent = "OK";
+  nommerBoutonModifier(true);
   btnParDefautReglages.hidden = false;
   construireControlesReglages();
   requestAnimationFrame(placerControlesReglages); // (après la mise en page avec la marge de gauche)
@@ -2448,7 +2456,7 @@ function finirEditionReglages(){
   if (!editionReglages) return;
   editionReglages = false;
   document.getElementById("ecranReglages").classList.remove("reglages-edition");
-  btnModifierReglages.textContent = "Modifier";
+  nommerBoutonModifier(false);
   btnParDefautReglages.hidden = true;
   if (zoneControlesReglages) zoneControlesReglages.remove();
   zoneControlesReglages = null;

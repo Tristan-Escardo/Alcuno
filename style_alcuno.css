@@ -9091,3 +9091,110 @@ html[data-theme="soleil"] body :is(#ecranCaster button:not(.btnRetour), #btnFerm
 #overlayRegleUnique .regle-detail.regle-boit + .regle-note{ margin-top: 1em; }
 /* Soleil couchant : le fond de l'annonce est pêche clair, le texte crème de la suite s'y perdait */
 html[data-theme="soleil"] body #overlayRegleUnique .regle-detail:is(.regle-boit, .regle-note){ color: #5a1f45 !important; text-shadow: none !important; }
+
+/* ===== Vues des Réglages : Liste (d'origine) / Sections / Tuiles (js/reglages-vue.js). Rien n'est déplacé : le CSS « order » les range. ===== */
+/* « Mise en page » : bouton en haut à droite (en face de « Retour »), « Modifier » passe juste dessous */
+#ecranReglages .btnMiseEnPage{
+  position: absolute; right: 20px; top: 20px; z-index: 6; display: inline-flex; align-items: center; gap: 7px; padding: 8px 12px; border-radius: 999px;
+  font-size: 13px; font-weight: 800; cursor: pointer; white-space: nowrap; color: var(--titreReglage, #FFD700);
+  background: rgba(255,255,255,.1); border: 1px solid rgba(255,215,0,.35); box-shadow: none; text-shadow: none;
+}
+#ecranReglages .mepIcone svg, #ecranReglages .menuMEPItem svg{ width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; display: block; }
+#ecranReglages .mepFleche::before{ content: "⌄"; font-size: 17px; line-height: 1; display: inline-block; transition: transform .2s; }
+#ecranReglages .btnMiseEnPage[aria-expanded="true"] .mepFleche::before{ transform: rotate(180deg); }
+#ecranReglages .btnMiseEnPage:active{ transform: scale(.96); }
+#ecranReglages .menuMiseEnPage{
+  position: absolute; right: 20px; top: 64px; z-index: 7; width: 232px; padding: 8px; border-radius: 16px;
+  background: var(--menuFond, #4a1535); border: 1px solid var(--menuBord, rgba(255,215,0,.35)); box-shadow: 0 10px 24px rgba(0,0,0,.5);
+}
+#ecranReglages .menuMiseEnPage[hidden]{ display: none; }
+#ecranReglages .menuMEPTitre{ font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--menuSousTitre, #ff8fb3); padding: 6px 8px; }
+#ecranReglages .menuMEPItem{
+  display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 8px; border: 0; border-radius: 10px; background: none; box-shadow: none;
+  color: var(--titreReglage, #e8d5e0); font-size: 15px; font-weight: 700; text-align: left; cursor: pointer; text-shadow: none;
+}
+#ecranReglages .menuMEPItem.actif{ background: var(--menuActif, rgba(255,215,0,.16)); }
+#ecranReglages .menuMEPCoche{ margin-left: auto; visibility: hidden; }
+#ecranReglages .menuMEPItem.actif .menuMEPCoche{ visibility: visible; }
+/* Modifier (et Par défaut) sous « Mise en page », à la hauteur du titre « Réglages », vue Liste seulement */
+#ecranReglages .btnModifierReglages{ top: 71px !important; }
+/* symbole discret : petit rond translucide (comme « Mise en page »), au-dessus du titre pour recevoir le tap */
+#ecranReglages #btnModifierReglages, #ecranReglages #btnParDefautReglages{
+  z-index: 6; left: auto !important; right: 20px; width: 36px !important; height: 36px !important; min-width: 0 !important; padding: 0 !important;
+  display: inline-flex; align-items: center; justify-content: center; border-radius: 50% !important; cursor: pointer;
+  background: rgba(255,255,255,.1) !important; background-image: none !important; color: var(--titreReglage, #FFD700) !important;
+  border: 1px solid rgba(255,215,0,.35) !important; box-shadow: none !important; text-shadow: none !important; opacity: .85;
+}
+#ecranReglages #btnModifierReglages[hidden], #ecranReglages #btnParDefautReglages[hidden]{ display: none !important; }
+#ecranReglages #btnModifierReglages svg, #ecranReglages #btnParDefautReglages svg{ width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+#ecranReglages.reglages-edition #btnModifierReglages{ background: #FFD700 !important; color: #3a2a00 !important; border-color: #FFD700 !important; opacity: 1; }
+.reglages-edition #btnMiseEnPage, .reglages-edition #menuMiseEnPage{ display: none !important; }
+#ecranReglages.vue-options #btnMiseEnPage, #ecranReglages.vue-options #menuMiseEnPage{ display: none !important; }
+#ecranReglages h2{ order: -30; }
+#ecranReglages .annonceRelais{ order: -20; }
+#tuilesReglages{ display: none; order: -5; }
+.enteteGroupe{ display: none; }
+#ecranReglages.vue-tuiles #tuilesReglages{ display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+#ecranReglages .tuileReglage{
+  display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 16px 10px; cursor: pointer;
+  border-radius: 16px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,215,0,0.18); color: var(--titreReglage, #FFD700); box-shadow: none;
+  transition: transform .15s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+#ecranReglages .tuileReglage:active{ transform: scale(.96); }
+#ecranReglages .tuileReglage.choisie{ background: rgba(255,215,0,0.14); border-color: #FFD700; box-shadow: 0 0 0 1px #FFD700 inset; }
+#ecranReglages .tuileIcone{ font-size: 28px; line-height: 1; }
+#ecranReglages .tuileNom{ font-size: 15px; font-weight: 800; }
+/* sections : titres qui s'ouvrent */
+#ecranReglages.vue-sections .enteteGroupe{
+  display: flex; align-items: center; gap: 12px; width: 100%; margin: 0; padding: 14px 16px; cursor: pointer; text-align: left;
+  border-radius: 16px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,215,0,0.18); color: var(--titreReglage, #FFD700); box-shadow: none;
+  transition: background .2s ease, transform .15s ease;
+}
+#ecranReglages.vue-sections .enteteGroupe:active{ transform: scale(.98); }
+#ecranReglages .enteteIcone{ font-size: 22px; }
+#ecranReglages .enteteNom{ font-size: 17px; font-weight: 800; flex: 1 1 auto; }
+#ecranReglages .enteteFleche{ line-height: 1; display: flex; align-items: center; }
+#ecranReglages.vue-sections .enteteFleche::before{ content: "⌄"; font-size: 20px; display: inline-block; transition: transform .25s ease; }
+#ecranReglages.vue-sections .enteteGroupe.groupe-ouvert .enteteFleche::before{ transform: rotate(180deg); }
+/* blocs : cachés quand leur groupe est fermé (sections) ou pas choisi (tuiles) */
+#ecranReglages.vue-sections .reglages-contenu > [data-groupe]:not(.enteteGroupe):not(.groupe-ouvert),
+#ecranReglages.vue-tuiles .reglages-contenu > [data-groupe]:not(.enteteGroupe):not(.groupe-ouvert){ display: none !important; }
+#ecranReglages.vue-tuiles .reglages-contenu > [data-groupe]{ scroll-margin-top: 12px; }
+/* « Modifier » (réorganiser) n'a de sens qu'en Liste */
+#ecranReglages.vue-sections #btnModifierReglages, #ecranReglages.vue-sections #btnParDefautReglages,
+#ecranReglages.vue-tuiles #btnModifierReglages, #ecranReglages.vue-tuiles #btnParDefautReglages{ display: none !important; }
+/* « Ta partie » : ni sélecteur de vue ni tuiles */
+#ecranReglages.vue-options #tuilesReglages{ display: none !important; }
+/* Langue */
+#ecranReglages .choixLangue{ display: flex; gap: 8px; flex: none; }
+#ecranReglages .chipLangue{
+  padding: 8px 12px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: none;
+  background: rgba(255,255,255,.08); color: inherit; border: 1px solid rgba(255,255,255,.25);
+}
+#ecranReglages .chipLangue.actif{ background: #FFD700; color: #3a2a00; border-color: #FFD700; }
+#ecranReglages .chipLangue:disabled{ opacity: .55; cursor: default; }
+#ecranReglages .chipLangue small{ display: block; font-size: 10px; font-weight: 400; }
+@media (prefers-reduced-motion: reduce){ #ecranReglages .tuileReglage, #ecranReglages .enteteGroupe, #ecranReglages .enteteFleche::before{ transition: none; } }
+
+/* Réglages rouverts après un changement de thème : cachés le temps que js/reglages-vue.js range les blocs, puis fondu (voir le <head> de index.html) */
+html.rouvrir-vue #ecranReglages{ opacity: 0 !important; }
+#ecranReglages.apparition-reglages{ animation: reglagesApparait .3s ease-out both !important; }
+@keyframes reglagesApparait{ from{ opacity: 0; transform: translateY(8px); } to{ opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce){ #ecranReglages.apparition-reglages{ animation: none !important; } }
+html.rouvrir-fond #choixMode{ visibility: hidden !important; }
+/* pendant la modification : « Par défaut » prend la place de « Mise en page » (en haut à droite), « OK » reste à la hauteur du titre */
+.reglages-edition #btnParDefautReglages{ top: 20px !important; right: 20px !important; }
+/* « Par défaut » garde son texte : même petite pastille discrète que « Mise en page », pas un rond */
+#ecranReglages #btnParDefautReglages{ width: auto !important; height: 36px !important; padding: 0 14px !important; border-radius: 999px !important; font-size: 13px; font-weight: 800; white-space: nowrap; }
+/* Kawaii : son thème impose un gros bouton rose à tous les .btnRetour ; ici les deux petits ronds restent discrets, comme « Mise en page » */
+html[data-theme="kawaii"][data-theme][data-theme] body #ecranReglages #btnModifierReglages,
+html[data-theme="kawaii"][data-theme][data-theme] body #ecranReglages #btnParDefautReglages,
+html[data-theme="kawaii"][data-theme][data-theme] body #ecranReglages #btnModifierReglages:hover,
+html[data-theme="kawaii"][data-theme][data-theme] body #ecranReglages #btnParDefautReglages:hover{
+  background: rgba(255,255,255,.55) !important; background-image: none !important; background-color: rgba(255,255,255,.55) !important;
+  border: 1px solid rgba(160,40,120,.35) !important; border-width: 1px !important; border-color: rgba(160,40,120,.35) !important;
+  box-shadow: none !important; text-shadow: none !important; color: var(--titreReglage, #6b1450) !important;
+}
+html[data-theme="kawaii"][data-theme][data-theme] body .reglages-edition #btnModifierReglages{
+  background: #ffffff !important; border-color: #a60f5b !important; border-width: 2px !important; color: #a60f5b !important;
+}
