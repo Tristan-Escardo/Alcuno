@@ -1547,6 +1547,12 @@ const musiqueGardee = async (nom) => { try { return !!(await caches.match(`Sons/
 // Bloc « Utilisable hors connexion » des Réglages : les fichiers du jeu sont-ils gardés ? (plus les musiques, comptées plus bas)
 const ligneHorsLigne = document.getElementById("ligneHorsLigne");
 const FICHIERS_JEU_HORS_LIGNE = ["index.html", "script.js", "style_alcuno.css", "js/plateau.js", "js/reglages.js"];
+// Icônes de la pastille (traits blancs sur fond de couleur) : ✓ prêt, horloge en attente, ✕ impossible
+const ICONES_HORS_LIGNE = {
+  ok: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  attente: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>',
+  non: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M7 7l10 10M17 7L7 17"/></svg>'
+};
 async function majStatutHorsLigne(pretes, total){
   const texte = document.getElementById("texteHorsLigne"), pastille = document.getElementById("pastilleHorsLigne");
   let etat, message;
@@ -1560,7 +1566,7 @@ async function majStatutHorsLigne(pretes, total){
   }
   ligneHorsLigne.dataset.etat = etat;
   texte.textContent = message;
-  pastille.textContent = etat === "ok" ? "✓" : etat === "non" ? "✕" : "…";
+  pastille.innerHTML = ICONES_HORS_LIGNE[etat] || "";
 }
 async function majNoteMusiqueHorsLigne(){
   // (visible aussi quand la musique est coupée : changer de thème la coupe, et on veut quand même voir si elle est prête hors connexion)

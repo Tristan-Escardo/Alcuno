@@ -8779,10 +8779,11 @@ html[data-theme="givre"] .ctrlReglage button, html[data-theme="kawaii"] .ctrlReg
 #ecranReglages .pastilleHorsLigne{
   flex: 0 0 auto; width: 34px; height: 34px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-weight: 900; font-size: 18px; color: #fff; background: #8a8f98;
+  color: #fff; background: transparent; box-shadow: inset 0 0 0 2px rgba(128, 128, 128, 0.35);
 }
-#ecranReglages #ligneHorsLigne[data-etat="ok"] .pastilleHorsLigne{ background: #22b866; }
-#ecranReglages #ligneHorsLigne[data-etat="non"] .pastilleHorsLigne{ background: #d64545; }
+#ecranReglages #ligneHorsLigne[data-etat="attente"] .pastilleHorsLigne{ background: #e8a317; box-shadow: none; }
+#ecranReglages #ligneHorsLigne[data-etat="ok"] .pastilleHorsLigne{ background: #22b866; box-shadow: none; }
+#ecranReglages #ligneHorsLigne[data-etat="non"] .pastilleHorsLigne{ background: #d64545; box-shadow: none; }
 
 /* Réglages à distance (js/config-distante.js) : pastille de thème cachée, annonce de l'accueil */
 .pastilleTheme.themeCoupe{ display: none !important; }
