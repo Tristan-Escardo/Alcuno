@@ -9153,9 +9153,14 @@ html[data-theme="soleil"] body #overlayRegleUnique .regle-detail:is(.regle-boit,
 #ecranReglages.vue-sections .enteteGroupe:active{ transform: scale(.98); }
 #ecranReglages .enteteIcone{ font-size: 22px; }
 #ecranReglages .enteteNom{ font-size: 17px; font-weight: 800; flex: 1 1 auto; }
-#ecranReglages .enteteFleche{ line-height: 1; display: flex; align-items: center; }
-#ecranReglages.vue-sections .enteteFleche::before{ content: "⌄"; font-size: 20px; display: inline-block; transition: transform .25s ease; }
-#ecranReglages.vue-sections .enteteGroupe.groupe-ouvert .enteteFleche::before{ transform: rotate(180deg); }
+/* flèche des sections : chevron fin dans une pastille ronde ; vers le bas quand c'est fermé, vers la droite (>) quand c'est ouvert */
+#ecranReglages .enteteFleche{
+  flex: none; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,.1); border: 1px solid rgba(255,215,0,.3); color: inherit; transition: background .2s ease, transform .25s ease;
+}
+#ecranReglages .enteteFleche svg{ width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .25s cubic-bezier(.3,.9,.3,1); }
+#ecranReglages.vue-sections .enteteGroupe.groupe-ouvert .enteteFleche svg{ transform: rotate(-90deg); }
+#ecranReglages.vue-sections .enteteGroupe.groupe-ouvert .enteteFleche{ background: rgba(255,215,0,.2); border-color: currentColor; }
 /* blocs : cachés quand leur groupe est fermé (sections) ou pas choisi (tuiles) */
 #ecranReglages.vue-sections .reglages-contenu > [data-groupe]:not(.enteteGroupe):not(.groupe-ouvert),
 #ecranReglages.vue-tuiles .reglages-contenu > [data-groupe]:not(.enteteGroupe):not(.groupe-ouvert){ display: none !important; }
@@ -9174,7 +9179,7 @@ html[data-theme="soleil"] body #overlayRegleUnique .regle-detail:is(.regle-boit,
 #ecranReglages .chipLangue.actif{ background: #FFD700; color: #3a2a00; border-color: #FFD700; }
 #ecranReglages .chipLangue:disabled{ opacity: .55; cursor: default; }
 #ecranReglages .chipLangue small{ display: block; font-size: 10px; font-weight: 400; }
-@media (prefers-reduced-motion: reduce){ #ecranReglages .tuileReglage, #ecranReglages .enteteGroupe, #ecranReglages .enteteFleche::before{ transition: none; } }
+@media (prefers-reduced-motion: reduce){ #ecranReglages .tuileReglage, #ecranReglages .enteteGroupe, #ecranReglages .enteteFleche, #ecranReglages .enteteFleche svg{ transition: none; } }
 
 /* Réglages rouverts après un changement de thème : cachés le temps que js/reglages-vue.js range les blocs, puis fondu (voir le <head> de index.html) */
 html.rouvrir-vue #ecranReglages{ opacity: 0 !important; }

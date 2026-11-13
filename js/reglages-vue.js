@@ -114,7 +114,8 @@
   // En-têtes de groupe (sections : titre à ouvrir / fermer ; tuiles : bouton « ← Groupe » au-dessus de la page ouverte)
   const entetes = GROUPES.map((g, i) => {
     const e = el("button", "enteteGroupe"); e.type = "button"; e.dataset.groupe = g.id; e.dataset.rang = String(i);
-    e.append(el("span", "enteteIcone", g.icone), el("span", "enteteNom", g.nom), el("span", "enteteFleche", ""));
+    e.append(el("span", "enteteIcone", g.icone), el("span", "enteteNom", g.nom), el("span", "enteteFleche"));
+    e.lastChild.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 9.5l5.5 5.5 5.5-5.5"/></svg>';
     e.addEventListener("click", () => {
       if (ouverts.has(g.id)) { sortir(blocsVisiblesDe(g.id), () => { ouverts.delete(g.id); majVue(); }); return; }
       ouverts.add(g.id); majVue(); entrer(blocsVisiblesDe(g.id));
