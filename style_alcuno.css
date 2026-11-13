@@ -9212,3 +9212,19 @@ html[data-theme="donjon"] #ecranReglages .menuMiseEnPage{
   box-shadow: 0 0 16px rgba(255,42,61,.75), 0 2px 0 rgba(255,255,255,.2) inset;
 }
 html[data-theme="donjon"] #ecranReglages .menuMEPItem.actif{ background: rgba(255,42,61,.22); }
+
+/* Kawaii : tuiles, titres de section et bouton « Mise en page » dans le style des panneaux du thème (verre blanc, contour blanc épais, ombre rose),
+   la tuile choisie cerclée de rose bonbon : le fin liseré doré d'avant ne se voyait presque pas */
+html[data-theme="kawaii"] #ecranReglages :is(.tuileReglage, .enteteGroupe, #btnMiseEnPage){
+  background: var(--givre-panneau, rgba(255,255,255,.78)) !important; border: 2px solid rgba(255,255,255,.95) !important;
+  box-shadow: 0 8px 20px rgba(150,90,200,.3), inset 0 0 0 1px rgba(255,255,255,.8), inset 0 8px 14px rgba(255,255,255,.85), inset 0 -6px 12px rgba(190,150,255,.25) !important;
+}
+html[data-theme="kawaii"] #ecranReglages :is(.tuileReglage, .enteteGroupe){ border-radius: 26px !important; }
+html[data-theme="kawaii"] #ecranReglages #btnMiseEnPage{ border-radius: 999px !important; color: #a60f5b !important; }
+html[data-theme="kawaii"] #ecranReglages #tuilesReglages .tuileReglage.choisie{
+  background: rgba(255,222,240,.97) !important; border-color: #ee70a9 !important;
+  box-shadow: 0 0 0 3px rgba(238,112,169,.6), 0 8px 20px rgba(150,90,200,.3), inset 0 8px 14px rgba(255,255,255,.85) !important;
+}
+/* Star Wars : écritures du menu « Mise en page » de la couleur de celles du bouton « Retour » */
+html[data-theme="galaxie"] #ecranReglages .menuMEPItem{ color: #eaf3ff; }
+html[data-theme="galaxie"] #ecranReglages .menuMEPTitre{ color: rgba(234,243,255,.7); }
