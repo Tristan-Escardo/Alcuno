@@ -54,7 +54,9 @@
   const menuMEP = el("div", "menuMiseEnPage"); menuMEP.id = "menuMiseEnPage"; menuMEP.setAttribute("role", "menu"); menuMEP.hidden = true;
   const titreMenu = el("div", "menuMEPTitre", "Présenter en"); menuMEP.append(titreMenu);
   const itemsMEP = VUES.map(([id, nom]) => {
-    const b = el("button", "menuMEPItem"); b.type = "button"; b.dataset.vue = id; b.setAttribute("role", "menuitemradio");
+    // (pas un <button> : les thèmes à néon dessinent un cadre lumineux autour de chaque bouton ; ici, le néon est autour du menu entier)
+    const b = el("div", "menuMEPItem"); b.tabIndex = 0; b.dataset.vue = id; b.setAttribute("role", "menuitemradio");
+    b.addEventListener("keydown", (ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); b.click(); } });
     b.innerHTML = ICONES_VUE[id] + "<span></span><span class=\"menuMEPCoche\" aria-hidden=\"true\">✓</span>"; b.children[1].textContent = nom;
     b.addEventListener("click", () => {
       fermerMenuMEP();

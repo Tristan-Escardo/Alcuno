@@ -9198,3 +9198,17 @@ html[data-theme="kawaii"][data-theme][data-theme] body #ecranReglages #btnParDef
 html[data-theme="kawaii"][data-theme][data-theme] body .reglages-edition #btnModifierReglages{
   background: #ffffff !important; border-color: #a60f5b !important; border-width: 2px !important; color: #a60f5b !important;
 }
+
+/* Menu « Mise en page » : choix sans cadre propre ; thèmes à néon (Star Wars, BDSM) : le néon entoure le menu entier, pas chaque choix */
+#ecranReglages .menuMEPItem{ font: inherit; font-size: 15px; font-weight: 700; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; outline: none; }
+#ecranReglages .menuMEPItem:focus-visible{ box-shadow: 0 0 0 2px var(--titreReglage, #FFD700) inset; }
+html[data-theme="galaxie"] #ecranReglages .menuMiseEnPage{
+  background: linear-gradient(rgba(14,22,44,.97), rgba(6,10,22,.97)); border: 1px solid #8fd0ff;
+  box-shadow: 0 0 6px #4aa8ff, 0 0 16px rgba(40,140,255,.55), 0 0 10px rgba(80,170,255,.22) inset;
+}
+html[data-theme="galaxie"] #ecranReglages .menuMEPItem.actif{ background: rgba(80,170,255,.2); }
+html[data-theme="donjon"] #ecranReglages .menuMiseEnPage{
+  background: linear-gradient(180deg, #2a0610 0%, #0a0a0c 100%); border: 2px solid #ff2a3d; border-radius: 20px;
+  box-shadow: 0 0 16px rgba(255,42,61,.75), 0 2px 0 rgba(255,255,255,.2) inset;
+}
+html[data-theme="donjon"] #ecranReglages .menuMEPItem.actif{ background: rgba(255,42,61,.22); }
