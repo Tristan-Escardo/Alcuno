@@ -9259,14 +9259,21 @@ html[data-theme="galaxie"] #ecranReglages .menuMEPTitre{ color: rgba(234,243,255
    ne changent que ces variables. Hauteur selon l'écran : petites sur un petit téléphone. */
 #choixMode .cartesAccueil{
   --h-carte: clamp(64px, 15vh, 122px);
-  display: grid;
-  justify-content: center;
-  margin-top: 10px;
-  padding-top: 8px;
+  --l-carte: calc(var(--h-carte) * 50 / 78);
+  /* (une boîte de la taille d'une carte, centrée, où les cartes sont posées l'une sur l'autre : tailles écrites en toutes
+     lettres, sans grille ni « aspect-ratio », que Safari sur iPhone ne plaçait pas comme Chrome : main décalée à gauche et coupée) */
+  position: relative;
+  flex: none;
+  align-self: center;
+  box-sizing: content-box;
+  width: var(--l-carte);
+  height: var(--h-carte);
+  margin: 18px auto 0;
+  padding: 0;
 }
 /* Écran très bas (téléphone couché) : cartes plus petites, serrées sous les boutons, pour tenir à l'écran */
 @media (max-height: 430px){
-  #choixMode .cartesAccueil{ --h-carte: 50px; margin-top: -10px; padding-top: 2px; }
+  #choixMode .cartesAccueil{ --h-carte: 50px; margin-top: -8px; }
 }
 #choixMode #albumAccueil{ display: contents; }
 #choixMode .carteAccueil{
@@ -9278,10 +9285,13 @@ html[data-theme="galaxie"] #ecranReglages .menuMEPTitre{ color: rgba(234,243,255
   --ovale: rgba(255, 255, 255, 0.16);
   --ombre: 0 8px 18px rgba(0, 0, 0, 0.4);
   --ombre-texte: 0 1px 2px rgba(0, 0, 0, 0.45);
-  grid-area: 1 / 1;
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--l-carte);
   height: var(--h-carte);
-  aspect-ratio: 50 / 78;
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -9342,7 +9352,9 @@ html[data-theme="galaxie"] #ecranReglages .menuMEPTitre{ color: rgba(234,243,255
 }
 #choixMode .carteAccueil svg{
   position: relative;
-  width: 50%;
+  flex: none;
+  width: calc(var(--l-carte) * 0.46);
+  height: calc(var(--l-carte) * 0.46);
   fill: none;
   stroke: currentColor;
   stroke-width: 3.2;
@@ -9353,7 +9365,7 @@ html[data-theme="galaxie"] #ecranReglages .menuMEPTitre{ color: rgba(234,243,255
 #choixMode .carteAccueil svg .plein{ fill: currentColor; stroke: none; }
 #choixMode .carteAccueil span{ position: relative; }
 /* Deux cartes : la droite recouvre un peu la gauche */
-#choixMode .carteBar{ --angle: -8deg; --fond: linear-gradient(170deg, #ef4a3c, #c4201f); padding-right: 12%; }
+#choixMode .carteBar{ --angle: -8deg; --fond: linear-gradient(170deg, #ef4a3c, #c4201f); padding-right: calc(var(--l-carte) * 0.12); }
 #choixMode .carteEthylo{ --angle: 8deg; --fond: linear-gradient(170deg, #2f8fe8, #1259b0); z-index: 1; }
 #choixMode .carteAlbum{
   --fond: linear-gradient(170deg, #ffd83a, #eeb000);
@@ -9362,8 +9374,8 @@ html[data-theme="galaxie"] #ecranReglages .menuMEPTitre{ color: rgba(234,243,255
   z-index: 2;
 }
 /* Trois cartes : l'album au milieu, par-dessus les deux autres, dont le dessin se décale vers le bord libre */
-#choixMode .troisCartes .carteBar{ --angle: -18deg; padding-right: 14%; }
-#choixMode .troisCartes .carteEthylo{ --angle: 18deg; padding-left: 14%; }
+#choixMode .troisCartes .carteBar{ --angle: -18deg; padding-right: calc(var(--l-carte) * 0.14); }
+#choixMode .troisCartes .carteEthylo{ --angle: 18deg; padding-left: calc(var(--l-carte) * 0.14); }
 @media (hover: hover){
   #choixMode .carteAccueil:hover{ --leve: -10%; }
 }
