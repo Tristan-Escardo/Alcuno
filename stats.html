@@ -148,11 +148,20 @@
         .pilNote.erreur{ color: #ff7b9c; }
         .pilMessage.erreur{ color: #ffc2d4; border-color: #ff4d6d; }
         .pilNote b{ color: var(--cyan-clair); }
-        #blocPilotage input[type=text], #blocPilotage input[type=email], #blocPilotage input[type=password], #blocPilotage input[type=date], #blocPilotage select, #blocPilotage textarea{
+        #blocPilotage input[type=text], #blocPilotage input[type=email], #blocPilotage input[type=password], #blocPilotage input[type=date], #blocPilotage select, #blocPilotage textarea,
+        #blocBar input[type=text], #blocBar input[type=search], #blocBar select, #blocBar textarea{
             width: 100%; box-sizing: border-box; margin: 0 0 8px; padding: 11px; border-radius: 6px; border: 1px solid rgba(0, 229, 255, .4);
             background: rgba(0, 229, 255, .06); color: var(--cyan-clair); font: 600 16px "Inter", Arial, sans-serif; outline: none;
         }
-        #blocPilotage textarea{ min-height: 74px; resize: vertical; }
+        #blocPilotage textarea, #blocBar textarea{ min-height: 74px; resize: vertical; }
+        #barPanneau[hidden], #barForm[hidden], #barConnexion[hidden]{ display: none; }
+        #barForm{ border: 1px solid rgba(0, 229, 255, .35); border-radius: 10px; padding: 4px 12px 12px; margin: 0 0 14px; background: rgba(0, 229, 255, .04); }
+        #barCherche{ margin-top: 6px; }
+        #barListe .pilLigne.masque .boutonsTheme{ opacity: 1; text-decoration: none; }
+        .barEtiquette{ display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 8px; font-size: 11px; font-weight: 700; border: 1px solid rgba(0, 229, 255, .45); color: var(--cyan-clair); vertical-align: 1px; }
+        .barEtiquette.ajout{ border-color: rgba(255, 79, 216, .6); color: #ffd6f6; }
+        .barEtiquette.cache{ border-color: #ff4d6d; color: #ff9fbd; }
+        #barListe .pilLigne > span:first-child small{ display: block; color: var(--cyan-doux); font-size: 13px; }
         .pilBtn{
             width: 100%; padding: 11px; margin-bottom: 8px; border-radius: 6px; border: 1px solid var(--cyan); background: rgba(0, 229, 255, .12);
             color: var(--cyan-clair); font: 700 12px "Orbitron", Arial, sans-serif; letter-spacing: .12em; cursor: pointer;
@@ -257,6 +266,7 @@
             <button type="button" class="onglet" id="ongletStats" role="tab" data-vue="stats" aria-selected="true">Stats</button>
             <button type="button" class="onglet" id="ongletSante" role="tab" data-vue="sante" aria-selected="false">Santé<span class="badgeOnglet" id="badgeSante" hidden></span></button>
             <button type="button" class="onglet" id="ongletPilotage" role="tab" data-vue="pilotage" aria-selected="false">Pilotage</button>
+            <button type="button" class="onglet" id="ongletBar" role="tab" data-vue="bar" aria-selected="false">Bar</button>
             <button type="button" class="onglet" id="ongletAide" role="tab" data-vue="aide" aria-selected="false">Aide</button>
         </nav>
         <div class="vue actif" id="vueStats">
@@ -493,6 +503,36 @@
             <p class="note">Alcuno Stats <span id="versionStats2"></span></p>
         </div>
 
+        <div class="vue" id="vueBar">
+            <section class="bloc" id="blocBar">
+                <div class="titre">Recettes du Bar</div>
+                <p class="pilNote" id="barConnexion">Connecte-toi dans l'onglet Pilotage pour modifier les recettes.</p>
+                <div id="barPanneau" hidden>
+                    <p class="pilNote">Modifie une recette du jeu, masque-la, ou ajoute la tienne. Les joueurs la voient au prochain lancement du jeu (avec internet). « D'origine » rend le texte de départ.</p>
+                    <button type="button" class="pilBtn" id="barNouveau">＋ Ajouter un cocktail</button>
+                    <div id="barForm" hidden>
+                        <div class="pilSous" id="barFormTitre">Nouveau cocktail</div>
+                        <label class="pilLabel" for="barNom">Nom</label>
+                        <input type="text" id="barNom" maxlength="50" autocomplete="off">
+                        <label class="pilLabel" for="barFamille">Catégorie</label>
+                        <select id="barFamille"></select>
+                        <label class="pilLabel" for="barVerre">Verre</label>
+                        <input type="text" id="barVerre" maxlength="60" autocomplete="off" placeholder="Ex : Grand verre">
+                        <label class="pilLabel" for="barIngredients">Ingrédients (un par ligne)</label>
+                        <textarea id="barIngredients" maxlength="1000" rows="6" placeholder="5 cl de rhum blanc&#10;2 cl de jus de citron vert"></textarea>
+                        <label class="pilLabel" for="barPreparation">Préparation</label>
+                        <textarea id="barPreparation" maxlength="1000" rows="4"></textarea>
+                        <button type="button" class="pilBtn" id="barEnregistrer">Enregistrer</button>
+                        <button type="button" class="pilBtn sec" id="barAnnuler">Annuler</button>
+                    </div>
+                    <input type="search" id="barCherche" placeholder="Chercher un cocktail" autocomplete="off">
+                    <div id="barListe"></div>
+                </div>
+            </section>
+            <div class="pilMessage" id="barMessage" aria-live="polite"></div>
+            <p class="note">Alcuno Stats</p>
+        </div>
+
         <div class="vue" id="vueAide">
             <section class="bloc aideBloc">
                 <div class="titre">Aide</div>
@@ -599,6 +639,7 @@
 
     <script src="js/config-lib.js"></script>
     <script src="js/mode-hot.js"></script><!-- (seulement pour les textes des défis : DEFIS_HOT) -->
+    <script src="js/cocktails.js"></script><!-- (recettes du Bar : onglet Bar) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
         import { getDatabase, ref, onValue, get, update, set, query, orderByKey, limitToLast, remove } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
@@ -647,7 +688,7 @@
         let ouvert = false;
 
         // ----- Onglets Stats / Pilotage : un tap sur l'onglet, ou un glissement du doigt vers la gauche / la droite -----
-        const VUES = ["stats", "sante", "pilotage", "aide"];
+        const VUES = ["stats", "sante", "pilotage", "bar", "aide"];
         let vueActuelle = "stats";
         function montrerVue(nom, anime = true){
             if (VUES.indexOf(nom) < 0) return;
@@ -659,7 +700,7 @@
                 if (v === nom) { el.classList.add("actif"); if (anime) el.classList.add(sens); }
                 document.getElementById("onglet" + v[0].toUpperCase() + v.slice(1)).setAttribute("aria-selected", v === nom ? "true" : "false");
             });
-            document.getElementById("sousTitre").textContent = { stats: "Statistiques", sante: "Santé du jeu", pilotage: "Pilotage", aide: "Aide" }[nom];
+            document.getElementById("sousTitre").textContent = { stats: "Statistiques", sante: "Santé du jeu", pilotage: "Pilotage", bar: "Recettes du Bar", aide: "Aide" }[nom];
             window.scrollTo(0, 0);
             try { history.replaceState(null, "", nom === "stats" ? location.pathname : "#" + nom); } catch (e) {}
         }
@@ -1030,7 +1071,69 @@
                 }
             }
 
-            onValue(ref(db, "config"), (s) => { config = ConfigLib.valider(s.val()); dessiner(); dessinerLecture(); });
+            onValue(ref(db, "config"), (s) => { config = ConfigLib.valider(s.val()); dessiner(); dessinerLecture(); dessinerBar(); });
+
+            // ----- Onglet Bar : recettes du jeu (js/cocktails.js) modifiées, masquées ou ajoutées (config/bar) -----
+            let barEdite = null; // { id, jeu } de la recette en cours de modification (id vide : nouvelle)
+            let minuteurBar = null;
+            const messageBar = (t, erreur) => {
+                $("barMessage").textContent = t; $("barMessage").classList.toggle("erreur", !!erreur);
+                clearTimeout(minuteurBar);
+                if (t) minuteurBar = setTimeout(() => { $("barMessage").textContent = ""; }, 7000);
+            };
+            $("barFamille").innerHTML = ConfigLib.FAMILLES_BAR.map(([id, nom]) => `<option value="${id}">${ecape(nom)}</option>`).join("");
+            const sansAccentBar = (t) => String(t).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+            function dessinerBar(){
+                if (typeof cocktailsBar !== "function") return;
+                const cherche = sansAccentBar($("barCherche").value.trim());
+                const toutes = cocktailsBar(config, true).filter((c) => !cherche || sansAccentBar(c.n + " " + c.i.join(" ")).includes(cherche));
+                $("barListe").innerHTML = ConfigLib.FAMILLES_BAR.map(([g, nom]) => {
+                    const liste = toutes.filter((c) => c.g === g);
+                    if (!liste.length) return "";
+                    return `<div class="pilSous">${ecape(nom)} · ${liste.length}</div>` + liste.map((c) => {
+                        const etiquette = !c.jeu ? '<span class="barEtiquette ajout">ajouté</span>' : c.masque ? '<span class="barEtiquette cache">masqué</span>' : c.modifie ? '<span class="barEtiquette">modifié</span>' : "";
+                        const boutons = `<button type="button" data-modifier="${c.id}">Modifier</button>` +
+                            (c.jeu && c.modifie ? `<button type="button" class="coupe" data-origine="${c.id}">D'origine</button>` : "") +
+                            (c.jeu ? `<button type="button" class="${c.masque ? "" : "coupe"}" data-masquer="${c.id}" data-masque="${c.masque ? 0 : 1}">${c.masque ? "Remettre" : "Masquer"}</button>`
+                                : `<button type="button" class="coupe" data-supprimer="${c.id}">Supprimer</button>`);
+                        return `<div class="pilLigne${c.masque ? " masque" : ""}"><span>${ecape(c.n)}${etiquette}<small>${c.i.length} ingrédient${c.i.length > 1 ? "s" : ""} · ${ecape(c.v)}</small></span><span class="boutonsTheme">${boutons}</span></div>`;
+                    }).join("");
+                }).join("") || '<p class="pilNote" style="margin-top:10px">Aucun cocktail ne correspond.</p>';
+            }
+            function ouvrirFormBar(c){
+                barEdite = c ? { id: c.id, jeu: c.jeu } : { id: "", jeu: false };
+                $("barFormTitre").textContent = c ? "Modifier : " + c.n : "Nouveau cocktail";
+                $("barNom").value = c ? c.n : ""; $("barFamille").value = c ? c.g : (ConfigLib.FAMILLES_BAR[0][0]);
+                $("barVerre").value = c ? c.v : ""; $("barIngredients").value = c ? c.i.join("\n") : ""; $("barPreparation").value = c ? c.p : "";
+                $("barForm").hidden = false; $("barNouveau").hidden = true;
+                $("barForm").scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+            function fermerFormBar(){ barEdite = null; $("barForm").hidden = true; $("barNouveau").hidden = false; }
+            async function lancerBar(cmd){
+                const r = ConfigLib.appliquer(config, cmd, Date.now());
+                if (r.erreur) { messageBar(r.erreur, true); return false; }
+                try { await ecrire(r.config, r.resume); messageBar("C'est fait ✓ : " + r.resume); return true; }
+                catch (e) { messageBar(/PERMISSION|permission/.test(String(e && e.message)) ? "Refusé par Firebase : les règles en ligne ne connaissent pas encore les recettes du Bar (publie database.rules.json)." : "Échec : " + (e && e.message ? e.message : e), true); return false; }
+            }
+            $("barNouveau").addEventListener("click", () => ouvrirFormBar(null));
+            $("barAnnuler").addEventListener("click", fermerFormBar);
+            $("barCherche").addEventListener("input", dessinerBar);
+            $("barEnregistrer").addEventListener("click", async () => {
+                if (!barEdite) return;
+                const cocktail = { n: $("barNom").value, g: $("barFamille").value, v: $("barVerre").value, i: $("barIngredients").value, p: $("barPreparation").value };
+                const b = $("barEnregistrer"); b.disabled = true;
+                const ok = await lancerBar({ op: "bar_enregistrer", id: barEdite.id, jeu: barEdite.jeu, cocktail });
+                b.disabled = false;
+                if (ok) fermerFormBar();
+            });
+            $("barListe").addEventListener("click", (ev) => {
+                const b = ev.target.closest("button"); if (!b) return;
+                const trouve = (id) => cocktailsBar(config, true).find((c) => c.id === id);
+                if (b.dataset.modifier) { const c = trouve(b.dataset.modifier); if (c) ouvrirFormBar(c); return; }
+                if (b.dataset.masquer) { const c = trouve(b.dataset.masquer); lancerBar({ op: "bar_masquer", id: b.dataset.masquer, masque: b.dataset.masque === "1", nom: c && c.n }); return; }
+                if (b.dataset.origine) { const c = trouve(b.dataset.origine); if (confirm(`Remettre « ${c ? c.n : ""} » comme à l'origine ? Tes changements de texte seront perdus.`)) lancerBar({ op: "bar_retirer", id: b.dataset.origine, jeu: true, nom: c && c.n }); return; }
+                if (b.dataset.supprimer) { const c = trouve(b.dataset.supprimer); if (confirm(`Supprimer « ${c ? c.n : ""} » du Bar ?`)) lancerBar({ op: "bar_retirer", id: b.dataset.supprimer, jeu: false }); }
+            });
 
             $("pilCoupures").addEventListener("click", (ev) => {
                 const b = ev.target.closest("button"); if (!b) return;
@@ -1329,6 +1432,7 @@ Données (stats ; « jours » = les 45 derniers jours, « visiteurs » du jour =
                 if (u) histoDesabonner = onValue(query(ref(db, "config_hist"), orderByKey(), limitToLast(20)), (sn) => { histo = sn.val() || {}; dessinerHisto(); }, () => { $("pilHisto").innerHTML = '<span class="pilNote erreur">Historique illisible (règles Firebase ?)</span>'; });
                 $("pilConnexion").hidden = !!u;
                 $("pilPanneau").hidden = !u;
+                $("barPanneau").hidden = !u; $("barConnexion").hidden = !!u;
                 $("pilUid").textContent = u ? u.uid : "–";
             });
         }

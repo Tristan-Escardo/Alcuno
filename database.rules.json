@@ -95,6 +95,18 @@
           "$autre": { ".validate": false }
         }
       },
+      "bar": {
+        "$id": {
+          ".validate": "$id.matches(/^[a-z0-9-]{1,40}$/) && (newData.hasChildren(['n', 'g', 'v', 'i', 'p']) || newData.child('x').val() === true)",
+          "n": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 50" },
+          "g": { ".validate": "newData.isString() && newData.val().matches(/^(rhum|vodka|gin|tequila|whisky|bulles|shooter|sans)$/)" },
+          "v": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 60" },
+          "i": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 1000" },
+          "p": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 1000" },
+          "x": { ".validate": "newData.val() === true" },
+          "$autre": { ".validate": false }
+        }
+      },
       "$autre": { ".validate": false }
     },
     "config_hist": {
