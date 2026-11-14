@@ -205,7 +205,7 @@ function ouvrirBar(){
   champ.enterKeyHint = "search";
   champ.value = rechercheBar;
 
-  const filtres = elementExtras("div", "extrasPuces barFamilles");
+  const filtres = elementExtras("div", "extrasPuces");
   filtres.setAttribute("role", "group");
   filtres.setAttribute("aria-label", "Famille de cocktails");
   const zone = elementExtras("div", "barListe");
@@ -225,27 +225,7 @@ function ouvrirBar(){
   champ.addEventListener("input", () => { rechercheBar = champ.value; remplirListeBar(zone); });
   champ.addEventListener("keydown", (e) => { if (e.key === "Enter") champ.blur(); });
 
-  // Le dé : une recette au hasard, ouverte et amenée à l'écran
-  const hasard = elementExtras("button", "barHasard", "🎲");
-  hasard.type = "button";
-  hasard.setAttribute("aria-label", "Un cocktail au hasard");
-  hasard.addEventListener("click", () => {
-    rechercheBar = ""; champ.value = "";
-    choisirFamille("");
-    const tire = COCKTAILS[Math.floor(Math.random() * COCKTAILS.length)];
-    const d = Array.from(zone.querySelectorAll("details")).find((x) => x.dataset.cocktail === tire.n);
-    if (!d) return;
-    zone.querySelectorAll("details[open]").forEach((x) => { x.open = false; });
-    d.open = true;
-    d.classList.add("barTire");
-    setTimeout(() => d.classList.remove("barTire"), 1000);
-    const calme = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
-    setTimeout(() => d.scrollIntoView({ block: "center", behavior: calme ? "auto" : "smooth" }), 60);
-  });
-  const recherche = elementExtras("div", "barRecherche");
-  recherche.append(champ, hasard);
-
-  liste.append(recherche, filtres, zone, elementExtras("p", "extrasNote", "L'abus d'alcool est dangereux pour la santé : à consommer avec modération."));
+  liste.append(champ, filtres, zone, elementExtras("p", "extrasNote", "L'abus d'alcool est dangereux pour la santé : à consommer avec modération."));
   remplirListeBar(zone);
 }
 // #endregion
@@ -276,14 +256,7 @@ const VERRES_ETHYLO = [
 ];
 // Grammes d'alcool pur : cl x 10 x degré / 100 x 0,8
 function grammesAlcool(cl, deg){ return cl * 10 * deg / 100 * 0.8; }
-// Les crans des curseurs « Quand » (minutes) : au quart d'heure jusqu'à 6 h, à la demi-heure jusqu'à 12 h, à l'heure jusqu'à 24 h
-const CRANS_TEMPS_ETHYLO = (() => {
-  const t = [];
-  for (let m = 0; m <= 360; m += 15) t.push(m);
-  for (let m = 390; m <= 720; m += 30) t.push(m);
-  for (let m = 780; m <= 1440; m += 60) t.push(m);
-  return t;
-})();
+const DUREE_MAX_ETHYLO = 16 * 60; // premier verre : jusqu'à 16 h avant maintenant
 // Numéros d'urgence en France (appel gratuit) et ligne d'écoute
 const NUMEROS_UTILES = [
   ["112", "Urgences", "Numéro d'urgence, partout en Europe"],
@@ -402,27 +375,70 @@ function majResultatEthylo(zone){
   if (ethylo.dernier < 45 && r.taux > 0) ligne("Dernier verre récent : ton taux peut encore monter pendant près d'une heure.");
 }
 
-// Un réglage à glisser : nom, valeur écrite, curseur. texte(valeur) : ce qu'on affiche ; siChange(valeur) : à chaque mouvement.
-// Renvoie { ligne, poser(valeur) } (poser : déplacer le curseur depuis le code).
-function glissiereEthylo(titre, min, max, pas, valeur, texte, siChange){
+// Un réglage à glisser : nom, valeur écrite, curseur, graduations dessous.
+//  texte(valeur) : ce qu'on affiche (un texte, ou [valeur, précision] : la précision s'écrit en petit dessous) ;
+//  siChange(valeur) : à chaque mouvement ;
+//  o.aimant(valeur) : palier vers lequel le curseur est attiré (renvoie la valeur elle-même s'il n'y en a pas près) ;
+//  o.estPalier(valeur) : vrai sur un palier (petite vibration en l'atteignant, sur Android) ;
+//  o.graduations : [{ v, grand, texte }] traits sous le curseur.
+// Renvoie { ligne, poser(valeur), redessiner() }.
+function glissiereEthylo(titre, min, max, pas, valeur, texte, siChange, o){
+  o = o || {};
   const ligne = elementExtras("label", "ethyloGlisse");
   const tete = elementExtras("div", "ethyloGlisseTete");
   const ecrit = elementExtras("span", "ethyloGlisseValeur");
+  const precision = elementExtras("span", "ethyloGlissePrecision");
   tete.append(elementExtras("span", "nomRegle", titre), ecrit);
   const curseur = elementExtras("input", "extrasGlisse");
   curseur.type = "range";
   curseur.min = String(min); curseur.max = String(max); curseur.step = String(pas);
+  const position = (v) => (v - min) / (max - min);
   const montrer = () => {
     const v = Number(curseur.value);
-    ecrit.textContent = texte(v);
-    curseur.setAttribute("aria-valuetext", texte(v));
-    curseur.style.setProperty("--p", ((v - min) / (max - min) * 100) + "%");
+    const t = texte(v), [principal, detail] = Array.isArray(t) ? t : [t, ""];
+    ecrit.textContent = principal;
+    precision.textContent = detail;
+    precision.hidden = !detail;
+    curseur.setAttribute("aria-valuetext", detail ? `${principal}, ${detail}` : principal);
+    curseur.style.setProperty("--p", (position(v) * 100) + "%");
   };
+  const graduations = elementExtras("div", "ethyloGraduations");
+  graduations.setAttribute("aria-hidden", "true");
+  const redessiner = () => {
+    graduations.textContent = "";
+    (typeof o.graduations === "function" ? o.graduations() : o.graduations || []).forEach((g) => {
+      // (le centre du rond va de 14 px à la largeur moins 14 px : voir .extrasGlisse dans style_alcuno.css)
+      const place = `calc(14px + (100% - 28px) * ${position(g.v)})`;
+      const trait = elementExtras("span", "ethyloTrait" + (g.grand ? " grand" : ""));
+      trait.style.left = place;
+      graduations.appendChild(trait);
+      if (g.texte) { const t = elementExtras("span", "ethyloTraitTexte", g.texte); t.style.left = place; graduations.appendChild(t); }
+    });
+    graduations.classList.toggle("avecTextes", !!graduations.querySelector(".ethyloTraitTexte"));
+    montrer();
+  };
+  let dernierPalier = null;
   curseur.value = String(valeur);
-  montrer();
-  curseur.addEventListener("input", () => { montrer(); siChange(Number(curseur.value)); });
-  ligne.append(tete, curseur);
-  return { ligne, poser: (v) => { curseur.value = String(v); montrer(); } };
+  curseur.addEventListener("input", () => {
+    let v = Number(curseur.value);
+    if (o.aimant) {
+      const a = Math.min(max, Math.max(min, o.aimant(v)));
+      if (a !== v) { v = a; curseur.value = String(a); }
+    }
+    if (o.estPalier && o.estPalier(v) && v !== dernierPalier) { try { if (navigator.vibrate) navigator.vibrate(6); } catch (e) {} }
+    dernierPalier = o.estPalier && o.estPalier(v) ? v : null;
+    montrer();
+    siChange(v);
+  });
+  ligne.append(tete, precision, curseur, graduations);
+  redessiner();
+  return { ligne, poser: (v) => { curseur.value = String(v); montrer(); }, redessiner };
+}
+
+// Heure de l'horloge du téléphone, il y a tant de minutes : « 21 h 30 »
+function heureIlYa(minutes){
+  const d = new Date(Date.now() - minutes * 60000);
+  return `${d.getHours()} h ${String(d.getMinutes()).padStart(2, "0")}`;
 }
 
 // sansSon : écran redessiné (« Tout remettre à zéro »), sans rejouer le son d'ouverture
@@ -451,8 +467,12 @@ function ouvrirEthylo(sansSon){
     });
     ligneSexe.appendChild(puce);
   });
+  // (paliers : attiré par les multiples de 5 à 1 kg près ; graduations tous les 5 kg, en grand tous les 10, chiffrées tous les 20)
+  const graduationsPoids = [];
+  for (let v = POIDS_MIN_ETHYLO; v <= POIDS_MAX_ETHYLO; v += 5) graduationsPoids.push({ v, grand: v % 10 === 0, texte: v % 20 === 0 ? String(v) : "" });
   const poids = glissiereEthylo("Poids", POIDS_MIN_ETHYLO, POIDS_MAX_ETHYLO, 1, ethylo.poids, (v) => v + " kg",
-    (v) => { ethylo.poids = v; garderEthylo(); maj(); });
+    (v) => { ethylo.poids = v; garderEthylo(); maj(); },
+    { aimant: (v) => (Math.abs(v - Math.round(v / 5) * 5) <= 1 ? Math.round(v / 5) * 5 : v), estPalier: (v) => v % 5 === 0, graduations: graduationsPoids });
   const ligneProbatoire = elementExtras("label", "ethyloLigneChamp");
   const caseProbatoire = elementExtras("input");
   caseProbatoire.type = "checkbox";
@@ -516,8 +536,12 @@ function ouvrirEthylo(sansSon){
       etiquettes.appendChild(e);
     });
   };
+  // (paliers : chaque degré entier, en grand à 5° et 10° ; les demi-degrés restent possibles entre deux)
+  const graduationsDegre = [];
+  for (let v = DEGRE_BIERE_MIN; v <= DEGRE_BIERE_MAX; v++) graduationsDegre.push({ v, grand: v % 5 === 0, texte: v % 2 === 0 ? v + "°" : "" });
   const degre = glissiereEthylo("Degré de la bière", DEGRE_BIERE_MIN, DEGRE_BIERE_MAX, 0.5, ethylo.degBiere, texteDegre,
-    (v) => { ethylo.degBiere = v; majBieres(); });
+    (v) => { ethylo.degBiere = v; majBieres(); },
+    { estPalier: (v) => v % 5 === 0, graduations: graduationsDegre });
   bu.appendChild(degre.ligne);
   lignesBiere = FORMATS_BIERE.map((f) => ligneCompteur(f.nom, "", () => ethylo.bieres[cleBiere(f)] || 0, (pas) => {
     const n = borner((ethylo.bieres[cleBiere(f)] || 0) + pas);
@@ -535,25 +559,47 @@ function ouvrirEthylo(sansSon){
       (pas) => { ethylo.verres[v.id] = borner((ethylo.verres[v.id] || 0) + pas); }).ligne);
   });
 
-  // --- Quand --- (deux curseurs ; le dernier verre ne peut pas être avant le premier : l'un pousse l'autre)
+  // --- Quand --- : deux curseurs indépendants sur une même frise (à gauche : il y a 16 h, à droite : maintenant), qui
+  // donnent l'heure de l'horloge du téléphone. Attirés par les heures et les demi-heures (à 7 min près), sinon de 5 en 5 min.
+  // (si le « dernier » est mis avant le « premier », le calcul les remet simplement dans l'ordre)
   const quand = elementExtras("div", "blocRegles ethyloBloc");
   quand.appendChild(elementExtras("h3", "", "Quand"));
-  const cran = (minutes) => { let k = 0; CRANS_TEMPS_ETHYLO.forEach((m, i) => { if (m <= minutes) k = i; }); return k; };
-  const texteCran = (k) => (CRANS_TEMPS_ETHYLO[k] === 0 ? "à l'instant" : "il y a " + texteDureeEthylo(CRANS_TEMPS_ETHYLO[k]));
-  const dernierCran = CRANS_TEMPS_ETHYLO.length - 1;
-  let premier, dernier;
-  premier = glissiereEthylo("Premier verre", 0, dernierCran, 1, cran(ethylo.debut), texteCran, (k) => {
-    ethylo.debut = CRANS_TEMPS_ETHYLO[k];
-    if (ethylo.dernier > ethylo.debut) { ethylo.dernier = ethylo.debut; dernier.poser(k); }
-    maj();
-  });
-  dernier = glissiereEthylo("Dernier verre", 0, dernierCran, 1, cran(ethylo.dernier), texteCran, (k) => {
-    ethylo.dernier = CRANS_TEMPS_ETHYLO[k];
-    if (ethylo.debut < ethylo.dernier) { ethylo.debut = ethylo.dernier; premier.poser(k); }
-    maj();
-  });
+  quand.appendChild(elementExtras("p", "detailRegle ethyloAide",
+    "Glisse vers la droite pour plus récent. Premier verre : quand tu as commencé ; dernier verre : quand tu as fini (tout à droite si tu bois encore)."));
+  const minuteDe = (t) => DUREE_MAX_ETHYLO - t; // (position du curseur => il y a tant de minutes)
+  const aimantHeure = (t) => {
+    const ilYa = minuteDe(t);
+    if (ilYa <= 3) return DUREE_MAX_ETHYLO; // (tout à droite : maintenant)
+    const heure = new Date(Date.now() - ilYa * 60000), m = heure.getMinutes();
+    const versDemi = Math.round(m / 30) * 30 - m;            // vers l'heure ou la demi-heure la plus proche
+    const decalage = Math.abs(versDemi) <= 7 ? versDemi : Math.round(m / 5) * 5 - m; // sinon, de 5 en 5 minutes
+    return t + decalage;
+  };
+  const estDemiHeure = (t) => minuteDe(t) > 0 && new Date(Date.now() - minuteDe(t) * 60000).getMinutes() % 30 === 0;
+  const graduationsHeures = () => {
+    const g = [], maintenant = new Date();
+    const debut = new Date(maintenant.getTime() - DUREE_MAX_ETHYLO * 60000);
+    let d = new Date(debut); d.setSeconds(0, 0); d.setMinutes(d.getMinutes() < 30 ? 30 : 60);
+    for (; d <= maintenant; d = new Date(d.getTime() + 30 * 60000)) {
+      const t = DUREE_MAX_ETHYLO - (maintenant - d) / 60000, pleine = d.getMinutes() === 0;
+      g.push({ v: t, grand: pleine, texte: pleine && d.getHours() % 2 === 0 ? d.getHours() + " h" : "" });
+    }
+    return g;
+  };
+  const texteQuand = (t) => {
+    const ilYa = minuteDe(t);
+    return ilYa <= 0 ? ["maintenant", ""] : [heureIlYa(ilYa), "il y a " + texteDureeEthylo(ilYa)];
+  };
+  const curseurQuand = (titre, cle) => glissiereEthylo(titre, 0, DUREE_MAX_ETHYLO, 1, DUREE_MAX_ETHYLO - Math.min(DUREE_MAX_ETHYLO, ethylo[cle]),
+    texteQuand, (t) => { ethylo[cle] = minuteDe(t); maj(); }, { aimant: aimantHeure, estPalier: estDemiHeure, graduations: graduationsHeures });
+  const premier = curseurQuand("Premier verre", "debut"), dernier = curseurQuand("Dernier verre", "dernier");
   quand.append(premier.ligne, dernier.ligne,
-    elementExtras("p", "detailRegle ethyloAide", "Les verres sont comptés comme répartis régulièrement entre les deux."));
+    elementExtras("p", "detailRegle ethyloAide", "Les verres sont comptés comme bus régulièrement entre les deux heures."));
+  // (l'écran resté ouvert : les heures écrites suivent l'horloge)
+  const minuterie = setInterval(() => {
+    if (!quand.isConnected) { clearInterval(minuterie); return; }
+    premier.redessiner(); dernier.redessiner(); maj();
+  }, 60000);
 
   const remise = elementExtras("button", "btnFaqLien ethyloRemise", "Tout remettre à zéro");
   remise.type = "button";

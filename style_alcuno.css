@@ -9593,45 +9593,11 @@ html[data-theme="soleil"] #choixMode .carteEthylo{ --fond: linear-gradient(180de
 #ecranRegles .extrasVide{ display: block; padding: 6px 0 10px; text-align: center; }
 
 /* ----- Bar ----- */
-#ecranRegles .barRecherche{ display: flex; gap: 8px; }
-#ecranRegles .barRecherche .extrasChamp{ flex: 1; min-width: 0; }
-#ecranRegles .barHasard{
-  flex: none;
-  width: 50px;
-  padding: 0;
-  border-radius: 14px;
-  border: 1.5px solid currentColor;
-  background: rgba(255, 255, 255, 0.08);
-  color: inherit;
-  font-size: 24px;
-  line-height: 1;
-  cursor: pointer;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-  transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.5);
-}
-#ecranRegles .barHasard:active{ transform: rotate(160deg) scale(0.9); }
-/* Les familles : une rangée qui défile sur le côté (9 puces sur trois lignes prenaient la moitié de l'écran) */
-#ecranRegles.bar .barFamilles{
-  flex-wrap: nowrap;
-  justify-content: flex-start;
-  overflow-x: auto;
-  margin: 0 -14px;
-  padding: 4px 14px;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-}
-#ecranRegles.bar .barFamilles::-webkit-scrollbar{ display: none; }
 #ecranRegles .barListe{ display: flex; flex-direction: column; gap: 14px; }
 #ecranRegles .barCompte{ margin: -6px 0 0; text-align: center; font-size: 12.5px; font-weight: 700; opacity: 0.65; }
 #ecranRegles .barSous{ display: block; margin-top: 2px; font-size: 12.5px; font-weight: 600; opacity: 0.7; }
 #ecranRegles.bar .faqItem{ transition: background 0.25s ease; border-radius: 12px; }
 #ecranRegles.bar .faqItem[open]{ background: rgba(255, 255, 255, 0.07); margin: 4px -8px; padding: 2px 8px; }
-#ecranRegles.bar .faqItem.barTire{ animation: barTire 0.9s ease; }
-@keyframes barTire{
-  0%, 60%{ box-shadow: 0 0 0 2px currentColor; }
-  100%{ box-shadow: 0 0 0 2px transparent; }
-}
 #ecranRegles .barRecette{ padding: 0 0 12px; }
 #ecranRegles .faqItem[open] > .barRecette{ animation: barDeroule 0.3s cubic-bezier(0.2, 0.8, 0.3, 1); }
 @keyframes barDeroule{
@@ -9698,6 +9664,14 @@ html[data-theme="soleil"] #choixMode .carteEthylo{ --fond: linear-gradient(180de
 #ecranRegles .ethyloGlisse{ padding: 8px 0 4px; }
 #ecranRegles .ethyloGlisseTete{ display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
 #ecranRegles .ethyloGlisseValeur{ font-size: 17px; font-weight: 900; white-space: nowrap; }
+#ecranRegles .ethyloGlissePrecision{ display: block; margin-top: -2px; text-align: right; font-size: 12.5px; font-weight: 700; opacity: 0.7; }
+#ecranRegles .ethyloGlissePrecision[hidden]{ display: none; }
+/* Graduations sous le curseur (placées par js/extras.js) */
+#ecranRegles .ethyloGraduations{ position: relative; height: 10px; margin: -6px 0 2px; pointer-events: none; }
+#ecranRegles .ethyloGraduations.avecTextes{ height: 24px; }
+#ecranRegles .ethyloTrait{ position: absolute; top: 0; width: 1.5px; height: 5px; margin-left: -0.75px; border-radius: 1px; background: currentColor; opacity: 0.4; }
+#ecranRegles .ethyloTrait.grand{ height: 9px; opacity: 0.75; }
+#ecranRegles .ethyloTraitTexte{ position: absolute; top: 10px; transform: translateX(-50%); font-size: 10.5px; font-weight: 700; line-height: 1.3; white-space: nowrap; opacity: 0.7; }
 #ecranRegles .extrasGlisse{
   --p: 50%;
   -webkit-appearance: none;
@@ -9782,6 +9756,6 @@ html[data-theme="soleil"] #choixMode .carteEthylo{ --fond: linear-gradient(180de
 #ecranRegles .ethyloNumero::after{ content: "📞"; flex: none; font-size: 18px; }
 @media (prefers-reduced-motion: reduce){
   #ecranRegles:is(.bar, .ethylo) #listeRegles > *, #ecranRegles .barListe > *, #ecranRegles .faqItem[open] > .barRecette,
-  #ecranRegles .ethyloChiffre.pop, #ecranRegles .ethyloNombre.pop, #ecranRegles .ethyloBieres .extrasPuce, #ecranRegles.bar .faqItem.barTire{ animation: none; }
+  #ecranRegles .ethyloChiffre.pop, #ecranRegles .ethyloNombre.pop, #ecranRegles .ethyloBieres .extrasPuce{ animation: none; }
   #ecranRegles .ethyloJaugePlein, #ecranRegles .ethyloJaugeLimite{ transition: none; }
 }
