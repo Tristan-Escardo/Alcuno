@@ -570,7 +570,7 @@ function ouvrirEthylo(sansSon){
   });
 
   // --- Quand --- : deux curseurs indépendants sur une même frise (à gauche : il y a 16 h, à droite : maintenant), qui
-  // donnent l'heure de l'horloge du téléphone. Toujours sur un quart d'heure.
+  // donnent l'heure de l'horloge du téléphone. Toujours sur une demi-heure.
   // (si le « dernier » est mis avant le « premier », le calcul les remet simplement dans l'ordre)
   const quand = elementExtras("div", "blocRegles ethyloBloc");
   quand.appendChild(elementExtras("h3", "", "Quand"));
@@ -579,9 +579,9 @@ function ouvrirEthylo(sansSon){
     const ilYa = minuteDe(t);
     if (ilYa <= 3) return DUREE_MAX_ETHYLO; // (tout à droite : maintenant)
     const heure = new Date(Date.now() - ilYa * 60000), m = heure.getMinutes();
-    return t + Math.round(m / 15) * 15 - m; // vers le quart d'heure le plus proche
+    return t + Math.round(m / 30) * 30 - m; // vers la demi-heure la plus proche
   };
-  const estDemiHeure = (t) => minuteDe(t) > 0 && new Date(Date.now() - minuteDe(t) * 60000).getMinutes() % 15 === 0;
+  const estDemiHeure = (t) => minuteDe(t) > 0 && new Date(Date.now() - minuteDe(t) * 60000).getMinutes() % 30 === 0;
   const graduationsHeures = () => {
     const g = [], maintenant = new Date();
     const debut = new Date(maintenant.getTime() - DUREE_MAX_ETHYLO * 60000);
@@ -599,6 +599,8 @@ function ouvrirEthylo(sansSon){
   };
   const curseurQuand = (titre, cle) => glissiereEthylo(titre, 0, DUREE_MAX_ETHYLO, 1, DUREE_MAX_ETHYLO - Math.min(DUREE_MAX_ETHYLO, ethylo[cle]),
     texteQuand, (t) => { ethylo[cle] = minuteDe(t); maj(); }, { aimant: aimantHeure, estPalier: estDemiHeure, graduations: graduationsHeures });
+  // (les valeurs de départ aussi tombent sur une demi-heure)
+  ["debut", "dernier"].forEach((cle) => { ethylo[cle] = Math.max(0, minuteDe(aimantHeure(DUREE_MAX_ETHYLO - Math.min(DUREE_MAX_ETHYLO, ethylo[cle])))); });
   const premier = curseurQuand("Premier verre", "debut"), dernier = curseurQuand("Dernier verre", "dernier");
   quand.append(premier.ligne, dernier.ligne,
     elementExtras("p", "detailRegle ethyloAide", "Les verres sont comptés comme bus régulièrement entre les deux heures."));
