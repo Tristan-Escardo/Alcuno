@@ -514,6 +514,7 @@ function ouvrirEthylo(sansSon){
 
   // Bières : le degré se règle au curseur ; les compteurs montrent les bières de CE degré, les étiquettes dessous toutes les bières
   bu.appendChild(elementExtras("p", "ethyloSousTitre", "Bières"));
+  bu.appendChild(elementExtras("p", "detailRegle ethyloAide", "Plusieurs bières différentes ? Règle le degré, ajoute, puis recommence pour la suivante."));
   const etiquettes = elementExtras("div", "ethyloBieres");
   etiquettes.setAttribute("aria-label", "Bières comptées (toucher pour en retirer une)");
   let lignesBiere = [];
@@ -550,7 +551,6 @@ function ouvrirEthylo(sansSon){
   }));
   lignesBiere.forEach((l) => bu.appendChild(l.ligne));
   bu.appendChild(etiquettes);
-  bu.appendChild(elementExtras("p", "detailRegle ethyloAide", "Plusieurs bières différentes ? Règle le degré, ajoute, puis recommence pour la suivante."));
   majBieres();
 
   bu.appendChild(elementExtras("p", "ethyloSousTitre", "Le reste"));
