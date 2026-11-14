@@ -355,7 +355,7 @@ function majResultatEthylo(zone){
   }
   const chiffre = zone.querySelector(".ethyloChiffre");
   const verdict = zone.querySelector(".ethyloVerdict"), lignes = zone.querySelector(".ethyloLignes");
-  const machine = ethylo.sexe === "a"; // (blague, en Star Wars seulement : un X-Wing ne marche pas à la bière)
+  const machine = ethylo.sexe === "a"; // (blague : un hélicoptère, ou un X-Wing en Star Wars, ne marche pas à la bière)
   zone.querySelector(".ethyloUnite").hidden = machine;
   zone.querySelector(".ethyloJauge").hidden = machine;
   zone.classList.toggle("machine", machine);
@@ -461,13 +461,12 @@ function ouvrirEthylo(sansSon){
   const maj = () => majResultatEthylo(resultat);
 
   // --- Toi ---
-  if (ethylo.sexe === "a" && document.documentElement.dataset.theme !== "galaxie") ethylo.sexe = "h"; // (l'option n'existe qu'en Star Wars)
   const toi = elementExtras("div", "blocRegles ethyloBloc");
   toi.appendChild(elementExtras("h3", "", "Toi"));
   const ligneSexe = elementExtras("div", "extrasPuces ethyloSexe");
   ligneSexe.setAttribute("role", "group");
   ligneSexe.setAttribute("aria-label", "Sexe (change le calcul)");
-  [["h", "Homme"], ["f", "Femme"]].concat(document.documentElement.dataset.theme === "galaxie" ? [["a", "T-65 X-Wing"]] : []).forEach(([id, nom]) => {
+  [["h", "Homme"], ["f", "Femme"]].concat([["a", document.documentElement.dataset.theme === "galaxie" ? "T-65 X-Wing" : "Boeing AH-64"]]).forEach(([id, nom]) => {
     const puce = elementExtras("button", "extrasPuce", nom);
     puce.type = "button";
     puce.setAttribute("aria-pressed", String(ethylo.sexe === id));
