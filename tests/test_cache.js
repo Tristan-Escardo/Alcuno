@@ -39,5 +39,13 @@ verifier(manquantes.length === 0, `images absentes de A_PRECHARGER dans sw.js ${
     `empreinte du code non enregistrée pour ${cache} : lance « node outils/maj_empreinte_cache.js »`);
 }
 
+// La version ajoutée à l'adresse des fichiers (index.html : VERSION_FICHIERS, « script.js?v=… ») doit être celle du jeu
+// (script.js : VERSION_AFFICHEE) : c'est elle qui fait prendre les nouveaux fichiers aux téléphones après une mise en ligne
+{
+  const vFichiers = (fs.readFileSync(path.join(RACINE, "index.html"), "utf8").match(/VERSION_FICHIERS = "([^"]+)"/) || [])[1];
+  const vJeu = (fs.readFileSync(path.join(RACINE, "script.js"), "utf8").match(/VERSION_AFFICHEE = "([^"]+)"/) || [])[1];
+  verifier(!!vJeu && vFichiers === vJeu, `VERSION_FICHIERS dans index.html (${vFichiers}) = VERSION_AFFICHEE dans script.js (${vJeu})`);
+}
+
 console.log(echecs ? `\n${echecs} ÉCHEC(S)` : "\nTOUT EST OK");
 process.exit(echecs ? 1 : 0);

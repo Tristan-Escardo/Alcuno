@@ -1803,6 +1803,13 @@ function ajouterJoueur(){
     return;
   }
 
+  // Mot réservé du langage (« constructor »…) : les compteurs du jeu se dérégleraient (voir nomImpossible, script.js)
+  if(nomImpossible(nom)){
+    nomJoueurInput.value = "";
+    afficherToast("Ce nom n'est pas possible : choisis-en un autre", 3000);
+    return;
+  }
+
   const key = nom.toLocaleLowerCase("fr-FR");
 
   if (joueurs.some(j => (j || "").replace(/\s+/g, " ").trim().toLocaleLowerCase("fr-FR") === key)) {

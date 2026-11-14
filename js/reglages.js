@@ -1742,7 +1742,7 @@ function chargerSon(ctx, nom){
   if (sonsCharges[nom] !== undefined || sonsEnChargement.has(nom)) return;
   if (sonsRatesA[nom] && Date.now() - sonsRatesA[nom] < 10000) return;
   sonsEnChargement.add(nom);
-  fetch(`Sons/${nom}.mp3?t=${window.ANTI_CACHE || Date.now()}`)
+  fetch(`Sons/${nom}.mp3?v=${window.ANTI_CACHE || ""}`)
     .then((reponse) => {
       if (reponse.status === 404) { sonsCharges[nom] = null; return null; } // (pas de son à ce moment-là)
       if (!reponse.ok) throw new Error("réseau");

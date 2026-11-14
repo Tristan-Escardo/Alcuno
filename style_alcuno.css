@@ -3406,6 +3406,23 @@ body.rattrapage [id^="overlay"] *{
   background: rgba(0, 0, 0, 0.45);
 }
 
+/* Coupure qui dure : bouton « Quitter la partie » sous le logo (js/en-ligne.js) */
+#coupureReseau{
+  flex-direction: column;
+  gap: 28px;
+}
+
+#coupureReseau .coupureQuitter{
+  padding: 14px 26px;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.72);
+  color: #fff;
+  font: 900 18px Arial, sans-serif;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
 #coupureReseau svg{
   width: min(48vw, 240px);
   height: auto;

@@ -104,14 +104,13 @@ new MutationObserver(() => { const t = document.getElementById('toastEnLigne'); 
 window.__refus = 'pas encore';
 window.__console = [];
 ['log', 'warn', 'error'].forEach((t) => { const f = console[t].bind(console); console[t] = (...a) => { const s = a.map(x => (x && x.stack) ? x.stack : String(x)).join(' '); if (/FIREBASE|Error|rror/.test(s)) window.__console.push(t + ': ' + s.slice(0, 600)); f(...a); }; });
-const vrai = window.fbUpdate;
-window.fbUpdate = function (ref, valeurs) {
-  const k = Object.keys(valeurs).find(c => c.includes('/actions/'));
-  if (!k) return vrai(ref, valeurs);
-  window.fbUpdate = vrai;
-  window.__refus = 'action ' + valeurs[k].id + ' envoyée avec un champ interdit';
-  const v = Object.assign({}, valeurs, { [k]: Object.assign({}, valeurs[k], { pirate: 1 }) });
-  return vrai(ref, v).then(() => { window.__refus += ' => ACCEPTÉE ?!'; }, (e) => { window.__refus += ' => refusée par le serveur'; throw e; });
+const vrai = window.fbRunTransaction;
+window.fbRunTransaction = function (ref, maj, options) {
+  if (!String(ref).includes('/actions/')) return vrai(ref, maj, options);
+  window.fbRunTransaction = vrai;
+  window.__refus = 'action envoyée avec un champ interdit';
+  const piegee = (deja) => { const v = maj(deja); return v ? Object.assign({}, v, { pirate: 1 }) : v; };
+  return vrai(ref, piegee, options).then((r) => { window.__refus += r.committed ? ' => ACCEPTÉE ?!' : ' => place déjà prise'; return r; }, (e) => { window.__refus += ' => refusée par le serveur'; throw e; });
 };
 'ok'
 '@

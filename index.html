@@ -3,10 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <!-- Anti-cache : GitHub Pages fait garder les fichiers 10 min par les navigateurs.
-         Un paramètre différent à chaque chargement force toujours la dernière version. -->
+    <!-- Version des fichiers du jeu : la même que VERSION_AFFICHEE dans script.js (tests/test_cache.js le vérifie), à changer
+         à chaque mise en ligne. Elle est ajoutée à l'adresse de chaque fichier (« script.js?v=9.88.15 ») : GitHub Pages fait
+         garder les fichiers 10 min par les navigateurs, une adresse neuve à chaque version force donc la nouvelle.
+         (Avant : « ?t= » + l'heure, différent à chaque lancement : tout le jeu était retéléchargé à chaque ouverture,
+         environ 400 Ko. Maintenant, tant que la version ne change pas, le navigateur se contente de vérifier.) -->
     <script>
-        window.ANTI_CACHE = Date.now();
+        window.VERSION_FICHIERS = "9.88.15";
+        // (ailleurs que sur le vrai site — poste de dev, appli de test — : l'heure en plus, comme avant, pour voir tout de
+        // suite un fichier modifié sans changer de version)
+        window.ANTI_CACHE = /(^|\.)github\.io$/i.test(location.hostname) ? window.VERSION_FICHIERS : window.VERSION_FICHIERS + "-" + Date.now();
         // Page privée des statistiques : …/Alcuno/?stats (ou tinyurl.com/alcuno?stats) => stats.html
         if (/[?&]stats(=|&|$)/.test(location.search)) location.replace("stats.html");
         // Page de la télé (…/Alcuno/tele ou …/Alcuno/?tele) : seulement l'affichage de la partie, voir js/tele.js.
@@ -20,7 +26,7 @@
         window.FICHIERS_JEU = ["script.js", "js/qrcode.js", "js/config-lib.js", "js/reglages.js", "js/en-ligne.js", "js/plateau.js", "js/regles.js", "js/mode-hot.js", "js/zizi-coptere.js", "js/reglages-vue.js",
                                "js/synchro-en-ligne.js", "js/retour-demarrage.js", "js/tele.js", "js/stats.js", "js/config-distante.js", "js/stickers.js", "js/faq.js", "js/mouchard.js", "js/poisson.js", "js/piano-accueil.js"];
         window.FICHIERS_JEU.forEach(function (f) {
-            document.write('<link rel="preload" as="script" href="' + f + '?t=' + window.ANTI_CACHE + '">');
+            document.write('<link rel="preload" as="script" href="' + f + '?v=' + window.ANTI_CACHE + '">');
         });
         // Pas de tap tant que tous les fichiers ne sont pas exécutés (retiré à la fin de js/retour-demarrage.js) :
         // un bouton du premier fichier peut appeler du code des suivants
@@ -103,19 +109,19 @@
             setTimeout(function () { document.documentElement.classList.remove("rouvrir-vue"); }, 2500);
             setTimeout(function () { document.documentElement.classList.remove("rouvrir-fond"); }, 3000);
         }
-        document.write('<link rel="stylesheet" href="style_alcuno.css?t=' + window.ANTI_CACHE + '" />');
-        document.write('<link rel="stylesheet" href="style_kawaii.css?t=' + window.ANTI_CACHE + '" />'); // thème Kawaii (généré : outils/generer_kawaii.py)
-        document.write('<link rel="stylesheet" href="style_donjon.css?t=' + window.ANTI_CACHE + '" />'); // thème secret Donjon (débloqué par une partie en mode hot)
-        document.write('<link rel="stylesheet" href="style_feux.css?t=' + window.ANTI_CACHE + '" />'); // feux d'artifice du Nouvel An (tous écrans, tous thèmes)
-        document.write('<link rel="stylesheet" href="style_noel.css?t=' + window.ANTI_CACHE + '" />'); // thème de fête Noël
-        document.write('<link rel="stylesheet" href="style_chandeleur.css?t=' + window.ANTI_CACHE + '" />'); // thème de fête Chandeleur
-        document.write('<link rel="stylesheet" href="style_valentin.css?t=' + window.ANTI_CACHE + '" />'); // thème de fête Saint-Valentin
-        document.write('<link rel="stylesheet" href="style_patrick.css?t=' + window.ANTI_CACHE + '" />'); // thème de fête Saint-Patrick
-        document.write('<link rel="stylesheet" href="style_justrose.css?t=' + window.ANTI_CACHE + '" />'); // thème de fête Just Rosé
-        document.write('<link rel="stylesheet" href="style_musique.css?t=' + window.ANTI_CACHE + '" />'); // thème de fête Fête de la musique
-        document.write('<link rel="stylesheet" href="style_halloween.css?t=' + window.ANTI_CACHE + '" />'); // thème de fête Halloween
-        document.write('<link rel="stylesheet" href="style_annonce_fete.css?t=' + window.ANTI_CACHE + '" />'); // fenêtre d'annonce d'un thème de fête (aux couleurs de la fête)
-        document.write('<link rel="stylesheet" href="style_poisson.css?t=' + window.ANTI_CACHE + '" />'); // blagues du 1er avril (js/poisson.js)
+        document.write('<link rel="stylesheet" href="style_alcuno.css?v=' + window.ANTI_CACHE + '" />');
+        document.write('<link rel="stylesheet" href="style_kawaii.css?v=' + window.ANTI_CACHE + '" />'); // thème Kawaii (généré : outils/generer_kawaii.py)
+        document.write('<link rel="stylesheet" href="style_donjon.css?v=' + window.ANTI_CACHE + '" />'); // thème secret Donjon (débloqué par une partie en mode hot)
+        document.write('<link rel="stylesheet" href="style_feux.css?v=' + window.ANTI_CACHE + '" />'); // feux d'artifice du Nouvel An (tous écrans, tous thèmes)
+        document.write('<link rel="stylesheet" href="style_noel.css?v=' + window.ANTI_CACHE + '" />'); // thème de fête Noël
+        document.write('<link rel="stylesheet" href="style_chandeleur.css?v=' + window.ANTI_CACHE + '" />'); // thème de fête Chandeleur
+        document.write('<link rel="stylesheet" href="style_valentin.css?v=' + window.ANTI_CACHE + '" />'); // thème de fête Saint-Valentin
+        document.write('<link rel="stylesheet" href="style_patrick.css?v=' + window.ANTI_CACHE + '" />'); // thème de fête Saint-Patrick
+        document.write('<link rel="stylesheet" href="style_justrose.css?v=' + window.ANTI_CACHE + '" />'); // thème de fête Just Rosé
+        document.write('<link rel="stylesheet" href="style_musique.css?v=' + window.ANTI_CACHE + '" />'); // thème de fête Fête de la musique
+        document.write('<link rel="stylesheet" href="style_halloween.css?v=' + window.ANTI_CACHE + '" />'); // thème de fête Halloween
+        document.write('<link rel="stylesheet" href="style_annonce_fete.css?v=' + window.ANTI_CACHE + '" />'); // fenêtre d'annonce d'un thème de fête (aux couleurs de la fête)
+        document.write('<link rel="stylesheet" href="style_poisson.css?v=' + window.ANTI_CACHE + '" />'); // blagues du 1er avril (js/poisson.js)
     </script>
     <title>Alcuno</title>
 
@@ -762,11 +768,9 @@
     <!-- async : le jeu démarre sans attendre le téléchargement de Firebase (lent en 4G).
          Ce qui a besoin de Firebase l'attend (attendreFirebase / événement « firebase-ready ») -->
     <script type="module" async>
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-        import {
-            getDatabase, ref, set, get, update, onValue, onChildAdded, remove, onDisconnect, runTransaction, serverTimestamp
-        } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
-
+        // (import() et pas « import … from » : un téléchargement raté — pas de réseau au lancement — peut être redemandé
+        // sans recharger la page : au retour du réseau, et quand un bouton du mode en ligne attend Firebase, voir attendreFirebase)
+        const ADRESSE_FIREBASE = "https://www.gstatic.com/firebasejs/12.19.0/";
         const firebaseConfig = {
             apiKey: "AIzaSyApZL1dCQLGdrZFjsGJC0y4DxLUzorum4M",
             authDomain: "alcuno.firebaseapp.com",
@@ -777,28 +781,40 @@
             appId: "1:481896309098:web:c84fe2d2ded1df80810513"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+        let chargement = null;
+        function chargerFirebase(){
+            if (window.firebaseDB || chargement) return chargement;
+            chargement = Promise.all([import(ADRESSE_FIREBASE + "firebase-app.js"), import(ADRESSE_FIREBASE + "firebase-database.js")])
+                .then(([{ initializeApp }, { getDatabase, ref, set, get, update, onValue, onChildAdded, remove, onDisconnect, runTransaction, serverTimestamp }]) => {
+                    const app = initializeApp(firebaseConfig);
+                    const db = getDatabase(app);
 
-        // On rend tout accessible depuis script.js
-        window.firebaseDB = db;
-        window.fbRef = ref;
-        window.fbSet = set;
-        window.fbGet = get;
-        window.fbUpdate = update;
-        window.fbOnValue = onValue;
-        window.fbRemove = remove;
-        window.fbOnChildAdded = onChildAdded;
-        window.fbRunTransaction = runTransaction;
-        window.fbServerTimestamp = serverTimestamp;
-        window.fbOnDisconnect = onDisconnect;
+                    // On rend tout accessible depuis script.js
+                    window.fbRef = ref;
+                    window.fbSet = set;
+                    window.fbGet = get;
+                    window.fbUpdate = update;
+                    window.fbOnValue = onValue;
+                    window.fbRemove = remove;
+                    window.fbOnChildAdded = onChildAdded;
+                    window.fbRunTransaction = runTransaction;
+                    window.fbServerTimestamp = serverTimestamp;
+                    window.fbOnDisconnect = onDisconnect;
+                    window.firebaseDB = db; // (en dernier : c'est lui qu'attendreFirebase regarde)
 
-        window.dispatchEvent(new Event("firebase-ready"));
+                    window.dispatchEvent(new Event("firebase-ready"));
+                })
+                .catch(() => { chargement = null; }); // (réessayé plus tard)
+            return chargement;
+        }
+        window.chargerFirebase = chargerFirebase;
+        window.addEventListener("online", chargerFirebase);
+        chargerFirebase();
     </script>
     
     <script>
         window.FICHIERS_JEU.forEach(function (f) {
-            document.write('<script src="' + f + '?t=' + window.ANTI_CACHE + '" onerror="echecChargementJeu()"><\/script>');
+            document.write('<script src="' + f + '?v=' + window.ANTI_CACHE + '" onerror="echecChargementJeu()"><\/script>');
         });
     </script>
     <!-- Thème Prestige : reflet doré qui traverse l'écran de temps en temps (ne bloque aucun tap) -->

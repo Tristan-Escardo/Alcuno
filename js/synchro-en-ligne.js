@@ -83,62 +83,61 @@ function envoyerAction(el){
 
 // Ajoute une action numérotée à la manche (partie, manche et pseudo lus tout de suite :
 // on peut quitter la partie juste après l'appel)
+//
+// L'action prend la première place libre (actions/1, actions/2…) en UNE seule écriture : une transaction sur cette place,
+// qui n'écrit que si elle est vide. Le numéro et l'action arrivent donc ensemble sur le serveur, ou pas du tout.
+// (Avant : un numéro réservé, PUIS l'action écrite. Si le réseau coupait entre les deux, le numéro restait vide ; les autres
+// téléphones le sautaient au bout de 5 s, alors que l'expéditeur avait déjà joué son action chez lui, et elle finissait par
+// arriver sur le serveur, trop tard pour tout le monde => téléphones décalés pour le reste de la manche, sans que rien ne le dise.)
+// « applyLocally: false » : ce téléphone ne voit pas son action avant l'accord du serveur ; il la reçoit ensuite comme les
+// autres, dans l'ordre. Une action refusée (réseau, règles) n'est donc jamais jouée nulle part.
+const ESSAIS_MAX_PLACE = 12;
+
+// Première place sans doute libre : après la dernière action reçue ici
+function prochainePlaceAction(){
+  let max = prochainSeq - 1;
+  toutesActionsManche.forEach((_, seq) => { if(seq > max) max = seq; });
+  return max + 1;
+}
+
 function ecrireAction(id){
   const db = window.firebaseDB;
   const code = codePartieActuel;
   const manche = mancheCourante;
   const par = pseudoActuel;
   const vu = prochainSeq - 1;
-  const refSeq = window.fbRef(db, `parties/${code}/manches/${manche}/seq`);
+  // « @vu » : dernière action que ce téléphone avait jouée au moment du tap (voir estUnDoublon)
+  const action = { id: `${id}@${vu}`, par };
+  const refActions = window.fbRef(db, `parties/${code}/manches/${manche}/actions`);
+  const toujoursLa = () => code === codePartieActuel && manche === mancheCourante;
 
-  // Deux téléphones qui envoient au même instant : Firebase refuse le 2e (« permission_denied »)
-  // au lieu de le faire réessayer. On réessaie nous-mêmes, un peu plus tard (3 fois au plus).
-  const reserverNumero = (essai) => window.fbRunTransaction(refSeq, n => (n || 0) + 1).catch((erreur) => {
-    noterJournal(`numéro refusé pour ${id} (essai ${essai}) : ${erreur && erreur.message}`);
-    if(essai >= 3 || code !== codePartieActuel || manche !== mancheCourante) throw erreur;
-    return new Promise(r => setTimeout(r, 60 + Math.random() * 180)).then(() => reserverNumero(essai + 1));
+  const tenter = (seq, essai) => window.fbRunTransaction(
+    window.fbRef(db, `parties/${code}/manches/${manche}/actions/${seq}`),
+    (deja) => (deja === null ? action : undefined), // place prise : on n'y touche pas
+    { applyLocally: false }
+  ).then((resultat) => {
+    if(resultat.committed){
+      noterJournal(`envoi ${id} => numéro ${seq}`);
+      marquerActiviteAction(code); // (js/en-ligne.js)
+      return;
+    }
+    // Place prise par un autre téléphone au même instant : la suivante
+    noterJournal(`numéro ${seq} déjà pris pour ${id} (essai ${essai})`);
+    if(essai >= ESSAIS_MAX_PLACE || !toujoursLa()) throw new Error("aucune place libre pour l'action");
+    // Plusieurs places prises d'affilée (ce téléphone est en retard sur la partie) : on demande au serveur où en est la manche
+    if(essai % 3 !== 0) return tenter(seq + 1, essai + 1);
+    return window.fbGet(refActions).then((snapshot) => {
+      const dernier = Object.keys(snapshot.val() || {}).reduce((max, k) => Math.max(max, Number(k) || 0), 0);
+      return tenter(Math.max(seq, dernier) + 1, essai + 1);
+    });
   });
 
-  return reserverNumero(1)
-    .then((res) => {
-      const seq = res.snapshot.val();
-      noterJournal(`envoi ${id} => numéro ${seq}`);
-      // Une seule écriture : l'action + la date de dernière activité.
-      // « @vu » : dernière action que ce téléphone avait jouée au moment du tap (voir estUnDoublon)
-      return window.fbUpdate(window.fbRef(db, `parties/${code}`), {
-        [`manches/${manche}/actions/${seq}`]: { id: `${id}@${vu}`, par },
-        activite: window.fbServerTimestamp()
-      }).catch((erreur) => {
-        actionRefusee(code, manche, seq);
-        throw erreur;
-      });
-    });
+  return tenter(prochainePlaceAction(), 1);
 }
 
-// Firebase montre tout de suite à ce téléphone sa propre action (avant l'accord du serveur) : le
-// jeu réagit sans attendre. Si le serveur la refuse ensuite (réseau, serveur), les autres
-// téléphones ne l'ont jamais reçue : ce téléphone ne doit pas la garder.
-// - pas encore appliquée ici => on la retire de la file (elle est sautée partout pareil) ;
-// - déjà appliquée ici => on rejoue toute la manche depuis le serveur (comme une reconnexion).
 let dernierEtatManche = null; // état de la manche en cours (pour la rejouer)
 
-function actionRefusee(code, manche, seq){
-  noterJournal(`refus du serveur pour mon action ${seq}`);
-  if(!enLigneActif || code !== codePartieActuel || manche !== mancheCourante) return;
-
-  const action = fileActions.get(seq);
-  if(seq > prochainSeq || (seq === prochainSeq && action && !traitementEnCours)){
-    fileActions.delete(seq);
-    traiterFile();
-    return;
-  }
-  if(seq === prochainSeq && action){
-    action.refusee = true; // en cours d'essai (« attendre ») : elle sera sautée
-    return;
-  }
-  resynchroniserManche();
-}
-
+// La manche est rejouée depuis le serveur (comme une reconnexion). retourArriere : sans le choix qu'on vient d'annuler
 function resynchroniserManche(retourArriere = false){
   if(!dernierEtatManche || !enLigneActif) return;
   noterJournal(retourArriere ? "choix annulé : manche rejouée sans lui" : "remise à jour de la manche depuis le serveur");
@@ -368,9 +367,9 @@ function traiterFile(){
 
   const action = fileActions.get(prochainSeq);
   if(!action){
-    // Trou dans la numérotation (envoi interrompu ou refusé par le serveur) : on le saute au
-    // bout de 5 s, dès qu'une action plus loin existe. Pendant un rattrapage, les numéros
-    // jusqu'à la fin du rattrapage ont tous été réservés : un trou est sauté même s'il est le dernier.
+    // Trou dans la numérotation : le jeu n'en fait plus (voir ecrireAction : numéro et action écrits ensemble). Filet de
+    // sécurité si une place restait vide quand même : sautée au bout de 5 s, dès qu'une action plus loin existe (et pendant
+    // un rattrapage, jusqu'à sa dernière action), pour ne pas bloquer la partie.
     const plusLoin = Array.from(fileActions.keys()).some(k => k > prochainSeq) ||
       (rattrapageEnCours && prochainSeq <= seqFinRattrapage);
     if(plusLoin && !timerTrou){
@@ -401,10 +400,9 @@ function traiterFile(){
   const essayer = () => {
     if(manche !== mancheCourante || generation !== generationFile) return;
 
-    // Action refusée par le serveur pendant qu'on attendait de pouvoir l'appliquer : sautée
-    // (et sautée aussi : action retirée par un « Annuler » du choix, voir appliquerDefaireEnLigne)
+    // (sautée : action retirée par un « Annuler » du choix, voir appliquerDefaireEnLigne)
     seqEnCours = prochainSeq;
-    const resultat = (action.refusee || seqsAnnulees.has(prochainSeq) || estUnDoublon(action)) ? "ignorer" : tenterAction(action);
+    const resultat = (seqsAnnulees.has(prochainSeq) || estUnDoublon(action)) ? "ignorer" : tenterAction(action);
     if(resultat === "ok"){
       actionsAppliquees.set(`${action.par}|${action.id}`, prochainSeq);
       actionAppliquee(prochainSeq);
@@ -506,6 +504,8 @@ function commencerRattrapage(cible, texte = "Retour dans la partie…"){
 function majRattrapage(){
   const ecran = document.getElementById("ecranRattrapage");
   if(!ecran) return;
+  // (nombre d'actions pas encore connu : la manche est en cours de lecture, voir demarrerMancheEnLigne)
+  if(seqFinRattrapage <= 0){ ecran.innerText = texteRattrapage; return; }
   const fait = Math.min(prochainSeq - 1, seqFinRattrapage);
   ecran.innerText = `${texteRattrapage}\n${fait} / ${seqFinRattrapage}`;
 }
@@ -612,29 +612,39 @@ function demarrerMancheEnLigne(etat, options = {}){
     return;
   }
 
-  // Reconnexion en pleine manche : on regarde combien d'actions ont déjà été jouées,
-  // puis on les rejoue toutes en accéléré avant de reprendre normalement
+  // Reconnexion en pleine manche : on lit les actions déjà jouées, puis on les rejoue toutes en accéléré avant de
+  // reprendre normalement. L'écran d'attente est là dès maintenant : le plateau tout neuf, pas encore à jour, ne se
+  // touche pas. Lecture ratée (réseau) : on réessaie jusqu'à ce qu'elle passe. (Avant : au premier échec, toute la manche
+  // était rejouée à vitesse normale, annonces et sons compris, sur un plateau qu'on pouvait toucher.)
   repriseEnCours = false;
   const code = codePartieActuel;
   const manche = etat.manche;
-  // (+ les actions déjà là : celles retirées par un « Annuler » du choix sont sautées dès le rejeu)
-  Promise.all([
-    window.fbGet(window.fbRef(window.firebaseDB, `parties/${code}/manches/${manche}/seq`)),
-    window.fbGet(window.fbRef(window.firebaseDB, `parties/${code}/manches/${manche}/actions`))
-  ])
-    .then(([snapshot, snapActions]) => {
-      if(manche !== mancheCourante) return;
-      calculerAnnulations(snapActions.val());
-      const cible = Number(snapshot.val() || 0);
-      if(cible > 0) commencerRattrapage(cible, options.retourArriere ? "Retour en arrière…" : undefined);
+  const generation = generationFile; // (manche relancée ou quittée entre-temps : cette lecture ne compte plus)
+  const texte = options.retourArriere ? "Retour en arrière…" : undefined;
+  const refActions = window.fbRef(window.firebaseDB, `parties/${code}/manches/${manche}/actions`);
+  commencerRattrapage(0, texte);
+
+  const lire = (essai) => {
+    window.fbGet(refActions).then((snapActions) => {
+      if(generation !== generationFile || manche !== mancheCourante) return;
+      const brutes = snapActions.val();
+      // (les actions retirées par un « Annuler » du choix sont sautées dès le rejeu)
+      calculerAnnulations(brutes);
+      // Dernière action à rattraper : le plus grand numéro écrit
+      const cible = Object.keys(brutes || {}).reduce((max, k) => Math.max(max, Number(k) || 0), 0);
+      if(cible > 0) commencerRattrapage(cible, texte);
+      else finirRattrapage();
       ecouterActions();
       if(cible === 0) verifierRetourDansManche();
-    })
-    .catch(() => {
-      if(manche !== mancheCourante) return;
-      ecouterActions();
-      verifierRetourDansManche();
+    }, (erreur) => {
+      if(generation !== generationFile || manche !== mancheCourante) return;
+      noterJournal(`lecture de la manche ratée (essai ${essai}) : ${erreur && erreur.message}`);
+      setTimeout(() => {
+        if(generation === generationFile && manche === mancheCourante) lire(essai + 1);
+      }, Math.min(4000, 1000 * essai));
     });
+  };
+  lire(1);
 }
 
 // Code de la partie, discret : petit bouton 🔑 en bas à gauche, accessible par-dessus les overlays

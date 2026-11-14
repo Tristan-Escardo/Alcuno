@@ -152,7 +152,7 @@
       "$code": {
         ".read": true,
         ".write": "!data.exists() || !newData.exists()",
-        ".validate": "$code.matches(/^[A-Z2-9]{5,6}$/)",
+        ".validate": "$code.matches(/^[A-Z2-9]{5,6}$/) && newData.hasChildren(['version', 'joueurs'])",
         "version": { ".validate": "newData.isNumber()" },
         "creee": { ".validate": "newData.isNumber()" },
         "soft": { ".validate": "newData.isBoolean()" },

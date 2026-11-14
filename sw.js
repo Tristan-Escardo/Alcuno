@@ -1,13 +1,18 @@
 // Service worker d'Alcuno : rend le jeu installable et jouable hors connexion (mode classique).
 //
-// Stratégie « réseau d'abord » : avec internet, on prend TOUJOURS la dernière version en ligne
-// (et on met à jour la copie locale) ; la copie locale ne sert que quand il n'y a pas de réseau.
+// Stratégie « réseau d'abord » : avec internet, on prend TOUJOURS la dernière version en ligne ; la copie locale ne sert
+// que quand il n'y a pas de réseau, ou qu'il ne répond pas au bout de DELAI_RESEAU (réseau très faible : avant, l'appli
+// restait bloquée au lancement alors que tout le jeu était dans le téléphone).
 // Ainsi l'appli installée ne reste jamais bloquée sur une vieille version (sinon les téléphones
 // d'une partie en ligne n'auraient pas la même version).
 //
+// La copie locale (CACHE) est celle d'UNE version du jeu, prise en entier à l'installation de ce fichier : la page et ses
+// fichiers vont ensemble. Elle n'est complétée ensuite que par des fichiers de cette même version (voir « garder »), pour
+// ne jamais mélanger deux versions (page d'une version, fichiers d'une autre : plantages au lancement).
+//
 // Changer CACHE (ex. "alcuno-v2") force les téléphones à repartir d'une copie locale propre.
 
-const CACHE = "alcuno-v39"; // v39 : pastille hors connexion de nouveau grise en attente, version 9.88.14 ; v38 : pastille « hors connexion » des Réglages refaite (icônes, plus de gris), version 9.88.13 ; v37 : chevrons des sections sans rond autour, version 9.88.12 ; v36 : Réglages en Sections, tout fermé au lancement de l appli (la section ouverte n est gardée que lors du rechargement d un changement de thème), version 9.88.11 ; v35 : flèches des sections refaites (chevron dans une pastille, > quand ouvert), version 9.88.10 ; v34 : Réglages, Kawaii tuiles / sections / Mise en page bien visibles, Star Wars menu aux couleurs de Retour, version 9.88.9 ; v33 : menu Mise en page, néon autour du menu entier en Star Wars et BDSM, version 9.88.8 ; v32 : Réglages en 3 vues au choix (Liste, Sections, Tuiles), bouton Mise en page, Modifier en symbole, réglage Langue (français seulement), plus de saut au changement de thème, version 9.88.7 ; v31 : pilotage, défis du jeu souvent refusés repérés, version 9.88.6 ; v30 : pilotage (doublons de défis et {nom1}/{nom2} en hard refusés), fichier son inutilisé supprimé, version 9.88.5 ; v29 : musiques hors connexion gardées dans un cache à part (plus supprimées à chaque mise en ligne) ; v28 : accueil sans sélection de texte à l'appui long (écran bleu sur iPhone), thème BDSM sans carré autour des noms au +4 ; v27 : crédits, mentions honorables côte à côte ; v26 : couronne argentée pour Jojo ; v25 : mode hard (défis sexuels à 2 joueurs, débloqué par un mot secret, js/zizi-coptere.js, Sons/mode_hard.mp3, Sons/zizicoptere.mp3), zizi-coptère du thème BDSM, chaîne sous le titre BDSM ; v24 : calendrier des thèmes de fête (dates par défaut, changeables depuis le pilotage) ; v23 : thèmes de fête (Noël, Chandeleur, Saint-Valentin, Saint-Patrick, Just Rosé, Fête de la musique, Halloween), feux du Nouvel An et de la Fête nationale, poisson d'avril, piano de l'accueil, musiques et sons, carte Coup de foudre ; v22 : sons des boutons BDSM retouchés (le test du cache était en échec) ; v21 : sons des boutons du thème BDSM (Sons/bdsm_buttons/) ; v20 : musique du thème BDSM, son de l'étoile filante ; v19 : faces de cartes du thème BDSM (Cartes/donjon/) ; v18 : dos des cartes du thème Donjon (cœur masqué) ; v17 : thème Donjon (style_donjon.css, donjon/) ; v16 : mode hot (js/mode-hot.js, carte Cupidon) ; v15 : 4 sons de sabre retirés ; v14 : FAQ (js/faq.js) ; // v13 : musique d'ambiance gardée en cache à la première écoute (hors connexion) ; v12 : trois dos Star Wars qui alternent ; v11 : dos Star Wars en acier (dos_galaxie_argent.svg) ; v10 : faces de cartes Star Wars (Cartes/galaxie/) ; v9 : faces de cartes Kawaii (Cartes/kawaii/) ; v8 : dos Kawaii renommés (dos_kawaii_alcuno_*) pour sortir des anciens caches ; v7 : dos Kawaii avec « ALC UNO » ; v6 : dos de cartes Kawaii ; v5 : petits personnages flottants du thème Kawaii ; v4 : album de stickers et thème Kawaii ; v3 : QR code de la partie (js/qrcode.js) ; v2 : cartes HD en WebP (les anciennes .jpg sont supprimées du cache)
+const CACHE = "alcuno-v40"; // v40 : réseau trop lent (3 s) => copie locale, copie locale d'une seule version, fichiers en « ?v=version » (plus retéléchargés à chaque lancement), version 9.88.15 ; v39 : pastille hors connexion de nouveau grise en attente, version 9.88.14 ; v38 : pastille « hors connexion » des Réglages refaite (icônes, plus de gris), version 9.88.13 ; v37 : chevrons des sections sans rond autour, version 9.88.12 ; v36 : Réglages en Sections, tout fermé au lancement de l appli (la section ouverte n est gardée que lors du rechargement d un changement de thème), version 9.88.11 ; v35 : flèches des sections refaites (chevron dans une pastille, > quand ouvert), version 9.88.10 ; v34 : Réglages, Kawaii tuiles / sections / Mise en page bien visibles, Star Wars menu aux couleurs de Retour, version 9.88.9 ; v33 : menu Mise en page, néon autour du menu entier en Star Wars et BDSM, version 9.88.8 ; v32 : Réglages en 3 vues au choix (Liste, Sections, Tuiles), bouton Mise en page, Modifier en symbole, réglage Langue (français seulement), plus de saut au changement de thème, version 9.88.7 ; v31 : pilotage, défis du jeu souvent refusés repérés, version 9.88.6 ; v30 : pilotage (doublons de défis et {nom1}/{nom2} en hard refusés), fichier son inutilisé supprimé, version 9.88.5 ; v29 : musiques hors connexion gardées dans un cache à part (plus supprimées à chaque mise en ligne) ; v28 : accueil sans sélection de texte à l'appui long (écran bleu sur iPhone), thème BDSM sans carré autour des noms au +4 ; v27 : crédits, mentions honorables côte à côte ; v26 : couronne argentée pour Jojo ; v25 : mode hard (défis sexuels à 2 joueurs, débloqué par un mot secret, js/zizi-coptere.js, Sons/mode_hard.mp3, Sons/zizicoptere.mp3), zizi-coptère du thème BDSM, chaîne sous le titre BDSM ; v24 : calendrier des thèmes de fête (dates par défaut, changeables depuis le pilotage) ; v23 : thèmes de fête (Noël, Chandeleur, Saint-Valentin, Saint-Patrick, Just Rosé, Fête de la musique, Halloween), feux du Nouvel An et de la Fête nationale, poisson d'avril, piano de l'accueil, musiques et sons, carte Coup de foudre ; v22 : sons des boutons BDSM retouchés (le test du cache était en échec) ; v21 : sons des boutons du thème BDSM (Sons/bdsm_buttons/) ; v20 : musique du thème BDSM, son de l'étoile filante ; v19 : faces de cartes du thème BDSM (Cartes/donjon/) ; v18 : dos des cartes du thème Donjon (cœur masqué) ; v17 : thème Donjon (style_donjon.css, donjon/) ; v16 : mode hot (js/mode-hot.js, carte Cupidon) ; v15 : 4 sons de sabre retirés ; v14 : FAQ (js/faq.js) ; // v13 : musique d'ambiance gardée en cache à la première écoute (hors connexion) ; v12 : trois dos Star Wars qui alternent ; v11 : dos Star Wars en acier (dos_galaxie_argent.svg) ; v10 : faces de cartes Star Wars (Cartes/galaxie/) ; v9 : faces de cartes Kawaii (Cartes/kawaii/) ; v8 : dos Kawaii renommés (dos_kawaii_alcuno_*) pour sortir des anciens caches ; v7 : dos Kawaii avec « ALC UNO » ; v6 : dos de cartes Kawaii ; v5 : petits personnages flottants du thème Kawaii ; v4 : album de stickers et thème Kawaii ; v3 : QR code de la partie (js/qrcode.js) ; v2 : cartes HD en WebP (les anciennes .jpg sont supprimées du cache)
 
 // Cache des MUSIQUES d'ambiance (Sons/musique*.mp3), à part de CACHE : CACHE change à chaque mise en ligne et l'ancien cache est
 // supprimé (voir « activate »), ce qui effaçait les musiques téléchargées pour le hors connexion (à retélécharger ensuite).
@@ -372,11 +377,15 @@ const SONS_A_PRECHARGER = ["zizicoptere", "mode_hard", "cartes", "doree", "tiens
   .concat(["piano/piano_fa4", "piano/piano_fa4d", "piano/piano_sol4", "piano/piano_sol4d", "piano/piano_la4", "piano/piano_la4d", "piano/piano_si4", "piano/piano_do5", "piano/piano_do5d", "piano/piano_re5", "piano/piano_re5d", "piano/piano_mi5", "piano/piano_fa5", "piano/piano_fa5d", "piano/piano_sol5"])
   .map((nom) => `./Sons/${nom}.mp3`);
 
+// (« reload » : pris sur le serveur, pas dans la mémoire du navigateur, qui peut garder un fichier 10 min : la copie locale
+// doit être celle de cette version)
+const frais = (adresse) => new Request(adresse, { cache: "reload" });
+
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE)
-      .then((cache) => cache.addAll(A_PRECHARGER)
-        .then(() => Promise.all(SONS_A_PRECHARGER.map((son) => cache.add(son).catch(() => {})))))
+      .then((cache) => cache.addAll(A_PRECHARGER.map(frais))
+        .then(() => Promise.all(SONS_A_PRECHARGER.map((son) => cache.add(frais(son)).catch(() => {})))))
       .then(() => self.skipWaiting())
   );
 });
@@ -405,7 +414,7 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(requete.url);
   // Firebase, polices, etc. : pas touché (le mode en ligne a de toute façon besoin du réseau)
   if (url.origin !== self.location.origin) return;
-  // Une seule copie par fichier : on ignore le « ?t=... » anti-cache de index.html
+  // Une seule copie par fichier : on ignore le « ?v=... » de index.html
   const cle = url.origin + url.pathname;
 
   // Musique d'ambiance : le jeu la télécharge en entier (Web Audio). Fichiers lourds (1 à 3 Mo) qui ne changent pas : on ne les garde
@@ -426,27 +435,71 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // La page (index.html) est toujours redemandée au serveur (« no-cache » : revalidée, un 304 suffit). Sinon GitHub Pages la laisse
+  // La page du jeu (index.html) est toujours redemandée au serveur (« no-cache » : revalidée, un 304 suffit). Sinon GitHub Pages la laisse
   // 10 minutes dans le cache du navigateur : juste après une mise en ligne, un téléphone avait l'ANCIENNE page avec les NOUVEAUX
-  // fichiers du jeu (leur « ?t=… » les rend toujours neufs), d'où des plantages d'un seul coup (« null is not an object » à
+  // fichiers du jeu, d'où des plantages d'un seul coup (« null is not an object » à
   // reglages.js, « estIOS is not defined »…, onglet Santé d'Alcuno Stats).
-  const page = requete.mode === "navigate" || url.pathname.endsWith("/index.html");
+  const navigation = requete.mode === "navigate";
+  const racine = new URL("./", self.registration.scope).pathname;
+  const pageJeu = url.pathname === racine || url.pathname === racine + "index.html";
+  const version = url.searchParams.get("v"); // fichiers du jeu : « script.js?v=9.88.15 » (index.html)
+  const adressePage = new URL("./index.html", self.registration.scope).href;
+
+  const reseau = (pageJeu || navigation ? fetch(requete.url, { cache: "no-cache", credentials: "same-origin" }) : fetch(requete))
+    .then((reponse) => {
+      if (reponse.ok && reponse.status === 200 && !pageJeu) garder(cle, reponse.clone(), version);
+      return reponse;
+    });
+  event.waitUntil(reseau.catch(() => {})); // (réponse donnée depuis la copie locale : le téléchargement en cours va quand même au bout)
+
+  // Copie locale à donner quand le réseau TARDE : seulement si elle va avec le reste (voir l'en-tête)
+  const copieSure = () => {
+    if (pageJeu) return caches.match(adressePage);
+    if (version === null) return caches.match(cle); // images, sons… : pas liés à une version
+    return versionDeLaCopie().then((v) => (v && v === version ? caches.match(cle) : undefined));
+  };
+  // Dernier recours quand le réseau a ÉCHOUÉ : ce qu'on a, même d'une autre version
+  const dernierRecours = () => caches.match(cle).then((enCache) => {
+    if (enCache) return enCache;
+    // Page du jeu demandée avec une autre adresse (ex. ?v=...) : on sert index.html
+    if (pageJeu) return caches.match(adressePage).then((p) => p || Response.error());
+    return Response.error();
+  });
+
+  const tropLent = new Promise((fini) => setTimeout(() => fini("lent"), DELAI_RESEAU));
   event.respondWith(
-    (page ? fetch(requete.url, { cache: "no-cache", credentials: "same-origin" }) : fetch(requete))
-      .then((reponse) => {
-        if (reponse.ok) {
-          const copie = reponse.clone();
-          caches.open(CACHE).then((cache) => cache.put(cle, copie));
-        }
-        return reponse;
-      })
-      .catch(() =>
-        caches.match(cle).then((enCache) => {
-          if (enCache) return enCache;
-          // Page d'accueil demandée avec une autre adresse (ex. ?v=...) : on sert index.html
-          if (requete.mode === "navigate") return caches.match(new URL("./index.html", self.registration.scope).href);
-          return Response.error();
-        })
-      )
+    Promise.race([reseau, tropLent]).then((premier) => {
+      if (premier !== "lent") return premier;
+      return copieSure().then((enCache) => enCache || reseau.catch(dernierRecours));
+    }, dernierRecours)
   );
 });
+
+// Réseau qui ne répond pas au bout de ce délai : on donne la copie locale (le téléchargement continue derrière)
+const DELAI_RESEAU = 3000;
+
+// Version du jeu de la copie locale : lue dans sa page (index.html : VERSION_FICHIERS), une fois
+let versionCopie = null;
+function versionDeLaCopie(){
+  if (versionCopie) return versionCopie;
+  const lecture = caches.open(CACHE)
+    .then((cache) => cache.match(new URL("./index.html", self.registration.scope).href))
+    .then((page) => (page ? page.text() : ""))
+    .then((texte) => (texte.match(/VERSION_FICHIERS = "([^"]+)"/) || [])[1] || "")
+    .catch(() => "");
+  lecture.then((v) => { if (v) versionCopie = lecture; }); // (copie pas encore prête : relue la prochaine fois)
+  return lecture;
+}
+
+// Garde une réponse du réseau dans la copie locale, si elle ne risque pas d'y mélanger deux versions :
+// - la page du jeu : jamais (celle de la copie est prise à l'installation, avec tous ses fichiers) ;
+// - un fichier du jeu (« ?v= ») : seulement s'il est de la version de la copie ;
+// - le reste (images, sons, page des stats…) : toujours, comme avant.
+function garder(cle, copie, version){
+  const mettre = () => caches.open(CACHE).then((cache) => cache.put(cle, copie)).catch(() => {});
+  if (version === null) { mettre(); return; }
+  versionDeLaCopie().then((v) => {
+    if (v && v === version) mettre();
+    else if (copie.body) copie.body.cancel().catch(() => {}); // (pas gardée : on ne la lit pas)
+  });
+}
