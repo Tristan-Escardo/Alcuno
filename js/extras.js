@@ -597,17 +597,28 @@ function ouvrirEthylo(sansSon){
     const ilYa = minuteDe(t);
     return ilYa <= 0 ? ["maintenant", "donc à " + heureIlYa(0)] : ["il y a " + texteDureeEthylo(ilYa), "donc à " + heureIlYa(ilYa)];
   };
-  const curseurQuand = (titre, cle) => glissiereEthylo(titre, 0, DUREE_MAX_ETHYLO, 1, DUREE_MAX_ETHYLO - Math.min(DUREE_MAX_ETHYLO, ethylo[cle]),
-    texteQuand, (t) => { ethylo[cle] = minuteDe(t); maj(); }, { aimant: aimantHeure, estPalier: estDemiHeure, graduations: graduationsHeures });
+  // (l'heure choisie reste accrochée à l'horloge : quand les minutes passent, le curseur recule avec elle, l'heure ne dérive pas)
+  const ancres = {};
+  const ancrer = (cle) => { ancres[cle] = ethylo[cle] > 0 ? Math.floor((Date.now() - ethylo[cle] * 60000) / 60000) * 60000 : null; };
+  const curseurQuand = (titre, cle) => {
+    ancrer(cle);
+    return glissiereEthylo(titre, 0, DUREE_MAX_ETHYLO, 1, DUREE_MAX_ETHYLO - Math.min(DUREE_MAX_ETHYLO, ethylo[cle]),
+      texteQuand, (t) => { ethylo[cle] = minuteDe(t); ancrer(cle); maj(); }, { aimant: aimantHeure, estPalier: estDemiHeure, graduations: graduationsHeures });
+  };
   // (les valeurs de départ aussi tombent sur une demi-heure)
   ["debut", "dernier"].forEach((cle) => { ethylo[cle] = Math.max(0, minuteDe(aimantHeure(DUREE_MAX_ETHYLO - Math.min(DUREE_MAX_ETHYLO, ethylo[cle])))); });
   const premier = curseurQuand("Premier verre", "debut"), dernier = curseurQuand("Dernier verre", "dernier");
+  const suivreHorloge = (cle, g) => {
+    if (ancres[cle] == null) return;
+    const ilYa = Math.min(DUREE_MAX_ETHYLO, Math.round((Date.now() - ancres[cle]) / 60000));
+    ethylo[cle] = ilYa; g.poser(DUREE_MAX_ETHYLO - ilYa);
+  };
   quand.append(premier.ligne, dernier.ligne,
     elementExtras("p", "detailRegle ethyloAide", "Les verres sont comptés comme bus régulièrement entre les deux heures."));
   // (l'écran resté ouvert : les heures écrites suivent l'horloge)
   const minuterie = setInterval(() => {
     if (!quand.isConnected) { clearInterval(minuterie); return; }
-    premier.redessiner(); dernier.redessiner(); maj();
+    suivreHorloge("debut", premier); suivreHorloge("dernier", dernier); premier.redessiner(); dernier.redessiner(); maj();
   }, 60000);
 
   // (« Tout remettre à zéro » : en bas du bloc « Ce que tu as bu », il ne vide que les verres)
