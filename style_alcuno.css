@@ -7910,7 +7910,7 @@ html[data-theme="soleil"] :is(.detailRegle, #voletCarte .voletPause-texte) em{ c
 
 
 /* Partie : remonter tout en haut (js/plateau.js) — rond translucide discret, en bas à gauche */
-#btnRemonter{
+#btnRemonter, #btnRemonterRegles{
   position: fixed;
   left: 16px;
   bottom: calc(20px + env(safe-area-inset-bottom));
@@ -7935,16 +7935,18 @@ html[data-theme="soleil"] :is(.detailRegle, #voletCarte .voletPause-texte) em{ c
   -webkit-tap-highlight-color: transparent;
   touch-action: none; /* le doigt sur la flèche ne fait jamais défiler la page */
 }
-#btnRemonter.visible{
+#btnRemonter.visible, #btnRemonterRegles.visible{
   opacity: 1;
   visibility: visible;
   transform: none;
   transition: opacity 0.25s ease, transform 0.25s ease, visibility 0s;
 }
-#btnRemonter:active{ transform: scale(0.92); }
-#btnRemonter svg{ width: 22px; height: 22px; fill: none; stroke: rgba(255, 255, 255, 0.85); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
-html[data-theme="givre"] #btnRemonter{ background: rgba(255, 255, 255, 0.45); border-color: rgba(13, 53, 80, 0.2); }
-html[data-theme="givre"] #btnRemonter svg{ stroke: rgba(13, 53, 80, 0.8); }
+#btnRemonter:active, #btnRemonterRegles:active{ transform: scale(0.92); }
+/* (la flèche de l'écran des Règles, js/extras.js : par-dessus cet écran) */
+#btnRemonterRegles{ z-index: 10003; }
+#btnRemonter svg, #btnRemonterRegles svg{ width: 22px; height: 22px; fill: none; stroke: rgba(255, 255, 255, 0.85); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+html[data-theme="givre"] :is(#btnRemonter, #btnRemonterRegles){ background: rgba(255, 255, 255, 0.45); border-color: rgba(13, 53, 80, 0.2); }
+html[data-theme="givre"] :is(#btnRemonter, #btnRemonterRegles) svg{ stroke: rgba(13, 53, 80, 0.8); }
 
 /* Bloc Règles en partie (et télé) : titre doré, puces, gorgées en doré (afficherRegleBloc, js/plateau.js) */
 .regleBloc{ white-space: normal; }
@@ -7969,7 +7971,7 @@ html[data-theme="soleil"] #ecranTele .tele-regles.regleBloc{ color: #fff1df; }
 
 /* Mode gaucher (Réglages, js/reglages.js) : ce qui se touche au pouce passe de l'autre côté */
 .mainGauche{ display: inline-block; transform: scaleX(-1); } /* (l'emoji 🤚 est une main droite) */
-html.gaucher #btnRemonter{ left: auto; right: 16px; }
+html.gaucher :is(#btnRemonter, #btnRemonterRegles){ left: auto; right: 16px; }
 /* la clé suit la flèche, et son texte « Code : … » s'ouvre vers la gauche */
 html.gaucher #btnCodePartie{ left: auto; right: 17px; flex-direction: row-reverse; }
 html.gaucher #annulerChoix{ flex-direction: row-reverse; }
@@ -9758,6 +9760,16 @@ html[data-theme="soleil"] #choixMode .carteEthylo{ --fond: linear-gradient(180de
   transition: border-color 0.3s ease;
 }
 #ecranRegles .ethyloResultat[hidden]{ display: none; }
+/* (fond plein dans tous les thèmes : collé en haut, il passe par-dessus le reste de la page, qui ne doit pas se lire au travers) */
+html[data-theme] #ecranRegles .blocRegles.ethyloResultat{
+  background: linear-gradient(rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.07)), var(--couleur-barre, #2b001d) !important;
+}
+/* (Kawaii impose un autre placement à ses blocs : le résultat doit quand même rester collé en haut) */
+@media (min-height: 521px){
+  html[data-theme] #ecranRegles .blocRegles.ethyloResultat{ position: sticky !important; top: 4px !important; z-index: 2 !important; }
+}
+/* (place pour la flèche « remonter », en bas de l'écran : elle ne recouvre pas la dernière ligne) */
+#ecranRegles #listeRegles{ padding-bottom: 56px; }
 @media (max-height: 520px){ #ecranRegles .ethyloResultat{ position: static; } }
 #ecranRegles .ethyloResultat[data-etat="rouge"]{ border-color: #ff5252 !important; }
 #ecranRegles .ethyloResultat[data-etat="orange"]{ border-color: #ffb300 !important; }
@@ -9864,7 +9876,7 @@ html[data-theme="soleil"] #choixMode .carteEthylo{ --fond: linear-gradient(180de
 #ecranRegles .ethyloBieres{ display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 0 2px; }
 #ecranRegles .ethyloBieres:empty{ display: none; }
 #ecranRegles .ethyloBieres .extrasPuce{ opacity: 1; font-size: 13px; padding: 6px 12px; animation: ethyloPop 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.6); }
-#ecranRegles .ethyloRemise{ margin: 0 auto; }
+#ecranRegles .ethyloRemise{ display: block; margin: 12px auto 2px; }
 /* Numéros utiles : un appui lance l'appel */
 #ecranRegles .ethyloNumero{ display: flex; align-items: center; gap: 12px; padding: 9px 0; color: inherit; text-decoration: none; -webkit-tap-highlight-color: transparent; transition: transform 0.15s ease; }
 #ecranRegles .ethyloNumero + .ethyloNumero{ border-top: 1px solid rgba(128, 128, 128, 0.25); }

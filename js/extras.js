@@ -564,8 +564,6 @@ function ouvrirEthylo(sansSon){
   // (si le « dernier » est mis avant le « premier », le calcul les remet simplement dans l'ordre)
   const quand = elementExtras("div", "blocRegles ethyloBloc");
   quand.appendChild(elementExtras("h3", "", "Quand"));
-  quand.appendChild(elementExtras("p", "detailRegle ethyloAide",
-    "Glisse vers la droite pour plus récent. Premier verre : quand tu as commencé ; dernier verre : quand tu as fini (tout à droite si tu bois encore)."));
   const minuteDe = (t) => DUREE_MAX_ETHYLO - t; // (position du curseur => il y a tant de minutes)
   const aimantHeure = (t) => {
     const ilYa = minuteDe(t);
@@ -602,9 +600,11 @@ function ouvrirEthylo(sansSon){
     premier.redessiner(); dernier.redessiner(); maj();
   }, 60000);
 
+  // (« Tout remettre à zéro » : en bas du bloc « Ce que tu as bu », il ne vide que les verres)
   const remise = elementExtras("button", "btnFaqLien ethyloRemise", "Tout remettre à zéro");
   remise.type = "button";
-  remise.addEventListener("click", () => { ethylo.verres = {}; ethylo.bieres = {}; ouvrirEthylo(true); });
+  remise.addEventListener("click", () => { ethylo.verres = {}; ethylo.bieres = {}; const y = ecranRegles.scrollTop; ouvrirEthylo(true); ecranRegles.scrollTop = y; });
+  bu.appendChild(remise);
 
   // --- Numéros utiles ---
   const numeros = elementExtras("div", "blocRegles ethyloBloc");
@@ -622,12 +622,53 @@ function ouvrirEthylo(sansSon){
     "Quelqu'un a trop bu et ne réagit plus ? Couche-le sur le côté, ne le laisse pas seul et appelle le 15."));
 
   liste.append(
-    elementExtras("p", "extrasSousTitre", "Pour estimer quand tu pourras reprendre le volant sans risquer ton permis."),
-    resultat, toi, bu, quand, remise, numeros, elementExtras("p", "extrasNote",
-    "Estimation indicative (formule de Widmark, hypothèses prudentes). Le vrai taux change d'une personne à l'autre : repas, fatigue, " +
-    "médicaments, santé. Seul un éthylotest fait foi. Dans le doute, ne prends pas le volant : dors sur place, fais-toi raccompagner ou prends un taxi."));
+    elementExtras("p", "extrasSousTitre", "Pour garder ton permis"),
+    resultat, toi, bu, quand, numeros,
+    elementExtras("p", "extrasNote", "Le vrai taux change d'une personne à l'autre : repas, fatigue, médicaments, santé."),
+    elementExtras("p", "extrasNote", "L'abus d'alcool est dangereux pour la santé, buvez avec modération. C'est vrai qu'il est pas souvent là en soirée mais c'est vraiment un chic type, c'est un tigre, un maestrom, un chevalier du zodiaque, un dragan du crépuscule, le café bien chaud qui t'apaise le matin bigoulet 😘"));
   maj();
 }
+// #endregion
+
+// #region Flèche « remonter » de l'écran des Règles (Règles, Bar, Éthylotest, album, FAQ)
+// La même que celle du plateau (#btnRemonter, js/plateau.js), mais pour cet écran, qui défile à part. Pas un <button> : les thèmes
+// à néon dessinent un cadre autour de chaque bouton. Remontée animée ici : le défilement « smooth » s'arrête en route sur iPhone.
+(() => {
+  const page = document.getElementById("ecranRegles");
+  if (!page) return;
+  const fleche = document.createElement("div");
+  fleche.id = "btnRemonterRegles";
+  fleche.setAttribute("role", "button");
+  fleche.setAttribute("aria-label", "Remonter en haut");
+  fleche.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>';
+  document.body.appendChild(fleche);
+  const majFleche = () => fleche.classList.toggle("visible",
+    page.style.display !== "none" && !page.classList.contains("page-sortie") && page.scrollTop > 400);
+  page.addEventListener("scroll", majFleche, { passive: true });
+  if (window.MutationObserver) new MutationObserver(majFleche).observe(page, { attributes: true, attributeFilter: ["class", "style"] });
+  let enCours = null, auDoigtA = 0;
+  const remonter = () => {
+    cancelAnimationFrame(enCours);
+    const depart = page.scrollTop;
+    if (depart <= 0) return;
+    const debut = performance.now(), duree = Math.min(650, 250 + depart / 8);
+    const etape = (maintenant) => {
+      const avance = Math.min(1, (maintenant - debut) / duree);
+      page.scrollTop = Math.round(depart * Math.pow(1 - avance, 3)); // rapide au début, en douceur à l'arrivée
+      enCours = avance < 1 ? requestAnimationFrame(etape) : null;
+    };
+    enCours = requestAnimationFrame(etape);
+  };
+  fleche.addEventListener("touchstart", (e) => {
+    if (e.cancelable) e.preventDefault();
+    auDoigtA = Date.now();
+    jouerSon("bouton");
+    remonter();
+  }, { passive: false });
+  fleche.addEventListener("click", () => { if (Date.now() - auDoigtA > 800) remonter(); });
+  // (un doigt posé ailleurs arrête la remontée)
+  page.addEventListener("touchstart", () => { if (enCours) { cancelAnimationFrame(enCours); enCours = null; } }, { passive: true });
+})();
 // #endregion
 
 // #region Cartes de l'accueil (Bar, Album, Éthylotest)
