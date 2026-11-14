@@ -623,7 +623,7 @@ function ouvrirEthylo(sansSon){
 
   liste.append(
     elementExtras("p", "extrasSousTitre", "Pour garder ton permis"),
-    resultat, toi, bu, quand, numeros,
+    resultat, toi, quand, bu, numeros,
     elementExtras("p", "extrasNote", "Le vrai taux change d'une personne à l'autre : repas, fatigue, médicaments, santé."),
     elementExtras("p", "extrasNote", "L'abus d'alcool est dangereux pour la santé, buvez avec modération. C'est vrai qu'il est pas souvent là en soirée mais c'est vraiment un chic type, c'est un tigre, un maestrom, un chevalier du zodiaque, un dragan du crépuscule, le café bien chaud qui t'apaise le matin bigoulet 😘"));
   maj();
