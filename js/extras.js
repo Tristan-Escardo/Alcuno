@@ -320,12 +320,14 @@ function texteDureeEthylo(minutes){
   const h = Math.floor(minutes / 60), m = minutes % 60;
   return h ? `${h} h${m ? " " + String(m).padStart(2, "0") : ""}` : `${m} min`;
 }
-// « vers 3 h 45 (dans 2 h 10) », arrondi au quart d'heure d'après
+// « 2 h 10, donc à 3 h 45 » : l'attente, puis l'heure de l'horloge (arrondie au quart d'heure d'après)
 function texteHeureEthylo(minutes){
-  const dans = Math.ceil(minutes / 15) * 15;
-  const d = new Date(Date.now() + dans * 60000);
+  const d = new Date(Date.now() + minutes * 60000);
+  d.setSeconds(0, 0);
+  if (d.getMinutes() % 15) d.setMinutes(Math.ceil(d.getMinutes() / 15) * 15);
+  const dans = Math.max(1, Math.round((d.getTime() - Date.now()) / 60000));
   const demain = d.getDate() !== new Date().getDate();
-  return `vers ${d.getHours()} h ${String(Math.floor(d.getMinutes() / 15) * 15).padStart(2, "0")}${demain ? " demain" : ""} (dans ${texteDureeEthylo(dans)})`;
+  return `${texteDureeEthylo(dans)}, donc à ${d.getHours()} h ${String(d.getMinutes()).padStart(2, "0")}${demain ? " demain" : ""}`;
 }
 
 // Rejoue une petite animation (classe « pop ») sur un élément
@@ -363,16 +365,14 @@ function majResultatEthylo(zone){
   const ligne = (texte) => lignes.appendChild(elementExtras("p", "ethyloLigne", texte));
   if (r.taux >= limite) {
     verdict.textContent = "Tu ne conduis pas.";
-    ligne(`Au-dessus de la limite de ${texteLimite}.`);
-    ligne(`Sous la limite ${texteHeureEthylo(r.sousLimite)}, à zéro ${texteHeureEthylo(r.zero)}, si tu ne bois plus rien.`);
+    ligne(`Attends ${texteHeureEthylo(r.sousLimite)} avant de reprendre le volant.`);
   } else if (r.taux > 0) {
-    verdict.textContent = "Sous la limite d'après l'estimation, mais pas à zéro.";
-    ligne(`Limite : ${texteLimite}. Tes réflexes sont déjà diminués : le plus sûr est d'attendre zéro, ${texteHeureEthylo(r.zero)}.`);
+    verdict.textContent = "Sous la limite, mais pas à zéro.";
+    ligne(`Le plus sûr : attends ${texteHeureEthylo(r.zero)}.`);
   } else {
     verdict.textContent = "Estimation : zéro.";
-    ligne("D'après ce que tu as indiqué, l'alcool est éliminé. Seul un éthylotest peut le confirmer.");
   }
-  if (ethylo.dernier < 45 && r.taux > 0) ligne("Dernier verre récent : ton taux peut encore monter pendant près d'une heure.");
+  if (ethylo.dernier < 45 && r.taux > 0) ligne("Dernier verre récent : ton taux peut encore monter.");
 }
 
 // Un réglage à glisser : nom, valeur écrite, curseur, graduations dessous.
@@ -560,7 +560,7 @@ function ouvrirEthylo(sansSon){
   });
 
   // --- Quand --- : deux curseurs indépendants sur une même frise (à gauche : il y a 16 h, à droite : maintenant), qui
-  // donnent l'heure de l'horloge du téléphone. Attirés par les heures et les demi-heures (à 7 min près), sinon de 5 en 5 min.
+  // donnent l'heure de l'horloge du téléphone. Toujours sur un quart d'heure.
   // (si le « dernier » est mis avant le « premier », le calcul les remet simplement dans l'ordre)
   const quand = elementExtras("div", "blocRegles ethyloBloc");
   quand.appendChild(elementExtras("h3", "", "Quand"));
@@ -569,11 +569,9 @@ function ouvrirEthylo(sansSon){
     const ilYa = minuteDe(t);
     if (ilYa <= 3) return DUREE_MAX_ETHYLO; // (tout à droite : maintenant)
     const heure = new Date(Date.now() - ilYa * 60000), m = heure.getMinutes();
-    const versDemi = Math.round(m / 30) * 30 - m;            // vers l'heure ou la demi-heure la plus proche
-    const decalage = Math.abs(versDemi) <= 7 ? versDemi : Math.round(m / 5) * 5 - m; // sinon, de 5 en 5 minutes
-    return t + decalage;
+    return t + Math.round(m / 15) * 15 - m; // vers le quart d'heure le plus proche
   };
-  const estDemiHeure = (t) => minuteDe(t) > 0 && new Date(Date.now() - minuteDe(t) * 60000).getMinutes() % 30 === 0;
+  const estDemiHeure = (t) => minuteDe(t) > 0 && new Date(Date.now() - minuteDe(t) * 60000).getMinutes() % 15 === 0;
   const graduationsHeures = () => {
     const g = [], maintenant = new Date();
     const debut = new Date(maintenant.getTime() - DUREE_MAX_ETHYLO * 60000);
