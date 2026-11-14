@@ -41,7 +41,7 @@ const QUESTIONS_FAQ = [
 function ouvrirFaq(){
   jouerSon("regles");
   const page = ecranRegles;
-  page.classList.remove("album");
+  page.classList.remove("album", "bar", "ethylo");
   page.classList.add("faq");
   page.querySelector("h2").textContent = "Questions fréquentes";
   const liste = document.getElementById("listeRegles");

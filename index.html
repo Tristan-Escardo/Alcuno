@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <!-- Version des fichiers du jeu : la même que VERSION_AFFICHEE dans script.js (tests/test_cache.js le vérifie), à changer
-         à chaque mise en ligne. Elle est ajoutée à l'adresse de chaque fichier (« script.js?v=9.88.15 ») : GitHub Pages fait
+         à chaque mise en ligne. Elle est ajoutée à l'adresse de chaque fichier (« script.js?v=9.89.0 ») : GitHub Pages fait
          garder les fichiers 10 min par les navigateurs, une adresse neuve à chaque version force donc la nouvelle.
          (Avant : « ?t= » + l'heure, différent à chaque lancement : tout le jeu était retéléchargé à chaque ouverture,
          environ 400 Ko. Maintenant, tant que la version ne change pas, le navigateur se contente de vérifier.) -->
     <script>
-        window.VERSION_FICHIERS = "9.88.15";
+        window.VERSION_FICHIERS = "9.89.0";
         // (ailleurs que sur le vrai site — poste de dev, appli de test — : l'heure en plus, comme avant, pour voir tout de
         // suite un fichier modifié sans changer de version)
         window.ANTI_CACHE = /(^|\.)github\.io$/i.test(location.hostname) ? window.VERSION_FICHIERS : window.VERSION_FICHIERS + "-" + Date.now();
@@ -24,7 +24,7 @@
         // et en parallèle : en bas de la page, ils s'exécutent d'affilée, sans attente entre deux fichiers
         // (aucun bouton ni minuteur ne peut se déclencher avant que tout le jeu soit là).
         window.FICHIERS_JEU = ["script.js", "js/qrcode.js", "js/config-lib.js", "js/reglages.js", "js/en-ligne.js", "js/plateau.js", "js/regles.js", "js/mode-hot.js", "js/zizi-coptere.js", "js/reglages-vue.js",
-                               "js/synchro-en-ligne.js", "js/retour-demarrage.js", "js/tele.js", "js/stats.js", "js/config-distante.js", "js/stickers.js", "js/faq.js", "js/mouchard.js", "js/poisson.js", "js/piano-accueil.js"];
+                               "js/synchro-en-ligne.js", "js/retour-demarrage.js", "js/tele.js", "js/stats.js", "js/config-distante.js", "js/stickers.js", "js/faq.js", "js/mouchard.js", "js/poisson.js", "js/piano-accueil.js", "js/extras.js"];
         window.FICHIERS_JEU.forEach(function (f) {
             document.write('<link rel="preload" as="script" href="' + f + '?v=' + window.ANTI_CACHE + '">');
         });
@@ -251,9 +251,24 @@
             <button type="button" id="btnModeClassique">Mode classique<br>(Hors connexion)</button>
             <!-- Installer l'appli : petit bouton en bas (téléphone : rouvre l'écran « Installer Alcuno » ;
                  ordinateur avec Chrome : installe directement). Rien quand le jeu est déjà ouvert en appli. -->
-            <!-- Album de stickers : caché jusqu'à ce qu'on le découvre (3 taps rapides sur la barre arc-en-ciel sous le titre), voir js/stickers.js -->
-            <div class="albumAccueil" id="albumAccueil" hidden>
-                <button type="button" class="btnInstaller" id="btnAlbumAccueil">Album de stickers</button>
+            <!-- Cartes en éventail : le Bar (recettes de cocktails) et l'Éthylo (estimation du taux d'alcool), js/extras.js.
+                 Entre les deux, l'album de stickers : caché jusqu'à ce qu'on le découvre (3 taps rapides sur la barre
+                 arc-en-ciel sous le titre), voir js/stickers.js -->
+            <div class="cartesAccueil" id="cartesAccueil">
+                <div class="carteAccueil carteBar" id="btnBarAccueil" role="button" tabindex="0" aria-label="Le Bar : recettes de cocktails">
+                    <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 9h32L24 27z"/><path d="M24 27v13M15 41h18"/><path d="M33 4l-5 9"/><circle cx="35" cy="5" r="3.2" class="plein"/></svg>
+                    <span>BAR</span>
+                </div>
+                <div id="albumAccueil" hidden>
+                    <div class="carteAccueil carteAlbum" id="btnAlbumAccueil" role="button" tabindex="0" aria-label="Album de stickers">
+                        <svg viewBox="0 0 48 48" aria-hidden="true"><path class="plein" d="M24 5l5.6 11.6 12.6 1.7-9.2 8.8 2.3 12.6L24 33.6 12.7 39.7 15 27.1l-9.2-8.8 12.6-1.7z"/></svg>
+                        <span>ALBUM</span>
+                    </div>
+                </div>
+                <div class="carteAccueil carteEthylo" id="btnEthyloAccueil" role="button" tabindex="0" aria-label="Éthylo : estimer son taux d'alcool avant de conduire">
+                    <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="17"/><circle cx="24" cy="24" r="4.5" class="plein"/><path d="M8 21.5c5-3.6 10.3-5.3 16-5.3s11 1.7 16 5.3M21 28l-4 11M27 28l4 11"/></svg>
+                    <span>ÉTHYLO</span>
+                </div>
             </div>
             <div class="installerAppli" id="installerAppli" hidden>
                 <button type="button" id="btnInstallerAppli" class="btnInstaller">📲 Installer l'appli</button>

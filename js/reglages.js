@@ -3139,7 +3139,7 @@ function remplirRegles(){
 
 // Remet le contenu des Règles dans l'écran (la FAQ, qui s'y ouvre aussi, y revient avec « Retour »)
 function afficherContenuRegles(){
-  ecranRegles.classList.remove("album", "faq"); // (l'album de stickers et la FAQ s'ouvrent dans cet écran : js/stickers.js, js/faq.js)
+  ecranRegles.classList.remove("album", "faq", "bar", "ethylo"); // (l'album de stickers et la FAQ s'ouvrent dans cet écran : js/stickers.js, js/faq.js)
   ecranRegles.querySelector("h2").textContent = "Règles du jeu";
   remplirRegles();
   ecranRegles.scrollTop = 0;

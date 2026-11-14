@@ -9248,3 +9248,177 @@ html[data-theme="kawaii"] #ecranReglages #tuilesReglages .tuileReglage.choisie{
 /* Star Wars : écritures du menu « Mise en page » de la couleur de celles du bouton « Retour » */
 html[data-theme="galaxie"] #ecranReglages .menuMEPItem{ color: #eaf3ff; }
 html[data-theme="galaxie"] #ecranReglages .menuMEPTitre{ color: rgba(234,243,255,.7); }
+
+/* =====================================================================================================
+   Cartes de l'accueil (Bar, Album, Éthylo) et leurs écrans (js/extras.js)
+   ===================================================================================================== */
+/* Trois cartes à jouer en éventail sous les boutons de l'accueil, aux couleurs des cartes du jeu (les mêmes dans tous les
+   thèmes : un bord blanc et une ombre les détachent de n'importe quel fond). Hauteur selon l'écran : petites sur un petit téléphone. */
+#choixMode .cartesAccueil{
+  --h-carte: clamp(64px, 15vh, 122px);
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  margin-top: 6px;
+  padding-top: 10px; /* (la carte du milieu dépasse un peu vers le haut) */
+}
+/* Écran très bas (téléphone couché) : cartes plus petites, serrées sous les boutons, pour tenir à l'écran */
+@media (max-height: 430px){
+  #choixMode .cartesAccueil{ --h-carte: 50px; margin-top: -12px; padding-top: 2px; }
+}
+#choixMode #albumAccueil{ display: contents; }
+#choixMode .carteAccueil{
+  position: relative;
+  flex: none;
+  height: var(--h-carte);
+  aspect-ratio: 50 / 78;
+  margin: 0 3px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--h-carte) * 0.06);
+  border: calc(var(--h-carte) * 0.03) solid #fff;
+  border-radius: calc(var(--h-carte) * 0.1);
+  color: #fff;
+  font-family: Arial, sans-serif;
+  font-size: calc(var(--h-carte) * 0.115);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  overflow: hidden;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.18s ease;
+}
+/* (l'ovale clair en travers, comme sur les cartes du jeu) */
+#choixMode .carteAccueil::before{
+  content: "";
+  position: absolute;
+  inset: 12% -6%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+  transform: rotate(-32deg);
+  pointer-events: none;
+}
+#choixMode .carteAccueil svg{
+  position: relative;
+  width: 50%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
+}
+#choixMode .carteAccueil svg .plein{ fill: currentColor; stroke: none; }
+#choixMode .carteAccueil span{ position: relative; }
+#choixMode .carteBar{ background: #d9302c; transform: rotate(-8deg) translateY(3%); }
+#choixMode .carteEthylo{ background: #1976d2; transform: rotate(8deg) translateY(3%); }
+#choixMode .carteAlbum{ background: #f4c20d; color: #4a3200; text-shadow: none; z-index: 1; transform: translateY(-9%); }
+#choixMode .carteAlbum svg{ filter: none; }
+#choixMode .carteBar:active{ transform: rotate(-8deg) translateY(3%) scale(0.94); }
+#choixMode .carteEthylo:active{ transform: rotate(8deg) translateY(3%) scale(0.94); }
+#choixMode .carteAlbum:active{ transform: translateY(-9%) scale(0.94); }
+@media (hover: hover){
+  #choixMode .carteBar:hover{ transform: rotate(-8deg) translateY(-4%); }
+  #choixMode .carteEthylo:hover{ transform: rotate(8deg) translateY(-4%); }
+  #choixMode .carteAlbum:hover{ transform: translateY(-15%); }
+}
+#choixMode .carteAccueil:focus-visible{ outline: 3px solid #fff; outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce){ #choixMode .carteAccueil{ transition: none; } }
+
+/* ----- Écrans Bar et Éthylo : dans l'écran des Règles (ses blocs prennent les couleurs de chaque thème) ----- */
+#ecranRegles.bar #btnFaqDepuisRegles, #ecranRegles.ethylo #btnFaqDepuisRegles{ display: none; }
+#ecranRegles .extrasChamp{
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1.5px solid currentColor;
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  font: inherit;
+  font-size: 16px; /* (16 px : sinon l'iPhone zoome sur le champ) */
+  font-weight: 700;
+}
+#ecranRegles .extrasChamp::placeholder{ color: inherit; opacity: 0.6; }
+#ecranRegles select.extrasChamp option{ color: #111; background: #fff; }
+#ecranRegles .extrasPuces{ display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+#ecranRegles .extrasPuce{
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1.5px solid currentColor;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  opacity: 0.7;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+#ecranRegles .extrasPuce[aria-pressed="true"]{
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.22);
+  background: color-mix(in srgb, currentColor 24%, transparent);
+  box-shadow: inset 0 0 0 1.5px currentColor;
+}
+#ecranRegles .extrasNote{ margin: 4px 6px 0; text-align: center; font-size: 12.5px; line-height: 1.4; opacity: 0.78; }
+#ecranRegles .extrasVide{ display: block; padding: 6px 0 10px; text-align: center; }
+#ecranRegles .barListe{ display: flex; flex-direction: column; gap: 14px; }
+#ecranRegles .barRecette{ padding: 0 0 12px; }
+#ecranRegles .barRecette ul{ margin: 2px 0 8px; padding-left: 20px; }
+#ecranRegles .barRecette li{ margin: 3px 0; }
+#ecranRegles .barRecette p{ margin: 6px 0 0; }
+#ecranRegles .barRecette .barVerre{ font-style: italic; opacity: 0.85; }
+
+/* Éthylo : le résultat reste en haut de l'écran pendant qu'on règle le reste */
+#ecranRegles .ethyloResultat{
+  position: sticky;
+  top: 4px;
+  z-index: 2;
+  padding: 12px 14px;
+  text-align: center;
+  background: linear-gradient(rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.07)), var(--couleur-barre, #2b001d);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
+}
+#ecranRegles .ethyloResultat[data-etat="rouge"]{ border-color: #ff5252; }
+#ecranRegles .ethyloResultat[data-etat="orange"]{ border-color: #ffb300; }
+#ecranRegles .ethyloChiffre{ display: block; font-size: 46px; line-height: 1; font-weight: 900; }
+#ecranRegles .ethyloResultat[data-etat="rouge"] .ethyloChiffre{ color: #ff5252; }
+#ecranRegles .ethyloResultat[data-etat="orange"] .ethyloChiffre{ color: #ffb300; }
+#ecranRegles .ethyloUnite{ display: block; margin-top: 4px; font-size: 13px; font-weight: 700; opacity: 0.8; }
+#ecranRegles .ethyloVerdict{ margin: 8px 0 2px; font-size: 18px; font-weight: 900; }
+#ecranRegles .ethyloLigne{ margin: 4px 0 0; font-size: 14px; line-height: 1.35; opacity: 0.92; }
+#ecranRegles .ethyloBloc{ padding-bottom: 10px; }
+#ecranRegles .ethyloBloc .extrasPuces{ justify-content: flex-start; padding: 6px 0; }
+#ecranRegles .ethyloLigneChamp{ display: flex; align-items: center; gap: 10px; padding: 8px 0; }
+#ecranRegles .ethyloLigneChamp .nomRegle{ flex: none; }
+#ecranRegles .ethyloLigneChamp select.extrasChamp{ flex: 1; width: auto; min-width: 0; }
+#ecranRegles .ethyloPoids{ width: 92px; text-align: center; }
+#ecranRegles .ethyloLigneChamp input[type="checkbox"]{ flex: none; width: 22px; height: 22px; margin: 0; accent-color: #ffcc00; }
+#ecranRegles .ethyloAide{ display: block; padding: 2px 0 4px; }
+#ecranRegles .ethyloVerre{ justify-content: space-between; }
+#ecranRegles .ethyloCompteur{ flex: none; display: flex; align-items: center; gap: 10px; }
+#ecranRegles .ethyloPas{
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+#ecranRegles .ethyloNombre{ min-width: 24px; text-align: center; font-size: 19px; font-weight: 900; opacity: 0.45; }
+#ecranRegles .ethyloChoisi .ethyloNombre{ opacity: 1; }
+#ecranRegles .ethyloRemise{ margin: 0 auto; }

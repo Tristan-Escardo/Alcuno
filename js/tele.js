@@ -207,7 +207,8 @@ function voletPourTele(){
 // écran, n'est pas envoyé). Courtes (12 règles), envoyées d'un bloc.
 function reglesPourTele(){
   const page = document.getElementById("ecranRegles");
-  if (!estAffiche(page) || page.classList.contains("album") || page.classList.contains("faq") || page.classList.contains("page-sortie")) return null;
+  if (!estAffiche(page) || page.classList.contains("album") || page.classList.contains("faq") ||
+      page.classList.contains("bar") || page.classList.contains("ethylo") || page.classList.contains("page-sortie")) return null; // (album, FAQ, Bar, Éthylo : pas envoyés)
   const parties = reglesDuJeu().map((partie) => ({
     t: partie.titre,
     r: partie.regles.map((r) => ({ c: r.carte || "", n: r.nom, l: Array.isArray(r.texte) ? r.texte : [r.texte] }))
