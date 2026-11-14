@@ -647,15 +647,26 @@ function ouvrirEthylo(sansSon){
   page.addEventListener("scroll", majFleche, { passive: true });
   if (window.MutationObserver) new MutationObserver(majFleche).observe(page, { attributes: true, attributeFilter: ["class", "style"] });
   let enCours = null, auDoigtA = 0;
+  // Sur iPhone, un élan de défilement encore en cours (doigt levé en plein mouvement) continue après la remontée et redescend la page.
+  // Pendant la remontée l'écran est donc bloqué (« overflow: hidden » coupe l'élan), puis on garde le haut de page 0,4 s de plus.
+  const arreter = () => {
+    if (enCours) { cancelAnimationFrame(enCours); enCours = null; }
+    page.style.overflowY = "";
+  };
   const remonter = () => {
     cancelAnimationFrame(enCours);
     const depart = page.scrollTop;
     if (depart <= 0) return;
+    page.style.overflowY = "hidden";
     const debut = performance.now(), duree = Math.min(650, 250 + depart / 8);
+    let fin = 0;
     const etape = (maintenant) => {
       const avance = Math.min(1, (maintenant - debut) / duree);
       page.scrollTop = Math.round(depart * Math.pow(1 - avance, 3)); // rapide au début, en douceur à l'arrivée
-      enCours = avance < 1 ? requestAnimationFrame(etape) : null;
+      if (avance >= 1 && !fin) fin = maintenant;
+      if (!fin || maintenant - fin < 400) { enCours = requestAnimationFrame(etape); return; }
+      arreter();
+      page.scrollTop = 0;
     };
     enCours = requestAnimationFrame(etape);
   };
@@ -667,7 +678,7 @@ function ouvrirEthylo(sansSon){
   }, { passive: false });
   fleche.addEventListener("click", () => { if (Date.now() - auDoigtA > 800) remonter(); });
   // (un doigt posé ailleurs arrête la remontée)
-  page.addEventListener("touchstart", () => { if (enCours) { cancelAnimationFrame(enCours); enCours = null; } }, { passive: true });
+  page.addEventListener("touchstart", arreter, { passive: true });
 })();
 // #endregion
 
