@@ -272,7 +272,7 @@ try {
   const garde = JSON.parse(localStorage.getItem(CLE_ETHYLO) || "null");
   if (garde && typeof garde === "object") {
     if (Number(garde.poids) >= 35 && Number(garde.poids) <= 200) ethylo.poids = Math.min(POIDS_MAX_ETHYLO, Math.max(POIDS_MIN_ETHYLO, Math.round(Number(garde.poids))));
-    if (garde.sexe === "f" || garde.sexe === "h") ethylo.sexe = garde.sexe;
+    if (garde.sexe === "f" || garde.sexe === "h" || garde.sexe === "a") ethylo.sexe = garde.sexe;
     ethylo.probatoire = garde.probatoire === true;
   }
 } catch (e) {}
@@ -354,13 +354,23 @@ function majResultatEthylo(zone){
     zone.append(taux, jauge, elementExtras("p", "ethyloVerdict"), elementExtras("div", "ethyloLignes"));
   }
   const chiffre = zone.querySelector(".ethyloChiffre");
+  const verdict = zone.querySelector(".ethyloVerdict"), lignes = zone.querySelector(".ethyloLignes");
+  const machine = ethylo.sexe === "a"; // (blague : un hélicoptère, ou un X-Wing en Star Wars, ne marche pas à la bière)
+  zone.querySelector(".ethyloUnite").hidden = machine;
+  zone.querySelector(".ethyloJauge").hidden = machine;
+  zone.classList.toggle("machine", machine);
+  if (machine) {
+    zone.dataset.etat = "rouge";
+    chiffre.textContent = "Mauvais carburant";
+    verdict.textContent = ""; lignes.textContent = "";
+    return;
+  }
   const texteTaux = r.taux.toFixed(2).replace(".", ",");
   if (chiffre.textContent !== texteTaux) { chiffre.textContent = texteTaux; popEthylo(chiffre); }
   const echelle = Math.max(limite * 2, r.taux * 1.1); // (la limite au milieu de la jauge, tant que le taux ne déborde pas)
   zone.querySelector(".ethyloJaugePlein").style.width = Math.min(100, r.taux / echelle * 100) + "%";
   zone.querySelector(".ethyloJaugeLimite").style.left = (limite / echelle * 100) + "%";
   const texteLimite = `${String(limite).replace(".", ",")} g/L${ethylo.probatoire ? " (permis probatoire)" : ""}`;
-  const verdict = zone.querySelector(".ethyloVerdict"), lignes = zone.querySelector(".ethyloLignes");
   lignes.textContent = "";
   const ligne = (texte) => lignes.appendChild(elementExtras("p", "ethyloLigne", texte));
   if (r.taux >= limite) {
@@ -456,7 +466,7 @@ function ouvrirEthylo(sansSon){
   const ligneSexe = elementExtras("div", "extrasPuces");
   ligneSexe.setAttribute("role", "group");
   ligneSexe.setAttribute("aria-label", "Sexe (change le calcul)");
-  [["h", "Homme"], ["f", "Femme"]].forEach(([id, nom]) => {
+  [["h", "Homme"], ["f", "Femme"], ["a", document.documentElement.dataset.theme === "galaxie" ? "T-65 X-Wing" : "BOEING AH-64 APACHE"]].forEach(([id, nom]) => {
     const puce = elementExtras("button", "extrasPuce", nom);
     puce.type = "button";
     puce.setAttribute("aria-pressed", String(ethylo.sexe === id));

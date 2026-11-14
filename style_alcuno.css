@@ -9899,3 +9899,5 @@ html[data-theme] #ecranRegles .blocRegles.ethyloResultat{
   #ecranRegles .ethyloChiffre.pop, #ecranRegles .ethyloNombre.pop, #ecranRegles .ethyloBieres .extrasPuce{ animation: none; }
   #ecranRegles .ethyloJaugePlein, #ecranRegles .ethyloJaugeLimite{ transition: none; }
 }
+#ecranRegles .ethyloResultat.machine .ethyloChiffre{ font-size: 32px; }
+#ecranRegles .ethyloResultat.machine .ethyloUnite, #ecranRegles .ethyloResultat.machine .ethyloJauge{ display: none; }
