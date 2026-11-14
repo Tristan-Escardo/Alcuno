@@ -575,50 +575,29 @@ function ouvrirEthylo(sansSon){
   const quand = elementExtras("div", "blocRegles ethyloBloc");
   quand.appendChild(elementExtras("h3", "", "Quand"));
   const minuteDe = (t) => DUREE_MAX_ETHYLO - t; // (position du curseur => il y a tant de minutes)
-  const aimantHeure = (t) => {
-    const ilYa = minuteDe(t);
-    if (ilYa <= 3) return DUREE_MAX_ETHYLO; // (tout à droite : maintenant)
-    const heure = new Date(Date.now() - ilYa * 60000), m = heure.getMinutes();
-    return t + Math.round(m / 30) * 30 - m; // vers la demi-heure la plus proche
-  };
-  const estDemiHeure = (t) => minuteDe(t) > 0 && new Date(Date.now() - minuteDe(t) * 60000).getMinutes() % 30 === 0;
+  // (le curseur avance par demi-heures d'écart : « il y a 15 h 30 » ; l'heure de l'horloge dessous se calcule d'après le téléphone)
+  const aimantHeure = (t) => DUREE_MAX_ETHYLO - Math.round(minuteDe(t) / 30) * 30;
+  const estDemiHeure = (t) => minuteDe(t) % 60 === 0;
   const graduationsHeures = () => {
-    const g = [], maintenant = new Date();
-    const debut = new Date(maintenant.getTime() - DUREE_MAX_ETHYLO * 60000);
-    let d = new Date(debut); d.setSeconds(0, 0); d.setMinutes(d.getMinutes() < 30 ? 30 : 60);
-    for (; d <= maintenant; d = new Date(d.getTime() + 30 * 60000)) {
-      if (d.getMinutes() !== 0 || d.getHours() % 4 !== 0) continue; // (un trait toutes les 4 h, chiffré)
-      const t = DUREE_MAX_ETHYLO - (maintenant - d) / 60000, paire = true;
-      g.push({ v: t, grand: paire, texte: paire ? d.getHours() + " h" : "" });
-    }
+    const g = [];
+    for (let h = 16; h >= 0; h -= 4) g.push({ v: DUREE_MAX_ETHYLO - h * 60, grand: true, texte: h ? "−" + h + " h" : "0" });
     return g;
   };
   const texteQuand = (t) => {
     const ilYa = minuteDe(t);
     return ilYa <= 0 ? ["maintenant", "donc à " + heureIlYa(0)] : ["il y a " + texteDureeEthylo(ilYa), "donc à " + heureIlYa(ilYa)];
   };
-  // (l'heure choisie reste accrochée à l'horloge : quand les minutes passent, le curseur recule avec elle, l'heure ne dérive pas)
-  const ancres = {};
-  const ancrer = (cle) => { ancres[cle] = ethylo[cle] > 0 ? Math.floor((Date.now() - ethylo[cle] * 60000) / 60000) * 60000 : null; };
-  const curseurQuand = (titre, cle) => {
-    ancrer(cle);
-    return glissiereEthylo(titre, 0, DUREE_MAX_ETHYLO, 1, DUREE_MAX_ETHYLO - Math.min(DUREE_MAX_ETHYLO, ethylo[cle]),
-      texteQuand, (t) => { ethylo[cle] = minuteDe(t); ancrer(cle); maj(); }, { aimant: aimantHeure, estPalier: estDemiHeure, graduations: graduationsHeures });
-  };
-  // (les valeurs de départ aussi tombent sur une demi-heure)
+  const curseurQuand = (titre, cle) => glissiereEthylo(titre, 0, DUREE_MAX_ETHYLO, 1, DUREE_MAX_ETHYLO - Math.min(DUREE_MAX_ETHYLO, ethylo[cle]),
+    texteQuand, (t) => { ethylo[cle] = minuteDe(t); maj(); }, { aimant: aimantHeure, estPalier: estDemiHeure, graduations: graduationsHeures });
+  // (les valeurs de départ aussi)
   ["debut", "dernier"].forEach((cle) => { ethylo[cle] = Math.max(0, minuteDe(aimantHeure(DUREE_MAX_ETHYLO - Math.min(DUREE_MAX_ETHYLO, ethylo[cle])))); });
   const premier = curseurQuand("Premier verre", "debut"), dernier = curseurQuand("Dernier verre", "dernier");
-  const suivreHorloge = (cle, g) => {
-    if (ancres[cle] == null) return;
-    const ilYa = Math.min(DUREE_MAX_ETHYLO, Math.round((Date.now() - ancres[cle]) / 60000));
-    ethylo[cle] = ilYa; g.poser(DUREE_MAX_ETHYLO - ilYa);
-  };
   quand.append(premier.ligne, dernier.ligne,
     elementExtras("p", "detailRegle ethyloAide", "Les verres sont comptés comme bus régulièrement entre les deux heures."));
   // (l'écran resté ouvert : les heures écrites suivent l'horloge)
   const minuterie = setInterval(() => {
     if (!quand.isConnected) { clearInterval(minuterie); return; }
-    suivreHorloge("debut", premier); suivreHorloge("dernier", dernier); premier.redessiner(); dernier.redessiner(); maj();
+    premier.redessiner(); dernier.redessiner(); maj();
   }, 60000);
 
   // (« Tout remettre à zéro » : en bas du bloc « Ce que tu as bu », il ne vide que les verres)
