@@ -460,7 +460,7 @@ function ouvrirEthylo(sansSon){
   const estDemiHeure = (t) => minuteDe(t) % 60 === 0;
   const graduationsHeures = () => {
     const g = [];
-    for (let h = 16; h >= 0; h -= 4) g.push({ v: DUREE_MAX_ETHYLO - h * 60, grand: true, texte: h ? "−" + h + " h" : "0" });
+    for (let h = 16; h >= 0; h -= 2) g.push({ v: DUREE_MAX_ETHYLO - h * 60, grand: true, texte: h + " h" }); // (il y a tant d'heures)
     return g;
   };
   const texteQuand = (t) => {
