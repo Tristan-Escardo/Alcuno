@@ -9901,3 +9901,5 @@ html[data-theme] #ecranRegles .blocRegles.ethyloResultat{
 }
 #ecranRegles .ethyloResultat.machine .ethyloChiffre{ font-size: 32px; }
 #ecranRegles .ethyloResultat.machine .ethyloUnite, #ecranRegles .ethyloResultat.machine .ethyloJauge{ display: none; }
+#ecranRegles .ethyloSexe{ flex-wrap: nowrap; }
+#ecranRegles .ethyloSexe .extrasPuce{ flex: 1 1 auto; white-space: nowrap; padding-left: 8px; padding-right: 8px; }

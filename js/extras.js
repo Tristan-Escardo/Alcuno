@@ -320,11 +320,11 @@ function texteDureeEthylo(minutes){
   const h = Math.floor(minutes / 60), m = minutes % 60;
   return h ? `${h} h${m ? " " + String(m).padStart(2, "0") : ""}` : `${m} min`;
 }
-// « 2 h 10, donc à 3 h 45 » : l'attente, puis l'heure de l'horloge (arrondie au quart d'heure d'après)
+// « 2 h 10, donc à 3 h 45 » : l'attente, puis l'heure de l'horloge (arrondie à la demi-heure d'après)
 function texteHeureEthylo(minutes){
   const d = new Date(Date.now() + minutes * 60000);
   d.setSeconds(0, 0);
-  if (d.getMinutes() % 15) d.setMinutes(Math.ceil(d.getMinutes() / 15) * 15);
+  if (d.getMinutes() % 30) d.setMinutes(Math.ceil(d.getMinutes() / 30) * 30);
   const dans = Math.max(1, Math.round((d.getTime() - Date.now()) / 60000));
   const demain = d.getDate() !== new Date().getDate();
   return `${texteDureeEthylo(dans)}, donc à ${d.getHours()} h ${String(d.getMinutes()).padStart(2, "0")}${demain ? " demain" : ""}`;
@@ -355,7 +355,7 @@ function majResultatEthylo(zone){
   }
   const chiffre = zone.querySelector(".ethyloChiffre");
   const verdict = zone.querySelector(".ethyloVerdict"), lignes = zone.querySelector(".ethyloLignes");
-  const machine = ethylo.sexe === "a"; // (blague : un hélicoptère, ou un X-Wing en Star Wars, ne marche pas à la bière)
+  const machine = ethylo.sexe === "a"; // (blague, en Star Wars seulement : un X-Wing ne marche pas à la bière)
   zone.querySelector(".ethyloUnite").hidden = machine;
   zone.querySelector(".ethyloJauge").hidden = machine;
   zone.classList.toggle("machine", machine);
@@ -461,12 +461,13 @@ function ouvrirEthylo(sansSon){
   const maj = () => majResultatEthylo(resultat);
 
   // --- Toi ---
+  if (ethylo.sexe === "a" && document.documentElement.dataset.theme !== "galaxie") ethylo.sexe = "h"; // (l'option n'existe qu'en Star Wars)
   const toi = elementExtras("div", "blocRegles ethyloBloc");
   toi.appendChild(elementExtras("h3", "", "Toi"));
-  const ligneSexe = elementExtras("div", "extrasPuces");
+  const ligneSexe = elementExtras("div", "extrasPuces ethyloSexe");
   ligneSexe.setAttribute("role", "group");
   ligneSexe.setAttribute("aria-label", "Sexe (change le calcul)");
-  [["h", "Homme"], ["f", "Femme"], ["a", document.documentElement.dataset.theme === "galaxie" ? "T-65 X-Wing" : "BOEING AH-64 APACHE"]].forEach(([id, nom]) => {
+  [["h", "Homme"], ["f", "Femme"]].concat(document.documentElement.dataset.theme === "galaxie" ? [["a", "T-65 X-Wing"]] : []).forEach(([id, nom]) => {
     const puce = elementExtras("button", "extrasPuce", nom);
     puce.type = "button";
     puce.setAttribute("aria-pressed", String(ethylo.sexe === id));
