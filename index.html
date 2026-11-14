@@ -9,7 +9,7 @@
          (Avant : « ?t= » + l'heure, différent à chaque lancement : tout le jeu était retéléchargé à chaque ouverture,
          environ 400 Ko. Maintenant, tant que la version ne change pas, le navigateur se contente de vérifier.) -->
     <script>
-        window.VERSION_FICHIERS = "9.91.1";
+        window.VERSION_FICHIERS = "9.92.0";
         // (ailleurs que sur le vrai site — poste de dev, appli de test — : l'heure en plus, comme avant, pour voir tout de
         // suite un fichier modifié sans changer de version)
         window.ANTI_CACHE = /(^|\.)github\.io$/i.test(location.hostname) ? window.VERSION_FICHIERS : window.VERSION_FICHIERS + "-" + Date.now();
@@ -25,6 +25,9 @@
         // (aucun bouton ni minuteur ne peut se déclencher avant que tout le jeu soit là).
         window.FICHIERS_JEU = ["script.js", "js/qrcode.js", "js/config-lib.js", "js/reglages.js", "js/en-ligne.js", "js/plateau.js", "js/regles.js", "js/mode-hot.js", "js/zizi-coptere.js", "js/reglages-vue.js",
                                "js/synchro-en-ligne.js", "js/retour-demarrage.js", "js/tele.js", "js/stats.js", "js/config-distante.js", "js/stickers.js", "js/faq.js", "js/mouchard.js", "js/poisson.js", "js/piano-accueil.js", "js/cocktails.js", "js/extras.js"];
+        // Langue (js/langue.js) : en tout premier ; les textes anglais (js/en.js) seulement si le jeu est en anglais
+        window.FICHIERS_JEU.unshift("js/langue.js");
+        try { if (localStorage.getItem("alcuno_langue") === "en") window.FICHIERS_JEU.unshift("js/en.js"); } catch (e) {}
         window.FICHIERS_JEU.forEach(function (f) {
             document.write('<link rel="preload" as="script" href="' + f + '?v=' + window.ANTI_CACHE + '">');
         });
@@ -511,13 +514,13 @@
                     <svg class="optionChevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
                 </button>
 
-                <!-- Langue du jeu : seul le français existe pour l'instant (l'anglais viendra) -->
+                <!-- Langue du jeu : français ou anglais (js/langue.js ; la page se recharge au changement) -->
                 <div class="blocReglage" data-cle="langue">
                     <div class="optionReglage">
                         <span class="optionTexte"><span class="optionTitre">Langue</span></span>
                         <span class="choixLangue">
                             <button type="button" class="chipLangue actif" data-langue="fr" aria-pressed="true">Français</button>
-                            <button type="button" class="chipLangue" data-langue="en" disabled>English <small>bientôt</small></button>
+                            <button type="button" class="chipLangue" data-langue="en" aria-pressed="false">English</button>
                         </span>
                     </div>
                 </div>

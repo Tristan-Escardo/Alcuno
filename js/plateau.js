@@ -28,7 +28,7 @@ const messageTexte = document.getElementById("messageTexte");
 // des joueurs sont tapés par les joueurs. innerText redonne le texte ligne par ligne (télé, tests).
 // Ligne de texte avec les gorgées (et le cul sec) en <em> doré, construite en DOM
 function remplirAvecGorgees(parent, ligne){
-  ligne.split(/(\d+ gorgées?|un CUL SEC)/).forEach((morceau, i) => {
+  ligne.split(estAnglais ? /(\d+ sips?|a CHUG)/ : /(\d+ gorgées?|un CUL SEC)/).forEach((morceau, i) => {
     if(!morceau) return;
     if(i % 2){
       const em = document.createElement("em");
@@ -181,23 +181,23 @@ function calculerRecap(restants = []){
     if(noms.length > 2) return null; // (égalité à plus de 2 : pas de titre)
     return { qui: noms.join(" et "), v: cible };
   };
-  const pluriel = (n, mot) => `${n} ${mot}${n > 1 ? "s" : ""}`;
+  const pluriel = trPluriel; // (js/langue.js : « 2 gorgées », « 2 sips », « 2 cancelled »)
   const titres = [];
   const ajouter = (e, t, m, texte) => { if(m) titres.push({ e, t, q: `${m.qui} · ${texte(m.v)}` }); };
-  ajouter("🐦", "Pigeon de la soirée", meilleurs(st.pigeon), v => `${v} fois`);
-  ajouter("💥", "Plus gros coup", meilleurs(st.plusGros, 2), v => `${v} d'un coup`);
-  ajouter("🛡️", "Trompe-la-mort", meilleurs(st.annulees), v => pluriel(v, "annulée"));
-  ajouter("😇", "Le plus sage", meilleurs(gorgees, 0, true), v => pluriel(v, "gorgée"));
-  ajouter("⚔️", "Duelliste", meilleurs(st.duels), v => `${v} duel${v > 1 ? "s" : ""} gagné${v > 1 ? "s" : ""}`);
-  ajouter("🎯", "Aimant à +4", meilleurs(st.plus4), v => `${pluriel(v, "gorgée")} de +4`);
+  ajouter("🐦", tr("Pigeon de la soirée"), meilleurs(st.pigeon), v => tr`${v} fois`);
+  ajouter("💥", tr("Plus gros coup"), meilleurs(st.plusGros, 2), v => tr`${v} d'un coup`);
+  ajouter("🛡️", tr("Trompe-la-mort"), meilleurs(st.annulees), v => pluriel(v, tr("annulée")));
+  ajouter("😇", tr("Le plus sage"), meilleurs(gorgees, 0, true), v => pluriel(v, tr("gorgée")));
+  ajouter("⚔️", tr("Duelliste"), meilleurs(st.duels), v => tr`${v} duel${v > 1 ? "s" : ""} gagné${v > 1 ? "s" : ""}`);
+  ajouter("🎯", tr("Aimant à +4"), meilleurs(st.plus4), v => tr`${pluriel(v, tr("gorgée"))} de +4`);
   // Mode hot : le couple de la soirée (un bisou compte comme un cul sec ; égalité : le premier par ordre alphabétique)
   if(partieHot && !partieHard && st.couples){ // (pas en mode hard : 2 joueurs, toujours le même couple)
     const couples = Object.entries(st.couples).map(([cle, c]) => ({ noms: cle.split("\u0001"), c, score: c.g + c.b * GORGEES_CUL_SEC }))
       .filter(x => x.score > 0 && x.noms.every(n => joueurs.includes(n))).sort((x, y) => y.score - x.score);
     if(couples.length){
       const { noms, c } = couples[0];
-      const morceaux = [c.b ? pluriel(c.b, "bisou") : "", c.g ? `${pluriel(c.g, "gorgée")} l'un pour l'autre` : ""].filter(Boolean);
-      titres.push({ e: "💞", t: "Couple de la soirée", q: `${noms.map(avecCouronne).join(" et ")} · ${morceaux.join(" · ")}` });
+      const morceaux = [c.b ? pluriel(c.b, "bisou") : "", c.g ? tr`${pluriel(c.g, tr("gorgée"))} l'un pour l'autre` : ""].filter(Boolean);
+      titres.push({ e: "💞", t: tr("Couple de la soirée"), q: `${noms.map(avecCouronne).join(" et ")} · ${morceaux.join(" · ")}` });
     }
   }
   const culSecs = !st.doree ? 0 : st.doree.personne ? joueurs.length : 1;
@@ -231,8 +231,8 @@ function construireRecap(r){
     return e;
   };
   const recap = el("div", "recap");
-  recap.append(el("div", "recap-titre", "🏆 Fin de partie"),
-    el("div", "recap-sous", `${r.minutes ? `${r.minutes} min · ` : ""}${r.nbJoueurs} joueurs`));
+  recap.append(el("div", "recap-titre", tr("🏆 Fin de partie")),
+    el("div", "recap-sous", tr`${r.minutes ? tr`${r.minutes} min · ` : ""}${r.nbJoueurs} joueurs`));
   const haut = el("div", "recap-gauche");
   const podium = el("div", "recap-podium");
   ["🥇", "🥈", "🥉"].forEach((medaille, i) => {
@@ -240,7 +240,7 @@ function construireRecap(r){
     if(!j) return;
     const marche = el("div", `recap-marche recap-m${i + 1}`);
     marche.append(el("div", "recap-medaille", medaille), el("div", "recap-nom", j.nom),
-      el("div", "recap-g", String(j.g)), el("div", "recap-p", j.g > 1 ? "gorgées" : "gorgée"));
+      el("div", "recap-g", String(j.g)), el("div", "recap-p", j.g > 1 ? tr("gorgées") : tr("gorgée")));
     podium.appendChild(marche);
   });
   haut.appendChild(podium);
@@ -249,7 +249,7 @@ function construireRecap(r){
     r.classement.slice(3).forEach((j, i) => {
       const ligne = el("div", "recap-ligne");
       const g = el("span");
-      g.append(el("em", "", String(j.g)), ` gorgée${j.g > 1 ? "s" : ""}`);
+      g.append(el("em", "", String(j.g)), tr` gorgée${j.g > 1 ? "s" : ""}`);
       ligne.append(el("span", "", `${i + 4}. ${j.nom}`), g);
       liste.appendChild(ligne);
     });
@@ -260,14 +260,14 @@ function construireRecap(r){
     // Carte dorée sortie pendant la partie (sinon rien : pas de spoil)
     const bloc = el("div", "recap-doree");
     const texte = el("div", "recap-doree-txt");
-    texte.appendChild(el("div", "recap-doree-t", "✦ Carte dorée ✦"));
+    texte.appendChild(el("div", "recap-doree-t", tr("✦ Carte dorée ✦")));
     const ligne1 = el("div", "recap-doree-q"), ligne2 = el("div", "recap-doree-q");
     if(r.doree.personne){
-      ligne1.textContent = "Personne ne l'a trouvée.";
-      ligne2.textContent = r.doree.soft ? "Tout le monde a bu 2 gorgées 🥃" : "Tout le monde a pris le cul sec 🥃";
+      ligne1.textContent = tr("Personne ne l'a trouvée.");
+      ligne2.textContent = r.doree.soft ? tr("Tout le monde a bu 2 gorgées 🥃") : tr("Tout le monde a pris le cul sec 🥃");
     } else {
-      ligne1.append(el("b", "", r.doree.tireur), " l'a tirée.");
-      ligne2.append(el("b", "", r.doree.victime), r.doree.soft ? " a bu les 3 gorgées 🥃" : " a pris le cul sec 🥃");
+      ligne1.append(el("b", "", r.doree.tireur), tr(" l'a tirée."));
+      ligne2.append(el("b", "", r.doree.victime), r.doree.soft ? tr(" a bu les 3 gorgées 🥃") : tr(" a pris le cul sec 🥃"));
     }
     texte.append(ligne1, ligne2);
     bloc.append(el("div", "recap-eclats", "✦ ✦ ✦"), el("div", "Carte retournee carte_doree recap-doree-carte"), texte);
@@ -288,13 +288,13 @@ function construireRecap(r){
   }
   const chiffres = el("div", "recap-chiffres");
   const chiffre = (n, texte) => { const c = el("span"); c.append(el("b", "", String(n)), texte); chiffres.appendChild(c); };
-  chiffre(r.totaux.gorgees, "gorgées au total");
-  chiffre(r.totaux.annulees, r.totaux.annulees > 1 ? "annulées" : "annulée");
-  if(r.doree && !r.doree.soft) chiffre(r.totaux.culSecs, r.totaux.culSecs > 1 ? "culs secs" : "cul sec");
+  chiffre(r.totaux.gorgees, tr("gorgées au total"));
+  chiffre(r.totaux.annulees, r.totaux.annulees > 1 ? tr("annulées") : tr("annulée"));
+  if(r.doree && !r.doree.soft) chiffre(r.totaux.culSecs, r.totaux.culSecs > 1 ? tr("culs secs") : tr("cul sec"));
   droite.appendChild(chiffres);
   if(r.restants.length){
     const fin = el("div", "recap-restants");
-    r.restants.forEach(x => fin.appendChild(el("div", "", `${x.nom} boit ${texteGorgees(x.n)} pour ses 1 restants`)));
+    r.restants.forEach(x => fin.appendChild(el("div", "", tr`${x.nom} boit ${texteGorgees(x.n)} pour ses 1 restants`)));
     droite.appendChild(fin);
   }
   recap.appendChild(droite);
@@ -431,7 +431,7 @@ const ADJECTIFS_COULEUR = { rouge: "rouge", bleu: "bleue", vert: "verte", jaune:
 // bannière « Tour de » teintée + petit rond + nom de la couleur, et nom dans le bloc Règles
 function majAffichageCouleur(){
   const hex = couleurChoisie ? (COULEURS_JEU[couleurChoisie] || "#FFD700") : null;
-  const nomCouleur = couleurChoisie ? couleurChoisie.toUpperCase() : "";
+  const nomCouleur = couleurChoisie ? tr(couleurChoisie).toUpperCase() : "";
 
   // Bloc Règles : petit encadré de la couleur, avec ce qu'elle fait (avant : juste « VERT », on ne
   // comprenait la règle qu'au moment où quelqu'un buvait). Compact : les autres règles restent dessous.
@@ -447,7 +447,7 @@ function majAffichageCouleur(){
     texte.className = "couleurActive-texte";
     const nom = document.createElement("b");
     nom.textContent = nomCouleur;
-    texte.append(nom, ` : 1 gorgée en plus pour le prochain qui tire une carte ${ADJECTIFS_COULEUR[couleurChoisie] || couleurChoisie}`);
+    texte.append(nom, tr` : 1 gorgée en plus pour le prochain qui tire une carte ${tr(ADJECTIFS_COULEUR[couleurChoisie] || couleurChoisie)}`);
     encadre.append(carre, texte);
     messageTexte.appendChild(encadre);
   }
@@ -536,7 +536,7 @@ function appliquerBonusCouleurSiBesoin(carteTiree, options = {}){
   // C'est toujours celui qui a tiré la carte qui boit pour la couleur : on le nomme
   // (sinon, après « Le PIGEON boit 1 gorgée », on croyait que c'était le pigeon)
   const nom = joueurs[options.joueur];
-  const msgCouleur = (nom ? `${nom} boit` : "Et boit") + " 1 gorgée pour la couleur (" + couleur + ")";
+  const msgCouleur = (nom ? tr`${nom} boit` : tr("Et boit")) + tr(" 1 gorgée pour la couleur (") + tr(couleur) + ")";
   noterGorgees(nom, 1);
   noterHistorique(msgCouleur);
 
@@ -706,11 +706,11 @@ const TYPES_PARIS = [
   { id: "un",     label: "1",        rep: "un_vert" },
   { id: "trois",  label: "3",        rep: "trois_vert" },
   { id: "quatre", label: "4",        rep: "quatre_vert" },
-  { id: "interdit", label: "Interdit", rep: "interdit_vert" },
-  { id: "couleur", label: "Couleur", rep: "couleur" },
+  { id: "interdit", label: tr("Interdit"), rep: "interdit_vert" },
+  { id: "couleur", label: tr("Couleur"), rep: "couleur" },
   { id: "plus2",  label: "+2",       rep: "plus_2_vert" },
   { id: "plus4",  label: "+4",       rep: "plus_4" },
-  { id: "switch", label: "Switch",  rep: "switch_vert" },
+  { id: "switch", label: tr("Switch"),  rep: "switch_vert" },
 ];
 
 // ===== Helpers UI: centrage de la dernière ligne (grilles) =====
@@ -775,7 +775,7 @@ function basculerPauseJoueur(nom){
       indexJoueur % joueurs.length === tourSautePourPause.vers && cartesRestantes() === tourSautePourPause.cartes;
     tourSautePourPause = null;
     if(tourRendu) indexJoueur = joueurs.indexOf(nom);
-    if(!discret) afficherNotificationHaut("", tourRendu ? `${nom} est de retour : c'est son tour !` : `${nom} est de retour !`, true);
+    if(!discret) afficherNotificationHaut("", tourRendu ? tr`${nom} est de retour : c'est son tour !` : tr`${nom} est de retour !`, true);
   } else {
     if(indexJoueursActifs().length <= 2) return;
     joueursEnPause.add(nom);
@@ -784,9 +784,9 @@ function basculerPauseJoueur(nom){
     if(joueurs[courant] === nom){
       indexJoueur = nextPlayerIndex(courant); // c'était son tour : au suivant
       tourSautePourPause = { nom, vers: indexJoueur, cartes: cartesRestantes() };
-      if(!discret) afficherNotificationHaut("", `${nom} est en pause : au tour de ${joueurs[indexJoueur]}`, true);
+      if(!discret) afficherNotificationHaut("", tr`${nom} est en pause : au tour de ${joueurs[indexJoueur]}`, true);
     } else if(!discret){
-      afficherNotificationHaut("", `${nom} est en pause`, true);
+      afficherNotificationHaut("", tr`${nom} est en pause`, true);
     }
   }
   afficherJoueurs();
@@ -847,7 +847,7 @@ function ouvrirVoletPause(nom, bouton){
   fermerVoletPause();
   const enPause = estEnPause(nom);
   if(!enPause && indexJoueursActifs().length <= 2){
-    afficherNotificationHaut("", "Il faut au moins 2 joueurs qui ne sont pas en pause", true);
+    afficherNotificationHaut("", tr("Il faut au moins 2 joueurs qui ne sont pas en pause"), true);
     return;
   }
   const volet = document.createElement("div");
@@ -858,12 +858,12 @@ function ouvrirVoletPause(nom, bouton){
       <div class="voletPause-texte"></div>
       <button type="button" class="voletPause-ok"></button>
       <button type="button" class="voletPause-annuler">Annuler</button>
-    </div>`;
+    </div>`; traduireElement(volet);
   volet.querySelector(".voletPause-nom").textContent = avecCouronne(nom);
   volet.querySelector(".voletPause-texte").innerHTML = enPause
-    ? "De retour parmi nous ?"
-    : "En pause clope, aux toilettes…<br>Son tour sera sauté jusqu'à ce qu'il revienne.";
-  volet.querySelector(".voletPause-ok").textContent = enPause ? `${nom} est de retour` : `Mettre ${nom} en pause`;
+    ? tr("De retour parmi nous ?")
+    : tr("En pause clope, aux toilettes…<br>Son tour sera sauté jusqu'à ce qu'il revienne.");
+  volet.querySelector(".voletPause-ok").textContent = enPause ? tr`${nom} est de retour` : tr`Mettre ${nom} en pause`;
   rendreVoletGlissable(volet);
   volet.addEventListener("click", (e) => { if(e.target === volet) fermerVoletPause(); });
   volet.querySelector(".voletPause-annuler").addEventListener("click", fermerVoletPause);
@@ -894,10 +894,10 @@ function typeDeCarte(classe){
 function regleDeCarte(classe){
   if(classe === "carte_doree"){
     return { nom: "Carte dorée", texte: estModeSoft()
-      ? "Distribue <em>3 gorgées</em> de la part du développeur 😘"
-      : "Distribue <em>un CUL SEC</em> de la part du développeur.<br>Et obligation de se servir un vrai verre avant 😘" };
+      ? tr("Distribue <em>3 gorgées</em> de la part du développeur 😘")
+      : tr("Distribue <em>un CUL SEC</em> de la part du développeur.<br>Et obligation de se servir un vrai verre avant 😘") };
   }
-  const cartes = reglesDuJeu().find(partie => partie.titre === "Les cartes").regles;
+  const cartes = reglesDuJeu().find(partie => partie.titre === tr("Les cartes")).regles;
   return cartes.find(r => typeDeCarte(r.carte) === typeDeCarte(classe)) || null;
 }
 
@@ -921,7 +921,7 @@ function ouvrirVoletCarte(classe){
           <div class="voletPause-texte"></div>
         </div>
       </div>
-    </div>`;
+    </div>`; traduireElement(volet);
   volet.querySelector(".voletCarte-carte").classList.add(classe);
   volet.querySelector(".voletPause-nom").textContent = regle.nom;
   volet.querySelector(".voletPause-texte").innerHTML = htmlRegle(regle.texte); // (texte du jeu, voir reglesDuJeu)
@@ -947,10 +947,10 @@ function ouvrirVoletHistorique(){
       <div class="voletPause-poignee"></div>
       <div class="voletPause-nom">Dernières cartes</div>
       <div class="historique-liste"></div>
-    </div>`;
+    </div>`; traduireElement(volet);
   const liste = volet.querySelector(".historique-liste");
   if(!historiqueCartes.length){
-    liste.innerHTML = '<div class="historique-vide">Aucune carte tirée pour l\'instant.</div>';
+    liste.innerHTML = tr('<div class="historique-vide">Aucune carte tirée pour l\'instant.</div>');
   }
   historiqueCartes.forEach((entree, i) => {
     const ligne = document.createElement("div");
@@ -965,7 +965,7 @@ function ouvrirVoletHistorique(){
     if(i === 0){
       const badge = document.createElement("span");
       badge.className = "historique-recente";
-      badge.textContent = "dernière";
+      badge.textContent = tr("dernière");
       nom.appendChild(badge);
     }
     texte.appendChild(nom);
@@ -989,9 +989,9 @@ function fermerVoletHistorique(){
 // Ce qui s'est passé pour une carte : les messages du bloc Règles, sinon de quoi la reconnaître
 function lignesHistorique(entree){
   if(entree.lignes.length) return entree.lignes;
-  if(entree.carte.startsWith("couleur")) return ["Choisit une couleur"];
-  if(entree.carte.startsWith("quatre")) return ["Duel"];
-  return ["Rien à boire"];
+  if(entree.carte.startsWith("couleur")) return [tr("Choisit une couleur")];
+  if(entree.carte.startsWith("quatre")) return [tr("Duel")];
+  return [tr("Rien à boire")];
 }
 
 let appuiCarte = null; // { carte, x, y, minuteur, minuteurVisuel }
@@ -1093,12 +1093,12 @@ function lancerOverlayPrediction(startIndex){
 
   const titre = document.createElement("div");
   titre.className = "titre-pigeon prediction-title";
-  titre.innerText = "Pari sur la dernière carte";
+  titre.innerText = tr("Pari sur la dernière carte");
 
   const subtitle = document.createElement("div");
   subtitle.className = "overlay-subtitle prediction-subtitle";
   // (le 2e bout de phrase à la ligne)
-  subtitle.append("Chacun choisit un type de carte.", document.createElement("br"), `Tous ceux qui trouvent distribuent ${texteCulSec().replace(/ /g, "\u00a0")}\u00a0!`); // (espaces insécables : « un CUL SEC ! » reste groupé, le « ! » ne passe jamais seul à la ligne)
+  subtitle.append(tr("Chacun choisit un type de carte."), document.createElement("br"), tr`Tous ceux qui trouvent distribuent ${texteCulSec().replace(/ /g, "\u00a0")}\u00a0!`); // (espaces insécables : « un CUL SEC ! » reste groupé, le « ! » ne passe jamais seul à la ligne)
 
   header.appendChild(titre);
   header.appendChild(subtitle);
@@ -1155,7 +1155,7 @@ function lancerOverlayPrediction(startIndex){
   const btnReveler = document.createElement("button");
   btnReveler.type = "button";
   btnReveler.className = "bouton-pigeon fin-choix-reveler";
-  btnReveler.innerText = "Valider";
+  btnReveler.innerText = tr("Valider");
   // (« Valider » et « Retour » : au doigt levé, comme les cartes. Au doigt posé, faire défiler la page en partant du
   // bouton « Retour », juste au-dessus des cartes, annulait le choix du joueur d'avant sans qu'on le voie, et le joueur
   // suivant remplaçait alors la carte de l'autre.)
@@ -1172,7 +1172,7 @@ function lancerOverlayPrediction(startIndex){
   const btnRetourPari = document.createElement("button");
   btnRetourPari.type = "button";
   btnRetourPari.className = "bouton-pigeon fin-choix-retour";
-  btnRetourPari.innerText = "Retour";
+  btnRetourPari.innerText = tr("Retour");
   surAction(btnRetourPari, "pred:retour", {
     evenement: "click",
     owner: () => curPos > 0 ? joueurs[ordre[curPos - 1]] : null, // celui qui vient de choisir
@@ -1190,7 +1190,7 @@ function lancerOverlayPrediction(startIndex){
     btnReveler.disabled = !peutReveler;
     btnReveler.classList.toggle("cache", !peutReveler);
     btnRetourPari.disabled = !peutRevenir;
-    btnRetourPari.innerText = peutRevenir ? `Retour (${joueurs[ordre[curPos - 1]]})` : "Retour"; // (on voit quel choix il annule)
+    btnRetourPari.innerText = peutRevenir ? tr`Retour (${joueurs[ordre[curPos - 1]]})` : tr("Retour"); // (on voit quel choix il annule)
     btnRetourPari.classList.toggle("cache", !peutRevenir);
   }
 
@@ -1237,10 +1237,10 @@ function lancerOverlayPrediction(startIndex){
 
     if(curPos < ordre.length){
       const jIdx = ordre[curPos];
-      turn.innerText = `Au tour de ${joueurs[jIdx]} : choisis un type`;
+      turn.innerText = tr`Au tour de ${joueurs[jIdx]} : choisis un type`;
       Array.from(grid.querySelectorAll('.fin-choix-card')).forEach(el => el.classList.remove('disabled'));
     } else if(!revele){
-      turn.innerText = "Tout le monde a choisi !";
+      turn.innerText = tr("Tout le monde a choisi !");
       Array.from(grid.querySelectorAll('.fin-choix-card')).forEach(el => el.classList.add('disabled'));
     } else {
       actionsPari.remove();
@@ -1252,7 +1252,7 @@ function lancerOverlayPrediction(startIndex){
         .filter(p => p.typeId === vraiType)
         .map(p => joueurs[p.joueurIndex]);
 
-      turn.innerText = "Révélation de la dernière carte";
+      turn.innerText = tr("Révélation de la dernière carte");
       header.style.display = 'none';
       panel.classList.add('prediction-reveal-mode');
 
@@ -1275,20 +1275,20 @@ function lancerOverlayPrediction(startIndex){
         prev.classList.add("doree-carte-vedette");
         reveal.classList.add("reveal-doree");
         txt.innerHTML =
-          '<div class="doree-titre"><span class="doree-etincelle">✦</span> PERSONNE N\'A TROUVÉ LA CARTE DORÉE !! <span class="doree-etincelle">✦</span></div>' +
+          tr('<div class="doree-titre"><span class="doree-etincelle">✦</span> PERSONNE N\'A TROUVÉ LA CARTE DORÉE !! <span class="doree-etincelle">✦</span></div>') +
           '<div class="doree-texte">' + texteDoreeJamaisTrouvee() + '</div>';
       } else if(gagnants.length === 0){
-        txt.innerText = `Personne n'a trouvé \nLa dernière carte était ${nomType(vraiType)}`;
+        txt.innerText = tr`Personne n'a trouvé \nLa dernière carte était ${nomType(vraiType)}`;
       } else if(gagnants.length === 1){
-        txt.innerText = `${gagnants[0]} a trouvé ! Il/elle distribue ${texteCulSec()} !`;
+        txt.innerText = tr`${gagnants[0]} a trouvé ! Il/elle distribue ${texteCulSec()} !`;
       } else {
-        txt.innerText = `${gagnants.join(', ')} ont trouvé ! Chacun distribue ${texteCulSec()} !`;
+        txt.innerText = tr`${gagnants.join(', ')} ont trouvé ! Chacun distribue ${texteCulSec()} !`;
       }
       reveal.appendChild(txt);
 
       const btn = document.createElement('button');
       btn.className = 'bouton-pigeon';
-      btn.innerText = 'Terminer';
+      btn.innerText = tr('Terminer');
       surAction(btn, "pred:terminer", { evenement: "click", once: true, unique: true }, () => { // (au doigt levé, comme le reste du pari)
         if(overlay._cleanup) overlay._cleanup();
         overlay.remove();
@@ -1447,7 +1447,7 @@ function creerUIJoueurActifSticky(){
         <span class="sticky-bonus"></span>
       </span>
       <span class="sticky-couleur"></span>
-    `;
+    `; traduireElement(stickyJoueurActif);
 
   // ⏸ Pause (mode classique) : au bout de la pastille, toujours à portée pendant la partie
   const btnPause = document.getElementById("btnPause");
@@ -1457,7 +1457,7 @@ function creerUIJoueurActifSticky(){
   const btnHistorique = document.createElement("button");
   btnHistorique.type = "button";
   btnHistorique.id = "btnHistorique";
-  btnHistorique.setAttribute("aria-label", "Dernières cartes");
+  btnHistorique.setAttribute("aria-label", tr("Dernières cartes"));
   btnHistorique.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v4h4"/><path d="M12 7v5l3 2"/></svg>';
   btnHistorique.addEventListener("click", () => { jouerSon("bouton"); ouvrirVoletHistorique(); });
   stickyJoueurActif.appendChild(btnHistorique);
@@ -1573,7 +1573,7 @@ function majStickyJoueurActif(){
   const labelEl = stickyJoueurActif.querySelector(".sticky-label");
   const nomEl = stickyJoueurActif.querySelector(".sticky-nom");
   const bonusEl = stickyJoueurActif.querySelector(".sticky-bonus");
-  labelEl.innerText = "Tour de";
+  labelEl.innerText = tr("Tour de");
   labelEl.hidden = true; // (« Tour de » ne dit rien de plus que le nom : de la place pour lui ; seul « À toi » s'affiche, en ligne)
 
   if(!partieLancee || joueurs.length === 0 || choixPigeonEnCours || duelEnCours){
@@ -1588,13 +1588,13 @@ function majStickyJoueurActif(){
   const n = Number(annulations[nom] || 0);
   const estPigeon = idx === indexPigeon;
 
-  nomEl.innerText = estPigeon ? `PIGEON (${avecCouronne(nom)})` : avecCouronne(nom);
+  nomEl.innerText = estPigeon ? tr`PIGEON (${avecCouronne(nom)})` : avecCouronne(nom);
   ajouterBadgeDeconnecte(nomEl, !!texteDeconnecte(nom));
   bonusEl.innerText = n > 0 ? `+${n}` : "";
   // Un tour = un nombre de cartes restantes dans la manche
   const tour = `${mancheCourante}:${cartesRestantes()}`;
   if(enLigneActif && nom === pseudoActuel){
-    labelEl.innerText = "À toi";
+    labelEl.innerText = tr("À toi");
     labelEl.hidden = false;
     // Vibre une seule fois par tour. Pas au tout premier tour (aucune carte retournée) : tout le monde
     // voit la partie démarrer
@@ -1629,11 +1629,11 @@ function echapperHtml(texte){
 
 // En ligne : mention ajoutée au nom d'un joueur déconnecté (vide sinon)
 function texteDeconnecte(nom){
-  return enLigneActif && deconnectes.has(nom) ? " (déconnecté(e))" : "";
+  return enLigneActif && deconnectes.has(nom) ? tr(" (déconnecté(e))") : "";
 }
 
 function badgeDeconnecte(nom){
-  return texteDeconnecte(nom) ? ` <span class="joueur-deconnecte">déconnecté(e)</span>` : "";
+  return texteDeconnecte(nom) ? tr` <span class="joueur-deconnecte">déconnecté(e)</span>` : "";
 }
 
 // Même mention (rouge, en italique, plus petite), ajoutée à un élément affiché en texte
@@ -1641,7 +1641,7 @@ function ajouterBadgeDeconnecte(el, deconnecte){
   if(!deconnecte) return;
   const badge = document.createElement("span");
   badge.className = "joueur-deconnecte";
-  badge.innerText = "déconnecté(e)";
+  badge.innerText = tr("déconnecté(e)");
   el.appendChild(badge);
 }
 
@@ -1655,8 +1655,8 @@ function afficherJoueurs(){
     const n = Number(annulations[j] || 0);
     const bonus = n > 0 ? ` <span class="bonus-annulation">+${n}</span>` : "";
 
-    const pause = estEnPause(j) ? ` <span class="badge-pause">EN PAUSE</span>` : "";
-    const lien = partenaireHot(j) ? ` <span class="badge-lien" title="Lié par Cupidon">💘</span>` : ""; // (mode hot)
+    const pause = estEnPause(j) ? tr` <span class="badge-pause">EN PAUSE</span>` : "";
+    const lien = partenaireHot(j) ? tr` <span class="badge-lien" title="Lié par Cupidon">💘</span>` : ""; // (mode hot)
     const classePause = estEnPause(j) ? " joueur-en-pause" : "";
     if(i === indexPigeon){
       return `<div class="joueur-ligne joueur-ligne-pigeon${classePause}"><span class="joueur-nom${classeNomLong(nomPigeonOriginal)}"><strong>PIGEON</strong> (${echapperHtml(avecCouronne(nomPigeonOriginal))})</span>${lien}${bonus}${pause}${badgeDeconnecte(j)}</div>`;
@@ -1672,7 +1672,7 @@ function afficherJoueurs(){
       const bouton = document.createElement("button");
       bouton.type = "button";
       bouton.className = "btnPauseJoueur" + (estEnPause(nom) ? " en-pause" : "");
-      bouton.setAttribute("aria-label", estEnPause(nom) ? `${nom} est de retour` : `Mettre ${nom} en pause`);
+      bouton.setAttribute("aria-label", estEnPause(nom) ? tr`${nom} est de retour` : tr`Mettre ${nom} en pause`);
       bouton.innerHTML = estEnPause(nom) ? ICONE_RETOUR_JOUEUR : ICONE_PAUSE_JOUEUR;
       surAction(bouton, "pause:" + nom, {
         evenement: "alcuno-pause",
@@ -1721,7 +1721,7 @@ function afficherJoueurActif(){
   const idx = indexJoueur % joueurs.length;
   const nom = joueurs[idx];
   const n = Number(annulations[nom] || 0);
-  const libelle = idx === indexPigeon ? `PIGEON (${avecCouronne(nom)})` : avecCouronne(nom);
+  const libelle = idx === indexPigeon ? tr`PIGEON (${avecCouronne(nom)})` : avecCouronne(nom);
   const bonus = n > 0 ? ` +${n}` : "";
   joueurActif.innerText = libelle + bonus; // (le titre « Joueur actif » est au-dessus / à côté, dans index.html)
   ajouterBadgeDeconnecte(joueurActif, !!texteDeconnecte(nom));
@@ -1739,8 +1739,8 @@ function majRappelTour(){
   let texte = "";
   if(libre){
     const nom = joueurs[indexJoueur % joueurs.length];
-    texte = enLigneActif && nom === pseudoActuel ? "C'est à toi de jouer, tire une carte." : `C'est à ${nom} de jouer, tire une carte.`;
-    rappelTour.dataset.tele = `C'est à ${nom} de jouer, tire une carte.`; // (la télé dit toujours le nom : « toi » n'y voudrait rien dire)
+    texte = enLigneActif && nom === pseudoActuel ? tr("C'est à toi de jouer, tire une carte.") : tr`C'est à ${nom} de jouer, tire une carte.`;
+    rappelTour.dataset.tele = tr`C'est à ${nom} de jouer, tire une carte.`; // (la télé dit toujours le nom : « toi » n'y voudrait rien dire)
   }
   if(rappelTour.textContent !== texte) rappelTour.textContent = texte;
   const affichage = texte ? "block" : "none";
@@ -1750,7 +1750,7 @@ function majRappelTour(){
 const compteurCartes = document.getElementById("compteurCartes");
 function majCompteurCartes(){
   const n = partieLancee ? cartesRestantes() : 0;
-  const texte = n > 0 ? `Il reste ${n} carte${n > 1 ? "s" : ""}` : "";
+  const texte = n > 0 ? tr`Il reste ${n} carte${n > 1 ? "s" : ""}` : "";
   if(compteurCartes.textContent !== texte) compteurCartes.textContent = texte;
   compteurCartes.hidden = !texte;
 }
@@ -1806,7 +1806,7 @@ function ajouterJoueur(){
   // Mot réservé du langage (« constructor »…) : les compteurs du jeu se dérégleraient (voir nomImpossible, script.js)
   if(nomImpossible(nom)){
     nomJoueurInput.value = "";
-    afficherToast("Ce nom n'est pas possible : choisis-en un autre", 3000);
+    afficherToast(tr("Ce nom n'est pas possible : choisis-en un autre"), 3000);
     return;
   }
 
@@ -1839,8 +1839,8 @@ btnSupprimer.addEventListener("click", ()=>{
     ouvrirRetraitEnJeu();
     return;
   }
-  titreSuppression.innerText = "Supprimer un ou plusieurs joueurs";
-  btnTermine.innerText = "Terminé";
+  titreSuppression.innerText = tr("Supprimer un ou plusieurs joueurs");
+  btnTermine.innerText = tr("Terminé");
   menu.style.display="none";
   suppression.style.display="flex";
   lockScroll();
@@ -1895,16 +1895,16 @@ function plateauLibre(){
 
 function ouvrirRetraitEnJeu(){
   if(joueurs.length <= 2){
-    afficherToast("Il faut au moins 3 joueurs pour en retirer un");
+    afficherToast(tr("Il faut au moins 3 joueurs pour en retirer un"));
     return;
   }
   if(!plateauLibre()){
-    afficherToast("Attends la fin de l'action en cours");
+    afficherToast(tr("Attends la fin de l'action en cours"));
     return;
   }
 
-  titreSuppression.innerText = "Retirer un joueur de la partie";
-  btnTermine.innerText = "Annuler";
+  titreSuppression.innerText = tr("Retirer un joueur de la partie");
+  btnTermine.innerText = tr("Annuler");
   listeSuppression.innerHTML = "";
   joueurs.forEach((nom) => {
     const bouton = document.createElement("button");
@@ -1925,14 +1925,14 @@ let retraitEnAttente = null;
 
 function demanderConfirmationRetrait(nom){
   retraitEnAttente = nom;
-  document.getElementById("titreConfirmerRetrait").innerText = `Retirer ${nom} de la partie ?`;
+  document.getElementById("titreConfirmerRetrait").innerText = tr`Retirer ${nom} de la partie ?`;
 
-  let texte = "La partie continue sans lui/elle.";
+  let texte = tr("La partie continue sans lui/elle.");
   if(enLigneActif && nom === pseudoActuel){
-    texte = "Tu vas quitter la partie. Elle continuera sans toi.";
+    texte = tr("Tu vas quitter la partie. Elle continuera sans toi.");
   } else if(enLigneActif && nom === hotePartie){
     const i = joueurs.indexOf(nom);
-    texte = `C'est l'hôte : le rôle d'hôte passera à ${joueurs[(i + 1) % joueurs.length]}.\nLa partie continue sans lui/elle.`;
+    texte = tr`C'est l'hôte : le rôle d'hôte passera à ${joueurs[(i + 1) % joueurs.length]}.\nLa partie continue sans lui/elle.`;
   }
   document.getElementById("texteConfirmerRetrait").innerText = texte;
   ecranConfirmerRetrait.style.display = "";
@@ -1958,18 +1958,18 @@ document.getElementById("btnConfirmerRetraitOui").addEventListener("click", () =
   fermerRetraitEnJeu();
   if(!nom || !joueurs.includes(nom)) return;
   if(joueurs.length <= 2){
-    afficherToast("Il faut au moins 3 joueurs pour en retirer un");
+    afficherToast(tr("Il faut au moins 3 joueurs pour en retirer un"));
     return;
   }
   if(!plateauLibre()){
-    afficherToast("Une action vient de commencer : réessaie juste après");
+    afficherToast(tr("Une action vient de commencer : réessaie juste après"));
     return;
   }
 
   if(!enLigneActif){
     retirerJoueurEnJeu(nom);
     noterActionClassique(`retrait-classique:${nom}`);
-    afficherToast(`${nom} a été retiré de la partie`);
+    afficherToast(tr`${nom} a été retiré de la partie`);
     return;
   }
 
@@ -1981,7 +1981,7 @@ document.getElementById("btnConfirmerRetraitOui").addEventListener("click", () =
       quitterPartieEnLigne();
       allerAccueil();
     })
-    .catch(() => afficherToast("Connexion perdue, réessaie"));
+    .catch(() => afficherToast(tr("Connexion perdue, réessaie")));
 });
 
 // Applique le retrait (identique sur tous les téléphones en ligne). Le tour, le pigeon, ses « 1 » et
@@ -2037,10 +2037,10 @@ function finDePartie(){
   }
 
   const texte = texteDoreeJamaisTrouvee();
-  montrerOverlayRegle(`Personne n'a trouvé la CARTE DORÉE !!\n${texte}`, "carte_doree");
+  montrerOverlayRegle(tr`Personne n'a trouvé la CARTE DORÉE !!\n${texte}`, "carte_doree");
   habillerOverlayCarteDoree(
     texte,
-    '<span class="doree-etincelle">✦</span> PERSONNE N\'A TROUVÉ LA CARTE DORÉE !! <span class="doree-etincelle">✦</span>'
+    tr('<span class="doree-etincelle">✦</span> PERSONNE N\'A TROUVÉ LA CARTE DORÉE !! <span class="doree-etincelle">✦</span>')
   );
   executerApresOverlayRegleUnique(afficherOverlayFinUnRestants);
 }
@@ -2055,7 +2055,7 @@ const btnRemonter = document.createElement("button");
 btnRemonter.type = "button";
 btnRemonter.id = "btnRemonter";
 btnRemonter.tabIndex = -1;
-btnRemonter.setAttribute("aria-label", "Remonter en haut");
+btnRemonter.setAttribute("aria-label", tr("Remonter en haut"));
 btnRemonter.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>';
 document.body.appendChild(btnRemonter);
 // Mouchard (js/mouchard.js) : chaque étape de la flèche est notée, pour comprendre ce que fait l'iPhone

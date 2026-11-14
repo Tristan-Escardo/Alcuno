@@ -66,7 +66,7 @@ function envoyerAction(el){
 
   const owner = proprietaireAction(el);
   if(owner && owner !== pseudoActuel){
-    afficherToast(`En attente de ${owner}`);
+    afficherToast(tr`En attente de ${owner}`);
     return;
   }
 
@@ -77,7 +77,7 @@ function envoyerAction(el){
 
   ecrireAction(el.dataset.netId).catch(() => {
     delete el.dataset.netEnvoye;
-    afficherToast("Connexion perdue, réessaie");
+    afficherToast(tr("Connexion perdue, réessaie"));
   });
 }
 
@@ -141,7 +141,7 @@ let dernierEtatManche = null; // état de la manche en cours (pour la rejouer)
 function resynchroniserManche(retourArriere = false){
   if(!dernierEtatManche || !enLigneActif) return;
   noterJournal(retourArriere ? "choix annulé : manche rejouée sans lui" : "remise à jour de la manche depuis le serveur");
-  if(!retourArriere) afficherToast("Connexion instable : remise à jour de la partie…", 3000);
+  if(!retourArriere) afficherToast(tr("Connexion instable : remise à jour de la partie…"), 3000);
   repriseEnCours = true;
   mancheCourante = null; // la même manche est redémarrée, puis rejouée depuis le serveur
   demarrerMancheEnLigne(dernierEtatManche, { resynchro: true, retourArriere });
@@ -161,7 +161,7 @@ function appliquerRetraitEnLigne(action){
   if(!joueurs.includes(nom) || joueurs.length <= 2) return "ignorer";
   if(cartesRestantes() !== Number(restantes)){
     if(action.par === pseudoActuel && !rattrapageEnCours){
-      afficherToast("Retrait annulé : une carte venait d'être tirée, réessaie");
+      afficherToast(tr("Retrait annulé : une carte venait d'être tirée, réessaie"));
     }
     return "ignorer";
   }
@@ -190,7 +190,7 @@ function appliquerRetraitEnLigne(action){
       else alerteRetire(code, nom);
     }, 0);
   } else if(!rattrapageEnCours){
-    afficherToast(action.par === nom ? `${nom} a quitté la partie` : `${nom} a été retiré de la partie`, 3000);
+    afficherToast(action.par === nom ? tr`${nom} a quitté la partie` : tr`${nom} a été retiré de la partie`, 3000);
   }
   return "ok";
 }
@@ -237,7 +237,7 @@ function verifierRetourDansManche(){
   if(!id){
     if(!retourAnnonce){
       retourAnnonce = true;
-      afficherToast("Tu reviens dans la partie à la fin de l'action en cours…", 3000);
+      afficherToast(tr("Tu reviens dans la partie à la fin de l'action en cours…"), 3000);
     }
     timerRetour = setTimeout(verifierRetourDansManche, 500);
     return;
@@ -281,7 +281,7 @@ function appliquerRetourEnLigne(action){
         retourAnnonce = false;
         clearTimeout(timerRetour);
         timerRetour = null;
-        afficherToast("Te revoilà dans la partie !", 3000);
+        afficherToast(tr("Te revoilà dans la partie !"), 3000);
         // Fiche effacée entre-temps par le nettoyage du retrait : on la remet
         const code = codePartieActuel;
         window.fbGet(window.fbRef(window.firebaseDB, `parties/${code}/joueurs/${nom}`)).then((snapshot) => {
@@ -292,7 +292,7 @@ function appliquerRetourEnLigne(action){
       }
     }
   } else if(resultat === "ok" && !rattrapageEnCours){
-    afficherToast(`${nom} est revenu(e) dans la partie`, 3000);
+    afficherToast(tr`${nom} est revenu(e) dans la partie`, 3000);
   }
   return resultat;
 }
@@ -486,7 +486,7 @@ function reinitialiserFileActions(){
 // ===== Rattrapage (reconnexion en pleine manche) =====
 // Le téléphone rejoue toutes les actions déjà faites, délais quasi nuls (delai()) ;
 // un écran « Retour dans la partie… » cache les overlays qui défilent en accéléré.
-function commencerRattrapage(cible, texte = "Retour dans la partie…"){
+function commencerRattrapage(cible, texte = tr("Retour dans la partie…")){
   rattrapageEnCours = true;
   texteRattrapage = texte;
   seqFinRattrapage = cible;
@@ -620,7 +620,7 @@ function demarrerMancheEnLigne(etat, options = {}){
   const code = codePartieActuel;
   const manche = etat.manche;
   const generation = generationFile; // (manche relancée ou quittée entre-temps : cette lecture ne compte plus)
-  const texte = options.retourArriere ? "Retour en arrière…" : undefined;
+  const texte = options.retourArriere ? tr("Retour en arrière…") : undefined;
   const refActions = window.fbRef(window.firebaseDB, `parties/${code}/manches/${manche}/actions`);
   commencerRattrapage(0, texte);
 
@@ -656,7 +656,7 @@ function afficherBadgeCode(){
     bouton = document.createElement("button");
     bouton.type = "button";
     bouton.id = "btnCodePartie";
-    bouton.setAttribute("aria-label", "Voir le code de la partie");
+    bouton.setAttribute("aria-label", tr("Voir le code de la partie"));
     bouton.innerHTML = '<span class="cle" aria-hidden="true">🔑</span><span class="texte"></span>';
     bouton.addEventListener("click", () => {
       bouton.classList.toggle("ouvert");
@@ -667,7 +667,7 @@ function afficherBadgeCode(){
     });
     document.body.appendChild(bouton);
   }
-  bouton.querySelector(".texte").innerText = "Code : " + codePartieActuel;
+  bouton.querySelector(".texte").innerText = tr("Code : ") + codePartieActuel;
   bouton.classList.remove("ouvert");
 }
 
@@ -790,8 +790,8 @@ function proposerRepriseClassique(){
   const s = lirePartieClassique();
   if(!s) return;
   const noms = s.joueurs.map(avecCouronne);
-  const liste = noms.length > 1 ? `${noms.slice(0, -1).join(", ")} et ${noms[noms.length - 1]}` : noms[0];
-  document.getElementById("texteReprise").innerText = `Avec ${liste}.`;
+  const liste = noms.length > 1 ? tr`${noms.slice(0, -1).join(", ")} et ${noms[noms.length - 1]}` : noms[0];
+  document.getElementById("texteReprise").innerText = tr`Avec ${liste}.`;
   ecranReprise.style.display = "";
 }
 
@@ -819,8 +819,8 @@ function reprendrePartieClassique(s){
   joueurs = s.joueurs.slice();
   annulations = {};
   afficherJoueurs();
-  rejouerActionsClassiques(s.actions.slice(), "Reprise de la partie…",
-    () => afficherNotificationHaut("", "Partie reprise !", true));
+  rejouerActionsClassiques(s.actions.slice(), tr("Reprise de la partie…"),
+    () => afficherNotificationHaut("", tr("Partie reprise !"), true));
 }
 
 // Relance la partie (même graine) et rejoue ces taps en accéléré, derrière un écran d'attente
@@ -899,7 +899,7 @@ let choixAnnulable = null;      // { debut, fin, timer } : positions des actions
 let seqEnCours = 0;             // en ligne : numéro de l'action en train d'être appliquée
 let toutesActionsManche = new Map(); // en ligne : seq -> action, toute la manche (pour valider un « defaire »)
 let seqsAnnulees = new Set();   // en ligne : actions retirées par un « Annuler » (sautées au rejeu)
-let texteRattrapage = "Retour dans la partie…";
+let texteRattrapage = tr("Retour dans la partie…");
 
 // Position de l'action en train d'être appliquée : son numéro en ligne, son rang dans la sauvegarde
 // en classique (pas encore notée pendant son handler : c'est la longueur de la liste)
@@ -910,7 +910,7 @@ function positionActionCourante(){
 
 // À appeler dans le handler du choix. debut : 1re action du choix (le 1er joueur du duel), sinon celle-ci.
 // texte : la question de la barre (« Mauvais joueur ? », « Mauvais bouton ? »…)
-function proposerAnnulerChoix(choisisseur, debut = positionActionCourante(), texte = "Mauvais joueur ?"){
+function proposerAnnulerChoix(choisisseur, debut = positionActionCourante(), texte = tr("Mauvais joueur ?")){
   masquerAnnulerChoix();
   if(rattrapageEnCours || repriseClassiqueEnCours) return;
   if(enLigneActif && choisisseur !== pseudoActuel) return;
@@ -1016,7 +1016,7 @@ function avancerJusquAEcran(id, fin){
 
 function defaireChoix(choix){
   if(enLigneActif){
-    ecrireAction(`defaire:${choix.debut}`).catch(() => afficherToast("Connexion perdue, réessaie"));
+    ecrireAction(`defaire:${choix.debut}`).catch(() => afficherToast(tr("Connexion perdue, réessaie")));
     return;
   }
   if(!sauvegardeClassique || sauvegardeClassique.actions.length - 1 !== choix.fin) return;
@@ -1026,7 +1026,7 @@ function defaireChoix(choix){
   retourMenu();
   joueurs = s.joueurs.slice();
   annulations = {};
-  rejouerActionsClassiques(s.actions.slice(0, choix.debut), "Retour en arrière…", null, ecranDuChoix(s.actions[choix.debut]));
+  rejouerActionsClassiques(s.actions.slice(0, choix.debut), tr("Retour en arrière…"), null, ecranDuChoix(s.actions[choix.debut]));
 }
 
 // Valable si le choix a été fait par le même joueur et que rien d'autre n'a été joué entre-temps
@@ -1046,7 +1046,7 @@ function appliquerDefaireEnLigne(action){
   const debut = Number(action.id.slice("defaire:".length));
   const fin = seqEnCours;
   if(!annulationValide(debut, fin, action.par, toutesActionsManche)){
-    if(action.par === pseudoActuel) afficherToast("Trop tard pour annuler");
+    if(action.par === pseudoActuel) afficherToast(tr("Trop tard pour annuler"));
     return "ignorer";
   }
   for(let s = debut; s <= fin; s++) seqsAnnulees.add(s);

@@ -47,7 +47,7 @@ function afficherOverlayFinUnRestants(){
 
   const btnTerminer = document.createElement("button");
   btnTerminer.className = "bouton-pigeon";
-  btnTerminer.innerText = "Terminer";
+  btnTerminer.innerText = tr("Terminer");
 
   surAction(btnTerminer, "fin:terminer", { once: true, unique: true }, () => {
     // ils boivent leurs "1 restants" => on remet les compteurs à 0
@@ -63,7 +63,7 @@ function afficherOverlayFinUnRestants(){
   // Rejouer avec les mêmes joueurs ») ; en ligne, n'importe qui peut la lancer, pour tout le monde
   const btnRevanche = document.createElement("button");
   btnRevanche.className = "bouton-pigeon fin-revanche";
-  btnRevanche.innerText = "Revanche (mêmes joueurs)";
+  btnRevanche.innerText = tr("Revanche (mêmes joueurs)");
   btnRevanche.addEventListener("click", () => {
     restants.forEach(x => { annulations[x.nom] = 0; noterGorgees(x.nom, x.n); });
     overlay.remove();
@@ -102,7 +102,7 @@ function afficherMenuPigeon(){
 
   const titre=document.createElement("div");
   titre.className="titre-pigeon";
-  titre.innerText="Choisis le nouveau PIGEON";
+  titre.innerText=tr("Choisis le nouveau PIGEON");
   overlay.appendChild(titre);
 
   candidats.forEach(i => {
@@ -135,7 +135,7 @@ function passerPigeonA(i, overlay, choisisseur, avecChoix){
   afficherJoueurActif();
   // 2) message demandé (overlay + .messages)
   const nPigeon = gorgeesPigeon();
-  const msg = `${joueurs[i]} est le nouveau PIGEON !\nIl/elle boit ${texteGorgees(nPigeon)} pour fêter ça.`;
+  const msg = tr`${joueurs[i]} est le nouveau PIGEON !\nIl/elle boit ${texteGorgees(nPigeon)} pour fêter ça.`;
   // .messages : on l'affiche dans reglePigeon (et il disparaît au prochain tirage)
   // 3) overlay + annulation si compteur (utilise la carte "trois" qui a déclenché le transfert)
   const carteTrois = carteTroisPourTransfertPigeon || "trois_vert";
@@ -344,18 +344,20 @@ function majRegleApresAnnulation(nom, nbGorgees, utilise, reste){
   if(utilise <= 0 || regleZero.style.display === "none") return;
   const texte = regleZero.innerText.trim();
   if(!texte) return;
-  const apres = `${texteGorgees(reste)} (${utilise} annulée${utilise > 1 ? "s" : ""})`;
+  const apres = tr`${texteGorgees(reste)} (${utilise} annulée${utilise > 1 ? "s" : ""})`;
   let nouveau = texte;
-  for(const avant of [`${nom} boit ${texteGorgees(nbGorgees)}`, `${avant2(nom)} boit ${texteGorgees(nbGorgees)}`]){
-    if(nouveau.includes(avant)){ nouveau = nouveau.replace(avant, `${avant.split(" boit ")[0]} boit ${apres}`); break; }
+  // (les phrases sont refaites en entier dans la langue du jeu : « Léa boit 3 gorgées » / « Léa drinks 3 sips »)
+  for(const sujet of [nom, avant2(nom)]){
+    const avant = tr`${sujet} boit ${texteGorgees(nbGorgees)}`;
+    if(nouveau.includes(avant)){ nouveau = nouveau.replace(avant, tr`${sujet} boit ${apres}`); break; }
   }
-  if(nouveau === texte && texte.includes("Il/elle boit " + texteGorgees(nbGorgees))){
-    nouveau = texte.replace("Il/elle boit " + texteGorgees(nbGorgees), "Il/elle boit " + apres);
+  if(nouveau === texte && texte.includes(tr("Il/elle boit ") + texteGorgees(nbGorgees))){
+    nouveau = texte.replace(tr("Il/elle boit ") + texteGorgees(nbGorgees), tr("Il/elle boit ") + apres);
   }
-  if(nouveau === texte) nouveau = `${texte}\n${nom} annule ${utilise} : boit ${texteGorgees(reste)}`;
+  if(nouveau === texte) nouveau = tr`${texte}\n${nom} annule ${utilise} : boit ${texteGorgees(reste)}`;
   afficherRegleBloc(regleZero, nouveau);
 }
-function avant2(nom){ return `Le PIGEON (${nom})`; }
+function avant2(nom){ return tr`Le PIGEON (${nom})`; }
 
 function afficherOverlayAnnulation(joueurIndex, nbGorgees, onDone = null, afterClose = null){
   const nom = joueurs[joueurIndex];
@@ -393,21 +395,21 @@ function afficherOverlayAnnulation(joueurIndex, nbGorgees, onDone = null, afterC
 
   // Le nombre de gorgées à boire d'abord (on le voyait juste avant, puis plus du tout ici)
   const titre = document.createElement("div");
-  titre.innerText = `${nom}, tu bois ${texteGorgees(nbGorgees)}.`;
+  titre.innerText = tr`${nom}, tu bois ${texteGorgees(nbGorgees)}.`;
   titre.style.fontSize = "clamp(24px, 5vw, 46px)";
   titre.style.fontWeight = "900";
   titre.style.textShadow = "2px 2px 5px #000";
   overlay.appendChild(titre);
 
   const ligneAnnulations = document.createElement("div");
-  ligneAnnulations.innerText = `Tu as ${dispo} annulation${dispo > 1 ? "s" : ""}.`;
+  ligneAnnulations.innerText = tr`Tu as ${dispo} annulation${dispo > 1 ? "s" : ""}.`;
   ligneAnnulations.style.fontSize = "clamp(20px, 4.4vw, 34px)";
   ligneAnnulations.style.fontWeight = "900";
   ligneAnnulations.style.textShadow = "2px 2px 5px #000";
   overlay.appendChild(ligneAnnulations);
 
   const sousTitre = document.createElement("div");
-  sousTitre.innerText = "Combien de gorgées veux-tu annuler ?";
+  sousTitre.innerText = tr("Combien de gorgées veux-tu annuler ?");
   sousTitre.style.fontSize = "clamp(18px, 4vw, 28px)";
   sousTitre.style.fontWeight = "800";
   sousTitre.style.maxWidth = "min(780px, 100%)";
@@ -440,7 +442,7 @@ function afficherOverlayAnnulation(joueurIndex, nbGorgees, onDone = null, afterC
   for(let i=0; i<=maxAnnulable; i++){
     const btn = document.createElement("button");
     btn.className = "bouton-annulation";
-    btn.innerText = `Annuler ${i}`;
+    btn.innerText = tr`Annuler ${i}`;
     btn.style.width = "min(420px, 100%)";
     btn.style.padding = "clamp(12px, 3.2vw, 22px)";
     btn.style.fontSize = "clamp(16px, 4vw, 28px)";
@@ -455,13 +457,13 @@ function afficherOverlayAnnulation(joueurIndex, nbGorgees, onDone = null, afterC
     surAction(btn, `annul:${nom}:${i}`, { owner: nom, once: true }, () => {
       // Overlay en train de se fermer : ses autres boutons ne doivent plus recevoir d'action
       overlay.dataset.netFerme = "1";
-      proposerAnnulerChoix(nom, positionActionCourante(), "Mauvais bouton ?"); // (retour au choix « Annuler 0, 1, 2… »)
+      proposerAnnulerChoix(nom, positionActionCourante(), tr("Mauvais bouton ?")); // (retour au choix « Annuler 0, 1, 2… »)
       const utilise = i;
       const reste = nbGorgees - utilise;
       jouerSon(utilise > 0 ? "annuler_gorgees" : "annuler_0_gorgees");
       const messageResultat = utilise > 0
-        ? `${texteGorgees(utilise)} annulée${utilise > 1 ? "s" : ""}. \nTu bois ${texteGorgees(reste)}.`
-        : `Tu n’annules rien. \nTu bois ${texteGorgees(reste)}.`;
+        ? tr`${texteGorgees(utilise)} annulée${utilise > 1 ? "s" : ""}. \nTu bois ${texteGorgees(reste)}.`
+        : tr`Tu n’annules rien. \nTu bois ${texteGorgees(reste)}.`;
 
       annulations[nom] = Math.max(0, dispo - utilise);
       noterGorgees(nom, reste);
@@ -493,7 +495,7 @@ function afficherOverlayAnnulation(joueurIndex, nbGorgees, onDone = null, afterC
 // Annonce "X boit N" + propose annulation si dispo
 function annoncerBoireAvecAnnulation(joueurIndex, nbGorgees, classeCarte = "", prefixMsg = null, onFinish = null){
   const nom = joueurs[joueurIndex];
-  const msg = prefixMsg ? prefixMsg : `${nom} boit ${texteGorgees(nbGorgees)}`;
+  const msg = prefixMsg ? prefixMsg : tr`${nom} boit ${texteGorgees(nbGorgees)}`;
 
   if (nbGorgees > 15) {
     // (bloc Règles rempli aussi : avant, il restait vide pour ces grosses gorgées)
@@ -501,8 +503,8 @@ function annoncerBoireAvecAnnulation(joueurIndex, nbGorgees, classeCarte = "", p
     regleZero.style.display = "block";
     zeroEnCours = true;
     // Easter egg : message signé Célien, mise en forme premium
-    const citationCelien = "Et interdit de vomir, c'est pas fini !";
-    const signatureCelien = "Signé Célien, un des créateurs du jeu";
+    const citationCelien = tr("Et interdit de vomir, c'est pas fini !");
+    const signatureCelien = tr("Signé Célien, un des créateurs du jeu");
     const message17 = `${citationCelien}\n${signatureCelien}`;
 
     montrerOverlayRegle(`${msg}\n\n${message17}`, classeCarte);
@@ -714,13 +716,13 @@ function afficherOverlayCouleur(joueurActuel){
 
   const titre = document.createElement("div");
   titre.className = "titre-couleur";
-  titre.innerText = "Choisis une couleur";
+  titre.innerText = tr("Choisis une couleur");
   overlay.appendChild(titre);
 
   // Ce que fait la couleur, dit tout de suite (avant, on ne le comprenait qu'au moment de boire)
   const explication = document.createElement("div");
   explication.className = "explication-couleur";
-  explication.innerHTML = "Le prochain qui tire une carte de cette couleur boit <b>1 gorgée en plus</b>";
+  explication.innerHTML = tr("Le prochain qui tire une carte de cette couleur boit <b>1 gorgée en plus</b>");
   overlay.appendChild(explication);
 
   const container = document.createElement("div");
@@ -739,13 +741,13 @@ function afficherOverlayCouleur(joueurActuel){
     surAction(carre, "couleur:" + c.nom, { owner: choisisseur, once: true }, ()=>{
       couleurChoisie = c.nom;
       majAffichageCouleur();
-      noterHistorique(`Choisit le ${c.nom}`);
+      noterHistorique(tr`Choisit le ${tr(c.nom)}`);
       unlockScroll();
       overlay.remove();
       choixPigeonEnCours = false;
       afficherJoueurActif();
       // Annonce pour toute la table (pas seulement celui qui a choisi)
-      montrerOverlayRegle(`Couleur ${c.nom.toUpperCase()}\nLe prochain qui tire une carte ${ADJECTIFS_COULEUR[c.nom]} boit 1 gorgée en plus`, "couleur");
+      montrerOverlayRegle(tr`Couleur ${tr(c.nom).toUpperCase()}\nLe prochain qui tire une carte ${tr(ADJECTIFS_COULEUR[c.nom])} boit 1 gorgée en plus`, "couleur");
     });
     container.appendChild(carre);
   });
@@ -756,7 +758,7 @@ function afficherOverlayCouleur(joueurActuel){
 
 /* ===== CARTE DORÉE : habillage premium de l'overlay de règle =====
    Fond doré + grand titre (par défaut « ✦ CARTE DORÉE ✦ ») + texte en dessous (facultatif) */
-const TITRE_CARTE_DOREE = '<span class="doree-etincelle">✦</span> CARTE DORÉE <span class="doree-etincelle">✦</span>';
+const TITRE_CARTE_DOREE = tr('<span class="doree-etincelle">✦</span> CARTE DORÉE <span class="doree-etincelle">✦</span>');
 
 // Change la durée d'affichage de l'overlay de règle qui vient d'être montré.
 // facteur = null : il reste affiché jusqu'à ce qu'on tape dessus.
@@ -868,7 +870,7 @@ function afficherOverlayCarteDoree(joueurActuel){
 
   const consigne = document.createElement("div");
   consigne.className = "doree-texte";
-  consigne.innerText = estModeSoft() ? "Choisis à qui tu distribues tes 3 gorgées" : "Choisis à qui tu distribues ton CUL SEC";
+  consigne.innerText = estModeSoft() ? tr("Choisis à qui tu distribues tes 3 gorgées") : tr("Choisis à qui tu distribues ton CUL SEC");
   overlay.appendChild(consigne);
 
   const liste = document.createElement("div");
@@ -917,8 +919,8 @@ function afficherOverlayTiensGueule(victime){
   noterGorgees(victime, estModeSoft() ? 3 : GORGEES_CUL_SEC);
   if(enLigneActif && victime !== pseudoActuel){
     const message = estModeSoft()
-      ? `${victime} boit les 3 gorgées de la carte dorée !`
-      : `${victime} prend le CUL SEC de la carte dorée !`;
+      ? tr`${victime} boit les 3 gorgées de la carte dorée !`
+      : tr`${victime} prend le CUL SEC de la carte dorée !`;
     montrerOverlayRegle(message, "carte_doree");
     habillerOverlayCarteDoree(message);
     reglerDureeOverlayRegle(message, null); // reste jusqu'au tap
@@ -931,10 +933,10 @@ function afficherOverlayTiensGueule(victime){
 
   // En classique, un seul téléphone pour tous : on précise qui prend le cul sec
   const titre = enLigneActif
-    ? "TIENS DANS<br>TA GUEULE."
-    : `TIENS DANS<br>TA GUEULE<br>${echapperHtml(avecCouronne(victime))}.`;
-  montrerOverlayRegle("TIENS DANS TA GUEULE.", "carte_doree");
-  habillerOverlayCarteDoree(estModeSoft() ? "3 gorgées !" : "", titre);
+    ? tr("TIENS DANS<br>TA GUEULE.")
+    : tr`TIENS DANS<br>TA GUEULE<br>${echapperHtml(avecCouronne(victime))}.`;
+  montrerOverlayRegle(tr("TIENS DANS TA GUEULE."), "carte_doree");
+  habillerOverlayCarteDoree(estModeSoft() ? tr("3 gorgées !") : "", titre);
   reglerDureeOverlayRegle("", null); // reste jusqu'au tap
 }
 
@@ -960,7 +962,7 @@ function lancerOverlayChoixDuel(joueurActuel, carteDuel = ""){
 
   const titre = document.createElement("div");
   titre.className = "titre-pigeon duel-main-title";
-  titre.innerText = "DUEL ! Choisis 2 joueurs";
+  titre.innerText = tr("DUEL ! Choisis 2 joueurs");
   content.appendChild(titre);
 
   const containerBoutons = document.createElement("div");
@@ -1112,8 +1114,8 @@ function afficherOverlayTirageDuel(overlay, j1, j2, carteDuel = ""){
     if(v1 === v2){
       duelMultiplicateur *= 2;
       // Le multiplicateur reste affiché dans le titre pendant tout le duel
-      titre.innerText = "DUEL ×" + duelMultiplicateur;
-      info.innerText = "Égalité ! Les gorgées sont multipliées : ×" + duelMultiplicateur;
+      titre.innerText = tr("DUEL ×") + duelMultiplicateur;
+      info.innerText = tr("Égalité ! Les gorgées sont multipliées : ×") + duelMultiplicateur;
       // petite pause puis on relance un duel (toujours dos au départ)
       setTimeout(() => {
         if(generation !== generationPartie) return;
@@ -1137,7 +1139,7 @@ function afficherOverlayTirageDuel(overlay, j1, j2, carteDuel = ""){
     c2.style.opacity = "";
     (perdant === j1 ? carteDeJ1 : carteDeJ2).classList.add("duel-perdant");
     (perdant === j1 ? carteDeJ2 : carteDeJ1).classList.add("duel-gagnant");
-    info.innerText = joueurs[perdant] + " perd le duel !";
+    info.innerText = joueurs[perdant] + tr(" perd le duel !");
 
     // 1) on enlève l’overlay du duel après le temps de lire le reveal (2,2 s),
     //    ou dès qu'on tape sur l'écran
@@ -1217,7 +1219,7 @@ function afficherOverlayTirageDuel(overlay, j1, j2, carteDuel = ""){
       choisie2.classList.add("duel-selected");
       setTimeout(() => {
         if(generation !== generationPartie) return;
-        info.innerText = "On retourne les cartes…";
+        info.innerText = tr("On retourne les cartes…");
         overlay.classList.add("reveal");
         c1.classList.remove("duel-selected");
         c2.classList.remove("duel-selected");
@@ -1251,7 +1253,7 @@ function afficherOverlayTirageDuel(overlay, j1, j2, carteDuel = ""){
           label2.innerText = "Carte de " + joueurs[j1];
         }
 
-        info.innerText = "Résultat…";
+        info.innerText = tr("Résultat…");
         resoudreDuel(carteJ1, carteJ2);
       }, delai(1400));
     }
@@ -1280,7 +1282,7 @@ function afficherOverlayPlus4(joueurActuel, classeCartePlus4){
 
   const titre = document.createElement("div");
   titre.className = "titre-pigeon";
-  titre.innerText = `PLUS 4\nDistribue ${texteGorgees(aDistribuer)}`; // « PLUS 4 » au-dessus
+  titre.innerText = tr`PLUS 4\nDistribue ${texteGorgees(aDistribuer)}`; // « PLUS 4 » au-dessus
   overlay.appendChild(titre);
 
   const totalBox = document.createElement("div");
@@ -1308,7 +1310,7 @@ function afficherOverlayPlus4(joueurActuel, classeCartePlus4){
 
   function refreshUI(){
     const total = totalDistribue();
-    totalBox.innerText = `Gorgées distribuées : ${total} / ${aDistribuer}`;
+    totalBox.innerText = tr`Gorgées distribuées : ${total} / ${aDistribuer}`;
 
     // update boutons joueurs (badge)
     [...container.querySelectorAll("button[data-idx]")].forEach(btn=>{
@@ -1355,7 +1357,7 @@ function afficherOverlayPlus4(joueurActuel, classeCartePlus4){
 
   const btnUndo = document.createElement("button");
   btnUndo.className = "bouton-pigeon plus4-action-btn";
-  btnUndo.innerText = "Retour";
+  btnUndo.innerText = tr("Retour");
   surAction(btnUndo, "plus4:annuler", { owner: choisisseur }, ()=>{
     if(historique.length === 0) return;
     const idx = historique.pop();
@@ -1365,7 +1367,7 @@ function afficherOverlayPlus4(joueurActuel, classeCartePlus4){
 
   const btnReset = document.createElement("button");
   btnReset.className = "bouton-pigeon plus4-action-btn";
-  btnReset.innerText = "Annuler";
+  btnReset.innerText = tr("Annuler");
   surAction(btnReset, "plus4:reset", { owner: choisisseur }, ()=>{
     Object.keys(dist).forEach(k => dist[k] = 0);
     historique = [];
@@ -1374,7 +1376,7 @@ function afficherOverlayPlus4(joueurActuel, classeCartePlus4){
 
   const btnValider = document.createElement("button");
   btnValider.className = "bouton-pigeon plus4-action-btn";
-  btnValider.innerText = "Valider";
+  btnValider.innerText = tr("Valider");
   surAction(btnValider, "plus4:valider", { owner: choisisseur, once: true }, ()=>{
     if(totalDistribue() !== aDistribuer) return;
     if(joueurs.filter(nom => !estEnPause(nom)).length > 1) proposerAnnulerChoix(choisisseur); // « Mauvais joueur ? Annuler » : retour à la distribution (pas s'il n'y avait qu'un joueur à qui distribuer)
@@ -1420,14 +1422,14 @@ function textePlus4(choisisseur, resultats){
     if(!parQuantite.has(r.reste)) parQuantite.set(r.reste, []);
     parQuantite.get(r.reste).push(r.nom);
   });
-  if(parQuantite.size === 0) return `+4 de ${choisisseur} :\nPersonne ne boit`;
+  if(parQuantite.size === 0) return tr`+4 de ${choisisseur} :\nPersonne ne boit`;
   const lignes = [...parQuantite.entries()]
     .sort((a, b) => b[0] - a[0]) // ceux qui boivent le plus d'abord
     .map(([n, noms]) => {
-      const qui = noms.length > 1 ? `${noms.slice(0, -1).join(", ")} et ${noms[noms.length - 1]}` : noms[0];
+      const qui = noms.length > 1 ? tr`${noms.slice(0, -1).join(", ")} et ${noms[noms.length - 1]}` : noms[0];
       return `${qui} ${noms.length > 1 ? "boivent" : "boit"} ${texteGorgees(n)}`;
     });
-  return `+4 de ${choisisseur} :\n${lignes.join("\n")}`;
+  return tr`+4 de ${choisisseur} :\n${lignes.join("\n")}`;
 }
 
 // onAnnulation(joueurIndex, gorgéesRestantes) : appelé quand un joueur a choisi combien il en annule
@@ -1444,7 +1446,7 @@ function distribuerFilePlus4(file, classeCartePlus4, onAnnulation = null, seul =
 function demanderAnnulationPlus4(joueurIndex, nbGorgees, classeCartePlus4, onFinish, onAnnulation = null, seul = false){
   compterStat("plus4", joueurs[joueurIndex], nbGorgees); // (récap de fin : gorgées reçues par des +4)
   const nom = joueurs[joueurIndex];
-  const msg = `${nom} boit ${texteGorgees(nbGorgees)} (+4)`;
+  const msg = tr`${nom} boit ${texteGorgees(nbGorgees)} (+4)`;
 
   montrerOverlayRegle(msg, classeCartePlus4);
   const defiHot = montrerDefiHot(joueurIndex, nbGorgees, seul); // (mode hot : bloc défi sous la carte, js/mode-hot.js)
@@ -1583,8 +1585,8 @@ function noterHistorique(texte){
   const entree = historiqueCartes[0];
   if(!entree) return;
   String(texte || "").split("\n").map(l => l.trim())
-    .filter(l => l && !/^(À chaque 3|Pour s'en débarrasser)/.test(l))
-    .map(l => l.replace(/ sauf toi$/, ` sauf ${entree.nom}`)) // (le 0 : « sauf toi » ne voudrait plus rien dire)
+    .filter(l => l && !/^(À chaque 3|Pour s'en débarrasser|Every time a 3|To get rid of it)/.test(l))
+    .map(l => l.replace(/ (sauf toi|except you)$/, tr` sauf ${entree.nom}`)) // (le 0 : « sauf toi » ne voudrait plus rien dire)
     .forEach(l => { if(!entree.lignes.includes(l)) entree.lignes.push(l); });
 }
 
@@ -1606,21 +1608,21 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
 
   if (carteTiree === "carte_doree") {
     noterDoreeStats("doreesTirees"); // statistiques (js/stats.js)
-    afficherRegleBloc(regleZero, `CARTE DORÉE : distribue ${texteCulSec()}`);
+    afficherRegleBloc(regleZero, tr`CARTE DORÉE : distribue ${texteCulSec()}`);
     regleZero.style.display = "block";
     zeroEnCours = true;
 
     // Plateau bloqué (et pari de fin en attente) jusqu'au choix de la victime
     choixPigeonEnCours = true;
     const texteCarteDoree = estModeSoft()
-      ? "Distribue 3 gorgées de la part du développeur 😘"
-      : "Distribue un CUL SEC de la part du développeur.\nEt obligation de se servir un vrai verre avant 😘";
+      ? tr("Distribue 3 gorgées de la part du développeur 😘")
+      : tr("Distribue un CUL SEC de la part du développeur.\nEt obligation de se servir un vrai verre avant 😘");
     // Le texte complet sert à calculer la durée d'affichage de l'overlay
-    montrerOverlayRegle(`CARTE DORÉE\n${texteCarteDoree}`, carteTiree);
+    montrerOverlayRegle(tr`CARTE DORÉE\n${texteCarteDoree}`, carteTiree);
     vibrer([150, 70, 150, 70, 300]);
     jouerSon("doree");
     habillerOverlayCarteDoree(texteCarteDoree);
-    reglerDureeOverlayRegle(`CARTE DORÉE\n${texteCarteDoree}`, 1.65); // +65 % de temps de lecture
+    reglerDureeOverlayRegle(tr`CARTE DORÉE\n${texteCarteDoree}`, 1.65); // +65 % de temps de lecture
     executerApresOverlayRegleUnique(() => afficherOverlayCarteDoree(joueurActuel));
     return;
   }
@@ -1633,7 +1635,7 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
 
   // Mode hot : carte Cupidon (lier deux joueurs ou briser un lien : js/mode-hot.js)
   if(carteTiree.startsWith("cupidon")){
-    const entete = "CUPIDON !\nLie 2 joueurs : quand l'un boit, l'autre aussi.";
+    const entete = tr("CUPIDON !\nLie 2 joueurs : quand l'un boit, l'autre aussi.");
     afficherRegleBloc(regleZero, entete);
     regleZero.style.display = "block";
     zeroEnCours = true;
@@ -1648,7 +1650,7 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
   // Mode hot, période Saint-Valentin : carte Coup de foudre (un bisou sur la bouche… ou un cul sec : js/mode-hot.js)
   if(carteTiree === "coup_de_foudre"){
     // (mode hard : un doigt dans le cul à la place du bisou)
-    const entete = `COUP DE FOUDRE ⚡\nChoisis quelqu'un : ${partieHard ? "un doigt dans le cul" : "un bisou sur la bouche"}… ou ${estModeSoft() ? "4 gorgées" : "un CUL SEC"} !`;
+    const entete = tr`COUP DE FOUDRE ⚡\nChoisis quelqu'un : ${partieHard ? "un doigt dans le cul" : "un bisou sur la bouche"}… ou ${estModeSoft() ? tr("4 gorgées") : tr("un CUL SEC")} !`;
     afficherRegleBloc(regleZero, entete);
     regleZero.style.display = "block";
     zeroEnCours = true;
@@ -1659,7 +1661,7 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
     if(titreAnnonce && !titreAnnonce.previousElementSibling?.classList.contains("foudre-badge")){
       const badge = document.createElement("div");
       badge.className = "foudre-badge";
-      badge.innerHTML = (partieHard ? SVG_18_BARRE + " Défi hard" : "🔥 Défi hot") + ' spécial <span class="foudre-nowrap">Saint-Valentin</span> 💘';
+      badge.innerHTML = (partieHard ? SVG_18_BARRE + tr(" Défi hard") : tr("🔥 Défi hot")) + tr(' spécial <span class="foudre-nowrap">Saint-Valentin</span> 💘');
       titreAnnonce.before(badge);
     }
     executerApresOverlayRegleUnique(() => afficherOverlayCoupDeFoudre(joueurActuel, carteTiree, () => {
@@ -1670,7 +1672,7 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
 
   // Cartes "boire"
   if(carteTiree.startsWith("interdit")){
-    const entete = "SOCIAAALE ! \nTout le monde boit 1 gorgée";
+    const entete = tr("SOCIAAALE ! \nTout le monde boit 1 gorgée");
 
     afficherRegleBloc(regleZero, entete);
     regleZero.style.display = "block";
@@ -1685,7 +1687,7 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
 
   // ZERO : tout le monde boit 1 sauf celui qui a tiré le 0
   if(carteTiree.startsWith("zero")){
-    const entete = "Tout le monde boit 1 gorgée sauf toi";
+    const entete = tr("Tout le monde boit 1 gorgée sauf toi");
 
     afficherRegleBloc(regleZero, entete);
     regleZero.style.display = "block";
@@ -1704,7 +1706,7 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
       joueurActuel,
       n,
       carteTiree,
-      `${joueurs[joueurActuel]} boit ${texteGorgees(n)}`,
+      tr`${joueurs[joueurActuel]} boit ${texteGorgees(n)}`,
       () => {
         appliquerBonusCouleurSiBesoin(carteTiree, { couleur: couleurBue, joueur: joueurActuel, preserveRuleMessage: true });
       }
@@ -1714,7 +1716,7 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
 
   // Cartes "un" => +1 annulation de gorgée
   if(carteTiree.startsWith("un")){
-    const msg = "+1 annulation de gorgée !";
+    const msg = tr("+1 annulation de gorgée !");
     montrerOverlayRegle(msg, carteTiree);
     // puis message persistant jusqu'au prochain tirage (géré par zeroEnCours)
     afficherRegleBloc(regleZero, msg);
@@ -1747,11 +1749,11 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
   // Cartes "switch"
   if(carteTiree.startsWith("switch")){
     sensHoraire = !sensHoraire;
-    const msg = "Sens du jeu inversé";
+    const msg = tr("Sens du jeu inversé");
     afficherRegleBloc(regleZero, msg);
     regleZero.style.display = "block";
     switchEnCours = true;
-    montrerOverlayRegle("Le sens du jeu est inversé !", carteTiree);
+    montrerOverlayRegle(tr("Le sens du jeu est inversé !"), carteTiree);
     appliquerBonusCouleurSiBesoin(carteTiree, { couleur: couleurBue, joueur: joueurActuel, preserveRuleMessage: true, afterRuleOverlay: true });
   }
 
@@ -1765,7 +1767,7 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
       nomPigeonOriginal=joueurs[joueurActuel];
       const nPigeon = gorgeesPigeon();
       // (la ligne « Pour s'en débarrasser » reste : c'est la règle ; mais plus courte qu'avant. Les lignes qui commencent par « À chaque 3 » / « Pour s'en débarrasser » sont filtrées de l'historique, noterHistorique)
-      const msgPigeon = `${joueurs[joueurActuel]} est le PIGEON !\nIl/elle boit ${texteGorgees(nPigeon)}.\nÀ chaque 3 tiré, le PIGEON boit 1 gorgée.\nPour s'en débarrasser : tirer un 3.`;
+      const msgPigeon = tr`${joueurs[joueurActuel]} est le PIGEON !\nIl/elle boit ${texteGorgees(nPigeon)}.\nÀ chaque 3 tiré, le PIGEON boit 1 gorgée.\nPour s'en débarrasser : tirer un 3.`;
       annoncerBoireAvecAnnulation(
         joueurActuel,
         nPigeon,
@@ -1787,7 +1789,7 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
     
     } else {
       // si quelqu'un d'autre tire un 3 : le pigeon boit 1 (annulable si compteur)
-      const msg = `Le PIGEON (${joueurs[indexPigeon]}) boit 1 gorgée`;
+      const msg = tr`Le PIGEON (${joueurs[indexPigeon]}) boit 1 gorgée`;
       // message dans .messages (disparaît au prochain tirage grâce à effacerMessagePigeon() au début)
       // overlay + choix d'annulation si le pigeon a des "UN"
       annoncerBoireAvecAnnulation(indexPigeon, 1, carteTiree, msg, () => {
@@ -1809,7 +1811,7 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
   // Duel de la couleur choisie : la gorgée couleur s'affiche avant le duel
   // (annulable via les "UN"). Les autres cartes l'affichent elles-mêmes après leur règle.
   if(couleurBue && carteTiree.startsWith("quatre")){
-    const msgCouleur = `${joueurs[joueurActuel]} boit 1 gorgée pour la couleur (${couleurBue})`;
+    const msgCouleur = tr`${joueurs[joueurActuel]} boit 1 gorgée pour la couleur (${tr(couleurBue)})`;
     annoncerBoireAvecAnnulation(joueurActuel, 1, carteTiree, msgCouleur);
     couleurDuelEnAttente = msgCouleur; // (remise sous le résultat du duel, qui remplace le bloc Règles : voir resoudreDuel)
   }
@@ -1819,12 +1821,12 @@ let couleurDuelEnAttente = null;
 /* ===== JEU ===== */
 function lancerPartie(){
   if(joueurs.length < 2){
-    alert("Il faut au moins 2 joueurs");
+    alert(tr("Il faut au moins 2 joueurs"));
     return;
   }
   // Mode hard : seulement à 2 (en ligne : vérifié au lancement de la manche, js/en-ligne.js)
   if(!enLigneActif && !repriseClassiqueEnCours && estModeHard() && joueurs.length !== 2){
-    alert("Le mode hard se joue à 2 joueurs seulement.");
+    alert(tr("Le mode hard se joue à 2 joueurs seulement."));
     return;
   }
   couleurDuelEnAttente = null;
@@ -1988,7 +1990,7 @@ function lancerPartie(){
       const sansPause = (indexJoueur + (sensHoraire ? 1 : -1) + joueurs.length) % joueurs.length;
       indexJoueur = nextPlayerIndex(indexJoueur);
       if(indexJoueur !== sansPause && !rattrapageEnCours){
-        afficherNotificationHaut("", `${joueurs[sansPause]} est en pause : au tour de ${joueurs[indexJoueur]}`, true);
+        afficherNotificationHaut("", tr`${joueurs[sansPause]} est en pause : au tour de ${joueurs[indexJoueur]}`, true);
       }
 
       afficherJoueurActif();
@@ -2126,8 +2128,8 @@ function annoncerNouvellePartie(){
   const annonce = document.createElement("div");
   annonce.id = "annonceNouvellePartie";
   annonce.innerHTML =
-    '<div class="annonce-titre">NOUVELLE PARTIE</div>' +
-    '<div class="annonce-texte">avec les mêmes joueurs</div>';
+    tr('<div class="annonce-titre">NOUVELLE PARTIE</div>') +
+    tr('<div class="annonce-texte">avec les mêmes joueurs</div>');
 
   const retirer = () => annonce.remove();
   annonce.addEventListener("pointerdown", retirer);

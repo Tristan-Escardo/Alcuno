@@ -39,11 +39,13 @@ const EMOJIS_BAR = { rhum: "🍹", vodka: "🍸", gin: "🌿", tequila: "🌵", 
 function remplirListeBar(zone){
   zone.textContent = "";
   const cherche = simplifierTexteBar(rechercheBar.trim());
-  const trouves = cocktailsBar(typeof configDistante === "object" ? configDistante : null).filter((c) => (!familleBar || c.g === familleBar) &&
+  // (jeu en anglais : les recettes du jeu sont traduites, js/en.js ; celles modifiées ou ajoutées depuis le pilotage restent telles quelles)
+  const trouves = cocktailsBar(typeof configDistante === "object" ? configDistante : null)
+    .map((c) => (estAnglais && c.jeu && !c.modifie ? Object.assign({}, c, { n: tr(c.n), v: tr(c.v), i: c.i.map((l) => tr(l)), p: tr(c.p) }) : c)).filter((c) => (!familleBar || c.g === familleBar) &&
     (!cherche || simplifierTexteBar(c.n + " " + c.i.join(" ")).includes(cherche)));
   if (!trouves.length) {
     const vide = elementExtras("div", "blocRegles");
-    vide.appendChild(elementExtras("p", "detailRegle extrasVide", "Aucun cocktail ne correspond."));
+    vide.appendChild(elementExtras("p", "detailRegle extrasVide", tr("Aucun cocktail ne correspond.")));
     zone.appendChild(vide);
     return;
   }
@@ -52,14 +54,14 @@ function remplirListeBar(zone){
     const liste = trouves.filter((c) => c.g === id);
     if (!liste.length) return;
     const bloc = elementExtras("div", "blocRegles blocFaq");
-    bloc.appendChild(elementExtras("h3", "", EMOJIS_BAR[id] + " " + nom));
+    bloc.appendChild(elementExtras("h3", "", EMOJIS_BAR[id] + " " + tr(nom)));
     liste.forEach((c) => {
       const d = elementExtras("details", "faqItem");
       d.name = "cocktail"; // (une seule recette ouverte à la fois, sur les téléphones récents)
       d.setAttribute("name", "cocktail");
       d.dataset.cocktail = c.n;
       const titre = elementExtras("summary", "nomRegle faqQuestion", c.n);
-      titre.appendChild(elementExtras("span", "barSous", `${c.i.length} ingrédients · ${c.v}`));
+      titre.appendChild(elementExtras("span", "barSous", tr`${c.i.length} ingrédients · ${c.v}`));
       d.appendChild(titre);
       const corps = elementExtras("div", "detailRegle barRecette");
       const ingredients = elementExtras("ul", "lignesRegle");
@@ -74,28 +76,28 @@ function remplirListeBar(zone){
 
 function ouvrirBar(){
   jouerSon("cartes");
-  ouvrirPageExtras("bar", "Le Bar");
+  ouvrirPageExtras("bar", tr("Le Bar"));
   const liste = document.getElementById("listeRegles");
 
   const champ = elementExtras("input", "extrasChamp");
   champ.type = "search";
-  champ.placeholder = "Cocktail ou ingrédient";
-  champ.setAttribute("aria-label", "Chercher un cocktail ou un ingrédient");
+  champ.placeholder = tr("Cocktail ou ingrédient");
+  champ.setAttribute("aria-label", tr("Chercher un cocktail ou un ingrédient"));
   champ.autocomplete = "off";
   champ.enterKeyHint = "search";
   champ.value = rechercheBar;
 
   const filtres = elementExtras("div", "extrasPuces");
   filtres.setAttribute("role", "group");
-  filtres.setAttribute("aria-label", "Famille de cocktails");
+  filtres.setAttribute("aria-label", tr("Famille de cocktails"));
   const zone = elementExtras("div", "barListe");
   const choisirFamille = (id) => {
     familleBar = id;
     filtres.querySelectorAll(".extrasPuce").forEach((p) => p.setAttribute("aria-pressed", String(p.dataset.famille === id)));
     remplirListeBar(zone);
   };
-  [["", "Tous"]].concat(FAMILLES_BAR).forEach(([id, nom]) => {
-    const puce = elementExtras("button", "extrasPuce", (id ? EMOJIS_BAR[id] + " " : "") + nom);
+  [["", tr("Tous")]].concat(FAMILLES_BAR).forEach(([id, nom]) => {
+    const puce = elementExtras("button", "extrasPuce", (id ? EMOJIS_BAR[id] + " " : "") + tr(nom));
     puce.type = "button";
     puce.dataset.famille = id;
     puce.setAttribute("aria-pressed", String(id === familleBar));
@@ -105,7 +107,7 @@ function ouvrirBar(){
   champ.addEventListener("input", () => { rechercheBar = champ.value; remplirListeBar(zone); });
   champ.addEventListener("keydown", (e) => { if (e.key === "Enter") champ.blur(); });
 
-  liste.append(champ, filtres, zone, elementExtras("p", "extrasNote", "L'abus d'alcool est dangereux pour la santé : à consommer avec modération."));
+  liste.append(champ, filtres, zone, elementExtras("p", "extrasNote", tr("L'abus d'alcool est dangereux pour la santé : à consommer avec modération.")));
   remplirListeBar(zone);
 }
 // #endregion
@@ -122,29 +124,29 @@ const LIMITE_ALCOOL = 0.5, LIMITE_PROBATOIRE = 0.2;
 const POIDS_MIN_ETHYLO = 40, POIDS_MAX_ETHYLO = 160;
 // Bières : un format et un degré au choix (le curseur), comptées à part pour chaque degré (clé « format@degré » dans ethylo.bieres)
 const FORMATS_BIERE = [
-  { id: "demi", nom: "Demi", cl: 25 },
-  { id: "bouteille", nom: "Bouteille ou canette", court: "Bouteille", cl: 33 },
-  { id: "pinte", nom: "Pinte", cl: 50 }
+  { id: "demi", nom: tr("Demi"), cl: 25 },
+  { id: "bouteille", nom: tr("Bouteille ou canette"), court: tr("Bouteille"), cl: 33 },
+  { id: "pinte", nom: tr("Pinte"), cl: 50 }
 ];
 const DEGRE_BIERE_MIN = 2, DEGRE_BIERE_MAX = 14;
 // Les autres verres : volume (cl) et degré fixes
 const VERRES_ETHYLO = [
-  { id: "vin", nom: "Verre de vin", detail: "12,5 cl, 12°", cl: 12.5, deg: 12 },
-  { id: "bulles", nom: "Coupe de champagne", detail: "10 cl, 12°", cl: 10, deg: 12 },
-  { id: "fort", nom: "Alcool fort ou cocktail", detail: "4 cl d'alcool à 40°", cl: 4, deg: 40 },
-  { id: "shooter", nom: "Shooter", detail: "3 cl, 40°", cl: 3, deg: 40 }
+  { id: "vin", nom: tr("Verre de vin"), detail: tr("12,5 cl, 12°"), cl: 12.5, deg: 12 },
+  { id: "bulles", nom: tr("Coupe de champagne"), detail: tr("10 cl, 12°"), cl: 10, deg: 12 },
+  { id: "fort", nom: tr("Alcool fort ou cocktail"), detail: tr("4 cl d'alcool à 40°"), cl: 4, deg: 40 },
+  { id: "shooter", nom: tr("Shooter"), detail: tr("3 cl, 40°"), cl: 3, deg: 40 }
 ];
 // Grammes d'alcool pur : cl x 10 x degré / 100 x 0,8
 function grammesAlcool(cl, deg){ return cl * 10 * deg / 100 * 0.8; }
 const DUREE_MAX_ETHYLO = 16 * 60; // premier verre : jusqu'à 16 h avant maintenant
 // Numéros d'urgence en France (appel gratuit) et ligne d'écoute
 const NUMEROS_UTILES = [
-  ["112", "Urgences", "Numéro d'urgence, partout en Europe"],
-  ["15", "SAMU", "Urgence médicale : quelqu'un qui ne se réveille plus, qui respire mal"],
-  ["18", "Pompiers", "Accident, personne en danger"],
-  ["17", "Police, gendarmerie", "Danger, agression, accident de la route"],
-  ["114", "Urgences par SMS", "Pour les personnes sourdes ou malentendantes"],
-  ["0980980930", "Alcool info service", "0 980 980 930 : écoute anonyme, appel non surtaxé, tous les jours de 8 h à 2 h"]
+  ["112", tr("Urgences"), tr("Numéro d'urgence, partout en Europe")],
+  ["15", "SAMU", tr("Urgence médicale : quelqu'un qui ne se réveille plus, qui respire mal")],
+  ["18", tr("Pompiers"), tr("Accident, personne en danger")],
+  ["17", tr("Police, gendarmerie"), tr("Danger, agression, accident de la route")],
+  ["114", tr("Urgences par SMS"), tr("Pour les personnes sourdes ou malentendantes")],
+  ["0980980930", tr("Alcool info service"), tr("0 980 980 930 : écoute anonyme, appel non surtaxé, tous les jours de 8 h à 2 h")]
 ];
 
 let ethylo = { poids: 70, sexe: "h", probatoire: false, verres: {}, bieres: {}, degBiere: 5, debut: 120, dernier: 30 }; // (debut, dernier : il y a tant de minutes)
@@ -159,7 +161,7 @@ try {
 function garderEthylo(){
   try { localStorage.setItem(CLE_ETHYLO, JSON.stringify({ poids: ethylo.poids, sexe: ethylo.sexe, probatoire: ethylo.probatoire })); } catch (e) {}
 }
-function texteDegre(deg){ return String(deg).replace(".", ",") + "°"; }
+function texteDegre(deg){ return estAnglais ? deg + "%" : String(deg).replace(".", ",") + "°"; }
 
 // Tous les verres comptés, en grammes d'alcool pur (un nombre par verre)
 function grammesBus(e){
@@ -198,7 +200,7 @@ function calculerEthylo(e, limite){
 
 function texteDureeEthylo(minutes){
   const h = Math.floor(minutes / 60), m = minutes % 60;
-  return h ? `${h} h${m ? " " + String(m).padStart(2, "0") : ""}` : `${m} min`;
+  return h ? `${h} h${m ? " " + String(m).padStart(2, "0") : ""}` : tr`${m} min`;
 }
 // « 2 h 10, donc à 3 h 45 » : l'attente, puis l'heure de l'horloge (arrondie à la demi-heure d'après)
 function texteHeureEthylo(minutes){
@@ -207,7 +209,7 @@ function texteHeureEthylo(minutes){
   if (d.getMinutes() % 30) d.setMinutes(Math.ceil(d.getMinutes() / 30) * 30);
   const dans = Math.max(1, Math.round((d.getTime() - Date.now()) / 60000));
   const demain = d.getDate() !== new Date().getDate();
-  return `${texteDureeEthylo(dans)}, donc à ${d.getHours()} h ${String(d.getMinutes()).padStart(2, "0")}${demain ? " demain" : ""}`;
+  return tr`${texteDureeEthylo(dans)}, donc à ${d.getHours()} h ${String(d.getMinutes()).padStart(2, "0")}${demain ? tr(" demain") : ""}`;
 }
 
 // Rejoue une petite animation (classe « pop ») sur un élément
@@ -227,7 +229,7 @@ function majResultatEthylo(zone){
   if (r.verres === 0) return;
   if (!zone.firstChild) {
     const taux = elementExtras("div", "ethyloTaux");
-    taux.append(elementExtras("span", "ethyloChiffre"), elementExtras("span", "ethyloUnite", "g/L de sang, estimé"));
+    taux.append(elementExtras("span", "ethyloChiffre"), elementExtras("span", "ethyloUnite", tr("g/L de sang, estimé")));
     const jauge = elementExtras("div", "ethyloJauge");
     jauge.setAttribute("aria-hidden", "true");
     jauge.append(elementExtras("div", "ethyloJaugePlein"), elementExtras("div", "ethyloJaugeLimite"));
@@ -241,28 +243,28 @@ function majResultatEthylo(zone){
   zone.classList.toggle("machine", machine);
   if (machine) {
     zone.dataset.etat = "rouge";
-    chiffre.textContent = "Mauvais carburant";
+    chiffre.textContent = tr("Mauvais carburant");
     verdict.textContent = ""; lignes.textContent = "";
     return;
   }
-  const texteTaux = r.taux.toFixed(2).replace(".", ",");
+  const texteTaux = trNombre(r.taux.toFixed(2).replace(".", ","));
   if (chiffre.textContent !== texteTaux) { chiffre.textContent = texteTaux; popEthylo(chiffre); }
   const echelle = Math.max(limite * 2, r.taux * 1.1); // (la limite au milieu de la jauge, tant que le taux ne déborde pas)
   zone.querySelector(".ethyloJaugePlein").style.width = Math.min(100, r.taux / echelle * 100) + "%";
   zone.querySelector(".ethyloJaugeLimite").style.left = (limite / echelle * 100) + "%";
-  const texteLimite = `${String(limite).replace(".", ",")} g/L${ethylo.probatoire ? " (permis probatoire)" : ""}`;
+  const texteLimite = `${trNombre(String(limite).replace(".", ","))} g/L${ethylo.probatoire ? tr(" (permis probatoire)") : ""}`;
   lignes.textContent = "";
   const ligne = (texte) => lignes.appendChild(elementExtras("p", "ethyloLigne", texte));
   if (r.taux >= limite) {
-    verdict.textContent = "Tu ne conduis pas.";
-    ligne(`Attends ${texteHeureEthylo(r.sousLimite)} avant de reprendre le volant.`);
+    verdict.textContent = tr("Tu ne conduis pas.");
+    ligne(tr`Attends ${texteHeureEthylo(r.sousLimite)} avant de reprendre le volant.`);
   } else if (r.taux > 0) {
-    verdict.textContent = "Sous la limite, mais pas à zéro.";
-    ligne(`Le plus sûr : attends ${texteHeureEthylo(r.zero)}.`);
+    verdict.textContent = tr("Sous la limite, mais pas à zéro.");
+    ligne(tr`Le plus sûr : attends ${texteHeureEthylo(r.zero)}.`);
   } else {
-    verdict.textContent = "Estimation : zéro.";
+    verdict.textContent = tr("Estimation : zéro.");
   }
-  if (ethylo.dernier < 45 && r.taux > 0) ligne("Dernier verre récent : ton taux peut encore monter.");
+  if (ethylo.dernier < 45 && r.taux > 0) ligne(tr("Dernier verre récent : ton taux peut encore monter."));
 }
 
 // Un réglage à glisser : nom, valeur écrite, curseur, graduations dessous.
@@ -328,13 +330,13 @@ function glissiereEthylo(titre, min, max, pas, valeur, texte, siChange, o){
 // Heure de l'horloge du téléphone, il y a tant de minutes : « 21 h 30 »
 function heureIlYa(minutes){
   const d = new Date(Date.now() - minutes * 60000);
-  return `${d.getHours()} h ${String(d.getMinutes()).padStart(2, "0")}`;
+  return `${d.getHours()}${estAnglais ? ":" : " h "}${String(d.getMinutes()).padStart(2, "0")}`;
 }
 
 // sansSon : écran redessiné (« Tout remettre à zéro »), sans rejouer le son d'ouverture
 function ouvrirEthylo(sansSon){
   if (sansSon !== true) jouerSon("cartes");
-  ouvrirPageExtras("ethylo", "Éthylotest");
+  ouvrirPageExtras("ethylo", tr("Éthylotest"));
   const liste = document.getElementById("listeRegles");
   const resultat = elementExtras("div", "blocRegles ethyloResultat");
   resultat.setAttribute("role", "status");
@@ -342,11 +344,11 @@ function ouvrirEthylo(sansSon){
 
   // --- Toi ---
   const toi = elementExtras("div", "blocRegles ethyloBloc");
-  toi.appendChild(elementExtras("h3", "", "Toi"));
+  toi.appendChild(elementExtras("h3", "", tr("Toi")));
   const ligneSexe = elementExtras("div", "extrasPuces ethyloSexe");
   ligneSexe.setAttribute("role", "group");
-  ligneSexe.setAttribute("aria-label", "Sexe (change le calcul)");
-  [["h", "Homme"], ["f", "Femme"]].concat([["a", document.documentElement.dataset.theme === "galaxie" ? "T-65 X-Wing" : "Boeing AH-64"]]).forEach(([id, nom]) => {
+  ligneSexe.setAttribute("aria-label", tr("Sexe (change le calcul)"));
+  [["h", tr("Homme")], ["f", tr("Femme")]].concat([["a", document.documentElement.dataset.theme === "galaxie" ? "T-65 X-Wing" : "Boeing AH-64"]]).forEach(([id, nom]) => {
     const puce = elementExtras("button", "extrasPuce", nom);
     puce.type = "button";
     puce.setAttribute("aria-pressed", String(ethylo.sexe === id));
@@ -360,7 +362,7 @@ function ouvrirEthylo(sansSon){
   // (paliers : attiré par les multiples de 5 à 1 kg près ; graduations tous les 10 kg, chiffrées tous les 20)
   const graduationsPoids = [];
   for (let v = POIDS_MIN_ETHYLO; v <= POIDS_MAX_ETHYLO; v += 20) graduationsPoids.push({ v, grand: true, texte: String(v) });
-  const poids = glissiereEthylo("Poids", POIDS_MIN_ETHYLO, POIDS_MAX_ETHYLO, 1, ethylo.poids, (v) => v + " kg",
+  const poids = glissiereEthylo(tr("Poids"), POIDS_MIN_ETHYLO, POIDS_MAX_ETHYLO, 1, ethylo.poids, (v) => v + " kg",
     (v) => { ethylo.poids = v; garderEthylo(); maj(); },
     { aimant: (v) => (Math.abs(v - Math.round(v / 5) * 5) <= 1 ? Math.round(v / 5) * 5 : v), estPalier: (v) => v % 5 === 0, graduations: graduationsPoids });
   const ligneProbatoire = elementExtras("label", "ethyloLigneChamp");
@@ -368,12 +370,12 @@ function ouvrirEthylo(sansSon){
   caseProbatoire.type = "checkbox";
   caseProbatoire.checked = ethylo.probatoire;
   caseProbatoire.addEventListener("change", () => { ethylo.probatoire = caseProbatoire.checked; garderEthylo(); maj(); });
-  ligneProbatoire.append(caseProbatoire, elementExtras("span", "nomRegle", "Permis probatoire"), elementExtras("span", "detailRegle", "limite à 0,2 g/L"));
+  ligneProbatoire.append(caseProbatoire, elementExtras("span", "nomRegle", tr("Permis probatoire")), elementExtras("span", "detailRegle", tr("limite à 0,2 g/L")));
   toi.append(ligneSexe, poids.ligne, ligneProbatoire);
 
   // --- Ce que tu as bu ---
   const bu = elementExtras("div", "blocRegles ethyloBloc");
-  bu.appendChild(elementExtras("h3", "", "Ce que tu as bu"));
+  bu.appendChild(elementExtras("h3", "", tr("Ce que tu as bu")));
   // Une ligne avec − nombre + ; lire() : le nombre du moment, changer(pas) : l'appliquer. Renvoie { ligne, montrer() }.
   const ligneCompteur = (nom, detail, lire, changer) => {
     const ligne = elementExtras("div", "ligneRegle ethyloVerre");
@@ -395,7 +397,7 @@ function ouvrirEthylo(sansSon){
       b.addEventListener("click", () => { changer(pas); montrer(true); maj(); });
       return b;
     };
-    compteur.append(bouton("−", "Un de moins", -1), nombre, bouton("+", "Un de plus", 1));
+    compteur.append(bouton("−", tr("Un de moins"), -1), nombre, bouton("+", tr("Un de plus"), 1));
     ligne.append(texte, compteur);
     montrer(false);
     return { ligne, montrer, sous };
@@ -403,14 +405,14 @@ function ouvrirEthylo(sansSon){
   const borner = (n) => Math.min(30, Math.max(0, n));
 
   // Bières : le degré se règle au curseur ; les compteurs montrent les bières de CE degré, les étiquettes dessous toutes les bières
-  bu.appendChild(elementExtras("p", "ethyloSousTitre", "Bières"));
-  bu.appendChild(elementExtras("p", "detailRegle ethyloAide", "Plusieurs bières différentes ? Règle le degré, ajoute, puis recommence pour la suivante."));
+  bu.appendChild(elementExtras("p", "ethyloSousTitre", tr("Bières")));
+  bu.appendChild(elementExtras("p", "detailRegle ethyloAide", tr("Plusieurs bières différentes ? Règle le degré, ajoute, puis recommence pour la suivante.")));
   const etiquettes = elementExtras("div", "ethyloBieres");
-  etiquettes.setAttribute("aria-label", "Bières comptées (toucher pour en retirer une)");
+  etiquettes.setAttribute("aria-label", tr("Bières comptées (toucher pour en retirer une)"));
   let lignesBiere = [];
   const cleBiere = (f) => f.id + "@" + ethylo.degBiere;
   const majBieres = () => {
-    lignesBiere.forEach((l, k) => { l.sous.textContent = `${FORMATS_BIERE[k].cl} cl à ${texteDegre(ethylo.degBiere)}`; l.montrer(false); });
+    lignesBiere.forEach((l, k) => { l.sous.textContent = tr`${FORMATS_BIERE[k].cl} cl à ${texteDegre(ethylo.degBiere)}`; l.montrer(false); });
     etiquettes.textContent = "";
     Object.keys(ethylo.bieres).sort().forEach((cle) => {
       const [id, deg] = cle.split("@");
@@ -418,7 +420,7 @@ function ouvrirEthylo(sansSon){
       if (!format || !ethylo.bieres[cle]) return;
       const e = elementExtras("button", "extrasPuce", `${ethylo.bieres[cle]} × ${format.court || format.nom} ${texteDegre(deg)}  ✕`);
       e.type = "button";
-      e.setAttribute("aria-label", `Retirer : ${format.nom} à ${texteDegre(deg)}`);
+      e.setAttribute("aria-label", tr`Retirer : ${format.nom} à ${texteDegre(deg)}`);
       e.addEventListener("click", () => {
         ethylo.bieres[cle] = borner(ethylo.bieres[cle] - 1);
         if (!ethylo.bieres[cle]) delete ethylo.bieres[cle];
@@ -429,8 +431,8 @@ function ouvrirEthylo(sansSon){
   };
   // (graduations tous les 2 degrés ; les demi-degrés restent possibles entre deux)
   const graduationsDegre = [];
-  for (let v = DEGRE_BIERE_MIN; v <= DEGRE_BIERE_MAX; v += 4) graduationsDegre.push({ v, grand: true, texte: v + "°" });
-  const degre = glissiereEthylo("Degré de la bière", DEGRE_BIERE_MIN, DEGRE_BIERE_MAX, 0.5, ethylo.degBiere, texteDegre,
+  for (let v = DEGRE_BIERE_MIN; v <= DEGRE_BIERE_MAX; v += 4) graduationsDegre.push({ v, grand: true, texte: v + (estAnglais ? "%" : "°") });
+  const degre = glissiereEthylo(tr("Degré de la bière"), DEGRE_BIERE_MIN, DEGRE_BIERE_MAX, 0.5, ethylo.degBiere, texteDegre,
     (v) => { ethylo.degBiere = v; majBieres(); },
     { estPalier: (v) => v % 5 === 0, graduations: graduationsDegre });
   bu.appendChild(degre.ligne);
@@ -443,7 +445,7 @@ function ouvrirEthylo(sansSon){
   bu.appendChild(etiquettes);
   majBieres();
 
-  bu.appendChild(elementExtras("p", "ethyloSousTitre", "Le reste"));
+  bu.appendChild(elementExtras("p", "ethyloSousTitre", tr("Le reste")));
   VERRES_ETHYLO.forEach((v) => {
     bu.appendChild(ligneCompteur(v.nom, v.detail, () => ethylo.verres[v.id] || 0,
       (pas) => { ethylo.verres[v.id] = borner((ethylo.verres[v.id] || 0) + pas); }).ligne);
@@ -453,7 +455,7 @@ function ouvrirEthylo(sansSon){
   // donnent l'heure de l'horloge du téléphone. Toujours sur une demi-heure.
   // (si le « dernier » est mis avant le « premier », le calcul les remet simplement dans l'ordre)
   const quand = elementExtras("div", "blocRegles ethyloBloc");
-  quand.appendChild(elementExtras("h3", "", "Quand"));
+  quand.appendChild(elementExtras("h3", "", tr("Quand")));
   const minuteDe = (t) => DUREE_MAX_ETHYLO - t; // (position du curseur => il y a tant de minutes)
   // (le curseur avance par demi-heures d'écart : « il y a 15 h 30 » ; l'heure de l'horloge dessous se calcule d'après le téléphone)
   const aimantHeure = (t) => DUREE_MAX_ETHYLO - Math.round(minuteDe(t) / 30) * 30;
@@ -465,15 +467,15 @@ function ouvrirEthylo(sansSon){
   };
   const texteQuand = (t) => {
     const ilYa = minuteDe(t);
-    return ilYa <= 0 ? ["maintenant", "donc à " + heureIlYa(0)] : ["il y a " + texteDureeEthylo(ilYa), "donc à " + heureIlYa(ilYa)];
+    return ilYa <= 0 ? [tr("maintenant"), tr("donc à ") + heureIlYa(0)] : [estAnglais ? texteDureeEthylo(ilYa) + " ago" : "il y a " + texteDureeEthylo(ilYa), tr("donc à ") + heureIlYa(ilYa)];
   };
   const curseurQuand = (titre, cle) => glissiereEthylo(titre, 0, DUREE_MAX_ETHYLO, 1, DUREE_MAX_ETHYLO - Math.min(DUREE_MAX_ETHYLO, ethylo[cle]),
     texteQuand, (t) => { ethylo[cle] = minuteDe(t); maj(); }, { aimant: aimantHeure, estPalier: estDemiHeure, graduations: graduationsHeures });
   // (les valeurs de départ aussi)
   ["debut", "dernier"].forEach((cle) => { ethylo[cle] = Math.max(0, minuteDe(aimantHeure(DUREE_MAX_ETHYLO - Math.min(DUREE_MAX_ETHYLO, ethylo[cle])))); });
-  const premier = curseurQuand("Premier verre", "debut"), dernier = curseurQuand("Dernier verre", "dernier");
+  const premier = curseurQuand(tr("Premier verre"), "debut"), dernier = curseurQuand(tr("Dernier verre"), "dernier");
   quand.append(premier.ligne, dernier.ligne,
-    elementExtras("p", "detailRegle ethyloAide", "Les verres sont comptés comme bus régulièrement entre les deux heures."));
+    elementExtras("p", "detailRegle ethyloAide", tr("Les verres sont comptés comme bus régulièrement entre les deux heures.")));
   // (l'écran resté ouvert : les heures écrites suivent l'horloge)
   const minuterie = setInterval(() => {
     if (!quand.isConnected) { clearInterval(minuterie); return; }
@@ -481,29 +483,29 @@ function ouvrirEthylo(sansSon){
   }, 60000);
 
   // (« Tout remettre à zéro » : en bas du bloc « Ce que tu as bu », il ne vide que les verres)
-  const remise = elementExtras("button", "btnFaqLien ethyloRemise", "Tout remettre à zéro");
+  const remise = elementExtras("button", "btnFaqLien ethyloRemise", tr("Tout remettre à zéro"));
   remise.type = "button";
   remise.addEventListener("click", () => { ethylo.verres = {}; ethylo.bieres = {}; const y = ecranRegles.scrollTop; ouvrirEthylo(true); ecranRegles.scrollTop = y; });
   bu.appendChild(remise);
 
   // --- Numéros utiles ---
   const numeros = elementExtras("div", "blocRegles ethyloBloc");
-  numeros.appendChild(elementExtras("h3", "", "Numéros utiles"));
+  numeros.appendChild(elementExtras("h3", "", tr("Numéros utiles")));
   NUMEROS_UTILES.forEach(([numero, nom, detail]) => {
     const lien = elementExtras("a", "ethyloNumero");
     lien.href = "tel:" + numero;
-    lien.setAttribute("aria-label", `Appeler ${nom}`);
+    lien.setAttribute("aria-label", tr`Appeler ${nom}`);
     const texte = elementExtras("div", "texteRegle");
     texte.append(elementExtras("span", "nomRegle", nom), elementExtras("span", "detailRegle", detail));
-    lien.append(elementExtras("span", "ethyloNumeroChiffre", numero.length > 3 ? "Info" : numero), texte);
+    lien.append(elementExtras("span", "ethyloNumeroChiffre", numero.length > 3 ? tr("Info") : numero), texte);
     numeros.appendChild(lien);
   });
 
   liste.append(
-    elementExtras("p", "extrasSousTitre", "Pour garder ton permis"),
+    elementExtras("p", "extrasSousTitre", tr("Pour garder ton permis")),
     resultat, toi, quand, bu, numeros,
-    elementExtras("p", "extrasNote", "Le vrai taux change d'une personne à l'autre : repas, fatigue, médicaments, santé."),
-    elementExtras("p", "extrasNote", "L'abus d'alcool est dangereux pour la santé, buvez avec modération. C'est vrai qu'il est pas souvent là en soirée mais c'est vraiment un chic type, c'est un tigre, un maestrom, un chevalier du zodiaque, un dragan du crépuscule, le café bien chaud qui t'apaise le matin bigoulet 😘"));
+    elementExtras("p", "extrasNote", tr("Le vrai taux change d'une personne à l'autre : repas, fatigue, médicaments, santé.")),
+    elementExtras("p", "extrasNote", tr("L'abus d'alcool est dangereux pour la santé, buvez avec modération. C'est vrai qu'il est pas souvent là en soirée mais c'est vraiment un chic type, c'est un tigre, un maestrom, un chevalier du zodiaque, un dragan du crépuscule, le café bien chaud qui t'apaise le matin bigoulet 😘")));
   maj();
 }
 // #endregion
@@ -517,7 +519,7 @@ function ouvrirEthylo(sansSon){
   const fleche = document.createElement("div");
   fleche.id = "btnRemonterRegles";
   fleche.setAttribute("role", "button");
-  fleche.setAttribute("aria-label", "Remonter en haut");
+  fleche.setAttribute("aria-label", tr("Remonter en haut"));
   fleche.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>';
   document.body.appendChild(fleche);
   const majFleche = () => fleche.classList.toggle("visible",

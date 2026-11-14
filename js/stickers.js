@@ -11,17 +11,17 @@ const CLE_STICKERS = "alcuno_stickers";
 const STICKERS_POUR_KAWAII = 11; // tout l'album
 const FENETRE_SOIREE = 6 * 60 * 60 * 1000; // « même soirée » : 2 parties finies en 6 h
 const STICKERS = [
-  { id: "cupcake", nom: "Cupcake",         indice: "Finir une partie" },
-  { id: "chat",    nom: "Chat",            indice: "Finir 3 parties" },
-  { id: "lapin",   nom: "Lapin",           indice: "Annuler une gorgée" },
-  { id: "poussin", nom: "Poussin",         indice: "Devenir pigeon" },
-  { id: "etoile",  nom: "Étoile",          indice: "Tirer la carte dorée", secret: true }, // (secret : « ??? » tant qu'il n'est pas gagné)
-  { id: "licorne", nom: "Licorne",         indice: "Gagner un duel" },
-  { id: "fraise",  nom: "Fraise",          indice: "Mettre un joueur en pause" },
-  { id: "sushi",   nom: "Sushi",           indice: "Finir une partie express" },
-  { id: "macaron", nom: "Macaron",         indice: "Finir une partie en ligne" },
-  { id: "chou",    nom: "Chou à la crème", indice: "Recevoir un +4" },
-  { id: "nuage",   nom: "Nuage",           indice: "Finir 2 parties dans la même soirée" }
+  { id: "cupcake", nom: tr("Cupcake"),         indice: tr("Finir une partie") },
+  { id: "chat",    nom: tr("Chat"),            indice: tr("Finir 3 parties") },
+  { id: "lapin",   nom: tr("Lapin"),           indice: tr("Annuler une gorgée") },
+  { id: "poussin", nom: tr("Poussin"),         indice: tr("Devenir pigeon") },
+  { id: "etoile",  nom: tr("Étoile"),          indice: tr("Tirer la carte dorée"), secret: true }, // (secret : « ??? » tant qu'il n'est pas gagné)
+  { id: "licorne", nom: tr("Licorne"),         indice: tr("Gagner un duel") },
+  { id: "fraise",  nom: tr("Fraise"),          indice: tr("Mettre un joueur en pause") },
+  { id: "sushi",   nom: tr("Sushi"),           indice: tr("Finir une partie express") },
+  { id: "macaron", nom: tr("Macaron"),         indice: tr("Finir une partie en ligne") },
+  { id: "chou",    nom: tr("Chou à la crème"), indice: tr("Recevoir un +4") },
+  { id: "nuage",   nom: tr("Nuage"),           indice: tr("Finir 2 parties dans la même soirée") }
 ];
 
 function lireAlbum(){
@@ -78,7 +78,7 @@ function annoncerStickers(nouveaux, delai){
   if (!nouveaux.length) return;
   const noms = nouveaux.map((id) => (STICKERS.find((s) => s.id === id) || {}).nom).filter(Boolean);
   setTimeout(() => {
-    try { afficherNotificationHaut("", noms.length > 1 ? `Nouveaux stickers : ${noms.join(", ")}` : `Nouveau sticker : ${noms[0]} !`, true); } catch (e) {}
+    try { afficherNotificationHaut("", noms.length > 1 ? tr`Nouveaux stickers : ${noms.join(", ")}` : tr`Nouveau sticker : ${noms[0]} !`, true); } catch (e) {}
     try { effetSticker(nouveaux[0]); } catch (e) {}
   }, delai);
 }
@@ -129,19 +129,19 @@ function ouvrirAlbum(){
   const page = document.getElementById("ecranRegles");
   page.classList.remove("faq", "bar", "ethylo");
   page.classList.add("album");
-  page.querySelector("h2").textContent = "Album de stickers";
+  page.querySelector("h2").textContent = tr("Album de stickers");
   const liste = document.getElementById("listeRegles");
   liste.innerHTML = "";
 
   const progression = document.createElement("div");
   progression.className = "blocRegles albumProgression";
   const titre = document.createElement("h3");
-  titre.textContent = kawaiiDebloque() ? "Thème Kawaii débloqué ✓" : `Thème Kawaii : ${Math.min(a.gagnes.length, STICKERS_POUR_KAWAII)} / ${STICKERS_POUR_KAWAII}`;
+  titre.textContent = kawaiiDebloque() ? tr("Thème Kawaii débloqué ✓") : tr`Thème Kawaii : ${Math.min(a.gagnes.length, STICKERS_POUR_KAWAII)} / ${STICKERS_POUR_KAWAII}`;
   const texte = document.createElement("p");
   texte.className = "albumTexte";
   texte.textContent = kawaiiDebloque()
-    ? "Il est dans Réglages › Thèmes. Bravo, album complet !"
-    : `Gagne les ${STICKERS.length} stickers pour débloquer le thème Kawaii.`;
+    ? tr("Il est dans Réglages › Thèmes. Bravo, album complet !")
+    : tr`Gagne les ${STICKERS.length} stickers pour débloquer le thème Kawaii.`;
   const barre = document.createElement("div");
   barre.className = "albumBarre";
   const rempli = document.createElement("span");
@@ -197,7 +197,7 @@ function decouvrirAlbum(message){
   try { vibrer([60, 40, 60]); } catch (e) {}
   const n = nombreStickers();
   const suite = n ? ` (${n} / ${STICKERS.length})` : "";
-  afficherNotificationHaut("", (message || "Album de stickers découvert !") + suite, true);
+  afficherNotificationHaut("", (message || tr("Album de stickers découvert !")) + suite, true);
 }
 
 // Étoile filante (stickers/etoile_filante.svg, 220 x 100, queue à gauche) : entre par un côté de l'accueil et ressort par l'autre,
@@ -218,7 +218,7 @@ function passageEtoileFilante(force){
   const bouton = document.createElement("div"); // (pas un <button> : les thèmes habillent tous les boutons de l'accueil)
   bouton.setAttribute("role", "button");
   bouton.className = "etoileFilante";
-  bouton.setAttribute("aria-label", "Étoile filante : fais un vœu");
+  bouton.setAttribute("aria-label", tr("Étoile filante : fais un vœu"));
   const image = document.createElement("img");
   image.src = "stickers/etoile_filante.svg";
   image.alt = "";
@@ -236,7 +236,7 @@ function passageEtoileFilante(force){
     bouton.remove();
     jouerSon("etoile"); // (Sons/etoile.mp3)
     paillettesVoeu(accueil, r.left + r.width / 2, r.top + r.height / 2);
-    decouvrirAlbum("Vœu exaucé ✨ Album de stickers découvert !");
+    decouvrirAlbum(tr("Vœu exaucé ✨ Album de stickers découvert !"));
   }, { once: true });
 }
 // Petite explosion de paillettes à l'endroit où on a touché l'étoile

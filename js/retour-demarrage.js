@@ -407,7 +407,7 @@ window.addEventListener("popstate", () => {
 
   // Écran d'accueil : on retire nos entrées, le prochain retour quitte l'appli
   retirerEntreesRetour();
-  afficherToast("Appuie encore une fois sur retour pour quitter");
+  afficherToast(tr("Appuie encore une fois sur retour pour quitter"));
 });
 
 /* ===== INIT ===== */

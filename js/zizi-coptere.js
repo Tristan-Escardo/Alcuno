@@ -21,12 +21,12 @@ function debloquerZiziCoptere(){
   const enDonjon = document.documentElement.dataset.theme === "donjon";
   try {
     afficherFenetreDeblocage("fenetreZiziCoptere", {
-      secret: "Partie hard terminée !",
-      titre: "🚁 Zizi-coptère<br>débloqué !",
-      texte: enDonjon ? "Il t'attend sur l'accueil.<br>Touche-le, lance-le !" : "Il t'attend sur l'accueil,<br>avec le thème BDSM",
+      secret: tr("Partie hard terminée !"),
+      titre: tr("🚁 Zizi-coptère<br>débloqué !"),
+      texte: enDonjon ? tr("Il t'attend sur l'accueil.<br>Touche-le, lance-le !") : tr("Il t'attend sur l'accueil,<br>avec le thème BDSM"),
       boutons: enDonjon ? [{ libelle: "OK", principal: true }] : [
-        { libelle: "Mettre le thème BDSM", principal: true, action: () => { const p = document.getElementById("pastilleDonjon"); if (p) p.click(); } },
-        { libelle: "Plus tard" }
+        { libelle: tr("Mettre le thème BDSM"), principal: true, action: () => { const p = document.getElementById("pastilleDonjon"); if (p) p.click(); } },
+        { libelle: tr("Plus tard") }
       ]
     });
   } catch (e) {}
@@ -37,7 +37,7 @@ const ziziCoptere = (() => {
   const el = document.createElement("div");
   el.setAttribute("role", "button");
   el.id = "ziziCoptere";
-  el.setAttribute("aria-label", "Zizi-coptère");
+  el.setAttribute("aria-label", tr("Zizi-coptère"));
   // Dessiné à l'horizontale, centré : il tourne autour de son milieu, comme une pale d'hélice
   // Style BDSM : peau en dégradé brillant, anneau de cuir noir clouté à la base, contour bordeaux, halo rouge (CSS)
   el.innerHTML = `<svg viewBox="0 0 120 60" aria-hidden="true">

@@ -50,7 +50,11 @@ const CONFIGS = [
   { nom: "mode hot, thème Donjon, en paysage, accessibilité", largeur: 844, hauteur: 390, theme: "donjon", hot: true, accessibilite: true },
   // Mode hard (2 joueurs, défis HA / HB)
   { nom: "mode hard, Bordeaux", largeur: 390, hauteur: 780, theme: "bordeaux", hard: true },
-  { nom: "mode hard + Mode PJ, partie express, thème Donjon", largeur: 390, hauteur: 780, theme: "donjon", hard: true, pj: true, express: true }
+  { nom: "mode hard + Mode PJ, partie express, thème Donjon", largeur: 390, hauteur: 780, theme: "donjon", hard: true, pj: true, express: true },
+  // Jeu en anglais (js/langue.js, js/en.js) : les règles qui lisent le texte affiché doivent marcher aussi
+  { nom: "anglais, téléphone debout, Bordeaux", largeur: 390, hauteur: 780, theme: "bordeaux", langue: "en" },
+  { nom: "anglais, mode hot, petit écran, Givre", largeur: 320, hauteur: 640, theme: "givre", hot: true, langue: "en" },
+  { nom: "anglais, mode hard, Star Wars, en paysage", largeur: 844, hauteur: 390, theme: "galaxie", hard: true, langue: "en" }
 ];
 const FILTRE = process.argv[2] || "";
 
@@ -66,10 +70,10 @@ const FILTRE = process.argv[2] || "";
     const page = await nav.newPage({ viewport: { width: c.largeur, height: c.hauteur } });
     await page.addInitScript(prelude);
     await page.addInitScript(robot);
-    await page.addInitScript(([theme, acc, express, hot, pj, hard]) => {
+    await page.addInitScript(([theme, acc, express, hot, pj, hard, langue]) => {
       window.__optionsRobot = [hot && "optionModeHot", hard && "optionModeHard", pj && "optionModeSoft", express && "optionPartieExpress"].filter(Boolean); // (cochées dans « Ta partie »)
-      try { localStorage.setItem("alcuno_theme", theme); localStorage.setItem("alcuno_theme_kawaii", "1"); localStorage.setItem("alcuno_theme_donjon", "1"); if (acc) localStorage.setItem("alcuno_accessibilite", "1"); } catch (e) {}
-    }, [c.theme, !!c.accessibilite, !!c.express, !!c.hot, !!c.pj, !!c.hard]);
+      try { localStorage.setItem("alcuno_theme", theme); localStorage.setItem("alcuno_theme_kawaii", "1"); localStorage.setItem("alcuno_theme_donjon", "1"); if (acc) localStorage.setItem("alcuno_accessibilite", "1"); if (langue) localStorage.setItem("alcuno_langue", langue); } catch (e) {}
+    }, [c.theme, !!c.accessibilite, !!c.express, !!c.hot, !!c.pj, !!c.hard, c.langue || ""]);
     await page.goto(url);
     let rapport = null;
     try {
