@@ -467,9 +467,9 @@ function ouvrirEthylo(sansSon){
     });
     ligneSexe.appendChild(puce);
   });
-  // (paliers : attiré par les multiples de 5 à 1 kg près ; graduations tous les 5 kg, en grand tous les 10, chiffrées tous les 20)
+  // (paliers : attiré par les multiples de 5 à 1 kg près ; graduations tous les 10 kg, chiffrées tous les 20)
   const graduationsPoids = [];
-  for (let v = POIDS_MIN_ETHYLO; v <= POIDS_MAX_ETHYLO; v += 5) graduationsPoids.push({ v, grand: v % 10 === 0, texte: v % 20 === 0 ? String(v) : "" });
+  for (let v = POIDS_MIN_ETHYLO; v <= POIDS_MAX_ETHYLO; v += 10) graduationsPoids.push({ v, grand: v % 20 === 0, texte: v % 20 === 0 ? String(v) : "" });
   const poids = glissiereEthylo("Poids", POIDS_MIN_ETHYLO, POIDS_MAX_ETHYLO, 1, ethylo.poids, (v) => v + " kg",
     (v) => { ethylo.poids = v; garderEthylo(); maj(); },
     { aimant: (v) => (Math.abs(v - Math.round(v / 5) * 5) <= 1 ? Math.round(v / 5) * 5 : v), estPalier: (v) => v % 5 === 0, graduations: graduationsPoids });
@@ -536,9 +536,9 @@ function ouvrirEthylo(sansSon){
       etiquettes.appendChild(e);
     });
   };
-  // (paliers : chaque degré entier, en grand à 5° et 10° ; les demi-degrés restent possibles entre deux)
+  // (graduations tous les 2 degrés ; les demi-degrés restent possibles entre deux)
   const graduationsDegre = [];
-  for (let v = DEGRE_BIERE_MIN; v <= DEGRE_BIERE_MAX; v++) graduationsDegre.push({ v, grand: v % 5 === 0, texte: v % 2 === 0 ? v + "°" : "" });
+  for (let v = DEGRE_BIERE_MIN; v <= DEGRE_BIERE_MAX; v += 2) graduationsDegre.push({ v, grand: true, texte: v + "°" });
   const degre = glissiereEthylo("Degré de la bière", DEGRE_BIERE_MIN, DEGRE_BIERE_MAX, 0.5, ethylo.degBiere, texteDegre,
     (v) => { ethylo.degBiere = v; majBieres(); },
     { estPalier: (v) => v % 5 === 0, graduations: graduationsDegre });
@@ -581,8 +581,9 @@ function ouvrirEthylo(sansSon){
     const debut = new Date(maintenant.getTime() - DUREE_MAX_ETHYLO * 60000);
     let d = new Date(debut); d.setSeconds(0, 0); d.setMinutes(d.getMinutes() < 30 ? 30 : 60);
     for (; d <= maintenant; d = new Date(d.getTime() + 30 * 60000)) {
-      const t = DUREE_MAX_ETHYLO - (maintenant - d) / 60000, pleine = d.getMinutes() === 0;
-      g.push({ v: t, grand: pleine, texte: pleine && d.getHours() % 2 === 0 ? d.getHours() + " h" : "" });
+      if (d.getMinutes() !== 0) continue; // (un trait par heure, chiffré toutes les 2 h)
+      const t = DUREE_MAX_ETHYLO - (maintenant - d) / 60000, paire = d.getHours() % 2 === 0;
+      g.push({ v: t, grand: paire, texte: paire ? d.getHours() + " h" : "" });
     }
     return g;
   };

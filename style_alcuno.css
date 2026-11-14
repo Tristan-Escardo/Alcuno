@@ -9406,7 +9406,7 @@ html[data-theme="galaxie"] #ecranReglages .menuMEPTitre{ color: rgba(234,243,255
 #choixMode .carteAccueil svg .plein{ fill: currentColor; stroke: none; }
 #choixMode .carteAccueil span{ position: relative; }
 /* Deux cartes : la droite recouvre un peu la gauche */
-#choixMode .carteBar{ --angle: -8deg; --fond: linear-gradient(170deg, #ef4a3c, #c4201f); padding-right: calc(var(--l-carte) * 0.12); }
+#choixMode .carteBar{ --angle: -8deg; --fond: linear-gradient(170deg, #ef4a3c, #c4201f); }
 #choixMode .carteEthylo{ --angle: 8deg; --fond: linear-gradient(170deg, #2f8fe8, #1259b0); z-index: 1; }
 #choixMode .carteAlbum{
   --fond: linear-gradient(170deg, #ffd83a, #eeb000);
@@ -9415,8 +9415,8 @@ html[data-theme="galaxie"] #ecranReglages .menuMEPTitre{ color: rgba(234,243,255
   z-index: 2;
 }
 /* Trois cartes : l'album au milieu, par-dessus les deux autres, dont le dessin se décale vers le bord libre */
-#choixMode .troisCartes .carteBar{ --angle: -18deg; padding-right: calc(var(--l-carte) * 0.14); }
-#choixMode .troisCartes .carteEthylo{ --angle: 18deg; padding-left: calc(var(--l-carte) * 0.14); }
+#choixMode .troisCartes .carteBar{ --angle: -18deg; }
+#choixMode .troisCartes .carteEthylo{ --angle: 18deg; }
 @media (hover: hover){
   #choixMode .carteAccueil:hover{ --leve: -10%; }
 }
