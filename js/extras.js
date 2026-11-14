@@ -585,43 +585,121 @@ function ouvrirEthylo(sansSon){
 
 // #region Cartes de l'accueil (Bar, Album, Éthylotest)
 // Une main de cartes à jouer sous les deux boutons de l'accueil (style_alcuno.css : « Cartes de l'accueil »). Ce ne sont pas
-// des <button> : ceux de l'accueil ont une forme imposée par chaque thème. Un tap, ou Entrée / Espace au clavier.
-// La carte touchée sort de la main (classe « jouee ») un court instant avant que sa page s'ouvre.
-const DELAI_CARTE_JOUEE = 170;
-function jouerCarteAccueil(carte){
-  carte.classList.add("jouee");
-  setTimeout(() => carte.classList.remove("jouee"), 600);
+// des <button> : ceux de l'accueil ont une forme imposée par chaque thème.
+//  - doigt posé : la carte sort à moitié de la main, grossit et s'incline sous le doigt ; les voisines s'écartent ;
+//  - doigt levé sans avoir bougé (un tap), ou carte tirée vers le haut : la carte est jouée (elle monte et grandit en
+//    s'effaçant, les autres retombent), puis sa page s'ouvre ; doigt glissé ailleurs : la carte revient dans la main ;
+//  - clavier : Entrée ou Espace ;
+//  - en revenant sur l'accueil, la main est redistribuée.
+const DELAI_CARTE_JOUEE = 380;   // ms entre la carte jouée et l'ouverture de sa page
+const TIRAGE_CARTE = 0.4;        // tirée vers le haut de 40 % de sa hauteur : jouée
+const INCLINAISON_CARTE = 14;    // degrés au plus sous le doigt
+const mainAccueil = document.getElementById("cartesAccueil");
+const calmeAccueil = () => window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function cartesVisibles(){
+  return mainAccueil ? Array.from(mainAccueil.querySelectorAll(".carteAccueil")).filter((c) => c.offsetParent) : [];
 }
+// Redonne la main (après une carte jouée, ou à l'arrivée sur l'accueil)
+function distribuerMain(){
+  if (!mainAccueil) return;
+  mainAccueil.classList.remove("enJeu", "tient", "distribution");
+  mainAccueil.querySelectorAll(".carteAccueil").forEach((c) => {
+    c.classList.remove("jouee", "tenue");
+    ["--ecart", "--tire", "--rx", "--ry"].forEach((v) => c.style.removeProperty(v));
+  });
+  void mainAccueil.offsetWidth; // (relance l'animation)
+  mainAccueil.classList.add("distribution");
+}
+function tenirCarte(carte, oui){
+  const cartes = cartesVisibles(), k = cartes.indexOf(carte);
+  mainAccueil.classList.toggle("tient", oui);
+  carte.classList.toggle("tenue", oui);
+  cartes.forEach((c, j) => { if (c !== carte) c.style.setProperty("--ecart", oui ? (j < k ? -4 : 4) + "deg" : "0deg"); });
+  if (!oui) ["--tire", "--rx", "--ry"].forEach((v) => carte.style.removeProperty(v));
+}
+function jouerCarte(carte, action){
+  if (mainAccueil.classList.contains("enJeu")) return; // (déjà une carte jouée)
+  tenirCarte(carte, false);
+  mainAccueil.classList.remove("distribution");
+  mainAccueil.classList.add("enJeu");
+  carte.classList.add("jouee");
+  try { if (navigator.vibrate) navigator.vibrate(12); } catch (e) {}
+  setTimeout(() => {
+    action();
+    // (la page recouvre l'accueil : la main est remise en place derrière, sans qu'on la voie)
+    setTimeout(() => { if (mainAccueil.classList.contains("enJeu")) { mainAccueil.classList.remove("enJeu"); carte.classList.remove("jouee"); } }, 700);
+  }, calmeAccueil() ? 0 : DELAI_CARTE_JOUEE);
+}
+
 function activerCarteAccueil(id, action){
   const carte = document.getElementById(id);
-  if (!carte) return;
-  const lancer = () => {
-    if (carte.classList.contains("jouee")) return; // (double tap)
-    jouerCarteAccueil(carte);
-    const calme = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
-    setTimeout(action, calme ? 0 : DELAI_CARTE_JOUEE);
-  };
-  carte.addEventListener("click", lancer);
+  if (!carte || !mainAccueil) return;
+  let appui = null, ignorerClic = 0;
+  const lacher = () => { if (appui) { appui = null; tenirCarte(carte, false); } };
+  carte.addEventListener("pointerdown", (e) => {
+    if (e.button > 0 || mainAccueil.classList.contains("enJeu")) return;
+    appui = { x: e.clientX, y: e.clientY, id: e.pointerId, bouge: false };
+    try { carte.setPointerCapture(e.pointerId); } catch (err) {}
+    tenirCarte(carte, true);
+  });
+  carte.addEventListener("pointermove", (e) => {
+    if (!appui || e.pointerId !== appui.id) return;
+    const dx = e.clientX - appui.x, dy = e.clientY - appui.y;
+    if (Math.abs(dx) > 10 || Math.abs(dy) > 10) appui.bouge = true;
+    // inclinaison : la carte penche vers le doigt (mesurée sur la carte sans sa rotation)
+    const h = carte.offsetHeight, l = carte.offsetWidth;
+    const borne = (v) => Math.max(-1, Math.min(1, v));
+    carte.style.setProperty("--ry", (borne(dx / l) * INCLINAISON_CARTE).toFixed(1) + "deg");
+    carte.style.setProperty("--rx", (borne(-dy / h) * INCLINAISON_CARTE).toFixed(1) + "deg");
+    carte.style.setProperty("--tire", Math.min(0, dy) + "px");
+    if (dy < -h * TIRAGE_CARTE) { appui = null; ignorerClic = Date.now(); jouerCarte(carte, action); }
+  });
+  carte.addEventListener("pointerup", (e) => {
+    if (!appui || e.pointerId !== appui.id) return;
+    const tap = !appui.bouge;
+    lacher();
+    ignorerClic = Date.now();
+    if (tap) jouerCarte(carte, action);
+  });
+  carte.addEventListener("pointercancel", lacher);
+  carte.addEventListener("lostpointercapture", lacher);
+  // (un clic sans doigt ni souris : lecteur d'écran, commande vocale)
+  carte.addEventListener("click", (e) => {
+    e.stopImmediatePropagation();
+    if (Date.now() - ignorerClic < 800) return;
+    jouerCarte(carte, action);
+  });
   carte.addEventListener("keydown", (e) => {
     if (e.key !== "Enter" && e.key !== " ") return;
     e.preventDefault();
-    lancer();
+    jouerCarte(carte, action);
   });
 }
 activerCarteAccueil("btnBarAccueil", ouvrirBar);
 activerCarteAccueil("btnEthyloAccueil", ouvrirEthylo);
+activerCarteAccueil("btnAlbumAccueil", ouvrirAlbum); // (js/stickers.js ne pose plus son tap)
 (() => {
-  // (carte Album : son tap est posé par js/stickers.js ; ici, le clavier et l'animation)
-  const album = document.getElementById("btnAlbumAccueil");
-  if (album) {
-    album.addEventListener("click", () => jouerCarteAccueil(album));
-    album.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); album.click(); } });
-  }
+  if (!mainAccueil) return;
   // Deux cartes ou trois : la main se resserre ou s'ouvre selon que l'album est découvert (classe « troisCartes »)
-  const main = document.getElementById("cartesAccueil"), zoneAlbum = document.getElementById("albumAccueil");
-  if (!main || !zoneAlbum) return;
-  const compter = () => main.classList.toggle("troisCartes", !zoneAlbum.hidden);
+  const zoneAlbum = document.getElementById("albumAccueil");
+  const compter = () => mainAccueil.classList.toggle("troisCartes", !!zoneAlbum && !zoneAlbum.hidden);
   compter();
-  if (window.MutationObserver) new MutationObserver(compter).observe(zoneAlbum, { attributes: true, attributeFilter: ["hidden"] });
+  if (!window.MutationObserver) { mainAccueil.classList.add("distribution"); return; }
+  if (zoneAlbum) new MutationObserver(compter).observe(zoneAlbum, { attributes: true, attributeFilter: ["hidden"] });
+  // Main redistribuée quand l'accueil réapparaît (retour d'une partie) ou quand la page ouverte par une carte se referme
+  distribuerMain();
+  const accueil = document.getElementById("choixMode");
+  let accueilVisible = accueil && accueil.style.display !== "none";
+  if (accueil) new MutationObserver(() => {
+    const v = accueil.style.display !== "none";
+    if (v && !accueilVisible) distribuerMain();
+    accueilVisible = v;
+  }).observe(accueil, { attributes: true, attributeFilter: ["style"] });
+  const regles = document.getElementById("ecranRegles");
+  if (regles) new MutationObserver(() => {
+    if (regles.classList.contains("page-sortie") && !regles._mainRedonnee) { regles._mainRedonnee = true; distribuerMain(); }
+    if (!regles.classList.contains("page-sortie")) regles._mainRedonnee = false;
+  }).observe(regles, { attributes: true, attributeFilter: ["class"] });
 })();
 // #endregion

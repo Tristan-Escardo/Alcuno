@@ -254,7 +254,7 @@ function paillettesVoeu(zone, x, y){
 }
 
 (function(){
-  document.getElementById("btnAlbumAccueil").addEventListener("click", ouvrirAlbum);
+  // (le tap sur la carte Album de l'accueil est posé par js/extras.js, avec l'animation de la carte jouée)
   majAlbumVisible();
   setTimeout(passageEtoileFilante, 10000); // (la première fois : 10 s après l'ouverture)
 })();

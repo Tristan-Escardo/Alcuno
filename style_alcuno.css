@@ -9270,6 +9270,7 @@ html[data-theme="galaxie"] #ecranReglages .menuMEPTitre{ color: rgba(234,243,255
   height: var(--h-carte);
   margin: 18px auto 0;
   padding: 0;
+  perspective: 700px; /* (les cartes s'inclinent sous le doigt) */
 }
 /* Écran très bas (téléphone couché) : cartes plus petites, serrées sous les boutons, pour tenir à l'écran */
 @media (max-height: 430px){
@@ -9277,8 +9278,13 @@ html[data-theme="galaxie"] #ecranReglages .menuMEPTitre{ color: rgba(234,243,255
 }
 #choixMode #albumAccueil{ display: contents; }
 #choixMode .carteAccueil{
-  --angle: 0deg;
-  --leve: 0%;
+  --angle: 0deg;   /* place dans l'éventail */
+  --ecart: 0deg;   /* les voisines s'écartent de la carte qu'on tient */
+  --leve: 0%;      /* sortie de la main */
+  --tire: 0px;     /* suit le doigt vers le haut */
+  --rx: 0deg;      /* inclinaison sous le doigt */
+  --ry: 0deg;
+  --zoom: 1;
   --fond: #d9302c;
   --bord: #fff;
   --encre: #fff;
@@ -9310,20 +9316,55 @@ html[data-theme="galaxie"] #ecranReglages .menuMEPTitre{ color: rgba(234,243,255
   box-shadow: var(--ombre);
   cursor: pointer;
   overflow: hidden;
-  touch-action: manipulation;
+  touch-action: none; /* (le doigt tire la carte : géré par js/extras.js) */
   -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  /* Pivot loin sous la carte (la main qui tient l'éventail) ; l'inclinaison et le zoom, eux, se font autour du centre de
+     la carte (2 hauteurs de carte plus haut que le pivot) */
   transform-origin: 50% 250%;
-  transform: rotate(var(--angle)) translateY(var(--leve));
-  transition: transform 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.4), filter 0.2s ease;
-  animation: carteDistribuee 0.55s cubic-bezier(0.2, 0.9, 0.3, 1.25) backwards;
+  transform: translateY(var(--tire)) rotate(calc(var(--angle) + var(--ecart))) translateY(var(--leve))
+    translateY(calc(var(--h-carte) * -2)) rotateX(var(--rx)) rotateY(var(--ry)) scale(var(--zoom)) translateY(calc(var(--h-carte) * 2));
+  transition: transform 0.38s cubic-bezier(0.2, 0.9, 0.3, 1.25), opacity 0.3s ease, filter 0.2s ease, box-shadow 0.2s ease;
 }
-/* À l'arrivée sur l'accueil, la main s'ouvre : les cartes partent du paquet, l'une après l'autre */
+/* À l'arrivée sur l'accueil (et au retour d'une page), la main est distribuée : les cartes montent du bas de l'écran, l'une
+   après l'autre, et s'ouvrent en éventail (classe « distribution », posée par js/extras.js) */
+#choixMode .cartesAccueil.distribution .carteAccueil{ animation: carteDistribuee 0.8s cubic-bezier(0.18, 0.9, 0.28, 1.15) backwards; }
 @keyframes carteDistribuee{
-  from{ transform: rotate(0deg) translateY(45%); opacity: 0; }
+  0%{ transform: translateY(160%) rotate(0deg) scale(0.7); opacity: 0; }
+  35%{ opacity: 1; }
 }
-#choixMode .carteBar{ animation-delay: 0.15s; }
-#choixMode .carteAlbum{ animation-delay: 0.23s; }
-#choixMode .carteEthylo{ animation-delay: 0.31s; }
+#choixMode .cartesAccueil.distribution .carteBar{ animation-delay: 0.12s; }
+#choixMode .cartesAccueil.distribution .carteAlbum{ animation-delay: 0.26s; }
+#choixMode .cartesAccueil.distribution .carteEthylo{ animation-delay: 0.4s; }
+/* Carte tenue sous le doigt : elle sort à moitié de la main, grossit, suit le doigt et s'incline ; les autres s'écartent */
+#choixMode .cartesAccueil .carteAccueil.tenue{
+  --leve: -16%;
+  --zoom: 1.08;
+  z-index: 4;
+  filter: brightness(1.08);
+  transition: transform 0.1s ease-out, filter 0.2s ease, box-shadow 0.2s ease;
+}
+#choixMode .cartesAccueil.tient .carteAccueil:not(.tenue){ --leve: 5%; filter: brightness(0.8); }
+/* Carte jouée : elle se redresse, monte et grandit en s'effaçant pendant que sa page arrive ; les autres retombent */
+#choixMode .cartesAccueil .carteAccueil.jouee{
+  --angle: 0deg;
+  --ecart: 0deg;
+  --rx: 0deg;
+  --ry: 0deg;
+  --leve: -70%;
+  --zoom: 1.35;
+  z-index: 5;
+  opacity: 0;
+  filter: brightness(1.15);
+  transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.22s ease 0.3s, filter 0.2s ease;
+}
+#choixMode .cartesAccueil.enJeu .carteAccueil:not(.jouee){
+  --leve: 45%;
+  opacity: 0;
+  transition: transform 0.4s cubic-bezier(0.5, 0, 0.75, 0), opacity 0.3s ease 0.1s;
+}
 /* (l'ovale clair en travers, comme sur les cartes du jeu) */
 #choixMode .carteAccueil::before{
   content: "";
@@ -9380,11 +9421,10 @@ html[data-theme="galaxie"] #ecranReglages .menuMEPTitre{ color: rgba(234,243,255
   #choixMode .carteAccueil:hover{ --leve: -10%; }
 }
 #choixMode .carteAccueil:focus-visible{ --leve: -10%; outline: 3px solid #fff; outline-offset: 3px; }
-#choixMode .carteAccueil:active{ --leve: -14%; filter: brightness(1.08); }
-/* Carte touchée : elle sort de la main (la page s'ouvre juste après, voir js/extras.js) */
-#choixMode .carteAccueil.jouee{ --leve: -30%; filter: brightness(1.12); z-index: 3; }
 @media (prefers-reduced-motion: reduce){
-  #choixMode .carteAccueil{ transition: none; animation: none; }
+  #choixMode .carteAccueil, #choixMode .cartesAccueil .carteAccueil.tenue, #choixMode .cartesAccueil .carteAccueil.jouee,
+  #choixMode .cartesAccueil.enJeu .carteAccueil:not(.jouee){ transition: none; }
+  #choixMode .cartesAccueil.distribution .carteAccueil{ animation: none; }
   #choixMode .carteAccueil.jouee::after{ animation: none; }
 }
 
