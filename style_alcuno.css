@@ -9252,57 +9252,93 @@ html[data-theme="galaxie"] #ecranReglages .menuMEPTitre{ color: rgba(234,243,255
 /* =====================================================================================================
    Cartes de l'accueil (Bar, Album, Éthylo) et leurs écrans (js/extras.js)
    ===================================================================================================== */
-/* Trois cartes à jouer en éventail sous les boutons de l'accueil, aux couleurs des cartes du jeu (les mêmes dans tous les
-   thèmes : un bord blanc et une ombre les détachent de n'importe quel fond). Hauteur selon l'écran : petites sur un petit téléphone. */
+/* Une main de cartes sous les boutons de l'accueil : les cartes sont empilées au même endroit et pivotent autour d'un point
+   situé loin sous elles (comme tenues entre les doigts), donc elles se chevauchent en éventail. Deux cartes tant que l'album
+   n'est pas découvert, trois ensuite (classe « troisCartes », posée par js/extras.js).
+   Chaque carte se règle par des variables : --fond, --bord, --encre (dessin et texte), --ovale, --ombre ; les thèmes plus bas
+   ne changent que ces variables. Hauteur selon l'écran : petites sur un petit téléphone. */
 #choixMode .cartesAccueil{
   --h-carte: clamp(64px, 15vh, 122px);
-  display: flex;
+  display: grid;
   justify-content: center;
-  align-items: flex-end;
-  margin-top: 6px;
-  padding-top: 10px; /* (la carte du milieu dépasse un peu vers le haut) */
+  margin-top: 10px;
+  padding-top: 8px;
 }
 /* Écran très bas (téléphone couché) : cartes plus petites, serrées sous les boutons, pour tenir à l'écran */
 @media (max-height: 430px){
-  #choixMode .cartesAccueil{ --h-carte: 50px; margin-top: -12px; padding-top: 2px; }
+  #choixMode .cartesAccueil{ --h-carte: 50px; margin-top: -10px; padding-top: 2px; }
 }
 #choixMode #albumAccueil{ display: contents; }
 #choixMode .carteAccueil{
+  --angle: 0deg;
+  --leve: 0%;
+  --fond: #d9302c;
+  --bord: #fff;
+  --encre: #fff;
+  --ovale: rgba(255, 255, 255, 0.16);
+  --ombre: 0 8px 18px rgba(0, 0, 0, 0.4);
+  --ombre-texte: 0 1px 2px rgba(0, 0, 0, 0.45);
+  grid-area: 1 / 1;
   position: relative;
-  flex: none;
   height: var(--h-carte);
   aspect-ratio: 50 / 78;
-  margin: 0 3px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: calc(var(--h-carte) * 0.06);
-  border: calc(var(--h-carte) * 0.03) solid #fff;
+  border: calc(var(--h-carte) * 0.028) solid var(--bord);
   border-radius: calc(var(--h-carte) * 0.1);
-  color: #fff;
+  background: var(--fond);
+  color: var(--encre);
   font-family: Arial, sans-serif;
   font-size: calc(var(--h-carte) * 0.115);
   font-weight: 900;
   letter-spacing: 0.02em;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
+  text-shadow: var(--ombre-texte);
+  box-shadow: var(--ombre);
   cursor: pointer;
   overflow: hidden;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
-  transition: transform 0.18s ease;
+  transform-origin: 50% 250%;
+  transform: rotate(var(--angle)) translateY(var(--leve));
+  transition: transform 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.4), filter 0.2s ease;
+  animation: carteDistribuee 0.55s cubic-bezier(0.2, 0.9, 0.3, 1.25) backwards;
 }
+/* À l'arrivée sur l'accueil, la main s'ouvre : les cartes partent du paquet, l'une après l'autre */
+@keyframes carteDistribuee{
+  from{ transform: rotate(0deg) translateY(45%); opacity: 0; }
+}
+#choixMode .carteBar{ animation-delay: 0.15s; }
+#choixMode .carteAlbum{ animation-delay: 0.23s; }
+#choixMode .carteEthylo{ animation-delay: 0.31s; }
 /* (l'ovale clair en travers, comme sur les cartes du jeu) */
 #choixMode .carteAccueil::before{
   content: "";
   position: absolute;
   inset: 12% -6%;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.16);
+  background: var(--ovale);
   transform: rotate(-32deg);
   pointer-events: none;
+}
+/* (un reflet qui traverse la carte quand on la touche) */
+#choixMode .carteAccueil::after{
+  content: "";
+  position: absolute;
+  inset: -20% auto -20% -60%;
+  width: 45%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  transform: skewX(-18deg);
+  opacity: 0;
+  pointer-events: none;
+}
+#choixMode .carteAccueil.jouee::after{ animation: carteReflet 0.45s ease; }
+@keyframes carteReflet{
+  from{ left: -60%; opacity: 1; }
+  to{ left: 130%; opacity: 1; }
 }
 #choixMode .carteAccueil svg{
   position: relative;
@@ -9312,41 +9348,170 @@ html[data-theme="galaxie"] #ecranReglages .menuMEPTitre{ color: rgba(234,243,255
   stroke-width: 3.2;
   stroke-linecap: round;
   stroke-linejoin: round;
-  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
+  filter: drop-shadow(var(--ombre-texte));
 }
 #choixMode .carteAccueil svg .plein{ fill: currentColor; stroke: none; }
 #choixMode .carteAccueil span{ position: relative; }
-#choixMode .carteBar{ background: #d9302c; transform: rotate(-8deg) translateY(3%); }
-#choixMode .carteEthylo{ background: #1976d2; transform: rotate(8deg) translateY(3%); }
-#choixMode .carteAlbum{ background: #f4c20d; color: #4a3200; text-shadow: none; z-index: 1; transform: translateY(-9%); }
-#choixMode .carteAlbum svg{ filter: none; }
-#choixMode .carteBar:active{ transform: rotate(-8deg) translateY(3%) scale(0.94); }
-#choixMode .carteEthylo:active{ transform: rotate(8deg) translateY(3%) scale(0.94); }
-#choixMode .carteAlbum:active{ transform: translateY(-9%) scale(0.94); }
-@media (hover: hover){
-  #choixMode .carteBar:hover{ transform: rotate(-8deg) translateY(-4%); }
-  #choixMode .carteEthylo:hover{ transform: rotate(8deg) translateY(-4%); }
-  #choixMode .carteAlbum:hover{ transform: translateY(-15%); }
+/* Deux cartes : la droite recouvre un peu la gauche */
+#choixMode .carteBar{ --angle: -8deg; --fond: linear-gradient(170deg, #ef4a3c, #c4201f); padding-right: 12%; }
+#choixMode .carteEthylo{ --angle: 8deg; --fond: linear-gradient(170deg, #2f8fe8, #1259b0); z-index: 1; }
+#choixMode .carteAlbum{
+  --fond: linear-gradient(170deg, #ffd83a, #eeb000);
+  --encre: #4a3200;
+  --ombre-texte: none;
+  z-index: 2;
 }
-#choixMode .carteAccueil:focus-visible{ outline: 3px solid #fff; outline-offset: 3px; }
-@media (prefers-reduced-motion: reduce){ #choixMode .carteAccueil{ transition: none; } }
+/* Trois cartes : l'album au milieu, par-dessus les deux autres, dont le dessin se décale vers le bord libre */
+#choixMode .troisCartes .carteBar{ --angle: -18deg; padding-right: 14%; }
+#choixMode .troisCartes .carteEthylo{ --angle: 18deg; padding-left: 14%; }
+@media (hover: hover){
+  #choixMode .carteAccueil:hover{ --leve: -10%; }
+}
+#choixMode .carteAccueil:focus-visible{ --leve: -10%; outline: 3px solid #fff; outline-offset: 3px; }
+#choixMode .carteAccueil:active{ --leve: -14%; filter: brightness(1.08); }
+/* Carte touchée : elle sort de la main (la page s'ouvre juste après, voir js/extras.js) */
+#choixMode .carteAccueil.jouee{ --leve: -30%; filter: brightness(1.12); z-index: 3; }
+@media (prefers-reduced-motion: reduce){
+  #choixMode .carteAccueil{ transition: none; animation: none; }
+  #choixMode .carteAccueil.jouee::after{ animation: none; }
+}
 
-/* ----- Écrans Bar et Éthylo : dans l'écran des Règles (ses blocs prennent les couleurs de chaque thème) ----- */
+/* ----- La main aux couleurs des thèmes (sans règle ici : les couleurs des cartes du jeu, rouge, jaune, bleu) ----- */
+/* Star Wars : des cartes sombres au liseré néon bleu, comme les boutons de l'accueil */
+html[data-theme="galaxie"] #choixMode .carteAccueil{
+  --fond: linear-gradient(180deg, #0f1c3c, #050a18);
+  --bord: #8fd0ff;
+  --encre: #eaf3ff;
+  --ovale: rgba(80, 170, 255, 0.1);
+  --ombre: 0 0 6px #4aa8ff, 0 0 16px rgba(40, 140, 255, 0.55), inset 0 0 10px rgba(80, 170, 255, 0.22);
+  --ombre-texte: 0 0 6px rgba(120, 190, 255, 0.9);
+  border-width: 1.5px;
+}
+/* Donjon : noir et néon rouge */
+html[data-theme="donjon"] #choixMode .carteAccueil{
+  --fond: linear-gradient(180deg, #2a0610, #0a0a0c);
+  --bord: #ff2a3d;
+  --encre: #ffd9dd;
+  --ovale: rgba(255, 42, 61, 0.1);
+  --ombre: 0 0 14px rgba(255, 42, 61, 0.7), inset 0 2px 0 rgba(255, 255, 255, 0.12);
+  --ombre-texte: 0 0 6px rgba(255, 42, 61, 0.9);
+  border-width: 2px;
+}
+html[data-theme="halloween"] #choixMode .carteAccueil{
+  --fond: linear-gradient(180deg, #1c0808, #070303);
+  --bord: #b01818;
+  --encre: #ff5a4d;
+  --ovale: rgba(200, 30, 30, 0.12);
+  --ombre: 0 0 12px rgba(200, 30, 30, 0.5);
+  --ombre-texte: 0 0 6px rgba(200, 30, 30, 0.8);
+  border-width: 1.5px;
+}
+html[data-theme="noir"] #choixMode .carteAccueil{
+  --fond: linear-gradient(180deg, #161206, #050505);
+  --bord: #b8962a;
+  --encre: #ffd700;
+  --ovale: rgba(255, 215, 0, 0.07);
+  --ombre: 0 8px 18px rgba(0, 0, 0, 0.6);
+  --ombre-texte: none;
+  border-width: 1.5px;
+}
+html[data-theme="prestige"] #choixMode .carteAccueil{
+  --fond: linear-gradient(160deg, #fff3b0, #f5c518 45%, #b8860b);
+  --bord: #fff8d6;
+  --encre: #4a3200;
+  --ovale: rgba(255, 255, 255, 0.28);
+  --ombre-texte: none;
+}
+/* Kawaii : pastels, gros bord blanc, coins très ronds */
+html[data-theme="kawaii"] #choixMode .carteAccueil{
+  --encre: #a60f5b;
+  --ovale: rgba(255, 255, 255, 0.45);
+  --ombre: 0 8px 18px rgba(150, 90, 200, 0.38), inset 0 6px 10px rgba(255, 255, 255, 0.7);
+  --ombre-texte: none;
+  border-radius: calc(var(--h-carte) * 0.17);
+}
+html[data-theme="kawaii"] #choixMode .carteBar{ --fond: linear-gradient(180deg, #ffe0ef, #ff9fcc); }
+html[data-theme="kawaii"] #choixMode .carteAlbum{ --fond: linear-gradient(180deg, #fffbe0, #ffe27a); }
+html[data-theme="kawaii"] #choixMode .carteEthylo{ --fond: linear-gradient(180deg, #ece6ff, #bba8ff); }
+html[data-theme="givre"] #choixMode .carteBar{ --fond: linear-gradient(180deg, #5cc3f0, #1787cf); }
+html[data-theme="givre"] #choixMode .carteAlbum{ --fond: linear-gradient(180deg, #ffffff, #cfeaff); --encre: #0f6fb8; }
+html[data-theme="givre"] #choixMode .carteEthylo{ --fond: linear-gradient(180deg, #2a9be0, #0b5fa8); }
+html[data-theme="givre"] #choixMode .carteAccueil{ --ombre: 0 8px 18px rgba(20, 90, 150, 0.35); }
+/* Musique : violet de la scène, un néon par carte (les couleurs de l'égaliseur) */
+html[data-theme="musique"] #choixMode .carteAccueil{
+  --fond: linear-gradient(180deg, #3d1cae, #230b6e);
+  --ovale: rgba(255, 255, 255, 0.07);
+  --ombre-texte: none;
+  border-width: 2px;
+}
+html[data-theme="musique"] #choixMode .carteBar{ --bord: #ff5fae; --encre: #ff8cc6; --ombre: 0 0 12px rgba(255, 95, 174, 0.6); }
+html[data-theme="musique"] #choixMode .carteAlbum{ --bord: #ffd23f; --encre: #ffe07a; --ombre: 0 0 12px rgba(255, 210, 63, 0.6); }
+html[data-theme="musique"] #choixMode .carteEthylo{ --bord: #3fd8ff; --encre: #8ae8ff; --ombre: 0 0 12px rgba(63, 216, 255, 0.6); }
+html[data-theme="justrose"] #choixMode .carteAccueil{
+  --fond: linear-gradient(180deg, #d63a8e, #9c1560);
+  --encre: #fff;
+  --ombre-texte: 0 1px 2px rgba(90, 0, 50, 0.5);
+  border-width: 2px;
+}
+html[data-theme="valentin"] #choixMode .carteAccueil{
+  --fond: linear-gradient(180deg, #ffffff, #ffd0e0);
+  --encre: #c2185b;
+  --ovale: rgba(255, 120, 170, 0.14);
+  --ombre-texte: none;
+}
+html[data-theme="patrick"] #choixMode .carteAccueil{
+  --fond: linear-gradient(180deg, #f3fff6, #b9eac7);
+  --encre: #0f5b33;
+  --ovale: rgba(30, 150, 80, 0.12);
+  --ombre-texte: none;
+}
+html[data-theme="chandeleur"] #choixMode .carteAccueil{
+  --fond: linear-gradient(180deg, #fff8dc, #ffdc91);
+  --encre: #6b3a00;
+  --ovale: rgba(230, 150, 30, 0.14);
+  --ombre-texte: none;
+}
+html[data-theme="noel"] #choixMode .carteBar{ --fond: linear-gradient(180deg, #23a058, #0d5e30); }
+html[data-theme="noel"] #choixMode .carteAlbum{ --fond: linear-gradient(180deg, #fff0b3, #e9b92c); --encre: #7a1010; }
+html[data-theme="noel"] #choixMode .carteEthylo{ --fond: linear-gradient(180deg, #ffffff, #e4ebf3); --encre: #b3141c; --ombre-texte: none; --ovale: rgba(180, 20, 28, 0.08); }
+html[data-theme="soleil"] #choixMode .carteBar{ --fond: linear-gradient(180deg, #ff9a5a, #ec5a3a); }
+html[data-theme="soleil"] #choixMode .carteAlbum{ --fond: linear-gradient(180deg, #ffe08a, #ffab40); --encre: #5a2a00; }
+html[data-theme="soleil"] #choixMode .carteEthylo{ --fond: linear-gradient(180deg, #8f74d6, #4b3f9e); }
+
+/* ----- Écrans Bar et Éthylotest : dans l'écran des Règles (ses blocs prennent les couleurs de chaque thème) ----- */
 #ecranRegles.bar #btnFaqDepuisRegles, #ecranRegles.ethylo #btnFaqDepuisRegles{ display: none; }
+/* Les blocs arrivent l'un après l'autre */
+@keyframes extrasEntree{
+  from{ opacity: 0; transform: translateY(16px) scale(0.98); }
+}
+#ecranRegles:is(.bar, .ethylo) #listeRegles > *,
+#ecranRegles .barListe > *{ animation: extrasEntree 0.4s cubic-bezier(0.2, 0.8, 0.3, 1) backwards; }
+#ecranRegles:is(.bar, .ethylo) #listeRegles > :nth-child(2),
+#ecranRegles .barListe > :nth-child(2){ animation-delay: 0.05s; }
+#ecranRegles:is(.bar, .ethylo) #listeRegles > :nth-child(3),
+#ecranRegles .barListe > :nth-child(3){ animation-delay: 0.1s; }
+#ecranRegles:is(.bar, .ethylo) #listeRegles > :nth-child(4),
+#ecranRegles .barListe > :nth-child(4){ animation-delay: 0.15s; }
+#ecranRegles:is(.bar, .ethylo) #listeRegles > :nth-child(5),
+#ecranRegles .barListe > :nth-child(5){ animation-delay: 0.2s; }
+#ecranRegles:is(.bar, .ethylo) #listeRegles > :nth-child(n+6),
+#ecranRegles .barListe > :nth-child(n+6){ animation-delay: 0.25s; }
+#ecranRegles .extrasSousTitre{ margin: -4px 10px 2px; text-align: center; font-size: 14.5px; line-height: 1.35; font-weight: 700; opacity: 0.85; }
 #ecranRegles .extrasChamp{
   width: 100%;
   box-sizing: border-box;
   padding: 12px 14px;
-  border-radius: 12px;
+  border-radius: 14px;
   border: 1.5px solid currentColor;
   background: rgba(255, 255, 255, 0.08);
   color: inherit;
   font: inherit;
   font-size: 16px; /* (16 px : sinon l'iPhone zoome sur le champ) */
   font-weight: 700;
+  transition: box-shadow 0.2s ease, background 0.2s ease;
 }
+#ecranRegles .extrasChamp:focus{ outline: none; background: rgba(255, 255, 255, 0.14); box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.22); }
 #ecranRegles .extrasChamp::placeholder{ color: inherit; opacity: 0.6; }
-#ecranRegles select.extrasChamp option{ color: #111; background: #fff; }
 #ecranRegles .extrasPuces{ display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
 #ecranRegles .extrasPuce{
   padding: 8px 14px;
@@ -9357,52 +9522,169 @@ html[data-theme="galaxie"] #ecranReglages .menuMEPTitre{ color: rgba(234,243,255
   font: inherit;
   font-size: 14px;
   font-weight: 800;
+  white-space: nowrap;
   opacity: 0.7;
   cursor: pointer;
   touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.18s cubic-bezier(0.2, 0.9, 0.3, 1.6), opacity 0.18s ease, background 0.18s ease;
 }
+#ecranRegles .extrasPuce:active{ transform: scale(0.9); }
 #ecranRegles .extrasPuce[aria-pressed="true"]{
   opacity: 1;
   background: rgba(255, 255, 255, 0.22);
   background: color-mix(in srgb, currentColor 24%, transparent);
   box-shadow: inset 0 0 0 1.5px currentColor;
+  transform: scale(1.05);
 }
 #ecranRegles .extrasNote{ margin: 4px 6px 0; text-align: center; font-size: 12.5px; line-height: 1.4; opacity: 0.78; }
 #ecranRegles .extrasVide{ display: block; padding: 6px 0 10px; text-align: center; }
-#ecranRegles .barListe{ display: flex; flex-direction: column; gap: 14px; }
-#ecranRegles .barRecette{ padding: 0 0 12px; }
-#ecranRegles .barRecette ul{ margin: 2px 0 8px; padding-left: 20px; }
-#ecranRegles .barRecette li{ margin: 3px 0; }
-#ecranRegles .barRecette p{ margin: 6px 0 0; }
-#ecranRegles .barRecette .barVerre{ font-style: italic; opacity: 0.85; }
 
-/* Éthylo : le résultat reste en haut de l'écran pendant qu'on règle le reste */
+/* ----- Bar ----- */
+#ecranRegles .barRecherche{ display: flex; gap: 8px; }
+#ecranRegles .barRecherche .extrasChamp{ flex: 1; min-width: 0; }
+#ecranRegles .barHasard{
+  flex: none;
+  width: 50px;
+  padding: 0;
+  border-radius: 14px;
+  border: 1.5px solid currentColor;
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.5);
+}
+#ecranRegles .barHasard:active{ transform: rotate(160deg) scale(0.9); }
+/* Les familles : une rangée qui défile sur le côté (9 puces sur trois lignes prenaient la moitié de l'écran) */
+#ecranRegles.bar .barFamilles{
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  overflow-x: auto;
+  margin: 0 -14px;
+  padding: 4px 14px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+#ecranRegles.bar .barFamilles::-webkit-scrollbar{ display: none; }
+#ecranRegles .barListe{ display: flex; flex-direction: column; gap: 14px; }
+#ecranRegles .barCompte{ margin: -6px 0 0; text-align: center; font-size: 12.5px; font-weight: 700; opacity: 0.65; }
+#ecranRegles .barSous{ display: block; margin-top: 2px; font-size: 12.5px; font-weight: 600; opacity: 0.7; }
+#ecranRegles.bar .faqItem{ transition: background 0.25s ease; border-radius: 12px; }
+#ecranRegles.bar .faqItem[open]{ background: rgba(255, 255, 255, 0.07); margin: 4px -8px; padding: 2px 8px; }
+#ecranRegles.bar .faqItem.barTire{ animation: barTire 0.9s ease; }
+@keyframes barTire{
+  0%, 60%{ box-shadow: 0 0 0 2px currentColor; }
+  100%{ box-shadow: 0 0 0 2px transparent; }
+}
+#ecranRegles .barRecette{ padding: 0 0 12px; }
+#ecranRegles .faqItem[open] > .barRecette{ animation: barDeroule 0.3s cubic-bezier(0.2, 0.8, 0.3, 1); }
+@keyframes barDeroule{
+  from{ opacity: 0; transform: translateY(-8px); }
+}
+#ecranRegles .barRecette ul{ margin: 2px 0 8px; padding: 0; list-style: none; }
+#ecranRegles .barRecette li{ position: relative; margin: 0; padding: 5px 0 5px 18px; border-bottom: 1px dashed rgba(255, 255, 255, 0.14); }
+#ecranRegles .barRecette li::before{ content: ""; position: absolute; left: 3px; top: 0.85em; width: 7px; height: 7px; border-radius: 50%; background: currentColor; opacity: 0.6; }
+#ecranRegles .barRecette p{ margin: 8px 0 0; }
+#ecranRegles .barRecette .barVerre{
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  font-size: 12.5px;
+  font-weight: 700;
+  opacity: 0.85;
+}
+
+/* ----- Éthylotest ----- */
+/* Le résultat reste en haut de l'écran pendant qu'on règle le reste (rien tant qu'aucun verre n'est compté) */
 #ecranRegles .ethyloResultat{
   position: sticky;
   top: 4px;
   z-index: 2;
   padding: 12px 14px;
   text-align: center;
-  background: linear-gradient(rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.07)), var(--couleur-barre, #2b001d);
+  background: linear-gradient(rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.07)), var(--couleur-barre, #2b001d) !important;
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
+  transition: border-color 0.3s ease;
 }
-#ecranRegles .ethyloResultat[data-etat="rouge"]{ border-color: #ff5252; }
-#ecranRegles .ethyloResultat[data-etat="orange"]{ border-color: #ffb300; }
-#ecranRegles .ethyloChiffre{ display: block; font-size: 46px; line-height: 1; font-weight: 900; }
+#ecranRegles .ethyloResultat[hidden]{ display: none; }
+@media (max-height: 520px){ #ecranRegles .ethyloResultat{ position: static; } }
+#ecranRegles .ethyloResultat[data-etat="rouge"]{ border-color: #ff5252 !important; }
+#ecranRegles .ethyloResultat[data-etat="orange"]{ border-color: #ffb300 !important; }
+#ecranRegles .ethyloChiffre{ display: inline-block; font-size: 46px; line-height: 1; font-weight: 900; transition: color 0.3s ease; }
+#ecranRegles .ethyloChiffre.pop, #ecranRegles .ethyloNombre.pop{ animation: ethyloPop 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.6); }
+@keyframes ethyloPop{
+  40%{ transform: scale(1.22); }
+}
 #ecranRegles .ethyloResultat[data-etat="rouge"] .ethyloChiffre{ color: #ff5252; }
 #ecranRegles .ethyloResultat[data-etat="orange"] .ethyloChiffre{ color: #ffb300; }
 #ecranRegles .ethyloUnite{ display: block; margin-top: 4px; font-size: 13px; font-weight: 700; opacity: 0.8; }
+/* Jauge : le taux par rapport à la limite (le trait) */
+#ecranRegles .ethyloJauge{ position: relative; height: 10px; margin: 10px 4px 4px; border-radius: 999px; background: rgba(128, 128, 128, 0.3); }
+#ecranRegles .ethyloJaugePlein{
+  height: 100%;
+  width: 0;
+  border-radius: 999px;
+  background: #ffb300;
+  transition: width 0.45s cubic-bezier(0.2, 0.8, 0.3, 1), background 0.3s ease;
+}
+#ecranRegles .ethyloResultat[data-etat="rouge"] .ethyloJaugePlein{ background: #ff5252; }
+#ecranRegles .ethyloJaugeLimite{ position: absolute; top: -4px; bottom: -4px; width: 3px; margin-left: -1.5px; border-radius: 2px; background: currentColor; transition: left 0.45s cubic-bezier(0.2, 0.8, 0.3, 1); }
 #ecranRegles .ethyloVerdict{ margin: 8px 0 2px; font-size: 18px; font-weight: 900; }
 #ecranRegles .ethyloLigne{ margin: 4px 0 0; font-size: 14px; line-height: 1.35; opacity: 0.92; }
 #ecranRegles .ethyloBloc{ padding-bottom: 10px; }
 #ecranRegles .ethyloBloc .extrasPuces{ justify-content: flex-start; padding: 6px 0; }
 #ecranRegles .ethyloLigneChamp{ display: flex; align-items: center; gap: 10px; padding: 8px 0; }
 #ecranRegles .ethyloLigneChamp .nomRegle{ flex: none; }
-#ecranRegles .ethyloLigneChamp select.extrasChamp{ flex: 1; width: auto; min-width: 0; }
-#ecranRegles .ethyloPoids{ width: 92px; text-align: center; }
 #ecranRegles .ethyloLigneChamp input[type="checkbox"]{ flex: none; width: 22px; height: 22px; margin: 0; accent-color: #ffcc00; }
 #ecranRegles .ethyloAide{ display: block; padding: 2px 0 4px; }
+/* Un réglage à glisser : son nom à gauche, sa valeur à droite, le curseur dessous */
+#ecranRegles .ethyloGlisse{ padding: 8px 0 4px; }
+#ecranRegles .ethyloGlisseTete{ display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+#ecranRegles .ethyloGlisseValeur{ font-size: 17px; font-weight: 900; white-space: nowrap; }
+#ecranRegles .extrasGlisse{
+  --p: 50%;
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: 36px; /* (zone de toucher large ; la piste est dessinée plus fine) */
+  margin: 2px 0 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  touch-action: pan-y;
+}
+#ecranRegles .extrasGlisse:focus{ outline: none; }
+#ecranRegles .extrasGlisse::-webkit-slider-runnable-track{
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, currentColor var(--p), rgba(128, 128, 128, 0.35) var(--p));
+}
+#ecranRegles .extrasGlisse::-moz-range-track{ height: 8px; border-radius: 999px; background: rgba(128, 128, 128, 0.35); }
+#ecranRegles .extrasGlisse::-moz-range-progress{ height: 8px; border-radius: 999px; background: currentColor; }
+#ecranRegles .extrasGlisse::-webkit-slider-thumb{
+  -webkit-appearance: none;
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  margin-top: -10px;
+  border-radius: 50%;
+  border: 3px solid currentColor;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  transition: transform 0.15s ease;
+}
+#ecranRegles .extrasGlisse::-moz-range-thumb{ width: 22px; height: 22px; border-radius: 50%; border: 3px solid currentColor; background: #fff; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4); }
+#ecranRegles .extrasGlisse:active::-webkit-slider-thumb{ transform: scale(1.18); }
+#ecranRegles .extrasGlisse:focus-visible::-webkit-slider-thumb{ box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.35); }
 #ecranRegles .ethyloVerre{ justify-content: space-between; }
+#ecranRegles .ethyloSousTitre{ margin: 10px 0 0; font-size: 13px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.65; }
 #ecranRegles .ethyloCompteur{ flex: none; display: flex; align-items: center; gap: 10px; }
 #ecranRegles .ethyloPas{
   width: 40px;
@@ -9418,7 +9700,36 @@ html[data-theme="galaxie"] #ecranReglages .menuMEPTitre{ color: rgba(234,243,255
   line-height: 1;
   cursor: pointer;
   touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.15s cubic-bezier(0.2, 0.9, 0.3, 1.6), background 0.15s ease;
 }
-#ecranRegles .ethyloNombre{ min-width: 24px; text-align: center; font-size: 19px; font-weight: 900; opacity: 0.45; }
+#ecranRegles .ethyloPas:active{ transform: scale(0.84); background: rgba(128, 128, 128, 0.35); }
+#ecranRegles .ethyloNombre{ display: inline-block; min-width: 24px; text-align: center; font-size: 19px; font-weight: 900; opacity: 0.45; }
 #ecranRegles .ethyloChoisi .ethyloNombre{ opacity: 1; }
+/* Les bières déjà comptées (tous degrés) : toucher une étiquette en retire une */
+#ecranRegles .ethyloBieres{ display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 0 2px; }
+#ecranRegles .ethyloBieres:empty{ display: none; }
+#ecranRegles .ethyloBieres .extrasPuce{ opacity: 1; font-size: 13px; padding: 6px 12px; animation: ethyloPop 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.6); }
 #ecranRegles .ethyloRemise{ margin: 0 auto; }
+/* Numéros utiles : un appui lance l'appel */
+#ecranRegles .ethyloNumero{ display: flex; align-items: center; gap: 12px; padding: 9px 0; color: inherit; text-decoration: none; -webkit-tap-highlight-color: transparent; transition: transform 0.15s ease; }
+#ecranRegles .ethyloNumero + .ethyloNumero{ border-top: 1px solid rgba(128, 128, 128, 0.25); }
+#ecranRegles .ethyloNumero:active{ transform: scale(0.97); }
+#ecranRegles .ethyloNumeroChiffre{
+  flex: none;
+  min-width: 58px;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1.5px solid currentColor;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 900;
+}
+#ecranRegles .ethyloNumero .texteRegle{ flex: 1; min-width: 0; }
+#ecranRegles .ethyloNumero::after{ content: "📞"; flex: none; font-size: 18px; }
+@media (prefers-reduced-motion: reduce){
+  #ecranRegles:is(.bar, .ethylo) #listeRegles > *, #ecranRegles .barListe > *, #ecranRegles .faqItem[open] > .barRecette,
+  #ecranRegles .ethyloChiffre.pop, #ecranRegles .ethyloNombre.pop, #ecranRegles .ethyloBieres .extrasPuce, #ecranRegles.bar .faqItem.barTire{ animation: none; }
+  #ecranRegles .ethyloJaugePlein, #ecranRegles .ethyloJaugeLimite{ transition: none; }
+}
