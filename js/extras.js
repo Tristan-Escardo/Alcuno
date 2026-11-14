@@ -589,7 +589,7 @@ function ouvrirEthylo(sansSon){
   };
   const texteQuand = (t) => {
     const ilYa = minuteDe(t);
-    return ilYa <= 0 ? ["maintenant", ""] : [heureIlYa(ilYa), "il y a " + texteDureeEthylo(ilYa)];
+    return ilYa <= 0 ? ["maintenant", "donc à " + heureIlYa(0)] : ["il y a " + texteDureeEthylo(ilYa), "donc à " + heureIlYa(ilYa)];
   };
   const curseurQuand = (titre, cle) => glissiereEthylo(titre, 0, DUREE_MAX_ETHYLO, 1, DUREE_MAX_ETHYLO - Math.min(DUREE_MAX_ETHYLO, ethylo[cle]),
     texteQuand, (t) => { ethylo[cle] = minuteDe(t); maj(); }, { aimant: aimantHeure, estPalier: estDemiHeure, graduations: graduationsHeures });
