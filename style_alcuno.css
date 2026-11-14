@@ -9114,7 +9114,7 @@ html[data-theme="soleil"] body #overlayRegleUnique .regle-detail:is(.regle-boit,
 #ecranReglages .btnMiseEnPage{
   position: absolute; right: 20px; top: 20px; z-index: 6; display: inline-flex; align-items: center; gap: 7px; padding: 8px 12px; border-radius: 999px;
   font-size: 13px; font-weight: 800; cursor: pointer; white-space: nowrap; color: var(--titreReglage, #FFD700);
-  background: rgba(255,255,255,.1); border: 1px solid rgba(255,215,0,.35); box-shadow: none; text-shadow: none;
+  background: rgba(255,255,255,.1); border: 1px solid rgba(255,215,0,.35); border-color: color-mix(in srgb, var(--accent-reglage, #FFD700) 40%, transparent); box-shadow: none; text-shadow: none;
 }
 #ecranReglages .mepIcone svg, #ecranReglages .menuMEPItem svg{ width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; display: block; }
 #ecranReglages .mepFleche::before{ content: "⌄"; font-size: 17px; line-height: 1; display: inline-block; transition: transform .2s; }
@@ -9130,7 +9130,7 @@ html[data-theme="soleil"] body #overlayRegleUnique .regle-detail:is(.regle-boit,
   display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 8px; border: 0; border-radius: 10px; background: none; box-shadow: none;
   color: var(--titreReglage, #e8d5e0); font-size: 15px; font-weight: 700; text-align: left; cursor: pointer; text-shadow: none;
 }
-#ecranReglages .menuMEPItem.actif{ background: var(--menuActif, rgba(255,215,0,.16)); }
+#ecranReglages .menuMEPItem.actif{ background: var(--menuActif, rgba(255,215,0,.16)); background: var(--menuActif, color-mix(in srgb, var(--accent-reglage, #FFD700) 18%, transparent)); }
 #ecranReglages .menuMEPCoche{ margin-left: auto; visibility: hidden; }
 #ecranReglages .menuMEPItem.actif .menuMEPCoche{ visibility: visible; }
 /* Modifier (et Par défaut) sous « Mise en page », à la hauteur du titre « Réglages », vue Liste seulement */
@@ -9144,7 +9144,7 @@ html[data-theme="soleil"] body #overlayRegleUnique .regle-detail:is(.regle-boit,
 }
 #ecranReglages #btnModifierReglages[hidden], #ecranReglages #btnParDefautReglages[hidden]{ display: none !important; }
 #ecranReglages #btnModifierReglages svg, #ecranReglages #btnParDefautReglages svg{ width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-#ecranReglages.reglages-edition #btnModifierReglages{ background: #FFD700 !important; color: #3a2a00 !important; border-color: #FFD700 !important; opacity: 1; }
+#ecranReglages.reglages-edition #btnModifierReglages{ background: var(--accent-reglage, #FFD700) !important; color: var(--accent-encre, #3a2a00) !important; border-color: var(--accent-reglage, #FFD700) !important; opacity: 1; }
 .reglages-edition #btnMiseEnPage, .reglages-edition #menuMiseEnPage{ display: none !important; }
 #ecranReglages.vue-options #btnMiseEnPage, #ecranReglages.vue-options #menuMiseEnPage{ display: none !important; }
 #ecranReglages h2{ order: -30; }
@@ -9154,17 +9154,18 @@ html[data-theme="soleil"] body #overlayRegleUnique .regle-detail:is(.regle-boit,
 #ecranReglages.vue-tuiles #tuilesReglages{ display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 #ecranReglages .tuileReglage{
   display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 16px 10px; cursor: pointer;
-  border-radius: 16px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,215,0,0.18); color: var(--titreReglage, #FFD700); box-shadow: none;
+  border-radius: 16px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,215,0,0.18); border-color: color-mix(in srgb, var(--accent-reglage, #FFD700) 22%, transparent); color: var(--titreReglage, #FFD700); box-shadow: none;
   transition: transform .15s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
 }
 #ecranReglages .tuileReglage:active{ transform: scale(.96); }
-#ecranReglages .tuileReglage.choisie{ background: rgba(255,215,0,0.14); border-color: #FFD700; box-shadow: 0 0 0 1px #FFD700 inset; }
+#ecranReglages .tuileReglage.choisie{ background: rgba(255,215,0,0.14); border-color: #FFD700; box-shadow: 0 0 0 1px #FFD700 inset;
+  background: color-mix(in srgb, var(--accent-reglage, #FFD700) 16%, transparent); border-color: var(--accent-reglage, #FFD700); box-shadow: 0 0 0 1px var(--accent-reglage, #FFD700) inset; }
 #ecranReglages .tuileIcone{ font-size: 28px; line-height: 1; }
 #ecranReglages .tuileNom{ font-size: 15px; font-weight: 800; }
 /* sections : titres qui s'ouvrent */
 #ecranReglages.vue-sections .enteteGroupe{
   display: flex; align-items: center; gap: 12px; width: 100%; margin: 0; padding: 14px 16px; cursor: pointer; text-align: left;
-  border-radius: 16px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,215,0,0.18); color: var(--titreReglage, #FFD700); box-shadow: none;
+  border-radius: 16px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,215,0,0.18); border-color: color-mix(in srgb, var(--accent-reglage, #FFD700) 22%, transparent); color: var(--titreReglage, #FFD700); box-shadow: none;
   transition: background .2s ease, transform .15s ease;
 }
 #ecranReglages.vue-sections .enteteGroupe:active{ transform: scale(.98); }
@@ -9191,7 +9192,7 @@ html[data-theme="soleil"] body #overlayRegleUnique .regle-detail:is(.regle-boit,
   padding: 8px 12px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: none;
   background: rgba(255,255,255,.08); color: inherit; border: 1px solid rgba(255,255,255,.25);
 }
-#ecranReglages .chipLangue.actif{ background: #FFD700; color: #3a2a00; border-color: #FFD700; }
+#ecranReglages .chipLangue.actif{ background: var(--accent-reglage, #FFD700); color: var(--accent-encre, #3a2a00); border-color: var(--accent-reglage, #FFD700); }
 #ecranReglages .chipLangue:disabled{ opacity: .55; cursor: default; }
 #ecranReglages .chipLangue small{ display: block; font-size: 10px; font-weight: 400; }
 @media (prefers-reduced-motion: reduce){ #ecranReglages .tuileReglage, #ecranReglages .enteteGroupe, #ecranReglages .enteteFleche, #ecranReglages .enteteFleche svg{ transition: none; } }
@@ -9221,7 +9222,7 @@ html[data-theme="kawaii"][data-theme][data-theme] body .reglages-edition #btnMod
 
 /* Menu « Mise en page » : choix sans cadre propre ; thèmes à néon (Star Wars, BDSM) : le néon entoure le menu entier, pas chaque choix */
 #ecranReglages .menuMEPItem{ font: inherit; font-size: 15px; font-weight: 700; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; outline: none; }
-#ecranReglages .menuMEPItem:focus-visible{ box-shadow: 0 0 0 2px var(--titreReglage, #FFD700) inset; }
+#ecranReglages .menuMEPItem:focus-visible{ box-shadow: 0 0 0 2px var(--accent-reglage, #FFD700) inset; }
 html[data-theme="galaxie"] #ecranReglages .menuMiseEnPage{
   background: linear-gradient(rgba(14,22,44,.97), rgba(6,10,22,.97)); border: 1px solid #8fd0ff;
   box-shadow: 0 0 6px #4aa8ff, 0 0 16px rgba(40,140,255,.55), 0 0 10px rgba(80,170,255,.22) inset;
@@ -9245,6 +9246,20 @@ html[data-theme="kawaii"] #ecranReglages #tuilesReglages .tuileReglage.choisie{
   background: rgba(255,222,240,.97) !important; border-color: #ee70a9 !important;
   box-shadow: 0 0 0 3px rgba(238,112,169,.6), 0 8px 20px rgba(150,90,200,.3), inset 0 8px 14px rgba(255,255,255,.85) !important;
 }
+/* Couleur d'accent des Réglages (tuile choisie, langue choisie, liserés, bouton Modifier) : l'or par défaut (Bordeaux, Casino, Nuit,
+   Sombre, Cerisier, Prestige, Noël, Soleil couchant : le thème est déjà jaune et doré), une couleur du thème pour les autres.
+   --accent-encre : la couleur de l'écriture posée sur l'accent. */
+html[data-theme="chandeleur"]{ --accent-reglage: #ffe3a3; --accent-encre: #6b3a00; }
+html[data-theme="valentin"]{ --accent-reglage: #ffffff; --accent-encre: #c2185b; }
+html[data-theme="patrick"]{ --accent-reglage: #d9ffe6; --accent-encre: #0f5b33; }
+html[data-theme="justrose"]{ --accent-reglage: #ffffff; --accent-encre: #9c1560; }
+html[data-theme="musique"]{ --accent-reglage: #8ae8ff; --accent-encre: #1b0a5c; }
+html[data-theme="halloween"]{ --accent-reglage: #d62828; --accent-encre: #ffffff; }
+html[data-theme="kawaii"]{ --accent-reglage: #ee70a9; --accent-encre: #ffffff; }
+html[data-theme="givre"]{ --accent-reglage: #1479b8; --accent-encre: #ffffff; }
+html[data-theme="galaxie"]{ --accent-reglage: #8fd0ff; --accent-encre: #02030a; }
+html[data-theme="donjon"]{ --accent-reglage: #ff2a3d; --accent-encre: #ffffff; }
+
 /* Givre : bouton « Mise en page », menu, en-têtes de sections et tuiles dans les couleurs du thème (verre blanc, liseré bleu) : ils gardaient
    les contours dorés des autres thèmes */
 html[data-theme="givre"] #ecranReglages :is(.btnMiseEnPage, .enteteGroupe, .tuileReglage){
@@ -9255,6 +9270,14 @@ html[data-theme="givre"] #ecranReglages :is(#btnModifierReglages, #btnParDefautR
   background: var(--givre-panneau) !important; border: 1px solid var(--givre-bord) !important; color: var(--givre-accent) !important;
 }
 html[data-theme="givre"] #ecranReglages.reglages-edition #btnModifierReglages{ background: var(--givre-accent) !important; color: #fff !important; border-color: var(--givre-accent) !important; }
+/* Star Wars et Donjon : la tuile choisie se voit (leur règle générale des boutons néon dessine déjà le cadre et l'ombre de chaque
+   tuile, et passe devant : on joue donc sur le contour, le fond d'écran et la luminosité, qu'elle ne touche pas) */
+html[data-theme="galaxie"] #ecranReglages #tuilesReglages .tuileReglage.choisie{
+  outline: 2px solid #fff; outline-offset: -5px; filter: brightness(1.5) saturate(1.2);
+}
+html[data-theme="donjon"] #ecranReglages #tuilesReglages .tuileReglage.choisie{
+  outline: 2px solid #ffb3bb; outline-offset: -5px; filter: brightness(1.6) saturate(1.2);
+}
 html[data-theme="givre"] #ecranReglages .menuMiseEnPage{
   background: #fff; border: 1px solid var(--givre-bord); box-shadow: 0 10px 24px rgba(13, 53, 80, 0.2);
 }
