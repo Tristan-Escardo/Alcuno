@@ -9245,6 +9245,27 @@ html[data-theme="kawaii"] #ecranReglages #tuilesReglages .tuileReglage.choisie{
   background: rgba(255,222,240,.97) !important; border-color: #ee70a9 !important;
   box-shadow: 0 0 0 3px rgba(238,112,169,.6), 0 8px 20px rgba(150,90,200,.3), inset 0 8px 14px rgba(255,255,255,.85) !important;
 }
+/* Givre : bouton « Mise en page », menu, en-têtes de sections et tuiles dans les couleurs du thème (verre blanc, liseré bleu) : ils gardaient
+   les contours dorés des autres thèmes */
+html[data-theme="givre"] #ecranReglages :is(.btnMiseEnPage, .enteteGroupe, .tuileReglage){
+  background: var(--givre-panneau) !important; border: 1px solid var(--givre-bord) !important; color: var(--givre-accent) !important;
+  box-shadow: 0 6px 16px rgba(13, 53, 80, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.7) !important;
+}
+html[data-theme="givre"] #ecranReglages :is(#btnModifierReglages, #btnParDefautReglages){
+  background: var(--givre-panneau) !important; border: 1px solid var(--givre-bord) !important; color: var(--givre-accent) !important;
+}
+html[data-theme="givre"] #ecranReglages.reglages-edition #btnModifierReglages{ background: var(--givre-accent) !important; color: #fff !important; border-color: var(--givre-accent) !important; }
+html[data-theme="givre"] #ecranReglages .menuMiseEnPage{
+  background: #fff; border: 1px solid var(--givre-bord); box-shadow: 0 10px 24px rgba(13, 53, 80, 0.2);
+}
+html[data-theme="givre"] #ecranReglages .menuMEPTitre{ color: var(--givre-doux); }
+html[data-theme="givre"] #ecranReglages .menuMEPItem{ color: var(--givre-texte); }
+html[data-theme="givre"] #ecranReglages .menuMEPItem.actif{ background: rgba(20, 121, 184, 0.14); color: var(--givre-accent); }
+html[data-theme="givre"] #ecranReglages .menuMEPItem:focus-visible{ box-shadow: 0 0 0 2px var(--givre-accent) inset; }
+html[data-theme="givre"] #ecranReglages #tuilesReglages .tuileReglage.choisie{
+  background: rgba(20, 121, 184, 0.14) !important; border-color: var(--givre-accent) !important;
+  box-shadow: 0 0 0 2px var(--givre-accent) inset, 0 6px 16px rgba(13, 53, 80, 0.1) !important;
+}
 /* Star Wars : écritures du menu « Mise en page » de la couleur de celles du bouton « Retour » */
 html[data-theme="galaxie"] #ecranReglages .menuMEPItem{ color: #eaf3ff; }
 html[data-theme="galaxie"] #ecranReglages .menuMEPTitre{ color: rgba(234,243,255,.7); }
