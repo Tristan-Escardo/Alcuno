@@ -3715,8 +3715,7 @@ html.accessibilite #overlayCoupDeFoudre .plus4-joueur-btn{
   box-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
 #ecranReglages #btnProfilConnexion.btnGoogle .logoGoogle{ display: block; flex: 0 0 auto; width: 20px; height: 20px; }
-/* Connecté : « Se déconnecter » garde le même bouton blanc que « Se connecter avec Google », sans le G */
-#ecranReglages #btnProfilConnexion.btnGoogle.connecte .logoGoogle{ display: none; }
+/* Connecté : « Se déconnecter » est le même bouton Google que « Se connecter avec Google » (G en couleurs compris) */
 /* « Supprimer mon profil » : même rendu dans tous les thèmes (les thèmes y mettaient un cadre ou un trait dessous) :
    petite pastille rouge discrète, ni cadre, ni souligné, ni ombre */
 html[data-theme][data-theme][data-theme] body #ecranReglages #btnProfilSupprimer{
