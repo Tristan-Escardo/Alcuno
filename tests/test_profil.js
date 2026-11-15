@@ -110,8 +110,14 @@ let courant = lireCompte();
 const prevenir = () => ecouteurs.forEach((f) => f(courant));
 export const getAuth = (appli) => ({ appli: appli && appli.nom });
 export const onAuthStateChanged = (a, f) => { window.__appliAuth = a.appli; ecouteurs.push(f); setTimeout(() => f(courant), 0); };
-export class GoogleAuthProvider { static credential(jeton){ return { jeton }; } }
+export class GoogleAuthProvider {}
+export class OAuthProvider { constructor(id){ this.id = id; } credential(o){ return { fournisseur: this.id, jeton: o.idToken, rawNonce: o.rawNonce }; } }
+// (comme le vrai Firebase : le jeton porte l'empreinte SHA-256 du nombre, qui doit être fourni en clair, sinon missing-or-invalid-nonce)
 export const signInWithCredential = async (a, c) => {
+  const contenu = JSON.parse(atob(c.jeton.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+  const h = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(c.rawNonce || ""));
+  const hache = Array.from(new Uint8Array(h), (o) => o.toString(16).padStart(2, "0")).join("");
+  if (c.fournisseur !== "google.com" || !c.rawNonce || contenu.nonce !== hache) { const e = new Error("x"); e.code = "auth/missing-or-invalid-nonce"; throw e; }
   localStorage.setItem("faux_jeton", c.jeton);
   courant = { uid: "u1", displayName: "Tom", email: "tom@example.com" };
   localStorage.setItem("faux_compte", JSON.stringify(courant)); prevenir();

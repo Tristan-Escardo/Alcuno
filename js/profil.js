@@ -228,7 +228,7 @@ if (typeof document !== "undefined" && !document.documentElement.classList.conta
       .then(([a, d, au]) => {
         const appli = a.initializeApp(config, "profil");
         fb = { ref: d.ref, get: d.get, set: d.set, remove: d.remove, GoogleAuthProvider: au.GoogleAuthProvider, signInWithPopup: au.signInWithPopup,
-               signInWithCredential: au.signInWithCredential, signOut: au.signOut, deleteUser: au.deleteUser };
+               OAuthProvider: au.OAuthProvider, signInWithCredential: au.signInWithCredential, signOut: au.signOut, deleteUser: au.deleteUser };
         base = d.getDatabase(appli);
         auth = au.getAuth(appli);
         au.onAuthStateChanged(auth, surChangementDeCompte);
@@ -312,10 +312,14 @@ if (typeof document !== "undefined" && !document.documentElement.classList.conta
     if (code === "auth/operation-not-supported-in-this-environment" || code === "auth/web-storage-unsupported") return tr("Connexion impossible ici : ouvre le jeu dans ton navigateur (Chrome, Safari), puis réessaie.");
     // (console Firebase : fournisseur Google pas activé, domaine du jeu pas autorisé, ou création de comptes désactivée : voir PILOTAGE.md)
     if (code === "auth/operation-not-allowed" || code === "auth/unauthorized-domain" || code === "auth/admin-restricted-operation") return tr("La connexion Google n'est pas encore activée pour le jeu.");
-    return tr("Connexion impossible pour le moment. Réessaie plus tard.");
+    // (le code de l'erreur est montré : il dit tout de suite ce qui coince quand un joueur le signale)
+    return tr("Connexion impossible pour le moment. Réessaie plus tard.") + (code ? " (" + code.replace(/^auth\//, "") + ")" : "");
   }
   const appliInstallee = () => { try { return navigator.standalone === true || window.matchMedia("(display-mode: standalone)").matches; } catch (e) { return false; } };
   const hasard = () => Array.from(crypto.getRandomValues(new Uint32Array(4)), (n) => n.toString(16).padStart(8, "0")).join("");
+  // (Google reçoit l'empreinte SHA-256 du nombre tiré, Firebase le nombre lui-même : sinon il refuse le jeton, « missing-or-invalid-nonce »)
+  const empreinte = (texte) => crypto.subtle.digest("SHA-256", new TextEncoder().encode(texte))
+    .then((h) => Array.from(new Uint8Array(h), (o) => o.toString(16).padStart(2, "0")).join(""));
   // (l'adresse du jeu sans « index.html » ni paramètres : celle qui est déclarée dans la console Google)
   const adresseRetour = () => location.origin + location.pathname.replace(/index\.html$/, "");
 
@@ -326,21 +330,22 @@ if (typeof document !== "undefined" && !document.documentElement.classList.conta
     // (la page est rechargée au retour : jamais pendant une partie ni dans une salle d'attente)
     if (enPartie) { dire(tr("Termine ta partie, puis connecte-toi depuis l'accueil.")); return; }
     if (!navigator.onLine) { dire(tr("Pas de connexion internet : réessaie plus tard.")); return; }
-    const aller = { etat: hasard(), nonce: hasard(), quand: Date.now() };
-    try {
-      localStorage.setItem(CLE_ALLER, JSON.stringify(aller));
-      if (localStorage.getItem(CLE_ALLER) === null) throw new Error("stockage");
-    } catch (e) { dire(tr("Connexion impossible ici : ouvre le jeu dans ton navigateur (Chrome, Safari), puis réessaie.")); return; }
-    try { sessionStorage.setItem(CLE_ROUVRIR_REGLAGES, String(ecranReglages.scrollTop)); } catch (e) {} // (au retour, les Réglages se rouvrent au même endroit)
     occupe = true;
     dire(tr("Connexion…"));
-    const adresse = "https://accounts.google.com/o/oauth2/v2/auth?" + new URLSearchParams({
-      client_id: ID_CLIENT_GOOGLE, redirect_uri: adresseRetour(), response_type: "id_token", scope: "openid email profile",
-      nonce: aller.nonce, state: aller.etat, prompt: "select_account" });
-    // (page gardée en mémoire par le téléphone puis réaffichée par « précédent » : le bouton n'y reste pas bloqué)
-    window.addEventListener("pageshow", (e) => { if (e.persisted) { occupe = false; dire(""); } }, { once: true });
-    // (rechargerPage vide d'abord l'historique du jeu : au retour, « précédent » ne ramène pas sur la page Google)
-    if (typeof rechargerPage === "function") rechargerPage(adresse); else location.assign(adresse);
+    const nonce = hasard();
+    empreinte(nonce).then((hache) => {
+      const aller = { etat: hasard(), nonce, hache, quand: Date.now() };
+      localStorage.setItem(CLE_ALLER, JSON.stringify(aller));
+      if (localStorage.getItem(CLE_ALLER) === null) throw new Error("stockage");
+      try { sessionStorage.setItem(CLE_ROUVRIR_REGLAGES, String(ecranReglages.scrollTop)); } catch (e) {} // (au retour, les Réglages se rouvrent au même endroit)
+      const adresse = "https://accounts.google.com/o/oauth2/v2/auth?" + new URLSearchParams({
+        client_id: ID_CLIENT_GOOGLE, redirect_uri: adresseRetour(), response_type: "id_token", scope: "openid email profile",
+        nonce: hache, state: aller.etat, prompt: "select_account" });
+      // (page gardée en mémoire par le téléphone puis réaffichée par « précédent » : le bouton n'y reste pas bloqué)
+      window.addEventListener("pageshow", (e) => { if (e.persisted) { occupe = false; dire(""); } }, { once: true });
+      // (rechargerPage vide d'abord l'historique du jeu : au retour, « précédent » ne ramène pas sur la page Google)
+      if (typeof rechargerPage === "function") rechargerPage(adresse); else location.assign(adresse);
+    }).catch(() => { occupe = false; dire(tr("Connexion impossible ici : ouvre le jeu dans ton navigateur (Chrome, Safari), puis réessaie.")); });
   }
 
   // Au lancement : la page Google vient de nous renvoyer ici (le script du <head> de index.html a retiré le jeton de l'adresse)
@@ -362,11 +367,12 @@ if (typeof document !== "undefined" && !document.documentElement.classList.conta
     // Le jeton doit porter le nombre tiré au départ : un jeton fabriqué ou rejoué ailleurs est refusé (Firebase vérifie le reste)
     let nonce = "";
     try { nonce = JSON.parse(atob(jeton.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))).nonce; } catch (e) {}
-    if (nonce !== aller.nonce) { dire(messageErreur(null)); return false; }
+    if (!aller.hache || nonce !== aller.hache) { dire(messageErreur({ code: "nonce" })); return false; }
     occupe = true;
     connexionVoulue = true;
     dire(tr("Connexion…"));
-    avecDelai(charger().then(() => fb.signInWithCredential(auth, fb.GoogleAuthProvider.credential(jeton))), 2 * DELAI_LECTURE)
+    const identifiant = () => new fb.OAuthProvider("google.com").credential({ idToken: jeton, rawNonce: aller.nonce });
+    avecDelai(charger().then(() => fb.signInWithCredential(auth, identifiant())), 2 * DELAI_LECTURE)
       .then(() => { occupe = false; etatTexte = ""; majBloc(); })
       .catch((e) => { occupe = false; connexionVoulue = false; dire(messageErreur(e)); });
     return true;
