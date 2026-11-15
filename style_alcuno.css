@@ -3694,7 +3694,7 @@ html.accessibilite #overlayCoupDeFoudre .plus4-joueur-btn{
   touch-action: manipulation;
 }
 #ecranReglages #btnProfilConnexion:disabled{ opacity: 0.55; cursor: default; }
-/* Déconnecté : le bouton « Se connecter avec Google » (blanc, G en couleurs, comme partout ailleurs), sur toute la largeur sous le texte */
+/* Déconnecté : le bouton « Se connecter avec Google » (Google mode sombre : fond #131314, texte #e3e3e3, G en couleurs), sur toute la largeur sous le texte */
 #ecranReglages [data-cle="compte"] .optionAction{ flex-wrap: wrap; }
 #ecranReglages #btnProfilConnexion .logoGoogle{ display: none; }
 #ecranReglages #btnProfilConnexion.btnGoogle{
@@ -3708,11 +3708,11 @@ html.accessibilite #overlayCoupDeFoudre .plus4-joueur-btn{
   font-family: Roboto, Arial, sans-serif;
   font-size: 15px;
   font-weight: 700;
-  color: #1f1f1f;
+  color: #e3e3e3;
   text-shadow: none;
-  background: #fff;
-  border: 1px solid #747775;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  background: #131314;
+  border: 1px solid #8e918f;
+  box-shadow: none;
 }
 #ecranReglages #btnProfilConnexion.btnGoogle .logoGoogle{ display: block; flex: 0 0 auto; width: 20px; height: 20px; }
 /* Connecté : « Se déconnecter » est le même bouton Google que « Se connecter avec Google » (G en couleurs compris) */
