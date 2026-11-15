@@ -3694,7 +3694,8 @@ html.accessibilite #overlayCoupDeFoudre .plus4-joueur-btn{
   touch-action: manipulation;
 }
 #ecranReglages #btnProfilConnexion:disabled{ opacity: 0.55; cursor: default; }
-/* Déconnecté : le bouton « Se connecter avec Google » (Google mode sombre : fond #131314, texte #e3e3e3, G en couleurs), sur toute la largeur sous le texte */
+/* Déconnecté : le bouton « Se connecter avec Google » (blanc, G en couleurs), sur toute la largeur sous le texte ;
+   en mode sombre Google (fond #131314, texte #e3e3e3) seulement dans les thèmes Sombre, BDSM, Nuit et Halloween (voir plus bas) */
 #ecranReglages [data-cle="compte"] .optionAction{ flex-wrap: wrap; }
 #ecranReglages #btnProfilConnexion .logoGoogle{ display: none; }
 #ecranReglages #btnProfilConnexion.btnGoogle{
@@ -3708,8 +3709,18 @@ html.accessibilite #overlayCoupDeFoudre .plus4-joueur-btn{
   font-family: Roboto, Arial, sans-serif;
   font-size: 15px;
   font-weight: 700;
-  color: #e3e3e3;
+  color: #1f1f1f;
   text-shadow: none;
+  background: #fff;
+  border: 1px solid #747775;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+/* Thèmes Sombre (noir), BDSM (donjon), Nuit (bleu) et Halloween : bouton Google en mode sombre */
+html[data-theme="noir"] #ecranReglages #btnProfilConnexion.btnGoogle,
+html[data-theme="donjon"] #ecranReglages #btnProfilConnexion.btnGoogle,
+html[data-theme="bleu"] #ecranReglages #btnProfilConnexion.btnGoogle,
+html[data-theme="halloween"] #ecranReglages #btnProfilConnexion.btnGoogle{
+  color: #e3e3e3;
   background: #131314;
   border: 1px solid #8e918f;
   box-shadow: none;
