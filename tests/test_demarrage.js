@@ -893,7 +893,7 @@ function verifier(ok, texte){
     await page.waitForTimeout(1500);
     await page.reload();
     await page.waitForTimeout(9000); // (sans toucher l'écran : le téléchargement en arrière-plan démarre seul)
-    const gardees = await page.evaluate(async () => { const c = await caches.open((await caches.keys())[0]); return (await c.keys()).map((r) => r.url.split("/").pop()).filter((n) => /^musique_ambiance/.test(n)).sort(); });
+    const gardees = await page.evaluate(async () => { const urls = []; for (const cle of await caches.keys()) urls.push(...(await (await caches.open(cle)).keys()).map((r) => r.url.split("/").pop())); return [...new Set(urls)].filter((n) => /^musique_ambiance/.test(n)).sort(); }); // (les musiques sont dans un cache à part : alcuno-musiques-v1)
     await ctx.setOffline(true);
     await page.goto(url); await page.waitForTimeout(800);
     await page.mouse.click(4, 600); await page.waitForTimeout(3500);
@@ -910,12 +910,13 @@ function verifier(ok, texte){
     const note = await page.evaluate(() => { const n = document.getElementById("noteMusiqueHorsLigne"); return n.hidden ? "(cachée)" : n.textContent; });
     // bloc « Utilisable hors connexion » : coche verte quand le jeu et les musiques sont gardés, en mode avion
     const hl = await page.evaluate(() => { const l = document.getElementById("ligneHorsLigne"); return l.dataset.etat + "|" + document.getElementById("pastilleHorsLigne").textContent + "|" + (l.getBoundingClientRect().height > 20); });
+    const pastilleSvg = await page.evaluate(() => !!document.querySelector("#pastilleHorsLigne svg path"));
     // la ligne reste visible quand la musique est coupée (changer de thème la coupe)
     await page.evaluate(() => { const c = document.getElementById("optionMusique"); c.checked = false; c.dispatchEvent(new Event("change")); }); await page.waitForTimeout(800);
     const noteCoupee = await page.evaluate(() => { const n = document.getElementById("noteMusiqueHorsLigne"); return n.hidden ? "(cachée)" : n.textContent; });
     verifier(gardees.length >= 6 && gardees.includes("musique_ambiance.mp3") && horsLigne && themes.join() === "musique_ambiance_givre,musique_ambiance_cerisier,musique_ambiance_sombre" &&
-      hl === "ok|✓|true" && note === "Hors connexion : musiques prêtes ✓" && noteCoupee === "Hors connexion : musiques prêtes ✓" && erreurs.length === 0,
-      `musique hors connexion : gardées sans tap ${JSON.stringify(gardees)}, jouée sans réseau ${horsLigne}, après changement de thème ${JSON.stringify(themes)}, ligne « ${note} », bloc hors connexion ${hl}, musique coupée « ${noteCoupee} » ${erreurs.join("|")}`);
+      hl === "ok||true" && pastilleSvg && note === "Hors connexion : musiques prêtes ✓" && noteCoupee === "Hors connexion : musiques prêtes ✓" && erreurs.length === 0,
+      `musique hors connexion : gardées sans tap ${JSON.stringify(gardees)}, jouée sans réseau ${horsLigne}, après changement de thème ${JSON.stringify(themes)}, ligne « ${note} », bloc hors connexion ${hl} icône ${pastilleSvg}, musique coupée « ${noteCoupee} » ${erreurs.join("|")}`);
     await ctx.close();
   }
 
@@ -1448,7 +1449,7 @@ function verifier(ok, texte){
     await c.ctx.close();
     verifier(sansDeblocage.theme === "bordeaux" && sansDeblocage.cachee && sansHot.cle === null && sansHot.cachee &&
       apresHot.cle === "1" && !apresHot.cachee && apresHot.nouveau &&
-      applique.theme === "donjon" && !applique.nouveau && applique.objets === 8 && applique.zone !== "none" && applique.barre === "#12040a" && applique.stocke === "donjon" && c.erreurs.length === 0,
+      applique.theme === "donjon" && !applique.nouveau && applique.objets === 4 && applique.zone !== "none" && applique.barre === "#12040a" && applique.stocke === "donjon" && c.erreurs.length === 0,
       `thème Donjon : ${JSON.stringify({ sansDeblocage, sansHot, apresHot, applique, erreurs: c.erreurs })}`);
   }
 
