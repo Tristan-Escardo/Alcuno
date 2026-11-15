@@ -634,6 +634,17 @@
                     <textarea id="barIngredients" maxlength="1000" rows="6" placeholder="5 cl de rhum blanc&#10;2 cl de jus de citron vert"></textarea>
                     <label class="pilLabel" for="barPreparation">Préparation</label>
                     <textarea id="barPreparation" maxlength="1000" rows="4"></textarea>
+                    <!-- Version anglaise (jeu en anglais, Réglages > Langue) : facultative, champ par champ -->
+                    <div class="pilSous">Version anglaise (facultatif)</div>
+                    <p class="pilNote">Ce que voient les joueurs qui ont mis le jeu en anglais. Un champ laissé vide : le jeu reprend sa propre traduction pour les lignes que tu n'as pas changées, et laisse le français pour les autres. Il n'y a pas de traduction automatique.</p>
+                    <label class="pilLabel" for="barNomEn">Nom (anglais)</label>
+                    <input type="text" id="barNomEn" maxlength="50" autocomplete="off">
+                    <label class="pilLabel" for="barVerreEn">Verre (anglais)</label>
+                    <input type="text" id="barVerreEn" maxlength="60" autocomplete="off" placeholder="Ex : Tall glass">
+                    <label class="pilLabel" for="barIngredientsEn">Ingrédients (anglais, un par ligne)</label>
+                    <textarea id="barIngredientsEn" maxlength="1000" rows="6" placeholder="5 cl white rum&#10;2 cl lime juice"></textarea>
+                    <label class="pilLabel" for="barPreparationEn">Préparation (anglais)</label>
+                    <textarea id="barPreparationEn" maxlength="1000" rows="4"></textarea>
                     <button type="button" class="pilBtn" id="barEnregistrer">Enregistrer</button>
                     <button type="button" class="pilBtn sec" id="barAnnuler">Annuler</button>
                 </div>
@@ -820,7 +831,7 @@
         });
         const authPorte = getAuth(app);
         // Version de la page de stats (à part de celle du jeu : +0.0.1 à chaque modification de cette page)
-        const VERSION_STATS = "1.23.0";
+        const VERSION_STATS = "1.24.0";
         document.getElementById("versionStats").textContent = VERSION_STATS;
         document.getElementById("versionStats2").textContent = VERSION_STATS;
         document.getElementById("versionStats3").textContent = VERSION_STATS;
@@ -1304,6 +1315,8 @@
                 $("barFormTitre").textContent = c ? "Modifier : " + c.n : "Nouveau cocktail";
                 $("barNom").value = c ? c.n : ""; $("barFamille").value = c ? c.g : (ConfigLib.FAMILLES_BAR[0][0]);
                 $("barVerre").value = c ? c.v : ""; $("barIngredients").value = c ? c.i.join("\n") : ""; $("barPreparation").value = c ? c.p : "";
+                const en = (c && c.en) || {};
+                $("barNomEn").value = en.n || ""; $("barVerreEn").value = en.v || ""; $("barIngredientsEn").value = en.i || ""; $("barPreparationEn").value = en.p || "";
                 $("barForm").hidden = false; $("barNouveau").hidden = true;
                 $("barForm").scrollIntoView({ behavior: "smooth", block: "start" });
             }
@@ -1312,14 +1325,15 @@
                 const r = ConfigLib.appliquer(config, cmd, Date.now());
                 if (r.erreur) { messageBar(r.erreur, true); return false; }
                 try { await ecrire(r.config, r.resume); messageBar("C'est fait ✓ : " + r.resume); return true; }
-                catch (e) { messageBar(/PERMISSION|permission/.test(String(e && e.message)) ? "Refusé par Firebase : les règles en ligne ne connaissent pas encore les recettes du Bar (publie database.rules.json)." : "Échec : " + (e && e.message ? e.message : e), true); return false; }
+                catch (e) { messageBar(/PERMISSION|permission/.test(String(e && e.message)) ? "Refusé par Firebase : les règles en ligne ne connaissent pas encore les recettes du Bar ou leur version anglaise (publie database.rules.json)." : "Échec : " + (e && e.message ? e.message : e), true); return false; }
             }
             $("barNouveau").addEventListener("click", () => ouvrirFormBar(null));
             $("barAnnuler").addEventListener("click", fermerFormBar);
             $("barCherche").addEventListener("input", dessinerBar);
             $("barEnregistrer").addEventListener("click", async () => {
                 if (!barEdite) return;
-                const cocktail = { n: $("barNom").value, g: $("barFamille").value, v: $("barVerre").value, i: $("barIngredients").value, p: $("barPreparation").value };
+                const cocktail = { n: $("barNom").value, g: $("barFamille").value, v: $("barVerre").value, i: $("barIngredients").value, p: $("barPreparation").value,
+                    en: { n: $("barNomEn").value, v: $("barVerreEn").value, i: $("barIngredientsEn").value, p: $("barPreparationEn").value } };
                 const b = $("barEnregistrer"); b.disabled = true;
                 const ok = await lancerBar({ op: "bar_enregistrer", id: barEdite.id, jeu: barEdite.jeu, cocktail });
                 b.disabled = false;

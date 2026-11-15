@@ -36,12 +36,26 @@ function ouvrirPageExtras(mode, titre){
 
 const EMOJIS_BAR = { rhum: "🍹", vodka: "🍸", gin: "🌿", tequila: "🌵", whisky: "🥃", bulles: "🥂", shooter: "🔥", sans: "🧃" };
 
+// Jeu en anglais : une recette du Bar dans sa version anglaise. Dans l'ordre : le texte anglais saisi dans le pilotage
+// (stats.html, onglet Bar : c.en), sinon la traduction du jeu (js/en.js) pour chaque morceau resté tel quel (nom, verre,
+// chaque ingrédient, préparation), sinon le français. Une recette du jeu dont on n'a changé qu'un ingrédient reste donc
+// en anglais partout ailleurs.
+function cocktailEnAnglais(c){
+  const en = c.en || {};
+  const lignesEn = en.i ? en.i.split("\n") : null;
+  return Object.assign({}, c, {
+    n: en.n || tr(c.n), v: en.v || tr(c.v),
+    i: lignesEn && lignesEn.length ? lignesEn : c.i.map((l) => tr(l)),
+    p: en.p || tr(c.p)
+  });
+}
+
 function remplirListeBar(zone){
   zone.textContent = "";
   const cherche = simplifierTexteBar(rechercheBar.trim());
-  // (jeu en anglais : les recettes du jeu sont traduites, js/en.js ; celles modifiées ou ajoutées depuis le pilotage restent telles quelles)
+  // (jeu en anglais : voir cocktailEnAnglais)
   const trouves = cocktailsBar(typeof configDistante === "object" ? configDistante : null)
-    .map((c) => (estAnglais && c.jeu && !c.modifie ? Object.assign({}, c, { n: tr(c.n), v: tr(c.v), i: c.i.map((l) => tr(l)), p: tr(c.p) }) : c)).filter((c) => (!familleBar || c.g === familleBar) &&
+    .map((c) => (estAnglais ? cocktailEnAnglais(c) : c)).filter((c) => (!familleBar || c.g === familleBar) &&
     (!cherche || simplifierTexteBar(c.n + " " + c.i.join(" ")).includes(cherche)));
   if (!trouves.length) {
     const vide = elementExtras("div", "blocRegles");

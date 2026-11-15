@@ -136,14 +136,14 @@ function cocktailsBar(config, avecMasques){
     const id = idCocktail(c.n), m = bar[id];
     if (m && m.x && !avecMasques) return;
     const base = { id, n: c.n, g: c.g, v: c.v, i: c.i.slice(), p: c.p, jeu: true, modifie: false, masque: !!(m && m.x) };
-    if (m && m.n) Object.assign(base, { n: m.n, g: m.g, v: m.v, i: m.i.split("\n"), p: m.p, modifie: true });
+    if (m && m.n) Object.assign(base, { n: m.n, g: m.g, v: m.v, i: m.i.split("\n"), p: m.p, en: m.en || null, modifie: true });
     liste.push(base);
   });
   const ids = new Set(liste.map((c) => c.id));
   Object.keys(bar).sort().forEach((id) => {
     const m = bar[id];
     if (ids.has(id) || COCKTAILS.some((c) => idCocktail(c.n) === id) || !m.n) return;
-    liste.push({ id, n: m.n, g: m.g, v: m.v, i: m.i.split("\n"), p: m.p, jeu: false, modifie: false, masque: false });
+    liste.push({ id, n: m.n, g: m.g, v: m.v, i: m.i.split("\n"), p: m.p, en: m.en || null, jeu: false, modifie: false, masque: false });
   });
   return liste;
 }

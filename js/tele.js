@@ -305,6 +305,7 @@ function etatPourTele(){
     couleur: couleurChoisie || "",
     regles,
     theme: document.documentElement.dataset.theme || "bordeaux",
+    langue: LANGUE, // (la télé passe dans la langue du téléphone qui caste, js/langue.js)
     voix: voixActive ? 1 : 0, // (réglage « Annonces à voix haute » : la télé lit alors les annonces, js/reglages.js)
     vitesseVoix, // (et à la vitesse choisie sur le téléphone)
     pause: !!pauseEnCours,
@@ -496,7 +497,10 @@ function creerDecorKawaiiTele(){
 }
 
 function demarrerPageTele(){
-  const code = genererCodeTele();
+  // (page rechargée pour prendre la langue du téléphone, voir dessinerTele : même code, le téléphone reste relié)
+  let codeGarde = "";
+  try { codeGarde = codeTeleDepuisTexte(sessionStorage.getItem("alcuno_tele_code_ecran") || ""); sessionStorage.removeItem("alcuno_tele_code_ecran"); } catch (e) {}
+  const code = codeGarde || genererCodeTele();
   const lien = `${ADRESSE_SITE_TELE}?caster=${code}`;
   appliquerThemeTele(THEME_TELE_ATTENTE);
 
@@ -551,6 +555,7 @@ function demarrerPageTele(){
   ecran.querySelector(".tele-jeu").prepend(creerDecorKawaiiTele());
   ecran.querySelector(".tele-ecran").prepend(creerDecorKawaiiTele());
   document.body.appendChild(ecran);
+  ecran.dataset.codeTele = code;
 
   const qr = qrcode(0, "M");
   qr.addData(lien);
@@ -901,6 +906,22 @@ function dessinerTele(ecran, etat){
     pauseMusiqueTele = false;
     majMusique();
     return;
+  }
+  // Langue du téléphone qui caste : la télé la prend (sinon : règles en anglais venues du téléphone, libellés de la télé en
+  // français). La langue se choisit au chargement, donc on recharge ; le code de la télé est gardé (sessionStorage), le
+  // téléphone reste relié. Une seule tentative par minute, au cas où le réglage ne s'enregistrerait pas.
+  if ((etat.langue === "en" || etat.langue === "fr") && etat.langue !== LANGUE) {
+    let dernier = 0;
+    try { dernier = Number(sessionStorage.getItem("alcuno_tele_langue_a")) || 0; } catch (e) {}
+    if (Date.now() - dernier > 60000) {
+      try {
+        sessionStorage.setItem("alcuno_tele_langue_a", String(Date.now()));
+        localStorage.setItem(CLE_LANGUE, etat.langue);
+        sessionStorage.setItem("alcuno_tele_code_ecran", ecran.dataset.codeTele || "");
+        location.reload();
+        return;
+      } catch (e) {}
+    }
   }
   attente.hidden = true;
   jeu.hidden = false;

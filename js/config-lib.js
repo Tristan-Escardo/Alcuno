@@ -15,7 +15,7 @@
 //   defisHot  : { <id>: { t, n } }           défis du mode hot ajoutés depuis le pilotage, mélangés à ceux du jeu
 //                                              (t : texte avec {nom}, ou {nom1} et {nom2} ; n : niveau A, B ou C, comme dans js/mode-hot.js)
 //   defisMasques : { <id>: true }              défis du jeu (A1, B12… de js/mode-hot.js) qui ne sortent plus
-//   bar       : { <id>: { n, g, v, i, p, x } }  recettes du Bar (js/cocktails.js) : <id> d'une recette du jeu = sa version modifiée
+//   bar       : { <id>: { n, g, v, i, p, x, en } }  recettes du Bar (js/cocktails.js) : <id> d'une recette du jeu = sa version modifiée
 //                                              (x:true : masquée), autre <id> = recette ajoutée. n : nom, g : famille (FAMILLES_BAR),
 //                                              v : verre, i : ingrédients (une ligne chacun, séparés par « \n »), p : préparation
 //   v         : date de la dernière modification (ms) : les appareils la renvoient dans stats/appareils (voyant du pilotage)
@@ -71,11 +71,28 @@
     if (c.i.length > BAR_TEXTE_MAX) return `Ingrédients trop longs (${BAR_TEXTE_MAX} caractères max).`;
     if (typeof c.p !== "string" || !c.p.trim()) return "Il manque la préparation.";
     if (c.p.trim().length > BAR_TEXTE_MAX) return `Préparation trop longue (${BAR_TEXTE_MAX} caractères max).`;
+    // Version anglaise (facultative) : en { n, v, i, p }, chaque texte facultatif
+    if (c.en !== undefined && c.en !== null) {
+      if (!estObjet(c.en)) return "Version anglaise illisible.";
+      const max = { n: BAR_NOM_MAX, v: BAR_VERRE_MAX, i: BAR_TEXTE_MAX, p: BAR_TEXTE_MAX };
+      for (const k of Object.keys(c.en)) {
+        if (!max[k] || typeof c.en[k] !== "string") return "Version anglaise illisible.";
+        if (c.en[k].trim().length > max[k]) return `Version anglaise : texte trop long (${max[k]} caractères max).`;
+      }
+    }
     return null;
   }
   // La même, nettoyée (espaces, lignes vides)
   function propreCocktail(c) {
-    return { n: c.n.trim(), g: c.g, v: c.v.trim(), i: c.i.split("\n").map((l) => l.trim()).filter(Boolean).join("\n"), p: c.p.trim() };
+    const lignes = (t) => t.split("\n").map((l) => l.trim()).filter(Boolean).join("\n");
+    const r = { n: c.n.trim(), g: c.g, v: c.v.trim(), i: lignes(c.i), p: c.p.trim() };
+    // (version anglaise : seulement les textes remplis ; rien du tout si tout est vide)
+    if (estObjet(c.en)) {
+      const en = {};
+      ["n", "v", "i", "p"].forEach((k) => { const t = typeof c.en[k] === "string" ? (k === "i" ? lignes(c.en[k]) : c.en[k].trim()) : ""; if (t) en[k] = t; });
+      if (Object.keys(en).length) r.en = en;
+    }
+    return r;
   }
   const motifIdDefiJeu = /^(H?[AB]|C)[0-9]{1,3}$/; // (HA / HB : mode hard)
 

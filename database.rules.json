@@ -114,6 +114,13 @@
           "i": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 1000" },
           "p": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 1000" },
           "x": { ".validate": "newData.val() === true" },
+          "en": {
+            "n": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 50" },
+            "v": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 60" },
+            "i": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 1000" },
+            "p": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 1000" },
+            "$autre": { ".validate": false }
+          },
           "$autre": { ".validate": false }
         }
       },
