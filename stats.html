@@ -817,7 +817,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
         import { getDatabase, ref, onValue, get, update, set, query, orderByKey, limitToLast, remove } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
-        import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, OAuthProvider, signInWithCredential, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
         // L'accès se fait avec le compte administrateur Firebase (e-mail + mot de passe) : les règles de la base ne laissent lire
         // les statistiques, la santé et la présence qu'à ce compte. La session est gardée par Firebase : on ne retape rien ensuite.
@@ -832,7 +832,7 @@
         });
         const authPorte = getAuth(app);
         // Version de la page de stats (à part de celle du jeu : +0.0.1 à chaque modification de cette page)
-        const VERSION_STATS = "1.24.1";
+        const VERSION_STATS = "1.24.2";
         document.getElementById("versionStats").textContent = VERSION_STATS;
         document.getElementById("versionStats2").textContent = VERSION_STATS;
         document.getElementById("versionStats3").textContent = VERSION_STATS;
@@ -955,15 +955,54 @@
         });
 
 
-        // Compte administrateur devenu « Google » : même identifiant Firebase (uid), donc mêmes droits qu'avec l'e-mail
+        // Compte administrateur devenu « Google » : même identifiant Firebase (uid), donc mêmes droits qu'avec l'e-mail.
+        // Navigateur : fenêtre Google. Appli installée (la fenêtre ne s'y ouvre pas) : on passe par la page Google, qui revient
+        // ici avec un jeton dans l'adresse (même méthode que le profil joueur, js/profil.js). L'adresse de cette page doit être
+        // dans les « URI de redirection autorisés » du client OAuth (Google Cloud Console, voir PILOTAGE.md).
+        const ID_CLIENT_GOOGLE = "481896309098-0a4v9j6saqfav3d9maej4qedbi0tsjr8.apps.googleusercontent.com";
+        const CLE_ALLER_STATS = "alcuno_stats_google_aller";
+        const adresseStats = location.origin + location.pathname;
+        const appliInstallee = () => { try { return navigator.standalone === true || window.matchMedia("(display-mode: standalone)").matches; } catch (e) { return false; } };
+        const hasardStats = () => Array.from(crypto.getRandomValues(new Uint32Array(4)), (n) => n.toString(16).padStart(8, "0")).join("");
+        const empreinteStats = (t) => crypto.subtle.digest("SHA-256", new TextEncoder().encode(t)).then((h) => Array.from(new Uint8Array(h), (o) => o.toString(16).padStart(2, "0")).join(""));
+        const erreurGoogle = (err) => {
+            const m = { "auth/popup-closed-by-user": "Fenêtre Google fermée.", "auth/unauthorized-domain": "Ce site n'est pas dans Firebase → Authentication → Paramètres → Domaines autorisés.", "auth/operation-not-allowed": "La connexion Google n'est pas activée dans Firebase.", "auth/missing-or-invalid-nonce": "Jeton Google refusé, réessaie." };
+            document.getElementById("erreurPorte").textContent = m[err.code] || ("Connexion refusée : " + (err.code || err.message || err));
+        };
+        async function allerChezGoogleStats(){
+            const nonce = hasardStats(), hache = await empreinteStats(nonce);
+            const aller = { etat: hasardStats(), nonce, hache, quand: Date.now() };
+            localStorage.setItem(CLE_ALLER_STATS, JSON.stringify(aller));
+            location.assign("https://accounts.google.com/o/oauth2/v2/auth?" + new URLSearchParams({
+                client_id: ID_CLIENT_GOOGLE, redirect_uri: adresseStats, response_type: "id_token", scope: "openid email profile",
+                nonce: hache, state: aller.etat, prompt: "select_account" }));
+        }
         document.getElementById("porteGoogle").addEventListener("click", async () => {
             document.getElementById("erreurPorte").textContent = "";
-            try { await signInWithPopup(authPorte, new GoogleAuthProvider()); }
-            catch (err) {
-                const m = { "auth/popup-closed-by-user": "Fenêtre Google fermée.", "auth/popup-blocked": "Fenêtre bloquée par le navigateur : autorise-la.", "auth/unauthorized-domain": "Ce site n'est pas dans Firebase → Authentication → Paramètres → Domaines autorisés.", "auth/operation-not-allowed": "La connexion Google n'est pas activée dans Firebase." };
-                document.getElementById("erreurPorte").textContent = m[err.code] || ("Connexion refusée : " + (err.code || err.message));
+            try {
+                if (appliInstallee()) { await allerChezGoogleStats(); return; }
+                await signInWithPopup(authPorte, new GoogleAuthProvider());
+            } catch (err) {
+                if (err && (err.code === "auth/popup-blocked" || err.code === "auth/operation-not-supported-in-this-environment")) { try { await allerChezGoogleStats(); return; } catch (e) {} }
+                erreurGoogle(err);
             }
         });
+        // Retour de la page Google : jeton dans l'adresse (#id_token=…). On le retire tout de suite de l'adresse (les onglets l'utilisent aussi).
+        { const h = location.hash;
+          if (/^#(id_token|error)=/.test(h) || /[#&]id_token=/.test(h)) {
+              try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
+              const p = new URLSearchParams(h.slice(1));
+              let aller = null;
+              try { aller = JSON.parse(localStorage.getItem(CLE_ALLER_STATS) || "null"); localStorage.removeItem(CLE_ALLER_STATS); } catch (e) {}
+              const jeton = p.get("id_token");
+              let nonce = "";
+              try { nonce = JSON.parse(atob(jeton.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))).nonce; } catch (e) {}
+              if (aller && p.get("state") === aller.etat && Date.now() - aller.quand < 10 * 60 * 1000 && jeton && nonce === aller.hache) {
+                  signInWithCredential(authPorte, new OAuthProvider("google.com").credential({ idToken: jeton, rawNonce: aller.nonce })).catch(erreurGoogle);
+              } else if (p.get("error") && p.get("error") !== "access_denied") {
+                  document.getElementById("erreurPorte").textContent = "Google a refusé : " + p.get("error");
+              }
+          } }
 
         // ===== Données =====
         const nombre = (n) => n.toLocaleString("fr-FR");

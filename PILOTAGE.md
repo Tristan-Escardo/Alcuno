@@ -172,6 +172,8 @@ encore activée pour le jeu ») :
    `https://tristan-escardo.github.io/Alcuno/` (exactement, avec la barre finale) → Enregistrer. Ne retire pas l'URI
    `https://alcuno.firebaseapp.com/__/auth/handler` déjà présent. Sans ça, dans l'appli installée, la page Google répond
    « Accès bloqué : redirect_uri_mismatch ». Si le jeu est servi à une autre adresse, ajoute-la aussi.
+   Pour **l'appli Stats installée** (bouton « Se connecter avec Google » de l'écran d'accès), ajoute aussi
+   `https://tristan-escardo.github.io/Alcuno/stats.html` (exactement) : même chemin, même compte administrateur.
 
 Ce qui est enregistré : `profils/<uid>` (déblocages, stickers, réglages), lisible et modifiable **seulement par son propriétaire**
 (pas même par le compte administrateur depuis le jeu ; tu le vois dans la console Firebase). Ni nom ni e-mail dans la base : ils sont
