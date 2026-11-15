@@ -137,6 +137,20 @@
         .barre.large{ align-items: center; }
         .barre.large .nom{ flex: none; width: 44%; white-space: normal; overflow-wrap: anywhere; line-height: 1.15; }
         .barre.large .pc{ width: auto; min-width: 70px; white-space: nowrap; }
+        /* Infos en temps réel : une carte par appareil (état, il y a …, lieu, fournisseur, puces de détails) */
+        .direct #pubDirectListe{ text-align: left; display: grid; gap: 10px; }
+        .liveCarte{ padding: 12px 14px; border: 1px solid rgba(0, 229, 255, .22); border-radius: 14px; background: rgba(0, 229, 255, .05); }
+        .liveHaut{ display: flex; justify-content: space-between; align-items: center; gap: 10px; min-height: 22px; margin-bottom: 4px; }
+        .liveHaut:has(.liveIl:only-child){ justify-content: flex-end; min-height: 0; margin-bottom: 0; }
+        .liveEtat{ font-size: 12px; font-weight: 800; letter-spacing: .3px; padding: 3px 10px; border-radius: 999px; background: rgba(0, 229, 255, .16); color: var(--cyan-clair); }
+        .liveEtat.e-classique{ background: rgba(120, 220, 140, .18); color: #9ff0b0; }
+        .liveEtat.e-enligne{ background: rgba(255, 190, 90, .18); color: #ffd28a; }
+        .liveEtat.e-tele{ background: rgba(190, 150, 255, .2); color: #d9c2ff; }
+        .liveIl{ font-size: 12.5px; font-weight: 600; color: #6fa3bb; }
+        .liveLieu{ font-size: 18px; font-weight: 800; color: var(--cyan-clair); line-height: 1.25; }
+        .liveFai{ margin-top: 2px; font-size: 13px; color: #7fb0c8; overflow-wrap: anywhere; }
+        .livePuces{ display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+        .livePuce{ font-size: 12.5px; line-height: 1.2; padding: 4px 9px; border-radius: 999px; border: 1px solid rgba(0, 229, 255, .2); background: rgba(0, 0, 0, .18); color: var(--cyan-doux); }
         .appLigne{ padding: 10px 0; border-top: 1px solid rgba(0, 229, 255, .14); }
         .appLigne:first-child{ border-top: 0; padding-top: 0; }
         .appLieu{ display: flex; justify-content: space-between; gap: 10px; font-size: 16px; font-weight: 700; color: var(--cyan-clair); }
@@ -832,7 +846,7 @@
         });
         const authPorte = getAuth(app);
         // Version de la page de stats (à part de celle du jeu : +0.0.1 à chaque modification de cette page)
-        const VERSION_STATS = "1.24.3";
+        const VERSION_STATS = "1.24.4";
         document.getElementById("versionStats").textContent = VERSION_STATS;
         document.getElementById("versionStats2").textContent = VERSION_STATS;
         document.getElementById("versionStats3").textContent = VERSION_STATS;
@@ -2123,24 +2137,25 @@ Données (stats ; « jours » = les 45 derniers jours, « visiteurs » du jour =
             }
             // ----- Public : qui a le jeu ouvert maintenant, avec tout ce qu'on sait de chaque appareil -----
             // (la présence et la fiche de l'appareil portent le même identifiant : on les rapproche. Rien de plus n'est écrit par les joueurs.)
-            const NOMS_ETATS = { menu: "Au menu", classique: "Partie classique", enligne: "Partie en ligne", tele: "Télé castée" };
+            const NOMS_ETATS = { menu: "", classique: "Partie classique", enligne: "Partie en ligne", tele: "Télé castée" };
             function dessinerDirectPublic(){
                 const zone = document.getElementById("pubDirectListe"), leg = document.getElementById("pubDirectLegende");
                 const vivants = Object.entries(presences || {})
-                    .filter(([, p]) => p && NOMS_ETATS[p.etat] && maintenant() - Number(p.maj || 0) < PRESENCE_VALABLE)
+                    .filter(([, p]) => p && Object.prototype.hasOwnProperty.call(NOMS_ETATS, p.etat) && maintenant() - Number(p.maj || 0) < PRESENCE_VALABLE)
                     .sort((x, y) => Number(y[1].maj || 0) - Number(x[1].maj || 0));
                 const fiches = donnees.appareils || {};
                 leg.textContent = vivants.length ? `${nombre(vivants.length)} ${pluriel(vivants.length, "appareil")} connecté${vivants.length > 1 ? "s" : ""} en ce moment.` : "Personne n'a le jeu ouvert en ce moment.";
                 zone.innerHTML = vivants.map(([id, p]) => {
                     const a = fiches[id] && typeof fiches[id] === "object" ? fiches[id] : null;
-                    if (!a) return `<div class="appLigne"><div class="appLieu"><span>${echapperStats(NOMS_ETATS[p.etat])}</span><small>${echapperStats(ilYAPublic(Number(p.maj || 0)))}</small></div><div class="appMeta">Appareil inconnu (télé, ou fiche pas encore écrite)</div></div>`;
+                    const etat = NOMS_ETATS[p.etat] ? `<span class="liveEtat e-${echapperStats(p.etat)}">${echapperStats(NOMS_ETATS[p.etat])}</span>` : "";
+                    const il = `<span class="liveIl">${echapperStats(ilYAPublic(Number(p.maj || 0)))}</span>`;
+                    if (!a) return `<div class="liveCarte"><div class="liveHaut">${etat}${il}</div><div class="liveLieu">Appareil inconnu</div><div class="liveFai">télé, ou fiche pas encore écrite</div></div>`;
                     const c = /^[A-Z]{2}$/.test(a.pays || "") ? a.pays : "";
-                    const lieu = c ? drapeau(c) + ([a.ville, a.region].filter(Boolean).join(", ") || nomPays(c).replace(drapeau(c), "")) : "Lieu inconnu";
+                    const lieu = c ? drapeau(c) + " " + ([a.ville, a.region].filter(Boolean).join(", ") || nomPays(c).replace(drapeau(c), "").trim()) : "Lieu inconnu";
                     let heure = "";
-                    try { if (a.fuseau) heure = "il est " + new Intl.DateTimeFormat("fr-FR", { timeZone: a.fuseau, hour: "2-digit", minute: "2-digit" }).format(new Date(maintenant())) + " chez lui"; } catch (e) {}
-                    const quoi = [NOMS_TYPES[a.type] || NOMS_OS[a.os], a.osv, a.nav, pixelsEcran(a.ecran), a.langue && "langue " + nomLangue(a.langue), a.fuseau && nomFuseau(a.fuseau), heure, a.version && "jeu " + a.version, a.installe && "installé"].filter(Boolean);
-                    const theme = a.theme ? "Thème : " + (NOMS_THEMES[a.theme] || a.theme) : "";
-                    return `<div class="appLigne"><div class="appLieu"><span>${echapperStats(NOMS_ETATS[p.etat])} · ${echapperStats(lieu)}</span><small>${echapperStats(ilYAPublic(Number(p.maj || 0)))}</small></div>${theme ? `<div class="appMeta">${echapperStats(theme)}</div>` : ""}${a.fai ? `<div class="appMeta">${echapperStats(a.fai)}</div>` : ""}<div class="appMeta">${echapperStats(quoi.join(" · "))}</div></div>`;
+                    try { if (a.fuseau) heure = "🕒 " + new Intl.DateTimeFormat("fr-FR", { timeZone: a.fuseau, hour: "2-digit", minute: "2-digit" }).format(new Date(maintenant())) + " chez lui"; } catch (e) {}
+                    const puces = [a.theme && "🎨 " + (NOMS_THEMES[a.theme] || a.theme), NOMS_TYPES[a.type] || NOMS_OS[a.os], a.osv, a.nav, pixelsEcran(a.ecran), a.langue && nomLangue(a.langue), a.fuseau && nomFuseau(a.fuseau), heure, a.version && "jeu " + a.version, a.installe && "installé"].filter(Boolean);
+                    return `<div class="liveCarte"><div class="liveHaut">${etat}${il}</div><div class="liveLieu">${echapperStats(lieu)}</div>${a.fai ? `<div class="liveFai">${echapperStats(a.fai)}</div>` : ""}<div class="livePuces">${puces.map((t) => `<span class="livePuce">${echapperStats(t)}</span>`).join("")}</div></div>`;
                 }).join("");
             }
             directPret = true;
