@@ -3674,6 +3674,29 @@ html.accessibilite #overlayCoupDeFoudre .plus4-joueur-btn{
   touch-action: manipulation;
 }
 
+/* ===== Réglages : « Profil joueur » (js/profil.js) : petit lien discret « Supprimer mon profil » sous la ligne, une fois connecté ===== */
+#ecranReglages .profilSupprimer{
+  margin: 8px 0 0;
+  text-align: right;
+  font-size: 13px;
+  font-weight: 700;
+}
+#ecranReglages .profilSupprimer[hidden]{ display: none; }
+#ecranReglages #btnProfilSupprimer{
+  padding: 8px 6px;
+  font: inherit;
+  color: rgba(255,255,255,0.6);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+#ecranReglages #btnProfilConnexion:disabled{ opacity: 0.55; cursor: default; }
+html[data-theme="givre"] #ecranReglages #btnProfilSupprimer{ color: var(--givre-doux); }
+html[data-theme="soleil"] #ecranReglages #btnProfilSupprimer{ color: #3a1f4a; }
+
 /* ===== Réglages : Partager le jeu (QR code + bouton « Partager ») ===== */
 #ecranReglages .blocPartage{
   margin-top: 10px;
