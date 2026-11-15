@@ -835,9 +835,9 @@ function verifier(ok, texte){
     const ordre = () => page.evaluate(() => [...document.querySelectorAll("#ecranReglages .reglages-contenu > [data-cle]")].map((e) => e.dataset.cle).join(","));
     await page.click("#btnReglages"); await page.waitForTimeout(600);
     const origine = await ordre();
-    const avant = await page.evaluate(() => ({ defaut: getComputedStyle(document.getElementById("btnParDefautReglages")).display, texte: document.getElementById("btnModifierReglages").textContent, poignees: document.querySelectorAll(".ctrlReglage").length }));
+    const avant = await page.evaluate(() => ({ defaut: getComputedStyle(document.getElementById("btnParDefautReglages")).display, texte: document.getElementById("btnModifierReglages").getAttribute("aria-label"), poignees: document.querySelectorAll(".ctrlReglage").length }));
     await page.click("#btnModifierReglages"); await page.waitForTimeout(400);
-    const pendant = await page.evaluate(() => ({ edition: document.getElementById("ecranReglages").classList.contains("reglages-edition"), texte: document.getElementById("btnModifierReglages").textContent,
+    const pendant = await page.evaluate(() => ({ edition: document.getElementById("ecranReglages").classList.contains("reglages-edition"), texte: document.getElementById("btnModifierReglages").getAttribute("aria-label"),
       defaut: getComputedStyle(document.getElementById("btnParDefautReglages")).display, poignees: document.querySelectorAll(".ctrlReglage .ctrlPoignee").length, fleches: document.querySelectorAll(".ctrlHaut, .ctrlBas").length,
       tremble: getComputedStyle(document.querySelector('#ecranReglages .reglages-contenu > [data-cle]')).animationName,
       // une poignée par bloc visible, et chacune à la hauteur de « son » bloc (avant : celle d'un bloc caché restait en haut de la page)
@@ -856,7 +856,7 @@ function verifier(ok, texte){
     await page.mouse.up(); await page.waitForTimeout(300);
     const apresGlisse = await ordre();
     await page.click("#btnModifierReglages"); await page.waitForTimeout(300);
-    const fini = await page.evaluate(() => ({ edition: document.getElementById("ecranReglages").classList.contains("reglages-edition"), controles: document.querySelectorAll(".ctrlReglage").length, texte: document.getElementById("btnModifierReglages").textContent }));
+    const fini = await page.evaluate(() => ({ edition: document.getElementById("ecranReglages").classList.contains("reglages-edition"), controles: document.querySelectorAll(".ctrlReglage").length, texte: document.getElementById("btnModifierReglages").getAttribute("aria-label") }));
     await page.reload(); await page.waitForTimeout(700);
     await page.click("#btnReglages"); await page.waitForTimeout(500);
     const rechargee = await ordre();
@@ -867,15 +867,15 @@ function verifier(ok, texte){
     await page.click("#btnModifierReglages"); await page.waitForTimeout(300);
     const interrupteur = await page.evaluate(() => { const c = document.getElementById("optionVibrations"), v = c.checked; c.click(); return c.checked !== v; });
     // « Partager » et « À propos » : pas de poignée et toujours en bas, même après avoir réorganisé (vérifié ici avant l'ordre d'origine, plus haut après le glisser)
-    const queue = await page.evaluate(() => { const e = [...document.querySelectorAll("#ecranReglages .reglages-contenu > *")].filter((x) => x.id !== "controlesReglages"); return e.slice(-2).map((x) => x.className).join(","); });
+    const queue = await page.evaluate(() => { const e = [...document.querySelectorAll("#ecranReglages .reglages-contenu > *")].filter((x) => x.id !== "controlesReglages" && !x.classList.contains("enteteGroupe")); return e.slice(-2).map((x) => x.classList.contains("blocPartage") ? "blocPartage" : x.classList.contains("aPropos") ? "aPropos" : x.className).join(","); });
     const fixesSansPoignee = await page.evaluate(() => !document.querySelector('.blocPartage[data-cle], .aPropos[data-cle], .ctrlReglage[data-pour="partage"], .ctrlReglage[data-pour="a-propos"]'));
     const attendueFleche = origine.replace("sons,musique", "musique,sons");
     // glisser : « voix » est monté (la distance exacte dépend du défilement), sans qu'aucun bloc ne soit perdu ni dupliqué
     const monte = apresGlisse.split(",").indexOf("voix") < apresFleche.split(",").indexOf("voix") && apresGlisse.split(",").sort().join() === apresFleche.split(",").sort().join();
     const attendueGlisse = apresGlisse;
-    verifier(avant.defaut === "none" && avant.texte === "Modifier" && avant.poignees === 0 && pendant.edition && pendant.texte === "OK" && pendant.defaut !== "none" &&
-      pendant.poignees >= 14 && pendant.fleches === 0 && pendant.tremble === "none" && pendant.poigneesVisibles === pendant.visibles && pendant.desalignees === 0 && pendant.poignees === 14 && apresFleche === attendueFleche && monte &&
-      !fini.edition && fini.controles === 0 && fini.texte === "Modifier" && rechargee === attendueGlisse && parDefaut === origine && stocke === null && interrupteur && queue === "blocPartage,aPropos" && fixesSansPoignee && erreurs.length === 0,
+    verifier(avant.defaut === "none" && avant.texte === "Réorganiser les réglages" && avant.poignees === 0 && pendant.edition && pendant.texte === "Terminer la modification" && pendant.defaut !== "none" &&
+      pendant.poignees >= 14 && pendant.fleches === 0 && pendant.tremble === "none" && pendant.poigneesVisibles === pendant.visibles && pendant.desalignees === 0 && pendant.poignees === 15 && apresFleche === attendueFleche && monte &&
+      !fini.edition && fini.controles === 0 && fini.texte === "Réorganiser les réglages" && rechargee === attendueGlisse && parDefaut === origine && stocke === null && interrupteur && queue === "blocPartage,aPropos" && fixesSansPoignee && erreurs.length === 0,
       `réglages réorganisables : avant ${JSON.stringify(avant)}, pendant ${JSON.stringify(pendant)}, flèche ${apresFleche === attendueFleche}, glisser monté ${monte} (${apresGlisse}), fini ${JSON.stringify(fini)}, rechargé ${rechargee === attendueGlisse}, par défaut ${parDefaut === origine}, stocké ${stocke}, interrupteur ${interrupteur}, fin de page ${queue}, fixes sans poignée ${fixesSansPoignee} ${erreurs.join("|")}`);
     await ctx.close();
   }
@@ -1361,7 +1361,7 @@ function verifier(ok, texte){
 
   // 48b. « Ta partie » : Mode PJ, express et hot ne sont plus enregistrés ; décochés au chargement (anciennes clés effacées) et à chaque ouverture
   {
-    const { ctx, page, erreurs } = await ouvrir({}, `try{["alcuno_mode_hot","alcuno_mode_soft","alcuno_partie_express"].forEach((c) => localStorage.setItem(c, "1"))}catch(e){}`);
+    const { ctx, page, erreurs } = await ouvrir({}, `try{if(window.top===window)["alcuno_mode_hot","alcuno_mode_soft","alcuno_partie_express"].forEach((c) => localStorage.setItem(c, "1"))}catch(e){}`); // (document principal seulement : le script tourne aussi dans les cadres about:blank de l'appli, qui remettraient les clés)
     const ids = ["optionModeSoft", "optionPartieExpress", "optionModeHot"];
     const lire = () => page.evaluate((ids) => ({ cases: ids.map((i) => document.getElementById(i).checked),
       cles: ["alcuno_mode_hot", "alcuno_mode_soft", "alcuno_partie_express"].map((c) => localStorage.getItem(c)) }), ids);
