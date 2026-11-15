@@ -10054,9 +10054,17 @@ html[data-theme="noir"] body :is(#btnBarAccueil, #btnEthyloAccueil){ border-colo
 html[data-theme="noir"] body :is(#btnBarAccueil, #btnEthyloAccueil)::before{ border-color: var(--noir-btn-bord) !important; }
 
 /* Réglages en Tuiles, dans TOUS les thèmes : plus de cadre (le « carré ») autour de la tuile ouverte.
-   On la reconnaît parce que les autres tuiles sont atténuées (classe avecChoix, js/reglages-vue.js). */
+   Elle se soulève, grossit un peu, s'éclaire, avec une ombre foncée dessous (pour les thèmes clairs) et un halo
+   de la couleur de son texte ; son icône grossit aussi. (!important : les thèmes y mettaient leur cadre et leur éclairage) */
+#ecranReglages #tuilesReglages .tuileReglage{ transition: transform .2s ease, filter .2s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease; }
+#ecranReglages #tuilesReglages .tuileIcone{ transition: transform .2s ease; }
 html[data-theme] body #ecranReglages #tuilesReglages .tuileReglage.choisie,
-html body #ecranReglages #tuilesReglages .tuileReglage.choisie{ outline: none !important; }
-#ecranReglages #tuilesReglages .tuileReglage{ transition: transform .15s ease, opacity .2s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease; }
-#ecranReglages #tuilesReglages.avecChoix .tuileReglage:not(.choisie){ opacity: 0.45; }
-@media (prefers-reduced-motion: reduce){ #ecranReglages #tuilesReglages .tuileReglage{ transition: none; } }
+html body #ecranReglages #tuilesReglages .tuileReglage.choisie{
+  outline: none !important;
+  position: relative; z-index: 1;
+  transform: translateY(-8px) scale(1.07);
+  filter: brightness(1.15) saturate(1.15) !important;
+  box-shadow: 0 18px 30px -8px rgba(0,0,0,0.6), 0 0 34px 6px color-mix(in srgb, currentColor 65%, transparent) !important;
+}
+#ecranReglages #tuilesReglages .tuileReglage.choisie .tuileIcone{ transform: scale(1.28); }
+@media (prefers-reduced-motion: reduce){ #ecranReglages #tuilesReglages .tuileReglage, #ecranReglages #tuilesReglages .tuileIcone{ transition: none; } }

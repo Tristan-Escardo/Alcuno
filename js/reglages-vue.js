@@ -134,7 +134,6 @@
     itemsMEP.forEach((b) => { const sel = b.dataset.vue === vue; b.classList.toggle("actif", sel); b.setAttribute("aria-checked", sel ? "true" : "false"); });
     btnMEP.querySelector(".mepIcone").innerHTML = ICONES_VUE[vue];
     tuiles.querySelectorAll(".tuileReglage").forEach((t) => t.classList.toggle("choisie", vue === "tuiles" && t.dataset.groupe === actif));
-    tuiles.classList.toggle("avecChoix", vue === "tuiles" && !!actif); // (une tuile ouverte : les autres sont atténuées, voir le CSS)
     sauverEtat();
     // Ordre d'affichage (CSS « order ») : un groupe après l'autre ; chaque bloc garde son rang d'origine dans son groupe
     GROUPES.forEach((g, i) => {
