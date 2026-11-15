@@ -156,7 +156,12 @@ export const deleteUser = async () => { window.__compteEfface = true; courant = 
       const suite = { refus: `error=access_denied&state=${e}`, ok: `state=${e}&id_token=${jeton(n)}&authuser=0`, faux: `state=${e}&id_token=${jeton("autre")}`, autre: `state=0000&id_token=${jeton(n)}` }[google.reponse];
       r.fulfill({ contentType: "text/html", body: `<script>location.replace(${JSON.stringify(url + "#" + suite)})</script>` });
     });
-    if (installee) await page.addInitScript(() => Object.defineProperty(Navigator.prototype, "standalone", { get: () => true, configurable: true }));
+    if (installee) await page.addInitScript(() => {
+      Object.defineProperty(Navigator.prototype, "standalone", { get: () => true, configurable: true });
+      // (comme sur un iPhone lent : la configuration Firebase, posée par le script module de index.html, arrive 2 s après js/profil.js)
+      Object.defineProperty(window, "CONFIG_FIREBASE", { configurable: true, get: () => undefined,
+        set: (v) => setTimeout(() => Object.defineProperty(window, "CONFIG_FIREBASE", { value: v, writable: true, configurable: true }), 2000) });
+    });
     page.on("pageerror", (e) => erreurs.push(e.message));
     page.on("dialog", (d) => d.accept());
     await page.route("**/firebase-app.js", (r) => r.fulfill({ contentType: "text/javascript", body: FAUX_APP }));

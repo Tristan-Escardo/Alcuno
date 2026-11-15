@@ -222,11 +222,20 @@ if (typeof document !== "undefined" && !document.documentElement.classList.conta
   function charger(){
     if (auth) return Promise.resolve();
     if (chargement) return chargement;
-    const adresse = window.ADRESSE_FIREBASE, config = window.CONFIG_FIREBASE;
-    if (!adresse || !config) return Promise.reject(new Error("config"));
-    chargement = Promise.all([import(adresse + "firebase-app.js"), import(adresse + "firebase-database.js"), import(adresse + "firebase-auth.js")])
+    // La configuration est posée par le script module de index.html, qui peut passer APRÈS ce fichier (iPhone surtout) :
+    // au retour de la page Google, on se connecte dès le lancement, il faut donc l'attendre (sinon « Connexion impossible »)
+    const attendreConfig = () => new Promise((ok, rejet) => {
+      const debut = Date.now();
+      (function voir(){
+        if (window.ADRESSE_FIREBASE && window.CONFIG_FIREBASE) ok();
+        else if (Date.now() - debut > 15000) { const e = new Error("config"); e.code = "config"; rejet(e); }
+        else setTimeout(voir, 100);
+      })();
+    });
+    chargement = attendreConfig()
+      .then(() => Promise.all([import(window.ADRESSE_FIREBASE + "firebase-app.js"), import(window.ADRESSE_FIREBASE + "firebase-database.js"), import(window.ADRESSE_FIREBASE + "firebase-auth.js")]))
       .then(([a, d, au]) => {
-        const appli = a.initializeApp(config, "profil");
+        const appli = a.initializeApp(window.CONFIG_FIREBASE, "profil");
         fb = { ref: d.ref, get: d.get, set: d.set, remove: d.remove, GoogleAuthProvider: au.GoogleAuthProvider, signInWithPopup: au.signInWithPopup,
                OAuthProvider: au.OAuthProvider, signInWithCredential: au.signInWithCredential, signOut: au.signOut, deleteUser: au.deleteUser };
         base = d.getDatabase(appli);
@@ -305,7 +314,8 @@ if (typeof document !== "undefined" && !document.documentElement.classList.conta
 
   // ----- Boutons -----
   function messageErreur(e){
-    const code = (e && e.code) || "";
+    // (erreur sans code — téléchargement raté, délai dépassé… — : son message court sert de code, pour toujours savoir ce qui coince)
+    const code = (e && (e.code || (typeof e.message === "string" ? e.message.slice(0, 40) : ""))) || "";
     if (code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request" || code === "auth/user-cancelled") return "";
     if (code === "auth/popup-blocked") return tr("Fenêtre bloquée par le navigateur : autorise les fenêtres pop-up, puis réessaie.");
     if (code === "auth/network-request-failed" || !navigator.onLine) return tr("Pas de connexion internet : réessaie plus tard.");
@@ -361,7 +371,7 @@ if (typeof document !== "undefined" && !document.documentElement.classList.conta
     const jeton = p.get("id_token");
     if (!jeton) {
       // (access_denied : le joueur a refusé ou fermé la page Google, rien à signaler)
-      if (p.get("error") && p.get("error") !== "access_denied") dire(messageErreur(null));
+      if (p.get("error") && p.get("error") !== "access_denied") dire(messageErreur({ code: "google-" + p.get("error") }));
       return false;
     }
     // Le jeton doit porter le nombre tiré au départ : un jeton fabriqué ou rejoué ailleurs est refusé (Firebase vérifie le reste)
