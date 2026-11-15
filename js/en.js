@@ -860,7 +860,7 @@ window.TEXTES_EN = {
 "La connexion Google n'est pas encore activée pour le jeu.": "Google sign-in isn't enabled for the game yet.",
 "Profil joueur": "Player profile",
 "Connecte-toi avec Google pour retrouver ta progression sur un autre téléphone.": "Sign in with Google to get your progress back on another phone.",
-"Se connecter": "Sign in",
+"Se connecter avec Google": "Sign in with Google",
 "Se déconnecter": "Sign out",
 "Supprimer mon profil": "Delete my profile",
 "Connecté : {0}.": "Signed in: {0}.",

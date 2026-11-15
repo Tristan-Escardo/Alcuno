@@ -145,7 +145,7 @@ export const deleteUser = async () => { window.__compteEfface = true; courant = 
     return { ctx, page };
   };
   const etat = (page) => page.evaluate(() => ({
-    bouton: document.getElementById("btnProfilConnexion").textContent, note: document.getElementById("texteProfil").textContent,
+    bouton: document.getElementById("btnProfilConnexion").textContent.trim(), google: document.getElementById("btnProfilConnexion").classList.contains("btnGoogle"), note: document.getElementById("texteProfil").textContent,
     supprimer: !document.getElementById("ligneProfilSupprimer").hidden, lie: localStorage.getItem("alcuno_profil"),
     profil: (JSON.parse(localStorage.getItem("faux_arbre") || "{}").profils || {}).u1 || null,
     reglagesOuverts: getComputedStyle(document.getElementById("ecranReglages")).display !== "none",
@@ -159,15 +159,15 @@ export const deleteUser = async () => { window.__compteEfface = true; courant = 
   verifier(!a.authCharge && a.lie === null, "sans profil : l'authentification n'est pas téléchargée au lancement");
   await A.page.click("#btnReglages"); await A.page.waitForTimeout(700);
   a = await etat(A.page);
-  const visible = await A.page.evaluate(() => { const b = document.querySelector('#ecranReglages [data-cle="compte"]'); return b.offsetHeight > 0 && b.dataset.groupe === "appareil"; });
-  verifier(visible && a.bouton === "Se connecter" && !a.supprimer && a.authCharge && a.appliAuth === "profil" && a.profil === null,
+  const visible = await A.page.evaluate(() => { const b = document.querySelector('#ecranReglages [data-cle="compte"]'); return b.offsetHeight > 0 && b.dataset.groupe === "appareil" && b.nextElementSibling.dataset.cle === "hors-ligne"; });
+  verifier(visible && a.google && a.bouton === "Se connecter avec Google" && !a.supprimer && a.authCharge && a.appliAuth === "profil" && a.profil === null,
     `Réglages : bloc « Profil joueur » visible, déconnecté, authentification prête dans sa propre appli (${a.appliAuth})`);
 
   // fenêtre bloquée par le navigateur : message, toujours déconnecté
   await A.page.evaluate(() => { window.__erreurPopup = "auth/popup-blocked"; });
   await A.page.click("#btnProfilConnexion"); await A.page.waitForTimeout(400);
   a = await etat(A.page);
-  verifier(/pop-up/.test(a.note) && a.bouton === "Se connecter" && a.lie === null, `fenêtre Google bloquée : message clair (${a.note})`);
+  verifier(/pop-up/.test(a.note) && a.bouton === "Se connecter avec Google" && a.lie === null, `fenêtre Google bloquée : message clair (${a.note})`);
   // fenêtre fermée par le joueur : pas de message d'erreur
   await A.page.evaluate(() => { window.__erreurPopup = "auth/popup-closed-by-user"; });
   await A.page.click("#btnProfilConnexion"); await A.page.waitForTimeout(400);
@@ -178,7 +178,7 @@ export const deleteUser = async () => { window.__compteEfface = true; courant = 
   await A.page.evaluate(() => { window.__erreurPopup = ""; });
   await A.page.click("#btnProfilConnexion"); await A.page.waitForTimeout(700);
   a = await etat(A.page);
-  verifier(a.bouton === "Se déconnecter" && a.supprimer && /Tom/.test(a.note) && a.reglagesOuverts && a.profil && a.profil.debloque.prestige === true && a.profil.debloque.album === true &&
+  verifier(a.bouton === "Se déconnecter" && !a.google && a.supprimer && /Tom/.test(a.note) && a.reglagesOuverts && a.profil && a.profil.debloque.prestige === true && a.profil.debloque.album === true &&
     Object.keys(a.profil.stickers.gagnes).sort().join() === "chat,cupcake" && a.profil.stickers.parties === 3 && a.profil.reglages.valeurs.theme === "noir" && JSON.parse(a.lie).uid === "u1",
     `connexion : profil créé avec les déblocages, les stickers et les réglages du téléphone (${a.note})`);
   verifier(a.ecritures === "profils/u1@profil" && !/ethylo|example\.com|Tom/.test(JSON.stringify(a.profil)), `le profil est écrit par l'appli « profil », sans éthylotest, nom ni e-mail (${a.ecritures})`);
@@ -229,13 +229,13 @@ export const deleteUser = async () => { window.__compteEfface = true; courant = 
   await B.page.click("#btnReglages"); await B.page.waitForTimeout(600);
   await B.page.click("#btnProfilConnexion"); await B.page.waitForTimeout(500);
   b = await etat(B.page);
-  verifier(b.bouton === "Se connecter" && !b.supprimer && b.lie === null && b.profil && await B.page.evaluate(() => localStorage.getItem("alcuno_theme_prestige") === "1"), "déconnexion : le téléphone et le profil en ligne gardent tout");
+  verifier(b.bouton === "Se connecter avec Google" && !b.supprimer && b.lie === null && b.profil && await B.page.evaluate(() => localStorage.getItem("alcuno_theme_prestige") === "1"), "déconnexion : le téléphone et le profil en ligne gardent tout");
 
   // suppression : profil effacé de la base, compte effacé, le téléphone garde ce qu'il a
   await B.page.click("#btnProfilConnexion"); await B.page.waitForTimeout(700);
   await B.page.click("#btnProfilSupprimer"); await B.page.waitForTimeout(700);
   b = await etat(B.page);
-  verifier(b.profil === null && b.bouton === "Se connecter" && b.lie === null && await B.page.evaluate(() => window.__compteEfface === true && localStorage.getItem("alcuno_theme_galaxie") === "1"),
+  verifier(b.profil === null && b.bouton === "Se connecter avec Google" && b.lie === null && await B.page.evaluate(() => window.__compteEfface === true && localStorage.getItem("alcuno_theme_galaxie") === "1"),
     "suppression : profil et compte effacés, le téléphone garde ses déblocages");
   await B.ctx.close();
 
