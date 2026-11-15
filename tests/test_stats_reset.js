@@ -436,6 +436,21 @@ export const signOut = async () => { utilisateur = null; ecouteurs.forEach((e) =
   await page.click('.sousMenu[data-groupe="public"] button[data-pan="liste"]'); const pubListe = await lirePublic();
   verifier(pub7.appareils === "4" && pub7.pays === "2" && pubTout.appareils === "6" && pubTout.pays === "4" && pubTout.bPays.join().includes("Japon") && pubListe.visibles.join() === "liste",
     `onglet Public : période 7 jours (${pub7.appareils} appareils, ${pub7.pays} pays), depuis le début (${pubTout.appareils}, ${pubTout.pays}), rubrique « Un par un » (${pubListe.visibles})`);
+  // Infos en temps réel (Public) : présences récentes rapprochées des fiches d'appareils (thème, lieu, appareil…)
+  const presAvant = await page.evaluate(() => JSON.stringify(window.__arbre.presence || {}));
+  await page.evaluate(() => {
+    const m = Date.now();
+    window.__arbre.presence = { aaaaaaaaaa01: { etat: "enligne", maj: m - 60000 }, aaaaaaaaaa04: { etat: "menu", maj: m - 5000 }, aaaaaaaaaa99: { etat: "tele", maj: m - 1000 }, aaaaaaaaaa02: { etat: "menu", maj: m - 600000 } };
+    window.__notifier();
+  });
+  await page.waitForTimeout(300);
+  const direct = await page.evaluate(() => ({ legende: document.getElementById("pubDirectLegende").textContent, lignes: [...document.querySelectorAll("#pubDirectListe .appLigne")].map((l) => l.textContent),
+    images: document.querySelectorAll("#pubDirectListe img").length, injecte: !!window.__injecte, debord: [...document.querySelectorAll("#pubDirectListe .appLigne")].some((e) => e.getBoundingClientRect().right > 391) }));
+  verifier(/3 appareils connectés/.test(direct.legende) && direct.lignes.length === 3 && /Télé castée/.test(direct.lignes[0]) && /Appareil inconnu/.test(direct.lignes[0])
+    && /Partie en ligne · .*Toulouse, Occitanie/.test(direct.lignes[2]) && /Thème : /.test(direct.lignes[2]) && /Orange S\.A\./.test(direct.lignes[2]) && /Téléphone · iOS 17\.5 · Safari 17/.test(direct.lignes[2]) && /il est \d\d:\d\d chez lui/.test(direct.lignes[2])
+    && /Au menu · .*Montréal/.test(direct.lignes[1]) && /<img src=x/.test(direct.lignes[1]) && !direct.lignes.join().includes("aaaaaaaaaa02") && direct.images === 0 && !direct.injecte && !direct.debord,
+    `Public : infos en temps réel, 3 présences récentes (la plus ancienne ignorée), thème et fiche rapprochés, texte piégé inerte (${JSON.stringify(direct)})`);
+  await page.evaluate((v) => { window.__arbre.presence = JSON.parse(v); window.__notifier(); }, presAvant);
   await page.click('#pubPeriode button[data-jours="30"]');
 
   // Pilotage rangé par rubriques : une seule affichée, celle qu'on a ouverte est retenue ; le Bar et la remise à zéro y sont rangés

@@ -399,6 +399,12 @@
             </div>
         </section>
 
+        <section class="bloc direct">
+            <div class="titre">Infos en temps réel</div>
+            <div class="legende" id="pubDirectLegende" style="font-size:14px;margin:0 0 10px">En attente…</div>
+            <div id="pubDirectListe"></div>
+        </section>
+
         <nav class="sousMenu trois" data-groupe="public" aria-label="Rubriques du public">
             <button type="button" data-pan="lieux"><i aria-hidden="true">📍</i>Lieux</button>
             <button type="button" data-pan="appareils"><i aria-hidden="true">📱</i>Appareils</button>
@@ -670,6 +676,7 @@
                 <details><summary>Comment lire la page Stats ?</summary>
                     <ul>
                         <li><b>En temps réel</b> : les personnes qui ont le jeu ouvert maintenant, réparties entre partie classique, partie en ligne et télé castée.</li>
+                        <li><b>Infos en temps réel</b> (onglet Public) : le détail de chaque appareil qui a le jeu ouvert maintenant (thème, lieu, appareil, navigateur, langue, heure locale…), tiré de sa fiche.</li>
                         <li><b>Déroulé des parties</b> : part des parties lancées qui arrivent au récap de fin (les autres ont été abandonnées), nombre de joueurs et durée moyens des parties finies. En ligne, c'est l'hôte qui compte.</li>
                         <li><b>Modes de jeu</b> : part des parties lancées en mode hot, PJ, express ou affichées sur une télé.</li>
                         <li><b>Fidélité</b> : parmi les visiteurs d'il y a 8 à 14 jours, combien sont revenus ces 7 derniers jours ; et parmi les appareils où le jeu est installé (ouvert depuis l'icône), combien ont lancé ou rejoint une partie.</li>
@@ -813,7 +820,7 @@
         });
         const authPorte = getAuth(app);
         // Version de la page de stats (à part de celle du jeu : +0.0.1 à chaque modification de cette page)
-        const VERSION_STATS = "1.22.0";
+        const VERSION_STATS = "1.23.0";
         document.getElementById("versionStats").textContent = VERSION_STATS;
         document.getElementById("versionStats2").textContent = VERSION_STATS;
         document.getElementById("versionStats3").textContent = VERSION_STATS;
@@ -1916,6 +1923,7 @@ Données (stats ; « jours » = les 45 derniers jours, « visiteurs » du jour =
 
             // ----- En ce moment -----
             let presences = {};
+            let directPret = false; // (vrai quand tout ce que dessinerDirectPublic utilise est déclaré plus bas)
             const majDirect = () => {
                 const c = { menu: 0, classique: 0, enligne: 0, tele: 0 };
                 Object.values(presences).forEach((p) => {
@@ -1929,8 +1937,8 @@ Données (stats ; « jours » = les 45 derniers jours, « visiteurs » du jour =
                 document.getElementById("enLigneJeu").textContent = nombre(c.enligne);
                 document.getElementById("enTele").textContent = nombre(c.tele);
             };
-            onValue(ref(db, "presence"), (s) => { presences = s.val() || {}; majDirect(); });
-            setInterval(majDirect, 15000);
+            onValue(ref(db, "presence"), (s) => { presences = s.val() || {}; majDirect(); if (directPret) dessinerDirectPublic(); });
+            setInterval(() => { majDirect(); if (directPret) dessinerDirectPublic(); }, 15000);
 
             let legendeRetour = "", legendeInstalls = "";
             const majLegendeFidelite = () => { document.getElementById("legendeFidelite").textContent = [legendeRetour, legendeInstalls].filter(Boolean).join(" "); };
@@ -2047,6 +2055,29 @@ Données (stats ; « jours » = les 45 derniers jours, « visiteurs » du jour =
                 plus.hidden = reste <= 0;
                 plus.textContent = `Voir plus (${nombre(Math.max(0, reste))} ${pluriel(reste, "autre")})`;
             }
+            // ----- Public : qui a le jeu ouvert maintenant, avec tout ce qu'on sait de chaque appareil -----
+            // (la présence et la fiche de l'appareil portent le même identifiant : on les rapproche. Rien de plus n'est écrit par les joueurs.)
+            const NOMS_ETATS = { menu: "Au menu", classique: "Partie classique", enligne: "Partie en ligne", tele: "Télé castée" };
+            function dessinerDirectPublic(){
+                const zone = document.getElementById("pubDirectListe"), leg = document.getElementById("pubDirectLegende");
+                const vivants = Object.entries(presences || {})
+                    .filter(([, p]) => p && NOMS_ETATS[p.etat] && maintenant() - Number(p.maj || 0) < PRESENCE_VALABLE)
+                    .sort((x, y) => Number(y[1].maj || 0) - Number(x[1].maj || 0));
+                const fiches = donnees.appareils || {};
+                leg.textContent = vivants.length ? `${nombre(vivants.length)} ${pluriel(vivants.length, "appareil")} connecté${vivants.length > 1 ? "s" : ""} en ce moment.` : "Personne n'a le jeu ouvert en ce moment.";
+                zone.innerHTML = vivants.map(([id, p]) => {
+                    const a = fiches[id] && typeof fiches[id] === "object" ? fiches[id] : null;
+                    if (!a) return `<div class="appLigne"><div class="appLieu"><span>${echapperStats(NOMS_ETATS[p.etat])}</span><small>${echapperStats(ilYAPublic(Number(p.maj || 0)))}</small></div><div class="appMeta">Appareil inconnu (télé, ou fiche pas encore écrite)</div></div>`;
+                    const c = /^[A-Z]{2}$/.test(a.pays || "") ? a.pays : "";
+                    const lieu = c ? drapeau(c) + ([a.ville, a.region].filter(Boolean).join(", ") || nomPays(c).replace(drapeau(c), "")) : "Lieu inconnu";
+                    let heure = "";
+                    try { if (a.fuseau) heure = "il est " + new Intl.DateTimeFormat("fr-FR", { timeZone: a.fuseau, hour: "2-digit", minute: "2-digit" }).format(new Date(maintenant())) + " chez lui"; } catch (e) {}
+                    const quoi = [NOMS_TYPES[a.type] || NOMS_OS[a.os], a.osv, a.nav, pixelsEcran(a.ecran), a.langue && "langue " + nomLangue(a.langue), a.fuseau && nomFuseau(a.fuseau), heure, a.version && "jeu " + a.version, a.installe && "installé"].filter(Boolean);
+                    const theme = a.theme ? "Thème : " + (NOMS_THEMES[a.theme] || a.theme) : "";
+                    return `<div class="appLigne"><div class="appLieu"><span>${echapperStats(NOMS_ETATS[p.etat])} · ${echapperStats(lieu)}</span><small>${echapperStats(ilYAPublic(Number(p.maj || 0)))}</small></div>${theme ? `<div class="appMeta">${echapperStats(theme)}</div>` : ""}${a.fai ? `<div class="appMeta">${echapperStats(a.fai)}</div>` : ""}<div class="appMeta">${echapperStats(quoi.join(" · "))}</div></div>`;
+                }).join("");
+            }
+            directPret = true;
             document.getElementById("pubPeriode").addEventListener("click", (e) => {
                 const b = e.target.closest("button[data-jours]"); if (!b) return;
                 joursPublic = Number(b.dataset.jours); limiteListe = 25;
@@ -2065,6 +2096,7 @@ Données (stats ; « jours » = les 45 derniers jours, « visiteurs » du jour =
                 });
                 barres("barresThemes", themes, NOMS_THEMES, 9);
                 dessinerPublic();
+                dessinerDirectPublic();
                 legendeInstalls = dessinerInstalls(s.val()); majLegendeFidelite();
             });
         }

@@ -146,3 +146,6 @@ Tant que ce n'est pas fait, rien ne casse : l'origine est écrite à part, seule
 Un lieu déduit de l'adresse IP, un fournisseur d'accès et les caractéristiques d'un appareil, rattachés à un identifiant, sont des
 données personnelles au sens du RGPD, et l'adresse IP part chez un service tiers. Le jeu ne peut donc plus être présenté comme ne
 collectant « aucune donnée personnelle » : il faut au minimum en informer les joueurs (FAQ ou Crédits du jeu). Ce point n'est pas réglé par le code.
+
+### Infos en temps réel (stats 1.23.0)
+Onglet Public, sous « Portée » : une ligne par appareil qui a le jeu ouvert maintenant (présence rafraîchie depuis moins de 3 min) : état (menu, partie classique, partie en ligne, télé), thème, lieu, fournisseur, appareil, navigateur, système, écran, langue, fuseau et heure locale, version du jeu. Rien de nouveau n'est écrit par les joueurs : la page rapproche `presence/{id}` de `stats/appareils/{id}` (même identifiant). Limites : le thème est celui relevé à l'ouverture du jeu (un changement de thème recharge la page, donc il est à jour) ; une télé castée n'a pas de fiche d'appareil (affichée « Appareil inconnu »).
