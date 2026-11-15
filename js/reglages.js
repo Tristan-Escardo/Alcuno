@@ -1297,6 +1297,7 @@ const BOUCLES_EXACTES = {
   musique_ambiance_patrick: { avant: 0.3, longueur: 2860541 / 44100 }, // 64,86 s = 40 mesures à 148 BPM (le morceau entier, « Irish Jig »). Le fondu de fin du morceau est retiré ; sa dernière résonance (1,07 s) est repliée par-dessus le début, donc l'accord final sonne encore pendant la reprise.
   musique_ambiance_justrose: { avant: 0.3, longueur: 4858224 / 44100 }, // 110,16 s = 56 mesures à 122 BPM (de 29,59 s à 2 min 19,75 du morceau, qui se fond ensuite). La dernière mesure est un fondu vers ce qui précédait 29,59 s : à la reprise on enchaîne sur la transition d'origine, sans saut de niveau.
   musique_ambiance_musique: { avant: 0.3, longueur: 1629920 / 44100 }, // 36,96 s = 20 mesures à 129,87 BPM. Le morceau fourni fait 59,2 s, mais ses 22,3 dernières secondes sont exactement les 22,3 premières (il se répète toutes les 20 mesures) : la boucle garde donc toute la musique, et la reprise n'est pas un raccord mais l'endroit où le morceau recommence de lui-même.
+  musique_ambiance_halloween: { avant: 0.3, longueur: 5388218 / 44100 }, // 2 min 02,18 = 56 mesures à 110 BPM (de 8,83 s à 2 min 11,01 du morceau, qui reprend presque à l'identique toutes les 56 mesures). Reprise sur un début de phrase de 4 mesures, là où les deux passages se ressemblent le plus. La première mesure est un fondu depuis ce qui suivait 2 min 11,01 : le rythme ne saute pas, le niveau non plus.
   debloquage_theme_galaxie: { avant: 0.3, longueur: 4201001 / 44100 }, // 95,26 s (générique du thème Star Wars)
 };
 const FONDU_BOUCLE_EXACTE = 0.03;
