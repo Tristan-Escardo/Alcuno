@@ -10052,3 +10052,11 @@ html[data-theme="noir"] body :is(#menu button, .btnRetour, .btnMiseEnPage, .btnM
 /* Sombre : cartes Bar / Éthylo de l'accueil, contour gris comme les boutons */
 html[data-theme="noir"] body :is(#btnBarAccueil, #btnEthyloAccueil){ border-color: var(--noir-btn-bord) !important; }
 html[data-theme="noir"] body :is(#btnBarAccueil, #btnEthyloAccueil)::before{ border-color: var(--noir-btn-bord) !important; }
+
+/* Réglages en Tuiles, dans TOUS les thèmes : plus de cadre (le « carré ») autour de la tuile ouverte.
+   On la reconnaît parce que les autres tuiles sont atténuées (classe avecChoix, js/reglages-vue.js). */
+html[data-theme] body #ecranReglages #tuilesReglages .tuileReglage.choisie,
+html body #ecranReglages #tuilesReglages .tuileReglage.choisie{ outline: none !important; }
+#ecranReglages #tuilesReglages .tuileReglage{ transition: transform .15s ease, opacity .2s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease; }
+#ecranReglages #tuilesReglages.avecChoix .tuileReglage:not(.choisie){ opacity: 0.45; }
+@media (prefers-reduced-motion: reduce){ #ecranReglages #tuilesReglages .tuileReglage{ transition: none; } }
