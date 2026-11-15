@@ -77,7 +77,14 @@ function choisirLangue(langue){
   const nouvelle = langue === "en" ? "en" : "fr";
   if (nouvelle === LANGUE) return;
   try { localStorage.setItem(CLE_LANGUE, nouvelle); } catch (e) { return; }
-  location.reload();
+  // Même chemin que le changement de thème (js/reglages.js) : rechargerPage() (js/retour-demarrage.js) revient d'abord à la
+  // première entrée de l'historique, puis recharge. Un simple location.reload() laissait derrière lui les entrées ajoutées par
+  // l'ouverture des Réglages : sur iPhone, la page d'accueil se retrouvait défilable. Les Réglages se rouvrent au même endroit.
+  try {
+    const ouverts = typeof ecranReglages !== "undefined" && ecranReglages.style.display !== "none" && !ecranReglages.classList.contains("page-sortie");
+    if (ouverts && typeof CLE_ROUVRIR_REGLAGES !== "undefined") sessionStorage.setItem(CLE_ROUVRIR_REGLAGES, String(ecranReglages.scrollTop));
+  } catch (e) {}
+  if (typeof rechargerPage === "function") rechargerPage(); else location.reload();
 }
 document.querySelectorAll(".chipLangue").forEach((chip) => {
   const active = chip.dataset.langue === LANGUE;
