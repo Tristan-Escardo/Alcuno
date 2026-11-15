@@ -22,7 +22,7 @@ const QUESTIONS_FAQ = [
       r: [tr("Touche <b>Mode en ligne</b>. Une personne choisit <b>Créer une partie</b> et reçoit un <b>code</b> (et un QR code)."),
           tr("Les autres touchent <b>Rejoindre une partie</b> et entrent le code, ou scannent le QR code."),
           tr("Chacun joue sur son téléphone. Déconnecté ? Entre le code dans « Revenir dans une partie » pour reprendre ta place."),
-          tr("Pour seulement suivre la partie, sans jouer ni donner de pseudo : <b>Regarder une partie</b>, puis le code.")] },
+          tr("Pour seulement suivre la partie, sans jouer ni donner de pseudo : <b>Spectateur</b>, puis le code.")] },
     { q: tr("Comment afficher la partie sur la télé ?"), image: "faq/tele.webp", alt: tr("Réglages : la ligne Afficher l'écran télé est entourée"),
       r: [tr("Sur la télé, ouvre le navigateur et va sur l'adresse du jeu. Sur la plupart des télés, l'<b>écran télé</b> s'ouvre tout seul."),
           tr("Sinon : <b>Réglages › Afficher l'écran télé</b>, sur la télé."),

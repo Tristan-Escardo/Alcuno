@@ -104,7 +104,7 @@ const verifier = (ok, message) => { console.log((ok ? "OK    " : "ECHEC ") + mes
 
   // 1. L'écran « Regarder » : le code seulement, pas de pseudo
   await page.click("#btnModeEnLigne"); await page.waitForTimeout(300);
-  verifier(await visible("#btnRegarderPartie") && await visible("#btnRejoindrePartie"), "mode en ligne : le bouton « Regarder une partie » est à côté de « Rejoindre une partie »");
+  verifier(await visible("#btnRegarderPartie") && await visible("#btnRejoindrePartie"), "mode en ligne : le bouton « Spectateur » est à côté de « Rejoindre une partie »");
   await cap("1_choix");
   await page.click("#btnRegarderPartie"); await page.waitForTimeout(300);
   await cap("2_regarder");
