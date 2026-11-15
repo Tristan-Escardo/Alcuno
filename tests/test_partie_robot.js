@@ -66,6 +66,7 @@ const FILTRE = process.argv[2] || "";
   const prelude = fs.readFileSync(path.join(__dirname, "prelude.js"), "utf8");
   const robot = fs.readFileSync(path.join(__dirname, "joueur_auto.js"), "utf8");
 
+  const textesVus = new Set();
   const jouer = async (c) => {
     const page = await nav.newPage({ viewport: { width: c.largeur, height: c.hauteur } });
     await page.addInitScript(prelude);
@@ -74,6 +75,14 @@ const FILTRE = process.argv[2] || "";
       window.__optionsRobot = [hot && "optionModeHot", hard && "optionModeHard", pj && "optionModeSoft", express && "optionPartieExpress"].filter(Boolean); // (cochées dans « Ta partie »)
       try { localStorage.setItem("alcuno_theme", theme); localStorage.setItem("alcuno_theme_kawaii", "1"); localStorage.setItem("alcuno_theme_donjon", "1"); if (acc) localStorage.setItem("alcuno_accessibilite", "1"); if (langue) localStorage.setItem("alcuno_langue", langue); } catch (e) {}
     }, [c.theme, !!c.accessibilite, !!c.express, !!c.hot, !!c.pj, !!c.hard, c.langue || ""]);
+    // ALCUNO_TEXTES=fichier.json : note tous les textes affichés pendant les parties (pour chercher ceux restés en français)
+    if (process.env.ALCUNO_TEXTES) await page.addInitScript(() => {
+      window.__textesVus = new Set();
+      const noter = (n) => { const t = (n.nodeValue || "").replace(/\s+/g, " ").trim(); if (t && !/^(SCRIPT|STYLE)$/.test((n.parentElement || {}).tagName || "")) window.__textesVus.add(t); };
+      const tout = (r) => { if (r.nodeType === 3) return noter(r); if (r.nodeType !== 1) return; const w = document.createTreeWalker(r, NodeFilter.SHOW_TEXT); for (let n = w.nextNode(); n; n = w.nextNode()) noter(n); };
+      new MutationObserver((ms) => ms.forEach((m) => { if (m.type === "characterData") noter(m.target); m.addedNodes.forEach(tout); }))
+        .observe(document, { childList: true, subtree: true, characterData: true });
+    });
     await page.goto(url);
     let rapport = null;
     try {
@@ -82,6 +91,7 @@ const FILTRE = process.argv[2] || "";
         .replace("RAPPORT_DEBUT\n", "").replace("\nRAPPORT_FIN", ""));
     } catch (e) {}
     const debordement = rapport ? await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth) : null;
+    if (process.env.ALCUNO_TEXTES) { try { (await page.evaluate(() => [...window.__textesVus])).forEach((t) => textesVus.add(t)); } catch (e) {} }
     await page.close();
     return { c, rapport, debordement };
   };
@@ -95,6 +105,7 @@ const FILTRE = process.argv[2] || "";
       ? `fin ${rapport.fin}, erreurs ${JSON.stringify(rapport.erreurs)}, cartes ${rapport.cartesRetournees}/${rapport.cartesTotal}, débordement ${debordement} px`
       : "pas de rapport (partie trop longue ?)"));
   }
+  if (process.env.ALCUNO_TEXTES) fs.writeFileSync(process.env.ALCUNO_TEXTES, JSON.stringify([...textesVus], null, 1));
   await nav.close();
   serveur.close();
   console.log(echecs ? `\n${echecs} ÉCHEC(S)` : "\nTOUT EST OK");

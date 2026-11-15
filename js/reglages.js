@@ -189,10 +189,10 @@ function afficherFenetrePrestige(){
 // « nom » est celui écrit dans l'annonce (« Nouveau thème … disponible ») : c'est le nom complet de la fête,
 // même quand la pastille des Réglages en montre un plus court (Fête de la musique -> Musique, faute de place).
 const FETES_ANNONCE = {
-  noel:       { nom: "Noël",           essayer: tr("Joyeux Noël"),           image: "noel/boule_neige.svg" },
+  noel:       { nom: tr("Noël"),          essayer: tr("Joyeux Noël"),           image: "noel/boule_neige.svg" },
   chandeleur: { nom: tr("Chandeleur"),     essayer: tr("L'essayer maintenant"), image: "chandeleur/crepe.svg" },
-  valentin:   { nom: "Saint-Valentin", essayer: tr("L'essayer maintenant"), image: "valentin/coeur_o.svg" },
-  patrick:    { nom: "Saint-Patrick",  essayer: "Sláinte is táinte !",  image: "patrick/trefle_apercu.svg" },
+  valentin:   { nom: tr("Saint-Valentin"), essayer: tr("L'essayer maintenant"), image: "valentin/coeur_o.svg" },
+  patrick:    { nom: tr("Saint-Patrick"), essayer: "Sláinte is táinte !",  image: "patrick/trefle_apercu.svg" },
   justrose:   { nom: tr("Just Rosé"),      essayer: tr("L'essayer maintenant"), image: "justrose/verre_apercu.svg" },
   musique:    { nom: tr("Fête de la musique"), essayer: tr("L'essayer maintenant"), image: "musique/note_apercu.svg" },
   halloween:  { nom: tr("Halloween"),       essayer: tr("L'essayer maintenant"), image: "halloween/citrouille_apercu.svg" }
@@ -1461,14 +1461,21 @@ function eteindreMusique(L, duree){
   });
 }
 
+// Où en est la boucle de musique (pour la reprendre au même endroit : pause, appli quittée puis rouverte,
+// moteur de son refait à neuf)
+function retenirPositionMusique(L){
+  if (!L || !L.actif) return;
+  const position = L.tourLongueur ? (((L.ctx.currentTime - L.tourDebut) % L.tourLongueur) + L.tourLongueur) % L.tourLongueur : 0;
+  L.reprise = { nom: L.nom, position };
+}
+
 function majMusique(){
   const voulu = musiqueVoulue();
   if (!voulu) {
     const L = lecteurMusique;
     if (L && L.actif) {
       // Pause de la partie : on retient où en est la boucle, la reprise repartira de là
-      const position = L.tourLongueur ? (((L.ctx.currentTime - L.tourDebut) % L.tourLongueur) + L.tourLongueur) % L.tourLongueur : 0;
-      L.reprise = musiqueMiseEnPause() ? { nom: L.nom, position } : null;
+      if (musiqueMiseEnPause()) retenirPositionMusique(L); else L.reprise = null;
       eteindreMusique(L, 0.4);
     }
     return;
@@ -1476,13 +1483,18 @@ function majMusique(){
   const ctx = contexteAudio();
   if (!ctx) return;
   if (!lecteurMusique || lecteurMusique.ctx !== ctx) {
-    if (lecteurMusique) eteindreMusique(lecteurMusique, 0.05);
+    let reprise = null;
+    if (lecteurMusique) {
+      retenirPositionMusique(lecteurMusique); // (moteur de son refait à neuf : la musique reprend où elle en était)
+      reprise = lecteurMusique.reprise || null;
+      try { eteindreMusique(lecteurMusique, 0.05); } catch (e) { lecteurMusique.actif = false; clearTimeout(lecteurMusique.minuteur); }
+    }
     const maitre = ctx.createGain();
     const attenuation = ctx.createGain(); // baisse le temps des sons forts (voir attenuerMusique)
     maitre.connect(attenuation);
     attenuation.connect(ctx.destination);
     lecteurMusique = { ctx, maitre, attenuation, nom: "", morceau: null, sources: [], minuteur: null, actif: false,
-                       enChargement: false, enPartie: false };
+                       enChargement: false, enPartie: false, reprise };
   }
   const L = lecteurMusique;
   // Volume (en douceur). Pleine musique dans les menus (accueil, réglages, salle d'attente, ajout des
@@ -1616,7 +1628,11 @@ document.getElementById("btnReglages").addEventListener("click", () => setTimeou
 document.addEventListener("visibilitychange", () => {
   // Appli quittée : le téléphone suspend le son presque aussitôt. Le fondu de 0,4 s de majMusique était
   // coupé net en plein volume (petit « bip » en quittant) : on éteint tout de suite, en 40 ms
-  if (document.visibilityState !== "visible" && lecteurMusique && lecteurMusique.actif) eteindreMusique(lecteurMusique, 0.04);
+  // (on retient où en est la boucle : au retour, la musique reprend au même endroit au lieu de repartir du début)
+  if (document.visibilityState !== "visible" && lecteurMusique && lecteurMusique.actif) {
+    retenirPositionMusique(lecteurMusique);
+    eteindreMusique(lecteurMusique, 0.04);
+  }
   setTimeout(majMusique, 0);
 });
 setInterval(majMusique, 2000); // (début ou fin du cast, changement de thème)
@@ -1645,16 +1661,30 @@ function contexteAudio(){
 // iPhone : le son ne se débloque qu'à la fin du toucher (doigt relevé) ou au clic, pas au début du
 // toucher. En classique, ça passait quand même (le son de la carte est joué dans le clic) ; en ligne,
 // tous les sons arrivent plus tard par Firebase : sans ça, le son n'était jamais débloqué.
+// Moteur de son « en marche » mais dont l'horloge n'avance plus : il ne sortira plus aucun son (vu au retour
+// dans l'appli). On compare l'horloge du moteur à celle prise au tap précédent, ou au retour dans l'appli.
+let reperesSon = null; // { ctx, temps, date }
+function sonFige(){
+  const r = reperesSon;
+  if (!r || !contexteSon || r.ctx !== contexteSon || contexteSon.state !== "running") return false;
+  if (Date.now() - r.date <= 1000) return false;
+  if (contexteSon.currentTime - r.temps >= 0.02) { figesDeSuite = 0; return false; }
+  return ++figesDeSuite <= 2; // (appareil sans sortie de son : l'horloge n'avance jamais, on n'insiste pas)
+}
+let figesDeSuite = 0;
 function debloquerSon(){
   if (!caseSons.checked && !caseMusique.checked) return;
   // iPhone : après une interruption (centre de contrôle, appel, Siri…), le son repartait parfois dans
   // l'écouteur du haut, beaucoup plus faible (la musique « baissait » toute seule). Au tap suivant, on
   // repart d'un contexte de son neuf (la musique reprend au début, en fondu).
+  if (sonFige()) sonInterrompu = true;
   if (sonInterrompu && contexteSon) {
     sonInterrompu = false;
+    try { retenirPositionMusique(lecteurMusique); } catch (e) {}
     try { contexteSon.close(); } catch (e) {}
     contexteSon = null;
   }
+  if (contexteSon) reperesSon = { ctx: contexteSon, temps: contexteSon.currentTime, date: Date.now() };
   if (contexteSon && contexteSon.state !== "running" && repriseRatee) {
     try { contexteSon.close(); } catch (e) {}
     contexteSon = null;
@@ -1685,19 +1715,37 @@ function repartirSonApresCamera(){
   try { contexteSon.close(); } catch (e) {}
   contexteSon = null;
 }
-// Retour dans l'appli : on relance le son tout de suite, et la barre du haut reprend la couleur du thème.
-// Après plus de 20 s ailleurs, on repart aussi d'un contexte de son neuf au premier tap (comme après une
-// interruption, voir debloquerSon) : l'iPhone rendait parfois un son « en marche » mais muet, et le jeu
-// restait sans son jusqu'à son redémarrage.
+// Retour dans l'appli : on relance le son tout de suite (et encore un peu après : juste au retour, le
+// téléphone refuse parfois), et la barre du haut reprend la couleur du thème.
+// iPhone : au premier tap après le retour, on repart d'un moteur de son neuf (comme après une interruption,
+// voir debloquerSon), même après quelques secondes ailleurs : l'iPhone rendait parfois un son « en marche »
+// mais muet, et le jeu restait sans son jusqu'à son redémarrage. Ailleurs : seulement après plus de 20 s,
+// ou si le moteur ne redémarre pas (horloge figée, voir sonFige). La musique reprend où elle en était.
 const RETOUR_SON_NEUF = 20 * 1000;
 let appliQuitteeA = null;
-document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState !== "visible") { appliQuitteeA = Date.now(); return; }
-  if (appliQuitteeA && Date.now() - appliQuitteeA > RETOUR_SON_NEUF && contexteSon) sonInterrompu = true;
+function retourDansAppli(){
+  if (document.visibilityState !== "visible") return;
+  if (appliQuitteeA && contexteSon && (estIOS || Date.now() - appliQuitteeA > RETOUR_SON_NEUF)) sonInterrompu = true;
   appliQuitteeA = null;
-  if (contexteSon && contexteSon.state !== "running") contexteSon.resume().catch(() => {});
+  reperesSon = null;
+  const relancer = () => {
+    if (document.visibilityState !== "visible" || !contexteSon) return;
+    if (contexteSon.state !== "running") contexteSon.resume().catch(() => {});
+    majMusique();
+  };
+  relancer();
+  [300, 1000, 2500].forEach((attente) => setTimeout(relancer, attente));
+  // (repère pris une fois le moteur relancé : si son horloge n'a pas bougé au prochain tap, il est figé)
+  setTimeout(() => { if (contexteSon && document.visibilityState === "visible") reperesSon = { ctx: contexteSon, temps: contexteSon.currentTime, date: Date.now() }; }, 400);
+}
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState !== "visible") { if (!appliQuitteeA) appliQuitteeA = Date.now(); return; }
+  retourDansAppli();
   peindreBarreTelephone();
 });
+// (appli rouverte depuis les applis récentes : selon le téléphone, c'est « pageshow » ou « focus » qui arrive)
+window.addEventListener("pageshow", (e) => { if (e.persisted) { if (!appliQuitteeA) appliQuitteeA = Date.now() - RETOUR_SON_NEUF - 1; retourDansAppli(); } });
+window.addEventListener("focus", () => { if (contexteSon && contexteSon.state !== "running") contexteSon.resume().catch(() => {}); });
 
 // Fichiers des sons : dossier Sons/, un MP3 par moment du jeu. Pour changer un son, il suffit de
 // remplacer le fichier (même nom). Fichier absent => pas de son à ce moment-là.
@@ -3042,9 +3090,9 @@ function reglesDuJeu(){
             tr("Tu lies <b>2 joueurs</b> : quand l'un boit, l'autre aussi (💘)"),
             tr("À la carte Cupidon suivante : lier 2 autres joueurs, ou briser un lien")
           ]}
-        : { carte: "un_rouge", nom: "1 : annulation", texte: tr`Tu gardes la carte : quand tu dois boire, tu peux t'en servir pour annuler ${g(1)}.` },
+        : { carte: "un_rouge", nom: tr("1 : annulation"), texte: tr`Tu gardes la carte : quand tu dois boire, tu peux t'en servir pour annuler ${g(1)}.` },
       ...(hot && saintValentinEnCours() ? [{ carte: "coup_de_foudre", nom: tr("Coup de foudre (Saint-Valentin)"), texte: [
-            tr`Choisis quelqu'un : <b>${hard ? "un doigt dans le cul" : "un bisou sur la bouche"}</b>…`,
+            tr`Choisis quelqu'un : <b>${hard ? tr("un doigt dans le cul") : tr("un bisou sur la bouche")}</b>…`,
             tr`… ou tu prends ${pj ? g(4) : tr("<em>un CUL SEC</em>")}`
           ]}] : []),
       { carte: "plus_2_jaune", nom: "+2", texte: tr`Tu bois ${g(gorgeesPlus2())}.` },
@@ -3054,7 +3102,7 @@ function reglesDuJeu(){
         tr`Un autre tire un 3 : le Pigeon boit ${g(1)}`,
         tr`Le Pigeon tire un 3 : il choisit le <b>nouveau Pigeon</b>, qui boit ${g(gorgeesPigeon())}`
       ]},
-      { carte: "quatre_bleu", nom: "4 : duel", texte: [
+      { carte: "quatre_bleu", nom: tr("4 : duel"), texte: [
         tr("Choisis <b>2 joueurs</b> : chacun prend une carte cachée"),
         pj ? tr("La plus petite carte boit <em>la moitié de sa valeur</em> (10 gorgées max)")
            : tr("La plus petite carte boit <em>sa valeur en gorgées</em>"),

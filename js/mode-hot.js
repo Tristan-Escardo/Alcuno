@@ -274,7 +274,7 @@ function montrerDefiHot(joueurIndex, nbGorgees, defiPossible = true, defiImpose 
     choisir("fait", tr`${qui} ${partenaire ? tr("relèvent") : tr("relève")} le défi :\n${defi.texte}`);
   });
   bouton("bois", tr`Je bois ${nbGorgees}`, "defi:bois", () => {
-    choisir("bois", `${qui} ${partenaire ? "boivent" : "boit"} ${texteGorgees(nbGorgees)}`);
+    choisir("bois", partenaire ? tr`${qui} boivent ${texteGorgees(nbGorgees)}` : tr`${qui} boit ${texteGorgees(nbGorgees)}`);
   });
 
   overlay.appendChild(bloc);
@@ -372,7 +372,7 @@ function afficherOverlayCoupDeFoudre(joueurActuel, classeCarte, suite = null){
     // (des <div> et pas des <span> : la télé, js/tele.js, met chaque bloc sur sa ligne)
     titre.innerHTML = `<div class="foudre-badge">${partieHard ? SVG_18_BARRE + tr(" Défi hard") : tr("🔥 Défi hot")}${tr(' spécial <span class="foudre-nowrap">Saint-Valentin</span> 💘')}</div><div class="foudre-titre">${tr("COUP DE FOUDRE ⚡")}</div>`
       + `<div class="foudre-consigne">${etape === "choix" ? tr("Choisis quelqu'un")
-        : tr`${echapperHtml(avecCouronne(elu))} : ${partieHard ? "un doigt dans le cul" : "un bisou sur la bouche"}… ou ${culSec} ?`}</div>`;
+        : tr`${echapperHtml(avecCouronne(elu))} : ${partieHard ? tr("un doigt dans le cul") : tr("un bisou sur la bouche")}… ou ${culSec} ?`}</div>`;
     boutons.forEach(({ el, etapes }) => { el.style.display = etapes.includes(etape) ? "" : "none"; });
   }
   document.body.appendChild(overlay);

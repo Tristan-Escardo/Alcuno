@@ -1085,7 +1085,7 @@ function afficherOverlayTirageDuel(overlay, j1, j2, carteDuel = ""){
   function preparerDuel(){
     phase = 1;
     choixJ1 = null;
-    info.innerText = joueurs[j1] + " : choisis une carte";
+    info.innerText = tr`${joueurs[j1]} : choisis une carte`;
 
     // Reset visuel : cartes de dos, qui pulsent (= à choisir)
     c1.className = "Carte duel-a-choisir";
@@ -1104,7 +1104,7 @@ function afficherOverlayTirageDuel(overlay, j1, j2, carteDuel = ""){
     carteA = tirerUneCarte();
     carteB = tirerUneCarte();
 
-    info.innerText = joueurs[j1] + " : choisis une carte";
+    info.innerText = tr`${joueurs[j1]} : choisis une carte`;
   }
 
   function resoudreDuel(carteJ1, carteJ2){
@@ -1130,7 +1130,7 @@ function afficherOverlayTirageDuel(overlay, j1, j2, carteDuel = ""){
     const vPerdant = (v1 < v2) ? v1 : v2;
     const cartePerdant = (v1 < v2) ? carteJ1 : carteJ2;
     const gorg = gorgeesDuel(vPerdant, duelMultiplicateur);
-    const msg = joueurs[perdant] + " boit " + texteGorgees(gorg);
+    const msg = tr`${joueurs[perdant]} boit ${texteGorgees(gorg)}`;
 
     // Résultat visible tout de suite sur le duel : la carte du perdant en rouge, celle du gagnant estompée
     const carteDeJ1 = (choixJ1 === 1) ? c1 : c2;
@@ -1188,9 +1188,9 @@ function afficherOverlayTirageDuel(overlay, j1, j2, carteDuel = ""){
       restante.style.pointerEvents = "auto";
 
       // On sait tout de suite à qui est la carte choisie
-      label1.innerText = (which === 1) ? "Carte de " + joueurs[j1] : "";
-      label2.innerText = (which === 2) ? "Carte de " + joueurs[j1] : "";
-      info.innerText = joueurs[j2] + " : clique sur la carte restante";
+      label1.innerText = (which === 1) ? tr`Carte de ${joueurs[j1]}` : "";
+      label2.innerText = (which === 2) ? tr`Carte de ${joueurs[j1]}` : "";
+      info.innerText = tr`${joueurs[j2]} : clique sur la carte restante`;
       return;
     }
 
@@ -1210,8 +1210,8 @@ function afficherOverlayTirageDuel(overlay, j1, j2, carteDuel = ""){
       const carteJ2 = (choixJ1 === 1) ? carteB : carteA;
 
       // Le nom de J2 s'affiche tout de suite sous sa carte (comme pour J1), avant le retournement
-      if(which === 1) label1.innerText = "Carte de " + joueurs[j2];
-      else label2.innerText = "Carte de " + joueurs[j2];
+      if(which === 1) label1.innerText = tr`Carte de ${joueurs[j2]}`;
+      else label2.innerText = tr`Carte de ${joueurs[j2]}`;
 
       // La 2e carte se met aussi en retrait (comme celle de J1) : on voit qu'elle a été prise, puis on
       // passe au retournement (avant : l'effet était retiré aussitôt, rien ne se voyait au 2e tap)
@@ -1246,11 +1246,11 @@ function afficherOverlayTirageDuel(overlay, j1, j2, carteDuel = ""){
 
         // Labels clairs : qui a quoi
         if(choixJ1 === 1){
-          label1.innerText = "Carte de " + joueurs[j1];
-          label2.innerText = "Carte de " + joueurs[j2];
+          label1.innerText = tr`Carte de ${joueurs[j1]}`;
+          label2.innerText = tr`Carte de ${joueurs[j2]}`;
         } else {
-          label1.innerText = "Carte de " + joueurs[j2];
-          label2.innerText = "Carte de " + joueurs[j1];
+          label1.innerText = tr`Carte de ${joueurs[j2]}`;
+          label2.innerText = tr`Carte de ${joueurs[j1]}`;
         }
 
         info.innerText = tr("Résultat…");
@@ -1427,7 +1427,7 @@ function textePlus4(choisisseur, resultats){
     .sort((a, b) => b[0] - a[0]) // ceux qui boivent le plus d'abord
     .map(([n, noms]) => {
       const qui = noms.length > 1 ? tr`${noms.slice(0, -1).join(", ")} et ${noms[noms.length - 1]}` : noms[0];
-      return `${qui} ${noms.length > 1 ? "boivent" : "boit"} ${texteGorgees(n)}`;
+      return noms.length > 1 ? tr`${qui} boivent ${texteGorgees(n)}` : tr`${qui} boit ${texteGorgees(n)}`;
     });
   return tr`+4 de ${choisisseur} :\n${lignes.join("\n")}`;
 }
@@ -1650,7 +1650,7 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
   // Mode hot, période Saint-Valentin : carte Coup de foudre (un bisou sur la bouche… ou un cul sec : js/mode-hot.js)
   if(carteTiree === "coup_de_foudre"){
     // (mode hard : un doigt dans le cul à la place du bisou)
-    const entete = tr`COUP DE FOUDRE ⚡\nChoisis quelqu'un : ${partieHard ? "un doigt dans le cul" : "un bisou sur la bouche"}… ou ${estModeSoft() ? tr("4 gorgées") : tr("un CUL SEC")} !`;
+    const entete = tr`COUP DE FOUDRE ⚡\nChoisis quelqu'un : ${partieHard ? tr("un doigt dans le cul") : tr("un bisou sur la bouche")}… ou ${estModeSoft() ? tr("4 gorgées") : tr("un CUL SEC")} !`;
     afficherRegleBloc(regleZero, entete);
     regleZero.style.display = "block";
     zeroEnCours = true;

@@ -49,7 +49,7 @@ function remplirListeBar(zone){
     zone.appendChild(vide);
     return;
   }
-  zone.appendChild(elementExtras("p", "barCompte", trouves.length + (trouves.length > 1 ? " recettes" : " recette")));
+  zone.appendChild(elementExtras("p", "barCompte", trPluriel(trouves.length, tr("recette"))));
   FAMILLES_BAR.forEach(([id, nom]) => {
     const liste = trouves.filter((c) => c.g === id);
     if (!liste.length) return;

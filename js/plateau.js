@@ -179,7 +179,7 @@ function calculerRecap(restants = []){
     const cible = plusPetit ? Math.min(...valeurs.map(x => x.v)) : Math.max(...valeurs.map(x => x.v));
     const noms = valeurs.filter(x => x.v === cible).map(x => avecCouronne(x.nom));
     if(noms.length > 2) return null; // (égalité à plus de 2 : pas de titre)
-    return { qui: noms.join(" et "), v: cible };
+    return { qui: noms.join(tr(" et ")), v: cible };
   };
   const pluriel = trPluriel; // (js/langue.js : « 2 gorgées », « 2 sips », « 2 cancelled »)
   const titres = [];
@@ -197,7 +197,7 @@ function calculerRecap(restants = []){
     if(couples.length){
       const { noms, c } = couples[0];
       const morceaux = [c.b ? pluriel(c.b, "bisou") : "", c.g ? tr`${pluriel(c.g, tr("gorgée"))} l'un pour l'autre` : ""].filter(Boolean);
-      titres.push({ e: "💞", t: tr("Couple de la soirée"), q: `${noms.map(avecCouronne).join(" et ")} · ${morceaux.join(" · ")}` });
+      titres.push({ e: "💞", t: tr("Couple de la soirée"), q: `${noms.map(avecCouronne).join(tr(" et "))} · ${morceaux.join(" · ")}` });
     }
   }
   const culSecs = !st.doree ? 0 : st.doree.personne ? joueurs.length : 1;
@@ -893,7 +893,7 @@ function typeDeCarte(classe){
 
 function regleDeCarte(classe){
   if(classe === "carte_doree"){
-    return { nom: "Carte dorée", texte: estModeSoft()
+    return { nom: tr("Carte dorée"), texte: estModeSoft()
       ? tr("Distribue <em>3 gorgées</em> de la part du développeur 😘")
       : tr("Distribue <em>un CUL SEC</em> de la part du développeur.<br>Et obligation de se servir un vrai verre avant 😘") };
   }

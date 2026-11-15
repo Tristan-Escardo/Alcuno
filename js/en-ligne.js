@@ -729,7 +729,7 @@ document.getElementById("validerRejoindre").addEventListener("click", () => {
 
         alert(tr("La partie a déjà commencé : on ne peut plus y ajouter de joueur.\n\n") +
               tr("Si tu en faisais partie et que tu as été déconnecté, entre exactement le même pseudo ") +
-              "qu'avant pour reprendre ta place.");
+              tr("qu'avant pour reprendre ta place."));
         return;
       }
 
