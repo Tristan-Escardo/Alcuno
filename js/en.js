@@ -1110,5 +1110,12 @@ window.TEXTES_EN = {
 "🔥 Partie hot lancée !": "🔥 Hot game started!",
 "🚁 Zizi-coptère<br>débloqué !": "🚁 Willy-copter<br>unlocked!",
 "🤡 Mot secret trouvé !": "🤡 Secret word found!",
-"🥃 {0} préfère {1} !": "🥃 {0} would rather {1}!"
+"🥃 {0} préfère {1} !": "🥃 {0} would rather {1}!",
+"Regarder une partie": "Watch a game",
+"Pour seulement suivre la partie, sans jouer ni donner de pseudo : <b>Regarder une partie</b>, puis le code.": "To just follow a game, without playing or giving a nickname: <b>Watch a game</b>, then the code.",
+"Regarder": "Watch",
+"Entre le code de la partie à regarder.": "Enter the code of the game to watch.",
+"Tu regardes cette partie sans y jouer": "You are watching this game without playing",
+"Tu regardes la partie, sans y jouer": "You are watching the game, not playing",
+"Tu regardes la partie sans y jouer": "You are watching the game without playing"
 };

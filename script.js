@@ -118,6 +118,9 @@ function attendreFirebase(callback, siEchec){
 
 let codePartieActuel = null;
 let pseudoActuel = null;
+// Mode en ligne : ce téléphone regarde la partie sans y jouer (js/en-ligne.js, « Regarder une partie ») : pas de pseudo, pas de fiche
+// de joueur, aucune action envoyée
+let estSpectateur = false;
 let estHote = false;
 let hotePartie = null;
 // En ligne : pseudos marqués déconnectés dans Firebase (affichés « déconnecté » à côté du nom)
@@ -241,7 +244,7 @@ try {
 // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
 // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
 // Numérotation : +0.0.1 à chaque mise en ligne, et après x.y.9 on passe à x.(y+1).0 (ex. 9.5.9 => 9.6.0)
-const VERSION_AFFICHEE = "9.93.2";
+const VERSION_AFFICHEE = "9.94.0";
 // Appli de test (adresse autre que GitHub Pages et que le poste de dev, ou « ?modetest ») : même jeu, même Firebase, mais
 // elle n'envoie ni statistiques ni plantages (les chiffres restent ceux de la vraie appli) et affiche « TEST » dans les Réglages
 // Un navigateur piloté par un programme (tests automatiques de Claude : navigator.webdriver) est aussi en mode test, pour que
@@ -299,7 +302,7 @@ document.addEventListener("pointerdown", () => { clicAAvaler = false; }, true);
 // (il se tasse puis revient, un peu plus clair un instant, 0,2 s). Seulement tant qu'il est à l'écran :
 // rien ne reste par-dessus l'écran suivant.
 const BOUTONS_AVEC_POP = "#btnModeEnLigne, #btnModeClassique, .btnRetour, #btnPartagerJeu, #btnCreerPartie, " +
-  "#btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, " +
+  "#btnRejoindrePartie, #btnRegarderPartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, " +
   "#lancerPartieEnLigne, #btnRejouerMemes, #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui, " +
   "#btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, " +
   "#ajouterJoueur, #jouer, #btnCaster, #supprimerJoueur, #nouvellePartie, #termineSuppression, #btnInstallationInstaller, " +

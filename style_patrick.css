@@ -249,15 +249,15 @@
 :where(html[data-theme="patrick"]) #ecranInstallation .numeroEtape{ background: #d9ffe5; }
 :where(html[data-theme="patrick"]) #ecranInstallation #btnInstallationInstaller{ background: #7dff9f; box-shadow: inset 0 -3px 0 rgba(0,0,0,0.18), 0 0 26px rgba(200,255,220,0.45); }
 @media (hover: hover){
-  :where(html[data-theme="patrick"]) body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
-    #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
+  :where(html[data-theme="patrick"]) body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie,
+    #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
     #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
     #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
     #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
     #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayDuel button,
     #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
-    #overlayAnnulation button):hover:not(:disabled), :where(html[data-theme="patrick"]) body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
-    #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
+    #overlayAnnulation button):hover:not(:disabled), :where(html[data-theme="patrick"]) body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie,
+    #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
     #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
     #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
     #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
@@ -440,7 +440,7 @@ html[data-theme="patrick"] #ecranTele .tele-pied{ color: rgba(230,255,240,.8); }
    (mêmes boutons que les autres thèmes habillés, Soleil couchant par exemple : tous les boutons du jeu doivent être aux couleurs du thème) */
 html[data-theme="patrick"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #ajouterJoueur, #jouer, #supprimerJoueur,
   #nouvellePartie, #btnRejouerMemes, #btnModifierJoueurs, #btnReprendrePause,
-  #btnCreerPartie, #btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR,
+  #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR,
   #lancerPartieEnLigne, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui, #btnConfirmerAccueilNon,
   #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #termineSuppression,
   #btnInstallationInstaller, #ecranRegles .btnFaqLien, #choixMode .btnInstaller, #menu #btnCaster, #ecranCaster button:not(.btnRetour), #btnFermerScanner, #ecranReprise button,
@@ -448,7 +448,7 @@ html[data-theme="patrick"][data-theme] body :is(#btnModeEnLigne, #btnModeClassiq
   #overlayAnnulation button, #overlayRegleUnique .bouton-annulation, #overlayDuel button:not(:disabled), #overlayPredictionFin .bouton-pigeon),
 html[data-theme="patrick"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #ajouterJoueur, #jouer, #supprimerJoueur,
   #nouvellePartie, #btnRejouerMemes, #btnModifierJoueurs, #btnReprendrePause,
-  #btnCreerPartie, #btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR,
+  #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR,
   #lancerPartieEnLigne, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui, #btnConfirmerAccueilNon,
   #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #termineSuppression,
   #btnInstallationInstaller, #ecranRegles .btnFaqLien, #choixMode .btnInstaller, #menu #btnCaster, #ecranCaster button:not(.btnRetour), #btnFermerScanner, #ecranReprise button,

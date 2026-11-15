@@ -1665,8 +1665,8 @@ function afficherJoueurs(){
     return `<div class="joueur-ligne${classePause}"><span class="joueur-nom${classeNomLong(j)}">${echapperHtml(avecCouronne(j))}</span>${lien}${bonus}${pause}${badgeDeconnecte(j)}</div>`;
   }).join("");
 
-  // En partie : bouton ⏸ (ou ▶ s'il est en pause) à droite de chaque nom
-  if(partieLancee){
+  // En partie : bouton ⏸ (ou ▶ s'il est en pause) à droite de chaque nom (pas pour un spectateur : il ne touche à rien)
+  if(partieLancee && !estSpectateur){
     listeJoueurs.querySelectorAll(".joueur-ligne").forEach((ligne, i) => {
       const nom = joueurs[i];
       const bouton = document.createElement("button");
@@ -1924,6 +1924,7 @@ const ecranConfirmerRetrait = document.getElementById("ecranConfirmerRetrait");
 let retraitEnAttente = null;
 
 function demanderConfirmationRetrait(nom){
+  if(estSpectateur) return; // (un spectateur ne retire personne)
   retraitEnAttente = nom;
   document.getElementById("titreConfirmerRetrait").innerText = tr`Retirer ${nom} de la partie ?`;
 

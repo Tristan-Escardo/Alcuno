@@ -5687,7 +5687,7 @@ html.accessibilite #ecranInstallation #btnInstallationPlusTard{ font-size: 19px;
    Léger dégradé doré (le jaune du haut reste celui d'avant) et ombre du texte plus marquée.
    Mêmes boutons dans les overlays des règles (règle suivante). */
 html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu,
-  #btnCreerPartie, #btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR,
+  #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR,
   #lancerPartieEnLigne, #btnRejouerMemes, #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button,
   #btnConfirmerAccueilOui, #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon,
   #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie,
@@ -5874,16 +5874,16 @@ html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#overlayPi
    Luminosité plutôt que couleur : marche sur le jaune comme sur le cyan de Givre.
    Au doigt : plus sombre et un peu plus petit pendant l'appui. À la souris : un peu plus clair au survol
    (seulement si l'appareil a une souris, sinon l'effet reste « collé » après un tap). */
-:is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
-  #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
+:is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie,
+  #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
   #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
   #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
   #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
   #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayDuel button,
   #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
   #overlayAnnulation button),
-:is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
-  #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
+:is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie,
+  #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
   #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
   #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
   #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
@@ -5893,16 +5893,16 @@ html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#overlayPi
   transition: transform 0.12s ease, filter 0.12s ease, translate 0.12s ease, box-shadow 0.12s ease;
 }
 @media (hover: hover){
-  html body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
-    #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
+  html body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie,
+    #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
     #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
     #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
     #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
     #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayDuel button,
     #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
     #overlayAnnulation button):hover:not(:disabled),
-  html body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
-    #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
+  html body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie,
+    #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
     #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
     #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
     #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
@@ -5917,8 +5917,8 @@ html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#overlayPi
 
 /* Sombre : au survol à la souris, anneau doré fin au lieu du gros anneau blanc éclatant */
 @media (hover: hover){
-  html[data-theme="noir"] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
-  #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
+  html[data-theme="noir"] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie,
+  #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
   #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
   #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
   #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
@@ -5930,16 +5930,16 @@ html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#overlayPi
 
 /* Givre : anneau et lueur bleus (le blanc et le jaune ne se voient pas sur le fond clair) */
 @media (hover: hover){
-  html[data-theme="givre"] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
-  #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
+  html[data-theme="givre"] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie,
+  #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
   #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
   #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
   #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
   #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayDuel button,
   #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
   #overlayAnnulation button):hover:not(:disabled),
-  html[data-theme="givre"] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
-  #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
+  html[data-theme="givre"] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie,
+  #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
   #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
   #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
   #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
@@ -7031,7 +7031,7 @@ html[data-theme="soleil"] header::after{
 /* Boutons : dégradé soleil, texte blanc */
 html[data-theme="soleil"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #ajouterJoueur, #jouer, #supprimerJoueur,
   #nouvellePartie, #btnRejouerMemes, #btnModifierJoueurs, #btnReprendrePause,
-  #btnCreerPartie, #btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR,
+  #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR,
   #lancerPartieEnLigne, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui, #btnConfirmerAccueilNon,
   #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #termineSuppression,
   #btnInstallationInstaller){
@@ -7355,7 +7355,7 @@ html[data-theme="noir"] #ecranReglages .blocReglage .optionReglage{ background: 
    éteint donnait l'impression que la luminosité de l'écran était basse)
    Les boutons de partie des overlays (pigeon, duel, +4…) ne changent pas : ils restent bien lisibles en jeu. ===== */
 html[data-theme="noir"] :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu,
-  #btnCreerPartie, #btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR,
+  #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR,
   #lancerPartieEnLigne, #btnRejouerMemes, #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button,
   #btnConfirmerAccueilOui, #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon,
   #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie,
@@ -9908,3 +9908,9 @@ html[data-theme] #ecranRegles .blocRegles.ethyloResultat{
    ne différaient que par un fin liseré) : coche devant la langue choisie, l'autre est atténuée. */
 html body #ecranReglages .chipLangue.actif::before{ content: "\2713\00a0"; }
 html body #ecranReglages .chipLangue:not(.actif){ opacity: .6 !important; }
+
+/* « Regarder une partie » (js/en-ligne.js) : l'écran « Rejoindre » sans le pseudo ; en partie, pas de menu « Nouvelle partie » */
+#enLigneRejoindre.regarder #pseudoRejoindre,
+#enLigneRejoindre.regarder #validerRejoindre,
+#enLigneRejoindre:not(.regarder) #validerRegarder{ display: none; }
+body.mode-spectateur #nouvellePartie{ display: none !important; }

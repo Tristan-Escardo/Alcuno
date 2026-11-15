@@ -77,7 +77,7 @@ html[data-theme="chandeleur"] #ecranTele .tele-pied{ color: rgba(255,241,220,.8)
    (mêmes boutons que les autres thèmes habillés, Soleil couchant par exemple : tous les boutons du jeu doivent être aux couleurs du thème) */
 html[data-theme="chandeleur"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #ajouterJoueur, #jouer, #supprimerJoueur,
   #nouvellePartie, #btnRejouerMemes, #btnModifierJoueurs, #btnReprendrePause,
-  #btnCreerPartie, #btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR,
+  #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR,
   #lancerPartieEnLigne, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui, #btnConfirmerAccueilNon,
   #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #termineSuppression,
   #btnInstallationInstaller, #ecranRegles .btnFaqLien, #choixMode .btnInstaller, #menu #btnCaster, #ecranCaster button:not(.btnRetour), #btnFermerScanner, #ecranReprise button,
@@ -85,7 +85,7 @@ html[data-theme="chandeleur"][data-theme] body :is(#btnModeEnLigne, #btnModeClas
   #overlayAnnulation button, #overlayRegleUnique .bouton-annulation, #overlayDuel button:not(:disabled), #overlayPredictionFin .bouton-pigeon),
 html[data-theme="chandeleur"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #ajouterJoueur, #jouer, #supprimerJoueur,
   #nouvellePartie, #btnRejouerMemes, #btnModifierJoueurs, #btnReprendrePause,
-  #btnCreerPartie, #btnRejoindrePartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR,
+  #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR,
   #lancerPartieEnLigne, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui, #btnConfirmerAccueilNon,
   #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #termineSuppression,
   #btnInstallationInstaller, #ecranRegles .btnFaqLien, #choixMode .btnInstaller, #menu #btnCaster, #ecranCaster button:not(.btnRetour), #btnFermerScanner, #ecranReprise button,

@@ -60,6 +60,7 @@ function proprietaireAction(el){
 }
 
 function envoyerAction(el){
+  if(estSpectateur){ afficherToast(tr("Tu regardes la partie sans y jouer")); return; }
   const net = el._net;
   if(net.valide && !net.valide()) return;
   if(!actionPrete(el)) return;
@@ -101,6 +102,7 @@ function prochainePlaceAction(){
 }
 
 function ecrireAction(id){
+  if(estSpectateur) return Promise.reject(new Error("spectateur")); // (un spectateur n'écrit jamais dans la partie)
   const db = window.firebaseDB;
   const code = codePartieActuel;
   const manche = mancheCourante;
@@ -667,7 +669,7 @@ function afficherBadgeCode(){
     });
     document.body.appendChild(bouton);
   }
-  bouton.querySelector(".texte").innerText = tr("Code : ") + codePartieActuel;
+  bouton.querySelector(".texte").innerText = (estSpectateur ? "👁 " : "") + tr("Code : ") + codePartieActuel;
   bouton.classList.remove("ouvert");
 }
 
@@ -913,7 +915,7 @@ function positionActionCourante(){
 function proposerAnnulerChoix(choisisseur, debut = positionActionCourante(), texte = tr("Mauvais joueur ?")){
   masquerAnnulerChoix();
   if(rattrapageEnCours || repriseClassiqueEnCours) return;
-  if(enLigneActif && choisisseur !== pseudoActuel) return;
+  if(enLigneActif && (estSpectateur || choisisseur !== pseudoActuel)) return;
   const fin = positionActionCourante();
   if(debut < 0 || fin < debut) return;
 
@@ -1015,6 +1017,7 @@ function avancerJusquAEcran(id, fin){
 }
 
 function defaireChoix(choix){
+  if(estSpectateur) return;
   if(enLigneActif){
     ecrireAction(`defaire:${choix.debut}`).catch(() => afficherToast(tr("Connexion perdue, réessaie")));
     return;

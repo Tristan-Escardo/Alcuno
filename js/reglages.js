@@ -3163,7 +3163,7 @@ let choixDejaEnAttente = new Set();
 let verificationReglesPrevue = false;
 
 function choixEnAttentePourMoi(){
-  if(!enLigneActif) return [];
+  if(!enLigneActif || estSpectateur) return []; // (un spectateur n'a jamais rien à choisir)
   return [...document.querySelectorAll('[id^="overlay"] [data-net-id]')]
     .filter(el => el._net && actionPrete(el) && proprietaireAction(el) === pseudoActuel);
 }

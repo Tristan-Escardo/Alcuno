@@ -501,16 +501,16 @@ html[data-theme="kawaii"] #ecranInstallation #btnInstallationInstaller{
 }
 html[data-theme="kawaii"] #ecranInstallation #btnInstallationPlusTard{ color: var(--givre-texte); }
 @media (hover: hover){
-html[data-theme="kawaii"] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
-  #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
+html[data-theme="kawaii"] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie,
+  #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
   #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
   #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
   #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
   #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayDuel button,
   #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
   #overlayAnnulation button):hover:not(:disabled),
-html[data-theme="kawaii"] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie,
-  #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
+html[data-theme="kawaii"] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie,
+  #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
   #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
   #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
   #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,

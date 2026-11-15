@@ -25,6 +25,14 @@ Démarrage rapide (30 secondes, Linux / macOS / Windows)
   ne sortent que dans ce thème. Résultat attendu : « TOUT EST OK ». GitHub le lance aussi à chaque
   push (onglet Actions, « Tests de démarrage »).
 
+Spectateur en ligne (10 secondes, Linux / macOS / Windows)
+----------------------------------------------------------
+  node tests/test_spectateur.js
+
+  « Regarder une partie » (mode en ligne) avec un Firebase simulé en mémoire : écran sans pseudo, salle d'attente
+  sans ✕ ni « Lancer », manche qui démarre ou rattrapée en cours de route, aucune écriture dans la partie, aucune
+  action possible, départ sans toucher à la liste des joueurs. Lancé aussi par GitHub.
+
 Parties complètes du robot (1 à 2 minutes, Linux / macOS / Windows)
 -------------------------------------------------------------------
   node tests/test_partie_robot.js

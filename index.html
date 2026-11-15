@@ -9,7 +9,7 @@
          (Avant : « ?t= » + l'heure, différent à chaque lancement : tout le jeu était retéléchargé à chaque ouverture,
          environ 400 Ko. Maintenant, tant que la version ne change pas, le navigateur se contente de vérifier.) -->
     <script>
-        window.VERSION_FICHIERS = "9.93.2";
+        window.VERSION_FICHIERS = "9.94.0";
         // (ailleurs que sur le vrai site — poste de dev, appli de test — : l'heure en plus, comme avant, pour voir tout de
         // suite un fichier modifié sans changer de version)
         window.ANTI_CACHE = /(^|\.)github\.io$/i.test(location.hostname) ? window.VERSION_FICHIERS : window.VERSION_FICHIERS + "-" + Date.now();
@@ -549,6 +549,7 @@
                 <button type="button" id="btnRetourChoixMode" class="btnRetour">← Retour</button>
                 <button type="button" id="btnCreerPartie">Créer une partie</button>
                 <button type="button" id="btnRejoindrePartie">Rejoindre une partie</button>
+                <button type="button" id="btnRegarderPartie">Regarder une partie</button>
                 <button type="button" id="btnRevenirPartie" style="display:none;">Revenir dans une partie en cours</button>
             </div>
 
@@ -573,6 +574,8 @@
                 <input type="text" id="codeRejoindre" placeholder="Code de la partie" maxlength="6" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="next" />
                 <input type="text" id="pseudoRejoindre" placeholder="Ton pseudo" maxlength="20" autocomplete="off" enterkeyhint="go" />
                 <button type="button" id="validerRejoindre">Rejoindre</button>
+                <!-- « Regarder une partie » : même écran, sans pseudo (classe « regarder », voir js/en-ligne.js) -->
+                <button type="button" id="validerRegarder">Regarder</button>
             </div>
 
             <div id="salleAttente" style="display:none;">
@@ -581,6 +584,7 @@
                 <h3 id="codePartieAffiche"></h3>
                 <button type="button" id="btnInviterPartie">📤 Inviter à rejoindre la partie</button>
                 <p id="infoModeSoft" class="infoModeSoft" style="display:none;">Partie en Mode PJ</p>
+                <p id="infoSpectateur" class="infoModeSoft" style="display:none;">Tu regardes cette partie sans y jouer</p>
                 <div id="listeJoueursEnLigne"></div>
                 <button type="button" id="lancerPartieEnLigne" style="display:none;">Lancer la partie</button>
             </div>
