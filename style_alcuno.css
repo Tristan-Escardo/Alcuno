@@ -10064,6 +10064,13 @@ html body #ecranReglages #tuilesReglages .tuileReglage.choisie{
   filter: brightness(1.15) saturate(1.15) !important;
   box-shadow: 0 18px 30px -8px rgba(0,0,0,0.6), 0 0 34px 6px color-mix(in srgb, currentColor 65%, transparent) !important;
 }
+/* Star Wars et BDSM : toutes les tuiles ont déjà un néon, et la règle qui le pose sur tous les boutons de ces thèmes
+   passe devant le halo ci-dessus. La tuile ouverte y a un contour blanc et un grand halo blanc. Les :not(#_f…)
+   (identifiants qui n'existent pas) ne servent qu'à passer devant cette règle, très prioritaire. */
+html[data-theme="galaxie"] body #ecranReglages #tuilesReglages .tuileReglage.choisie:not(#_f0):not(#_f1):not(#_f2):not(#_f3):not(#_f4):not(#_f5):not(#_f6):not(#_f7):not(#_f8):not(#_f9):not(#_f10):not(#_f11):not(#_f12):not(#_f13):not(#_f14):not(#_f15):not(#_f16):not(#_f17):not(#_f18):not(#_f19):not(#_f20):not(#_f21):not(#_f22):not(#_f23):not(#_f24):not(#_f25):not(#_f26):not(#_f27):not(#_f28):not(#_f29),
+html[data-theme="donjon"] body #ecranReglages #tuilesReglages .tuileReglage.choisie:not(#_f0):not(#_f1):not(#_f2):not(#_f3):not(#_f4):not(#_f5):not(#_f6):not(#_f7):not(#_f8):not(#_f9):not(#_f10):not(#_f11):not(#_f12):not(#_f13):not(#_f14):not(#_f15):not(#_f16):not(#_f17):not(#_f18):not(#_f19):not(#_f20):not(#_f21):not(#_f22):not(#_f23):not(#_f24):not(#_f25):not(#_f26):not(#_f27):not(#_f28):not(#_f29){
+  box-shadow: 0 0 0 2px #fff, 0 0 30px 8px rgba(255,255,255,0.55), 0 0 60px 14px color-mix(in srgb, currentColor 60%, transparent) !important;
+}
 @media (prefers-reduced-motion: reduce){ #ecranReglages #tuilesReglages .tuileReglage{ transition: none; } }
 
 /* ===== Accueil : la page ne défile plus. L'accueil est un écran fixe par-dessus le jeu : sur iPhone, glisser le doigt dessus
