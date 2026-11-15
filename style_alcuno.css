@@ -3715,8 +3715,25 @@ html.accessibilite #overlayCoupDeFoudre .plus4-joueur-btn{
   box-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
 #ecranReglages #btnProfilConnexion.btnGoogle .logoGoogle{ display: block; flex: 0 0 auto; width: 20px; height: 20px; }
-html[data-theme="givre"] #ecranReglages #btnProfilSupprimer{ color: var(--givre-doux); }
-html[data-theme="soleil"] #ecranReglages #btnProfilSupprimer{ color: #3a1f4a; }
+/* Connecté : « Se déconnecter » garde le même bouton blanc que « Se connecter avec Google », sans le G */
+#ecranReglages #btnProfilConnexion.btnGoogle.connecte .logoGoogle{ display: none; }
+/* « Supprimer mon profil » : même rendu dans tous les thèmes (les thèmes y mettaient un cadre ou un trait dessous) :
+   petite pastille rouge discrète, ni cadre, ni souligné, ni ombre */
+html[data-theme][data-theme][data-theme] body #ecranReglages #btnProfilSupprimer{
+  display: inline-block;
+  padding: 7px 14px;
+  min-width: 0; min-height: 0; width: auto; height: auto;
+  font-family: inherit; font-size: 13px; font-weight: 700; letter-spacing: 0;
+  text-transform: none; text-decoration: none !important; text-shadow: none;
+  color: var(--dangerReglage, #ff9b9b);
+  background: rgba(214, 69, 69, 0.14);
+  border: 0; border-radius: 999px; outline: none;
+  box-shadow: none; filter: none; clip-path: none;
+  cursor: pointer; touch-action: manipulation;
+}
+html[data-theme][data-theme][data-theme] body #ecranReglages #btnProfilSupprimer::before,
+html[data-theme][data-theme][data-theme] body #ecranReglages #btnProfilSupprimer::after{ content: none; display: none; }
+html[data-theme][data-theme][data-theme] body #ecranReglages #btnProfilSupprimer:active{ background: rgba(214, 69, 69, 0.28); }
 
 /* ===== Réglages : Partager le jeu (QR code + bouton « Partager ») ===== */
 #ecranReglages .blocPartage{
@@ -8180,7 +8197,7 @@ html[data-theme="galaxie"] #choixMode .titreAccueilBarre, html[data-theme="galax
   box-shadow: 0 0 4px #fff, 0 0 10px #39a0ff, 0 0 22px #1f7bff, 0 0 40px rgba(31,123,255,.6) !important; animation:none !important;
 }
 /* Boutons : lame bleue, « Jouer » et le mode classique en rouge */
-html[data-theme="galaxie"] button:not(#btnInstallationInstaller):not(#btnInstallationPlusTard):not(.pastilleTheme):not(#btnRemonter):not(#btnPause):not(#btnHistorique):not(#btnReglagesJeu):not(.btnPauseJoueur):not(.btnLivre):not(#btnReglages):not(.btnAccueilTexte):not(#btnSignalerBug):not(#btnFaq):not(.fenetrePrestige-essayer):not(.fenetreKawaii-essayer):not(.fenetreKawaii-plusTard):not(.fenetrePrestige-plusTard):not(.fenetreGalaxie-ok):not(.fenetreGalaxie-plusTard):not(.bloc-hot-btn):not(#overlayDuel .duel-boutons button:disabled){
+html[data-theme="galaxie"] button:not(#btnProfilSupprimer):not(#btnProfilConnexion):not(#btnInstallationInstaller):not(#btnInstallationPlusTard):not(.pastilleTheme):not(#btnRemonter):not(#btnPause):not(#btnHistorique):not(#btnReglagesJeu):not(.btnPauseJoueur):not(.btnLivre):not(#btnReglages):not(.btnAccueilTexte):not(#btnSignalerBug):not(#btnFaq):not(.fenetrePrestige-essayer):not(.fenetreKawaii-essayer):not(.fenetreKawaii-plusTard):not(.fenetrePrestige-plusTard):not(.fenetreGalaxie-ok):not(.fenetreGalaxie-plusTard):not(.bloc-hot-btn):not(#overlayDuel .duel-boutons button:disabled){
   background: linear-gradient(180deg, rgba(14,22,44,.92), rgba(6,10,22,.92)) !important; color:#eaf3ff !important; text-shadow:none !important;
   border: 1.5px solid #8fd0ff !important; letter-spacing:.04em;
   box-shadow: 0 0 6px #4aa8ff, 0 0 16px rgba(40,140,255,.55), inset 0 0 10px rgba(80,170,255,.22) !important;

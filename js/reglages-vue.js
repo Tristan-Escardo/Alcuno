@@ -173,6 +173,7 @@
       ecran.style.setProperty("--menuBord", css(titre, 0.4));
       ecran.style.setProperty("--menuActif", css(titre, 0.18));
       ecran.style.setProperty("--menuSousTitre", css(titre, 0.75));
+      ecran.style.setProperty("--dangerReglage", clair ? "#a3161b" : "#ff9b9b"); // (« Supprimer mon profil » : rouge lisible sur fond clair ou foncé)
     } catch (e) {}
   };
   majCouleurTitre();

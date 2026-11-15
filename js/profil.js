@@ -206,7 +206,8 @@ if (typeof document !== "undefined" && !document.documentElement.classList.conta
     const nom = connecte ? (utilisateur.displayName || utilisateur.email || "") : "";
     bloc.classList.toggle("profil-connecte", connecte);
     // Déconnecté : bouton « Se connecter avec Google » (blanc, avec le G de Google), sous le texte ; connecté : petit bouton du jeu
-    btnConnexion.classList.toggle("btnGoogle", !connecte);
+    btnConnexion.classList.add("btnGoogle"); // (même bouton blanc « Google » connecté ou non)
+    btnConnexion.classList.toggle("connecte", connecte);
     document.getElementById("texteBtnProfil").textContent = connecte ? tr("Se déconnecter") : tr("Se connecter avec Google");
     btnConnexion.disabled = occupe;
     ligneSupprimer.hidden = !connecte;
