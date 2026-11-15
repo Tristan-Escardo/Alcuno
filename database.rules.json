@@ -46,6 +46,16 @@
           "confV": { ".validate": "newData.isNumber()" },
           "installe": { ".validate": "newData.val() === true" },
           "joue": { ".validate": "newData.val() === true" },
+          "type": { ".validate": "newData.isString() && newData.val().matches(/^(telephone|tablette|ordi)$/)" },
+          "nav": { ".validate": "newData.isString() && newData.val().length <= 30" },
+          "osv": { ".validate": "newData.isString() && newData.val().length <= 30" },
+          "ecran": { ".validate": "newData.isString() && newData.val().matches(/^[0-9]{2,5}x[0-9]{2,5}@[0-9]([.][0-9]{1,2})?$/)" },
+          "langue": { ".validate": "newData.isString() && newData.val().length <= 16" },
+          "fuseau": { ".validate": "newData.isString() && newData.val().length <= 40" },
+          "pays": { ".validate": "newData.isString() && newData.val().matches(/^[A-Z]{2}$/)" },
+          "region": { ".validate": "newData.isString() && newData.val().length <= 60" },
+          "ville": { ".validate": "newData.isString() && newData.val().length <= 60" },
+          "fai": { ".validate": "newData.isString() && newData.val().length <= 80" },
           "$autre": { ".validate": false }
         }
       }

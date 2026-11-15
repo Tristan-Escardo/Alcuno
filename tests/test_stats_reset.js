@@ -1,4 +1,5 @@
-// Page de stats : le bouton « Réinitialiser toutes les statistiques » efface bien tout (Firebase simulé en mémoire : pas de réseau).
+// Page de stats : onglets, rubriques, onglet Public, pilotage, santé, et le bouton « Réinitialiser toutes les statistiques »
+// (Firebase simulé en mémoire : pas de réseau).
 //   node tests/test_stats_reset.js
 const http = require("http");
 const fs = require("fs");
@@ -97,6 +98,25 @@ export const signOut = async () => { utilisateur = null; ecouteurs.forEach((e) =
     await p.route(/fonts\.(googleapis|gstatic)\.com/, (r) => r.abort());
   };
   await brancher(page);
+  // Les réglages sont rangés par onglets et par rubriques (une seule affichée à la fois) : avant d'agir sur un élément, on ouvre
+  // son onglet et sa rubrique en tapant sur les vrais boutons, comme le ferait l'utilisateur.
+  const ouvrirRubriqueDe = (p) => {
+    for (const methode of ["click", "fill", "selectOption"]) {
+      const origine = p[methode].bind(p);
+      p[methode] = async (selecteur, ...reste) => {
+        await p.evaluate((sel) => {
+          let el = null; try { el = document.querySelector(sel.split(" >> ")[0]); } catch (e) {}
+          if (!el || el.closest(".onglets, .sousMenu")) return;
+          const vue = el.closest(".vue");
+          if (vue && !vue.classList.contains("actif")) document.getElementById("onglet" + vue.id.slice(3)).click();
+          const pan = el.closest(".pan");
+          if (pan && !pan.classList.contains("actif")) document.querySelector(`.sousMenu[data-groupe="${pan.dataset.groupe}"] button[data-pan="${pan.dataset.pan}"]`).click();
+        }, selecteur);
+        return origine(selecteur, ...reste);
+      };
+    }
+  };
+  ouvrirRubriqueDe(page);
   await page.addInitScript(() => { try { localStorage.setItem("faux_utilisateur", "1"); } catch (e) {} }); // (session Firebase retrouvée : connecté d'office)
   await page.goto(url); await page.waitForTimeout(800);
 
@@ -114,8 +134,10 @@ export const signOut = async () => { utilisateur = null; ecouteurs.forEach((e) =
     const refuse = await etat();
     await p2.fill("#porteMdp", "bon"); await p2.click("#formPorte button"); await p2.waitForTimeout(600);
     const ouvert = await etat();
-    await p2.evaluate(() => document.getElementById("ongletPilotage").click()); await p2.waitForTimeout(200);
-    await p2.evaluate(() => { document.getElementById("pilDeconnecter").closest("details").open = true; });
+    await p2.click("#ongletPilotage"); await p2.waitForTimeout(200);
+    const avantCompte = await p2.isVisible("#pilDeconnecter"); // (rangé dans la rubrique « Compte » : pas visible avant de l'ouvrir)
+    await p2.click('#pilMenu button[data-pan="compte"]');
+    if (avantCompte) throw new Error("« Se déconnecter » devrait être rangé dans la rubrique Compte");
     await p2.click("#pilDeconnecter"); await p2.waitForTimeout(800); // (se déconnecter ramène à l'écran de connexion)
     const deconnecte = await p2.evaluate(() => ({ porte: !document.getElementById("porte").hidden, contenu: !document.getElementById("contenu").hidden }));
     await p2.close();
@@ -147,7 +169,7 @@ export const signOut = async () => { utilisateur = null; ecouteurs.forEach((e) =
   const d = await etat();
   verifier(d.jours === 0 && d.appareils === 0 && d.presence === 1 && d.message.includes("remises à zéro") && d.bouton && !d.confirme,
     `« Oui » : tout est effacé (jours ${d.jours}, appareils ${d.appareils}), le direct est gardé (présence ${d.presence}), message « ${d.message} »`);
-  // Onglet Aide : 4 onglets tiennent sur la largeur du téléphone, la page s'ouvre, ses questions se déplient
+  // Onglet Aide : les 5 onglets tiennent sur la largeur du téléphone, la page s'ouvre, ses questions se déplient
   await page.click("#ongletAide"); await page.waitForTimeout(400);
   const aide = await page.evaluate(() => {
     const bar = document.querySelector(".onglets").getBoundingClientRect();
@@ -160,7 +182,8 @@ export const signOut = async () => { utilisateur = null; ecouteurs.forEach((e) =
   await page.click("#ongletStats"); await page.waitForTimeout(300);
 
   // Onglets Stats / Pilotage : tap sur l'onglet, glissement du doigt (gauche = Pilotage, droite = Stats), pas de glissement depuis un champ
-  const vues = () => page.evaluate(() => ({ stats: document.getElementById("vueStats").classList.contains("actif") && getComputedStyle(document.getElementById("vueStats")).display !== "none",
+  const vues = () => page.evaluate(() => ({ public: document.getElementById("vuePublic").classList.contains("actif") && getComputedStyle(document.getElementById("vuePublic")).display !== "none",
+    stats: document.getElementById("vueStats").classList.contains("actif") && getComputedStyle(document.getElementById("vueStats")).display !== "none",
     sante: document.getElementById("vueSante").classList.contains("actif") && getComputedStyle(document.getElementById("vueSante")).display !== "none",
     pilotage: document.getElementById("vuePilotage").classList.contains("actif") && getComputedStyle(document.getElementById("vuePilotage")).display !== "none",
     onglet: document.querySelector('.onglet[aria-selected="true"]').dataset.vue, sous: document.getElementById("sousTitre").textContent, hash: location.hash }));
@@ -171,12 +194,14 @@ export const signOut = async () => { utilisateur = null; ecouteurs.forEach((e) =
     el.dispatchEvent(new TouchEvent("touchend", { bubbles: true, cancelable: true, touches: [], changedTouches: [t(200 + dx)] }));
   }, [dx, cible]);
   const v0 = await vues();
+  await glisser(-200); const v0b = await vues(); // (page Public)
   await glisser(-200); const v1 = await vues();
   await glisser(-200); const v1b = await vues();
   await glisser(-200); const v1c = await vues(); // (page Aide)
   await glisser(-200); const v1d = await vues(); // (déjà sur la dernière page : rien de plus)
   await glisser(200); const v1e = await vues(); // (retour à Pilotage)
   await glisser(200); const v2 = await vues();
+  await glisser(200); const v2a = await vues(); // (retour à Public)
   await glisser(200); const v2b = await vues();
   await glisser(200); const v2c = await vues(); // (déjà sur la première page)
   await page.click("#ongletPilotage"); const v3 = await vues();
@@ -184,8 +209,8 @@ export const signOut = async () => { utilisateur = null; ecouteurs.forEach((e) =
   await page.click("#ongletStats"); const v4 = await vues();
   await glisser(-200, "#pilEmail"); const v5 = await vues(); // (un glissement qui démarre dans un champ ne change pas de page)
   await glisser(-30); const v6 = await vues(); // (trop court)
-  verifier(v0.stats && !v0.pilotage && v1.sante && v1.sous === "Santé du jeu" && v1.hash === "#sante" && v1b.pilotage && v1b.sous === "Pilotage" && v1c.onglet === "aide" && v1d.onglet === "aide" && v1e.pilotage && v2.sante && v2b.stats && v2b.sous === "Statistiques" && v2c.stats && v3.pilotage && v3b.sante && v4.stats && v4.hash === "" && v5.stats && v6.stats,
-    `onglets Stats / Santé / Pilotage : glisser, taper (${JSON.stringify([v0.stats, v1.sante, v1b.pilotage, v1c.onglet, v1d.onglet, v1e.pilotage, v2.sante, v2b.stats, v2c.stats, v3.pilotage, v3b.sante, v4.stats, v5.stats, v6.stats])})`);
+  verifier(v0.stats && !v0.pilotage && v0b.public && v0b.sous === "Public et appareils" && v0b.hash === "#public" && v2a.public && v1.sante && v1.sous === "Santé du jeu" && v1.hash === "#sante" && v1b.pilotage && v1b.sous === "Pilotage" && v1c.onglet === "aide" && v1d.onglet === "aide" && v1e.pilotage && v2.sante && v2b.stats && v2b.sous === "Statistiques" && v2c.stats && v3.pilotage && v3b.sante && v4.stats && v4.hash === "" && v5.stats && v6.stats,
+    `onglets Stats / Public / Santé / Pilotage / Aide : glisser, taper (${JSON.stringify([v0.stats, v1.sante, v1b.pilotage, v1c.onglet, v1d.onglet, v1e.pilotage, v2.sante, v2b.stats, v2c.stats, v3.pilotage, v3b.sante, v4.stats, v5.stats, v6.stats])})`);
   // Santé : plantages envoyés par le jeu, regroupés sur 7 jours
   const jourDe = (decalage) => { const d = new Date(Date.now() - decalage * 86400000); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
   await page.evaluate(([auj, hier, vieux]) => {
@@ -375,6 +400,79 @@ export const signOut = async () => { utilisateur = null; ecouteurs.forEach((e) =
   await page.click("#santeEffacer"); await page.waitForTimeout(300);
   const efface = await page.evaluate(() => ({ jours: !!(window.__arbre.sante && window.__arbre.sante.jours), etat: document.getElementById("santeEtat").textContent }));
   verifier(ign.ignore === true && ign.lignes === 1 && /Ignorés \(1\)/.test(ign.ignores) && ign.badge === "2" && reaf.ignore === false && reaf.lignes === 2 && !efface.jours && /Aucun plantage/.test(efface.etat), `santé (connecté) : ignorer, réafficher, effacer (${JSON.stringify([ign, reaf, efface])})`);
+  // Onglet Public : lieux (d'après l'IP, écrits par js/stats.js), appareils, fiche par fiche, période ; rien d'injecté dans la page
+  await page.evaluate(() => {
+    const m = Date.now(), h = 3600000, j = 24 * h;
+    window.__arbre.stats = { appareils: {
+      aaaaaaaaaa01: { os: "ios", vu: m - h, version: "9.92.0", theme: "noir", type: "telephone", nav: "Safari 17", osv: "iOS 17.5", ecran: "390x844@3", langue: "fr-FR", fuseau: "Europe/Paris", pays: "FR", region: "Occitanie", ville: "Toulouse", fai: "Orange S.A.", installe: true },
+      aaaaaaaaaa02: { os: "android", vu: m - 2 * h, version: "9.92.0", type: "telephone", nav: "Chrome 126", osv: "Android 14", ecran: "412x915@2.63", langue: "fr-FR", fuseau: "Europe/Paris", pays: "FR", region: "Occitanie", ville: "Toulouse", fai: "Free SAS" },
+      aaaaaaaaaa03: { os: "android", vu: m - 3 * j, version: "9.92.0", type: "tablette", nav: "Instagram", osv: "Android 13", ecran: "800x1280@2", langue: "fr-BE", fuseau: "Europe/Brussels", pays: "BE", region: "Bruxelles", ville: "Bruxelles", fai: "Proximus NV" },
+      aaaaaaaaaa04: { os: "ordi", vu: m - 20 * j, version: "9.92.0", type: "ordi", nav: "Edge 126", osv: "Windows 11", ecran: "1920x1080@1", langue: "en-CA", fuseau: "America/Toronto", pays: "CA", region: "Québec", ville: "Montréal", fai: "<img src=x onerror=window.__injecte=1>" },
+      aaaaaaaaaa05: { os: "ios", vu: m - 5 * h, version: "9.91.1", theme: "noir" },
+      aaaaaaaaaa06: { os: "ios", vu: m - 200 * j, version: "9.80.0", pays: "JP", ville: "Tokyo", type: "telephone" } } };
+    window.__notifier();
+  });
+  await page.click("#ongletPublic"); await page.waitForTimeout(300);
+  const lirePublic = () => page.evaluate(() => {
+    const barres = (id) => [...document.querySelectorAll("#" + id + " .barre")].map((b) => b.querySelector(".nom").textContent + " = " + b.querySelector(".pc").textContent);
+    const visibles = [...document.querySelectorAll('.pan[data-groupe="public"]')].filter((p) => getComputedStyle(p).display !== "none").map((p) => p.dataset.pan);
+    return { pays: document.getElementById("pubPays").textContent, villes: document.getElementById("pubVilles").textContent, appareils: document.getElementById("pubAppareils").textContent, legende: document.getElementById("pubLegende").textContent,
+      bPays: barres("barresPays"), bVilles: barres("barresVilles"), bFai: barres("barresFai"), bTypes: barres("barresTypes"), bOsv: barres("barresOsv"), bNav: barres("barresNav"), bEcrans: barres("barresEcrans"), bLangues: barres("barresLangues"), bFuseaux: barres("barresFuseaux"), bOs: barres("barresOs"), bVersions: barres("barresVersions"),
+      fiches: [...document.querySelectorAll("#pubListe .appLigne")].map((l) => l.textContent), images: document.querySelectorAll("#vuePublic img").length, injecte: !!window.__injecte, visibles,
+      plus: !document.getElementById("pubVoirPlus").hidden, largeur: document.documentElement.scrollWidth,
+      debord: [...document.querySelectorAll("#vuePublic .barre, #vuePublic .sousMenu button, #vuePublic .appLigne")].some((e) => e.getBoundingClientRect().right > 391) };
+  });
+  const pub30 = await lirePublic();
+  verifier(pub30.pays === "3" && pub30.villes === "3" && pub30.appareils === "5" && /4 localisés sur 5/.test(pub30.legende) && /France = 2 · 50 %/.test(pub30.bPays[0]) && pub30.bPays.length === 3 && /Toulouse = 2 · 50 %/.test(pub30.bVilles[0])
+    && pub30.bFai.length === 4 && pub30.bTypes.join().includes("Téléphone = 2 · 50 %") && pub30.bOsv.join().includes("iOS 17.5") && pub30.bNav.join().includes("Instagram") && pub30.bEcrans.join().includes("1170 × 2532") && pub30.bEcrans.join().includes("1084 × 2406")
+    && /Français \(France\) = 2/.test(pub30.bLangues[0]) && /Europe\/Paris · UTC\+[12] = 2/.test(pub30.bFuseaux[0]) && pub30.bOs.join().includes("iPhone = 2 · 40 %") && pub30.bVersions.join().includes("9.92.0 = 4 · 80 %"),
+    `onglet Public (30 jours) : pays, villes, fournisseurs, appareils (${JSON.stringify([pub30.pays, pub30.villes, pub30.appareils, pub30.legende, pub30.bPays, pub30.bVilles, pub30.bEcrans, pub30.bLangues, pub30.bFuseaux])})`);
+  verifier(pub30.fiches.length === 5 && /Toulouse, Occitanie/.test(pub30.fiches[0]) && /il y a 60 min/.test(pub30.fiches[0]) && /Orange S\.A\./.test(pub30.fiches[0]) && /Téléphone · iOS 17\.5 · Safari 17 · 1170 × 2532 · Français \(France\) · Europe\/Paris · jeu 9\.92\.0 · installé/.test(pub30.fiches[0])
+    && /Lieu inconnu/.test(pub30.fiches.join("|")) && /<img src=x/.test(pub30.fiches.join("|")) && pub30.images === 0 && !pub30.injecte && !pub30.plus,
+    `onglet Public : une fiche par appareil, la plus récente d'abord ; un texte piégé reste du texte (${JSON.stringify(pub30.fiches[0])}, images ${pub30.images})`);
+  verifier(pub30.visibles.length === 1 && pub30.largeur <= 390 && !pub30.debord, `onglet Public : une seule rubrique affichée (${pub30.visibles}), rien ne dépasse de l'écran (largeur ${pub30.largeur})`);
+  await page.click('#pubPeriode button[data-jours="7"]'); const pub7 = await lirePublic();
+  await page.click('#pubPeriode button[data-jours="0"]'); const pubTout = await lirePublic();
+  await page.click('.sousMenu[data-groupe="public"] button[data-pan="liste"]'); const pubListe = await lirePublic();
+  verifier(pub7.appareils === "4" && pub7.pays === "2" && pubTout.appareils === "6" && pubTout.pays === "4" && pubTout.bPays.join().includes("Japon") && pubListe.visibles.join() === "liste",
+    `onglet Public : période 7 jours (${pub7.appareils} appareils, ${pub7.pays} pays), depuis le début (${pubTout.appareils}, ${pubTout.pays}), rubrique « Un par un » (${pubListe.visibles})`);
+  await page.click('#pubPeriode button[data-jours="30"]');
+
+  // Pilotage rangé par rubriques : une seule affichée, celle qu'on a ouverte est retenue ; le Bar et la remise à zéro y sont rangés
+  await page.click("#ongletPilotage"); await page.waitForTimeout(200);
+  const rubriques = () => page.evaluate(() => ({ boutons: [...document.querySelectorAll("#pilMenu button")].map((b) => b.dataset.pan), choisie: (document.querySelector('#pilMenu button[aria-selected="true"]') || {}).dataset.pan,
+    visibles: [...document.querySelectorAll('.pan[data-groupe="pilotage"]')].filter((p) => getComputedStyle(p).display !== "none").map((p) => p.dataset.pan),
+    orphelins: [...document.querySelectorAll("#pilPanneau > *")].filter((e) => !e.matches(".sousMenu, .pan")).length, retenue: localStorage.getItem("alcuno_stats_rubrique_pilotage"),
+    debord: [...document.querySelectorAll("#pilMenu button")].some((b) => b.scrollWidth > b.clientWidth + 1), largeur: document.documentElement.scrollWidth }));
+  await page.click('#pilMenu button[data-pan="themes"]'); const rubThemes = await rubriques();
+  const themesVisibles = await page.evaluate(() => ({ themes: document.getElementById("pilThemes").offsetParent !== null, annonce: document.getElementById("pilAnnonce").offsetParent !== null, reset: document.getElementById("btnReset").offsetParent !== null, bar: document.getElementById("barListe").offsetParent !== null }));
+  await page.click('#pilMenu button[data-pan="bar"]'); const rubBar = await rubriques();
+  const barVisible = await page.evaluate(() => ({ bar: document.getElementById("barListe").offsetParent !== null, recettes: document.querySelectorAll("#barListe .pilLigne").length, themes: document.getElementById("pilThemes").offsetParent !== null }));
+  verifier(rubThemes.boutons.join() === "etat,assistant,annonce,jeu,themes,defis,bar,compte" && rubThemes.choisie === "themes" && rubThemes.visibles.join() === "themes" && rubThemes.orphelins === 0 && rubThemes.retenue === "themes" && !rubThemes.debord && rubThemes.largeur <= 390
+    && themesVisibles.themes && !themesVisibles.annonce && !themesVisibles.reset && !themesVisibles.bar && rubBar.visibles.join() === "bar" && barVisible.bar && barVisible.recettes > 10 && !barVisible.themes,
+    `pilotage : 8 rubriques, une seule affichée (${rubThemes.visibles} puis ${rubBar.visibles}), retenue (${rubThemes.retenue}), Bar rangé dedans (${barVisible.recettes} recettes)`);
+  // Mise à jour demandée : son propre réglage (avant : seulement par une phrase à l'assistant)
+  await page.fill("#pilMajMin", "9.92"); await page.click("#pilMajDemander"); await page.waitForTimeout(200);
+  const majRefus = await page.evaluate(() => ({ majMin: window.__arbre.config.majMin || null, message: document.getElementById("pilMessage").textContent }));
+  await page.fill("#pilMajMin", "9.92.0"); await page.click("#pilMajDemander"); await page.waitForTimeout(300);
+  const majOui = await page.evaluate(() => ({ majMin: window.__arbre.config.majMin || null, etat: document.getElementById("pilMajEtat").textContent, rubrique: document.querySelector('#pilMenu button[aria-selected="true"]').dataset.pan }));
+  await page.click("#pilMajRetirer"); await page.waitForTimeout(300);
+  const majNon = await page.evaluate(() => ({ majMin: window.__arbre.config.majMin || null, etat: document.getElementById("pilMajEtat").textContent }));
+  verifier(majRefus.majMin === null && /9\.92\.0/.test(majRefus.message) && majOui.majMin === "9.92.0" && /9\.92\.0/.test(majOui.etat) && majOui.rubrique === "jeu" && majNon.majMin === null && /rien/.test(majNon.etat),
+    `pilotage : mise à jour demandée (${JSON.stringify([majRefus, majOui, majNon])})`);
+  // Adresse directe vers une rubrique, et rubrique retenue d'une ouverture à l'autre
+  const directe = await (async () => {
+    const p3 = await nav.newPage({ viewport: { width: 390, height: 780 } });
+    await brancher(p3);
+    await p3.addInitScript(() => { try { localStorage.setItem("faux_utilisateur", "1"); } catch (e) {} });
+    await p3.goto(url + "#pilotage-defis"); await p3.waitForTimeout(600);
+    const r = await p3.evaluate(() => ({ vue: document.querySelector(".vue.actif").id, rubrique: document.querySelector('#pilMenu button[aria-selected="true"]').dataset.pan, defis: document.getElementById("pilDefiTexte").offsetParent !== null }));
+    await p3.goto(url + "#public-liste"); await p3.reload(); await p3.waitForTimeout(600);
+    const r2 = await p3.evaluate(() => ({ vue: document.querySelector(".vue.actif").id, rubrique: document.querySelector('.sousMenu[data-groupe="public"] button[aria-selected="true"]').dataset.pan }));
+    await p3.close();
+    return { r, r2 };
+  })();
+  verifier(directe.r.vue === "vuePilotage" && directe.r.rubrique === "defis" && directe.r.defis && directe.r2.vue === "vuePublic" && directe.r2.rubrique === "liste", `adresse directe vers une rubrique (${JSON.stringify(directe)})`);
   verifier(erreurs.length === 0 && nbErreursStats === 0, `aucune erreur dans les pages (${erreurs.length})`);
   await nav.close(); serveur.close();
   console.log(echecs ? `\n${echecs} ÉCHEC(S)` : "\nTOUT EST OK");

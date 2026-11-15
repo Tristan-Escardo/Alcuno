@@ -107,3 +107,42 @@ Pour revenir en arrière : recoller l'ancien contenu de `database.rules.json` (g
 
 À faire aussi dans la console (sans code) : restreindre la clé d'API aux adresses du jeu (Google Cloud Console → Identifiants), désactiver la création de comptes
 (Authentication → Paramètres → Actions de l'utilisateur), mot de passe administrateur long et unique, alerte de budget / quota.
+
+## Onglet Public et rangement par rubriques (stats 1.22.0, jeu 9.92.0)
+
+### Ce qui a changé dans Alcuno Stats
+
+- 5 onglets : **Stats** (ce qui se passe dans le jeu, en trois groupes : Parties, Quand on joue, Joueurs), **Public** (nouveau),
+  **Santé**, **Pilotage**, **Aide**.
+- **Pilotage** n'est plus une longue page : 8 rubriques, une seule affichée à la fois (la dernière ouverte est retenue).
+  👁 Aperçu (réglé en ce moment, ce que voit un joueur, lecture, historique, annuler) · 💬 Assistant (+ raccourcis, clé d'IA) ·
+  📣 Annonce · 🔊 Son et jeu (couper une fonction, valeurs de départ, **mise à jour demandée**, qui a maintenant son propre réglage) ·
+  🎨 Thèmes · 🔥 Défis hot · 🍹 Bar (l'ancien onglet Bar) · 🔑 Compte (identifiant, déconnexion, réinitialisation des statistiques).
+- Adresse directe vers une rubrique : `stats.html#pilotage-themes`, `#pilotage-bar`, `#public-liste`…
+
+### Onglet Public : d'où viennent les appareils
+
+Pour chaque appareil qui ouvre le jeu (jeu 9.92.0 ou plus), `js/stats.js` ajoute à sa fiche `stats/appareils/{id}` :
+
+| Information | D'où elle vient |
+|---|---|
+| Pays, région, ville, fournisseur internet | de l'**adresse IP**, par un service extérieur (ipwho.is, puis get.geojs.io si le premier ne répond pas), une fois par jour et par appareil |
+| Type d'appareil, navigateur, version du système, résolution d'écran, langue de l'appareil, fuseau horaire | du **navigateur** (l'adresse IP ne les donne pas) |
+
+- **Aucune autorisation n'est demandée au joueur** : le jeu n'utilise pas la position du téléphone (GPS), un test le vérifie.
+- **L'adresse IP n'est pas enregistrée** ; seul le lieu déduit l'est. Le service de lieu, lui, voit l'adresse IP (comme tout site visité).
+- La ville est **approximative** : en 4G / 5G c'est souvent celle du relais de l'opérateur, avec un VPN celle du VPN.
+- Chrome sur Android et les ordinateurs ne donnent pas toujours la version exacte du système : elle s'affiche alors sans numéro.
+- Les deux services sont gratuits et sans clé ; leurs limites d'usage peuvent changer. Si « localisés » reste à 0 alors que les autres
+  informations arrivent, c'est le service qui ne répond plus (adresses dans `SERVICES_ORIGINE`, `js/stats.js`).
+
+### À faire après la mise en ligne
+
+Recoller `database.rules.json` dans Realtime Database → Règles → **Publier** (10 nouveaux champs dans `stats/appareils`).
+Tant que ce n'est pas fait, rien ne casse : l'origine est écrite à part, seule cette écriture est refusée, et l'onglet Public reste vide.
+
+### À savoir (données personnelles)
+
+Un lieu déduit de l'adresse IP, un fournisseur d'accès et les caractéristiques d'un appareil, rattachés à un identifiant, sont des
+données personnelles au sens du RGPD, et l'adresse IP part chez un service tiers. Le jeu ne peut donc plus être présenté comme ne
+collectant « aucune donnée personnelle » : il faut au minimum en informer les joueurs (FAQ ou Crédits du jeu). Ce point n'est pas réglé par le code.

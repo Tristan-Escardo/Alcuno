@@ -17,8 +17,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
-    <!-- Page privée des statistiques (anonymes) du jeu : écrites par js/stats.js, lues ici en direct.
-         Ouverte par …/Alcuno/?stats (redirection dans index.html). Un code la protège des curieux. -->
+    <!-- Page privée des statistiques du jeu : écrites par js/stats.js, lues ici en direct.
+         Ouverte par …/Alcuno/?stats (redirection dans index.html), avec le compte administrateur Firebase.
+         Rangement : 5 onglets (Stats, Public, Santé, Pilotage, Aide) ; Public et Pilotage sont découpés en rubriques
+         (.sousMenu + .pan : une seule affichée à la fois). Un nouveau réglage va dans la rubrique qui lui correspond. -->
     <style>
         :root{ --cyan: #00e5ff; --cyan-clair: #e6fbff; --cyan-doux: #9fdcf5; --cyan-titre: #5fd8ff; --rose: #ff4fd8; }
         html{ background: #020713; }
@@ -109,7 +111,38 @@
         .onglet{ flex: 1; text-align: center; padding: 12px 4px; border-radius: 10px; border: 1px solid rgba(0, 229, 255, .3); background: transparent; color: var(--cyan-doux); font: 700 11px "Orbitron", Arial, sans-serif; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; -webkit-tap-highlight-color: rgba(0, 229, 255, .35); transition: transform .08s, background .08s; }
         .onglet[aria-selected="true"]{ background: rgba(0, 229, 255, .16); border-color: var(--cyan); color: var(--cyan-clair); box-shadow: 0 0 14px rgba(0, 229, 255, .35); text-shadow: 0 0 8px var(--cyan); }
         .onglet:active{ transform: scale(.97); background: rgba(0, 229, 255, .3); }
-        .onglets .onglet{ letter-spacing: .06em; padding-left: 2px; padding-right: 2px; }
+        .onglets{ gap: 5px; }
+        .onglets .onglet{ flex: 1 1 auto; letter-spacing: .06em; padding-left: 4px; padding-right: 4px; font-size: clamp(9px, 2.75vw, 11px); }
+        /* Titres de groupe (page Stats) */
+        h2.groupe{ display: flex; align-items: center; gap: 10px; margin: 24px 2px 10px; font: 700 12px "Orbitron", Arial, sans-serif; letter-spacing: .22em; text-transform: uppercase; color: var(--cyan-clair); text-shadow: 0 0 8px rgba(0, 229, 255, .6); }
+        h2.groupe::after{ content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(0, 229, 255, .45), rgba(0, 229, 255, 0)); }
+        /* Rubriques d'une page (Public, Pilotage) : une seule affichée à la fois, choisie dans la grille de boutons */
+        .sousMenu{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 0 0 16px; scroll-margin-top: 70px; }
+        .sousMenu.trois{ grid-template-columns: repeat(3, 1fr); margin-bottom: 14px; }
+        .sousMenu button{ min-width: 0; padding: 8px 2px 7px; border-radius: 10px; border: 1px solid rgba(0, 229, 255, .25); background: rgba(0, 229, 255, .04); color: var(--cyan-doux); font: 700 13px/1.15 "Rajdhani", Arial, sans-serif; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: rgba(0, 229, 255, .35); transition: transform .08s, background .08s; }
+        .sousMenu button i{ display: block; font-style: normal; font-size: 20px; line-height: 1.2; margin-bottom: 2px; }
+        .sousMenu button[aria-selected="true"]{ background: rgba(0, 229, 255, .16); border-color: var(--cyan); color: var(--cyan-clair); box-shadow: 0 0 12px rgba(0, 229, 255, .3); }
+        .sousMenu button:active{ transform: scale(.96); background: rgba(0, 229, 255, .3); }
+        @media (max-width: 350px){ .sousMenu button{ font-size: 12px; } }
+        .pan{ display: none; }
+        .pan.actif{ display: block; }
+        .pan > .pilSous:first-child{ margin-top: 0; }
+        .pan .zoneReset{ margin: 0; }
+        #versRubriques{ position: fixed; right: max(12px, calc(50vw - 260px)); bottom: calc(14px + env(safe-area-inset-bottom)); z-index: 4; padding: 10px 14px; border-radius: 22px; border: 1px solid var(--cyan); background: rgba(2, 24, 40, .96); color: var(--cyan-clair); font: 700 13px "Rajdhani", Arial, sans-serif; box-shadow: 0 6px 20px rgba(0, 0, 0, .6); cursor: pointer; }
+        #versRubriques[hidden]{ display: none; }
+        /* Page Public */
+        .periode{ display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 14px; }
+        .periode button{ font: 700 13px "Rajdhani", Arial, sans-serif; padding: 6px 12px; border-radius: 14px; border: 1px solid rgba(0, 229, 255, .35); background: transparent; color: var(--cyan-doux); cursor: pointer; }
+        .periode button[aria-pressed="true"]{ background: rgba(0, 229, 255, .16); border-color: var(--cyan); color: var(--cyan-clair); }
+        .barre.large{ align-items: center; }
+        .barre.large .nom{ flex: none; width: 44%; white-space: normal; overflow-wrap: anywhere; line-height: 1.15; }
+        .barre.large .pc{ width: auto; min-width: 70px; white-space: nowrap; }
+        .appLigne{ padding: 10px 0; border-top: 1px solid rgba(0, 229, 255, .14); }
+        .appLigne:first-child{ border-top: 0; padding-top: 0; }
+        .appLieu{ display: flex; justify-content: space-between; gap: 10px; font-size: 16px; font-weight: 700; color: var(--cyan-clair); }
+        .appLieu small{ flex: none; font-weight: 600; font-size: 13px; color: #6fa3bb; }
+        .appMeta{ margin-top: 2px; font-size: 14px; line-height: 1.4; color: var(--cyan-doux); overflow-wrap: anywhere; }
+        #vuePublic .aideBloc details{ margin: 0; }
         .aideBloc details{ margin: 0 0 8px; padding: 10px 12px; border: 1px solid rgba(0, 229, 255, .22); border-radius: 12px; background: rgba(0, 229, 255, .04); font-size: 14px; line-height: 1.5; }
         .aideBloc summary{ cursor: pointer; color: var(--cyan); font-weight: 700; }
         .aideBloc p, .aideBloc li{ margin: 8px 0 0; color: var(--cyan-doux); }
@@ -154,7 +187,7 @@
             background: rgba(0, 229, 255, .06); color: var(--cyan-clair); font: 600 16px "Inter", Arial, sans-serif; outline: none;
         }
         #blocPilotage textarea, #blocBar textarea{ min-height: 74px; resize: vertical; }
-        #barPanneau[hidden], #barForm[hidden], #barConnexion[hidden]{ display: none; }
+        #barForm[hidden]{ display: none; }
         #barForm{ border: 1px solid rgba(0, 229, 255, .35); border-radius: 10px; padding: 4px 12px 12px; margin: 0 0 14px; background: rgba(0, 229, 255, .04); }
         #barCherche{ margin-top: 6px; }
         #barListe .pilLigne.masque .boutonsTheme{ opacity: 1; text-decoration: none; }
@@ -264,11 +297,13 @@
         <div class="sous" id="sousTitre">Statistiques</div>
         <nav class="onglets" role="tablist" aria-label="Pages">
             <button type="button" class="onglet" id="ongletStats" role="tab" data-vue="stats" aria-selected="true">Stats</button>
+            <button type="button" class="onglet" id="ongletPublic" role="tab" data-vue="public" aria-selected="false">Public</button>
             <button type="button" class="onglet" id="ongletSante" role="tab" data-vue="sante" aria-selected="false">Santé<span class="badgeOnglet" id="badgeSante" hidden></span></button>
             <button type="button" class="onglet" id="ongletPilotage" role="tab" data-vue="pilotage" aria-selected="false">Pilotage</button>
-            <button type="button" class="onglet" id="ongletBar" role="tab" data-vue="bar" aria-selected="false">Bar</button>
             <button type="button" class="onglet" id="ongletAide" role="tab" data-vue="aide" aria-selected="false">Aide</button>
         </nav>
+
+        <!-- ===== STATS : ce qui se passe dans le jeu (en direct, parties, horaires, joueurs) ===== -->
         <div class="vue actif" id="vueStats">
 
         <section class="bloc direct">
@@ -290,28 +325,12 @@
             </table>
         </section>
 
+        <h2 class="groupe">Parties</h2>
         <section class="bloc">
             <div class="titre">Parties · 30 derniers jours</div>
             <div id="barresParties"></div>
             <div class="legendeCouleurs"><span><b class="pastille"></b>Classique</span><span><b class="pastille rose"></b>En ligne</span></div>
         </section>
-
-        <section class="bloc">
-            <div class="titre">Visites · 30 derniers jours</div>
-            <div id="courbe"></div>
-        </section>
-
-        <section class="bloc">
-            <div class="titre">Heures de jeu · 30 jours</div>
-            <div class="pointe"><b class="chiffre" id="heurePointe">–</b><span id="legendePointe">heure de pointe</span></div>
-            <div id="barresHeures"></div>
-        </section>
-
-        <section class="bloc"><div class="titre">Jours de la semaine</div><div id="barresJours"></div></section>
-        <section class="bloc"><div class="titre">Téléphones</div><div id="barresOs"></div></section>
-        <section class="bloc"><div class="titre">Versions en circulation</div><div id="barresVersions"></div></section>
-        <section class="bloc"><div class="titre">Thèmes choisis</div><div id="barresThemes"></div></section>
-
         <section class="bloc">
             <div class="titre">Déroulé des parties · 30 jours</div>
             <div class="cases">
@@ -326,6 +345,20 @@
             <div id="barresModes"></div>
             <div class="legende">Part des parties lancées dans chaque mode (une partie peut en cumuler plusieurs).</div>
         </section>
+
+        <h2 class="groupe">Quand on joue</h2>
+        <section class="bloc">
+            <div class="titre">Visites · 30 derniers jours</div>
+            <div id="courbe"></div>
+        </section>
+        <section class="bloc">
+            <div class="titre">Heures de jeu · 30 jours</div>
+            <div class="pointe"><b class="chiffre" id="heurePointe">–</b><span id="legendePointe">heure de pointe</span></div>
+            <div id="barresHeures"></div>
+        </section>
+        <section class="bloc"><div class="titre">Jours de la semaine</div><div id="barresJours"></div></section>
+
+        <h2 class="groupe">Joueurs</h2>
         <section class="bloc">
             <div class="titre">Fidélité</div>
             <div class="cases" style="grid-template-columns: 1fr 1fr">
@@ -334,6 +367,7 @@
             </div>
             <div class="legende" id="legendeFidelite"></div>
         </section>
+        <section class="bloc"><div class="titre">Thèmes choisis · 30 jours</div><div id="barresThemes"></div></section>
         <section class="bloc">
             <div class="titre">Défis hot</div>
             <div class="gros chiffre" id="tauxDefis">–</div>
@@ -345,19 +379,70 @@
             <div class="legende">Seuls les défis sortis au moins 3 fois sont classés. ✍️ : ajouté depuis le Pilotage.</div>
         </section>
 
-        <div class="zoneReset">
-            <button type="button" id="btnReset" class="btnReset">Réinitialiser toutes les statistiques</button>
-            <div id="confirmeReset" hidden>
-                <div class="texteReset">Tout effacer ?<br>Visites, parties, appareils : tout repart de zéro. C'est définitif.</div>
-                <div class="boutonsReset">
-                    <button type="button" id="btnResetOui" class="btnReset">Oui, tout effacer</button>
-                    <button type="button" id="btnResetNon" class="btnResetNon">Annuler</button>
-                </div>
-            </div>
-            <div id="messageReset" class="messageReset" aria-live="polite"></div>
+        <p class="note">Aucun nom ni pseudo, aucune adresse IP enregistrée<br>Alcuno Stats <span id="versionStats"></span></p>
         </div>
 
-        <p class="note">Appareils vus ces 30 derniers jours · aucune donnée personnelle<br>Alcuno Stats <span id="versionStats"></span></p>
+        <!-- ===== PUBLIC : d'où viennent les appareils et ce qu'ils sont (écrit par js/stats.js, « Origine de l'appareil ») ===== -->
+        <div class="vue" id="vuePublic">
+        <section class="bloc direct">
+            <div class="titre">Portée</div>
+            <div class="cases">
+                <div class="case"><b class="chiffre" id="pubPays">–</b><span id="pubPaysLegende">pays</span></div>
+                <div class="case"><b class="chiffre" id="pubVilles">–</b><span id="pubVillesLegende">villes</span></div>
+                <div class="case"><b class="chiffre" id="pubAppareils">–</b><span id="pubAppareilsLegende">appareils</span></div>
+            </div>
+            <div class="legende" id="pubLegende" style="font-size:14px;margin-top:12px"></div>
+            <div class="periode" id="pubPeriode" role="group" aria-label="Période">
+                <button type="button" data-jours="7" aria-pressed="false">7 jours</button>
+                <button type="button" data-jours="30" aria-pressed="true">30 jours</button>
+                <button type="button" data-jours="0" aria-pressed="false">Depuis le début</button>
+            </div>
+        </section>
+
+        <nav class="sousMenu trois" data-groupe="public" aria-label="Rubriques du public">
+            <button type="button" data-pan="lieux"><i aria-hidden="true">📍</i>Lieux</button>
+            <button type="button" data-pan="appareils"><i aria-hidden="true">📱</i>Appareils</button>
+            <button type="button" data-pan="liste"><i aria-hidden="true">📋</i>Un par un</button>
+        </nav>
+
+        <div class="pan" data-groupe="public" data-pan="lieux">
+            <section class="bloc"><div class="titre">Pays</div><div id="barresPays"></div></section>
+            <section class="bloc"><div class="titre">Régions</div><div id="barresRegions"></div></section>
+            <section class="bloc"><div class="titre">Villes</div><div id="barresVilles"></div></section>
+            <section class="bloc"><div class="titre">Fournisseurs internet</div><div id="barresFai"></div></section>
+            <section class="bloc"><div class="titre">Fuseaux horaires</div><div id="barresFuseaux"></div></section>
+        </div>
+
+        <div class="pan" data-groupe="public" data-pan="appareils">
+            <section class="bloc"><div class="titre">Type d'appareil</div><div id="barresTypes"></div></section>
+            <section class="bloc"><div class="titre">Système</div><div id="barresOs"></div></section>
+            <section class="bloc"><div class="titre">Version du système</div><div id="barresOsv"></div></section>
+            <section class="bloc"><div class="titre">Navigateur</div><div id="barresNav"></div><div class="legende">Instagram, Snapchat, TikTok… : le lien du jeu a été ouvert depuis cette appli.</div></section>
+            <section class="bloc"><div class="titre">Résolution d'écran</div><div id="barresEcrans"></div><div class="legende">En pixels réels, téléphone tenu debout.</div></section>
+            <section class="bloc"><div class="titre">Langue de l'appareil</div><div id="barresLangues"></div></section>
+            <section class="bloc"><div class="titre">Versions du jeu en circulation</div><div id="barresVersions"></div></section>
+        </div>
+
+        <div class="pan" data-groupe="public" data-pan="liste">
+            <section class="bloc">
+                <div class="titre">Appareil par appareil</div>
+                <div id="pubListe"></div>
+                <button type="button" class="pilBtn sec" id="pubVoirPlus" hidden style="margin-top:12px">Voir plus</button>
+            </section>
+        </div>
+
+        <section class="bloc aideBloc">
+            <details><summary>D'où viennent ces informations ?</summary>
+                <ul>
+                    <li><b>Pays, région, ville, fournisseur internet</b> : déduits de l'adresse IP de l'appareil par un service extérieur, une fois par jour. L'adresse IP elle-même n'est <b>pas enregistrée</b>.</li>
+                    <li>C'est <b>approximatif</b> : le pays est fiable, la ville beaucoup moins. En 4G / 5G, c'est souvent la ville du relais de l'opérateur (parfois à des centaines de kilomètres) ; avec un VPN, c'est celle du VPN.</li>
+                    <li><b>Type d'appareil, navigateur, version du système, écran, langue, fuseau horaire</b> : lus dans le navigateur, pas dans l'adresse IP. Aucune autorisation n'est demandée au joueur (ce n'est pas le GPS).</li>
+                    <li>Sur Android et sur ordinateur, certains navigateurs cachent la version exacte du système : elle s'affiche alors sans numéro.</li>
+                    <li>Seuls les appareils en version <b>9.92.0</b> ou plus envoient ces informations ; les autres comptent dans « sans localisation ».</li>
+                </ul>
+            </details>
+        </section>
+        <p class="note">Lieux approximatifs (d'après l'adresse IP, non enregistrée)<br>Alcuno Stats <span id="versionStats5"></span></p>
         </div>
 
         <div class="vue" id="vueSante">
@@ -377,6 +462,7 @@
             <p class="note">Erreurs du jeu, anonymes : message nettoyé, fichier, version, type d'appareil · rien de personnel<br>Alcuno Stats <span id="versionStats3"></span></p>
         </div>
 
+        <!-- ===== PILOTAGE : tout ce qui change le jeu à distance, rangé par rubriques (une seule affichée à la fois) ===== -->
         <div class="vue" id="vuePilotage">
         <section class="bloc" id="blocPilotage">
             <div class="titre">Pilotage du jeu</div>
@@ -389,14 +475,37 @@
                 </form>
             </div>
             <div id="pilPanneau" hidden>
-                <div class="pilSous" style="margin-top:0">Réglé en ce moment</div>
+                <nav class="sousMenu" data-groupe="pilotage" id="pilMenu" aria-label="Rubriques du pilotage">
+                    <button type="button" data-pan="etat"><i aria-hidden="true">👁</i>Aperçu</button>
+                    <button type="button" data-pan="assistant"><i aria-hidden="true">💬</i>Assistant</button>
+                    <button type="button" data-pan="annonce"><i aria-hidden="true">📣</i>Annonce</button>
+                    <button type="button" data-pan="jeu"><i aria-hidden="true">🔊</i>Son et jeu</button>
+                    <button type="button" data-pan="themes"><i aria-hidden="true">🎨</i>Thèmes</button>
+                    <button type="button" data-pan="defis"><i aria-hidden="true">🔥</i>Défis hot</button>
+                    <button type="button" data-pan="bar"><i aria-hidden="true">🍹</i>Bar</button>
+                    <button type="button" data-pan="compte"><i aria-hidden="true">🔑</i>Compte</button>
+                </nav>
+
+                <!-- Aperçu : l'état actuel, ce que voient les joueurs, et de quoi revenir en arrière -->
+                <div class="pan" data-groupe="pilotage" data-pan="etat">
+                <div class="pilSous">Réglé en ce moment</div>
                 <div class="pilEtat" id="pilEtat">…</div>
-                <div class="apLegende" style="font:700 10px Orbitron,Arial,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#5fd8ff;margin-bottom:6px">Ce que voit un joueur</div>
+                <div class="pilSous">Ce que voit un joueur</div>
                 <div class="pilApercu" id="pilApercu"></div>
 
                 <div class="pilSous">Lecture par les joueurs</div>
                 <div class="pilEtat" id="pilLecture">…</div>
 
+                <div class="pilSous">Historique</div>
+                <div class="pilHisto" id="pilHisto"><span class="pilNote">…</span></div>
+
+                <div class="pilSous">Revenir en arrière</div>
+                <button type="button" class="pilBtn sec" id="pilAnnulerDerniere">↩ Annuler la dernière modification</button>
+                <button type="button" class="pilBtn danger" id="pilToutRemettre">Tout remettre par défaut</button>
+                </div>
+
+                <!-- Assistant : demandes en français, raccourcis, clé d'IA -->
+                <div class="pan" data-groupe="pilotage" data-pan="assistant">
                 <div class="pilSous">Assistant</div>
                 <p class="pilNote">Écris ce que tu veux en français, ou pose une question sur les stats (« combien de parties cette semaine ? »). Je te montre ce que j'ai compris avant d'appliquer, et je me souviens de la conversation (« finalement non, remets-la »).</p>
                 <div class="pilFil" id="pilFil" aria-live="polite"></div>
@@ -414,17 +523,23 @@
                 <div class="pilSous">Raccourcis</div>
                 <div class="pilExemples" id="pilRaccourcis"></div>
 
-                <div class="pilSous">Fonctions</div>
-                <div id="pilCoupures"></div>
+                <details>
+                    <summary>Clé d'IA : assistant plus intelligent (facultatif)</summary>
+                    <p class="pilNote" style="margin-top:8px">Sans IA, l'assistant comprend les phrases simples et répond aux questions courantes sur les stats. Avec une IA, il comprend les demandes plus libres, reformule tes annonces et répond à toutes les questions. La clé reste dans ce téléphone, jamais dans le jeu ni sur GitHub. L'IA propose seulement des réglages de la liste : tu valides toujours avant.</p>
+                    <label class="pilLabel" for="pilFournisseur">Fournisseur</label>
+                    <select id="pilFournisseur">
+                        <option value="gemini">Google Gemini (gratuit)</option>
+                        <option value="claude">Claude – Anthropic (payant à l'usage)</option>
+                        <option value="openai">ChatGPT – OpenAI (payant à l'usage)</option>
+                    </select>
+                    <p class="pilNote" id="pilIAAide"></p>
+                    <input id="pilCleIA" type="password" placeholder="Clé d'API" autocomplete="off">
+                    <button type="button" class="pilBtn sec" id="pilEnregistrerCle">Enregistrer et tester la clé</button>
+                    <div class="pilNote" id="pilIAEtat"></div>
+                </details>
+                </div>
 
-                <div class="pilSous">Thèmes</div>
-                <div id="pilThemes"></div>
-                <p class="pilNote" style="margin-top:8px">Dates d'un thème (visible seulement sur cette période, chaque année ; « Dates » ci-dessus remplit le formulaire). Les thèmes de fête n'apparaissent qu'à leurs dates ; un joueur qui l'avait choisi revient à Bordeaux après la fin :</p>
-                <select id="pilThemePeriode"></select>
-                <input id="pilDebut" type="date" aria-label="Début">
-                <input id="pilFin" type="date" aria-label="Fin">
-                <button type="button" class="pilBtn" id="pilAppliquerPeriode">Appliquer la période</button>
-
+                <div class="pan" data-groupe="pilotage" data-pan="annonce">
                 <div class="pilSous">Annonce sur l'accueil</div>
                 <div class="pilExemples" id="pilModeles"></div>
                 <input id="pilAnnonce" type="text" maxlength="140" placeholder="Texte (140 caractères max)">
@@ -441,7 +556,40 @@
                 <input id="pilAnnonceAvant" type="text" inputmode="decimal" placeholder="ex : 9.65.0" maxlength="11">
                 <button type="button" class="pilBtn" id="pilPublierAnnonce">Publier l'annonce</button>
                 <button type="button" class="pilBtn sec" id="pilRetirerAnnonce">Retirer l'annonce</button>
+                </div>
 
+                <!-- Son et jeu : fonctions coupées, valeurs de départ, mise à jour demandée -->
+                <div class="pan" data-groupe="pilotage" data-pan="jeu">
+                <div class="pilSous">Couper une fonction</div>
+                <div id="pilCoupures"></div>
+
+                <div class="pilSous">Valeurs de départ</div>
+                <p class="pilNote">Pour ceux qui n'ont jamais touché au curseur. Les autres gardent leur choix.</p>
+                <label class="pilLabel" for="pilDefVolume">Volume de la musique</label>
+                <select id="pilDefVolume"></select>
+                <label class="pilLabel" for="pilDefVitesse">Vitesse de la voix</label>
+                <select id="pilDefVitesse"></select>
+                <button type="button" class="pilBtn" id="pilAppliquerDefauts">Enregistrer les valeurs de départ</button>
+
+                <div class="pilSous">Mise à jour demandée</div>
+                <p class="pilNote">Invite les joueurs qui ont une version plus ancienne à recharger le jeu. <span id="pilMajEtat"></span></p>
+                <label class="pilLabel" for="pilMajMin">Version minimale</label>
+                <input id="pilMajMin" type="text" inputmode="decimal" placeholder="ex : 9.92.0" maxlength="11">
+                <button type="button" class="pilBtn" id="pilMajDemander">Demander cette version</button>
+                <button type="button" class="pilBtn sec" id="pilMajRetirer">Ne plus rien demander</button>
+                </div>
+
+                <div class="pan" data-groupe="pilotage" data-pan="themes">
+                <div class="pilSous">Thèmes</div>
+                <div id="pilThemes"></div>
+                <p class="pilNote" style="margin-top:8px">Dates d'un thème (visible seulement sur cette période, chaque année ; « Dates » ci-dessus remplit le formulaire). Les thèmes de fête n'apparaissent qu'à leurs dates ; un joueur qui l'avait choisi revient à Bordeaux après la fin :</p>
+                <select id="pilThemePeriode"></select>
+                <input id="pilDebut" type="date" aria-label="Début">
+                <input id="pilFin" type="date" aria-label="Fin">
+                <button type="button" class="pilBtn" id="pilAppliquerPeriode">Appliquer la période</button>
+                </div>
+
+                <div class="pan" data-groupe="pilotage" data-pan="defis">
                 <div class="pilSous">Défis hot</div>
                 <p class="pilNote">Tes défis s'ajoutent à ceux du jeu en mode hot 🔥 (niveaux Léger, Moyen, Osé) ou en mode hard 🔞 (niveaux Hard), au niveau choisi. Ils arrivent chez les joueurs à leur prochaine ouverture du jeu, et comptent dès la partie suivante.</p>
                 <textarea id="pilDefiTexte" maxlength="160" placeholder="Ex : Fais un massage des épaules à {nom} pendant 1 minute."></textarea>
@@ -461,76 +609,57 @@
                     <p class="pilNote" style="margin-top:8px">Un défi masqué ne sort plus, dès la partie suivante. « Remettre » le fait revenir. Le pourcentage : part des fois où il a été relevé plutôt que bu (Stats → Défis hot).</p>
                     <div id="pilDefisJeuListe"></div>
                 </details>
+                </div>
 
-                <div class="pilSous">Valeurs de départ</div>
-                <p class="pilNote">Pour ceux qui n'ont jamais touché au curseur. Les autres gardent leur choix.</p>
-                <label class="pilLabel" for="pilDefVolume">Volume de la musique</label>
-                <select id="pilDefVolume"></select>
-                <label class="pilLabel" for="pilDefVitesse">Vitesse de la voix</label>
-                <select id="pilDefVitesse"></select>
-                <button type="button" class="pilBtn" id="pilAppliquerDefauts">Enregistrer les valeurs de départ</button>
+                <!-- Bar : recettes du jeu (js/cocktails.js) modifiées, masquées ou ajoutées -->
+                <div class="pan" data-groupe="pilotage" data-pan="bar" id="blocBar">
+                <div class="pilSous">Recettes du Bar</div>
+                <p class="pilNote">Modifie une recette du jeu, masque-la, ou ajoute la tienne. Les joueurs la voient au prochain lancement du jeu (avec internet). « D'origine » rend le texte de départ.</p>
+                <button type="button" class="pilBtn" id="barNouveau">＋ Ajouter un cocktail</button>
+                <div id="barForm" hidden>
+                    <div class="pilSous" id="barFormTitre">Nouveau cocktail</div>
+                    <label class="pilLabel" for="barNom">Nom</label>
+                    <input type="text" id="barNom" maxlength="50" autocomplete="off">
+                    <label class="pilLabel" for="barFamille">Catégorie</label>
+                    <select id="barFamille"></select>
+                    <label class="pilLabel" for="barVerre">Verre</label>
+                    <input type="text" id="barVerre" maxlength="60" autocomplete="off" placeholder="Ex : Grand verre">
+                    <label class="pilLabel" for="barIngredients">Ingrédients (un par ligne)</label>
+                    <textarea id="barIngredients" maxlength="1000" rows="6" placeholder="5 cl de rhum blanc&#10;2 cl de jus de citron vert"></textarea>
+                    <label class="pilLabel" for="barPreparation">Préparation</label>
+                    <textarea id="barPreparation" maxlength="1000" rows="4"></textarea>
+                    <button type="button" class="pilBtn" id="barEnregistrer">Enregistrer</button>
+                    <button type="button" class="pilBtn sec" id="barAnnuler">Annuler</button>
+                </div>
+                <input type="search" id="barCherche" placeholder="Chercher un cocktail" autocomplete="off">
+                <div id="barListe"></div>
+                </div>
 
-                <div class="pilSous">Historique</div>
-                <div class="pilHisto" id="pilHisto"><span class="pilNote">…</span></div>
+                <div class="pan" data-groupe="pilotage" data-pan="compte">
+                <div class="pilSous">Compte</div>
+                <p class="pilNote">Identifiant de ce compte (à mettre dans les règles Firebase) :<br><code id="pilUid">–</code></p>
+                <button type="button" class="pilBtn sec" id="pilDeconnecter">Se déconnecter</button>
 
-                <div class="pilSous">Annuler</div>
-                <button type="button" class="pilBtn sec" id="pilAnnulerDerniere">↩ Annuler la dernière modification</button>
-                <button type="button" class="pilBtn danger" id="pilToutRemettre">Tout remettre par défaut</button>
-
-                <details>
-                    <summary>Assistant intelligent (facultatif)</summary>
-                    <p class="pilNote" style="margin-top:8px">Sans IA, l'assistant comprend les phrases simples et répond aux questions courantes sur les stats. Avec une IA, il comprend les demandes plus libres, reformule tes annonces et répond à toutes les questions. La clé reste dans ce téléphone, jamais dans le jeu ni sur GitHub. L'IA propose seulement des réglages de la liste : tu valides toujours avant.</p>
-                    <label class="pilLabel" for="pilFournisseur">Fournisseur</label>
-                    <select id="pilFournisseur">
-                        <option value="gemini">Google Gemini (gratuit)</option>
-                        <option value="claude">Claude – Anthropic (payant à l'usage)</option>
-                        <option value="openai">ChatGPT – OpenAI (payant à l'usage)</option>
-                    </select>
-                    <p class="pilNote" id="pilIAAide"></p>
-                    <input id="pilCleIA" type="password" placeholder="Clé d'API" autocomplete="off">
-                    <button type="button" class="pilBtn sec" id="pilEnregistrerCle">Enregistrer et tester la clé</button>
-                    <div class="pilNote" id="pilIAEtat"></div>
-                </details>
-                <details>
-                    <summary>Sécurité et compte</summary>
-                    <p class="pilNote" style="margin-top:8px">Identifiant de ce compte (à mettre dans les règles Firebase) :<br><code id="pilUid">–</code></p>
-                    <button type="button" class="pilBtn sec" id="pilDeconnecter">Se déconnecter</button>
-                </details>
+                <div class="pilSous">Zone dangereuse</div>
+                <p class="pilNote">Efface les visites, les parties, les appareils et leurs lieux. Le direct n'est pas touché. C'est définitif.</p>
+                <div class="zoneReset">
+                    <button type="button" id="btnReset" class="btnReset">Réinitialiser toutes les statistiques</button>
+                    <div id="confirmeReset" hidden>
+                        <div class="texteReset">Tout effacer ?<br>Visites, parties, appareils : tout repart de zéro. C'est définitif.</div>
+                        <div class="boutonsReset">
+                            <button type="button" id="btnResetOui" class="btnReset">Oui, tout effacer</button>
+                            <button type="button" id="btnResetNon" class="btnResetNon">Annuler</button>
+                        </div>
+                    </div>
+                    <div id="messageReset" class="messageReset" aria-live="polite"></div>
+                </div>
+                </div>
             </div>
         </section>
 
         <div class="pilMessage" id="pilMessage" aria-live="polite"></div>
+        <div class="pilMessage" id="barMessage" aria-live="polite"></div>
             <p class="note">Alcuno Stats <span id="versionStats2"></span></p>
-        </div>
-
-        <div class="vue" id="vueBar">
-            <section class="bloc" id="blocBar">
-                <div class="titre">Recettes du Bar</div>
-                <p class="pilNote" id="barConnexion">Connecte-toi dans l'onglet Pilotage pour modifier les recettes.</p>
-                <div id="barPanneau" hidden>
-                    <p class="pilNote">Modifie une recette du jeu, masque-la, ou ajoute la tienne. Les joueurs la voient au prochain lancement du jeu (avec internet). « D'origine » rend le texte de départ.</p>
-                    <button type="button" class="pilBtn" id="barNouveau">＋ Ajouter un cocktail</button>
-                    <div id="barForm" hidden>
-                        <div class="pilSous" id="barFormTitre">Nouveau cocktail</div>
-                        <label class="pilLabel" for="barNom">Nom</label>
-                        <input type="text" id="barNom" maxlength="50" autocomplete="off">
-                        <label class="pilLabel" for="barFamille">Catégorie</label>
-                        <select id="barFamille"></select>
-                        <label class="pilLabel" for="barVerre">Verre</label>
-                        <input type="text" id="barVerre" maxlength="60" autocomplete="off" placeholder="Ex : Grand verre">
-                        <label class="pilLabel" for="barIngredients">Ingrédients (un par ligne)</label>
-                        <textarea id="barIngredients" maxlength="1000" rows="6" placeholder="5 cl de rhum blanc&#10;2 cl de jus de citron vert"></textarea>
-                        <label class="pilLabel" for="barPreparation">Préparation</label>
-                        <textarea id="barPreparation" maxlength="1000" rows="4"></textarea>
-                        <button type="button" class="pilBtn" id="barEnregistrer">Enregistrer</button>
-                        <button type="button" class="pilBtn sec" id="barAnnuler">Annuler</button>
-                    </div>
-                    <input type="search" id="barCherche" placeholder="Chercher un cocktail" autocomplete="off">
-                    <div id="barListe"></div>
-                </div>
-            </section>
-            <div class="pilMessage" id="barMessage" aria-live="polite"></div>
-            <p class="note">Alcuno Stats</p>
         </div>
 
         <div class="vue" id="vueAide">
@@ -549,16 +678,29 @@
                         <li><b>Fréquentation</b> : « visites » compte chaque ouverture du jeu ; « visiteurs » compte les personnes différentes (un joueur qui ouvre dix fois = 1 visiteur).</li>
                         <li><b>Parties</b> : celles qui ont vraiment été lancées, classiques et en ligne.</li>
                         <li><b>Heures de jeu</b> et <b>jours de la semaine</b> : quand on joue le plus (heure de pointe).</li>
-                        <li><b>Téléphones, versions, thèmes</b> : appareils vus ces 30 derniers jours seulement. Aucune donnée personnelle n'est gardée.</li>
+                        <li><b>Thèmes choisis</b> : appareils vus ces 30 derniers jours seulement.</li>
+                        <li>La page est rangée en trois groupes : <b>Parties</b>, <b>Quand on joue</b>, <b>Joueurs</b>. Les appareils (pays, téléphones, versions) sont dans l'onglet <b>Public</b>.</li>
                         <li>Les passages de Claude (tests automatiques) ne comptent pas dans les chiffres.</li>
                     </ul>
                 </details>
 
                 <details><summary>Pourquoi mes chiffres sont à zéro ou bizarres ?</summary>
                     <ul>
-                        <li>« Réinitialiser toutes les statistiques » (bas de la page Stats) remet tout à zéro, définitivement.</li>
+                        <li>« Réinitialiser toutes les statistiques » (Pilotage → Compte) remet tout à zéro, définitivement.</li>
                         <li>Après une mise en ligne, les chiffres de versions mettent quelques jours à se stabiliser : un joueur n'est compté dans sa nouvelle version qu'à sa prochaine ouverture.</li>
-                        <li>Les appareils pas ouverts depuis 30 jours disparaissent des répartitions (téléphones, versions, thèmes).</li>
+                        <li>Les appareils pas ouverts depuis 30 jours disparaissent des thèmes choisis ; dans l'onglet Public, tu choisis la période (7 jours, 30 jours, depuis le début).</li>
+                    </ul>
+                </details>
+
+                <details><summary>Que montre l'onglet Public ?</summary>
+                    <p>D'où viennent les appareils qui ouvrent le jeu, et ce qu'ils sont. Trois rubriques : <b>Lieux</b>, <b>Appareils</b>, <b>Un par un</b>.</p>
+                    <ul>
+                        <li><b>Lieux</b> : pays, région, ville, fournisseur internet (déduits de l'adresse IP, qui n'est pas enregistrée) et fuseau horaire.</li>
+                        <li><b>Appareils</b> : téléphone / tablette / ordinateur, système et sa version, navigateur, résolution d'écran, langue de l'appareil, version du jeu.</li>
+                        <li><b>Un par un</b> : la fiche de chaque appareil, du plus récent au plus ancien.</li>
+                        <li>La ville est <b>approximative</b> : en 4G / 5G c'est souvent celle du relais de l'opérateur, avec un VPN celle du VPN. Le pays est fiable.</li>
+                        <li>Rien ne s'affiche chez le joueur : aucune autorisation de position n'est demandée (ce n'est pas le GPS).</li>
+                        <li>Seuls les appareils en 9.92.0 ou plus envoient ces informations, et il faut avoir republié <code>database.rules.json</code>.</li>
                     </ul>
                 </details>
 
@@ -568,21 +710,33 @@
                         <li>Une erreur vue <b>une seule fois</b> est presque toujours sans gravité.</li>
                         <li>Des erreurs « is not defined » juste après une mise en ligne viennent surtout de pages pas encore à jour : elles s'arrêtent d'elles-mêmes.</li>
                         <li>C'est à corriger quand la <b>même erreur se répète</b> ou touche plusieurs appareils ou versions.</li>
-                        <li><b>Ignorer</b> cache une erreur connue ; <b>Effacer le journal</b> vide tout (il faut être connecté dans Pilotage).</li>
+                        <li><b>Ignorer</b> cache une erreur connue ; <b>Effacer le journal</b> vide tout.</li>
+                    </ul>
+                </details>
+
+                <details><summary>Où trouver chaque réglage du Pilotage ?</summary>
+                    <p>Le Pilotage est rangé en 8 rubriques (les boutons du haut) ; une seule s'affiche à la fois. Le bouton « ☰ Rubriques » en bas à droite y ramène.</p>
+                    <ul>
+                        <li><b>👁 Aperçu</b> : ce qui est réglé en ce moment, ce que voit un joueur, combien d'appareils ont lu tes réglages, l'historique et « Annuler ».</li>
+                        <li><b>💬 Assistant</b> : écrire une demande en français, les raccourcis (maintenance, silence total…), la clé d'IA.</li>
+                        <li><b>📣 Annonce</b>, <b>🎨 Thèmes</b>, <b>🔥 Défis hot</b>, <b>🍹 Bar</b> (recettes) : chacun sa rubrique.</li>
+                        <li><b>🔊 Son et jeu</b> : couper une fonction, valeurs de départ, mise à jour demandée.</li>
+                        <li><b>🔑 Compte</b> : identifiant pour les règles Firebase, déconnexion, réinitialisation des statistiques.</li>
                     </ul>
                 </details>
 
                 <details><summary>À quoi sert chaque réglage du Pilotage ?</summary>
                     <ul>
-                        <li><b>Fonctions</b> : couper la voix, la musique ou le mode en ligne pour tout le monde (utile en cas de bug ou de maintenance). Pense à les remettre.</li>
+                        <li><b>Couper une fonction</b> (Son et jeu) : couper la voix, la musique ou le mode en ligne pour tout le monde (utile en cas de bug ou de maintenance). Pense à les remettre.</li>
                         <li><b>Thèmes</b> : cacher un thème, ou ne le montrer que sur une période chaque année (ex. Star Wars début mai).</li>
+                        <li><b>Bar</b> : modifier une recette du jeu, la masquer, ou ajouter la tienne.</li>
                         <li><b>Annonce</b> : un message sur l'accueil, les Réglages et les Crédits (140 caractères). Tu peux la programmer (début + durée) ou la viser aux versions plus anciennes qu'une version donnée.</li>
                         <li><b>Défis hot</b> : tes propres défis, ajoutés à ceux du jeu en mode hot (ou hard, niveaux « Hard ») au niveau choisi. {nom} devient le prénom d'un autre joueur ; {nom1} et {nom2}, deux autres joueurs. 160 caractères, 300 défis au plus. Une partie déjà commencée garde les défis qu'elle avait au départ ; en ligne, tous les téléphones prennent ceux de celui qui lance la partie.</li>
                         <li><b>Défis du jeu</b> (sous Défis hot) : masque un défi du jeu qui ne marche pas, sans republier le jeu. 👁 montre un défi tel qu'il apparaît en partie.</li>
-                        <li><b>Valeurs de départ</b> : volume de la musique et vitesse de la voix pour ceux qui n'ont jamais touché au curseur.</li>
-                        <li><b>Mise à jour demandée</b> : invite les joueurs d'une version trop ancienne à recharger le jeu.</li>
-                        <li><b>Historique</b> et <b>Annuler la dernière modification</b> : tout se défait. « Tout remettre par défaut » efface tous les réglages (pas les défis hot).</li>
-                        <li><b>Lecture par les joueurs</b> : combien d'appareils ont lu tes réglages (seuls ceux en 9.65.0 ou plus le signalent).</li>
+                        <li><b>Valeurs de départ</b> (Son et jeu) : volume de la musique et vitesse de la voix pour ceux qui n'ont jamais touché au curseur.</li>
+                        <li><b>Mise à jour demandée</b> (Son et jeu) : invite les joueurs d'une version trop ancienne à recharger le jeu.</li>
+                        <li><b>Historique</b> et <b>Annuler la dernière modification</b> (Aperçu) : tout se défait. « Tout remettre par défaut » efface tous les réglages (pas les défis hot).</li>
+                        <li><b>Lecture par les joueurs</b> (Aperçu) : combien d'appareils ont lu tes réglages (seuls ceux en 9.65.0 ou plus le signalent).</li>
                     </ul>
                     <p>Le Pilotage ne peut pas bloquer le jeu : sans réseau, il reste réglé par défaut. Un changement arrive chez les joueurs à leur prochaine ouverture du jeu.</p>
                 </details>
@@ -601,7 +755,7 @@
                 <details><summary>Comment ajouter une clé d'IA (Gemini gratuit) ?</summary>
                     <ul>
                         <li>Va sur aistudio.google.com, connecte-toi avec un compte Google, puis « Get API key ».</li>
-                        <li>Dans Pilotage, ouvre « Assistant intelligent (facultatif) », choisis Google Gemini, colle la clé, puis « Enregistrer et tester la clé ».</li>
+                        <li>Dans Pilotage → Assistant, ouvre « Clé d'IA », choisis Google Gemini, colle la clé, puis « Enregistrer et tester la clé ».</li>
                         <li>L'appli choisit toute seule un modèle disponible, et en change si Google en retire un.</li>
                         <li>La clé reste dans ce téléphone : jamais dans le jeu ni sur GitHub. Une clé par fournisseur ; Claude et ChatGPT sont payants à l'usage.</li>
                     </ul>
@@ -621,7 +775,7 @@
                     <ul>
                         <li>Depuis la 1.16.0, la page Stats s'ouvre avec <b>l'e-mail et le mot de passe du compte administrateur</b> (plus de code). La session est gardée : tu ne le retapes que si tu te déconnectes.</li>
                         <li>Connecte-toi avec le compte administrateur créé dans Firebase (Authentication).</li>
-                        <li>« Refusé » veut dire que les règles de la base ne sont pas à jour : recolle <code>database.rules.json</code> dans Realtime Database → Règles (avec ton identifiant), puis Publier. Ton identifiant est dans Pilotage → « Sécurité et compte ».</li>
+                        <li>« Refusé » veut dire que les règles de la base ne sont pas à jour : recolle <code>database.rules.json</code> dans Realtime Database → Règles (avec ton identifiant), puis Publier. Ton identifiant est dans Pilotage → Compte.</li>
                         <li>Le détail pas à pas est dans PILOTAGE.md, dans le dépôt GitHub.</li>
                     </ul>
                 </details>
@@ -629,7 +783,7 @@
                 <details><summary>Un joueur voit encore l'ancienne version</summary>
                     <ul>
                         <li>Après une mise en ligne, un joueur peut garder l'ancienne page quelques minutes. Fermer complètement l'appli puis la rouvrir règle presque toujours ça.</li>
-                        <li>Si ça persiste, utilise « Mise à jour demandée » dans Pilotage.</li>
+                        <li>Si ça persiste, utilise « Mise à jour demandée » dans Pilotage → Son et jeu.</li>
                     </ul>
                 </details>
             </section>
@@ -639,7 +793,7 @@
 
     <script src="js/config-lib.js"></script>
     <script src="js/mode-hot.js"></script><!-- (seulement pour les textes des défis : DEFIS_HOT) -->
-    <script src="js/cocktails.js"></script><!-- (recettes du Bar : onglet Bar) -->
+    <script src="js/cocktails.js"></script><!-- (recettes du Bar : Pilotage → Bar) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
         import { getDatabase, ref, onValue, get, update, set, query, orderByKey, limitToLast, remove } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
@@ -658,11 +812,12 @@
         });
         const authPorte = getAuth(app);
         // Version de la page de stats (à part de celle du jeu : +0.0.1 à chaque modification de cette page)
-        const VERSION_STATS = "1.21.3";
+        const VERSION_STATS = "1.22.0";
         document.getElementById("versionStats").textContent = VERSION_STATS;
         document.getElementById("versionStats2").textContent = VERSION_STATS;
         document.getElementById("versionStats3").textContent = VERSION_STATS;
         document.getElementById("versionStats4").textContent = VERSION_STATS;
+        document.getElementById("versionStats5").textContent = VERSION_STATS;
 
 
         const NOMS_THEMES = {
@@ -687,8 +842,10 @@
         const contenu = document.getElementById("contenu");
         let ouvert = false;
 
-        // ----- Onglets Stats / Pilotage : un tap sur l'onglet, ou un glissement du doigt vers la gauche / la droite -----
-        const VUES = ["stats", "sante", "pilotage", "bar", "aide"];
+        // ----- Onglets : un tap sur l'onglet, ou un glissement du doigt vers la gauche / la droite -----
+        // Stats (ce qui se passe dans le jeu) · Public (d'où viennent les appareils) · Santé (plantages) · Pilotage (tout ce qui
+        // change le jeu, rangé en rubriques : voir « Rubriques » plus bas) · Aide
+        const VUES = ["stats", "public", "sante", "pilotage", "aide"];
         let vueActuelle = "stats";
         function montrerVue(nom, anime = true){
             if (VUES.indexOf(nom) < 0) return;
@@ -700,8 +857,9 @@
                 if (v === nom) { el.classList.add("actif"); if (anime) el.classList.add(sens); }
                 document.getElementById("onglet" + v[0].toUpperCase() + v.slice(1)).setAttribute("aria-selected", v === nom ? "true" : "false");
             });
-            document.getElementById("sousTitre").textContent = { stats: "Statistiques", sante: "Santé du jeu", pilotage: "Pilotage", bar: "Recettes du Bar", aide: "Aide" }[nom];
+            document.getElementById("sousTitre").textContent = { stats: "Statistiques", public: "Public et appareils", sante: "Santé du jeu", pilotage: "Pilotage", aide: "Aide" }[nom];
             window.scrollTo(0, 0);
+            majVersRubriques();
             try { history.replaceState(null, "", nom === "stats" ? location.pathname : "#" + nom); } catch (e) {}
         }
         document.querySelectorAll(".onglet").forEach((o) => o.addEventListener("click", () => montrerVue(o.dataset.vue)));
@@ -719,7 +877,38 @@
                 if (suivante >= 0 && suivante < VUES.length) montrerVue(VUES[suivante]);
             }
         }, { passive: true });
-        if (location.hash === "#pilotage" || location.hash === "#sante" || location.hash === "#aide") montrerVue(location.hash.slice(1), false);
+
+        // ----- Rubriques d'une page (Public, Pilotage) : une grille de boutons (.sousMenu), une seule rubrique (.pan) affichée -----
+        // La dernière rubrique ouverte est retenue dans ce téléphone.
+        const CLE_RUBRIQUE = "alcuno_stats_rubrique_";
+        function montrerPan(groupe, nom){
+            const pans = Array.from(document.querySelectorAll(`.pan[data-groupe="${groupe}"]`));
+            if (!pans.length) return;
+            if (!pans.some((p) => p.dataset.pan === nom)) nom = pans[0].dataset.pan;
+            pans.forEach((p) => p.classList.toggle("actif", p.dataset.pan === nom));
+            document.querySelectorAll(`.sousMenu[data-groupe="${groupe}"] button`).forEach((b) => b.setAttribute("aria-selected", b.dataset.pan === nom ? "true" : "false"));
+            try { localStorage.setItem(CLE_RUBRIQUE + groupe, nom); } catch (e) {}
+        }
+        // « ☰ Rubriques » : bouton flottant qui ramène à la grille quand elle est sortie de l'écran (rubrique longue)
+        const versRubriques = document.getElementById("versRubriques");
+        const menusVisibles = new Map();
+        function majVersRubriques(){
+            const menu = document.querySelector(`#vue${vueActuelle[0].toUpperCase() + vueActuelle.slice(1)} .sousMenu`);
+            versRubriques.hidden = !(menu && menu.offsetParent !== null && menusVisibles.get(menu) === false);
+        }
+        const guetteur = typeof IntersectionObserver === "function" ? new IntersectionObserver((entrees) => { entrees.forEach((e) => menusVisibles.set(e.target, e.isIntersecting)); majVersRubriques(); }) : null;
+        document.querySelectorAll(".sousMenu").forEach((menu) => {
+            let retenue = null; try { retenue = localStorage.getItem(CLE_RUBRIQUE + menu.dataset.groupe); } catch (e) {}
+            montrerPan(menu.dataset.groupe, retenue);
+            menu.addEventListener("click", (e) => { const b = e.target.closest("button[data-pan]"); if (b) montrerPan(menu.dataset.groupe, b.dataset.pan); });
+            if (guetteur) guetteur.observe(menu);
+        });
+        versRubriques.addEventListener("click", () => {
+            const menu = document.querySelector(`#vue${vueActuelle[0].toUpperCase() + vueActuelle.slice(1)} .sousMenu`);
+            if (menu) menu.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+        // Adresse directe : stats.html#pilotage, #public… et une rubrique : #pilotage-themes, #public-liste
+        { const [vue, rubrique] = location.hash.slice(1).split("-"); if (VUES.indexOf(vue) > 0) { if (rubrique) montrerPan(vue, rubrique); montrerVue(vue, false); } }
 
         function ouvrir(){
             if (ouvert) return;
@@ -756,7 +945,8 @@
             return liste;
         }
 
-        function barres(idZone, compte, noms = {}, max = 8){
+        // opt.large : noms longs (villes, fournisseurs) ; opt.nombres : « 12 · 40 % » au lieu de « 40 % »
+        function barres(idZone, compte, noms = {}, max = 8, opt = {}){
             const zone = document.getElementById(idZone);
             const total = Object.values(compte).reduce((a, b) => a + b, 0);
             if (!total) { zone.innerHTML = '<div class="vide">Pas encore de données</div>'; return; }
@@ -769,11 +959,12 @@
             lignes.forEach(([cle, n]) => {
                 const pc = Math.round(n / total * 100);
                 const ligne = document.createElement("div");
-                ligne.className = "barre";
+                ligne.className = "barre" + (opt.large ? " large" : "");
                 ligne.innerHTML = '<span class="nom"></span><span class="piste"><span class="rempli"></span></span><span class="pc"></span>';
                 ligne.querySelector(".nom").textContent = cle === "__autres" ? "autres" : (noms[cle] || cle);
+                ligne.querySelector(".nom").title = ligne.querySelector(".nom").textContent;
                 ligne.querySelector(".rempli").style.width = `${Math.max(pc, 1)}%`;
-                ligne.querySelector(".pc").textContent = `${pc} %`;
+                ligne.querySelector(".pc").textContent = opt.nombres ? `${nombre(n)} · ${pc} %` : `${pc} %`;
                 zone.appendChild(ligne);
             });
         }
@@ -1006,6 +1197,8 @@
                         (p && !p.parDefaut ? `<button type="button" data-defaut="${t}">${fete ? "Par défaut" : "Toute l'année"}</button>` : "");
                     return `<div class="pilLigne"><span>${ecape(ConfigLib.NOMS_THEMES[t])}${etat}${dates}</span><span class="boutonsTheme">${autres}<button type="button" class="${cache ? "" : "coupe"}" data-theme="${t}" data-actif="${cache ? 1 : 0}">${cache ? "Remettre" : "Cacher"}</button></span></div>`;
                 }).join("");
+                $("pilMajEtat").innerHTML = config.majMin ? `En ce moment : <b>${ecape(config.majMin)}</b> demandée.` : "En ce moment : rien de demandé.";
+                if (document.activeElement !== $("pilMajMin")) $("pilMajMin").value = config.majMin || "";
                 dessinerDefis();
             }
 
@@ -1066,14 +1259,12 @@
                     message("C'est fait ✓ : " + resumes.join(" ; "));
                     return true;
                 } catch (e) {
-                    message(/PERMISSION|permission/.test(String(e && e.message)) ? "Refusé par Firebase : les règles ne connaissent pas encore ce compte (voir « Sécurité et compte » plus bas)." : "Échec : " + (e && e.message ? e.message : e), true);
+                    message(/PERMISSION|permission/.test(String(e && e.message)) ? "Refusé par Firebase : les règles ne connaissent pas encore ce compte (voir Pilotage → Compte)." : "Échec : " + (e && e.message ? e.message : e), true);
                     return false;
                 }
             }
 
-            onValue(ref(db, "config"), (s) => { config = ConfigLib.valider(s.val()); dessiner(); dessinerLecture(); dessinerBar(); });
-
-            // ----- Onglet Bar : recettes du jeu (js/cocktails.js) modifiées, masquées ou ajoutées (config/bar) -----
+            // ----- Pilotage → Bar : recettes du jeu (js/cocktails.js) modifiées, masquées ou ajoutées (config/bar) -----
             let barEdite = null; // { id, jeu } de la recette en cours de modification (id vide : nouvelle)
             let minuteurBar = null;
             const messageBar = (t, erreur) => {
@@ -1160,6 +1351,13 @@
                 if ($("pilAnnonceAvant").value.trim()) cmd.avantVersion = $("pilAnnonceAvant").value.trim();
                 if (await lancer([cmd])) { $("pilAnnonce").value = ""; $("pilAnnonceDebut").value = ""; $("pilAnnonceAvant").value = ""; }
             });
+            // mise à jour demandée (version minimale)
+            $("pilMajDemander").addEventListener("click", () => {
+                const v = $("pilMajMin").value.trim();
+                if (!/^\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(v)) { message("Écris une version comme 9.92.0.", true); return; }
+                lancer([{ op: "majmin", version: v }]);
+            });
+            $("pilMajRetirer").addEventListener("click", () => lancer([{ op: "majmin", version: null }]));
             // valeurs de départ des curseurs
             $("pilDefVolume").innerHTML = '<option value="">Au choix de chacun</option>' + Array.from({ length: 21 }, (_, i) => `<option value="${i * 5}">${i * 5} %</option>`).join("");
             $("pilDefVitesse").innerHTML = '<option value="">Au choix de chacun</option>' + Array.from({ length: 11 }, (_, i) => `<option value="${(0.6 + i / 10).toFixed(1)}">${(0.6 + i / 10).toFixed(1).replace(".", ",")}×</option>`).join("");
@@ -1269,7 +1467,7 @@
                 const reponse = ConfigLib.repondreQuestion(texte, construireResume());
                 if (reponse) { direFil(reponse); return; }
                 if (cleIA()) return; // (l'IA a déjà dit pourquoi elle n'a pas répondu)
-                direFil(r.raison || "Je n'ai pas compris. Essaie une phrase plus simple, ou ajoute une clé d'IA (en bas) pour que je comprenne les demandes plus libres.");
+                direFil(r.raison || "Je n'ai pas compris. Essaie une phrase plus simple, ou ajoute une clé d'IA (plus bas dans cette rubrique) pour que je comprenne les demandes plus libres.");
             }
             $("pilComprendre").addEventListener("click", envoyer);
             $("pilAppliquer").addEventListener("click", async () => {
@@ -1333,10 +1531,10 @@ Noms des thèmes : ${ConfigLib.THEMES_CONNUS.map((t) => t + "=" + ConfigLib.NOMS
 Thèmes de fête (disponibles seulement à leurs dates, chaque année ; dates par défaut, sauf autres dates dans la config) : ${Object.entries(ConfigLib.PERIODES_FETES).map(([t, p]) => t + " du " + ConfigLib.dateEnTexte(p[0]) + " au " + ConfigLib.dateEnTexte(p[1])).join(", ")}.
 Réglages actuels : ${ConfigLib.decrire(config).join(" ; ")}.
 Date du jour : ${new Date().toISOString().slice(0, 10)}.
-Données (stats ; « jours » = les 45 derniers jours, « visiteurs » du jour = personnes différentes ; os/themes/versions = appareils vus ces 30 jours) : ${JSON.stringify((() => { const r = construireResume(); const jours = {}; joursPasses(45).forEach((j) => { if (r.jours[j]) jours[j] = { ...r.jours[j], jour: ["dim", "lun", "mar", "mer", "jeu", "ven", "sam"][new Date(j + "T12:00:00").getDay()] }; }); return { ...r, jours }; })())}`;
+Données (stats ; « jours » = les 45 derniers jours, « visiteurs » du jour = personnes différentes ; os/themes/versions/pays/villes = appareils vus ces 30 jours ; pays et villes sont déduits de l'adresse IP, donc approximatifs, et ne sont connus que pour les appareils en 9.92.0 ou plus) : ${JSON.stringify((() => { const r = construireResume(); const jours = {}; joursPasses(45).forEach((j) => { if (r.jours[j]) jours[j] = { ...r.jours[j], jour: ["dim", "lun", "mar", "mer", "jeu", "ven", "sam"][new Date(j + "T12:00:00").getDay()] }; }); return { ...r, jours }; })())}`;
             async function demanderIA(){
                 const cle = cleIA();
-                if (!cle) { direFil("Ajoute d'abord une clé d'IA (section en bas).", undefined); return false; }
+                if (!cle) { direFil("Ajoute d'abord une clé d'IA (Pilotage → Assistant).", undefined); return false; }
                 message("L'IA réfléchit…");
                 // la conversation jusqu'ici (sans le dernier message, ajouté à la fin) : l'IA se souvient de ce qui a été dit
                 const contenus = fil.slice(0, -1).slice(-8).map((m) => ({ role: m.role === "moi" ? "user" : "assistant", texte: m.role === "moi" ? m.texte : JSON.stringify({ commandes: m.cmds || [], reponse: m.texte }) }));
@@ -1362,7 +1560,7 @@ Données (stats ; « jours » = les 45 derniers jours, « visiteurs » du jour =
                 const texte = $("pilAnnonce").value.trim();
                 if (!texte) { message("Écris d'abord ton annonce, même en brouillon.", true); return; }
                 const cle = cleIA();
-                if (!cle) { message("Pour reformuler, ajoute une clé d'IA (section en bas : Gemini est gratuit).", true); return; }
+                if (!cle) { message("Pour reformuler, ajoute une clé d'IA (Pilotage → Assistant : Gemini est gratuit).", true); return; }
                 message("L'IA réécrit…"); $("pilVariantes").innerHTML = "";
                 try {
                     const j = await appelerIA('Réécris ce message d\'annonce pour un jeu de cartes à boire entre amis : 3 variantes différentes, en français, chaleureuses et courtes, 140 caractères maximum chacune, un émoji au plus. N\'invente aucune information (date, lieu, chiffre) qui n\'est pas dans le texte. Réponds uniquement par {"variantes":["…","…","…"]}.', [{ role: "user", texte }]);
@@ -1427,12 +1625,15 @@ Données (stats ; « jours » = les 45 derniers jours, « visiteurs » du jour =
             onValue(ref(db, "stats/appareils"), (sn) => { appareils = sn.val() || {}; dessinerLecture(); }, () => {});
             setInterval(dessinerLecture, 30000);
 
+            // (abonnement posé en dernier : la première réponse peut arriver tout de suite, et dessiner() et dessinerBar() ont besoin
+            // de tout ce qui est déclaré plus haut ; avant, « sansAccentBar » n'était pas encore prêt)
+            onValue(ref(db, "config"), (s) => { config = ConfigLib.valider(s.val()); dessiner(); dessinerLecture(); dessinerBar(); });
+
             onAuthStateChanged(auth, (u) => {
                 if (histoDesabonner) { histoDesabonner(); histoDesabonner = null; }
                 if (u) histoDesabonner = onValue(query(ref(db, "config_hist"), orderByKey(), limitToLast(20)), (sn) => { histo = sn.val() || {}; dessinerHisto(); }, () => { $("pilHisto").innerHTML = '<span class="pilNote erreur">Historique illisible (règles Firebase ?)</span>'; });
                 $("pilConnexion").hidden = !!u;
                 $("pilPanneau").hidden = !u;
-                $("barPanneau").hidden = !u; $("barConnexion").hidden = !!u;
                 $("pilUid").textContent = u ? u.uid : "–";
             });
         }
@@ -1442,14 +1643,17 @@ Données (stats ; « jours » = les 45 derniers jours, « visiteurs » du jour =
             const aujourdhui = jourDe(new Date()), jours = {};
             Object.entries(donnees.jours).forEach(([j, d]) => { d = d || {}; jours[j] = { visites: Number(d.visites || 0), installs: Number(d.installs || 0), parties: Number(d.parties || 0), partiesEnLigne: Number(d.partiesEnLigne || 0), visiteurs: Object.keys(d.visiteurs || {}).length }; });
             const unique = (liste) => { const ids = new Set(); liste.forEach((j) => Object.keys((donnees.jours[j] || {}).visiteurs || {}).forEach((id) => ids.add(id))); return ids.size; };
-            const os = {}, themes = {}, versions = {};
+            const os = {}, themes = {}, versions = {}, pays = {}, villes = {};
             Object.values(donnees.appareils).forEach((a) => {
                 if (!a || Date.now() - Number(a.vu || 0) > APPAREILS_VUS_DEPUIS) return;
                 os[a.os] = (os[a.os] || 0) + 1; if (a.theme) themes[a.theme] = (themes[a.theme] || 0) + 1; if (a.version) versions[a.version] = (versions[a.version] || 0) + 1;
+                if (a.pays) pays[a.pays] = (pays[a.pays] || 0) + 1;
+                if (a.pays && a.ville) villes[`${a.ville} (${a.pays})`] = (villes[`${a.ville} (${a.pays})`] || 0) + 1;
             });
+            const villesTop = Object.fromEntries(Object.entries(villes).sort((x, y) => y[1] - x[1]).slice(0, 15));
             const ignores = (donnees.sante || {}).ignores || {};
             const plantages = agregerPlantages(donnees.sante || {}).filter((a) => !ignores[a.sig]).map((a) => ({ msg: a.msg, fichier: a.fichier, n: a.n, n24: a.n24, versions: a.versions }));
-            return { aujourdhui, jours, visiteurs: { aujourdhui: unique([aujourdhui]), "7": unique(joursPasses(7)), "30": unique(joursPasses(30)), tout: unique(Object.keys(donnees.jours)) }, os, themes, versions, plantages };
+            return { aujourdhui, jours, visiteurs: { aujourdhui: unique([aujourdhui]), "7": unique(joursPasses(7)), "30": unique(joursPasses(30)), tout: unique(Object.keys(donnees.jours)) }, os, themes, versions, pays, villes: villesTop, plantages };
         }
         // Plantages regroupés par empreinte sur 7 jours (onglet Santé et résumé)
         function agregerPlantages(sante){
@@ -1767,19 +1971,99 @@ Données (stats ; « jours » = les 45 derniers jours, « visiteurs » du jour =
             onValue(ref(db, "stats/defis"), (s) => { statsDefis = s.val() || {}; dessinerDefisStats(statsDefis, defisAjoutes); }, () => {});
             onValue(ref(db, "config/defisHot"), (s) => { defisAjoutes = s.val() || {}; dessinerDefisStats(statsDefis, defisAjoutes); }, () => {});
 
-            // ----- Téléphones, thèmes, versions (appareils vus ces 30 derniers jours) -----
+            // ----- Onglet Public : d'où viennent les appareils et ce qu'ils sont (fiches écrites par js/stats.js) -----
+            // Tout ce qui vient de la base est affiché par textContent ou échappé : n'importe qui peut écrire une fiche d'appareil.
+            const NOMS_TYPES = { telephone: "Téléphone", tablette: "Tablette", ordi: "Ordinateur" };
+            let nomsPays = null, nomsLangues = null;
+            try { nomsPays = new Intl.DisplayNames(["fr"], { type: "region" }); nomsLangues = new Intl.DisplayNames(["fr"], { type: "language" }); } catch (e) {}
+            const drapeau = (c) => (/^[A-Z]{2}$/.test(c || "") ? String.fromCodePoint(...[...c].map((l) => 0x1F1E6 + l.charCodeAt(0) - 65)) + " " : "");
+            const nomPays = (c) => { let n = c; try { n = nomsPays.of(c) || c; } catch (e) {} return drapeau(c) + n; };
+            const nomLangue = (l) => { try { const n = nomsLangues.of(l); return n ? n[0].toUpperCase() + n.slice(1) : l; } catch (e) { return l; } };
+            const nomFuseau = (f) => {
+                let d = "";
+                try { d = new Intl.DateTimeFormat("fr-FR", { timeZone: f, timeZoneName: "shortOffset" }).formatToParts(new Date()).find((x) => x.type === "timeZoneName").value; } catch (e) {}
+                return String(f).replace(/_/g, " ") + (d ? " · " + d : "");
+            };
+            const pixelsEcran = (e) => { const m = /^(\d+)x(\d+)@(\d+(?:\.\d+)?)$/.exec(e || ""); return m ? `${Math.round(m[1] * m[3])} × ${Math.round(m[2] * m[3])}` : ""; };
+            const ilYAPublic = (ms) => { const min = Math.max(0, Math.round((maintenant() - ms) / 60000)); return min < 1 ? "à l'instant" : min < 90 ? `il y a ${min} min` : min < 2880 ? `il y a ${Math.round(min / 60)} h` : `il y a ${Math.round(min / 1440)} j`; };
+            const pluriel = (n, mot) => `${mot}${n > 1 ? "s" : ""}`;
+            let joursPublic = 30, limiteListe = 25;
+            function dessinerPublic(){
+                const depuis = joursPublic ? maintenant() - joursPublic * 24 * 3600 * 1000 : 0;
+                const liste = Object.values(donnees.appareils || {}).filter((a) => a && typeof a === "object" && Number(a.vu || 0) >= depuis).sort((x, y) => Number(y.vu || 0) - Number(x.vu || 0));
+                // un compteur par rubrique : { clé: nombre } et le nom affiché de chaque clé
+                const tas = () => ({ compte: {}, noms: {} });
+                const T = { pays: tas(), regions: tas(), villes: tas(), fai: tas(), fuseaux: tas(), types: tas(), os: tas(), osv: tas(), nav: tas(), ecrans: tas(), langues: tas(), versions: tas() };
+                const ajouter = (t, cle, nom) => { if (!cle) return; t.compte[cle] = (t.compte[cle] || 0) + 1; if (nom) t.noms[cle] = nom; };
+                liste.forEach((a) => {
+                    const p = /^[A-Z]{2}$/.test(a.pays || "") ? a.pays : "";
+                    ajouter(T.pays, p, p && nomPays(p));
+                    if (p && a.region) ajouter(T.regions, p + "|" + a.region, drapeau(p) + a.region);
+                    if (p && a.ville) ajouter(T.villes, p + "|" + a.ville, drapeau(p) + a.ville);
+                    ajouter(T.fai, a.fai);
+                    ajouter(T.fuseaux, a.fuseau, a.fuseau && nomFuseau(a.fuseau));
+                    ajouter(T.types, a.type, NOMS_TYPES[a.type]);
+                    ajouter(T.os, a.os, NOMS_OS[a.os]);
+                    ajouter(T.osv, a.osv);
+                    ajouter(T.nav, a.nav);
+                    ajouter(T.ecrans, pixelsEcran(a.ecran));
+                    ajouter(T.langues, a.langue, a.langue && nomLangue(a.langue));
+                    ajouter(T.versions, a.version);
+                });
+                const large = { large: true, nombres: true };
+                barres("barresPays", T.pays.compte, T.pays.noms, 12, large);
+                barres("barresRegions", T.regions.compte, T.regions.noms, 12, large);
+                barres("barresVilles", T.villes.compte, T.villes.noms, 15, large);
+                barres("barresFai", T.fai.compte, {}, 10, large);
+                barres("barresFuseaux", T.fuseaux.compte, T.fuseaux.noms, 8, large);
+                barres("barresTypes", T.types.compte, T.types.noms, 3, large);
+                barres("barresOs", T.os.compte, T.os.noms, 3, large);
+                barres("barresOsv", T.osv.compte, {}, 10, large);
+                barres("barresNav", T.nav.compte, {}, 10, large);
+                barres("barresEcrans", T.ecrans.compte, {}, 10, large);
+                barres("barresLangues", T.langues.compte, T.langues.noms, 8, large);
+                barres("barresVersions", T.versions.compte, {}, 6, large);
+                const nbPays = Object.keys(T.pays.compte).length, nbVilles = Object.keys(T.villes.compte).length;
+                const localises = liste.filter((a) => /^[A-Z]{2}$/.test(a.pays || "")).length;
+                document.getElementById("pubPays").textContent = nombre(nbPays);
+                document.getElementById("pubPaysLegende").textContent = "pays";
+                document.getElementById("pubVilles").textContent = nombre(nbVilles);
+                document.getElementById("pubVillesLegende").textContent = pluriel(nbVilles, "ville");
+                document.getElementById("pubAppareils").textContent = nombre(liste.length);
+                document.getElementById("pubAppareilsLegende").textContent = pluriel(liste.length, "appareil");
+                document.getElementById("pubLegende").textContent = !liste.length ? "Aucun appareil vu sur cette période."
+                    : localises === liste.length ? "Tous ces appareils sont localisés."
+                    : `${nombre(localises)} ${pluriel(localises, "localisé")} sur ${nombre(liste.length)} : ${localises ? "les autres ont" : "ils ont"} une version du jeu d'avant la 9.92.0, ou le lieu n'a pas pu être trouvé${localises ? "" : " (règles Firebase republiées ?)"}.`;
+                // un par un
+                const fiche = (a) => {
+                    const p = /^[A-Z]{2}$/.test(a.pays || "") ? a.pays : "";
+                    const lieu = p ? drapeau(p) + [a.ville, a.region].filter(Boolean).join(", ") + (a.ville || a.region ? "" : nomPays(p).replace(drapeau(p), "")) : "Lieu inconnu";
+                    const quoi = [NOMS_TYPES[a.type] || NOMS_OS[a.os], a.osv, a.nav, pixelsEcran(a.ecran), a.langue && nomLangue(a.langue), a.fuseau, a.version && "jeu " + a.version, a.installe && "installé"].filter(Boolean);
+                    return `<div class="appLigne"><div class="appLieu"><span>${echapperStats(lieu)}</span><small>${echapperStats(ilYAPublic(Number(a.vu || 0)))}</small></div>${a.fai ? `<div class="appMeta">${echapperStats(a.fai)}</div>` : ""}<div class="appMeta">${echapperStats(quoi.join(" · "))}</div></div>`;
+                };
+                document.getElementById("pubListe").innerHTML = liste.length ? liste.slice(0, limiteListe).map(fiche).join("") : '<div class="vide">Pas encore de données</div>';
+                const reste = liste.length - limiteListe, plus = document.getElementById("pubVoirPlus");
+                plus.hidden = reste <= 0;
+                plus.textContent = `Voir plus (${nombre(Math.max(0, reste))} ${pluriel(reste, "autre")})`;
+            }
+            document.getElementById("pubPeriode").addEventListener("click", (e) => {
+                const b = e.target.closest("button[data-jours]"); if (!b) return;
+                joursPublic = Number(b.dataset.jours); limiteListe = 25;
+                document.querySelectorAll("#pubPeriode button").forEach((x) => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
+                dessinerPublic();
+            });
+            document.getElementById("pubVoirPlus").addEventListener("click", () => { limiteListe += 25; dessinerPublic(); });
+
+            // ----- Fiches des appareils : onglet Public, thèmes choisis (30 derniers jours), installations qui jouent -----
             onValue(ref(db, "stats/appareils"), (s) => {
                 donnees.appareils = s.val() || {};
-                const os = {}, themes = {}, versions = {};
-                Object.values(s.val() || {}).forEach((a) => {
+                const themes = {};
+                Object.values(donnees.appareils).forEach((a) => {
                     if (!a || maintenant() - Number(a.vu || 0) > APPAREILS_VUS_DEPUIS) return;
-                    os[a.os] = (os[a.os] || 0) + 1;
                     if (a.theme) themes[a.theme] = (themes[a.theme] || 0) + 1;
-                    if (a.version) versions[a.version] = (versions[a.version] || 0) + 1;
                 });
-                barres("barresOs", os, NOMS_OS);
                 barres("barresThemes", themes, NOMS_THEMES, 9);
-                barres("barresVersions", versions, {}, 4);
+                dessinerPublic();
                 legendeInstalls = dessinerInstalls(s.val()); majLegendeFidelite();
             });
         }
@@ -1791,6 +2075,7 @@ Données (stats ; « jours » = les 45 derniers jours, « visiteurs » du jour =
             else if (ouvert) location.reload();
         });
     </script>
+    <button type="button" id="versRubriques" hidden>☰ Rubriques</button>
     <div id="apercuJeu" hidden role="dialog" aria-label="Aperçu du défi dans le jeu">
         <iframe id="apercuJeuCadre" title="Aperçu du défi dans le jeu"></iframe>
         <button type="button" class="pilBtn" id="apercuJeuFermer">Fermer l'aperçu</button>

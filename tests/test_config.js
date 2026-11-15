@@ -113,6 +113,38 @@ verifier(regles.stats.appareils.$id.confVu && regles.stats.appareils.$id.confV &
   verifier(!refuses.length && !motif.test("inconnu"), "règles Firebase : tous les thèmes du pilotage acceptés" + (refuses.length ? " (refusés : " + refuses.join(", ") + ")" : ""));
 }
 verifier(/auth\.uid/.test(regles.sante[".read"]) && regles.sante.jours.$jour.$sig.n[".read"] === true && regles.sante.jours[".write"].includes("auth.uid") && regles.sante.ignores.$sig[".write"].includes("auth.uid") && regles.sante.jours.$jour.$sig[".write"] === "newData.exists()" && regles.sante.jours.$jour.$sig.n[".validate"].includes("data.exists()"), "règles Firebase : journal de santé (écriture des erreurs ouverte mais sans suppression ; effacer et ignorer réservés à l'administrateur)");
+// origine de l'appareil (onglet Public) : les règles acceptent les champs écrits par js/stats.js, toujours lisibles par l'administrateur seulement
+{
+  const a = regles.stats.appareils.$id, champs = ["type", "nav", "osv", "ecran", "langue", "fuseau", "pays", "region", "ville", "fai"];
+  const motif = (c) => new RegExp(a[c][".validate"].match(/matches\((\/.*\/)\)/)[1].slice(1, -1));
+  verifier(champs.every((c) => a[c] && /isString/.test(a[c][".validate"])) && a.$autre[".validate"] === false && a.ip === undefined && regles.stats.appareils[".read"] === undefined
+    && motif("pays").test("FR") && !motif("pays").test("France") && motif("type").test("tablette") && !motif("type").test("montre") && motif("ecran").test("390x844@3") && motif("ecran").test("412x915@2.63") && !motif("ecran").test("390x844"),
+    "règles Firebase : champs de l'origine de l'appareil (et pas d'adresse IP)");
+  // les fonctions de js/stats.js qui lisent le navigateur et la réponse du service de lieu (extraites du fichier : il ne se charge pas hors du jeu)
+  const code = fs.readFileSync(path.join(__dirname, "..", "js", "stats.js"), "utf8");
+  const morceau = code.slice(code.indexOf("const couper ="), code.indexOf("// (deux services gratuits"));
+  const bac = { screen: { width: 844, height: 390 }, window: { devicePixelRatio: 3 }, navigator: { userAgent: "", platform: "", maxTouchPoints: 0, language: "fr-FR" }, Intl };
+  const F = require("vm").runInNewContext(morceau + "; ({ typeAppareilStats, navigateurStats, versionSystemeStats, ecranStats, lireReponseOrigine, techniqueOrigineStats })", bac);
+  const iphone = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1";
+  const insta = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Instagram 330.0.0.0";
+  const chromeAndroid = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36";
+  const samsung = "Mozilla/5.0 (Linux; Android 14; SAMSUNG SM-S918B) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/25.0 Chrome/121.0.0.0 Mobile Safari/537.36";
+  const tablette = "Mozilla/5.0 (Linux; Android 12; SM-X200) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+  const edge = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0";
+  const mac = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15";
+  const safariFige = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Mobile/15E148 Safari/604.1";
+  const trio = (ua, tactile) => [F.typeAppareilStats(ua, !!tactile), F.navigateurStats(ua), F.versionSystemeStats(ua, null, !!tactile)].join(" | ");
+  verifier(trio(iphone) === "telephone | Safari 17 | iOS 17.5" && trio(insta) === "telephone | Instagram | iOS 17.4" && trio(chromeAndroid) === "telephone | Chrome 126 | Android" && trio(samsung) === "telephone | Samsung Internet 25 | Android 14"
+    && trio(tablette) === "tablette | Chrome 120 | Android 12" && trio(edge) === "ordi | Edge 126 | Windows 10 ou 11" && trio(mac) === "ordi | Safari 17 | macOS" && trio(mac, true) === "tablette | Safari 17 | iPadOS" && trio(safariFige) === "telephone | Safari 26 | iOS 26.0",
+    "origine : type d'appareil, navigateur et version du système lus dans le navigateur (" + [iphone, chromeAndroid, edge, safariFige].map((u) => trio(u)).join(" ; ") + ")");
+  verifier(F.versionSystemeStats(chromeAndroid, { platformVersion: "14.0.0" }, false) === "Android 14" && F.versionSystemeStats(edge, { platformVersion: "15.0.0" }, false) === "Windows 11" && F.versionSystemeStats(edge, { platformVersion: "10.0.0" }, false) === "Windows 10" && F.versionSystemeStats(mac, { platformVersion: "14.5.0" }, false) === "macOS 14.5"
+    && F.ecranStats("telephone") === "390x844@3" && F.ecranStats("ordi") === "844x390@3", "origine : vraie version du système quand le navigateur la donne, écran toujours debout sur téléphone");
+  const lu = (j) => JSON.stringify(F.lireReponseOrigine(j));
+  verifier(lu({ success: true, ip: "203.0.113.7", country_code: "FR", region: "Occitanie", city: "Toulouse", connection: { org: "Orange S.A.", isp: "Orange S.A." } }) === '{"pays":"FR","region":"Occitanie","ville":"Toulouse","fai":"Orange S.A."}'
+    && lu({ ip: "203.0.113.7", country_code: "BE", region: "Brussels Capital", city: "Brussels", organization_name: "Proximus NV" }) === '{"pays":"BE","region":"Brussels Capital","ville":"Brussels","fai":"Proximus NV"}'
+    && lu({ country_code: "be", organization: "AS5432 Proximus NV" }) === '{"pays":"BE","fai":"Proximus NV"}' && lu({ success: false, message: "limit" }) === "null" && lu({ country: "France" }) === "null" && lu(null) === "null"
+    && lu({ country_code: "FR", city: "x".repeat(200) }).length < 100, "origine : réponse du service de lieu lue sous ses deux formes, jamais l'adresse IP, textes raccourcis");
+}
 // la lecture des statistiques, de la santé et de la présence est réservée à l'administrateur (sauf les compteurs que les transactions du jeu lisent)
 verifier(["stats", "presence", "sante"].every((n) => /auth\.uid/.test(regles[n][".read"])) && regles.stats.jours.$jour.visites[".read"] === true && regles.stats.jours.$jour.heures.$h[".read"] === true && regles.stats.appareils[".read"] === undefined && regles.stats.jours.$jour.visiteurs.$id[".read"] === undefined, "règles Firebase : stats, santé et présence lisibles par l'administrateur seulement");
 verifier(regles.config[".read"] === true && /auth\.uid/.test(regles.config[".write"]) && /auth\.uid/.test(regles.config_hist[".write"]) && regles.config_hist[".read"] !== true, "règles Firebase : config lisible par tous, écriture réservée au compte administrateur");

@@ -1085,6 +1085,49 @@ function verifier(ok, texte){
       `appli de test : vraie appli ${vrai.ecr.length} écritures de stats, version « ${vrai.version} » ; test ${essai.ecr.length} écriture, version « ${essai.version} »`);
   }
 
+  // 39 bis. Origine de l'appareil (onglet Public d'Alcuno Stats) : écrite à part de la fiche, lieu demandé une fois par jour à un service
+  // extérieur (ici simulé), deuxième service si le premier ne répond pas, jamais de demande de position (GPS), rien en mode test
+  {
+    const origine = async (adresse, { premierEnPanne = false, deuxFois = false } = {}) => {
+      const ctx = await nav.newContext({ viewport: { width: 390, height: 780 }, locale: "fr-FR", timezoneId: "Europe/Paris" });
+      const page = await ctx.newPage();
+      const appels = [];
+      await ctx.route("https://ipwho.is/**", (r) => { appels.push("ipwho"); return premierEnPanne ? r.fulfill({ status: 500, body: "" }) : r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify({ success: true, country_code: "FR", region: "Occitanie", city: "Toulouse", connection: { asn: 3215, org: "Orange S.A.", isp: "Orange S.A." } }) }); });
+      await ctx.route("https://get.geojs.io/**", (r) => { appels.push("geojs"); return r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify({ ip: "203.0.113.7", country_code: "BE", region: "Brussels Capital", city: "Brussels", organization_name: "Proximus NV" }) }); });
+      await page.addInitScript(() => {
+        window.__maj = []; window.__gps = 0;
+        const rien = () => Promise.resolve({ val: () => null, exists: () => false });
+        window.firebaseDB = {};
+        window.fbRef = (db, chemin) => chemin;
+        window.fbSet = rien; window.fbRunTransaction = rien; window.fbRemove = rien; window.fbGet = rien;
+        window.fbUpdate = (chemin, valeur) => { window.__maj.push([chemin, JSON.parse(JSON.stringify(valeur))]); return Promise.resolve(); };
+        window.fbOnDisconnect = () => ({ remove: () => Promise.resolve() }); window.fbServerTimestamp = () => 1;
+        try { const g = navigator.geolocation; ["getCurrentPosition", "watchPosition"].forEach((m) => { g[m] = () => { window.__gps++; }; }); } catch (e) {}
+      });
+      await page.goto(adresse); await page.waitForTimeout(1500);
+      if (deuxFois) { await page.reload(); await page.waitForTimeout(1500); }
+      const r = await page.evaluate(() => ({ maj: window.__maj.filter((m) => /^stats\/appareils\/[a-z0-9]{12}$/.test(m[0])).map((m) => m[1]), gps: window.__gps, garde: localStorage.getItem("alcuno_origine_stats") }));
+      await ctx.close();
+      return { ...r, appels };
+    };
+    const un = await origine(url + "?vraistats=1");
+    const fiche = un.maj[0] || {}, technique = un.maj[1] || {}, lieu = un.maj.find((m) => m.pays) || {};
+    verifier(un.maj.length >= 3 && fiche.os && fiche.vu === 1 && fiche.type === undefined && fiche.pays === undefined
+      && technique.type === "ordi" && /^Chrome \d+$/.test(technique.nav) && !!technique.osv && /^390x780@1$/.test(technique.ecran) && technique.langue === "fr-FR" && technique.fuseau === "Europe/Paris" && technique.os === undefined
+      && lieu.pays === "FR" && lieu.region === "Occitanie" && lieu.ville === "Toulouse" && lieu.fai === "Orange S.A." && un.appels.join() === "ipwho" && un.gps === 0
+      && !/203\.0\.113|"ip"/.test(JSON.stringify(un.maj)) && /Toulouse/.test(un.garde || ""),
+      `origine de l'appareil : fiche habituelle intacte, puis écriture à part (${JSON.stringify(technique)}), lieu d'après l'IP (${JSON.stringify(lieu)}), ${un.appels.length} appel, aucune demande de position (${un.gps})`);
+    const deux = await origine(url + "?vraistats=1", { deuxFois: true });
+    const apresRechargement = deux.maj.slice(-2).concat(deux.maj).find((m) => m.type && m.pays) || {};
+    verifier(deux.appels.length === 1 && apresRechargement.ville === "Toulouse" && apresRechargement.type === "ordi", `origine : une seule demande de lieu par jour (${deux.appels.length} appel pour 2 ouvertures), lieu gardé réécrit avec la fiche (${JSON.stringify(apresRechargement)})`);
+    const secours = await origine(url + "?vraistats=1", { premierEnPanne: true });
+    const lieuSecours = secours.maj.find((m) => m.pays) || {};
+    verifier(secours.appels.join() === "ipwho,geojs" && lieuSecours.pays === "BE" && lieuSecours.ville === "Brussels" && lieuSecours.fai === "Proximus NV" && !/203\.0\.113/.test(JSON.stringify(secours.maj) + secours.garde),
+      `origine : premier service en panne => le deuxième répond (${secours.appels}), l'adresse IP n'est écrite nulle part (${JSON.stringify(lieuSecours)})`);
+    const essai = await origine(url + "?modetest=1");
+    verifier(essai.maj.length === 0 && essai.appels.length === 0 && essai.garde === null, `origine : rien en mode test (${essai.maj.length} écriture, ${essai.appels.length} appel)`);
+  }
+
   // 40. Écran « le jeu n'a pas pu se charger » : sur un navigateur trop ancien, il le dit clairement (et plus « vérifie ta connexion »)
   {
     const message = async (vieux) => {

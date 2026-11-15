@@ -3,8 +3,11 @@
 // (fichier chargé après ceux d'avant dans index.html : voir l'en-tête de script.js)
 // =============================================================================================
 // #region Statistiques anonymes
-// Rien de personnel : un identifiant tiré au hasard et gardé dans ce téléphone (pour compter les
-// visiteurs différents), le type d'appareil, le thème et la version du jeu. Pas de pseudo, pas d'IP.
+// Pas de nom, pas de pseudo, pas d'adresse IP enregistrée : un identifiant tiré au hasard et gardé dans ce téléphone (pour
+// compter les visiteurs différents), le type d'appareil, le thème et la version du jeu. Depuis la 9.92.0 s'y ajoute
+// « l'origine » de l'appareil (onglet Public d'Alcuno Stats) : pays, région, ville et fournisseur d'accès déduits de
+// l'adresse IP par un service extérieur (l'IP elle-même n'est PAS gardée), navigateur, version du système, écran, langue
+// et fuseau horaire lus dans le navigateur. Rien de tout ça ne demande d'autorisation au joueur (pas de GPS).
 // Dans Firebase :
 // - stats/jours/AAAA-MM-JJ : visites, installs, parties, partiesEnLigne, doreesEnJeu, doreesTirees
 //   (compteurs), heures/{HH} (parties
@@ -15,6 +18,7 @@
 // - stats/appareils/{id} : os, thème, version, dernière visite (répartitions de la page stats), et la dernière lecture des
 //   réglages à distance : confVu (quand) et confV (quelle modification) : voyant de l'onglet Pilotage de stats.html ;
 //   installe (ouvert depuis l'icône de l'appli) et joue (au moins une partie lancée) : « installations qui jouent » ;
+//   origine (voir « Origine de l'appareil » plus bas) : type, nav, osv, ecran, langue, fuseau, pays, region, ville, fai ;
 // - presence/{id} : ce que fait ce téléphone en ce moment (menu, classique, enligne, tele), retiré
 //   par Firebase dès que le téléphone se déconnecte (« en ce moment » de la page stats).
 const CLE_ID_STATS = "alcuno_id_stats";
@@ -62,7 +66,139 @@ function noterAppareilStats(){
       vu: window.fbServerTimestamp()
     };
     if (window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true) fiche.installe = true;
-    window.fbUpdate(refStats(`stats/appareils/${idStats}`), fiche).catch(() => {});
+    window.fbUpdate(refStats(`stats/appareils/${idStats}`), fiche).then(noterOrigineStats).catch(() => {});
+  });
+}
+
+// ===== Origine de l'appareil (onglet « Public » d'Alcuno Stats) =====
+// Écrite À PART de la fiche ci-dessus (deuxième écriture) : si les règles Firebase en ligne ne connaissent pas encore ces
+// champs, seule cette écriture est refusée et les statistiques d'avant continuent de marcher.
+// - Lu dans le navigateur, sans autorisation à demander : type d'appareil, navigateur, version du système, écran, langue, fuseau.
+// - Déduit de l'adresse IP par un service extérieur (une fois par jour et par appareil) : pays, région, ville, fournisseur
+//   d'accès. Approximatif (en 4G, c'est souvent la ville du relais de l'opérateur). L'adresse IP n'est jamais enregistrée.
+const CLE_ORIGINE = "alcuno_origine_stats";
+const DELAI_ORIGINE = 6000;
+const couper = (t, n) => String(t === undefined || t === null ? "" : t).replace(/\s+/g, " ").trim().slice(0, n);
+
+function typeAppareilStats(ua = navigator.userAgent, tactileMac = navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1){
+  if (/iPad/.test(ua) || tactileMac) return "tablette";
+  if (/iPhone|iPod/.test(ua)) return "telephone";
+  if (/Android/.test(ua)) return /Mobile/.test(ua) ? "telephone" : "tablette";
+  return "ordi";
+}
+// Navigateur (ou appli dans laquelle le lien a été ouvert : Instagram, Snapchat… utile pour savoir par où le jeu circule)
+function navigateurStats(ua = navigator.userAgent){
+  const v = (re) => { const m = ua.match(re); return m ? " " + m[1] : ""; };
+  if (/Instagram/.test(ua)) return "Instagram";
+  if (/FBAN|FBAV|FB_IAB/.test(ua)) return "Facebook";
+  if (/Snapchat/.test(ua)) return "Snapchat";
+  if (/TikTok|musical_ly|BytedanceWebview/i.test(ua)) return "TikTok";
+  if (/EdgA?\/|EdgiOS\//.test(ua)) return "Edge" + v(/Edg(?:A|iOS)?\/(\d+)/);
+  if (/OPR\/|OPT\//.test(ua)) return "Opera" + v(/OP[RT]\/(\d+)/);
+  if (/SamsungBrowser\//.test(ua)) return "Samsung Internet" + v(/SamsungBrowser\/(\d+)/);
+  if (/Firefox\/|FxiOS\//.test(ua)) return "Firefox" + v(/(?:Firefox|FxiOS)\/(\d+)/);
+  if (/CriOS\//.test(ua)) return "Chrome" + v(/CriOS\/(\d+)/);
+  if (/Chrome\//.test(ua)) return "Chrome" + v(/Chrome\/(\d+)/);
+  if (/Safari\//.test(ua) || /iPhone|iPad|iPod/.test(ua)) return "Safari" + v(/Version\/(\d+)/);
+  return "Autre";
+}
+// Version du système. « precis » : ce que Chrome donne en plus sur demande (userAgentData), car son user-agent est figé
+// (« Android 10 », « Windows NT 10.0 », « Mac OS X 10_15_7 » quelle que soit la vraie version).
+function versionSystemeStats(ua = navigator.userAgent, precis = null, tactileMac = navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1){
+  const majeure = precis && precis.platformVersion ? Number(String(precis.platformVersion).split(".")[0]) : NaN;
+  const deux = precis && precis.platformVersion ? String(precis.platformVersion).split(".").slice(0, 2).join(".").replace(/\.0$/, "") : "";
+  let m;
+  if ((m = ua.match(/(?:iPhone|iPod|iPad).*? OS (\d+)[_.](\d+)/))) {
+    // (Safari récent peut annoncer une version du système figée : son propre numéro « Version/ » suit celui d'iOS, on prend le plus grand)
+    const s = /CriOS|FxiOS|EdgiOS/.test(ua) ? null : ua.match(/Version\/(\d+)\.(\d+)/);
+    const v = s && Number(s[1]) > Number(m[1]) ? s : m;
+    return `${/iPad/.test(ua) ? "iPadOS" : "iOS"} ${v[1]}.${v[2]}`;
+  }
+  if (tactileMac) return "iPadOS";
+  if (/Android/.test(ua)) {
+    if (majeure) return "Android " + deux;
+    m = ua.match(/Android (\d+(?:\.\d+)?)/);
+    if (!m || /Android 10; K\)/.test(ua)) return "Android"; // (user-agent figé de Chrome : la vraie version n'y est pas)
+    return "Android " + m[1];
+  }
+  if (/Windows/.test(ua)) return majeure ? (majeure >= 13 ? "Windows 11" : "Windows 10") : /Windows NT 10/.test(ua) ? "Windows 10 ou 11" : "Windows (ancien)";
+  if (/CrOS/.test(ua)) return "ChromeOS";
+  if (/Mac OS X/.test(ua)) return majeure ? "macOS " + deux : "macOS";
+  if (/Linux/.test(ua)) return "Linux";
+  return "Autre";
+}
+// Écran en points × densité : « 390x844@3 » (la page stats en tire les pixels réels). Téléphones et tablettes : toujours debout.
+function ecranStats(type){
+  let l = Math.round(Number(screen.width) || 0), h = Math.round(Number(screen.height) || 0);
+  if (!l || !h) return "";
+  if (type !== "ordi" && l > h) { const t = l; l = h; h = t; }
+  const d = Math.round((Number(window.devicePixelRatio) || 1) * 100) / 100;
+  return `${l}x${h}@${d}`;
+}
+function techniqueOrigineStats(precis){
+  const type = typeAppareilStats(), fiche = { type, nav: couper(navigateurStats(), 30), osv: couper(versionSystemeStats(navigator.userAgent, precis), 30) };
+  const ecran = ecranStats(type); if (/^\d{2,5}x\d{2,5}@\d(\.\d{1,2})?$/.test(ecran)) fiche.ecran = ecran;
+  const langue = couper(navigator.language || "", 16); if (/^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*$/.test(langue)) fiche.langue = langue;
+  let fuseau = ""; try { fuseau = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch (e) {}
+  if (/^[A-Za-z0-9_+\/-]{1,40}$/.test(fuseau)) fiche.fuseau = fuseau;
+  return fiche;
+}
+// Réponse d'un service de géolocalisation par IP => { pays, region, ville, fai } (seulement les champs trouvés), ou null.
+// Plusieurs formes acceptées (les services n'ont pas tous les mêmes noms de champs).
+function lireReponseOrigine(j){
+  if (!j || typeof j !== "object" || j.success === false || j.error) return null;
+  const c = j.connection && typeof j.connection === "object" ? j.connection : {};
+  const pays = couper(j.country_code || j.countryCode || j.country_code2 || "", 2).toUpperCase();
+  if (!/^[A-Z]{2}$/.test(pays)) return null;
+  const sortie = { pays };
+  const region = couper(j.region || j.regionName || j.region_name || "", 60), ville = couper(j.city || "", 60);
+  const fai = couper(c.isp || c.org || j.isp || j.organization_name || j.org || j.organization || j.asn_org || "", 80).replace(/^AS\d+\s+/, "");
+  if (region) sortie.region = region;
+  if (ville) sortie.ville = ville;
+  if (fai) sortie.fai = fai;
+  return sortie;
+}
+// (deux services gratuits, sans clé, interrogés l'un après l'autre : le deuxième ne sert que si le premier ne répond pas)
+const SERVICES_ORIGINE = ["https://ipwho.is/", "https://get.geojs.io/v1/ip/geo.json"];
+async function chercherOrigineStats(){
+  for (const url of SERVICES_ORIGINE) {
+    try {
+      const arret = typeof AbortController === "function" ? new AbortController() : null;
+      const minuteur = setTimeout(() => { if (arret) arret.abort(); }, DELAI_ORIGINE);
+      const rep = await fetch(url, { signal: arret ? arret.signal : undefined, credentials: "omit", referrerPolicy: "no-referrer", cache: "no-store" });
+      clearTimeout(minuteur);
+      if (!rep.ok) continue;
+      const lieu = lireReponseOrigine(await rep.json());
+      if (lieu) return lieu;
+    } catch (e) {}
+  }
+  return null;
+}
+let origineNotee = false;
+function noterOrigineStats(){
+  if (MODE_TEST || origineNotee) return; // (une fois par ouverture du jeu ; noterAppareilStats repasse à chaque changement de thème)
+  origineNotee = true;
+  const ecrire = (fiche) => window.fbUpdate(refStats(`stats/appareils/${idStats}`), fiche).catch(() => {});
+  let garde = null;
+  try { garde = JSON.parse(localStorage.getItem(CLE_ORIGINE) || "null"); } catch (e) {}
+  const lieuGarde = garde && garde.lieu ? lireReponseOrigine({ country_code: garde.lieu.pays, region: garde.lieu.region, city: garde.lieu.ville, isp: garde.lieu.fai }) : null;
+  ecrire(Object.assign(techniqueOrigineStats(null), lieuGarde || {}));
+  // la vraie version du système (Chrome : sur demande, sans rien afficher au joueur)
+  try {
+    if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
+      navigator.userAgentData.getHighEntropyValues(["platformVersion"]).then((precis) => {
+        const osv = couper(versionSystemeStats(navigator.userAgent, precis), 30);
+        if (osv) ecrire({ osv });
+      }).catch(() => {});
+    }
+  } catch (e) {}
+  // le lieu : une seule demande par jour et par appareil
+  if (garde && garde.jour === jourStats() && lieuGarde) return;
+  chercherOrigineStats().then((lieu) => {
+    if (!lieu) return;
+    try { localStorage.setItem(CLE_ORIGINE, JSON.stringify({ jour: jourStats(), lieu })); } catch (e) {}
+    // (région, ville ou fournisseur absents de la réponse : on efface ceux d'avant, qui ne valent plus pour ce lieu)
+    ecrire({ pays: lieu.pays, region: lieu.region || null, ville: lieu.ville || null, fai: lieu.fai || null });
   });
 }
 
