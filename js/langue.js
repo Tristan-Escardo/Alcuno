@@ -70,6 +70,10 @@ function traduireElement(racine){
 if (estAnglais) {
   document.documentElement.lang = "en";
   traduireElement(document.body);
+  // Titre du réglage « Mode hard » : en anglais l'adjectif passe devant (« Hard mode », « hard » dans son badge orange)
+  const titreHard = document.querySelector("#ligneModeHard .optionTitre");
+  const badgeHard = titreHard && titreHard.querySelector(".badgeOrangeHard");
+  if (badgeHard) { badgeHard.textContent = "Hard"; titreHard.textContent = " mode"; titreHard.prepend(badgeHard); }
 }
 
 // Réglages > Langue : on retient le choix et on recharge la page
