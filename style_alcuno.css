@@ -1216,7 +1216,7 @@ html[data-theme="galaxie"] .fin-choix-numeros b{ background: #8fd0ff; color: #02
     html #menu #btnCaster{ background-image: linear-gradient(180deg, #ffd426, #f6b800) !important; background-color: transparent !important; color: #fff !important; border: none !important; border-radius: 12px; text-shadow: 0 1px 0 rgba(122, 74, 0, 0.85); box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.18), 0 6px 14px rgba(0, 0, 0, 0.16) !important; }
     html #menu #btnCaster .casterIcone{ position: static; transform: none; width: auto; height: auto; background: none !important; box-shadow: none; color: inherit; }
     html #menu #btnCaster .casterIcone svg{ width: 26px; height: 26px; }
-    html[data-theme="noir"] #menu #btnCaster{ background-image: linear-gradient(180deg, #0d0b06, #030302) !important; color: #ffd426 !important; border: 1px solid rgba(255, 210, 38, 0.6) !important; text-shadow: none; box-shadow: none !important; }
+    html[data-theme="noir"] #menu #btnCaster{ background-image: var(--noir-btn-fond) !important; color: var(--noir-btn-texte) !important; border: 1px solid var(--noir-btn-bord) !important; text-shadow: none; box-shadow: none !important; }
     html[data-theme="soleil"] #menu #btnCaster{ background-image: linear-gradient(180deg, #ffb35c, #f2775c) !important; text-shadow: 0 1px 0 rgba(150, 50, 40, 0.8); }
     html[data-theme="givre"] #menu #btnCaster{ background-image: linear-gradient(180deg, #27aee8, #1474b8) !important; text-shadow: 0 1px 2px rgba(8, 60, 100, 0.55); }
     /* télé connectée : anneau autour du bouton (outline : les styles de thème écrasent les ombres) */
@@ -5989,7 +5989,7 @@ html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#overlayPi
   #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
   #btnInstallationInstaller):hover:not(:disabled){
     filter: none;
-    box-shadow: 0 0 0 2px rgba(255, 210, 38, 0.7), 0 6px 18px rgba(255, 210, 38, 0.18) !important;
+    box-shadow: 0 0 0 1px var(--noir-btn-bord-survol), 0 8px 20px rgba(0, 0, 0, 0.7) !important;
   }
 }
 
@@ -7218,6 +7218,16 @@ html:is([data-theme="bordeaux"], [data-theme="vert"], [data-theme="bleu"]) :is(#
 
 /* ===== Sombre : plus de restes de bordeaux, tout en noir et gris neutres ===== */
 html[data-theme="noir"]{ --pastille-haut: rgba(40, 40, 40, 0.94); --pastille-bas: rgba(10, 10, 10, 0.92); }
+/* Boutons du thème Sombre « Obsidienne » : plaques de graphite à peine détachées du noir, liseré gris très fin, texte jaune.
+   Plus aucun contour jaune : le jaune reste sur les écritures, les icônes et le titre. Tout passe par ces
+   variables (texte jaune : --noir-btn-texte). */
+html[data-theme="noir"]{
+  --noir-btn-fond: linear-gradient(180deg, #19191c, #0e0e10);
+  --noir-btn-bord: rgba(255, 255, 255, 0.09);
+  --noir-btn-bord-survol: rgba(255, 255, 255, 0.3);
+  --noir-btn-texte: #ffd426;
+  --noir-bord-fort: rgba(255, 255, 255, 0.38);
+}
 html[data-theme="noir"] :is(#ecranPause, #ecranTele .tele-pause){ background: rgba(0, 0, 0, 0.6); }
 html[data-theme="noir"] :is(#overlayCarteDoree, #overlayRegleUnique.overlay-doree){
   background: radial-gradient(ellipse 95% 34% at 50% 33%, rgba(255, 215, 0, 0.2), transparent 100%), #000 !important;
@@ -7425,18 +7435,18 @@ html[data-theme="noir"] :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOpt
   #btnConfirmerAccueilOui, #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon,
   #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie,
   #termineSuppression, #btnInstallationInstaller){
-  background-image: linear-gradient(180deg, #0d0b06, #030302);
-  color: #ffd426;
-  border: 1px solid rgba(255, 210, 38, 0.6);
+  background-image: var(--noir-btn-fond);
+  color: var(--noir-btn-texte);
+  border: 1px solid var(--noir-btn-bord);
   box-shadow: none;
   text-shadow: none;
 }
 
 /* « Partager le lien » (Réglages) : sa règle propre (blanc, sans liseré) passait devant celle du thème : même style noir et doré que les autres boutons */
 html[data-theme="noir"] #ecranReglages #btnPartagerJeu{
-  background-image: linear-gradient(180deg, #0d0b06, #030302);
-  color: #ffd426;
-  border: 1px solid rgba(255, 210, 38, 0.6);
+  background-image: var(--noir-btn-fond);
+  color: var(--noir-btn-texte);
+  border: 1px solid var(--noir-btn-bord);
   box-shadow: none;
   text-shadow: none;
 }
@@ -7515,9 +7525,9 @@ html[data-theme="noir"] :is(#btnRepriseOui, #btnRepriseNon, #btnFermerScanner, #
   #overlayPlus4 .bouton-pigeon,
   #overlayCoupDeFoudre .bouton-pigeon, #overlayDuel button:not(:disabled), #overlayFinUnRestants .bouton-pigeon,
   #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation, #overlayAnnulation button){
-  background: linear-gradient(180deg, #0d0b06, #030302) !important;
-  color: #ffd426 !important;
-  border: 1px solid rgba(255, 210, 38, 0.6) !important;
+  background: var(--noir-btn-fond) !important;
+  color: var(--noir-btn-texte) !important;
+  border: 1px solid var(--noir-btn-bord) !important;
   box-shadow: none !important;
   text-shadow: none !important;
 }
@@ -7531,13 +7541,13 @@ html[data-theme="noir"] :is(#btnRepriseOui, #btnRepriseNon, #btnFermerScanner, #
     #overlayCoupDeFoudre .bouton-pigeon, #overlayDuel button:not(:disabled), #overlayFinUnRestants .bouton-pigeon,
     #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation, #overlayAnnulation button):hover:not(:disabled){
     filter: none;
-    box-shadow: 0 0 0 2px rgba(255, 210, 38, 0.7), 0 6px 18px rgba(255, 210, 38, 0.18) !important;
+    box-shadow: 0 0 0 1px var(--noir-btn-bord-survol), 0 8px 20px rgba(0, 0, 0, 0.7) !important;
   }
 }
 html[data-theme="noir"] #menu #btnCaster{
-  background: linear-gradient(180deg, #0d0b06, #030302) !important;
-  color: #ffd426 !important;
-  border: 1px solid rgba(255, 210, 38, 0.6) !important;
+  background: var(--noir-btn-fond) !important;
+  color: var(--noir-btn-texte) !important;
+  border: 1px solid var(--noir-btn-bord) !important;
 }
 html[data-theme="noir"] :is(.prediction-header, .fin-choix-recap, .recap-marche, .recap-liste, .recap-bloc){
   background: #000 !important;
@@ -8612,23 +8622,23 @@ html[data-theme="galaxie"] :is(#overlayRegleUnique, #overlayCarteDoree, #overlay
 /* ===== Fenêtres du bas (pause, carte, historique) : accordées aux thèmes ===== */
 /* Sombre : mêmes boutons presque noirs, texte et liseré dorés que le reste du thème */
 html[data-theme="noir"] :is(.voletPause-ok, .voletPause-annuler){
-  background: linear-gradient(180deg, #0d0b06, #030302) !important;
-  color: #ffd426 !important;
-  border: 1px solid rgba(255, 210, 38, 0.6) !important;
+  background: var(--noir-btn-fond) !important;
+  color: var(--noir-btn-texte) !important;
+  border: 1px solid var(--noir-btn-bord) !important;
   box-shadow: none !important;
   text-shadow: none !important;
 }
-html[data-theme="noir"] .voletPause-feuille{ border-top: 1px solid rgba(255, 210, 38, 0.35); }
+html[data-theme="noir"] .voletPause-feuille{ border-top: 1px solid var(--noir-btn-bord); }
 /* Givre : « Aucune carte tirée pour l'instant » était gris clair sur fond clair */
 html[data-theme="givre"] .historique-vide{ color: var(--givre-texte); }
 
 /* Sombre : plus de contour bleu du navigateur dans les champs de texte : liseré doré à la place */
 html[data-theme="noir"] :is(input:not([type="checkbox"]):not([type="range"]):not([type="file"]), textarea, select):focus{
   outline: none !important;
-  border-color: rgba(255, 210, 38, 0.85) !important;
-  box-shadow: 0 0 0 1px rgba(255, 210, 38, 0.45) !important;
+  border-color: var(--noir-bord-fort) !important;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12) !important;
 }
-html[data-theme="noir"] :focus-visible{ outline-color: #ffd426; }
+html[data-theme="noir"] :focus-visible{ outline-color: var(--noir-btn-texte); }
 
 /* ===== Album de stickers (s'ouvre dans l'écran des règles : mêmes blocs, mêmes couleurs de thème ; js/stickers.js) ===== */
 :root{ --album-silhouette: brightness(0) invert(1) opacity(0.3); --album-barre-fond: rgba(255, 255, 255, 0.14); --album-barre-plein: #FFD700; }
@@ -9161,8 +9171,8 @@ html #ecranTele .tele-puce.tele-puce-calme{ opacity: 0.5; box-shadow: none; }
 /* ===== Écran « Caster sur la télé » (Scanner la télé, OK, Arrêter de caster) et bouton Annuler de la caméra de scan :
    Sombre et Soleil couchant les laissaient en jaune par défaut, alors que « Retour » était bien dans le thème ===== */
 html[data-theme="noir"] body :is(#ecranCaster button:not(.btnRetour), #btnFermerScanner, #btnReprendrePause){
-  background: linear-gradient(180deg, #0d0b06, #030302) !important; color: #ffd426 !important;
-  border: 1px solid rgba(255, 210, 38, 0.6) !important; box-shadow: none !important; text-shadow: none !important;
+  background: var(--noir-btn-fond) !important; color: var(--noir-btn-texte) !important;
+  border: 1px solid var(--noir-btn-bord) !important; box-shadow: none !important; text-shadow: none !important;
 }
 html[data-theme="soleil"] body :is(#ecranCaster button:not(.btnRetour), #btnFermerScanner, #ecranReprise button){
   background: linear-gradient(180deg, #ffb35c, #f2775c) !important; color: #fff !important; border: 0 !important;
@@ -9326,7 +9336,7 @@ html[data-theme="bordeaux"] body #ecranReglages :is(.btnMiseEnPage, #btnModifier
 html[data-theme="bordeaux"] body #ecranReglages .tuileReglage.choisie{ outline: 3px solid rgb(255, 255, 255); outline-offset: -7px; }
 html[data-theme="bordeaux"] body #ecranReglages.reglages-edition #btnModifierReglages{ outline: 3px solid rgb(255, 255, 255); outline-offset: -4px; }
 html[data-theme="noir"] body #ecranReglages :is(.btnMiseEnPage, .enteteGroupe, .tuileReglage, #btnModifierReglages, #btnParDefautReglages, .chipLangue.actif){
-  background: linear-gradient(rgb(13, 11, 6), rgb(3, 3, 2)) !important; border: 1px solid rgba(255, 210, 38, 0.6) !important; color: rgb(255, 212, 38) !important; box-shadow: none !important; text-shadow: none !important; opacity: 1;
+  background: var(--noir-btn-fond) !important; border: 1px solid var(--noir-btn-bord) !important; color: var(--noir-btn-texte) !important; box-shadow: none !important; text-shadow: none !important; opacity: 1;
 }
 html[data-theme="noir"] body #ecranReglages :is(.enteteGroupe, .tuileReglage){ border-radius: 14px !important; }
 html[data-theme="noir"] body #ecranReglages :is(.btnMiseEnPage, #btnModifierReglages, #btnParDefautReglages, .chipLangue){ border-radius: 999px !important; }
@@ -9979,3 +9989,55 @@ html body #ecranReglages .chipLangue:not(.actif){ opacity: .6 !important; }
 #enLigneRejoindre.regarder #validerRejoindre,
 #enLigneRejoindre:not(.regarder) #validerRegarder{ display: none; }
 body.mode-spectateur #nouvellePartie{ display: none !important; }
+
+/* ===== Thème Sombre « Obsidienne » : plus aucun contour jaune. Tout ce qui était cerclé de doré (cadre de la partie,
+   boutons ronds, pastille du thème choisi, sections des Réglages, blocs des Règles, QR code, boutons pause des joueurs…)
+   passe en gris neutre très fin (variables --noir-* plus haut). Le doré ne reste que là où il veut dire quelque chose :
+   le titre, les textes importants, les interrupteurs allumés et le joueur dont c'est le tour (sans halo). ===== */
+html[data-theme="noir"] .messages::before{ background: rgba(255, 255, 255, 0.1) !important; }
+html[data-theme="noir"] body :is(#btnModifierReglages, #btnMiseEnPage, #btnFaqDepuisRegles, #listeJoueurs .joueur-ligne:not(.joueur-ligne-actif) .btnPauseJoueur){
+  border-color: var(--noir-btn-bord) !important;
+}
+html[data-theme="noir"] body #ecranReglages :is(.optionReglage, .optionReglage.groupe-ouvert, .blocPartage),
+html[data-theme="noir"] body .optionsPartie .optionReglage,
+html[data-theme="noir"] body .blocRegles{ border-color: var(--noir-btn-bord) !important; }
+/* Thème choisi (Réglages) : anneau gris clair net au lieu de l'anneau doré lumineux */
+html[data-theme="noir"] body #ecranReglages .pastilleTheme.actif .rond,
+html[data-theme="noir"] body #ecranReglages .pastilleTheme[aria-pressed="true"] .rond{
+  border-color: #e9e9ee !important;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.14) !important;
+}
+html[data-theme="noir"] body .chipLangue.actif{
+  background: var(--noir-btn-fond) !important; color: var(--noir-btn-texte) !important; border-color: var(--noir-bord-fort) !important;
+}
+html[data-theme="noir"] body .qrJeu{ box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25), 0 10px 24px rgba(0, 0, 0, 0.6) !important; }
+html[data-theme="noir"] body .lignesRegle li::before{ background: #6f6f78 !important; }
+/* Joueur dont c'est le tour : doré plein, mais mat (ni contour blanc ni halo qui éclaire l'écran) */
+html[data-theme="noir"]{ --actif-haut: #f1c93a; --actif-bas: #d9a800; --actif-texte: #1a1300; --actif-halo: transparent; }
+html[data-theme="noir"] #listeJoueurs .joueur-ligne-actif{ border-color: transparent !important; box-shadow: none !important; }
+/* Titre de l'accueil : la copie décalée du « bug » est gris froid (le rouge sang rappelait Halloween) */
+html[data-theme="noir"] #choixMode #titreAccueil::before{ color: #4a4a55; }
+/* Petits boutons en pastille (Album de stickers, Inviter à rejoindre, Questions fréquentes, crayon et « Mise en page »
+   des Réglages) : même graphite que les grands boutons, au lieu du voile et du liseré dorés */
+html[data-theme="noir"] body :is(#btnAlbumAccueil, #btnInviterPartie, #btnFaqDepuisRegles, .btnModifierReglages, #btnMiseEnPage){
+  background: var(--noir-btn-fond) !important;
+  color: var(--noir-btn-texte) !important;
+  border: 1px solid var(--noir-btn-bord) !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+html[data-theme="noir"] body #codeCaster{ border-color: rgba(255, 255, 255, 0.14) !important; }
+html[data-theme="noir"] body .qrPartie{ border-color: rgba(255, 255, 255, 0.25) !important; box-shadow: none !important; }
+html[data-theme="noir"] body #ecranReglages:not(.reglages-edition) #btnModifierReglages{
+  background: var(--noir-btn-fond) !important; color: var(--noir-btn-texte) !important; border-color: var(--noir-btn-bord) !important;
+}
+
+/* Sombre : tout ce qui était resté blanc (Retour, Mise en page, crayon, icônes des boutons, titres de blocs, nom du joueur actif) en jaune comme le reste */
+html[data-theme="noir"] body :is(.titreBloc, .btnRetour, .btnMiseEnPage, #btnMiseEnPage, .btnModifierReglages, #btnModifierReglages,
+  #menu button, #stickyJoueurActif, #stickyJoueurActif .sticky-nom, #stickyJoueurActif button){
+  color: var(--noir-btn-texte) !important;
+}
+html[data-theme="noir"] body :is(#menu button, .btnRetour, .btnMiseEnPage, .btnModifierReglages, #stickyJoueurActif button) svg{ stroke: var(--noir-btn-texte); }
+/* Sombre : cartes Bar / Éthylo de l'accueil, contour gris comme les boutons */
+html[data-theme="noir"] body :is(#btnBarAccueil, #btnEthyloAccueil){ border-color: var(--noir-btn-bord) !important; }
+html[data-theme="noir"] body :is(#btnBarAccueil, #btnEthyloAccueil)::before{ border-color: var(--noir-btn-bord) !important; }

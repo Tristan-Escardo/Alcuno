@@ -280,7 +280,7 @@ function verifier(ok, texte){
       return s.backgroundImage + "|" + s.color;
     }, theme);
     const sombre = await fond("noir"), bordeaux = await fond("bordeaux");
-    verifier(/rgb\(13, 11, 6\)/.test(sombre) && sombre !== bordeaux && erreurs.length === 0, `thème Sombre : boutons des fenêtres de jeu sombres (${sombre.slice(0, 50)}…)`);
+    verifier(/rgb\(25, 25, 28\)/.test(sombre) && sombre !== bordeaux && erreurs.length === 0, `thème Sombre : boutons des fenêtres de jeu sombres (${sombre.slice(0, 50)}…)`);
     await ctx.close();
   }
 
@@ -368,7 +368,7 @@ function verifier(ok, texte){
     await ctx.close();
   }
 
-  // 17. Thème Sombre : boutons de la fenêtre de pause presque noirs au texte doré, champ de texte sans contour bleu du navigateur
+  // 17. Thème Sombre : boutons de la fenêtre de pause en graphite au texte jaune, liseré gris, champ de texte sans contour bleu du navigateur
   {
     const { ctx, page, erreurs } = await ouvrir({}, `try{localStorage.setItem("alcuno_theme","noir")}catch(e){}`);
     await page.click("#btnModeClassique"); await page.click("#btnContinuerOptions"); await page.waitForTimeout(800);
@@ -378,7 +378,7 @@ function verifier(ok, texte){
     await page.click("#jouer"); await page.waitForTimeout(1200);
     await page.click("#listeJoueurs .joueur-ligne:nth-child(2) .btnPauseJoueur"); await page.waitForTimeout(700);
     const boutons = await page.evaluate(() => [".voletPause-ok", ".voletPause-annuler"].map((sel) => { const c = getComputedStyle(document.querySelector(sel)); return c.color + "|" + c.backgroundImage.slice(0, 40); }));
-    verifier(champ.contour === "none" && /255, 2\d\d, \d+/.test(champ.bord) && boutons.every((b) => b.startsWith("rgb(255, 212, 38)") && b.includes("linear-gradient(rgb(13, 11, 6)")) && erreurs.length === 0,
+    verifier(champ.contour === "none" && /255, 255, 255/.test(champ.bord) && boutons.every((b) => b.startsWith("rgb(255, 212, 38)") && b.includes("linear-gradient(rgb(25, 25, 28)")) && erreurs.length === 0,
       `thème Sombre : champ de texte (contour ${champ.contour}, bord ${champ.bord}), boutons de pause ${boutons.join(" ; ")}`);
     await ctx.close();
   }
