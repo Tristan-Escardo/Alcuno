@@ -832,7 +832,7 @@
         });
         const authPorte = getAuth(app);
         // Version de la page de stats (à part de celle du jeu : +0.0.1 à chaque modification de cette page)
-        const VERSION_STATS = "1.24.2";
+        const VERSION_STATS = "1.24.3";
         document.getElementById("versionStats").textContent = VERSION_STATS;
         document.getElementById("versionStats2").textContent = VERSION_STATS;
         document.getElementById("versionStats3").textContent = VERSION_STATS;
@@ -963,6 +963,7 @@
         const CLE_ALLER_STATS = "alcuno_stats_google_aller";
         const adresseStats = location.origin + location.pathname;
         const appliInstallee = () => { try { return navigator.standalone === true || window.matchMedia("(display-mode: standalone)").matches; } catch (e) { return false; } };
+        const telephone = () => /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
         const hasardStats = () => Array.from(crypto.getRandomValues(new Uint32Array(4)), (n) => n.toString(16).padStart(8, "0")).join("");
         const empreinteStats = (t) => crypto.subtle.digest("SHA-256", new TextEncoder().encode(t)).then((h) => Array.from(new Uint8Array(h), (o) => o.toString(16).padStart(2, "0")).join(""));
         const erreurGoogle = (err) => {
@@ -980,7 +981,8 @@
         document.getElementById("porteGoogle").addEventListener("click", async () => {
             document.getElementById("erreurPorte").textContent = "";
             try {
-                if (appliInstallee()) { await allerChezGoogleStats(); return; }
+                // (téléphone ou appli installée : la fenêtre de Firebase y échoue, « missing initial state » sur iPhone)
+                if (appliInstallee() || telephone()) { await allerChezGoogleStats(); return; }
                 await signInWithPopup(authPorte, new GoogleAuthProvider());
             } catch (err) {
                 if (err && (err.code === "auth/popup-blocked" || err.code === "auth/operation-not-supported-in-this-environment")) { try { await allerChezGoogleStats(); return; } catch (e) {} }
