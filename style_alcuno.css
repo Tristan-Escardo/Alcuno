@@ -3716,23 +3716,28 @@ html.accessibilite #overlayCoupDeFoudre .plus4-joueur-btn{
 }
 #ecranReglages #btnProfilConnexion.btnGoogle .logoGoogle{ display: block; flex: 0 0 auto; width: 20px; height: 20px; }
 /* Connecté : « Se déconnecter » est le même bouton Google que « Se connecter avec Google » (G en couleurs compris) */
-/* « Supprimer mon profil » : même rendu dans tous les thèmes (les thèmes y mettaient un cadre ou un trait dessous) :
-   petite pastille rouge discrète, ni cadre, ni souligné, ni ombre */
+/* « Supprimer mon profil » : sous « Se déconnecter », même taille, en rouge, même rendu dans tous les thèmes
+   (les thèmes y mettaient un cadre néon ou un trait dessous) */
+#ecranReglages [data-cle="compte"] .profilSupprimer{ flex: 1 0 100%; margin: 10px 0 0; text-align: center; }
 html[data-theme][data-theme][data-theme] body #ecranReglages #btnProfilSupprimer{
-  display: inline-block;
-  padding: 7px 14px;
-  min-width: 0; min-height: 0; width: auto; height: auto;
-  font-family: inherit; font-size: 13px; font-weight: 700; letter-spacing: 0;
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; min-width: 0; min-height: 0; height: auto; box-sizing: border-box;
+  margin: 0; padding: 11px 16px;
+  font-family: Roboto, Arial, sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 0;
   text-transform: none; text-decoration: none !important; text-shadow: none;
-  color: var(--dangerReglage, #ff9b9b);
-  background: rgba(214, 69, 69, 0.14);
-  border: 0; border-radius: 999px; outline: none;
-  box-shadow: none; filter: none; clip-path: none;
+  color: #fff;
+  background: #d93025;
+  border: 1px solid #b3261e; border-radius: 999px; outline: none;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3); filter: none; clip-path: none;
   cursor: pointer; touch-action: manipulation;
 }
 html[data-theme][data-theme][data-theme] body #ecranReglages #btnProfilSupprimer::before,
 html[data-theme][data-theme][data-theme] body #ecranReglages #btnProfilSupprimer::after{ content: none; display: none; }
-html[data-theme][data-theme][data-theme] body #ecranReglages #btnProfilSupprimer:active{ background: rgba(214, 69, 69, 0.28); }
+html[data-theme][data-theme][data-theme] body #ecranReglages #btnProfilSupprimer:active{ background: #b3261e; transform: scale(0.98); }
+/* même arrondi pour « Se connecter / Se déconnecter » (les deux boutons alignés) */
+#ecranReglages #btnProfilConnexion.btnGoogle{ border-radius: 999px; }
+/* Confirmation « Supprimer ton profil ? » : l'écran de confirmation du jeu passe au-dessus des Réglages (js/profil.js) */
+#ecranConfirmerRetrait.confirmationReglages{ z-index: 10060; }
 
 /* ===== Réglages : Partager le jeu (QR code + bouton « Partager ») ===== */
 #ecranReglages .blocPartage{

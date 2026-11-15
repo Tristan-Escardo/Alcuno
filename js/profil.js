@@ -423,9 +423,37 @@ if (typeof document !== "undefined" && !document.documentElement.classList.conta
     // (le téléphone garde tout ce qu'il a ; le profil en ligne reste tel qu'il était à la dernière sauvegarde)
     fb.signOut(auth).catch(() => {}).then(() => { occupe = false; etatTexte = ""; ecrireEtat(null); majBloc(); });
   }
+  // Confirmation à l'écran, aux couleurs du thème (pas de confirm() du navigateur) : on emprunte l'écran « Retirer un joueur ? »
+  // du jeu (#ecranConfirmerRetrait, déjà habillé par chaque thème), passé au-dessus des Réglages le temps de la question.
+  // Ses boutons sont écoutés AVANT ceux du jeu (capture) : le retrait d'un joueur n'est jamais déclenché d'ici.
+  function confirmerAEcran(titre, texte, libelleOui, libelleNon){
+    return new Promise((fin) => {
+      const ecran = document.getElementById("ecranConfirmerRetrait"), h = document.getElementById("titreConfirmerRetrait"),
+        p = document.getElementById("texteConfirmerRetrait"), oui = document.getElementById("btnConfirmerRetraitOui"), non = document.getElementById("btnConfirmerRetraitNon");
+      if (!ecran || !oui || !non) { fin(window.confirm(titre + "\n\n" + texte)); return; }
+      const avant = [h.innerText, p.innerText, oui.textContent, non.textContent];
+      h.innerText = titre; p.innerText = texte; oui.textContent = libelleOui; non.textContent = libelleNon;
+      ecran.classList.add("confirmationReglages");
+      ecran.style.display = "";
+      const repondre = (rep) => (e) => {
+        e.stopImmediatePropagation(); e.preventDefault();
+        oui.removeEventListener("click", siOui, true); non.removeEventListener("click", siNon, true);
+        ecran.style.display = "none"; ecran.classList.remove("confirmationReglages");
+        [h.innerText, p.innerText, oui.textContent, non.textContent] = avant;
+        fin(rep);
+      };
+      const siOui = repondre(true), siNon = repondre(false);
+      oui.addEventListener("click", siOui, true); non.addEventListener("click", siNon, true);
+    });
+  }
   function supprimer(){
     if (occupe || !utilisateur) return;
-    if (!confirm(tr("Supprimer ton profil ?\n\nTa progression sauvegardée en ligne et ton compte Alcuno sont effacés. Ce téléphone garde ce qu'il a déjà."))) return;
+    confirmerAEcran(tr("Supprimer ton profil ?"),
+      tr("Ta progression sauvegardée en ligne et ton compte Alcuno sont effacés. Ce téléphone garde ce qu'il a déjà."),
+      tr("Supprimer"), tr("Annuler")).then((ok) => { if (ok) supprimerVraiment(); });
+  }
+  function supprimerVraiment(){
+    if (occupe || !utilisateur) return;
     occupe = true;
     dire(tr("Suppression…"));
     const moi = utilisateur;

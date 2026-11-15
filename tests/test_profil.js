@@ -217,7 +217,7 @@ export const deleteUser = async () => { window.__compteEfface = true; courant = 
   await A.page.evaluate(() => { window.__erreurPopup = ""; });
   await A.page.click("#btnProfilConnexion"); await A.page.waitForTimeout(700);
   a = await etat(A.page);
-  verifier(a.bouton === "Se déconnecter" && !a.google && a.supprimer && /Tom/.test(a.note) && a.reglagesOuverts && a.profil && a.profil.debloque.prestige === true && a.profil.debloque.album === true &&
+  verifier(a.bouton === "Se déconnecter" && a.google && a.supprimer && /Tom/.test(a.note) && a.reglagesOuverts && a.profil && a.profil.debloque.prestige === true && a.profil.debloque.album === true &&
     Object.keys(a.profil.stickers.gagnes).sort().join() === "chat,cupcake" && a.profil.stickers.parties === 3 && a.profil.reglages.valeurs.theme === "noir" && JSON.parse(a.lie).uid === "u1",
     `connexion : profil créé avec les déblocages, les stickers et les réglages du téléphone (${a.note})`);
   verifier(a.ecritures === "profils/u1@profil" && !/ethylo|example\.com|Tom/.test(JSON.stringify(a.profil)), `le profil est écrit par l'appli « profil », sans éthylotest, nom ni e-mail (${a.ecritures})`);
@@ -272,7 +272,11 @@ export const deleteUser = async () => { window.__compteEfface = true; courant = 
 
   // suppression : profil effacé de la base, compte effacé, le téléphone garde ce qu'il a
   await B.page.click("#btnProfilConnexion"); await B.page.waitForTimeout(700);
-  await B.page.click("#btnProfilSupprimer"); await B.page.waitForTimeout(700);
+  await B.page.click("#btnProfilSupprimer"); await B.page.waitForTimeout(300);
+  // (confirmation à l'écran, aux couleurs du thème : plus de confirm() du navigateur)
+  const confirmation = await B.page.evaluate(() => { const e = document.getElementById("ecranConfirmerRetrait"); return e.style.display !== "none" && document.getElementById("titreConfirmerRetrait").innerText; });
+  verifier(confirmation === "Supprimer ton profil ?", `suppression : confirmation affichée à l'écran (${confirmation})`);
+  await B.page.click("#btnConfirmerRetraitOui"); await B.page.waitForTimeout(700);
   b = await etat(B.page);
   verifier(b.profil === null && b.bouton === "Se connecter avec Google" && b.lie === null && await B.page.evaluate(() => window.__compteEfface === true && localStorage.getItem("alcuno_theme_galaxie") === "1"),
     "suppression : profil et compte effacés, le téléphone garde ses déblocages");
