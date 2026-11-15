@@ -4,37 +4,37 @@
 // Les images (dossier faq/) sont des captures du jeu avec la zone à toucher entourée ; elles ne se chargent qu'à l'ouverture
 // d'une question, pour ne pas ralentir le démarrage. Petit HTML écrit ici (rien qui vient d'un joueur).
 const QUESTIONS_FAQ = [
-  { titre: "Jouer", questions: [
-    { q: "Comment lancer une partie ?", image: "faq/accueil.webp", alt: "Accueil du jeu : le bouton Mode classique est entouré",
-      r: ["Touche <b>Mode classique</b> : tout le monde joue sur <b>un seul téléphone</b>, même sans réseau.",
-          "Ajoute les prénoms des joueurs, puis touche <b>Jouer</b>.",
-          "Chacun son tour retourne une carte et applique sa règle (voir le livre 📖 en haut à gauche)."] },
-    { q: "Comment mettre quelqu'un en pause ?", image: "faq/pause.webp", alt: "Barre du joueur actif : le petit bouton pause est entouré",
-      r: ["Touche le petit bouton <b>pause</b> ⏸ à côté du nom du joueur (toilettes, clope, appel…).",
-          "Pendant sa pause, on le saute. S'il revient avant qu'une carte soit retournée, il récupère son tour.",
-          "Touche ▶ pour le remettre en jeu."] },
-    { q: "Où changer le thème du jeu ?", r: [
-          "Dans <b>Réglages › Thèmes</b>, touche la pastille du thème que tu veux.",
-          "Certains thèmes se débloquent en jouant."] }
+  { titre: tr("Jouer"), questions: [
+    { q: tr("Comment lancer une partie ?"), image: "faq/accueil.webp", alt: tr("Accueil du jeu : le bouton Mode classique est entouré"),
+      r: [tr("Touche <b>Mode classique</b> : tout le monde joue sur <b>un seul téléphone</b>, même sans réseau."),
+          tr("Ajoute les prénoms des joueurs, puis touche <b>Jouer</b>."),
+          tr("Chacun son tour retourne une carte et applique sa règle (voir le livre 📖 en haut à gauche).")] },
+    { q: tr("Comment mettre quelqu'un en pause ?"), image: "faq/pause.webp", alt: tr("Barre du joueur actif : le petit bouton pause est entouré"),
+      r: [tr("Touche le petit bouton <b>pause</b> ⏸ à côté du nom du joueur (toilettes, clope, appel…)."),
+          tr("Pendant sa pause, on le saute. S'il revient avant qu'une carte soit retournée, il récupère son tour."),
+          tr("Touche ▶ pour le remettre en jeu.")] },
+    { q: tr("Où changer le thème du jeu ?"), r: [
+          tr("Dans <b>Réglages › Thèmes</b>, touche la pastille du thème que tu veux."),
+          tr("Certains thèmes se débloquent en jouant.")] }
   ]},
-  { titre: "En ligne et télé", questions: [
-    { q: "Comment jouer en ligne avec des amis ?", image: "faq/enligne.webp", alt: "Écran du mode en ligne : Créer une partie et Rejoindre une partie sont entourés",
-      r: ["Touche <b>Mode en ligne</b>. Une personne choisit <b>Créer une partie</b> et reçoit un <b>code</b> (et un QR code).",
-          "Les autres touchent <b>Rejoindre une partie</b> et entrent le code, ou scannent le QR code.",
-          "Chacun joue sur son téléphone. Déconnecté ? Entre le code dans « Revenir dans une partie » pour reprendre ta place."] },
-    { q: "Comment afficher la partie sur la télé ?", image: "faq/tele.webp", alt: "Réglages : la ligne Afficher l'écran télé est entourée",
-      r: ["Sur la télé, ouvre le navigateur et va sur l'adresse du jeu. Sur la plupart des télés, l'<b>écran télé</b> s'ouvre tout seul.",
-          "Sinon : <b>Réglages › Afficher l'écran télé</b>, sur la télé.",
-          "Sur ton téléphone, touche l'icône de diffusion à côté de « Nouvelle partie » et entre le code affiché sur la télé."] }
+  { titre: tr("En ligne et télé"), questions: [
+    { q: tr("Comment jouer en ligne avec des amis ?"), image: "faq/enligne.webp", alt: tr("Écran du mode en ligne : Créer une partie et Rejoindre une partie sont entourés"),
+      r: [tr("Touche <b>Mode en ligne</b>. Une personne choisit <b>Créer une partie</b> et reçoit un <b>code</b> (et un QR code)."),
+          tr("Les autres touchent <b>Rejoindre une partie</b> et entrent le code, ou scannent le QR code."),
+          tr("Chacun joue sur son téléphone. Déconnecté ? Entre le code dans « Revenir dans une partie » pour reprendre ta place.")] },
+    { q: tr("Comment afficher la partie sur la télé ?"), image: "faq/tele.webp", alt: tr("Réglages : la ligne Afficher l'écran télé est entourée"),
+      r: [tr("Sur la télé, ouvre le navigateur et va sur l'adresse du jeu. Sur la plupart des télés, l'<b>écran télé</b> s'ouvre tout seul."),
+          tr("Sinon : <b>Réglages › Afficher l'écran télé</b>, sur la télé."),
+          tr("Sur ton téléphone, touche l'icône de diffusion à côté de « Nouvelle partie » et entre le code affiché sur la télé.")] }
   ]},
-  { titre: "Appli et problèmes", questions: [
-    { q: "Comment installer l'appli sur mon téléphone ?", image: "faq/installer.webp", alt: "Écran Installer Alcuno avec les 3 étapes",
-      r: ["<b>iPhone</b> : dans Safari, touche <b>Partager</b>, puis <b>Sur l'écran d'accueil</b>, puis <b>Ajouter</b>.",
-          "<b>Android</b> : touche le menu ⋮ du navigateur, puis <b>Installer l'application</b> (ou <b>Ajouter à l'écran d'accueil</b>).",
-          "Le bouton <b>Installer l'appli</b> en bas de l'accueil rouvre cet écran. Une fois installé, le mode classique marche sans réseau."] },
-    { q: "Le jeu ne se met pas à jour ou plante", r: [
-          "Ferme complètement l'appli, puis rouvre-la : une nouvelle version se charge en général toute seule.",
-          "Si ça continue : <b>Réglages › Signaler un bug</b>, ou « Copier le diagnostic » pour l'envoyer."] }
+  { titre: tr("Appli et problèmes"), questions: [
+    { q: tr("Comment installer l'appli sur mon téléphone ?"), image: "faq/installer.webp", alt: tr("Écran Installer Alcuno avec les 3 étapes"),
+      r: [tr("<b>iPhone</b> : dans Safari, touche <b>Partager</b>, puis <b>Sur l'écran d'accueil</b>, puis <b>Ajouter</b>."),
+          tr("<b>Android</b> : touche le menu ⋮ du navigateur, puis <b>Installer l'application</b> (ou <b>Ajouter à l'écran d'accueil</b>)."),
+          tr("Le bouton <b>Installer l'appli</b> en bas de l'accueil rouvre cet écran. Une fois installé, le mode classique marche sans réseau.")] },
+    { q: tr("Le jeu ne se met pas à jour ou plante"), r: [
+          tr("Ferme complètement l'appli, puis rouvre-la : une nouvelle version se charge en général toute seule."),
+          tr("Si ça continue : <b>Réglages › Signaler un bug</b>, ou « Copier le diagnostic » pour l'envoyer.")] }
   ]}
 ];
 
@@ -43,7 +43,7 @@ function ouvrirFaq(){
   const page = ecranRegles;
   page.classList.remove("album", "bar", "ethylo");
   page.classList.add("faq");
-  page.querySelector("h2").textContent = "Questions fréquentes";
+  page.querySelector("h2").textContent = tr("Questions fréquentes");
   const liste = document.getElementById("listeRegles");
   liste.innerHTML = "";
   QUESTIONS_FAQ.forEach((partie) => {

@@ -13,24 +13,24 @@
 // démarrage du jeu. La première note peut donc arriver avec un petit retard ; jouerSon la joue dès
 // qu'elle est prête. Elles sont dans sw.js pour être là hors connexion.
 const PIANO_BLANCHES = [
-  { cle: "fa4",  nom: "Fa" },
-  { cle: "sol4", nom: "Sol" },
-  { cle: "la4",  nom: "La" },
-  { cle: "si4",  nom: "Si" },
-  { cle: "do5",  nom: "Do" },
-  { cle: "re5",  nom: "Ré" },
-  { cle: "mi5",  nom: "Mi" },
-  { cle: "fa5",  nom: "Fa aigu" },
-  { cle: "sol5", nom: "Sol aigu" },
+  { cle: "fa4",  nom: tr("Fa") },
+  { cle: "sol4", nom: tr("Sol") },
+  { cle: "la4",  nom: tr("La") },
+  { cle: "si4",  nom: tr("Si") },
+  { cle: "do5",  nom: tr("Do") },
+  { cle: "re5",  nom: tr("Ré") },
+  { cle: "mi5",  nom: tr("Mi") },
+  { cle: "fa5",  nom: tr("Fa aigu") },
+  { cle: "sol5", nom: tr("Sol aigu") },
 ];
 // apres : numéro de la touche blanche à droite de laquelle la noire est posée (0 = la première)
 const PIANO_NOIRES = [
-  { cle: "fa4d",  nom: "Fa dièse",  apres: 0 },
-  { cle: "sol4d", nom: "Sol dièse", apres: 1 },
-  { cle: "la4d",  nom: "La dièse",  apres: 2 },
-  { cle: "do5d",  nom: "Do dièse",  apres: 4 },
-  { cle: "re5d",  nom: "Ré dièse",  apres: 5 },
-  { cle: "fa5d",  nom: "Fa dièse aigu", apres: 7 },
+  { cle: "fa4d",  nom: tr("Fa dièse"),  apres: 0 },
+  { cle: "sol4d", nom: tr("Sol dièse"), apres: 1 },
+  { cle: "la4d",  nom: tr("La dièse"),  apres: 2 },
+  { cle: "do5d",  nom: tr("Do dièse"),  apres: 4 },
+  { cle: "re5d",  nom: tr("Ré dièse"),  apres: 5 },
+  { cle: "fa5d",  nom: tr("Fa dièse aigu"), apres: 7 },
 ];
 const SONS_PIANO = PIANO_BLANCHES.concat(PIANO_NOIRES).map((t) => `piano/piano_${t.cle}`);
 let pianoSonsDemandes = false;
@@ -49,7 +49,7 @@ function toucheDuPiano(t, genre){
   b.type = "button";
   b.className = `pianoTouche pianoTouche-${genre}`;
   b.dataset.note = t.cle;
-  b.setAttribute("aria-label", `Note ${t.nom}`);
+  b.setAttribute("aria-label", tr`Note ${t.nom}`);
   return b;
 }
 
@@ -90,7 +90,7 @@ function majPianoAccueil(){
   barre.classList.add("titreAccueilPiano");
   barre.removeAttribute("aria-hidden"); // des boutons sous aria-hidden seraient invisibles pour un lecteur d'écran
   barre.setAttribute("role", "group");
-  barre.setAttribute("aria-label", "Petit piano");
+  barre.setAttribute("aria-label", tr("Petit piano"));
   PIANO_BLANCHES.forEach((t, i) => {
     const b = toucheDuPiano(t, "blanche");
     if (i === PIANO_BLANCHES.length - 1) b.classList.add("pianoTouche-fin"); // (pas de trait à droite)

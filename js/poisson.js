@@ -52,6 +52,7 @@ function poissonFenetre(id, classe, html){
   voile.className = "poisson-voile " + classe;
   voile.setAttribute("role", "dialog");
   voile.innerHTML = html;
+  traduireElement(voile); // (js/langue.js : fenêtre traduite si le jeu est en anglais)
   document.body.appendChild(voile);
   return voile;
 }
@@ -131,7 +132,7 @@ function poissonFausseMiseAJour(){
       <button type="button" class="fenetrePoisson-bouton">OK</button>
     </div>`);
   if (!voile) return;
-  boutonFuyard(voile.querySelector("button"), { apresFuites: 7, apresMs: 20000, aveu: "Poisson d’avril ! 🐟", fermer: () => voile.remove() });
+  boutonFuyard(voile.querySelector("button"), { apresFuites: 7, apresMs: 20000, aveu: tr("Poisson d’avril ! 🐟"), fermer: () => voile.remove() });
 }
 
 // ----- 3 : faux plantage -----
@@ -145,7 +146,7 @@ function poissonFauxPlantage(){
       <button type="button" class="fenetrePoisson-bouton">Réparer</button>
     </div>`);
   if (!voile) return;
-  boutonFuyard(voile.querySelector("button"), { apresFuites: 7, apresMs: 20000, aveu: "Poisson d’avril ! 🐟", fermer: () => voile.remove() });
+  boutonFuyard(voile.querySelector("button"), { apresFuites: 7, apresMs: 20000, aveu: tr("Poisson d’avril ! 🐟"), fermer: () => voile.remove() });
 }
 
 // ----- Tirage du 1er avril -----

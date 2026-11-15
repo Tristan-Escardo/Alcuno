@@ -10,114 +10,114 @@
 const DEFIS_HOT = {
   // moins de 5 gorgées
   A: [
-    { id: "A1", t: "Fais un compliment sincère à {nom}." },
-    { id: "A2", t: "Souffle un bisou à {nom}, de loin." },
-    { id: "A3", t: "Dis ce que tu as remarqué en premier chez {nom}." },
-    { id: "A4", t: "Fais un clin d'œil hot à {nom}." },
-    { id: "A5", t: "Fais ton regard le plus charmeur à {nom} pendant 5 secondes." },
-    { id: "A6", t: "Donne une note sur 10 au sourire de {nom}, et explique-la." },
-    { id: "A7", t: "Dis si tu inviterais {nom} à dîner en tête à tête, et pourquoi." },
-    { id: "A8", t: "Toi et {nom}, buvez chacun dans le verre de l'autre. Il faut des alcools différents, sinon tu bois tes gorgées." },
-    { id: "A9", t: "Tiens la main de {nom} pendant 30 secondes." },
-    { id: "A10", t: "Invente un surnom mignon pour {nom} et utilise-le chaque fois que tu lui parles jusqu'à la fin de la partie." },
-    { id: "A11", t: "Murmure un compliment à l'oreille de {nom}." },
-    { id: "A12", t: "Dis le premier mot qui te vient en tête quand tu penses à {nom}." },
-    { id: "A13", t: "Imite le rire de {nom}." },
-    { id: "A14", t: "Dis ce que tu préfères dans le style de {nom}." },
-    { id: "A15", t: "Échange un de tes accessoires (bague, montre, chaussette…) avec {nom} pendant 5 minutes." },
-    { id: "A16", t: "Raconte à {nom} ton meilleur souvenir de bisou." },
-    { id: "A17", t: "Dis à {nom} quelle a été ta première impression en faisant sa connaissance." },
-    { id: "A18", t: "Fais un compliment à {nom} sur ses yeux." },
-    { id: "A19", t: "Dis à {nom} dans quoi il/elle est selon toi le/la plus doué(e)." },
-    { id: "A20", t: "Fais une révérence à {nom}, comme à la cour." },
-    { id: "A21", t: "Dis à {nom} ce que tu aimes dans son rire." },
-    { id: "A22", t: "Imite la démarche de {nom} pendant 10 secondes." },
-    { id: "A23", t: "Passe ta main dans les cheveux de {nom}." },
-    { id: "A24", t: "Dis à {nom} dans quelle ville du monde tu l'emmènerais pour un week-end, et pourquoi." },
-    { id: "A25", t: "Mime un « coup de foudre » en croisant le regard de {nom}." },
-    { id: "A26", t: "Dis à {nom} ce que tu ferais si vous étiez coincés tous les deux dans un ascenseur." },
-    { id: "A27", t: "Complimente {nom} en 3 mots exactement." }
+    { id: "A1", t: tr("Fais un compliment sincère à {nom}.") },
+    { id: "A2", t: tr("Souffle un bisou à {nom}, de loin.") },
+    { id: "A3", t: tr("Dis ce que tu as remarqué en premier chez {nom}.") },
+    { id: "A4", t: tr("Fais un clin d'œil hot à {nom}.") },
+    { id: "A5", t: tr("Fais ton regard le plus charmeur à {nom} pendant 5 secondes.") },
+    { id: "A6", t: tr("Donne une note sur 10 au sourire de {nom}, et explique-la.") },
+    { id: "A7", t: tr("Dis si tu inviterais {nom} à dîner en tête à tête, et pourquoi.") },
+    { id: "A8", t: tr("Toi et {nom}, buvez chacun dans le verre de l'autre. Il faut des alcools différents, sinon tu bois tes gorgées.") },
+    { id: "A9", t: tr("Tiens la main de {nom} pendant 30 secondes.") },
+    { id: "A10", t: tr("Invente un surnom mignon pour {nom} et utilise-le chaque fois que tu lui parles jusqu'à la fin de la partie.") },
+    { id: "A11", t: tr("Murmure un compliment à l'oreille de {nom}.") },
+    { id: "A12", t: tr("Dis le premier mot qui te vient en tête quand tu penses à {nom}.") },
+    { id: "A13", t: tr("Imite le rire de {nom}.") },
+    { id: "A14", t: tr("Dis ce que tu préfères dans le style de {nom}.") },
+    { id: "A15", t: tr("Échange un de tes accessoires (bague, montre, chaussette…) avec {nom} pendant 5 minutes.") },
+    { id: "A16", t: tr("Raconte à {nom} ton meilleur souvenir de bisou.") },
+    { id: "A17", t: tr("Dis à {nom} quelle a été ta première impression en faisant sa connaissance.") },
+    { id: "A18", t: tr("Fais un compliment à {nom} sur ses yeux.") },
+    { id: "A19", t: tr("Dis à {nom} dans quoi il/elle est selon toi le/la plus doué(e).") },
+    { id: "A20", t: tr("Fais une révérence à {nom}, comme à la cour.") },
+    { id: "A21", t: tr("Dis à {nom} ce que tu aimes dans son rire.") },
+    { id: "A22", t: tr("Imite la démarche de {nom} pendant 10 secondes.") },
+    { id: "A23", t: tr("Passe ta main dans les cheveux de {nom}.") },
+    { id: "A24", t: tr("Dis à {nom} dans quelle ville du monde tu l'emmènerais pour un week-end, et pourquoi.") },
+    { id: "A25", t: tr("Mime un « coup de foudre » en croisant le regard de {nom}.") },
+    { id: "A26", t: tr("Dis à {nom} ce que tu ferais si vous étiez coincés tous les deux dans un ascenseur.") },
+    { id: "A27", t: tr("Complimente {nom} en 3 mots exactement.") }
   ],
   // de 5 à 10 gorgées
   B: [
-    { id: "B1", t: "Fais un bisou sur la main de {nom}." },
-    { id: "B2", t: "Danse collée 30 secondes avec {nom}." },
-    { id: "B3", t: "Assieds-toi sur les genoux de {nom} pendant 1 minute." },
-    { id: "B4", t: "Fais un bisou sur la joue de {nom}." },
-    { id: "B5", t: "Toi et {nom}, buvez bras entrelacés." },
-    { id: "B6", t: "Déclare ta flamme à {nom}, le plus sérieusement possible." },
-    { id: "B7", t: "Fais un baisemain théâtral à {nom}." },
-    { id: "B8", t: "{nom} te fait un compliment les yeux dans les yeux pendant 10 secondes : interdit de rire." },
-    { id: "B9", t: "Fais un slow de 30 secondes avec {nom}." },
-    { id: "B10", t: "Fais un câlin de 15 secondes à {nom}." },
-    { id: "B11", t: "Fais un massage des épaules à {nom} pendant 30 secondes." },
-    { id: "B12", t: "Caresse doucement la joue de {nom} pendant 10 secondes." },
-    { id: "B13", t: "Mime avec {nom} une scène de film romantique." },
-    { id: "B14", t: "Tiens les deux mains de {nom1} et dis ce que tu admires le plus chez {nom2}.", deux: true },
-    { id: "B15", t: "Fais tourner {nom} sur place en lui tenant la main, comme dans une danse de salon, pendant 20 secondes." },
-    { id: "B16", t: "Fais un massage de la main de {nom} pendant 15 secondes." }
+    { id: "B1", t: tr("Fais un bisou sur la main de {nom}.") },
+    { id: "B2", t: tr("Danse collée 30 secondes avec {nom}.") },
+    { id: "B3", t: tr("Assieds-toi sur les genoux de {nom} pendant 1 minute.") },
+    { id: "B4", t: tr("Fais un bisou sur la joue de {nom}.") },
+    { id: "B5", t: tr("Toi et {nom}, buvez bras entrelacés.") },
+    { id: "B6", t: tr("Déclare ta flamme à {nom}, le plus sérieusement possible.") },
+    { id: "B7", t: tr("Fais un baisemain théâtral à {nom}.") },
+    { id: "B8", t: tr("{nom} te fait un compliment les yeux dans les yeux pendant 10 secondes : interdit de rire.") },
+    { id: "B9", t: tr("Fais un slow de 30 secondes avec {nom}.") },
+    { id: "B10", t: tr("Fais un câlin de 15 secondes à {nom}.") },
+    { id: "B11", t: tr("Fais un massage des épaules à {nom} pendant 30 secondes.") },
+    { id: "B12", t: tr("Caresse doucement la joue de {nom} pendant 10 secondes.") },
+    { id: "B13", t: tr("Mime avec {nom} une scène de film romantique.") },
+    { id: "B14", t: tr("Tiens les deux mains de {nom1} et dis ce que tu admires le plus chez {nom2}."), deux: true },
+    { id: "B15", t: tr("Fais tourner {nom} sur place en lui tenant la main, comme dans une danse de salon, pendant 20 secondes.") },
+    { id: "B16", t: tr("Fais un massage de la main de {nom} pendant 15 secondes.") }
   ],
   // plus de 10 gorgées
   C: [
-    { id: "C1", t: "Fais un bisou dans le cou de {nom}." },
-    { id: "C2", t: "Fais un bisou au coin de la bouche de {nom}." },
-    { id: "C3", t: "Danse collée 1 minute avec {nom}, front contre front." },
-    { id: "C4", t: "Souffle doucement dans le cou de {nom}." },
-    { id: "C5", t: "Lèche le bas du dos de {nom}." },
-    { id: "C6", t: "Retire lentement un vêtement en regardant {nom} dans les yeux." },
-    { id: "C7", t: "Tiens {nom} par la taille pendant 1 minute." },
-    { id: "C8", t: "Embrasse l'épaule de {nom}." },
-    { id: "C9", t: "Raconte ta soirée idéale à deux avec {nom}." },
-    { id: "C10", t: "Fais un compliment très osé à {nom}, sans rire ni te cacher." },
-    { id: "C11", t: "Colle ton épaule à celle de {nom} pendant 1 minute." },
-    { id: "C12", t: "Fais un défilé de 20 secondes devant {nom}, comme un mannequin." },
-    { id: "C13", t: "Échange un vêtement avec {nom} jusqu'à la fin de la partie." },
-    { id: "C14", t: "Chante une petite chanson à {nom} pendant 20 secondes." },
-    { id: "C15", t: "Tiens le visage de {nom} entre tes mains et dis-lui que tu adores te marteler les fesses avec un cactus nain 2 à 3 soirs par semaine et que tu as pris l'habitude de retirer les épines avec une pince à épiler, ce qui a nettement amélioré ta dextérité et ta mobilité des doigts." }
+    { id: "C1", t: tr("Fais un bisou dans le cou de {nom}.") },
+    { id: "C2", t: tr("Fais un bisou au coin de la bouche de {nom}.") },
+    { id: "C3", t: tr("Danse collée 1 minute avec {nom}, front contre front.") },
+    { id: "C4", t: tr("Souffle doucement dans le cou de {nom}.") },
+    { id: "C5", t: tr("Lèche le bas du dos de {nom}.") },
+    { id: "C6", t: tr("Retire lentement un vêtement en regardant {nom} dans les yeux.") },
+    { id: "C7", t: tr("Tiens {nom} par la taille pendant 1 minute.") },
+    { id: "C8", t: tr("Embrasse l'épaule de {nom}.") },
+    { id: "C9", t: tr("Raconte ta soirée idéale à deux avec {nom}.") },
+    { id: "C10", t: tr("Fais un compliment très osé à {nom}, sans rire ni te cacher.") },
+    { id: "C11", t: tr("Colle ton épaule à celle de {nom} pendant 1 minute.") },
+    { id: "C12", t: tr("Fais un défilé de 20 secondes devant {nom}, comme un mannequin.") },
+    { id: "C13", t: tr("Échange un vêtement avec {nom} jusqu'à la fin de la partie.") },
+    { id: "C14", t: tr("Chante une petite chanson à {nom} pendant 20 secondes.") },
+    { id: "C15", t: tr("Tiens le visage de {nom} entre tes mains et dis-lui que tu adores te marteler les fesses avec un cactus nain 2 à 3 soirs par semaine et que tu as pris l'habitude de retirer les épines avec une pince à épiler, ce qui a nettement amélioré ta dextérité et ta mobilité des doigts.") }
   ],
   // ===== Mode hard (2 joueurs, voir MODE_HARD.md) : HA jusqu'à 4 gorgées (2 en PJ), HB au-dessus =====
   HA: [
-    { id: "HA1", t: "Roule une pelle à {nom}." },
-    { id: "HA2", t: "Mordille la lèvre de {nom}." },
-    { id: "HA3", t: "Embrasse {nom} où il ou elle veut, sauf sur la bouche." },
-    { id: "HA4", t: "Assieds-toi nu(e) sur les genoux de {nom}, face à lui ou elle, jusqu'au prochain tour." },
-    { id: "HA5", t: "Enlève un vêtement de {nom}, avec les dents." },
-    { id: "HA6", t: "Enlève 4 vêtements, au choix de {nom}." },
-    { id: "HA7", t: "Glisse ta main sous le haut de {nom}." },
-    { id: "HA8", t: "Embrasse {nom} en partant de l'oreille jusqu'à la clavicule." },
-    { id: "HA9", t: "Lèche une goutte de ton verre sur le cou de {nom}." },
-    { id: "HA10", t: "Murmure à {nom} ce que tu as envie de lui faire ce soir." },
-    { id: "HA11", t: "Caresse {nom} par-dessus ses vêtements, là où il ou elle te guide." },
-    { id: "HA12", t: "Bande les yeux de {nom} et embrasse-le ou la 3 fois, où tu veux." },
-    { id: "HA13", t: "Fais un suçon à {nom}, à l'endroit de son choix." },
-    { id: "HA14", t: "Embrasse le ventre de {nom}, en descendant jusqu'à la ceinture." },
-    { id: "HA15", t: "Fais un strip-tease à {nom}." },
-    { id: "HA16", t: "Laisse {nom} t'embrasser où il ou elle veut pendant 20 secondes, sans bouger." },
-    { id: "HA17", t: "Embrasse {nom} les yeux bandés, et devine quelle partie de son corps il ou elle t'a présentée." },
-    { id: "HA18", t: "Mordille le téton de {nom}." },
-    { id: "HA19", t: "Fais asseoir {nom} et embrasse l'intérieur de ses cuisses." },
-    { id: "HA20", t: "Passe un glaçon sur le corps de {nom}, où tu veux. Pas de glaçon : ta langue." }
+    { id: "HA1", t: tr("Roule une pelle à {nom}.") },
+    { id: "HA2", t: tr("Mordille la lèvre de {nom}.") },
+    { id: "HA3", t: tr("Embrasse {nom} où il ou elle veut, sauf sur la bouche.") },
+    { id: "HA4", t: tr("Assieds-toi nu(e) sur les genoux de {nom}, face à lui ou elle, jusqu'au prochain tour.") },
+    { id: "HA5", t: tr("Enlève un vêtement de {nom}, avec les dents.") },
+    { id: "HA6", t: tr("Enlève 4 vêtements, au choix de {nom}.") },
+    { id: "HA7", t: tr("Glisse ta main sous le haut de {nom}.") },
+    { id: "HA8", t: tr("Embrasse {nom} en partant de l'oreille jusqu'à la clavicule.") },
+    { id: "HA9", t: tr("Lèche une goutte de ton verre sur le cou de {nom}.") },
+    { id: "HA10", t: tr("Murmure à {nom} ce que tu as envie de lui faire ce soir.") },
+    { id: "HA11", t: tr("Caresse {nom} par-dessus ses vêtements, là où il ou elle te guide.") },
+    { id: "HA12", t: tr("Bande les yeux de {nom} et embrasse-le ou la 3 fois, où tu veux.") },
+    { id: "HA13", t: tr("Fais un suçon à {nom}, à l'endroit de son choix.") },
+    { id: "HA14", t: tr("Embrasse le ventre de {nom}, en descendant jusqu'à la ceinture.") },
+    { id: "HA15", t: tr("Fais un strip-tease à {nom}.") },
+    { id: "HA16", t: tr("Laisse {nom} t'embrasser où il ou elle veut pendant 20 secondes, sans bouger.") },
+    { id: "HA17", t: tr("Embrasse {nom} les yeux bandés, et devine quelle partie de son corps il ou elle t'a présentée.") },
+    { id: "HA18", t: tr("Mordille le téton de {nom}.") },
+    { id: "HA19", t: tr("Fais asseoir {nom} et embrasse l'intérieur de ses cuisses.") },
+    { id: "HA20", t: tr("Passe un glaçon sur le corps de {nom}, où tu veux. Pas de glaçon : ta langue.") }
   ],
   HB: [
-    { id: "HB1", t: "Caresse le sexe de {nom}, sous ses vêtements." },
-    { id: "HB2", t: "Fais un cunni ou une fellation à {nom}." },
-    { id: "HB3", t: "Laisse {nom} te caresser le sexe, sans bouger les mains." },
-    { id: "HB4", t: "Fais un 69 avec {nom}." },
-    { id: "HB5", t: "Masturbe {nom} jusqu'au prochain tour." },
-    { id: "HB6", t: "Lèche {nom} de la poitrine jusqu'au sexe, puis lèche le sexe." },
-    { id: "HB7", t: "Laisse {nom} choisir une position, et prenez-la, nus." },
-    { id: "HB8", t: "Masturbe {nom} avec tes pieds, ou mets ton gros orteil dans la ****** de {nom} (propres, bien sûr)." },
-    { id: "HB9", t: "Attache les mains de {nom} et fais-lui ce que tu veux." },
-    { id: "HB10", t: "Masturbe-toi devant {nom}." },
-    { id: "HB11", t: "Prends {nom} en levrette, ou laisse-toi prendre." },
-    { id: "HB12", t: "Chevauche {nom}." },
-    { id: "HB13", t: "Faites une levrette debout dans une pièce où il y a une machine à laver." },
-    { id: "HB14", t: "Utilise un jouet sur {nom}. Pas de jouet ? Tu bois les gorgées de ce défi." },
-    { id: "HB15", t: "Réalise le fantasme de {nom}." },
-    { id: "HB16", t: "Mets de la chantilly (ou autre chose, pourvu que ce soit comestible) sur la poitrine de {nom}, et lèche tout." },
-    { id: "HB17", t: "Fais un cunni ou une fellation à {nom} avec un glaçon dans la bouche." },
-    { id: "HB18", t: "Faites une position de votre choix en silence total : le premier qui fait un bruit boit les gorgées de ce défi." },
-    { id: "HB19", t: "Fais l'amour à {nom} pendant qu'il ou elle récite l'alphabet à l'envers. S'il ou elle se trompe, il ou elle boit les gorgées de ce défi." }
+    { id: "HB1", t: tr("Caresse le sexe de {nom}, sous ses vêtements.") },
+    { id: "HB2", t: tr("Fais un cunni ou une fellation à {nom}.") },
+    { id: "HB3", t: tr("Laisse {nom} te caresser le sexe, sans bouger les mains.") },
+    { id: "HB4", t: tr("Fais un 69 avec {nom}.") },
+    { id: "HB5", t: tr("Masturbe {nom} jusqu'au prochain tour.") },
+    { id: "HB6", t: tr("Lèche {nom} de la poitrine jusqu'au sexe, puis lèche le sexe.") },
+    { id: "HB7", t: tr("Laisse {nom} choisir une position, et prenez-la, nus.") },
+    { id: "HB8", t: tr("Masturbe {nom} avec tes pieds, ou mets ton gros orteil dans la ****** de {nom} (propres, bien sûr).") },
+    { id: "HB9", t: tr("Attache les mains de {nom} et fais-lui ce que tu veux.") },
+    { id: "HB10", t: tr("Masturbe-toi devant {nom}.") },
+    { id: "HB11", t: tr("Prends {nom} en levrette, ou laisse-toi prendre.") },
+    { id: "HB12", t: tr("Chevauche {nom}.") },
+    { id: "HB13", t: tr("Faites une levrette debout dans une pièce où il y a une machine à laver.") },
+    { id: "HB14", t: tr("Utilise un jouet sur {nom}. Pas de jouet ? Tu bois les gorgées de ce défi.") },
+    { id: "HB15", t: tr("Réalise le fantasme de {nom}.") },
+    { id: "HB16", t: tr("Mets de la chantilly (ou autre chose, pourvu que ce soit comestible) sur la poitrine de {nom}, et lèche tout.") },
+    { id: "HB17", t: tr("Fais un cunni ou une fellation à {nom} avec un glaçon dans la bouche.") },
+    { id: "HB18", t: tr("Faites une position de votre choix en silence total : le premier qui fait un bruit boit les gorgées de ce défi.") },
+    { id: "HB19", t: tr("Fais l'amour à {nom} pendant qu'il ou elle récite l'alphabet à l'envers. S'il ou elle se trompe, il ou elle boit les gorgées de ce défi.") }
   ]
 };
 
@@ -223,7 +223,7 @@ function montrerDefiHot(joueurIndex, nbGorgees, defiPossible = true, defiImpose 
   const defi = defiImpose || tirerDefiHot(nom, nbGorgees, partenaire);
   if(!defi) return null;
   const etat = { choix: null, partenaire };
-  const qui = partenaire ? `${avecCouronne(nom)} et ${avecCouronne(partenaire)}` : avecCouronne(nom);
+  const qui = partenaire ? tr`${avecCouronne(nom)} et ${avecCouronne(partenaire)}` : avecCouronne(nom);
 
   overlay.querySelectorAll(".bloc-hot").forEach(b => b.remove());
   const bloc = document.createElement("div");
@@ -231,14 +231,14 @@ function montrerDefiHot(joueurIndex, nbGorgees, defiPossible = true, defiImpose 
 
   const puce = document.createElement("span");
   puce.className = "bloc-hot-puce";
-  if(partieHard) puce.innerHTML = `${SVG_18_BARRE} MODE HARD`;
-  else puce.innerText = "🔥 MODE HOT";
+  if(partieHard) puce.innerHTML = tr`${SVG_18_BARRE} MODE HARD`;
+  else puce.innerText = tr("🔥 MODE HOT");
   bloc.appendChild(puce);
 
   if(partenaire){
     const lien = document.createElement("div");
     lien.className = "bloc-hot-lien";
-    lien.innerText = `💘 ${qui} boivent ensemble`;
+    lien.innerText = tr`💘 ${qui} boivent ensemble`;
     bloc.appendChild(lien);
   }
 
@@ -269,11 +269,11 @@ function montrerDefiHot(joueurIndex, nbGorgees, defiPossible = true, defiImpose 
     surAction(btn, id, { owner: nom, once: true }, action);
     boutons.appendChild(btn);
   };
-  bouton("fait", "Je le fais", "defi:fait", () => {
+  bouton("fait", tr("Je le fais"), "defi:fait", () => {
     jouerSon("annuler_gorgees");
-    choisir("fait", `${qui} ${partenaire ? "relèvent" : "relève"} le défi :\n${defi.texte}`);
+    choisir("fait", tr`${qui} ${partenaire ? tr("relèvent") : tr("relève")} le défi :\n${defi.texte}`);
   });
-  bouton("bois", `Je bois ${nbGorgees}`, "defi:bois", () => {
+  bouton("bois", tr`Je bois ${nbGorgees}`, "defi:bois", () => {
     choisir("bois", `${qui} ${partenaire ? "boivent" : "boit"} ${texteGorgees(nbGorgees)}`);
   });
 
@@ -308,9 +308,9 @@ function afficherOverlayCoupDeFoudre(joueurActuel, classeCarte, suite = null){
   }
   choixPigeonEnCours = true;
   lockScroll();
-  const culSec = estModeSoft() ? "4 gorgées" : "CUL SEC";
+  const culSec = estModeSoft() ? tr("4 gorgées") : tr("CUL SEC");
   // Mode hard : un doigt dans le cul à la place du bisou (le reste pareil)
-  const geste = partieHard ? "Un doigt dans le cul" : "Bisou sur la bouche";
+  const geste = partieHard ? tr("Un doigt dans le cul") : tr("Bisou sur la bouche");
   let etape = "choix", elu = null;
 
   const overlay = document.createElement("div");
@@ -359,20 +359,20 @@ function afficherOverlayCoupDeFoudre(joueurActuel, classeCarte, suite = null){
   nouveau(actions, `${partieHard ? "👉" : "💋"} ${geste}`, "foudre:bisou", ["action"], () => {
     if(!partieHard) compterCouple(choisisseur, elu, 0, 1);
     jouerSon("annuler_gorgees");
-    terminer(`${partieHard ? "👉" : "💋"} ${avecCouronne(choisisseur)} et ${avecCouronne(elu)} : coup de foudre !`);
+    terminer(tr`${partieHard ? "👉" : "💋"} ${avecCouronne(choisisseur)} et ${avecCouronne(elu)} : coup de foudre !`);
   }, { once: true });
   nouveau(actions, `🥃 ${culSec}`, "foudre:culsec", ["action"], () => {
     noterGorgees(choisisseur, estModeSoft() ? 4 : GORGEES_CUL_SEC);
-    terminer(`🥃 ${avecCouronne(choisisseur)} préfère ${estModeSoft() ? "boire 4 gorgées" : "le CUL SEC"} !`);
+    terminer(tr`🥃 ${avecCouronne(choisisseur)} préfère ${estModeSoft() ? tr("boire 4 gorgées") : tr("le CUL SEC")} !`);
   }, { once: true });
-  nouveau(actions, "Retour", "foudre:retour", ["action"], () => { elu = null; etape = "choix"; refresh(); });
+  nouveau(actions, tr("Retour"), "foudre:retour", ["action"], () => { elu = null; etape = "choix"; refresh(); });
 
   function refresh(){
     // « Défi hot spécial Saint-Valentin », puis le titre, puis la consigne, bien séparés (style_alcuno.css : .foudre-*)
     // (des <div> et pas des <span> : la télé, js/tele.js, met chaque bloc sur sa ligne)
-    titre.innerHTML = `<div class="foudre-badge">${partieHard ? SVG_18_BARRE + " Défi hard" : "🔥 Défi hot"} spécial <span class="foudre-nowrap">Saint-Valentin</span> 💘</div><div class="foudre-titre">COUP DE FOUDRE ⚡</div>`
-      + `<div class="foudre-consigne">${etape === "choix" ? "Choisis quelqu'un"
-        : `${echapperHtml(avecCouronne(elu))} : ${partieHard ? "un doigt dans le cul" : "un bisou sur la bouche"}… ou ${culSec} ?`}</div>`;
+    titre.innerHTML = `<div class="foudre-badge">${partieHard ? SVG_18_BARRE + tr(" Défi hard") : tr("🔥 Défi hot")}${tr(' spécial <span class="foudre-nowrap">Saint-Valentin</span> 💘')}</div><div class="foudre-titre">${tr("COUP DE FOUDRE ⚡")}</div>`
+      + `<div class="foudre-consigne">${etape === "choix" ? tr("Choisis quelqu'un")
+        : tr`${echapperHtml(avecCouronne(elu))} : ${partieHard ? "un doigt dans le cul" : "un bisou sur la bouche"}… ou ${culSec} ?`}</div>`;
     boutons.forEach(({ el, etapes }) => { el.style.display = etapes.includes(etape) ? "" : "none"; });
   }
   document.body.appendChild(overlay);
@@ -442,8 +442,8 @@ function afficherOverlayCupidon(joueurActuel, classeCarte, suite = null){
   }
 
   // 1) lier ou briser
-  nouveau(container, "bouton-pigeon plus4-joueur-btn", "Lier deux joueurs", "cupidon:lier", ["choix"], () => { etape = "lier"; refresh(); });
-  nouveau(container, "bouton-pigeon plus4-joueur-btn", "Briser un lien", "cupidon:briser", ["choix"], () => { etape = "briser"; refresh(); });
+  nouveau(container, "bouton-pigeon plus4-joueur-btn", tr("Lier deux joueurs"), "cupidon:lier", ["choix"], () => { etape = "lier"; refresh(); });
+  nouveau(container, "bouton-pigeon plus4-joueur-btn", tr("Briser un lien"), "cupidon:briser", ["choix"], () => { etape = "briser"; refresh(); });
 
   // 2) lier : joueurs libres au moment où la carte sort
   const libres = joueursLibresHot();
@@ -462,26 +462,26 @@ function afficherOverlayCupidon(joueurActuel, classeCarte, suite = null){
   liensAuDepart.forEach(([a, b], k) => {
     nouveau(container, "bouton-pigeon plus4-joueur-btn", `${echapperHtml(avecCouronne(a))} 💘 ${echapperHtml(avecCouronne(b))}`, "cupidon:lien:" + k, ["briser"], () => {
       liensHot = liensHot.filter(([x, y]) => !(x === a && y === b));
-      terminer(`💔 Le lien entre ${avecCouronne(a)} et ${avecCouronne(b)} est brisé.`);
+      terminer(tr`💔 Le lien entre ${avecCouronne(a)} et ${avecCouronne(b)} est brisé.`);
     });
   });
 
-  const btnValider = nouveau(actions, "bouton-pigeon plus4-action-btn", "Valider", "cupidon:valider", ["lier"], () => {
+  const btnValider = nouveau(actions, "bouton-pigeon plus4-action-btn", tr("Valider"), "cupidon:valider", ["lier"], () => {
     if(selection.length !== 2) return;
     const [a, b] = selection;
     liensHot.push([a, b]);
-    terminer(`💘 ${avecCouronne(a)} et ${avecCouronne(b)} sont liés !\nQuand l'un boit, l'autre aussi.`);
+    terminer(tr`💘 ${avecCouronne(a)} et ${avecCouronne(b)} sont liés !\nQuand l'un boit, l'autre aussi.`);
   }, { once: true });
-  const btnRetour = nouveau(actions, "bouton-pigeon plus4-action-btn", "Retour", "cupidon:retour", ["lier", "briser"], () => {
+  const btnRetour = nouveau(actions, "bouton-pigeon plus4-action-btn", tr("Retour"), "cupidon:retour", ["lier", "briser"], () => {
     selection = [];
     etape = (peutLier() && peutBriser()) ? "choix" : etape;
     refresh();
   });
 
   function refresh(){
-    titre.innerText = etape === "choix" ? "CUPIDON\nQue veux-tu faire ?"
-      : etape === "lier" ? "CUPIDON\nChoisis 2 joueurs à lier" : "CUPIDON\nQuel lien briser ?";
-    total.innerText = etape === "lier" ? `Joueurs choisis : ${selection.length} / 2` : "";
+    titre.innerText = etape === "choix" ? tr("CUPIDON\nQue veux-tu faire ?")
+      : etape === "lier" ? tr("CUPIDON\nChoisis 2 joueurs à lier") : tr("CUPIDON\nQuel lien briser ?");
+    total.innerText = etape === "lier" ? tr`Joueurs choisis : ${selection.length} / 2` : "";
     total.style.display = etape === "lier" ? "" : "none";
     boutons.forEach(({ el, etapes }) => {
       el.style.display = etapes.includes(etape) ? "" : "none";

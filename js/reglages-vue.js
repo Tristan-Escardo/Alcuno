@@ -9,12 +9,12 @@
   if (!contenu) return;
   const CLE_VUE = "alcuno_reglages_vue";
   const GROUPES = [
-    { id: "affichage", nom: "Affichage", icone: "🎨", cles: ["themes", "feux-artifice", "faces-cachees", "gaucher", "accessibilite"] },
-    { id: "son", nom: "Son", icone: "🔊", cles: ["sons", "musique", "vibrations", "voix"] },
-    { id: "jeu", nom: "Jeu", icone: "🎮", cles: ["eau", "ecran-allume", "partie-memoire"] },
-    { id: "appareil", nom: "Appareil", icone: "📱", cles: ["hors-ligne", "ecran-tele"] },
-    { id: "langue", nom: "Langue", icone: "🌐", cles: ["langue"] },
-    { id: "apropos", nom: "À propos", icone: "ℹ️", cles: [] } // (Partager le jeu + À propos : sans data-cle, repérés par leur classe)
+    { id: "affichage", nom: tr("Affichage"), icone: "🎨", cles: ["themes", "feux-artifice", "faces-cachees", "gaucher", "accessibilite"] },
+    { id: "son", nom: tr("Son"), icone: "🔊", cles: ["sons", "musique", "vibrations", "voix"] },
+    { id: "jeu", nom: tr("Jeu"), icone: "🎮", cles: ["eau", "ecran-allume", "partie-memoire"] },
+    { id: "appareil", nom: tr("Appareil"), icone: "📱", cles: ["hors-ligne", "ecran-tele"] },
+    { id: "langue", nom: tr("Langue"), icone: "🌐", cles: ["langue"] },
+    { id: "apropos", nom: tr("À propos"), icone: "ℹ️", cles: [] } // (Partager le jeu + À propos : sans data-cle, repérés par leur classe)
   ];
   const groupeDe = (cle) => (GROUPES.find((g) => g.cles.includes(cle)) || GROUPES[2]).id; // (réglage ajouté plus tard : rangé dans « Jeu »)
   Array.from(contenu.children).forEach((el) => {
@@ -50,12 +50,12 @@
     sections: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="6" rx="2"/><path d="M4 15h16M4 19h16"/></svg>',
     tuiles: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>'
   };
-  const VUES = [["liste", "Liste"], ["sections", "Sections"], ["tuiles", "Tuiles"]];
+  const VUES = [["liste", tr("Liste")], ["sections", tr("Sections")], ["tuiles", tr("Tuiles")]];
   const btnMEP = el("button", "btnMiseEnPage"); btnMEP.type = "button"; btnMEP.id = "btnMiseEnPage";
   btnMEP.setAttribute("aria-haspopup", "menu"); btnMEP.setAttribute("aria-expanded", "false");
-  btnMEP.innerHTML = '<span class="mepIcone"></span><span class="mepTexte">Mise en page</span><span class="mepFleche" aria-hidden="true"></span>';
+  btnMEP.innerHTML = tr('<span class="mepIcone"></span><span class="mepTexte">Mise en page</span><span class="mepFleche" aria-hidden="true"></span>');
   const menuMEP = el("div", "menuMiseEnPage"); menuMEP.id = "menuMiseEnPage"; menuMEP.setAttribute("role", "menu"); menuMEP.hidden = true;
-  const titreMenu = el("div", "menuMEPTitre", "Présenter en"); menuMEP.append(titreMenu);
+  const titreMenu = el("div", "menuMEPTitre", tr("Présenter en")); menuMEP.append(titreMenu);
   const itemsMEP = VUES.map(([id, nom]) => {
     // (pas un <button> : les thèmes à néon dessinent un cadre lumineux autour de chaque bouton ; ici, le néon est autour du menu entier)
     const b = el("div", "menuMEPItem"); b.tabIndex = 0; b.dataset.vue = id; b.setAttribute("role", "menuitemradio");

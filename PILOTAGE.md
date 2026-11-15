@@ -108,7 +108,7 @@ Pour revenir en arrière : recoller l'ancien contenu de `database.rules.json` (g
 À faire aussi dans la console (sans code) : restreindre la clé d'API aux adresses du jeu (Google Cloud Console → Identifiants), désactiver la création de comptes
 (Authentication → Paramètres → Actions de l'utilisateur), mot de passe administrateur long et unique, alerte de budget / quota.
 
-## Onglet Public et rangement par rubriques (stats 1.22.0, jeu 9.92.0)
+## Onglet Public et rangement par rubriques (stats 1.22.0, jeu 9.93.0)
 
 ### Ce qui a changé dans Alcuno Stats
 
@@ -122,7 +122,7 @@ Pour revenir en arrière : recoller l'ancien contenu de `database.rules.json` (g
 
 ### Onglet Public : d'où viennent les appareils
 
-Pour chaque appareil qui ouvre le jeu (jeu 9.92.0 ou plus), `js/stats.js` ajoute à sa fiche `stats/appareils/{id}` :
+Pour chaque appareil qui ouvre le jeu (jeu 9.93.0 ou plus), `js/stats.js` ajoute à sa fiche `stats/appareils/{id}` :
 
 | Information | D'où elle vient |
 |---|---|

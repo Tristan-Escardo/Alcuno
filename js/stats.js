@@ -4,7 +4,7 @@
 // =============================================================================================
 // #region Statistiques anonymes
 // Pas de nom, pas de pseudo, pas d'adresse IP enregistrée : un identifiant tiré au hasard et gardé dans ce téléphone (pour
-// compter les visiteurs différents), le type d'appareil, le thème et la version du jeu. Depuis la 9.92.0 s'y ajoute
+// compter les visiteurs différents), le type d'appareil, le thème et la version du jeu. Depuis la 9.93.0 s'y ajoute
 // « l'origine » de l'appareil (onglet Public d'Alcuno Stats) : pays, région, ville et fournisseur d'accès déduits de
 // l'adresse IP par un service extérieur (l'IP elle-même n'est PAS gardée), navigateur, version du système, écran, langue
 // et fuseau horaire lus dans le navigateur. Rien de tout ça ne demande d'autorisation au joueur (pas de GPS).

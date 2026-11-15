@@ -458,7 +458,7 @@ export const signOut = async () => { utilisateur = null; ecouteurs.forEach((e) =
   const majOui = await page.evaluate(() => ({ majMin: window.__arbre.config.majMin || null, etat: document.getElementById("pilMajEtat").textContent, rubrique: document.querySelector('#pilMenu button[aria-selected="true"]').dataset.pan }));
   await page.click("#pilMajRetirer"); await page.waitForTimeout(300);
   const majNon = await page.evaluate(() => ({ majMin: window.__arbre.config.majMin || null, etat: document.getElementById("pilMajEtat").textContent }));
-  verifier(majRefus.majMin === null && /9\.92\.0/.test(majRefus.message) && majOui.majMin === "9.92.0" && /9\.92\.0/.test(majOui.etat) && majOui.rubrique === "jeu" && majNon.majMin === null && /rien/.test(majNon.etat),
+  verifier(majRefus.majMin === null && /\d+\.\d+\.\d+/.test(majRefus.message) && majOui.majMin === "9.92.0" && /9\.92\.0/.test(majOui.etat) && majOui.rubrique === "jeu" && majNon.majMin === null && /rien/.test(majNon.etat),
     `pilotage : mise à jour demandée (${JSON.stringify([majRefus, majOui, majNon])})`);
   // Adresse directe vers une rubrique, et rubrique retenue d'une ouverture à l'autre
   const directe = await (async () => {

@@ -46,13 +46,13 @@ function ouvrirOptionsPartie(suite){
   majOptionHard(); // (ligne « Mode hard » : seulement une fois débloqué)
   majTitrePJ();
   ecranReglages.classList.add("vue-options");
-  document.getElementById("titreReglages").textContent = "Ta partie";
+  document.getElementById("titreReglages").textContent = tr("Ta partie");
   ecranReglages.scrollTop = 0;
   ouvrirPage(ecranReglages);
 }
 function finVueOptions(){
   ecranReglages.classList.remove("vue-options");
-  document.getElementById("titreReglages").textContent = "Réglages";
+  document.getElementById("titreReglages").textContent = tr("Réglages");
 }
 function fermerReglages(){
   const vueOptions = ecranReglages.classList.contains("vue-options");
@@ -156,7 +156,7 @@ function afficherFenetrePrestige(){
   const voile = document.createElement("div");
   voile.id = "fenetrePrestige";
   voile.setAttribute("role", "dialog");
-  voile.setAttribute("aria-label", "Thème Prestige débloqué");
+  voile.setAttribute("aria-label", tr("Thème Prestige débloqué"));
   voile.innerHTML = `
     <div class="fenetrePrestige-carte">
       <div class="fenetrePrestige-secret">✦ Secret trouvé ✦</div>
@@ -165,7 +165,7 @@ function afficherFenetrePrestige(){
       <div class="fenetrePrestige-texte">Il est maintenant dans<br>Réglages › Thèmes</div>
       <button type="button" class="fenetrePrestige-essayer">L'essayer maintenant</button>
       <button type="button" class="fenetrePrestige-plusTard">Plus tard</button>
-    </div>`;
+    </div>`; traduireElement(voile);
   const fermer = () => {
     voile.classList.add("fenetrePrestige-sortie");
     setTimeout(() => voile.remove(), 250);
@@ -189,13 +189,13 @@ function afficherFenetrePrestige(){
 // « nom » est celui écrit dans l'annonce (« Nouveau thème … disponible ») : c'est le nom complet de la fête,
 // même quand la pastille des Réglages en montre un plus court (Fête de la musique -> Musique, faute de place).
 const FETES_ANNONCE = {
-  noel:       { nom: "Noël",           essayer: "Joyeux Noël",           image: "noel/boule_neige.svg" },
-  chandeleur: { nom: "Chandeleur",     essayer: "L'essayer maintenant", image: "chandeleur/crepe.svg" },
-  valentin:   { nom: "Saint-Valentin", essayer: "L'essayer maintenant", image: "valentin/coeur_o.svg" },
+  noel:       { nom: "Noël",           essayer: tr("Joyeux Noël"),           image: "noel/boule_neige.svg" },
+  chandeleur: { nom: tr("Chandeleur"),     essayer: tr("L'essayer maintenant"), image: "chandeleur/crepe.svg" },
+  valentin:   { nom: "Saint-Valentin", essayer: tr("L'essayer maintenant"), image: "valentin/coeur_o.svg" },
   patrick:    { nom: "Saint-Patrick",  essayer: "Sláinte is táinte !",  image: "patrick/trefle_apercu.svg" },
-  justrose:   { nom: "Just Rosé",      essayer: "L'essayer maintenant", image: "justrose/verre_apercu.svg" },
-  musique:    { nom: "Fête de la musique", essayer: "L'essayer maintenant", image: "musique/note_apercu.svg" },
-  halloween:  { nom: "Halloween",       essayer: "L'essayer maintenant", image: "halloween/citrouille_apercu.svg" }
+  justrose:   { nom: tr("Just Rosé"),      essayer: tr("L'essayer maintenant"), image: "justrose/verre_apercu.svg" },
+  musique:    { nom: tr("Fête de la musique"), essayer: tr("L'essayer maintenant"), image: "musique/note_apercu.svg" },
+  halloween:  { nom: tr("Halloween"),       essayer: tr("L'essayer maintenant"), image: "halloween/citrouille_apercu.svg" }
 };
 // Fête en cours à cette date (null si aucune) : du jour de début à 0 h au jour de fin à 23 h 59, thème pas caché
 // depuis le pilotage. (Les dates seulement : pas le passe-droit des tests de themeBloqueADistance, js/config-distante.js.)
@@ -214,14 +214,14 @@ function afficherAnnonceFete(cle){
   voile.id = "fenetreFete";
   voile.dataset.fete = cle;
   voile.setAttribute("role", "dialog");
-  voile.setAttribute("aria-label", "Nouveau thème " + f.nom);
+  voile.setAttribute("aria-label", tr("Nouveau thème ") + f.nom);
   voile.innerHTML = `
     <div class="fenetreFete-carte">
       <span class="fenetreFete-image" aria-hidden="true"></span>
       <div class="fenetreFete-titre">Nouveau thème<br>${f.nom.replace(/-/g, "\u2011")}<br>disponible pour une durée limitée !!</div>
       <button type="button" class="fenetreFete-essayer"></button>
       <button type="button" class="fenetreFete-plusTard">Plus tard</button>
-    </div>`;
+    </div>`; traduireElement(voile);
   voile.querySelector(".fenetreFete-essayer").textContent = f.essayer;
   const fermer = () => {
     voile.classList.add("fenetreFete-sortie");
@@ -334,15 +334,15 @@ function afficherFenetreBdsm(){
   const voile = document.createElement("div");
   voile.id = "fenetreBdsm";
   voile.setAttribute("role", "dialog");
-  voile.setAttribute("aria-label", "Thème BDSM débloqué");
+  voile.setAttribute("aria-label", tr("Thème BDSM débloqué"));
   voile.innerHTML = `
     <div class="fenetreBdsm-carte">
-      <div class="fenetreBdsm-secret">${donjonDebloqueParHard ? SVG_18_BARRE + " Partie hard lancée !" : "🔥 Partie hot lancée !"}</div>
+      <div class="fenetreBdsm-secret">${donjonDebloqueParHard ? SVG_18_BARRE + tr(" Partie hard lancée !") : tr("🔥 Partie hot lancée !")}</div>
       <div class="fenetreBdsm-titre">Thème BDSM<br>débloqué !</div>
       <div class="fenetreBdsm-texte">Il est maintenant dans<br>Réglages › Thèmes</div>
       <button type="button" class="fenetreBdsm-essayer">L'essayer maintenant</button>
       <button type="button" class="fenetreBdsm-plusTard">Plus tard</button>
-    </div>`;
+    </div>`; traduireElement(voile);
   const fermer = () => {
     voile.classList.add("fenetreBdsm-sortie");
     setTimeout(() => voile.remove(), 250);
@@ -422,7 +422,7 @@ function afficherFenetreKawaii(){
   const voile = document.createElement("div");
   voile.id = "fenetreKawaii";
   voile.setAttribute("role", "dialog");
-  voile.setAttribute("aria-label", "Thème Kawaii débloqué");
+  voile.setAttribute("aria-label", tr("Thème Kawaii débloqué"));
   voile.innerHTML = `
     <div class="fenetreKawaii-carte">
       <div class="fenetreKawaii-secret">Album complet : 11 stickers !</div>
@@ -433,7 +433,7 @@ function afficherFenetreKawaii(){
       <div class="fenetreKawaii-texte">Il est maintenant dans<br>Réglages › Thèmes</div>
       <button type="button" class="fenetreKawaii-essayer">L'essayer maintenant</button>
       <button type="button" class="fenetreKawaii-plusTard">Plus tard</button>
-    </div>`;
+    </div>`; traduireElement(voile);
   const fermer = () => {
     voile.classList.add("fenetreKawaii-sortie");
     setTimeout(() => voile.remove(), 250);
@@ -612,7 +612,7 @@ function afficherGeneriqueGalaxie(premiere){
   const ecran = document.createElement("div");
   ecran.id = "generiqueGalaxie";
   ecran.setAttribute("role", "dialog");
-  ecran.setAttribute("aria-label", "Thème Star Wars débloqué");
+  ecran.setAttribute("aria-label", tr("Thème Star Wars débloqué"));
   ecran.innerHTML = `
     <div class="generique-intro">Il y a bien longtemps, dans une soirée lointaine, très lointaine…</div>
     <div class="generique-scene"><div class="generique-texte">
@@ -625,7 +625,7 @@ function afficherGeneriqueGalaxie(premiere){
       <p class="generique-fin">THÈME STAR WARS DÉBLOQUÉ</p>
       <p class="generique-fin">Que la gorgée soit avec toi.</p>
     </div></div>
-    <div class="generique-passer">Touche l'écran pour passer</div>`;
+    <div class="generique-passer">Touche l'écran pour passer</div>`; traduireElement(ecran);
   let fini = false;
   const terminer = () => {
     if (fini) return;
@@ -662,7 +662,7 @@ function afficherFenetreGalaxie(){
   const voile = document.createElement("div");
   voile.id = "fenetreGalaxie";
   voile.setAttribute("role", "dialog");
-  voile.setAttribute("aria-label", "Thème Star Wars débloqué");
+  voile.setAttribute("aria-label", tr("Thème Star Wars débloqué"));
   voile.innerHTML = `
     <div class="fenetreGalaxie-carte">
       <div class="fenetreGalaxie-secret">✦ Secret trouvé ✦</div>
@@ -671,7 +671,7 @@ function afficherFenetreGalaxie(){
       <div class="fenetreGalaxie-texte">Il est maintenant dans<br>Réglages › Thèmes</div>
       <button type="button" class="fenetreGalaxie-ok">Que la gorgée soit avec toi</button>
       <button type="button" class="fenetreGalaxie-plusTard">Plus tard</button>
-    </div>`;
+    </div>`; traduireElement(voile);
   const fermer = () => {
     voile.classList.add("fenetreGalaxie-sortie");
     setTimeout(() => voile.remove(), 250);
@@ -1107,9 +1107,9 @@ function debloquerHard(){
   majOptionHard();
   if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); // (le clavier se ferme)
   afficherFenetreDeblocage("fenetreHard", {
-    secret: "🤡 Mot secret trouvé !",
-    titre: "Mode hard<br>débloqué !",
-    texte: "Il est maintenant dans « Ta partie »,<br>au début de chaque partie<br>(à 2 joueurs seulement)",
+    secret: tr("🤡 Mot secret trouvé !"),
+    titre: tr("Mode hard<br>débloqué !"),
+    texte: tr("Il est maintenant dans « Ta partie »,<br>au début de chaque partie<br>(à 2 joueurs seulement)"),
     boutons: [{ libelle: "OK", principal: true }]
   });
 }
@@ -1146,7 +1146,7 @@ function majTitrePJ(){
 }
 
 // Gorgées selon le mode (normal | soft)
-function texteCulSec(){ return estModeSoft() ? "3 gorgées" : "un CUL SEC"; }
+function texteCulSec(){ return estModeSoft() ? tr("3 gorgées") : tr("un CUL SEC"); }
 function gorgeesPlus2(){ return estModeSoft() ? 1 : 2; }
 function gorgeesPlus4(){ return estModeSoft() ? 2 : 4; }
 function gorgeesPigeon(){ return estModeSoft() ? 1 : 2; }
@@ -1154,11 +1154,11 @@ function gorgeesPigeon(){ return estModeSoft() ? 1 : 2; }
 function gorgeesDuel(valeur, multiplicateur){
   return estModeSoft() ? Math.min(10, Math.ceil(valeur / 2) * multiplicateur) : valeur * multiplicateur;
 }
-function texteGorgees(n){ return `${n} gorgée${n > 1 ? "s" : ""}`; }
+function texteGorgees(n){ return tr`${n} gorgée${n > 1 ? "s" : ""}`; }
 function texteDoreeJamaisTrouvee(){
   return estModeSoft()
-    ? "Tout le monde boit 2 gorgées de la part du développeur 😘"
-    : "Tout le monde prend un CUL SEC de la part du développeur 😘";
+    ? tr("Tout le monde boit 2 gorgées de la part du développeur 😘")
+    : tr("Tout le monde prend un CUL SEC de la part du développeur 😘");
 }
 
 // En ligne : mode de la partie qu'on rejoint / crée, affiché dans la salle d'attente
@@ -1556,13 +1556,13 @@ const ICONES_HORS_LIGNE = {
 async function majStatutHorsLigne(pretes, total){
   const texte = document.getElementById("texteHorsLigne"), pastille = document.getElementById("pastilleHorsLigne");
   let etat, message;
-  if (!(window.caches && navigator.serviceWorker)) { etat = "non"; message = "Pas possible sur ce navigateur."; }
+  if (!(window.caches && navigator.serviceWorker)) { etat = "non"; message = tr("Pas possible sur ce navigateur."); }
   else {
     let jeuPret = false;
     try { jeuPret = (await Promise.all(FICHIERS_JEU_HORS_LIGNE.map((f) => caches.match(f)))).every(Boolean); } catch (e) {}
-    if (!jeuPret) { etat = "attente"; message = "Pas encore prêt : reste connecté et rouvre le jeu une fois."; }
-    else if (pretes < total) { etat = "attente"; message = `Le jeu est prêt. Musiques : ${pretes} / ${total} gardées (active la musique en ligne pour les garder).`; }
-    else { etat = "ok"; message = "Prêt : le jeu et les musiques marchent sans réseau (mode avion)."; }
+    if (!jeuPret) { etat = "attente"; message = tr("Pas encore prêt : reste connecté et rouvre le jeu une fois."); }
+    else if (pretes < total) { etat = "attente"; message = tr`Le jeu est prêt. Musiques : ${pretes} / ${total} gardées (active la musique en ligne pour les garder).`; }
+    else { etat = "ok"; message = tr("Prêt : le jeu et les musiques marchent sans réseau (mode avion)."); }
   }
   ligneHorsLigne.dataset.etat = etat;
   texte.textContent = message;
@@ -1578,11 +1578,11 @@ async function majNoteMusiqueHorsLigne(){
   for (const nom of noms) if (await musiqueGardee(nom)) pretes++;
   majStatutHorsLigne(pretes, noms.length);
   noteMusiqueHorsLigne.textContent = pretes >= noms.length
-    ? "Hors connexion : musiques prêtes ✓"
-    : !caseMusique.checked ? `Hors connexion : ${pretes} / ${noms.length} prêtes. Active la musique pour télécharger le reste.`
-    : gardeMusiquesEnCours ? `Hors connexion : téléchargement (${pretes} / ${noms.length})…`
-    : navigator.onLine ? `Hors connexion : ${pretes} / ${noms.length} prêtes, téléchargement à venir…`
-    : `Hors connexion : ${pretes} / ${noms.length} prêtes (le reste demande du réseau)`;
+    ? tr("Hors connexion : musiques prêtes ✓")
+    : !caseMusique.checked ? tr`Hors connexion : ${pretes} / ${noms.length} prêtes. Active la musique pour télécharger le reste.`
+    : gardeMusiquesEnCours ? tr`Hors connexion : téléchargement (${pretes} / ${noms.length})…`
+    : navigator.onLine ? tr`Hors connexion : ${pretes} / ${noms.length} prêtes, téléchargement à venir…`
+    : tr`Hors connexion : ${pretes} / ${noms.length} prêtes (le reste demande du réseau)`;
 }
 let gardeMusiquesEnCours = false;
 function garderMusiquesPourHorsLigne(){
@@ -1959,8 +1959,8 @@ function afficherRappelEau(){
   bandeau.setAttribute("role", "status");
   bandeau.innerHTML =
     '<span class="rappelEau-icone" aria-hidden="true">💧</span>' +
-    '<span class="rappelEau-texte"><strong>MESSAGE DE TON ANGE GARDIEN</strong>' +
-    '<strong>L\'eau aussi, ça se boit 😉</strong></span>' +
+    tr('<span class="rappelEau-texte"><strong>MESSAGE DE TON ANGE GARDIEN</strong>') +
+    tr('<strong>L\'eau aussi, ça se boit 😉</strong></span>') +
     '<span class="rappelEau-languette" aria-hidden="true"></span>'; // (on peut la glisser, comme une vraie)
   rendreNotifGlissable(bandeau, 9000);
   document.body.appendChild(bandeau);
@@ -1978,8 +1978,8 @@ document.getElementById("btnPartagerJeu").addEventListener("click", () => {
     return;
   }
   const copie = navigator.clipboard ? navigator.clipboard.writeText(ADRESSE_JEU) : Promise.reject();
-  copie.then(() => afficherToast("Lien copié !"))
-    .catch(() => prompt("Copie le lien du jeu :", ADRESSE_JEU));
+  copie.then(() => afficherToast(tr("Lien copié !")))
+    .catch(() => prompt(tr("Copie le lien du jeu :"), ADRESSE_JEU));
 });
 
 // ===== Diagnostic : tout ce qu'il faut pour comprendre un plantage en ligne, copié en un tap =====
@@ -2057,11 +2057,11 @@ document.getElementById("btnDiagnostic").addEventListener("click", () => {
   const copie = (navigator.clipboard && navigator.clipboard.writeText)
     ? navigator.clipboard.writeText(texte)
     : Promise.reject(new Error("presse-papiers indisponible"));
-  copie.then(() => afficherToast("Diagnostic copié", 3000))
+  copie.then(() => afficherToast(tr("Diagnostic copié"), 3000))
     .catch((e) => {
       // Refus du téléphone : on le dit (avant, rien : l'ancien texte restait dans le presse-papier)
       noterErreur(`copie du diagnostic refusée : ${e && (e.name + " " + e.message)}`);
-      afficherToast(`Copie refusée par le téléphone (${(e && e.name) || "erreur"})`, 4000);
+      afficherToast(tr`Copie refusée par le téléphone (${(e && e.name) || "erreur"})`, 4000);
     });
 });
 
@@ -2075,7 +2075,7 @@ document.getElementById("btnDiagnostic").addEventListener("click", () => {
 const CANAL_BUGS = "alcuno-bugs-7cy7edx1ee25";
 const MAX_PIECES_BUG = 3;
 const TAILLE_MAX_VIDEO_BUG = 15 * 1024 * 1024; // (limite des pièces jointes de ntfy.sh)
-const TEXTE_BOUTON_BUG = "Envoyer le rapport";
+const TEXTE_BOUTON_BUG = tr("Envoyer le rapport");
 const ecranBug = document.getElementById("ecranBug");
 const feuilleBug = ecranBug.querySelector(".bugFeuille");
 const champBug = document.getElementById("texteBug");
@@ -2147,11 +2147,11 @@ function afficherPiecesBug(){
       apercu = document.createElement("img");
       apercu.src = piece.url;
     }
-    apercu.setAttribute("aria-label", `Pièce jointe ${i + 1}`);
+    apercu.setAttribute("aria-label", tr`Pièce jointe ${i + 1}`);
     const retirer = document.createElement("button");
     retirer.type = "button";
     retirer.className = "bugRetirer";
-    retirer.setAttribute("aria-label", "Retirer la pièce jointe");
+    retirer.setAttribute("aria-label", tr("Retirer la pièce jointe"));
     retirer.innerText = "✕";
     retirer.addEventListener("click", () => {
       URL.revokeObjectURL(piece.url);
@@ -2170,10 +2170,10 @@ champPiecesBug.addEventListener("change", () => {
     .filter(f => f.type.startsWith("image/") || f.type.startsWith("video/"));
   champPiecesBug.value = "";
   const tropLourdes = fichiers.filter(f => f.type.startsWith("video/") && f.size > TAILLE_MAX_VIDEO_BUG);
-  if (tropLourdes.length) afficherToast("Vidéo trop lourde (15 Mo au plus) : prends-en une plus courte", 3500);
+  if (tropLourdes.length) afficherToast(tr("Vidéo trop lourde (15 Mo au plus) : prends-en une plus courte"), 3500);
   fichiers = fichiers.filter(f => !tropLourdes.includes(f));
   const place = MAX_PIECES_BUG - piecesBug.length;
-  if (fichiers.length > place) afficherToast(`${MAX_PIECES_BUG} pièces jointes au plus`);
+  if (fichiers.length > place) afficherToast(tr`${MAX_PIECES_BUG} pièces jointes au plus`);
   fichiers.slice(0, place).forEach(f => piecesBug.push({ fichier: f, url: URL.createObjectURL(f), video: f.type.startsWith("video/") }));
   afficherPiecesBug();
 });
@@ -2220,8 +2220,8 @@ function extensionPieceBug(fichier){
 
 async function envoyerBug(){
   const texte = champBug.value.trim();
-  if (!texte) { afficherToast("Écris d'abord ce qui s'est passé"); return; }
-  if (Date.now() - dernierEnvoiBug < 30000) { afficherToast("Attends un peu avant d'en renvoyer un"); return; }
+  if (!texte) { afficherToast(tr("Écris d'abord ce qui s'est passé")); return; }
+  if (Date.now() - dernierEnvoiBug < 30000) { afficherToast(tr("Attends un peu avant d'en renvoyer un")); return; }
   const titre = `Bug Alcuno ${VERSION_AFFICHEE}`;
   const pieces = piecesBug.slice();
   const annoncePieces = pieces.length
@@ -2231,22 +2231,22 @@ async function envoyerBug(){
   // Mouchard actif : le diagnostic complet (avec tout son journal) part aussi en fichier, juste après
   const diagnosticComplet = (typeof mouchardActif !== "undefined" && mouchardActif) ? texteDiagnostic() : null;
   btnEnvoyerBug.disabled = true;
-  libelleEnvoyerBug.innerText = "Envoi…";
+  libelleEnvoyerBug.innerText = tr("Envoi…");
   try {
     await publierNtfy(titre, message);
   } catch (e) {
-    afficherToast(navigator.onLine === false ? "Pas de réseau : réessaie plus tard" : "L'envoi n'a pas marché, réessaie", 3000);
+    afficherToast(navigator.onLine === false ? tr("Pas de réseau : réessaie plus tard") : tr("L'envoi n'a pas marché, réessaie"), 3000);
     remettreBoutonBug();
     return;
   }
   dernierEnvoiBug = Date.now();
   let piecesRatees = 0;
   if (diagnosticComplet) {
-    libelleEnvoyerBug.innerText = "Envoi du mouchard…";
+    libelleEnvoyerBug.innerText = tr("Envoi du mouchard…");
     try { await publierNtfy(`${titre} : mouchard`, new Blob([diagnosticComplet]), "mouchard.txt"); } catch (e) { piecesRatees++; }
   }
   for (let i = 0; i < pieces.length; i++) {
-    libelleEnvoyerBug.innerText = `Envoi de la pièce jointe ${i + 1}/${pieces.length}…`;
+    libelleEnvoyerBug.innerText = tr`Envoi de la pièce jointe ${i + 1}/${pieces.length}…`;
     try {
       const { fichier, video } = pieces[i];
       const contenu = video ? fichier : await compresserPhotoBug(fichier); // (vidéo telle quelle)
@@ -2262,7 +2262,7 @@ async function envoyerBug(){
   afficherPiecesBug();
   remettreBoutonBug();
   fermerEcranBug();
-  afficherNotificationHaut("", piecesRatees ? "Rapport envoyé, mais pas toutes les pièces jointes" : "Merci ! Le rapport est envoyé", true);
+  afficherNotificationHaut("", piecesRatees ? tr("Rapport envoyé, mais pas toutes les pièces jointes") : tr("Merci ! Le rapport est envoyé"), true);
 }
 
 document.getElementById("btnSignalerBug").addEventListener("click", ouvrirEcranBug);
@@ -2280,19 +2280,19 @@ function majLignePartieMemoire(){
     return;
   }
   document.getElementById("textePartieMemoire").innerText =
-    `Partie ${memoire.code}${memoire.pseudo ? " (" + memoire.pseudo + ")" : ""} : proposée par « Revenir dans une partie en cours ».`;
+    tr`Partie ${memoire.code}${memoire.pseudo ? " (" + memoire.pseudo + ")" : ""} : proposée par « Revenir dans une partie en cours ».`;
   ligne.style.display = "";
 }
 
 document.getElementById("btnOublierPartie").addEventListener("click", () => {
   const memoire = lirePartieLocale();
   if (!memoire || !memoire.code) { majLignePartieMemoire(); return; }
-  if (!confirm(`Oublier la partie ${memoire.code} ?\n\nLe bouton « Revenir dans une partie en cours » ne la proposera plus. ` +
-               `(Tu pourras toujours la rejoindre avec « Rejoindre » et ton pseudo.)`)) return;
+  if (!confirm(tr`Oublier la partie ${memoire.code} ?\n\nLe bouton « Revenir dans une partie en cours » ne la proposera plus. ` +
+               tr`(Tu pourras toujours la rejoindre avec « Rejoindre » et ton pseudo.)`)) return;
   oublierPartieLocale();
   majBoutonRevenir();
   majLignePartieMemoire();
-  afficherToast("Partie oubliée");
+  afficherToast(tr("Partie oubliée"));
 });
 
 // ===== Vibrations (Android : un iPhone ne peut pas vibrer depuis une page web) =====
@@ -2374,7 +2374,7 @@ function construireControlesReglages(){
     const groupe = document.createElement("div");
     groupe.className = "ctrlReglage";
     groupe.dataset.pour = bloc.dataset.cle;
-    groupe.innerHTML = `<button type="button" class="ctrlPoignee" aria-label="Déplacer ${nom} (glisser, ou flèches haut et bas du clavier)">≡</button>`;
+    groupe.innerHTML = tr`<button type="button" class="ctrlPoignee" aria-label="Déplacer ${nom} (glisser, ou flèches haut et bas du clavier)">≡</button>`;
     const poignee = groupe.querySelector(".ctrlPoignee");
     poignee.addEventListener("pointerdown", (e) => demarrerGlisseReglage(bloc, e));
     poignee.addEventListener("keydown", (e) => { // (clavier : la poignée a le focus, flèches haut / bas)
@@ -2446,7 +2446,7 @@ const ICONE_MODIFIER = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 
 const ICONE_TERMINER = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 function nommerBoutonModifier(termine){
   btnModifierReglages.innerHTML = termine ? ICONE_TERMINER : ICONE_MODIFIER;
-  const nom = termine ? "Terminer la modification" : "Réorganiser les réglages";
+  const nom = termine ? tr("Terminer la modification") : tr("Réorganiser les réglages");
   btnModifierReglages.setAttribute("aria-label", nom); btnModifierReglages.title = nom;
 }
 function entrerEditionReglages(){
@@ -2504,7 +2504,7 @@ function majLigneVoix(){
 majLigneVoix();
 if (!voixPossible) {
   caseVoix.disabled = true;
-  document.getElementById("noteVoix").insertAdjacentHTML("beforeend", "<br>Indisponible sur cet appareil.");
+  document.getElementById("noteVoix").insertAdjacentHTML("beforeend", tr("<br>Indisponible sur cet appareil."));
 }
 
 // (les emojis : « \p{…} » n'existe qu'à partir de Chrome 64 ; écrit en texte et essayé ici, sinon un vieux téléphone ne chargeait plus
@@ -2518,8 +2518,9 @@ function textePourVoix(brut){
   return String(brut || "")
     .replace(regexEmojisVoix, " ")
     .replace(/\b(Il|Elle|il|elle)\/(il|elle)\b/g, "$1 ou $2")
+    .replace(/\b(\d+) cl\b/g, estAnglais ? "$1 centilitres" : "$1 cl")
     .replace(/\+(\d+)/g, "plus $1")
-    .replace(/(\d+)\s*\/\s*(\d+)/g, "$1 sur $2")
+    .replace(/(\d+)\s*\/\s*(\d+)/g, estAnglais ? "$1 out of $2" : "$1 sur $2")
     .replace(/\s+/g, " ").replace(/\s+([.,!?])/g, "$1").replace(/([!?])\./g, "$1").trim();
 }
 
@@ -2530,7 +2531,7 @@ function noteVoix(v){
   const nom = `${v.name || ""} ${v.voiceURI || ""}`;
   let n = 0;
   if (/premium|enhanced|am[ée]lior[ée]e?|neural|natural|naturelle/i.test(nom)) n += 100;
-  if (/^fr[-_]FR$/i.test(v.lang)) n += 20; else if (/^fr$/i.test(v.lang)) n += 10;
+  if ((estAnglais ? /^en[-_](US|GB)$/i : /^fr[-_]FR$/i).test(v.lang)) n += 20; else if ((estAnglais ? /^en$/i : /^fr$/i).test(v.lang)) n += 10;
   if (v.localService) n += 5;
   if (/google/i.test(nom)) n += 3;
   if (v.default) n += 1;
@@ -2539,7 +2540,7 @@ function noteVoix(v){
 function meilleureVoixFr(){
   ecouterChangementDeVoix();
   if (voixFrCherchee && voixFrChoisie) return voixFrChoisie;
-  const voix = (window.speechSynthesis.getVoices() || []).filter((v) => /^fr/i.test(v.lang));
+  const voix = (window.speechSynthesis.getVoices() || []).filter((v) => (estAnglais ? /^en/i : /^fr/i).test(v.lang)); // (voix de la langue du jeu)
   voixFrCherchee = voix.length > 0; // (liste encore vide : on redemande à la prochaine lecture)
   voixFrChoisie = voix.length ? voix.slice().sort((a, b) => noteVoix(b) - noteVoix(a))[0] : null;
   return voixFrChoisie;
@@ -2562,7 +2563,7 @@ function dire(brut, force = false, vitesse = null){
   try {
     window.speechSynthesis.cancel();
     const lecture = new SpeechSynthesisUtterance(texte);
-    lecture.lang = "fr-FR";
+    lecture.lang = estAnglais ? "en-US" : "fr-FR";
     lecture.rate = Math.min(1.6, Math.max(0.6, Number(vitesse) || vitesseVoix));
     const voixFr = meilleureVoixFr();
     if (voixFr) lecture.voice = voixFr;
@@ -2591,14 +2592,14 @@ curseurVoix.addEventListener("input", () => {
 });
 curseurVoix.addEventListener("change", () => {
   try { localStorage.setItem(CLE_VITESSE_VOIX, String(vitesseVoix)); } catch (e) {}
-  parler("Voilà la vitesse de la voix.", true); // (essai au relâchement, comme le curseur du volume)
+  parler(tr("Voilà la vitesse de la voix."), true); // (essai au relâchement, comme le curseur du volume)
 });
 
 caseVoix.addEventListener("change", () => {
   voixActive = caseVoix.checked && voixPossible;
   majLigneVoix();
   try { localStorage.setItem(CLE_VOIX, voixActive ? "1" : "0"); } catch (e) {}
-  if (voixActive) parler("Annonces à voix haute activées.", true); // (part d'un tap : nécessaire sur iPhone)
+  if (voixActive) parler(tr("Annonces à voix haute activées."), true); // (part d'un tap : nécessaire sur iPhone)
   else { try { window.speechSynthesis.cancel(); } catch (e) {} }
 });
 document.addEventListener("visibilitychange", () => { if (document.visibilityState !== "visible" && voixActive) { try { window.speechSynthesis.cancel(); } catch (e) {} } });
@@ -2726,9 +2727,9 @@ function afficherBandeauMiseAJour(){
   const bandeau = document.createElement("div");
   bandeau.id = "bandeauMiseAJour";
   bandeau.innerHTML =
-    `<span class="texte">Nouvelle version disponible (${echapperHtml(versionEnLigne)})</span>` +
-    `<button type="button" class="maj">Mettre à jour</button>` +
-    `<button type="button" class="plusTard" aria-label="Plus tard">✕</button>`;
+    tr`<span class="texte">Nouvelle version disponible (${echapperHtml(versionEnLigne)})</span>` +
+    tr`<button type="button" class="maj">Mettre à jour</button>` +
+    tr`<button type="button" class="plusTard" aria-label="Plus tard">✕</button>`;
   // Adresse neuve (?v=...) : contourne le cache et recharge toute l'appli. Avec son propre son (celui de
   // l'accessibilité, 1,7 s) : la page ne se recharge qu'à la fin, sinon il serait coupé net.
   // Les sons ne se chargent qu'au premier tap : si c'est celui-ci (appli tout juste rouverte, bandeau
@@ -2737,7 +2738,7 @@ function afficherBandeauMiseAJour(){
   boutonMaj.addEventListener("click", () => {
     if (boutonMaj.disabled) return;
     boutonMaj.disabled = true;
-    boutonMaj.textContent = "Mise à jour…";
+    boutonMaj.textContent = tr("Mise à jour…");
     const recharger = () => rechargerPage(location.pathname + "?v=" + encodeURIComponent(versionEnLigne)); // (js/retour-demarrage.js)
     if (!caseSons.checked || volumeSons <= 0) { recharger(); return; }
     const debut = Date.now();
@@ -2794,12 +2795,12 @@ const ICONE_MENU = '<svg viewBox="0 0 24 24" class="iconeEtape" aria-hidden="tru
 
 function majEcranInstallation(){
   const etapes = estIOS
-    ? [`Dans Safari, touche ${ICONE_PARTAGER} <b>Partager</b><small>(ou ••• puis Partager)</small>`,
-       `Choisis ${ICONE_AJOUTER} <b>Sur l'écran d'accueil</b>`,
-       "Touche <b>Ajouter</b>"]
-    : [`Touche le menu ${ICONE_MENU} du navigateur`,
-       "Choisis <b>Installer l'application</b> ou <b>Ajouter à l'écran d'accueil</b>",
-       "Confirme"];
+    ? [tr`Dans Safari, touche ${ICONE_PARTAGER} <b>Partager</b><small>(ou ••• puis Partager)</small>`,
+       tr`Choisis ${ICONE_AJOUTER} <b>Sur l'écran d'accueil</b>`,
+       tr("Touche <b>Ajouter</b>")]
+    : [tr`Touche le menu ${ICONE_MENU} du navigateur`,
+       tr("Choisis <b>Installer l'application</b> ou <b>Ajouter à l'écran d'accueil</b>"),
+       tr("Confirme")];
   const zone = document.getElementById("installationEtapes");
   zone.hidden = !!demandeInstallation; // Chrome sait installer : pas besoin d'étapes
   zone.innerHTML = etapes.map((texte, i) =>
@@ -2965,7 +2966,7 @@ function afficherAideAccueil(){
   const aide = document.createElement("div");
   aide.id = "aideAccueil";
   aide.setAttribute("role", "dialog");
-  aide.setAttribute("aria-label", "Où sont les règles et les réglages");
+  aide.setAttribute("aria-label", tr("Où sont les règles et les réglages"));
   aide.innerHTML = `
     <div class="aideAccueil-voile"></div>
     <svg class="aideAccueil-fleches" aria-hidden="true">
@@ -2974,7 +2975,7 @@ function afficherAideAccueil(){
     </svg>
     <div class="aideAccueil-repere aideAccueil-gauche"><b>Règles</b>Toutes les cartes<br>expliquées.</div>
     <div class="aideAccueil-repere aideAccueil-droite"><b>Réglages</b>Thèmes, sons,<br>musiques…</div>
-    <div class="aideAccueil-bas"><b>QUE LA FÊTE COMMENCE !</b>Touche l'écran pour jouer</div>`;
+    <div class="aideAccueil-bas"><b>QUE LA FÊTE COMMENCE !</b>Touche l'écran pour jouer</div>`; traduireElement(aide);
   placerAideAccueil(aide);
   aide._replacer = () => placerAideAccueil(aide);
   window.addEventListener("resize", aide._replacer);
@@ -3027,63 +3028,63 @@ function reglesDuJeu(){
   const hot = estModeHot() || hard; // mode hot : pas de « 1 » (annulation), une carte Cupidon, des défis
   const g = (n) => `<em>${texteGorgees(n)}</em>`;
   const parties = [
-    { titre: "Comment on joue", regles: [
-      { carte: "", nom: "À ton tour", texte: [
-        "Toutes les cartes sont posées <b>face cachée</b>",
-        "À ton tour, retourne celle de ton choix et applique sa règle",
-        "Puis c'est au joueur suivant"
+    { titre: tr("Comment on joue"), regles: [
+      { carte: "", nom: tr("À ton tour"), texte: [
+        tr("Toutes les cartes sont posées <b>face cachée</b>"),
+        tr("À ton tour, retourne celle de ton choix et applique sa règle"),
+        tr("Puis c'est au joueur suivant")
       ]}
     ]},
-    { titre: "Les cartes", regles: [
-      { carte: "zero_bleu", nom: "0", texte: `Tout le monde boit ${g(1)}, sauf toi.` },
+    { titre: tr("Les cartes"), regles: [
+      { carte: "zero_bleu", nom: "0", texte: tr`Tout le monde boit ${g(1)}, sauf toi.` },
       hard ? null : hot
-        ? { carte: "cupidon_a", nom: "Cupidon", texte: [
-            "Tu lies <b>2 joueurs</b> : quand l'un boit, l'autre aussi (💘)",
-            "À la carte Cupidon suivante : lier 2 autres joueurs, ou briser un lien"
+        ? { carte: "cupidon_a", nom: tr("Cupidon"), texte: [
+            tr("Tu lies <b>2 joueurs</b> : quand l'un boit, l'autre aussi (💘)"),
+            tr("À la carte Cupidon suivante : lier 2 autres joueurs, ou briser un lien")
           ]}
-        : { carte: "un_rouge", nom: "1 : annulation", texte: `Tu gardes la carte : quand tu dois boire, tu peux t'en servir pour annuler ${g(1)}.` },
-      ...(hot && saintValentinEnCours() ? [{ carte: "coup_de_foudre", nom: "Coup de foudre (Saint-Valentin)", texte: [
-            `Choisis quelqu'un : <b>${hard ? "un doigt dans le cul" : "un bisou sur la bouche"}</b>…`,
-            `… ou tu prends ${pj ? g(4) : "<em>un CUL SEC</em>"}`
+        : { carte: "un_rouge", nom: "1 : annulation", texte: tr`Tu gardes la carte : quand tu dois boire, tu peux t'en servir pour annuler ${g(1)}.` },
+      ...(hot && saintValentinEnCours() ? [{ carte: "coup_de_foudre", nom: tr("Coup de foudre (Saint-Valentin)"), texte: [
+            tr`Choisis quelqu'un : <b>${hard ? "un doigt dans le cul" : "un bisou sur la bouche"}</b>…`,
+            tr`… ou tu prends ${pj ? g(4) : tr("<em>un CUL SEC</em>")}`
           ]}] : []),
-      { carte: "plus_2_jaune", nom: "+2", texte: `Tu bois ${g(gorgeesPlus2())}.` },
-      { carte: "plus_4", nom: "+4", texte: `Tu distribues ${g(gorgeesPlus4())} comme tu veux.` },
-      { carte: "trois_vert", nom: "3 : le Pigeon", texte: [
-        `Le premier qui tire un 3 devient le <b>Pigeon</b> : ${g(gorgeesPigeon())}`,
-        `Un autre tire un 3 : le Pigeon boit ${g(1)}`,
-        `Le Pigeon tire un 3 : il choisit le <b>nouveau Pigeon</b>, qui boit ${g(gorgeesPigeon())}`
+      { carte: "plus_2_jaune", nom: "+2", texte: tr`Tu bois ${g(gorgeesPlus2())}.` },
+      { carte: "plus_4", nom: "+4", texte: tr`Tu distribues ${g(gorgeesPlus4())} comme tu veux.` },
+      { carte: "trois_vert", nom: tr("3 : le Pigeon"), texte: [
+        tr`Le premier qui tire un 3 devient le <b>Pigeon</b> : ${g(gorgeesPigeon())}`,
+        tr`Un autre tire un 3 : le Pigeon boit ${g(1)}`,
+        tr`Le Pigeon tire un 3 : il choisit le <b>nouveau Pigeon</b>, qui boit ${g(gorgeesPigeon())}`
       ]},
       { carte: "quatre_bleu", nom: "4 : duel", texte: [
-        "Choisis <b>2 joueurs</b> : chacun prend une carte cachée",
-        pj ? "La plus petite carte boit <em>la moitié de sa valeur</em> (10 gorgées max)"
-           : "La plus petite carte boit <em>sa valeur en gorgées</em>",
-        "Égalité : on recommence, <em>gorgées doublées</em>"
+        tr("Choisis <b>2 joueurs</b> : chacun prend une carte cachée"),
+        pj ? tr("La plus petite carte boit <em>la moitié de sa valeur</em> (10 gorgées max)")
+           : tr("La plus petite carte boit <em>sa valeur en gorgées</em>"),
+        tr("Égalité : on recommence, <em>gorgées doublées</em>")
       ]},
-      { carte: "interdit_rouge", nom: "Sociale", texte: `Tout le monde boit ${g(1)}.` },
-      { carte: "switch_vert", nom: "Changement de sens", texte: "Le sens du jeu est inversé." },
-      { carte: "couleur", nom: "Couleur", texte: `Choisis une couleur : le prochain qui tire une carte de cette couleur boit ${g(1)} en plus.` }
+      { carte: "interdit_rouge", nom: tr("Sociale"), texte: tr`Tout le monde boit ${g(1)}.` },
+      { carte: "switch_vert", nom: tr("Changement de sens"), texte: tr("Le sens du jeu est inversé.") },
+      { carte: "couleur", nom: tr("Couleur"), texte: tr`Choisis une couleur : le prochain qui tire une carte de cette couleur boit ${g(1)} en plus.` }
     ]},
-    { titre: "Fin de la partie", regles: [
-      { carte: "", nom: "Pari sur la dernière carte", texte: [
-        "Quand il ne reste qu'<b>une carte</b>, chacun parie sur son type",
-        `Ceux qui trouvent distribuent <em>${texteCulSec()}</em>`
+    { titre: tr("Fin de la partie"), regles: [
+      { carte: "", nom: tr("Pari sur la dernière carte"), texte: [
+        tr("Quand il ne reste qu'<b>une carte</b>, chacun parie sur son type"),
+        tr`Ceux qui trouvent distribuent <em>${texteCulSec()}</em>`
       ]},
-      ...(hot ? [] : [{ carte: "un_jaune", nom: "Les 1 restants", texte: `Chaque 1 gardé jusqu'à la fin se transforme en gorgée à boire (${g(1)} par carte).` }])
+      ...(hot ? [] : [{ carte: "un_jaune", nom: tr("Les 1 restants"), texte: tr`Chaque 1 gardé jusqu'à la fin se transforme en gorgée à boire (${g(1)} par carte).` }])
     ]}
   ];
   if(hot){
     // Mode hot : le défi à la place des gorgées (décisions : MODE_HOT.md)
-    parties.splice(2, 0, hard ? { titre: "Mode hard", regles: [
-      { carte: "", nom: "Le défi", texte: [
-        "Partie <b>à 2 joueurs</b>",
-        "Quand tu dois boire, tu peux relever un défi avec l'autre joueur à la place",
-        "<b>Je le fais</b> : rien à boire. <b>Je bois</b> : les gorgées prévues"
+    parties.splice(2, 0, hard ? { titre: tr("Mode hard"), regles: [
+      { carte: "", nom: tr("Le défi"), texte: [
+        tr("Partie <b>à 2 joueurs</b>"),
+        tr("Quand tu dois boire, tu peux relever un défi avec l'autre joueur à la place"),
+        tr("<b>Je le fais</b> : rien à boire. <b>Je bois</b> : les gorgées prévues")
       ]}
-    ]} : { titre: "Mode hot 🔥", regles: [
-      { carte: "", nom: "Le défi", texte: [
-        "Quand <b>une seule personne</b> doit boire, elle peut relever un défi à la place",
-        "<b>Je le fais</b> : rien à boire. <b>Je bois</b> : les gorgées prévues",
-        "Deux joueurs liés par Cupidon comptent pour une personne : le défi se fait entre eux"
+    ]} : { titre: tr("Mode hot 🔥"), regles: [
+      { carte: "", nom: tr("Le défi"), texte: [
+        tr("Quand <b>une seule personne</b> doit boire, elle peut relever un défi à la place"),
+        tr("<b>Je le fais</b> : rien à boire. <b>Je bois</b> : les gorgées prévues"),
+        tr("Deux joueurs liés par Cupidon comptent pour une personne : le défi se fait entre eux")
       ]}
     ]});
   }
@@ -3106,7 +3107,7 @@ function remplirRegles(){
   if(pj){
     const note = document.createElement("p");
     note.className = "reglesNotePJ";
-    note.innerText = "Mode PJ activé : moins de gorgées.";
+    note.innerText = tr("Mode PJ activé : moins de gorgées.");
     liste.appendChild(note);
   }
   parties.forEach(partie => {
@@ -3140,7 +3141,7 @@ function remplirRegles(){
 // Remet le contenu des Règles dans l'écran (la FAQ, qui s'y ouvre aussi, y revient avec « Retour »)
 function afficherContenuRegles(){
   ecranRegles.classList.remove("album", "faq", "bar", "ethylo"); // (l'album de stickers et la FAQ s'ouvrent dans cet écran : js/stickers.js, js/faq.js)
-  ecranRegles.querySelector("h2").textContent = "Règles du jeu";
+  ecranRegles.querySelector("h2").textContent = tr("Règles du jeu");
   remplirRegles();
   ecranRegles.scrollTop = 0;
 }
@@ -3175,7 +3176,7 @@ function fermerReglesSiCestAMoi(){
   if(!ouvertes.length) return;
   if(!choixEnAttentePourMoi().some(el => !choixDejaEnAttente.has(el))) return;
   ouvertes.forEach(p => fermerPage(p));
-  afficherToast("C'est à toi de choisir !", 2500);
+  afficherToast(tr("C'est à toi de choisir !"), 2500);
 }
 
 new MutationObserver(() => {

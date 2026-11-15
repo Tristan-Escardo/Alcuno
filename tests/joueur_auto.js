@@ -46,7 +46,7 @@
 
       // Plus 4 : distribuer puis valider
       if ($("#overlayPlus4")) {
-        const valider = $$("#overlayPlus4 .plus4-action-btn").find(b => b.innerText.includes("Valider"));
+        const valider = $$("#overlayPlus4 .plus4-action-btn").find(b => b.innerText.includes("Valider") || b.innerText.includes("Confirm"));
         if (cliquable(valider)) { journal.push("+4 valider"); pd(valider); }
         else { const liste = $$("#overlayPlus4 .plus4-joueur-btn"); const b = liste[(nbPlus4++) % liste.length]; journal.push("+4 " + b.innerText.split(" ")[0]); pd(b); }
         return setTimeout(tick, 40);
@@ -61,7 +61,7 @@
       // Mode hot, période Saint-Valentin : Coup de foudre (choisir quelqu'un, puis bisou ou cul sec, en alternance)
       if ($("#overlayCoupDeFoudre")) {
         const btns = $$("#overlayCoupDeFoudre button").filter(visible);
-        const bisou = btns.find(b => b.innerText.includes("Bisou") || b.innerText.includes("doigt")), culsec = btns.find(b => b.innerText.includes("🥃"));
+        const bisou = btns.find(b => b.innerText.includes("Bisou") || b.innerText.includes("doigt") || b.innerText.includes("Kiss") || b.innerText.includes("finger")), culsec = btns.find(b => b.innerText.includes("🥃"));
         if (bisou && culsec) { const b = nbDefis++ % 2 ? culsec : bisou; journal.push("coup de foudre " + b.innerText.trim()); pd(b); }
         else if (btns.length) { journal.push("coup de foudre joueur"); pd(btns[0]); }
         return setTimeout(tick, 60);
@@ -70,8 +70,8 @@
       if ($("#overlayCupidon")) {
         const btns = $$("#overlayCupidon button").filter(visible);
         const texte = (b) => b.innerText.trim();
-        const lier = btns.find(b => texte(b) === "Lier deux joueurs");
-        const valider = btns.find(b => texte(b) === "Valider");
+        const lier = btns.find(b => ["Lier deux joueurs", "Link two players"].includes(texte(b)));
+        const valider = btns.find(b => ["Valider", "Confirm"].includes(texte(b)));
         const joueursLier = btns.filter(b => b.dataset.nom);
         if (lier) { journal.push("cupidon lier"); pd(lier); }
         else if (joueursLier.length) {

@@ -33,7 +33,7 @@ function appliquerConfigDistante(){
   const bouton = document.getElementById("btnModeEnLigne");
   if (bouton) {
     bouton.disabled = enligne;
-    bouton.title = enligne ? "Le mode en ligne est coupé pour le moment" : "";
+    bouton.title = enligne ? tr("Le mode en ligne est coupé pour le moment") : "";
   }
   if (ConfigLib.coupee(configDistante, "voix")) { try { window.speechSynthesis && speechSynthesis.cancel(); } catch (e) {} }
   try { majMusique(); } catch (e) {}
@@ -69,7 +69,7 @@ function majAnnonceAccueil(){
   if (!zone) return;
   let texte = "", maj = false, cle = "";
   if (configDistante.majMin && ConfigLib.versionPlusVieille(VERSION_AFFICHEE, configDistante.majMin)) {
-    texte = `Une nouvelle version du jeu est disponible (${configDistante.majMin}).`; maj = true; cle = "maj" + configDistante.majMin;
+    texte = tr`Une nouvelle version du jeu est disponible (${configDistante.majMin}).`; maj = true; cle = "maj" + configDistante.majMin;
   } else if (ConfigLib.annonceVisible(configDistante, Date.now(), VERSION_AFFICHEE)) {
     texte = configDistante.annonce.texte; cle = "annonce" + (configDistante.annonce.maj || 0) + texte;
   }
@@ -78,7 +78,7 @@ function majAnnonceAccueil(){
   zone.hidden = !afficher;
   zone.dataset.cle = cle;
   document.getElementById("texteAnnonce").textContent = texte;
-  document.getElementById("etiquetteAnnonce").textContent = maj ? "Mise à jour" : "Annonce";
+  document.getElementById("etiquetteAnnonce").textContent = maj ? tr("Mise à jour") : tr("Annonce");
   document.getElementById("iconeAnnonce").textContent = maj ? "🚀" : "📣";
   document.getElementById("btnAnnonceMaj").hidden = !maj;
   document.getElementById("btnAnnonceFermer").hidden = maj; // (une mise à jour demandée ne se ferme pas)
@@ -92,17 +92,17 @@ function majAnnonceAccueil(){
     carte.setAttribute("role", "status");
     const icone = document.createElement("span"); icone.className = "annonceIcone"; icone.textContent = maj ? "🚀" : "📣";
     const corps = document.createElement("div"); corps.className = "annonceCorps";
-    const etiquette = document.createElement("span"); etiquette.className = "annonceEtiquette"; etiquette.textContent = maj ? "Mise à jour" : "Annonce";
+    const etiquette = document.createElement("span"); etiquette.className = "annonceEtiquette"; etiquette.textContent = maj ? tr("Mise à jour") : tr("Annonce");
     const message = document.createElement("span"); message.className = "annonceTexte"; message.textContent = texte;
     corps.append(etiquette, message);
     if (maj) {
-      const bouton = document.createElement("button"); bouton.type = "button"; bouton.className = "annonceMaj"; bouton.textContent = "Mettre à jour";
+      const bouton = document.createElement("button"); bouton.type = "button"; bouton.className = "annonceMaj"; bouton.textContent = tr("Mettre à jour");
       bouton.addEventListener("click", () => location.reload());
       corps.append(bouton);
     }
     carte.append(icone, corps);
     if (!maj) {
-      const fermer = document.createElement("button"); fermer.type = "button"; fermer.className = "annonceFermer"; fermer.setAttribute("aria-label", "Fermer l'annonce"); fermer.textContent = "✕";
+      const fermer = document.createElement("button"); fermer.type = "button"; fermer.className = "annonceFermer"; fermer.setAttribute("aria-label", tr("Fermer l'annonce")); fermer.textContent = "✕";
       fermer.addEventListener("click", fermerAnnonce);
       carte.append(fermer);
     }

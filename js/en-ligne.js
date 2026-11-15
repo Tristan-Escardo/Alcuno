@@ -36,7 +36,7 @@ function trouverCodeLibre(essaisRestants = 10){
   const code = genererCodePartie();
   return window.fbGet(window.fbRef(window.firebaseDB, `parties/${code}`)).then((snapshot) => {
     if (!snapshot.exists()) return code;
-    if (essaisRestants <= 1) throw new Error("Aucun code de partie libre trouvé");
+    if (essaisRestants <= 1) throw new Error(tr("Aucun code de partie libre trouvé"));
     return trouverCodeLibre(essaisRestants - 1);
   });
 }
@@ -47,8 +47,8 @@ function firebaseInjoignable(finAttente){
   return () => {
     finAttente();
     alert(navigator.onLine === false
-      ? "Pas de connexion internet : le mode en ligne a besoin du réseau.\n\nVérifie ta connexion, puis réessaie."
-      : "Impossible de joindre le serveur du mode en ligne.\n\nVérifie ta connexion, puis réessaie.");
+      ? tr("Pas de connexion internet : le mode en ligne a besoin du réseau.\n\nVérifie ta connexion, puis réessaie.")
+      : tr("Impossible de joindre le serveur du mode en ligne.\n\nVérifie ta connexion, puis réessaie."));
   };
 }
 
@@ -56,8 +56,8 @@ function erreurFirebase(err){
   console.error(err);
   const refus = err && String(err.code || err.message || "").toLowerCase().includes("permission");
   alert(refus
-    ? "Accès refusé par la base Firebase (règles de sécurité)."
-    : "Impossible de joindre le serveur. Vérifie ta connexion.");
+    ? tr("Accès refusé par la base Firebase (règles de sécurité).")
+    : tr("Impossible de joindre le serveur. Vérifie ta connexion."));
 }
 
 // Entrée dans un champ = clic sur le bouton de validation
@@ -306,7 +306,7 @@ function boutonEnAttente(id, texte){
 let codeAInviter = null;
 function afficherCodePartie(code){
   codeAInviter = code;
-  document.getElementById("codePartieAffiche").innerText = "Code de la partie : " + code;
+  document.getElementById("codePartieAffiche").innerText = tr("Code de la partie : ") + code;
   const zone = document.getElementById("qrPartie");
   try {
     const qr = qrcode(0, "M");
@@ -354,14 +354,14 @@ let numeroScanner = 0; // change à chaque ouverture / fermeture : une lecture e
 document.getElementById("btnInviterPartie").addEventListener("click", () => {
   if (!codeAInviter) return;
   const lien = "https://tristan-escardo.github.io/Alcuno/?code=" + encodeURIComponent(codeAInviter);
-  const texte = `🍻 Rejoins ma partie d'Alcuno ! Code : ${codeAInviter}`;
+  const texte = tr`🍻 Rejoins ma partie d'Alcuno ! Code : ${codeAInviter}`;
   if (navigator.share) {
     navigator.share({ text: texte, url: lien }).catch(() => {});
     return;
   }
   const copie = navigator.clipboard ? navigator.clipboard.writeText(texte + "\n" + lien) : Promise.reject();
-  copie.then(() => afficherToast("Invitation copiée !"))
-    .catch(() => prompt("Copie l'invitation :", texte + " " + lien));
+  copie.then(() => afficherToast(tr("Invitation copiée !")))
+    .catch(() => prompt(tr("Copie l'invitation :"), texte + " " + lien));
 });
 
 // Texte du QR code => code de la partie (lien …/?code=ABC12 du jeu, ou le code tout seul)
@@ -438,7 +438,7 @@ function remplirCodePartieScanne(code){
 
 async function ouvrirScanner({ lireCode = codeDepuisQR, quandCode = remplirCodePartieScanne } = {}){
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    alert("Ce téléphone ne permet pas de scanner ici : entre le code à la main.");
+    alert(tr("Ce téléphone ne permet pas de scanner ici : entre le code à la main."));
     return;
   }
   const numero = ++numeroScanner;
@@ -468,8 +468,8 @@ async function ouvrirScanner({ lireCode = codeDepuisQR, quandCode = remplirCodeP
     if (numero !== numeroScanner) return;
     fermerScanner();
     alert(e && e.name === "NotAllowedError"
-      ? "Autorise la caméra pour scanner le QR code (ou entre le code à la main)."
-      : "Impossible d'ouvrir la caméra : entre le code à la main.");
+      ? tr("Autorise la caméra pour scanner le QR code (ou entre le code à la main).")
+      : tr("Impossible d'ouvrir la caméra : entre le code à la main."));
   }
 }
 
@@ -543,16 +543,16 @@ document.getElementById("btnRetourRevenir").addEventListener("click", () => {
 
 document.getElementById("validerRevenir").addEventListener("click", () => {
   const code = document.getElementById("codeRevenir").value.trim().toUpperCase();
-  if (!code) { alert("Entre le code de la partie."); return; }
+  if (!code) { alert(tr("Entre le code de la partie.")); return; }
 
-  const finAttente = boutonEnAttente("validerRevenir", "Connexion…");
+  const finAttente = boutonEnAttente("validerRevenir", tr("Connexion…"));
   attendreFirebase(() => {
     window.fbGet(window.fbRef(window.firebaseDB, `parties/${code}`)).then((snapshot) => {
       finAttente();
       if (!snapshot.exists()) {
         oublierPartieLocale();
         majBoutonRevenir();
-        alert("Aucune partie trouvée avec ce code (elle est peut-être terminée).");
+        alert(tr("Aucune partie trouvée avec ce code (elle est peut-être terminée)."));
         return;
       }
       const partie = snapshot.val();
@@ -566,8 +566,8 @@ document.getElementById("validerRevenir").addEventListener("click", () => {
         majBoutonRevenir();
         document.getElementById("enLigneRevenir").style.display = "none";
         document.getElementById("enLigneChoix").style.display = "";
-        alert("Cette partie a été créée avec une ancienne version du jeu : elle ne peut plus être reprise.\n\n" +
-              "Créez une nouvelle partie.");
+        alert(tr("Cette partie a été créée avec une ancienne version du jeu : elle ne peut plus être reprise.\n\n") +
+              tr("Créez une nouvelle partie."));
         return;
       }
 
@@ -585,11 +585,11 @@ function versionCompatible(partie){
   const versionPartie = typeof partie.version === "number" ? partie.version : 0;
   if (versionPartie > VERSION_JEU) {
     // C'est nous qui sommes en retard : rechargement sur une adresse neuve (contourne le cache)
-    alert("Ton jeu n'est pas à jour : la page va se recharger.\nEntre ensuite à nouveau le code.");
+    alert(tr("Ton jeu n'est pas à jour : la page va se recharger.\nEntre ensuite à nouveau le code."));
     rechargerPage(location.pathname + "?v=" + versionPartie); // (js/retour-demarrage.js)
   } else {
-    alert("Le téléphone qui a créé la partie a une ancienne version du jeu.\n" +
-          "Il doit recharger la page (ou l'ouvrir en navigation privée), puis recréer la partie.");
+    alert(tr("Le téléphone qui a créé la partie a une ancienne version du jeu.\n") +
+          tr("Il doit recharger la page (ou l'ouvrir en navigation privée), puis recréer la partie."));
   }
   return false;
 }
@@ -599,11 +599,11 @@ document.getElementById("btnQuitterSalle").addEventListener("click", quitterPart
 document.getElementById("validerCreation").addEventListener("click", () => {
   const pseudo = document.getElementById("pseudoCreateur").value.replace(/\s+/g, " ").trim();
   if (estCodeHard(pseudo)) debloquerHard(); // (« Jojo » : mode hard débloqué, js/reglages.js)
-  if (!pseudo) { alert("Entre un pseudo."); return; }
-  if (PSEUDO_INVALIDE.test(pseudo)) { alert("Pseudo invalide (pas de . # $ [ ] /)."); return; }
-  if (nomImpossible(pseudo)) { alert("Ce pseudo n'est pas possible : choisis-en un autre."); return; }
+  if (!pseudo) { alert(tr("Entre un pseudo.")); return; }
+  if (PSEUDO_INVALIDE.test(pseudo)) { alert(tr("Pseudo invalide (pas de . # $ [ ] /).")); return; }
+  if (nomImpossible(pseudo)) { alert(tr("Ce pseudo n'est pas possible : choisis-en un autre.")); return; }
 
-  const finAttente = boutonEnAttente("validerCreation", "Création…");
+  const finAttente = boutonEnAttente("validerCreation", tr("Création…"));
   attendreFirebase(() => {
     let code = null;
     let soft = caseModeSoft.checked; // réglage de l'hôte, fixé pour toute la partie
@@ -641,8 +641,8 @@ document.getElementById("validerCreation").addEventListener("click", () => {
           .catch(() => {});
       }
       if (softRefuse) {
-        alert("Le Mode PJ n'est pas encore disponible en ligne (règles Firebase à mettre à jour) : " +
-              "la partie est créée en mode normal.");
+        alert(tr("Le Mode PJ n'est pas encore disponible en ligne (règles Firebase à mettre à jour) : ") +
+              tr("la partie est créée en mode normal."));
       }
       codePartieActuel = code;
       pseudoActuel = pseudo;
@@ -665,21 +665,21 @@ document.getElementById("validerRejoindre").addEventListener("click", () => {
   const pseudo = document.getElementById("pseudoRejoindre").value.replace(/\s+/g, " ").trim();
   if (estCodeHard(pseudo)) debloquerHard(); // (« Jojo » : mode hard débloqué, js/reglages.js)
   if (!code || !pseudo) {
-    alert("Entre le code et ton pseudo.\n\n" +
-          "Tu as été déconnecté d'une partie ? Entre le code et le même pseudo qu'avant : tu reprendras ta place.");
+    alert(tr("Entre le code et ton pseudo.\n\n") +
+          tr("Tu as été déconnecté d'une partie ? Entre le code et le même pseudo qu'avant : tu reprendras ta place."));
     return;
   }
-  if (PSEUDO_INVALIDE.test(pseudo)) { alert("Pseudo invalide (pas de . # $ [ ] /)."); return; }
-  if (nomImpossible(pseudo)) { alert("Ce pseudo n'est pas possible : choisis-en un autre."); return; }
+  if (PSEUDO_INVALIDE.test(pseudo)) { alert(tr("Pseudo invalide (pas de . # $ [ ] /).")); return; }
+  if (nomImpossible(pseudo)) { alert(tr("Ce pseudo n'est pas possible : choisis-en un autre.")); return; }
 
-  const finAttente = boutonEnAttente("validerRejoindre", "Connexion…");
+  const finAttente = boutonEnAttente("validerRejoindre", tr("Connexion…"));
   attendreFirebase(() => {
     const db = window.firebaseDB;
     const refPartie = window.fbRef(db, `parties/${code}`);
 
     window.fbGet(refPartie).then((snapshot) => {
       if (!snapshot.exists()) {
-        alert("Aucune partie trouvée avec ce code.");
+        alert(tr("Aucune partie trouvée avec ce code."));
         return;
       }
 
@@ -695,10 +695,10 @@ document.getElementById("validerRejoindre").addEventListener("click", () => {
 
       if (nomExistant) {
         const ok = confirm(
-          `« ${nomExistant} » est déjà dans cette partie.\n\n` +
-          `C'est toi ? Appuie sur OK pour reprendre ta place` +
-          (enJeu ? " : tu retrouveras la partie là où elle en est." : ".") +
-          `\n\n(Sinon, annule et choisis un autre pseudo.)`
+          tr`« ${nomExistant} » est déjà dans cette partie.\n\n` +
+          tr`C'est toi ? Appuie sur OK pour reprendre ta place` +
+          (enJeu ? tr(" : tu retrouveras la partie là où elle en est.") : ".") +
+          tr`\n\n(Sinon, annule et choisis un autre pseudo.)`
         );
         if (ok) reprendrePlaceEnLigne(code, nomExistant, partie);
         return;
@@ -709,15 +709,15 @@ document.getElementById("validerRejoindre").addEventListener("click", () => {
         const nomRetire = joueurRetire(partie, pseudo);
         if (nomRetire) {
           const ok = confirm(
-            `« ${nomRetire} » a été retiré de cette partie.\n\n` +
-            `C'est toi ? Appuie sur OK pour y revenir : tu retrouveras la partie là où elle en est.`
+            tr`« ${nomRetire} » a été retiré de cette partie.\n\n` +
+            tr`C'est toi ? Appuie sur OK pour y revenir : tu retrouveras la partie là où elle en est.`
           );
           if (ok) revenirApresRetrait(code, nomRetire, partie);
           return;
         }
 
-        alert("La partie a déjà commencé : on ne peut plus y ajouter de joueur.\n\n" +
-              "Si tu en faisais partie et que tu as été déconnecté, entre exactement le même pseudo " +
+        alert(tr("La partie a déjà commencé : on ne peut plus y ajouter de joueur.\n\n") +
+              tr("Si tu en faisais partie et que tu as été déconnecté, entre exactement le même pseudo ") +
               "qu'avant pour reprendre ta place.");
         return;
       }
@@ -747,13 +747,13 @@ document.getElementById("validerRejoindre").addEventListener("click", () => {
 document.getElementById("lancerPartieEnLigne").addEventListener("click", () => {
   if (!estHote || !codePartieActuel) return;
 
-  const finAttente = boutonEnAttente("lancerPartieEnLigne", "Lancement…");
+  const finAttente = boutonEnAttente("lancerPartieEnLigne", tr("Lancement…"));
   window.fbGet(window.fbRef(window.firebaseDB, `parties/${codePartieActuel}/joueurs`)).then((snapshot) => {
     const liste = Object.values(snapshot.val() || {})
       .sort((a, b) => (a.rejoint || 0) - (b.rejoint || 0))
       .map(j => j.nom);
 
-    if (liste.length < 2) { alert("Il faut au moins 2 joueurs."); return; }
+    if (liste.length < 2) { alert(tr("Il faut au moins 2 joueurs.")); return; }
     return lancerMancheEnLigne(liste, true);
   }).catch(erreurFirebase).finally(finAttente);
 });
@@ -828,7 +828,7 @@ function ecouterSalleAttente(code){
     tries.forEach((j) => {
       const div = document.createElement("div");
       const nom = document.createElement("span");
-      nom.innerText = avecCouronne(j.nom) + (j.host ? " (hôte)" : "");
+      nom.innerText = avecCouronne(j.nom) + (j.host ? tr(" (hôte)") : "");
       ajouterBadgeDeconnecte(nom, deconnectes.has(j.nom));
       div.appendChild(nom);
 
@@ -838,7 +838,7 @@ function ecouterSalleAttente(code){
         btn.type = "button";
         btn.className = "btnExclure";
         btn.innerText = "✕";
-        btn.title = "Retirer " + j.nom;
+        btn.title = tr("Retirer ") + j.nom;
         btn.addEventListener("click", () => {
           // Retirer l'hôte : écran de confirmation d'abord (un autre joueur devient l'hôte)
           if (j.host) {
@@ -864,8 +864,8 @@ let retraitHoteEnAttente = null; // { code, nom }
 
 function demanderRetraitHote(code, nomHote){
   document.getElementById("texteConfirmerHote").innerText =
-    `${nomHote} est l'hôte de la partie.\n` +
-    `Si tu le retires, un autre joueur devient l'hôte.`;
+    tr`${nomHote} est l'hôte de la partie.\n` +
+    tr`Si tu le retires, un autre joueur devient l'hôte.`;
   retraitHoteEnAttente = { code, nom: nomHote };
   ecranConfirmerHote.style.display = "";
 }
@@ -939,7 +939,7 @@ function lancerMancheEnLigne(listeJoueurs, depuisSalle, avecDefis = true){
       hote: e.hote || pseudoActuel
     }, defis && Object.keys(defis).length ? { defisHot: defis } : {}, masques && Object.keys(masques).length ? { defisMasques: masques } : {});
   }).then((resultat) => {
-    if (hardRefuse) { alert("Le mode hard se joue à 2 joueurs seulement."); return; }
+    if (hardRefuse) { alert(tr("Le mode hard se joue à 2 joueurs seulement.")); return; }
     if (resultat && resultat.committed) { // statistiques : une fois par manche (celui qui lance)
       const seed = (resultat.snapshot && resultat.snapshot.val() || {}).seed || 0;
       noterPartieStats(true, { hot: graineHot(seed), hard: graineHard(seed), express: graineExpress(seed), pj: estModeSoft() });
@@ -1035,7 +1035,7 @@ function quitterPendantCoupure(){
   quitterPartieEnLigne();
   if (code && pseudo) memoriserPartieLocale(code, pseudo); // (pour y revenir une fois le réseau retrouvé)
   allerAccueil();
-  afficherToast("Partie quittée. Pour y revenir : Mode en ligne, « Revenir dans une partie en cours »", 6000);
+  afficherToast(tr("Partie quittée. Pour y revenir : Mode en ligne, « Revenir dans une partie en cours »"), 6000);
 }
 
 function montrerQuitterCoupure(logo){
@@ -1043,7 +1043,7 @@ function montrerQuitterCoupure(logo){
   const bouton = document.createElement("button");
   bouton.type = "button";
   bouton.className = "coupureQuitter";
-  bouton.textContent = "Quitter la partie";
+  bouton.textContent = tr("Quitter la partie");
   bouton.addEventListener("click", quitterPendantCoupure);
   logo.appendChild(bouton);
 }
@@ -1066,7 +1066,7 @@ function majCoupureReseau(connecte){
   logo = document.createElement("div");
   logo.id = "coupureReseau";
   logo.setAttribute("role", "alert");
-  logo.setAttribute("aria-label", "Connexion perdue");
+  logo.setAttribute("aria-label", tr("Connexion perdue"));
   ["pointerdown", "pointerup", "click", "touchstart", "touchend", "mousedown", "mouseup", "contextmenu"].forEach((type) => {
     logo.addEventListener(type, (e) => {
       // (le bouton « Quitter la partie » garde son tap ; il ne passe pas au jeu derrière pour autant)
@@ -1158,7 +1158,7 @@ function revenirAvecLeCode(code, partie, enJeu){
     n.toLocaleLowerCase("fr-FR") === String(memoire.pseudo).toLocaleLowerCase("fr-FR"));
   if (memoire && memoire.code === code && memoire.pseudo &&
       (enJeu ? joueurRetire(partie, memoire.pseudo) : pseudoLibre())) {
-    if (confirm(`Tu as été retiré de la partie ${code}.\n\nY revenir en tant que « ${memoire.pseudo} » ?`)) {
+    if (confirm(tr`Tu as été retiré de la partie ${code}.\n\nY revenir en tant que « ${memoire.pseudo} » ?`)) {
       revenirApresRetrait(code, memoire.pseudo, partie);
     }
     return;
@@ -1172,13 +1172,13 @@ function revenirAvecLeCode(code, partie, enJeu){
 
   if (candidats.length === 0) {
     alert(enJeu
-      ? "Tous les joueurs de cette partie sont connectés : il n'y a pas de place à reprendre."
-      : "Entre ton pseudo pour rejoindre la partie.");
+      ? tr("Tous les joueurs de cette partie sont connectés : il n'y a pas de place à reprendre.")
+      : tr("Entre ton pseudo pour rejoindre la partie."));
     return;
   }
 
   if (candidats.length === 1) {
-    if (confirm(`Reprendre la place de « ${candidats[0]} » dans la partie ${code} ?`)) {
+    if (confirm(tr`Reprendre la place de « ${candidats[0]} » dans la partie ${code} ?`)) {
       reprendrePlaceEnLigne(code, candidats[0], partie);
     }
     return;
@@ -1192,7 +1192,7 @@ const ecranChoixPseudo = document.getElementById("ecranChoixPseudo");
 
 function afficherChoixPseudo(code, noms, partie){
   document.getElementById("texteChoixPseudo").innerText =
-    `Plusieurs joueurs se sont déconnectés de la partie ${code}.\nChoisis ton pseudo pour reprendre ta place.`;
+    tr`Plusieurs joueurs se sont déconnectés de la partie ${code}.\nChoisis ton pseudo pour reprendre ta place.`;
 
   const liste = document.getElementById("listeChoixPseudo");
   liste.innerHTML = "";
@@ -1285,7 +1285,7 @@ function alerteRetire(code, nom){
     memoriserPartieLocale(code, nom);
     majBoutonRevenir();
   }
-  alert("Tu as été retiré de la partie.\n\nPour y revenir : « Revenir dans une partie en cours ».");
+  alert(tr("Tu as été retiré de la partie.\n\nPour y revenir : « Revenir dans une partie en cours »."));
 }
 
 function arreterRetour(){
@@ -1323,7 +1323,7 @@ function quitterPartie(){
   quitterPartieEnLigne();
   if (!code) return;
 
-  retirerJoueur(code, pseudo, `${pseudo} a quitté la partie`).catch(erreurFirebase);
+  retirerJoueur(code, pseudo, tr`${pseudo} a quitté la partie`).catch(erreurFirebase);
 }
 
 // Retire un joueur (soi-même ou un autre).
@@ -1367,7 +1367,7 @@ function retirerJoueur(code, nom, message, essai = 1){
         if (!etat) return; // (partie supprimée entre-temps)
         const dansLaManche = !!etat.demarree && Object.values(etat.joueurs || {}).includes(nom);
         if (dansLaManche) {
-          return { demarree: false, manche: etat.manche || 0, hote, message: message || `${nom} a été retiré de la partie` };
+          return { demarree: false, manche: etat.manche || 0, hote, message: message || tr`${nom} a été retiré de la partie` };
         }
         return etat.hote === hote ? undefined : Object.assign({}, etat, { hote });
       })
@@ -1382,7 +1382,7 @@ function retirerJoueur(code, nom, message, essai = 1){
 // La partie n'existe plus (le dernier joueur est parti, ou elle a été supprimée après une longue inactivité)
 function partieFermee(){
   quitterPartieEnLigne();
-  alert("La partie est terminée : elle a été fermée.");
+  alert(tr("La partie est terminée : elle a été fermée."));
 }
 
 function quitterPartieEnLigne(){
