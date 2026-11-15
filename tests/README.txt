@@ -33,6 +33,15 @@ Spectateur en ligne (10 secondes, Linux / macOS / Windows)
   sans ✕ ni « Lancer », manche qui démarre ou rattrapée en cours de route, aucune écriture dans la partie, aucune
   action possible, départ sans toucher à la liste des joueurs. Lancé aussi par GitHub.
 
+Profil joueur (30 secondes, Linux / macOS / Windows)
+----------------------------------------------------
+  node tests/test_profil.js
+
+  Le profil joueur (js/profil.js) : la fusion entre le téléphone et le profil, les règles Firebase, puis le parcours dans le
+  jeu avec un Firebase et un compte Google simulés : connexion, sauvegarde d'un réglage, récupération sur un second téléphone
+  (déblocages et stickers réunis, réglages repris), reconnexion au lancement, base en panne, déconnexion, suppression.
+  Ne teste PAS la vraie fenêtre Google : à vérifier à la main sur un vrai téléphone (voir PILOTAGE.md). Lancé aussi par GitHub.
+
 Parties complètes du robot (1 à 2 minutes, Linux / macOS / Windows)
 -------------------------------------------------------------------
   node tests/test_partie_robot.js

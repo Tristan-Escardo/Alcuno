@@ -126,6 +126,34 @@
       },
       "$autre": { ".validate": false }
     },
+    "profils": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid",
+        "v": { ".validate": "newData.isNumber()" },
+        "debloque": {
+          "$id": { ".validate": "$id.matches(/^(prestige|galaxie|donjon|kawaii|hard|album|zizi)$/) && newData.val() === true" }
+        },
+        "stickers": {
+          "gagnes": {
+            "$id": { ".validate": "$id.matches(/^(cupcake|chat|lapin|poussin|etoile|licorne|fraise|sushi|macaron|chou|nuage)$/) && newData.val() === true" }
+          },
+          "parties": { ".validate": "newData.isNumber() && newData.val() >= 0" },
+          "fins": {
+            "$i": { ".validate": "$i.matches(/^[0-4]$/) && newData.isNumber()" }
+          },
+          "$autre": { ".validate": false }
+        },
+        "reglages": {
+          "maj": { ".validate": "newData.isNumber()" },
+          "valeurs": {
+            "$cle": { ".validate": "$cle.matches(/^(theme|langue|accessibilite|faces_fermees|sons|volume|musique|volume_musique|rappel_eau|gaucher|feux_artifice|vibrations|ordre_reglages|voix|vitesse_voix|ecran_allume|reglages_vue)$/) && newData.isString() && newData.val().length <= 600" }
+          },
+          "$autre": { ".validate": false }
+        },
+        "$autre": { ".validate": false }
+      }
+    },
     "config_hist": {
       ".read": "auth != null && auth.uid === 'Ex6dzCTIfGhZXPhedzIYzKZWxQm1'",
       ".write": "auth != null && auth.uid === 'Ex6dzCTIfGhZXPhedzIYzKZWxQm1'"

@@ -149,3 +149,39 @@ collectant « aucune donnée personnelle » : il faut au minimum en informer les
 
 ### Infos en temps réel (stats 1.23.0)
 Onglet Public, sous « Portée » : une ligne par appareil qui a le jeu ouvert maintenant (présence rafraîchie depuis moins de 3 min) : état (menu, partie classique, partie en ligne, télé), thème, lieu, fournisseur, appareil, navigateur, système, écran, langue, fuseau et heure locale, version du jeu. Rien de nouveau n'est écrit par les joueurs : la page rapproche `presence/{id}` de `stats/appareils/{id}` (même identifiant). Limites : le thème est celui relevé à l'ouverture du jeu (un changement de thème recharge la page, donc il est à jour) ; une télé castée n'a pas de fiche d'appareil (affichée « Appareil inconnu »).
+
+## Profil joueur : connexion Google (jeu 9.95.0)
+
+Dans les Réglages du jeu, le bloc **Profil joueur** permet de se connecter avec Google (facultatif) pour retrouver sa progression
+sur un autre téléphone : thèmes secrets débloqués, mode hard, album de stickers, zizi-coptère, et les réglages (thème, sons, voix,
+langue, ordre des Réglages…). Sans compte, rien ne change. Code : `js/profil.js` ; test : `node tests/test_profil.js`.
+
+**À faire une seule fois, AVANT de mettre cette version en ligne** (sinon « Se connecter » répond « La connexion Google n'est pas
+encore activée pour le jeu ») :
+
+1. **Console Firebase** → **Authentication** → **Sign-in method** → *Ajouter un fournisseur* → **Google** → Activer
+   (nom public du projet : « Alcuno », e-mail d'assistance : le tien) → Enregistrer.
+2. **Authentication** → **Settings** → **Authorized domains** : ajoute `tristan-escardo.github.io` (et tout autre domaine où le jeu
+   est servi).
+3. **Authentication** → **Settings** → **User actions** : la **création de comptes doit rester autorisée** (si tu l'avais désactivée
+   à l'étape 2 du début de ce document, réactive-la : un joueur qui se connecte pour la première fois crée son compte).
+4. **Realtime Database** → **Règles** : recolle `database.rules.json` (nouvelle section `profils`) → **Publier**. Sans ça, la
+   connexion marche mais rien n'est sauvegardé (« Connecté, mais la sauvegarde n'a pas pu se faire »).
+
+Ce qui est enregistré : `profils/<uid>` (déblocages, stickers, réglages), lisible et modifiable **seulement par son propriétaire**
+(pas même par le compte administrateur depuis le jeu ; tu le vois dans la console Firebase). Ni nom ni e-mail dans la base : ils sont
+dans Authentication → Users. Ne partent jamais : l'éthylotest (poids, sexe), le journal du mouchard, la partie en cours, les codes.
+
+Règles de fusion : déblocages et stickers = l'union des téléphones (rien ne se perd) ; réglages = le dernier modifié gagne, et à la
+première connexion sur un téléphone ce sont ceux du profil qui sont repris (la page se recharge une fois, depuis l'accueil seulement).
+
+« Supprimer mon profil » (visible une fois connecté) efface `profils/<uid>` et le compte dans Authentication ; le téléphone garde ce
+qu'il a. C'est le droit à l'effacement du RGPD : pense à mentionner le profil dans ta politique de confidentialité si tu en as une.
+
+Le profil utilise sa propre appli Firebase (nommée « profil ») : ta connexion administrateur d'Alcuno Stats n'est pas touchée, et le
+reste du jeu continue de parler à la base sans être connecté.
+
+**À vérifier à la main sur de vrais téléphones** (le test automatique simule Google) : la fenêtre Google s'ouvre et revient bien
+dans le jeu sur Android (Chrome, appli installée) et surtout sur **iPhone avec l'appli ajoutée à l'écran d'accueil**, où les
+fenêtres de connexion sont capricieuses. Si ça ne marche pas là, le jeu affiche un message et rien n'est cassé ; dis-le-moi, il
+faudra une autre méthode de connexion pour ce cas.

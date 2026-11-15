@@ -9,7 +9,7 @@
          (Avant : « ?t= » + l'heure, différent à chaque lancement : tout le jeu était retéléchargé à chaque ouverture,
          environ 400 Ko. Maintenant, tant que la version ne change pas, le navigateur se contente de vérifier.) -->
     <script>
-        window.VERSION_FICHIERS = "9.94.4";
+        window.VERSION_FICHIERS = "9.95.0";
         // (ailleurs que sur le vrai site — poste de dev, appli de test — : l'heure en plus, comme avant, pour voir tout de
         // suite un fichier modifié sans changer de version)
         window.ANTI_CACHE = /(^|\.)github\.io$/i.test(location.hostname) ? window.VERSION_FICHIERS : window.VERSION_FICHIERS + "-" + Date.now();
@@ -24,7 +24,7 @@
         // et en parallèle : en bas de la page, ils s'exécutent d'affilée, sans attente entre deux fichiers
         // (aucun bouton ni minuteur ne peut se déclencher avant que tout le jeu soit là).
         window.FICHIERS_JEU = ["script.js", "js/qrcode.js", "js/config-lib.js", "js/reglages.js", "js/en-ligne.js", "js/plateau.js", "js/regles.js", "js/mode-hot.js", "js/zizi-coptere.js", "js/reglages-vue.js",
-                               "js/synchro-en-ligne.js", "js/retour-demarrage.js", "js/tele.js", "js/stats.js", "js/config-distante.js", "js/stickers.js", "js/faq.js", "js/mouchard.js", "js/poisson.js", "js/piano-accueil.js", "js/cocktails.js", "js/extras.js"];
+                               "js/synchro-en-ligne.js", "js/retour-demarrage.js", "js/tele.js", "js/stats.js", "js/config-distante.js", "js/stickers.js", "js/faq.js", "js/mouchard.js", "js/poisson.js", "js/piano-accueil.js", "js/cocktails.js", "js/extras.js", "js/profil.js"];
         // Langue (js/langue.js) : en tout premier ; les textes anglais (js/en.js) seulement si le jeu est en anglais
         window.FICHIERS_JEU.unshift("js/langue.js");
         try { if (localStorage.getItem("alcuno_langue") === "en") window.FICHIERS_JEU.unshift("js/en.js"); } catch (e) {}
@@ -505,6 +505,18 @@
                     <span class="pastilleHorsLigne" id="pastilleHorsLigne" aria-hidden="true"></span>
                 </div>
 
+                <!-- Profil joueur : connexion Google facultative, pour retrouver sa progression sur un autre téléphone (js/profil.js) -->
+                <div class="blocReglage" data-cle="compte">
+                    <div class="optionReglage optionAction">
+                        <span class="optionTexte">
+                            <span class="optionTitre">Profil joueur</span>
+                            <span class="optionNote" id="texteProfil" aria-live="polite">Connecte-toi avec Google pour retrouver ta progression sur un autre téléphone.</span>
+                        </span>
+                        <button type="button" id="btnProfilConnexion">Se connecter</button>
+                    </div>
+                    <p class="profilSupprimer" id="ligneProfilSupprimer" hidden><button type="button" id="btnProfilSupprimer">Supprimer mon profil</button></p>
+                </div>
+
                 <!-- Mode télé : pour une télé que le jeu n'a pas reconnue toute seule (voir le début de cette page) -->
                 <button type="button" class="optionReglage optionLien" id="btnAfficherEcranTele" data-cle="ecran-tele">
                     <span class="optionTexte">
@@ -802,6 +814,9 @@
             messagingSenderId: "481896309098",
             appId: "1:481896309098:web:c84fe2d2ded1df80810513"
         };
+        // (pour js/profil.js : le profil joueur a sa propre appli Firebase, avec l'authentification en plus)
+        window.ADRESSE_FIREBASE = ADRESSE_FIREBASE;
+        window.CONFIG_FIREBASE = firebaseConfig;
 
         let chargement = null;
         function chargerFirebase(){
