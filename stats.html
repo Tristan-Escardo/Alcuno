@@ -288,6 +288,7 @@
             <input id="porteEmail" name="username" type="email" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="E-mail">
             <input id="porteMdp" name="password" type="password" autocomplete="current-password" placeholder="Mot de passe">
             <button type="submit">Entrer</button>
+            <button type="button" id="porteGoogle" style="margin-top:10px;opacity:.85">Se connecter avec Google</button>
             <div id="erreurPorte"></div>
         </form>
     </div>
@@ -816,7 +817,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
         import { getDatabase, ref, onValue, get, update, set, query, orderByKey, limitToLast, remove } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
-        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
         // L'accès se fait avec le compte administrateur Firebase (e-mail + mot de passe) : les règles de la base ne laissent lire
         // les statistiques, la santé et la présence qu'à ce compte. La session est gardée par Firebase : on ne retape rien ensuite.
@@ -831,7 +832,7 @@
         });
         const authPorte = getAuth(app);
         // Version de la page de stats (à part de celle du jeu : +0.0.1 à chaque modification de cette page)
-        const VERSION_STATS = "1.24.0";
+        const VERSION_STATS = "1.24.1";
         document.getElementById("versionStats").textContent = VERSION_STATS;
         document.getElementById("versionStats2").textContent = VERSION_STATS;
         document.getElementById("versionStats3").textContent = VERSION_STATS;
@@ -953,6 +954,16 @@
             }
         });
 
+
+        // Compte administrateur devenu « Google » : même identifiant Firebase (uid), donc mêmes droits qu'avec l'e-mail
+        document.getElementById("porteGoogle").addEventListener("click", async () => {
+            document.getElementById("erreurPorte").textContent = "";
+            try { await signInWithPopup(authPorte, new GoogleAuthProvider()); }
+            catch (err) {
+                const m = { "auth/popup-closed-by-user": "Fenêtre Google fermée.", "auth/popup-blocked": "Fenêtre bloquée par le navigateur : autorise-la.", "auth/unauthorized-domain": "Ce site n'est pas dans Firebase → Authentication → Paramètres → Domaines autorisés.", "auth/operation-not-allowed": "La connexion Google n'est pas activée dans Firebase." };
+                document.getElementById("erreurPorte").textContent = m[err.code] || ("Connexion refusée : " + (err.code || err.message));
+            }
+        });
 
         // ===== Données =====
         const nombre = (n) => n.toLocaleString("fr-FR");
