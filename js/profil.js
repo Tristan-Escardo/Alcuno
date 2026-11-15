@@ -15,6 +15,13 @@
 // que si ce téléphone est déjà connecté à un profil, ou à l'ouverture des Réglages (pour que « Se connecter » ouvre la
 // fenêtre Google tout de suite : un navigateur bloque une fenêtre ouverte trop longtemps après le tap).
 //
+// Deux façons de se connecter :
+//   - dans un navigateur : la fenêtre Google de Firebase (signInWithPopup) ;
+//   - dans l'appli installée (écran d'accueil de l'iPhone surtout), où cette fenêtre ne s'ouvre jamais et ne répond jamais :
+//     on va sur la page Google, qui revient dans le jeu avec un jeton dans l'adresse (#id_token=…), donné à Firebase
+//     (signInWithCredential). C'est aussi le secours quand la fenêtre est bloquée ou ne donne rien au bout de quelques secondes.
+//     L'adresse du jeu doit être dans les « URI de redirection autorisés » du client OAuth (Google Cloud Console, voir PILOTAGE.md).
+//
 // L'appli Firebase du profil a son propre nom (« profil ») : sa connexion n'est pas celle de la page des statistiques
 // (stats.html, compte administrateur), et le reste du jeu continue de parler à la base sans être connecté.
 // =============================================================================================
@@ -111,6 +118,11 @@ if (typeof document !== "undefined" && !document.documentElement.classList.conta
   const CLE_PROFIL = "alcuno_profil"; // { uid, nom, maj, reglages } : le compte de ce téléphone et ce qu'il a vu à la dernière synchronisation
   const CLE_RECHARGE = "alcuno_profil_recharge"; // (sessionStorage : heure du dernier rechargement fait pour appliquer des réglages)
   const DELAI_LECTURE = 12000;
+  // Client OAuth « Web client (auto created by Google Service) » du projet Firebase alcuno (public : il est dans l'adresse de la page Google)
+  const ID_CLIENT_GOOGLE = "481896309098-0a4v9j6saqfav3d9maej4qedbi0tsjr8.apps.googleusercontent.com";
+  const CLE_ALLER = "alcuno_profil_aller"; // { etat, nonce, quand } : départ vers la page Google, vérifié au retour
+  const DELAI_FENETRE = 8000;              // (fenêtre Google sans réponse : le bouton est rendu, le tap suivant passe par la page Google)
+  const DUREE_ALLER = 15 * 60000;
   const note = document.getElementById("texteProfil");
   const btnConnexion = document.getElementById("btnProfilConnexion");
   const btnSupprimer = document.getElementById("btnProfilSupprimer");
@@ -125,6 +137,8 @@ if (typeof document !== "undefined" && !document.documentElement.classList.conta
   let occupe = false;          // (fenêtre Google ouverte, suppression en cours)
   let etatTexte = "";          // message à la place de la note habituelle (erreur, « Sauvegarde… »)
   let dernierInstantane = null;
+  let sansFenetre = false;     // (la fenêtre Google n'a rien donné ici : on passe par la page Google)
+  let essai = 0;
 
   const lireEtat = () => {
     try { const e = JSON.parse(localStorage.getItem(CLE_PROFIL) || "null"); return e && typeof e === "object" && typeof e.uid === "string" ? e : null; } catch (e) { return null; }
@@ -214,7 +228,7 @@ if (typeof document !== "undefined" && !document.documentElement.classList.conta
       .then(([a, d, au]) => {
         const appli = a.initializeApp(config, "profil");
         fb = { ref: d.ref, get: d.get, set: d.set, remove: d.remove, GoogleAuthProvider: au.GoogleAuthProvider, signInWithPopup: au.signInWithPopup,
-               signOut: au.signOut, deleteUser: au.deleteUser };
+               signInWithCredential: au.signInWithCredential, signOut: au.signOut, deleteUser: au.deleteUser };
         base = d.getDatabase(appli);
         auth = au.getAuth(appli);
         au.onAuthStateChanged(auth, surChangementDeCompte);
@@ -300,16 +314,91 @@ if (typeof document !== "undefined" && !document.documentElement.classList.conta
     if (code === "auth/operation-not-allowed" || code === "auth/unauthorized-domain" || code === "auth/admin-restricted-operation") return tr("La connexion Google n'est pas encore activée pour le jeu.");
     return tr("Connexion impossible pour le moment. Réessaie plus tard.");
   }
+  const appliInstallee = () => { try { return navigator.standalone === true || window.matchMedia("(display-mode: standalone)").matches; } catch (e) { return false; } };
+  const hasard = () => Array.from(crypto.getRandomValues(new Uint32Array(4)), (n) => n.toString(16).padStart(8, "0")).join("");
+  // (l'adresse du jeu sans « index.html » ni paramètres : celle qui est déclarée dans la console Google)
+  const adresseRetour = () => location.origin + location.pathname.replace(/index\.html$/, "");
+
+  // Connexion sans fenêtre : on quitte le jeu pour la page Google, qui y revient (voir retourDeGoogle)
+  function allerChezGoogle(){
+    let enPartie = false;
+    try { enPartie = !!(partieLancee || codePartieActuel); } catch (e) {}
+    // (la page est rechargée au retour : jamais pendant une partie ni dans une salle d'attente)
+    if (enPartie) { dire(tr("Termine ta partie, puis connecte-toi depuis l'accueil.")); return; }
+    if (!navigator.onLine) { dire(tr("Pas de connexion internet : réessaie plus tard.")); return; }
+    const aller = { etat: hasard(), nonce: hasard(), quand: Date.now() };
+    try {
+      localStorage.setItem(CLE_ALLER, JSON.stringify(aller));
+      if (localStorage.getItem(CLE_ALLER) === null) throw new Error("stockage");
+    } catch (e) { dire(tr("Connexion impossible ici : ouvre le jeu dans ton navigateur (Chrome, Safari), puis réessaie.")); return; }
+    try { sessionStorage.setItem(CLE_ROUVRIR_REGLAGES, String(ecranReglages.scrollTop)); } catch (e) {} // (au retour, les Réglages se rouvrent au même endroit)
+    occupe = true;
+    dire(tr("Connexion…"));
+    const adresse = "https://accounts.google.com/o/oauth2/v2/auth?" + new URLSearchParams({
+      client_id: ID_CLIENT_GOOGLE, redirect_uri: adresseRetour(), response_type: "id_token", scope: "openid email profile",
+      nonce: aller.nonce, state: aller.etat, prompt: "select_account" });
+    // (page gardée en mémoire par le téléphone puis réaffichée par « précédent » : le bouton n'y reste pas bloqué)
+    window.addEventListener("pageshow", (e) => { if (e.persisted) { occupe = false; dire(""); } }, { once: true });
+    // (rechargerPage vide d'abord l'historique du jeu : au retour, « précédent » ne ramène pas sur la page Google)
+    if (typeof rechargerPage === "function") rechargerPage(adresse); else location.assign(adresse);
+  }
+
+  // Au lancement : la page Google vient de nous renvoyer ici (le script du <head> de index.html a retiré le jeton de l'adresse)
+  function retourDeGoogle(){
+    const brut = window.RETOUR_GOOGLE;
+    if (!brut) return false;
+    window.RETOUR_GOOGLE = "";
+    const p = new URLSearchParams(brut);
+    let aller = null;
+    try { aller = JSON.parse(localStorage.getItem(CLE_ALLER) || "null"); localStorage.removeItem(CLE_ALLER); } catch (e) {}
+    // (retour qui ne répond pas à un départ de CE téléphone, ou trop vieux : on n'en fait rien)
+    if (!aller || typeof aller !== "object" || !aller.etat || p.get("state") !== aller.etat || Date.now() - Number(aller.quand) > DUREE_ALLER) return false;
+    const jeton = p.get("id_token");
+    if (!jeton) {
+      // (access_denied : le joueur a refusé ou fermé la page Google, rien à signaler)
+      if (p.get("error") && p.get("error") !== "access_denied") dire(messageErreur(null));
+      return false;
+    }
+    // Le jeton doit porter le nombre tiré au départ : un jeton fabriqué ou rejoué ailleurs est refusé (Firebase vérifie le reste)
+    let nonce = "";
+    try { nonce = JSON.parse(atob(jeton.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))).nonce; } catch (e) {}
+    if (nonce !== aller.nonce) { dire(messageErreur(null)); return false; }
+    occupe = true;
+    connexionVoulue = true;
+    dire(tr("Connexion…"));
+    avecDelai(charger().then(() => fb.signInWithCredential(auth, fb.GoogleAuthProvider.credential(jeton))), 2 * DELAI_LECTURE)
+      .then(() => { occupe = false; etatTexte = ""; majBloc(); })
+      .catch((e) => { occupe = false; connexionVoulue = false; dire(messageErreur(e)); });
+    return true;
+  }
+
   function connecter(){
     if (occupe) return;
+    // (appli installée : la fenêtre de Firebase ne s'y ouvre pas et ne répond jamais, le bouton restait sur « Connexion… »)
+    if (sansFenetre || appliInstallee()) { allerChezGoogle(); return; }
     occupe = true;
     dire(tr("Connexion…"));
     const ouvrir = () => fb.signInWithPopup(auth, new fb.GoogleAuthProvider());
     // (authentification déjà téléchargée, cas normal : la fenêtre Google s'ouvre dans le tap lui-même)
     connexionVoulue = true;
+    const moi = ++essai;
+    // Fenêtre qui ne s'ouvre pas ou ne répond pas : on ne reste jamais bloqué, le tap suivant passe par la page Google
+    setTimeout(() => {
+      if (moi !== essai || utilisateur) return;
+      occupe = false; sansFenetre = true;
+      dire(tr("Si la fenêtre Google ne s'est pas ouverte, appuie de nouveau sur le bouton."));
+    }, DELAI_FENETRE);
     (auth ? ouvrir() : charger().then(ouvrir))
-      .then(() => { occupe = false; etatTexte = ""; majBloc(); })
-      .catch((e) => { occupe = false; connexionVoulue = false; dire(messageErreur(e)); });
+      .then(() => { if (moi === essai) essai++; occupe = false; etatTexte = ""; majBloc(); })
+      .catch((e) => {
+        if (moi !== essai) return; // (réponse d'une ancienne tentative : elle ne dérange pas la nouvelle)
+        essai++;
+        occupe = false; connexionVoulue = false;
+        const code = (e && e.code) || "";
+        // (fenêtre bloquée ou impossible dans ce navigateur : on passe tout de suite par la page Google)
+        if (code === "auth/popup-blocked" || code === "auth/operation-not-supported-in-this-environment") { sansFenetre = true; allerChezGoogle(); return; }
+        dire(messageErreur(e));
+      });
   }
   function deconnecter(){
     if (occupe || !auth) return;
@@ -346,8 +435,9 @@ if (typeof document !== "undefined" && !document.documentElement.classList.conta
   setInterval(verifier, 45000);
 
   majBloc();
+  if (retourDeGoogle()) { /* (la connexion est en route) */ }
   // Téléphone déjà lié à un profil : on s'y reconnecte tout seul (un peu après le lancement : le jeu d'abord)
-  if (lireEtat()) setTimeout(precharger, 1500);
+  else if (lireEtat()) setTimeout(precharger, 1500);
   // (rouverts après un rechargement, les Réglages n'ont pas reçu de tap : l'authentification est préparée quand même)
   else if (document.documentElement.classList.contains("rouvrir-reglages")) setTimeout(precharger, 1500);
 })();

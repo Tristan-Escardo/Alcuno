@@ -167,6 +167,11 @@ encore activée pour le jeu ») :
    à l'étape 2 du début de ce document, réactive-la : un joueur qui se connecte pour la première fois crée son compte).
 4. **Realtime Database** → **Règles** : recolle `database.rules.json` (nouvelle section `profils`) → **Publier**. Sans ça, la
    connexion marche mais rien n'est sauvegardé (« Connecté, mais la sauvegarde n'a pas pu se faire »).
+5. **Google Cloud Console** (console.cloud.google.com, projet *alcuno*) → **API et services** → **Identifiants** → *ID clients
+   OAuth 2.0* → **Web client (auto created by Google Service)** → **URI de redirection autorisés** → *Ajouter un URI* →
+   `https://tristan-escardo.github.io/Alcuno/` (exactement, avec la barre finale) → Enregistrer. Ne retire pas l'URI
+   `https://alcuno.firebaseapp.com/__/auth/handler` déjà présent. Sans ça, dans l'appli installée, la page Google répond
+   « Accès bloqué : redirect_uri_mismatch ». Si le jeu est servi à une autre adresse, ajoute-la aussi.
 
 Ce qui est enregistré : `profils/<uid>` (déblocages, stickers, réglages), lisible et modifiable **seulement par son propriétaire**
 (pas même par le compte administrateur depuis le jeu ; tu le vois dans la console Firebase). Ni nom ni e-mail dans la base : ils sont
@@ -181,7 +186,14 @@ qu'il a. C'est le droit à l'effacement du RGPD : pense à mentionner le profil 
 Le profil utilise sa propre appli Firebase (nommée « profil ») : ta connexion administrateur d'Alcuno Stats n'est pas touchée, et le
 reste du jeu continue de parler à la base sans être connecté.
 
-**À vérifier à la main sur de vrais téléphones** (le test automatique simule Google) : la fenêtre Google s'ouvre et revient bien
-dans le jeu sur Android (Chrome, appli installée) et surtout sur **iPhone avec l'appli ajoutée à l'écran d'accueil**, où les
-fenêtres de connexion sont capricieuses. Si ça ne marche pas là, le jeu affiche un message et rien n'est cassé ; dis-le-moi, il
-faudra une autre méthode de connexion pour ce cas.
+**Deux façons de se connecter** (jeu 9.95.2) :
+- dans un navigateur : la fenêtre Google de Firebase ;
+- dans l'**appli installée** (écran d'accueil de l'iPhone surtout), où cette fenêtre ne s'ouvre jamais et ne répond jamais (le
+  bouton restait sur « Connexion… ») : le jeu va sur la page Google, qui revient dans le jeu déjà connecté, Réglages rouverts.
+  C'est l'étape 5 ci-dessus qui l'autorise. Pas pendant une partie (la page est rechargée au retour) : « Termine ta partie, puis
+  connecte-toi depuis l'accueil ».
+- la page Google sert aussi de secours : fenêtre bloquée par le navigateur, ou sans réponse au bout de 8 s (le bouton est rendu,
+  le tap suivant passe par la page Google).
+
+**À vérifier à la main sur de vrais téléphones** (le test automatique simule Google) : iPhone avec l'appli ajoutée à l'écran
+d'accueil, iPhone dans Safari, Android (Chrome et appli installée).

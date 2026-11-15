@@ -872,6 +872,8 @@ window.TEXTES_EN = {
 "Connecté, mais la sauvegarde n'a pas pu se faire. Elle sera retentée.": "Signed in, but the backup couldn't be done. It will be retried.",
 "Fenêtre bloquée par le navigateur : autorise les fenêtres pop-up, puis réessaie.": "Window blocked by the browser: allow pop-ups, then try again.",
 "Pas de connexion internet : réessaie plus tard.": "No internet connection: try again later.",
+"Termine ta partie, puis connecte-toi depuis l'accueil.": "Finish your game, then sign in from the home screen.",
+"Si la fenêtre Google ne s'est pas ouverte, appuie de nouveau sur le bouton.": "If the Google window didn't open, tap the button again.",
 "Connexion impossible ici : ouvre le jeu dans ton navigateur (Chrome, Safari), puis réessaie.": "Can't sign in here: open the game in your browser (Chrome, Safari), then try again.",
 "Connexion impossible pour le moment. Réessaie plus tard.": "Can't sign in right now. Try again later.",
 "Supprimer ton profil ?\n\nTa progression sauvegardée en ligne et ton compte Alcuno sont effacés. Ce téléphone garde ce qu'il a déjà.": "Delete your profile?\n\nYour progress saved online and your Alcuno account are erased. This phone keeps what it already has.",

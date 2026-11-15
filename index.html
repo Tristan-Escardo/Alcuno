@@ -9,7 +9,7 @@
          (Avant : « ?t= » + l'heure, différent à chaque lancement : tout le jeu était retéléchargé à chaque ouverture,
          environ 400 Ko. Maintenant, tant que la version ne change pas, le navigateur se contente de vérifier.) -->
     <script>
-        window.VERSION_FICHIERS = "9.95.1";
+        window.VERSION_FICHIERS = "9.95.2";
         // (ailleurs que sur le vrai site — poste de dev, appli de test — : l'heure en plus, comme avant, pour voir tout de
         // suite un fichier modifié sans changer de version)
         window.ANTI_CACHE = /(^|\.)github\.io$/i.test(location.hostname) ? window.VERSION_FICHIERS : window.VERSION_FICHIERS + "-" + Date.now();
@@ -104,6 +104,15 @@
         document.write('<meta name="theme-color" content="' + (couleursBarre[theme] || couleursBarre.bordeaux) + '">');
         // iPhone : page rechargée après un changement de thème (voir rafraichirBarreIphone dans script.js) :
         // on rouvre les Réglages dès le premier affichage
+        // Retour de la page de connexion Google (profil joueur, js/profil.js) : le jeton est retiré de l'adresse tout de suite,
+        // et les Réglages se rouvrent même si le téléphone a oublié qu'ils étaient ouverts
+        try {
+            if (/(^#|&)(id_token|error)=/.test(location.hash) && /(^#|&)state=/.test(location.hash)) {
+                window.RETOUR_GOOGLE = location.hash.slice(1);
+                history.replaceState(null, "", location.pathname + location.search);
+                if (sessionStorage.getItem("alcuno_rouvrir_reglages") === null) sessionStorage.setItem("alcuno_rouvrir_reglages", "0");
+            }
+        } catch (e) {}
         try { if (sessionStorage.getItem("alcuno_rouvrir_reglages") !== null) document.documentElement.classList.add("rouvrir-reglages"); } catch (e) {}
         // Les Réglages rouverts restent invisibles jusqu'à ce que leur mise en page (js/reglages-vue.js) soit prête, puis apparaissent en
         // fondu : sans ça, on voyait la liste brute un instant, puis un saut vers les tuiles. Filet de sécurité : au bout de 2,5 s, on les montre quoi qu'il arrive.

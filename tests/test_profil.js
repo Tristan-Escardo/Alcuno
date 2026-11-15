@@ -1,6 +1,7 @@
 // Profil joueur (js/profil.js) : la fusion téléphone / profil (sans navigateur), les règles Firebase, puis le parcours complet
 // dans le jeu avec un Firebase simulé (pas de réseau, pas de vrai compte Google) : connexion, sauvegarde, récupération sur un
-// second téléphone, reconnexion au lancement, déconnexion, suppression.
+// second téléphone, reconnexion au lancement, déconnexion, suppression ; et la connexion sans fenêtre (appli installée, fenêtre
+// bloquée ou muette) : aller sur la page Google (simulée), retour dans le jeu avec le jeton.
 //   node tests/test_profil.js
 const http = require("http");
 const fs = require("fs");
@@ -109,8 +110,16 @@ let courant = lireCompte();
 const prevenir = () => ecouteurs.forEach((f) => f(courant));
 export const getAuth = (appli) => ({ appli: appli && appli.nom });
 export const onAuthStateChanged = (a, f) => { window.__appliAuth = a.appli; ecouteurs.push(f); setTimeout(() => f(courant), 0); };
-export class GoogleAuthProvider {}
+export class GoogleAuthProvider { static credential(jeton){ return { jeton }; } }
+export const signInWithCredential = async (a, c) => {
+  localStorage.setItem("faux_jeton", c.jeton);
+  courant = { uid: "u1", displayName: "Tom", email: "tom@example.com" };
+  localStorage.setItem("faux_compte", JSON.stringify(courant)); prevenir();
+  return { user: courant };
+};
 export const signInWithPopup = async () => {
+  localStorage.setItem("faux_popup", "1");
+  if (window.__erreurPopup === "muette") return new Promise(() => {}); // (fenêtre qui ne s'ouvre pas et ne répond jamais : appli installée sur iPhone)
   if (window.__erreurPopup) { const e = new Error("x"); e.code = window.__erreurPopup; throw e; }
   courant = { uid: "u1", displayName: "Tom", email: "tom@example.com" };
   localStorage.setItem("faux_compte", JSON.stringify(courant)); prevenir();
@@ -127,9 +136,21 @@ export const deleteUser = async () => { window.__compteEfface = true; courant = 
   const nav = await chromium.launch(exe);
   const erreurs = [];
   // Un « téléphone » : son propre stockage local, rempli avant le premier lancement
-  const telephone = async (stockage) => {
+  const racine = url.replace(/index\.html.*$/, "");
+  const telephone = async (stockage, installee) => {
     const ctx = await nav.newContext({ viewport: { width: 390, height: 780 }, hasTouch: true, isMobile: true });
     const page = await ctx.newPage();
+    // La page Google (simulée) : elle renvoie dans le jeu, avec un jeton (« ok »), un refus du joueur (« refus »), un jeton qui ne porte
+    // pas le bon nombre (« faux ») ou une réponse à un autre départ (« autre »)
+    const google = { demandes: [], reponse: "refus" };
+    const jeton = (nonce) => "e30." + Buffer.from(JSON.stringify({ sub: "u1", nonce })).toString("base64url") + ".x";
+    await page.route("https://accounts.google.com/**", (r) => {
+      const u = new URL(r.request().url()), e = u.searchParams.get("state"), n = u.searchParams.get("nonce");
+      google.demandes.push(u);
+      const suite = { refus: `error=access_denied&state=${e}`, ok: `state=${e}&id_token=${jeton(n)}&authuser=0`, faux: `state=${e}&id_token=${jeton("autre")}`, autre: `state=0000&id_token=${jeton(n)}` }[google.reponse];
+      r.fulfill({ contentType: "text/html", body: `<script>location.replace(${JSON.stringify(url + "#" + suite)})</script>` });
+    });
+    if (installee) await page.addInitScript(() => Object.defineProperty(Navigator.prototype, "standalone", { get: () => true, configurable: true }));
     page.on("pageerror", (e) => erreurs.push(e.message));
     page.on("dialog", (d) => d.accept());
     await page.route("**/firebase-app.js", (r) => r.fulfill({ contentType: "text/javascript", body: FAUX_APP }));
@@ -142,7 +163,7 @@ export const deleteUser = async () => { window.__compteEfface = true; courant = 
       Object.keys(s).forEach((k) => localStorage.setItem(k, s[k]));
     }, stockage);
     await page.goto(url); await page.waitForTimeout(1500);
-    return { ctx, page };
+    return { ctx, page, google };
   };
   const etat = (page) => page.evaluate(() => ({
     bouton: document.getElementById("btnProfilConnexion").textContent.trim(), google: document.getElementById("btnProfilConnexion").classList.contains("btnGoogle"), note: document.getElementById("texteProfil").textContent,
@@ -150,7 +171,9 @@ export const deleteUser = async () => { window.__compteEfface = true; courant = 
     profil: (JSON.parse(localStorage.getItem("faux_arbre") || "{}").profils || {}).u1 || null,
     reglagesOuverts: getComputedStyle(document.getElementById("ecranReglages")).display !== "none",
     theme: document.documentElement.dataset.theme || "", authCharge: !!window.__authCharge, appliAuth: window.__appliAuth || "",
-    ecritures: (window.__ecritures || []).map((e) => e.chemin + "@" + e.appli).join() }));
+    ecritures: (window.__ecritures || []).map((e) => e.chemin + "@" + e.appli).join(),
+    adresse: location.href, aller: localStorage.getItem("alcuno_profil_aller"), jeton: localStorage.getItem("faux_jeton"), popup: localStorage.getItem("faux_popup"),
+    desactive: document.getElementById("btnProfilConnexion").disabled }));
 
   // --- Téléphone A : Prestige débloqué, album découvert, 2 stickers, thème noir ---
   const A = await telephone({ alcuno_theme_prestige: "1", alcuno_album_decouvert: "1", alcuno_theme: "noir",
@@ -163,11 +186,16 @@ export const deleteUser = async () => { window.__compteEfface = true; courant = 
   verifier(visible && a.google && a.bouton === "Se connecter avec Google" && !a.supprimer && a.authCharge && a.appliAuth === "profil" && a.profil === null,
     `Réglages : bloc « Profil joueur » visible, déconnecté, authentification prête dans sa propre appli (${a.appliAuth})`);
 
-  // fenêtre bloquée par le navigateur : message, toujours déconnecté
+  // fenêtre bloquée par le navigateur : on passe par la page Google ; le joueur y renonce : retour dans les Réglages, rien à signaler
   await A.page.evaluate(() => { window.__erreurPopup = "auth/popup-blocked"; });
-  await A.page.click("#btnProfilConnexion"); await A.page.waitForTimeout(400);
+  await A.page.click("#btnProfilConnexion"); await A.page.waitForTimeout(3200);
   a = await etat(A.page);
-  verifier(/pop-up/.test(a.note) && a.bouton === "Se connecter avec Google" && a.lie === null, `fenêtre Google bloquée : message clair (${a.note})`);
+  const dA = A.google.demandes[0];
+  verifier(A.google.demandes.length === 1 && dA.searchParams.get("redirect_uri") === racine && dA.searchParams.get("response_type") === "id_token" && /openid/.test(dA.searchParams.get("scope")) &&
+    dA.searchParams.get("nonce").length >= 32 && dA.searchParams.get("state").length >= 32 && /apps\.googleusercontent\.com$/.test(dA.searchParams.get("client_id")),
+    `fenêtre Google bloquée : on va sur la page Google, qui doit revenir à l'adresse du jeu (${dA && dA.searchParams.get("redirect_uri")})`);
+  verifier(/^Connecte-toi avec Google/.test(a.note) && a.bouton === "Se connecter avec Google" && !a.desactive && a.lie === null && a.aller === null && a.reglagesOuverts && !/#|access_denied/.test(a.adresse),
+    `page Google quittée sans se connecter : retour dans les Réglages, rien à signaler, adresse propre (${a.note})`);
   // fenêtre fermée par le joueur : pas de message d'erreur
   await A.page.evaluate(() => { window.__erreurPopup = "auth/popup-closed-by-user"; });
   await A.page.click("#btnProfilConnexion"); await A.page.waitForTimeout(400);
@@ -200,7 +228,7 @@ export const deleteUser = async () => { window.__compteEfface = true; courant = 
   // --- Téléphone B (la base contient le profil de A) : Star Wars débloqué, 1 sticker, thème vert ---
   const B = await telephone({ faux_arbre: arbreA, alcuno_theme_galaxie: "1", alcuno_theme: "vert", alcuno_stickers: JSON.stringify({ gagnes: ["lapin"], parties: 1, fins: [300] }) });
   await B.page.click("#btnReglages"); await B.page.waitForTimeout(700);
-  await B.page.click("#btnProfilConnexion"); await B.page.waitForTimeout(3500); // (les réglages du profil sont repris : la page se recharge, les Réglages se rouvrent)
+  await B.page.click("#btnProfilConnexion"); await B.page.waitForTimeout(4500); // (les réglages du profil sont repris : la page se recharge, les Réglages se rouvrent)
   let b = await etat(B.page);
   const localB = await B.page.evaluate(() => ({ prestige: localStorage.getItem("alcuno_theme_prestige"), galaxie: localStorage.getItem("alcuno_theme_galaxie"), album: localStorage.getItem("alcuno_album_decouvert"),
     stickers: JSON.parse(localStorage.getItem("alcuno_stickers")), vibrations: localStorage.getItem("alcuno_vibrations"),
@@ -238,6 +266,49 @@ export const deleteUser = async () => { window.__compteEfface = true; courant = 
   verifier(b.profil === null && b.bouton === "Se connecter avec Google" && b.lie === null && await B.page.evaluate(() => window.__compteEfface === true && localStorage.getItem("alcuno_theme_galaxie") === "1"),
     "suppression : profil et compte effacés, le téléphone garde ses déblocages");
   await B.ctx.close();
+
+  // --- Appli installée (écran d'accueil de l'iPhone) : jamais la fenêtre, toujours la page Google ---
+  const D = await telephone({ alcuno_theme_prestige: "1" }, true);
+  await D.page.click("#btnReglages"); await D.page.waitForTimeout(700);
+  // en partie : on ne quitte pas le jeu
+  await D.page.evaluate(() => { partieLancee = true; });
+  await D.page.click("#btnProfilConnexion"); await D.page.waitForTimeout(400);
+  let d = await etat(D.page);
+  verifier(/Termine ta partie/.test(d.note) && !d.desactive && D.google.demandes.length === 0, `appli installée, en partie : on ne part pas chez Google (${d.note})`);
+  await D.page.evaluate(() => { partieLancee = false; });
+  // jeton qui ne porte pas le nombre tiré au départ : refusé
+  D.google.reponse = "faux";
+  await D.page.click("#btnProfilConnexion"); await D.page.waitForTimeout(3200);
+  d = await etat(D.page);
+  verifier(D.google.demandes.length === 1 && d.bouton === "Se connecter avec Google" && d.jeton === null && /Connexion impossible/.test(d.note) && !d.desactive && !/id_token/.test(d.adresse), `jeton qui ne répond pas à ce départ : refusé (${d.note})`);
+  // réponse à un autre départ : ignorée
+  D.google.reponse = "autre";
+  await D.page.click("#btnProfilConnexion"); await D.page.waitForTimeout(3200);
+  d = await etat(D.page);
+  verifier(d.bouton === "Se connecter avec Google" && d.jeton === null && d.aller === null && !/id_token/.test(d.adresse), "réponse à un autre départ : ignorée, le jeton ne reste pas dans l'adresse");
+  // connexion : aller sur la page Google, retour dans le jeu, connecté, Réglages rouverts
+  D.google.reponse = "ok";
+  await D.page.click("#btnProfilConnexion"); await D.page.waitForTimeout(3500);
+  d = await etat(D.page);
+  verifier(d.bouton === "Se déconnecter" && /Tom/.test(d.note) && d.popup === null && d.jeton && d.aller === null && d.reglagesOuverts && !/#/.test(d.adresse) && d.profil && d.profil.debloque.prestige === true && JSON.parse(d.lie).uid === "u1",
+    `appli installée : connexion par la page Google sans aucune fenêtre, profil créé, Réglages rouverts (${d.note})`);
+  await D.ctx.close();
+
+  // --- Navigateur où la fenêtre Google ne répond jamais : le bouton est rendu, le tap suivant passe par la page Google ---
+  const E = await telephone({});
+  await E.page.click("#btnReglages"); await E.page.waitForTimeout(700);
+  await E.page.evaluate(() => { window.__erreurPopup = "muette"; });
+  await E.page.click("#btnProfilConnexion"); await E.page.waitForTimeout(600);
+  let e5 = await etat(E.page);
+  verifier(/Connexion…/.test(e5.note) && e5.desactive, "fenêtre muette : « Connexion… » pendant qu'on l'attend");
+  await E.page.waitForTimeout(8000);
+  e5 = await etat(E.page);
+  verifier(/appuie de nouveau/.test(e5.note) && !e5.desactive && E.google.demandes.length === 0, `fenêtre muette : au bout de 8 s le bouton est rendu (${e5.note})`);
+  E.google.reponse = "ok";
+  await E.page.click("#btnProfilConnexion"); await E.page.waitForTimeout(3500);
+  e5 = await etat(E.page);
+  verifier(E.google.demandes.length === 1 && e5.bouton === "Se déconnecter" && /Tom/.test(e5.note), `fenêtre muette : le tap suivant connecte par la page Google (${e5.note})`);
+  await E.ctx.close();
 
   // --- En anglais : le bloc est traduit ---
   const C = await telephone({ alcuno_langue: "en" });
