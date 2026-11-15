@@ -244,7 +244,7 @@ try {
 // Affichée en bas de l'accueil. Enregistrée dans Firebase sous forme de nombre
 // (les règles l'exigent) : "8.3.2" => 80302, pour pouvoir comparer les versions.
 // Numérotation : +0.0.1 à chaque mise en ligne, et après x.y.9 on passe à x.(y+1).0 (ex. 9.5.9 => 9.6.0)
-const VERSION_AFFICHEE = "9.95.14";
+const VERSION_AFFICHEE = "9.95.15";
 // Appli de test (adresse autre que GitHub Pages et que le poste de dev, ou « ?modetest ») : même jeu, même Firebase, mais
 // elle n'envoie ni statistiques ni plantages (les chiffres restent ceux de la vraie appli) et affiche « TEST » dans les Réglages
 // Un navigateur piloté par un programme (tests automatiques de Claude : navigator.webdriver) est aussi en mode test, pour que
@@ -383,3 +383,7 @@ function fermerPage(page){
 }
 
 // #endregion
+
+// Accueil : un glissement du doigt ne fait plus défiler ni rebondir la page derrière (iPhone ; voir #choixMode dans le CSS).
+// Seul le défilement natif est annulé : les cartes Bar / Éthylo et le zizi-coptère suivent toujours le doigt (événements pointer).
+document.getElementById("choixMode")?.addEventListener("touchmove", (e) => { if (e.touches.length === 1 && e.cancelable) e.preventDefault(); }, { passive: false });

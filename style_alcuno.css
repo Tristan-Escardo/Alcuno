@@ -10065,3 +10065,8 @@ html body #ecranReglages #tuilesReglages .tuileReglage.choisie{
   box-shadow: 0 18px 30px -8px rgba(0,0,0,0.6), 0 0 34px 6px color-mix(in srgb, currentColor 65%, transparent) !important;
 }
 @media (prefers-reduced-motion: reduce){ #ecranReglages #tuilesReglages .tuileReglage{ transition: none; } }
+
+/* ===== Accueil : la page ne défile plus. L'accueil est un écran fixe par-dessus le jeu : sur iPhone, glisser le doigt dessus
+   faisait défiler (ou rebondir) la page derrière. Aucun glissement n'y est utile (les taps marchent toujours, et les cartes
+   Bar / Éthylo et le zizi-coptère suivent le doigt par leur propre code). ===== */
+#choixMode{ touch-action: none; overscroll-behavior: none; }
