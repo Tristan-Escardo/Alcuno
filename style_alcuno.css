@@ -9903,3 +9903,8 @@ html[data-theme] #ecranRegles .blocRegles.ethyloResultat{
 #ecranRegles .ethyloResultat.machine .ethyloUnite, #ecranRegles .ethyloResultat.machine .ethyloJauge{ display: none; }
 #ecranRegles .ethyloSexe{ flex-wrap: nowrap; }
 #ecranRegles .ethyloSexe .extrasPuce{ flex: 1 1 auto; white-space: nowrap; padding-left: 8px; padding-right: 8px; }
+
+/* Langue : on voit laquelle est choisie dans TOUS les thèmes (Star Wars et Donjon dessinaient les deux boutons pareil ; Noir et Halloween
+   ne différaient que par un fin liseré) : coche devant la langue choisie, l'autre est atténuée. */
+html body #ecranReglages .chipLangue.actif::before{ content: "\2713\00a0"; }
+html body #ecranReglages .chipLangue:not(.actif){ opacity: .6 !important; }
