@@ -1161,5 +1161,13 @@ window.TEXTES_EN = {
 "🔥 Partie hot lancée !": "🔥 Hot game started!",
 "🚁 Zizi-coptère<br>débloqué !": "🚁 Willy-copter<br>unlocked!",
 "🤡 Mot secret trouvé !": "🤡 Secret word found!",
+"Favoris": "Favourites",
+"Ajouter aux favoris": "Add to favourites",
+"Retirer des favoris": "Remove from favourites",
+"Aucun favori pour l'instant : ouvre une recette et touche « Ajouter aux favoris ».": "No favourites yet: open a recipe and tap “Add to favourites”.",
+"Supprimer ton profil ?": "Delete your profile?",
+"Ta progression sauvegardée en ligne et ton compte Alcuno sont effacés. Ce téléphone garde ce qu'il a déjà.": "Your progress saved online and your Alcuno account are erased. This phone keeps what it already has.",
+"Supprimer": "Delete",
+"Picon bière": "Picon beer",
 "🥃 {0} préfère {1} !": "🥃 {0} would rather {1}!"
 };

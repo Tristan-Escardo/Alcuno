@@ -9344,116 +9344,97 @@ html[data-theme="bordeaux"] body #ecranReglages :is(.btnMiseEnPage, .enteteGroup
 }
 html[data-theme="bordeaux"] body #ecranReglages :is(.enteteGroupe, .tuileReglage){ border-radius: 14px !important; }
 html[data-theme="bordeaux"] body #ecranReglages :is(.btnMiseEnPage, #btnModifierReglages, #btnParDefautReglages, .chipLangue){ border-radius: 999px !important; }
-html[data-theme="bordeaux"] body #ecranReglages .tuileReglage.choisie{ outline: 3px solid rgb(255, 255, 255); outline-offset: -7px; }
 html[data-theme="bordeaux"] body #ecranReglages.reglages-edition #btnModifierReglages{ outline: 3px solid rgb(255, 255, 255); outline-offset: -4px; }
 html[data-theme="noir"] body #ecranReglages :is(.btnMiseEnPage, .enteteGroupe, .tuileReglage, #btnModifierReglages, #btnParDefautReglages, .chipLangue.actif){
   background: var(--noir-btn-fond) !important; border: 1px solid var(--noir-btn-bord) !important; color: var(--noir-btn-texte) !important; box-shadow: none !important; text-shadow: none !important; opacity: 1;
 }
 html[data-theme="noir"] body #ecranReglages :is(.enteteGroupe, .tuileReglage){ border-radius: 14px !important; }
 html[data-theme="noir"] body #ecranReglages :is(.btnMiseEnPage, #btnModifierReglages, #btnParDefautReglages, .chipLangue){ border-radius: 999px !important; }
-html[data-theme="noir"] body #ecranReglages .tuileReglage.choisie{ outline: 3px solid rgb(255, 212, 38); outline-offset: -7px; }
 html[data-theme="noir"] body #ecranReglages.reglages-edition #btnModifierReglages{ outline: 3px solid rgb(255, 212, 38); outline-offset: -4px; }
 html[data-theme="vert"] body #ecranReglages :is(.btnMiseEnPage, .enteteGroupe, .tuileReglage, #btnModifierReglages, #btnParDefautReglages, .chipLangue.actif){
   background: linear-gradient(rgb(255, 212, 38), rgb(246, 184, 0)) !important; border: 0 !important; color: rgb(255, 255, 255) !important; box-shadow: rgba(0, 0, 0, 0.18) 0px -2px 0px 0px inset, rgba(0, 0, 0, 0.25) 0px 8px 18px 0px !important; text-shadow: rgba(122, 74, 0, 0.85) 0px 1px 0px, rgba(0, 0, 0, 0.4) 0px 2px 4px !important; opacity: 1;
 }
 html[data-theme="vert"] body #ecranReglages :is(.enteteGroupe, .tuileReglage){ border-radius: 14px !important; }
 html[data-theme="vert"] body #ecranReglages :is(.btnMiseEnPage, #btnModifierReglages, #btnParDefautReglages, .chipLangue){ border-radius: 999px !important; }
-html[data-theme="vert"] body #ecranReglages .tuileReglage.choisie{ outline: 3px solid rgb(255, 255, 255); outline-offset: -7px; }
 html[data-theme="vert"] body #ecranReglages.reglages-edition #btnModifierReglages{ outline: 3px solid rgb(255, 255, 255); outline-offset: -4px; }
 html[data-theme="bleu"] body #ecranReglages :is(.btnMiseEnPage, .enteteGroupe, .tuileReglage, #btnModifierReglages, #btnParDefautReglages, .chipLangue.actif){
   background: linear-gradient(rgb(255, 212, 38), rgb(246, 184, 0)) !important; border: 0 !important; color: rgb(255, 255, 255) !important; box-shadow: rgba(0, 0, 0, 0.18) 0px -2px 0px 0px inset, rgba(0, 0, 0, 0.25) 0px 8px 18px 0px !important; text-shadow: rgba(122, 74, 0, 0.85) 0px 1px 0px, rgba(0, 0, 0, 0.4) 0px 2px 4px !important; opacity: 1;
 }
 html[data-theme="bleu"] body #ecranReglages :is(.enteteGroupe, .tuileReglage){ border-radius: 14px !important; }
 html[data-theme="bleu"] body #ecranReglages :is(.btnMiseEnPage, #btnModifierReglages, #btnParDefautReglages, .chipLangue){ border-radius: 999px !important; }
-html[data-theme="bleu"] body #ecranReglages .tuileReglage.choisie{ outline: 3px solid rgb(255, 255, 255); outline-offset: -7px; }
 html[data-theme="bleu"] body #ecranReglages.reglages-edition #btnModifierReglages{ outline: 3px solid rgb(255, 255, 255); outline-offset: -4px; }
 html[data-theme="soleil"] body #ecranReglages :is(.btnMiseEnPage, .enteteGroupe, .tuileReglage, #btnModifierReglages, #btnParDefautReglages, .chipLangue.actif){
   background: linear-gradient(rgb(255, 179, 92), rgb(242, 119, 92)) !important; border: 0 !important; color: rgb(255, 255, 255) !important; box-shadow: rgba(120, 30, 40, 0.25) 0px -2px 0px 0px inset, rgba(60, 20, 60, 0.3) 0px 8px 18px 0px !important; text-shadow: rgba(150, 50, 40, 0.8) 0px 1px 0px, rgba(60, 20, 40, 0.35) 0px 2px 4px !important; opacity: 1;
 }
 html[data-theme="soleil"] body #ecranReglages :is(.enteteGroupe, .tuileReglage){ border-radius: 14px !important; }
 html[data-theme="soleil"] body #ecranReglages :is(.btnMiseEnPage, #btnModifierReglages, #btnParDefautReglages, .chipLangue){ border-radius: 999px !important; }
-html[data-theme="soleil"] body #ecranReglages .tuileReglage.choisie{ outline: 3px solid rgb(255, 255, 255); outline-offset: -7px; }
 html[data-theme="soleil"] body #ecranReglages.reglages-edition #btnModifierReglages{ outline: 3px solid rgb(255, 255, 255); outline-offset: -4px; }
 html[data-theme="cerisier"] body #ecranReglages :is(.btnMiseEnPage, .enteteGroupe, .tuileReglage, #btnModifierReglages, #btnParDefautReglages, .chipLangue.actif){
   background: linear-gradient(rgb(255, 212, 38), rgb(246, 184, 0)) !important; border: 0 !important; color: rgb(255, 255, 255) !important; box-shadow: rgba(0, 0, 0, 0.18) 0px -2px 0px 0px inset, rgba(0, 0, 0, 0.25) 0px 8px 18px 0px !important; text-shadow: rgba(122, 74, 0, 0.85) 0px 1px 0px, rgba(0, 0, 0, 0.4) 0px 2px 4px !important; opacity: 1;
 }
 html[data-theme="cerisier"] body #ecranReglages :is(.enteteGroupe, .tuileReglage){ border-radius: 14px !important; }
 html[data-theme="cerisier"] body #ecranReglages :is(.btnMiseEnPage, #btnModifierReglages, #btnParDefautReglages, .chipLangue){ border-radius: 999px !important; }
-html[data-theme="cerisier"] body #ecranReglages .tuileReglage.choisie{ outline: 3px solid rgb(255, 255, 255); outline-offset: -7px; }
 html[data-theme="cerisier"] body #ecranReglages.reglages-edition #btnModifierReglages{ outline: 3px solid rgb(255, 255, 255); outline-offset: -4px; }
 html[data-theme="givre"] body #ecranReglages :is(.btnMiseEnPage, .enteteGroupe, .tuileReglage, #btnModifierReglages, #btnParDefautReglages, .chipLangue.actif){
   background: linear-gradient(rgb(39, 174, 232), rgb(20, 116, 184)) !important; border: 0 !important; color: rgb(255, 255, 255) !important; box-shadow: rgba(8, 60, 100, 0.25) 0px -2px 0px 0px inset, rgba(26, 146, 214, 0.28) 0px 6px 14px 0px !important; text-shadow: rgba(8, 60, 100, 0.55) 0px 1px 2px !important; opacity: 1;
 }
 html[data-theme="givre"] body #ecranReglages :is(.enteteGroupe, .tuileReglage){ border-radius: 14px !important; }
 html[data-theme="givre"] body #ecranReglages :is(.btnMiseEnPage, #btnModifierReglages, #btnParDefautReglages, .chipLangue){ border-radius: 999px !important; }
-html[data-theme="givre"] body #ecranReglages .tuileReglage.choisie{ outline: 3px solid rgb(255, 255, 255); outline-offset: -7px; }
 html[data-theme="givre"] body #ecranReglages.reglages-edition #btnModifierReglages{ outline: 3px solid rgb(255, 255, 255); outline-offset: -4px; }
 html[data-theme="prestige"] body #ecranReglages :is(.btnMiseEnPage, .enteteGroupe, .tuileReglage, #btnModifierReglages, #btnParDefautReglages, .chipLangue.actif){
   background: linear-gradient(rgb(255, 212, 38), rgb(246, 184, 0)) !important; border: 0 !important; color: rgb(255, 255, 255) !important; box-shadow: rgba(0, 0, 0, 0.18) 0px -2px 0px 0px inset, rgba(0, 0, 0, 0.25) 0px 8px 18px 0px !important; text-shadow: rgba(122, 74, 0, 0.85) 0px 1px 0px, rgba(0, 0, 0, 0.4) 0px 2px 4px !important; opacity: 1;
 }
 html[data-theme="prestige"] body #ecranReglages :is(.enteteGroupe, .tuileReglage){ border-radius: 14px !important; }
 html[data-theme="prestige"] body #ecranReglages :is(.btnMiseEnPage, #btnModifierReglages, #btnParDefautReglages, .chipLangue){ border-radius: 999px !important; }
-html[data-theme="prestige"] body #ecranReglages .tuileReglage.choisie{ outline: 3px solid rgb(255, 255, 255); outline-offset: -7px; }
 html[data-theme="prestige"] body #ecranReglages.reglages-edition #btnModifierReglages{ outline: 3px solid rgb(255, 255, 255); outline-offset: -4px; }
 html[data-theme="kawaii"] body #ecranReglages :is(.btnMiseEnPage, .enteteGroupe, .tuileReglage, #btnModifierReglages, #btnParDefautReglages, .chipLangue.actif){
   background: linear-gradient(rgb(249, 166, 203), rgb(238, 112, 169)) !important; border: 3px solid rgb(255, 255, 255) !important; color: rgb(107, 20, 80) !important; box-shadow: rgb(201, 87, 138) 0px 6px 0px 0px, rgba(150, 30, 90, 0.3) 0px 10px 14px 0px, rgba(255, 255, 255, 0.55) 0px 3px 0px 0px inset !important; text-shadow: rgba(255, 255, 255, 0.6) 0px 1px 0px !important; opacity: 1;
 }
 html[data-theme="kawaii"] body #ecranReglages :is(.enteteGroupe, .tuileReglage){ border-radius: 26px !important; }
 html[data-theme="kawaii"] body #ecranReglages :is(.btnMiseEnPage, #btnModifierReglages, #btnParDefautReglages, .chipLangue){ border-radius: 999px !important; }
-html[data-theme="kawaii"] body #ecranReglages .tuileReglage.choisie{ outline: 3px solid rgb(107, 20, 80); outline-offset: -7px; }
 html[data-theme="kawaii"] body #ecranReglages.reglages-edition #btnModifierReglages{ outline: 3px solid rgb(107, 20, 80); outline-offset: -4px; }
 html[data-theme="noel"] body #ecranReglages :is(.btnMiseEnPage, .enteteGroupe, .tuileReglage, #btnModifierReglages, #btnParDefautReglages, .chipLangue.actif){
   background: linear-gradient(rgb(255, 226, 122), rgb(232, 169, 0)) !important; border: 0 !important; color: rgb(110, 10, 20) !important; box-shadow: rgba(255, 255, 255, 0.95) 0px 0px 0px 2px inset, rgba(60, 0, 8, 0.4) 0px 6px 14px 0px !important; text-shadow: rgba(255, 244, 190, 0.7) 0px 1px 0px !important; opacity: 1;
 }
 html[data-theme="noel"] body #ecranReglages :is(.enteteGroupe, .tuileReglage){ border-radius: 14px !important; }
 html[data-theme="noel"] body #ecranReglages :is(.btnMiseEnPage, #btnModifierReglages, #btnParDefautReglages, .chipLangue){ border-radius: 999px !important; }
-html[data-theme="noel"] body #ecranReglages .tuileReglage.choisie{ outline: 3px solid rgb(110, 10, 20); outline-offset: -7px; }
 html[data-theme="noel"] body #ecranReglages.reglages-edition #btnModifierReglages{ outline: 3px solid rgb(110, 10, 20); outline-offset: -4px; }
 html[data-theme="chandeleur"] body #ecranReglages :is(.btnMiseEnPage, .enteteGroupe, .tuileReglage, #btnModifierReglages, #btnParDefautReglages, .chipLangue.actif){
   background: linear-gradient(rgb(255, 246, 214), rgb(255, 215, 122)) !important; border: 0 !important; color: rgb(90, 34, 5) !important; box-shadow: rgba(255, 255, 255, 0.95) 0px 0px 0px 2px inset, rgba(90, 30, 0, 0.4) 0px 6px 14px 0px !important; text-shadow: rgba(255, 244, 190, 0.7) 0px 1px 0px !important; opacity: 1;
 }
 html[data-theme="chandeleur"] body #ecranReglages :is(.enteteGroupe, .tuileReglage){ border-radius: 14px !important; }
 html[data-theme="chandeleur"] body #ecranReglages :is(.btnMiseEnPage, #btnModifierReglages, #btnParDefautReglages, .chipLangue){ border-radius: 999px !important; }
-html[data-theme="chandeleur"] body #ecranReglages .tuileReglage.choisie{ outline: 3px solid rgb(90, 34, 5); outline-offset: -7px; }
 html[data-theme="chandeleur"] body #ecranReglages.reglages-edition #btnModifierReglages{ outline: 3px solid rgb(90, 34, 5); outline-offset: -4px; }
 html[data-theme="valentin"] body #ecranReglages :is(.btnMiseEnPage, .enteteGroupe, .tuileReglage, #btnModifierReglages, #btnParDefautReglages, .chipLangue.actif){
   background: linear-gradient(rgb(255, 246, 250), rgb(255, 201, 222)) !important; border: 0 !important; color: rgb(106, 10, 52) !important; box-shadow: rgba(255, 255, 255, 0.95) 0px 0px 0px 2px inset, rgba(60, 0, 30, 0.4) 0px 6px 14px 0px !important; text-shadow: rgba(255, 236, 244, 0.7) 0px 1px 0px !important; opacity: 1;
 }
 html[data-theme="valentin"] body #ecranReglages :is(.enteteGroupe, .tuileReglage){ border-radius: 14px !important; }
 html[data-theme="valentin"] body #ecranReglages :is(.btnMiseEnPage, #btnModifierReglages, #btnParDefautReglages, .chipLangue){ border-radius: 999px !important; }
-html[data-theme="valentin"] body #ecranReglages .tuileReglage.choisie{ outline: 3px solid rgb(106, 10, 52); outline-offset: -7px; }
 html[data-theme="valentin"] body #ecranReglages.reglages-edition #btnModifierReglages{ outline: 3px solid rgb(106, 10, 52); outline-offset: -4px; }
 html[data-theme="patrick"] body #ecranReglages :is(.btnMiseEnPage, .enteteGroupe, .tuileReglage, #btnModifierReglages, #btnParDefautReglages, .chipLangue.actif){
   background: linear-gradient(rgb(242, 255, 246), rgb(155, 232, 180)) !important; border: 0 !important; color: rgb(4, 54, 31) !important; box-shadow: rgba(255, 255, 255, 0.95) 0px 0px 0px 2px inset, rgba(0, 50, 25, 0.4) 0px 6px 14px 0px !important; text-shadow: rgba(240, 255, 245, 0.7) 0px 1px 0px !important; opacity: 1;
 }
 html[data-theme="patrick"] body #ecranReglages :is(.enteteGroupe, .tuileReglage){ border-radius: 14px !important; }
 html[data-theme="patrick"] body #ecranReglages :is(.btnMiseEnPage, #btnModifierReglages, #btnParDefautReglages, .chipLangue){ border-radius: 999px !important; }
-html[data-theme="patrick"] body #ecranReglages .tuileReglage.choisie{ outline: 3px solid rgb(4, 54, 31); outline-offset: -7px; }
 html[data-theme="patrick"] body #ecranReglages.reglages-edition #btnModifierReglages{ outline: 3px solid rgb(4, 54, 31); outline-offset: -4px; }
 html[data-theme="justrose"] body #ecranReglages :is(.btnMiseEnPage, .enteteGroupe, .tuileReglage, #btnModifierReglages, #btnParDefautReglages, .chipLangue.actif){
   background: linear-gradient(rgb(212, 64, 138), rgb(154, 16, 82)) !important; border: 0 !important; color: rgb(255, 255, 255) !important; box-shadow: rgba(255, 255, 255, 0.95) 0px 0px 0px 2px inset, rgba(60, 0, 35, 0.4) 0px 6px 14px 0px !important; text-shadow: rgba(90, 10, 50, 0.6) 0px 1px 0px !important; opacity: 1;
 }
 html[data-theme="justrose"] body #ecranReglages :is(.enteteGroupe, .tuileReglage){ border-radius: 14px !important; }
 html[data-theme="justrose"] body #ecranReglages :is(.btnMiseEnPage, #btnModifierReglages, #btnParDefautReglages, .chipLangue){ border-radius: 999px !important; }
-html[data-theme="justrose"] body #ecranReglages .tuileReglage.choisie{ outline: 3px solid rgb(255, 255, 255); outline-offset: -7px; }
 html[data-theme="justrose"] body #ecranReglages.reglages-edition #btnModifierReglages{ outline: 3px solid rgb(255, 255, 255); outline-offset: -4px; }
 html[data-theme="musique"] body #ecranReglages :is(.btnMiseEnPage, .enteteGroupe, .tuileReglage, #btnModifierReglages, #btnParDefautReglages, .chipLangue.actif){
   background: linear-gradient(rgb(74, 31, 180), rgb(42, 14, 110)) !important; border: 0 !important; color: rgb(255, 255, 255) !important; box-shadow: rgba(20, 0, 80, 0.4) 0px 6px 14px 0px !important; text-shadow: rgba(20, 0, 80, 0.6) 0px 1px 0px !important; opacity: 1;
 }
 html[data-theme="musique"] body #ecranReglages :is(.enteteGroupe, .tuileReglage){ border-radius: 14px !important; }
 html[data-theme="musique"] body #ecranReglages :is(.btnMiseEnPage, #btnModifierReglages, #btnParDefautReglages, .chipLangue){ border-radius: 999px !important; }
-html[data-theme="musique"] body #ecranReglages .tuileReglage.choisie{ outline: 3px solid rgb(255, 255, 255); outline-offset: -7px; }
 html[data-theme="musique"] body #ecranReglages.reglages-edition #btnModifierReglages{ outline: 3px solid rgb(255, 255, 255); outline-offset: -4px; }
 html[data-theme="halloween"] body #ecranReglages :is(.btnMiseEnPage, .enteteGroupe, .tuileReglage, #btnModifierReglages, #btnParDefautReglages, .chipLangue.actif){
   background: linear-gradient(rgb(42, 6, 9), rgb(18, 2, 3)) !important; border: 1px solid rgba(163, 21, 26, 0.9) !important; color: rgb(255, 107, 107) !important; box-shadow: rgba(0, 0, 0, 0.75) 0px 0px 22px 0px inset, rgba(163, 21, 26, 0.55) 0px 0px 16px 0px, rgba(0, 0, 0, 0.6) 0px 6px 16px 0px !important; text-shadow: rgb(0, 0, 0) 0px 1px 3px !important; opacity: 1;
 }
 html[data-theme="halloween"] body #ecranReglages :is(.enteteGroupe, .tuileReglage){ border-radius: 14px !important; }
 html[data-theme="halloween"] body #ecranReglages :is(.btnMiseEnPage, #btnModifierReglages, #btnParDefautReglages, .chipLangue){ border-radius: 999px !important; }
-html[data-theme="halloween"] body #ecranReglages .tuileReglage.choisie{ outline: 3px solid rgb(255, 107, 107); outline-offset: -7px; }
 html[data-theme="halloween"] body #ecranReglages.reglages-edition #btnModifierReglages{ outline: 3px solid rgb(255, 107, 107); outline-offset: -4px; }
-/* Star Wars et Donjon : la tuile choisie se voit (leur règle générale des boutons néon dessine déjà le cadre et l'ombre de chaque tuile) */
-html[data-theme="galaxie"] #ecranReglages #tuilesReglages .tuileReglage.choisie{ outline: 2px solid #fff; outline-offset: -5px; filter: brightness(1.5) saturate(1.2); }
-html[data-theme="donjon"] #ecranReglages #tuilesReglages .tuileReglage.choisie{ outline: 2px solid #ffb3bb; outline-offset: -5px; filter: brightness(1.6) saturate(1.2); }
 html[data-theme="givre"] #ecranReglages .menuMiseEnPage{
   background: #fff; border: 1px solid var(--givre-bord); box-shadow: 0 10px 24px rgba(13, 53, 80, 0.2);
 }
@@ -9819,6 +9800,9 @@ html[data-theme="soleil"] #choixMode .carteEthylo{ --fond: linear-gradient(180de
 #ecranRegles .barRecette li{ position: relative; margin: 0; padding: 5px 0 5px 18px; border-bottom: 1px dashed rgba(255, 255, 255, 0.14); }
 #ecranRegles .barRecette li::before{ content: ""; position: absolute; left: 3px; top: 0.85em; width: 7px; height: 7px; border-radius: 50%; background: currentColor; opacity: 0.6; }
 #ecranRegles .barRecette p{ margin: 8px 0 0; }
+#ecranRegles .barEtoile{ color: #ffc531; margin-right: 0.3em; }
+#ecranRegles .barEtoile:empty{ display: none; }
+#ecranRegles .barFavori{ display: block; margin: 12px auto 0; }
 #ecranRegles .barRecette .barVerre{
   display: inline-block;
   padding: 4px 10px;

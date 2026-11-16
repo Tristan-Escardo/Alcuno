@@ -13,7 +13,13 @@ function simplifierTexteBar(texte){
   return String(texte).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 }
 
-let familleBar = "";   // filtre choisi ("" : tous)
+// Petit retour au doigt (Android ; un iPhone ne peut pas vibrer depuis une page web). Passe par vibrer() de js/reglages.js, donc
+// respecte le réglage « Vibrations » ; ne fait rien si le téléphone ne sait pas vibrer.
+function tic(ms){
+  try { if (typeof vibrer === "function") vibrer(ms); } catch (e) {}
+}
+
+let familleBar = "";   // filtre choisi ("" : tous, "fav" : les favoris)
 let rechercheBar = "";
 
 function elementExtras(balise, classe, texte){
@@ -34,7 +40,19 @@ function ouvrirPageExtras(mode, titre){
   if (page.style.display === "none" || page.classList.contains("page-sortie")) ouvrirPage(page);
 }
 
-const EMOJIS_BAR = { rhum: "🍹", vodka: "🍸", gin: "🌿", tequila: "🌵", whisky: "🥃", bulles: "🥂", shooter: "🔥", sans: "🧃" };
+// Favoris : les identifiants des recettes, gardés sur ce téléphone
+const CLE_FAVORIS_BAR = "alcuno_bar_favoris";
+function lireFavorisBar(){
+  try {
+    const l = JSON.parse(localStorage.getItem(CLE_FAVORIS_BAR) || "[]");
+    return new Set(Array.isArray(l) ? l.filter((x) => typeof x === "string") : []);
+  } catch (e) { return new Set(); }
+}
+function ecrireFavorisBar(favoris){
+  try { localStorage.setItem(CLE_FAVORIS_BAR, JSON.stringify(Array.from(favoris))); } catch (e) {}
+}
+
+const EMOJIS_BAR = { fav: "⭐", rhum: "🍹", vodka: "🍸", gin: "🌿", tequila: "🌵", whisky: "🥃", bulles: "🥂", shooter: "🔥", sans: "🧃" };
 
 // Jeu en anglais : une recette du Bar dans sa version anglaise. Dans l'ordre : le texte anglais saisi dans le pilotage
 // (stats.html, onglet Bar : c.en), sinon la traduction du jeu (js/en.js) pour chaque morceau resté tel quel (nom, verre,
@@ -54,12 +72,14 @@ function remplirListeBar(zone){
   zone.textContent = "";
   const cherche = simplifierTexteBar(rechercheBar.trim());
   // (jeu en anglais : voir cocktailEnAnglais)
+  const favoris = lireFavorisBar();
   const trouves = cocktailsBar(typeof configDistante === "object" ? configDistante : null)
-    .map((c) => (estAnglais ? cocktailEnAnglais(c) : c)).filter((c) => (!familleBar || c.g === familleBar) &&
+    .map((c) => (estAnglais ? cocktailEnAnglais(c) : c)).filter((c) => (!familleBar || (familleBar === "fav" ? favoris.has(c.id) : c.g === familleBar)) &&
     (!cherche || simplifierTexteBar(c.n + " " + c.i.join(" ")).includes(cherche)));
   if (!trouves.length) {
     const vide = elementExtras("div", "blocRegles");
-    vide.appendChild(elementExtras("p", "detailRegle extrasVide", tr("Aucun cocktail ne correspond.")));
+    vide.appendChild(elementExtras("p", "detailRegle extrasVide", familleBar === "fav" && !cherche
+      ? tr("Aucun favori pour l'instant : ouvre une recette et touche « Ajouter aux favoris ».") : tr("Aucun cocktail ne correspond.")));
     zone.appendChild(vide);
     return;
   }
@@ -75,12 +95,30 @@ function remplirListeBar(zone){
       d.setAttribute("name", "cocktail");
       d.dataset.cocktail = c.n;
       const titre = elementExtras("summary", "nomRegle faqQuestion", c.n);
+      const etoile = elementExtras("span", "barEtoile", favoris.has(c.id) ? "★" : "");
+      etoile.setAttribute("aria-hidden", "true");
+      titre.prepend(etoile);
       titre.appendChild(elementExtras("span", "barSous", tr`${c.i.length} ingrédients · ${c.v}`));
       d.appendChild(titre);
       const corps = elementExtras("div", "detailRegle barRecette");
       const ingredients = elementExtras("ul", "lignesRegle");
       c.i.forEach((ligne) => ingredients.appendChild(elementExtras("li", "", ligne)));
-      corps.append(ingredients, elementExtras("p", "", c.p), elementExtras("p", "barVerre", "🍸 " + c.v));
+      const bouton = elementExtras("button", "extrasPuce barFavori");
+      bouton.type = "button";
+      const majFavori = () => {
+        const fav = favoris.has(c.id);
+        bouton.textContent = fav ? "★ " + tr("Retirer des favoris") : "☆ " + tr("Ajouter aux favoris");
+        bouton.setAttribute("aria-pressed", String(fav));
+        etoile.textContent = fav ? "★" : "";
+      };
+      bouton.addEventListener("click", () => { // (la recette reste ouverte : on met seulement l'étoile à jour)
+        if (!favoris.delete(c.id)) favoris.add(c.id);
+        ecrireFavorisBar(favoris);
+        tic(10);
+        majFavori();
+      });
+      majFavori();
+      corps.append(ingredients, elementExtras("p", "", c.p), elementExtras("p", "barVerre", "🍸 " + c.v), bouton);
       d.appendChild(corps);
       bloc.appendChild(d);
     });
@@ -110,7 +148,7 @@ function ouvrirBar(){
     filtres.querySelectorAll(".extrasPuce").forEach((p) => p.setAttribute("aria-pressed", String(p.dataset.famille === id)));
     remplirListeBar(zone);
   };
-  [["", tr("Tous")]].concat(FAMILLES_BAR).forEach(([id, nom]) => {
+  [["", tr("Tous")], ["fav", tr("Favoris")]].concat(FAMILLES_BAR).forEach(([id, nom]) => {
     const puce = elementExtras("button", "extrasPuce", (id ? EMOJIS_BAR[id] + " " : "") + tr(nom));
     puce.type = "button";
     puce.dataset.famille = id;
@@ -331,7 +369,7 @@ function glissiereEthylo(titre, min, max, pas, valeur, texte, siChange, o){
       const a = Math.min(max, Math.max(min, o.aimant(v)));
       if (a !== v) { v = a; curseur.value = String(a); }
     }
-    if (o.estPalier && o.estPalier(v) && v !== dernierPalier) { try { if (navigator.vibrate) navigator.vibrate(6); } catch (e) {} }
+    if (o.estPalier && o.estPalier(v) && v !== dernierPalier) { tic(6); }
     dernierPalier = o.estPalier && o.estPalier(v) ? v : null;
     montrer();
     siChange(v);
@@ -635,7 +673,7 @@ function jouerCarte(carte, action){
   mainAccueil.classList.remove("distribution");
   mainAccueil.classList.add("enJeu");
   carte.classList.add("jouee");
-  try { if (navigator.vibrate) navigator.vibrate(12); } catch (e) {}
+  tic(12);
   setTimeout(() => {
     action();
     // (la page recouvre l'accueil : la main est remise en place derrière, sans qu'on la voie)
@@ -679,7 +717,7 @@ function viserEventail(m){
       if (!meilleure || c.poids > meilleure.poids) meilleure = c;
     });
     if (meilleure !== m.choisie) {
-      if (m.choisie) m.choisie.el.classList.remove("tenue", "prete");
+      if (m.choisie) { m.choisie.el.classList.remove("tenue", "prete"); tic(5); } // (tic léger : le doigt passe sur une autre carte)
       m.choisie = meilleure; m.prete = false;
       meilleure.el.classList.add("tenue");
     }
@@ -688,7 +726,7 @@ function viserEventail(m){
   if (prete !== m.prete) {
     m.prete = prete;
     m.choisie.el.classList.toggle("prete", prete);
-    try { if (prete && navigator.vibrate) navigator.vibrate(12); } catch (e) {}
+    if (prete) tic(12);
   }
   const xEcart = m.verrou ? m.choisie.cx : x;
   m.cartes.forEach((c) => {
