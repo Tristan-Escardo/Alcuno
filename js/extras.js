@@ -579,44 +579,59 @@ function ouvrirEthylo(sansSon){
 // #region Cartes de l'accueil (Bar, Album, Éthylotest)
 // Une main de cartes à jouer sous les deux boutons de l'accueil (style_alcuno.css : « Cartes de l'accueil »). Ce ne sont pas
 // des <button> : ceux de l'accueil ont une forme imposée par chaque thème.
-//  - doigt posé : la carte sort à moitié de la main, grossit et s'incline sous le doigt ; les voisines s'écartent ;
-//  - doigt glissé de côté, sans lever : on passe d'une carte à l'autre (celle sous le doigt sort à son tour) ;
-//  - doigt avancé vers le haut : la carte suit et sort du lot ; doigt levé quand elle est assez sortie (40 % de sa hauteur) :
-//    elle est jouée (elle monte et grandit en s'effaçant, les autres retombent), puis sa page s'ouvre ;
-//    doigt reculé avant de le lever : la carte revient dans l'éventail et rien n'est joué ;
+//  - doigt posé : la carte sous le doigt sort un peu de la main, grossit, s'éclaire et s'incline ; les autres s'écartent,
+//    s'enfoncent et s'assombrissent ;
+//  - doigt glissé de côté, sans lever : l'éventail suit le doigt en continu (entre deux cartes, les deux sont à moitié sorties) ;
+//  - doigt avancé vers le haut : la carte suit, jusqu'à une sortie maximale (elle résiste en approchant du maximum) ;
+//    doigt levé quand elle est assez sortie : elle est jouée (elle monte et grandit en s'effaçant, les autres retombent),
+//    puis sa page s'ouvre ; doigt reculé avant de le lever : la carte revient dans l'éventail et rien n'est joué ;
 //  - simple tap (doigt levé sans avoir bougé) : la carte est jouée ;
 //  - clavier : Entrée ou Espace ;
 //  - en revenant sur l'accueil, la main est redistribuée.
+// Tant qu'un doigt est posé (et jusqu'au retour au repos), les cartes sont animées ici, image par image, par des ressorts :
+// chaque valeur (sortie, écart, inclinaison, zoom, lumière) rejoint sa cible en douceur, et le transform est écrit
+// directement sur la carte (classe « vivante » : les transitions CSS sont coupées, sinon elles se relanceraient à chaque
+// mouvement du doigt). Au repos, tout est rendu au CSS.
 const DELAI_CARTE_JOUEE = 380;   // ms entre la carte jouée et l'ouverture de sa page
-const TIRAGE_CARTE = 0.4;        // tirée vers le haut de 40 % de sa hauteur : jouée
 const INCLINAISON_CARTE = 14;    // degrés au plus sous le doigt
+const LEVE_TENUE = 0.16;         // la carte sous le doigt sort de 16 % de sa hauteur…
+const LEVE_AUTRES = 0.05;        // … les autres s'enfoncent de 5 %
+const ZOOM_TENUE = 0.08;         // … elle grossit de 8 %
+const ECART_VOISINES = 4;        // degrés : les voisines s'écartent de la carte tenue
+const LUM_TENUE = 1.08, LUM_AUTRES = 0.8, LUM_PRETE = 1.25; // lumière : carte tenue, autres cartes, carte prête à être jouée
+const ZONE_MORTE_TIRE = 8;       // px : le doigt doit monter de plus que ça avant que la carte le suive
+const TIRE_MAX = 0.4;            // tirée au plus de 40 % de sa hauteur (en plus des 16 %) : la carte ne sort jamais davantage
+const TIRE_PRETE = 0.24;         // tirée de 24 % : elle sera jouée au lâcher
+const TIRE_VERROU = 0.1;         // tirée de plus de 10 % : glisser de côté ne change plus de carte (déverrouillée sous 5 %)
 const mainAccueil = document.getElementById("cartesAccueil");
 const calmeAccueil = () => window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+const actionsCartes = new Map(); // carte => ce qu'elle ouvre
+let eventail = null;             // animation en cours : { cartes: [{ el, cx, angle, v, vit }], h, l, pas, doigt, choisie, verrou, prete, t, raf }
+let ignorerClicCarte = 0;
 
 function cartesVisibles(){
   return mainAccueil ? Array.from(mainAccueil.querySelectorAll(".carteAccueil")).filter((c) => c.offsetParent) : [];
 }
+// Rend les cartes au CSS (fin de l'animation au doigt)
+function lacherEventail(){
+  if (!eventail) return;
+  cancelAnimationFrame(eventail.raf);
+  eventail.cartes.forEach((c) => { c.el.style.transform = ""; c.el.style.filter = ""; c.el.style.zIndex = ""; c.el.classList.remove("tenue", "prete"); });
+  eventail = null;
+  mainAccueil.classList.remove("vivante");
+}
 // Redonne la main (après une carte jouée, ou à l'arrivée sur l'accueil)
 function distribuerMain(){
   if (!mainAccueil) return;
-  mainAccueil.classList.remove("enJeu", "tient", "distribution");
-  mainAccueil.querySelectorAll(".carteAccueil").forEach((c) => {
-    c.classList.remove("jouee", "tenue");
-    ["--ecart", "--tire", "--rx", "--ry"].forEach((v) => c.style.removeProperty(v));
-  });
+  lacherEventail();
+  mainAccueil.classList.remove("enJeu", "distribution");
+  mainAccueil.querySelectorAll(".carteAccueil").forEach((c) => c.classList.remove("jouee"));
   void mainAccueil.offsetWidth; // (relance l'animation)
   mainAccueil.classList.add("distribution");
 }
-function tenirCarte(carte, oui){
-  const cartes = cartesVisibles(), k = cartes.indexOf(carte);
-  mainAccueil.classList.toggle("tient", oui);
-  carte.classList.toggle("tenue", oui);
-  cartes.forEach((c, j) => { if (c !== carte) c.style.setProperty("--ecart", oui ? (j < k ? -2 : 2) + "deg" : "0deg"); });
-  if (!oui) ["--tire", "--rx", "--ry"].forEach((v) => carte.style.removeProperty(v));
-}
 function jouerCarte(carte, action){
   if (mainAccueil.classList.contains("enJeu")) return; // (déjà une carte jouée)
-  tenirCarte(carte, false);
+  lacherEventail(); // (la carte part de là où elle est : la transition CSS de « jouee » prend le relais)
   mainAccueil.classList.remove("distribution");
   mainAccueil.classList.add("enJeu");
   carte.classList.add("jouee");
@@ -628,64 +643,120 @@ function jouerCarte(carte, action){
   }, calmeAccueil() ? 0 : DELAI_CARTE_JOUEE);
 }
 
-const ZONE_MORTE_TIRE = 14;      // px : le doigt doit monter de plus que ça avant que la carte le suive
-const SORTIE_VERROU = 0.15;       // sortie de plus de 15 % de sa hauteur : glisser de côté ne change plus de carte
-const actionsCartes = new Map(); // carte => ce qu'elle ouvre
-let appuiMain = null;            // doigt posé sur la main : { carte, x, y, id, bouge, prete, centres }
-let ignorerClicCarte = 0;
-
-// Carte la plus proche du doigt (centres mesurés au moment où le doigt s'est posé, éventail au repos)
-// (la carte tenue garde un peu d'avance : on ne change qu'une fois nettement passé sur la voisine, sans va-et-vient au milieu)
-function carteSousDoigt(x){
-  let meilleure = null, d = Infinity;
-  appuiMain.centres.forEach(([c, cx]) => { const e = Math.abs(cx - x) - (c === appuiMain.carte ? 10 : 0); if (e < d) { d = e; meilleure = c; } });
-  return meilleure;
+// ----- Éventail animé au doigt -----
+const REPOS_CARTE = { leve: 0, ecart: 0, tire: 0, rx: 0, ry: 0, zoom: 1, lum: 1 };
+const SEUIL_REPOS = { leve: 0.002, ecart: 0.05, tire: 0.3, rx: 0.1, ry: 0.1, zoom: 0.002, lum: 0.005 }; // (écart négligeable)
+const borneCarte = (v, min, max) => Math.max(min, Math.min(max, v));
+function creerEventail(){
+  const cartes = cartesVisibles();
+  if (!cartes.length) return null;
+  const h = cartes[0].offsetHeight, l = cartes[0].offsetWidth, r = mainAccueil.getBoundingClientRect();
+  // Centre de chaque carte au repos, calculé (pas mesuré : une carte peut être en plein mouvement) : les cartes tournent
+  // autour d'un pivot placé 2 hauteurs de carte sous leur centre (transform-origin du CSS)
+  const liste = cartes.map((el) => {
+    const angle = parseFloat(getComputedStyle(el).getPropertyValue("--angle")) || 0;
+    return { el, angle, cx: r.left + l / 2 + 2 * h * Math.sin(angle * Math.PI / 180), v: Object.assign({}, REPOS_CARTE), vit: { leve: 0, ecart: 0, tire: 0, rx: 0, ry: 0, zoom: 0, lum: 0 }, cible: null };
+  });
+  const pas = liste.length > 1 ? (liste[liste.length - 1].cx - liste[0].cx) / (liste.length - 1) : l;
+  return { cartes: liste, h, l, pas: Math.max(1, pas), doigt: null, choisie: null, verrou: false, prete: false, t: 0, raf: 0 };
 }
-function suivreDoigt(e){
-  const a = appuiMain, carte = a.carte;
-  const dx = e.clientX - a.x, dy = e.clientY - a.y;
-  if (Math.abs(dx) > 10 || Math.abs(dy) > 10) a.bouge = true;
-  const h = carte.offsetHeight, l = carte.offsetWidth;
-  // Changer de carte : seulement tant que la carte tenue n'est pas sortie du lot
-  if (dy > -h * SORTIE_VERROU) {
-    const autre = carteSousDoigt(e.clientX);
-    if (autre && autre !== carte) {
-      tenirCarte(carte, false);
-      a.carte = autre; a.prete = false;
-      tenirCarte(autre, true);
-      try { if (navigator.vibrate) navigator.vibrate(6); } catch (err) {}
-      return suivreDoigt(e);
+// Où chaque carte doit aller, d'après le doigt
+function viserEventail(m){
+  const d = m.doigt;
+  if (!d) { m.cartes.forEach((c) => { c.cible = REPOS_CARTE; }); return; }
+  const dy = d.y - d.y0, h = m.h;
+  // sortie de la carte tirée : suit le doigt, puis résiste et plafonne à TIRE_MAX
+  const monte = Math.max(0, -dy - ZONE_MORTE_TIRE), max = TIRE_MAX * h;
+  const tire = max * Math.tanh(monte / max);
+  if (tire > TIRE_VERROU * h) m.verrou = true; else if (tire < TIRE_VERROU * h / 2) m.verrou = false;
+  // poids de chaque carte : 1 sous le doigt, 0 à une carte de distance (continu : entre deux cartes, moitié-moitié)
+  const x = borneCarte(d.x, m.cartes[0].cx, m.cartes[m.cartes.length - 1].cx);
+  if (!m.verrou || !m.choisie) {
+    let meilleure = null;
+    m.cartes.forEach((c) => {
+      const p = borneCarte(1 - Math.abs(x - c.cx) / m.pas, 0, 1);
+      c.poids = p * p * (3 - 2 * p); // (départ et arrivée en douceur)
+      if (!meilleure || c.poids > meilleure.poids) meilleure = c;
+    });
+    if (meilleure !== m.choisie) {
+      if (m.choisie) m.choisie.el.classList.remove("tenue", "prete");
+      m.choisie = meilleure; m.prete = false;
+      meilleure.el.classList.add("tenue");
     }
+  } else m.cartes.forEach((c) => { c.poids = c === m.choisie ? 1 : 0; });
+  const prete = tire >= TIRE_PRETE * h;
+  if (prete !== m.prete) {
+    m.prete = prete;
+    m.choisie.el.classList.toggle("prete", prete);
+    try { if (prete && navigator.vibrate) navigator.vibrate(12); } catch (e) {}
   }
-  // inclinaison : la carte penche vers le doigt (par rapport à son centre)
-  const centre = (a.centres.find(([c]) => c === carte) || [null, a.x])[1];
-  const borne = (v) => Math.max(-1, Math.min(1, v));
-  carte.style.setProperty("--ry", (borne((e.clientX - centre) / l) * INCLINAISON_CARTE).toFixed(1) + "deg");
-  carte.style.setProperty("--rx", (borne(-dy / h) * INCLINAISON_CARTE).toFixed(1) + "deg");
-  // (la carte ne monte qu'une fois le doigt nettement avancé : glisser de côté en déviant un peu ne la fait pas sortir)
-  carte.style.setProperty("--tire", Math.max(-h * 0.9, Math.min(0, dy + ZONE_MORTE_TIRE)) + "px");
-  // assez sortie : elle sera jouée au lâcher (petite vibration au passage, dans un sens comme dans l'autre)
-  const prete = dy < -h * TIRAGE_CARTE;
-  if (prete !== a.prete) {
-    a.prete = prete;
-    carte.classList.toggle("prete", prete);
-    try { if (prete && navigator.vibrate) navigator.vibrate(12); } catch (err) {}
-  }
+  const xEcart = m.verrou ? m.choisie.cx : x;
+  m.cartes.forEach((c) => {
+    const p = c.poids, tenue = c === m.choisie;
+    c.cible = {
+      leve: -LEVE_TENUE * p + LEVE_AUTRES * (1 - p),
+      ecart: borneCarte((c.cx - xEcart) / m.pas, -1, 1) * ECART_VOISINES,
+      tire: tenue ? -tire : 0,
+      rx: tenue ? borneCarte(-dy / h, -1, 1) * INCLINAISON_CARTE * p : 0,
+      ry: tenue ? borneCarte((d.x - c.cx) / m.l, -1, 1) * INCLINAISON_CARTE * p : 0,
+      zoom: 1 + ZOOM_TENUE * p,
+      lum: tenue && prete ? LUM_PRETE : LUM_AUTRES + (LUM_TENUE - LUM_AUTRES) * p,
+    };
+    c.el.style.zIndex = tenue ? "4" : "";
+  });
+}
+function animerEventail(t){
+  const m = eventail;
+  if (!m) return;
+  const dt = Math.min(0.034, m.t ? (t - m.t) / 1000 : 0.016);
+  m.t = t;
+  viserEventail(m);
+  const calme = calmeAccueil();
+  let auRepos = !m.doigt;
+  m.cartes.forEach((c) => {
+    for (const k in c.cible) {
+      // ressort : raide pour ce qui suit le doigt (tirage, inclinaison), plus souple pour le reste (léger rebond au retour)
+      const raide = m.doigt && (k === "tire" || k === "rx" || k === "ry");
+      const K = raide ? 900 : 300, D = raide ? 54 : 26;
+      if (calme) { c.v[k] = c.cible[k]; c.vit[k] = 0; }
+      else {
+        c.vit[k] += ((c.cible[k] - c.v[k]) * K - c.vit[k] * D) * dt;
+        c.v[k] += c.vit[k] * dt;
+      }
+      if (Math.abs(c.cible[k] - c.v[k]) > SEUIL_REPOS[k] || Math.abs(c.vit[k]) > SEUIL_REPOS[k] * 20) auRepos = false;
+    }
+    const v = c.v, h = m.h;
+    // (même suite de transformations que dans le CSS, pour que les transitions CSS reprennent sans à-coup)
+    c.el.style.transform = `translateY(${v.tire.toFixed(2)}px) rotate(${(c.angle + v.ecart).toFixed(3)}deg) translateY(${(v.leve * h).toFixed(2)}px) `
+      + `translateY(${-2 * h}px) rotateX(${v.rx.toFixed(2)}deg) rotateY(${v.ry.toFixed(2)}deg) scale(${v.zoom.toFixed(4)}) translateY(${2 * h}px)`;
+    c.el.style.filter = Math.abs(v.lum - 1) < 0.005 ? "" : `brightness(${v.lum.toFixed(3)})`;
+  });
+  if (auRepos) { lacherEventail(); return; }
+  m.raf = requestAnimationFrame(animerEventail);
 }
 function finAppuiMain(jouer){
-  const a = appuiMain;
-  if (!a) return;
-  appuiMain = null;
-  a.carte.classList.remove("prete");
-  tenirCarte(a.carte, false);
+  const m = eventail;
+  if (!m || !m.doigt) return;
+  const carte = m.choisie && m.choisie.el;
+  m.doigt = null; m.verrou = false; m.prete = false;
+  m.cartes.forEach((c) => { c.el.classList.remove("tenue", "prete"); c.el.style.zIndex = ""; });
+  m.choisie = null;
   ignorerClicCarte = Date.now();
-  if (jouer) jouerCarte(a.carte, actionsCartes.get(a.carte));
+  if (jouer && carte) jouerCarte(carte, actionsCartes.get(carte)); // (sinon l'animation ramène les cartes au repos)
 }
 if (mainAccueil) {
-  mainAccueil.addEventListener("pointermove", (e) => { if (appuiMain && e.pointerId === appuiMain.id) suivreDoigt(e); });
+  mainAccueil.addEventListener("pointermove", (e) => {
+    const d = eventail && eventail.doigt;
+    if (!d || e.pointerId !== d.id) return;
+    d.x = e.clientX; d.y = e.clientY; // (seulement noté : c'est l'animation qui en tient compte, une fois par image)
+    if (Math.abs(d.x - d.x0) > 10 || Math.abs(d.y - d.y0) > 10) d.bouge = true;
+  });
   mainAccueil.addEventListener("pointerup", (e) => {
-    if (!appuiMain || e.pointerId !== appuiMain.id) return;
-    finAppuiMain(!appuiMain.bouge || appuiMain.prete); // (tap, ou carte assez sortie)
+    const d = eventail && eventail.doigt;
+    if (!d || e.pointerId !== d.id) return;
+    d.x = e.clientX; d.y = e.clientY;
+    viserEventail(eventail); // (position du doigt au moment exact du lâcher)
+    finAppuiMain(!d.bouge || eventail.prete); // (tap, ou carte assez sortie)
   });
   mainAccueil.addEventListener("pointercancel", () => finAppuiMain(false));
   mainAccueil.addEventListener("lostpointercapture", () => finAppuiMain(false));
@@ -696,13 +767,13 @@ function activerCarteAccueil(id, action){
   if (!carte || !mainAccueil) return;
   actionsCartes.set(carte, action);
   carte.addEventListener("pointerdown", (e) => {
-    if (e.button > 0 || appuiMain || mainAccueil.classList.contains("enJeu")) return;
-    // (centres mesurés avant que la carte ne sorte : l'éventail au repos)
-    const centres = cartesVisibles().map((c) => { const r = c.getBoundingClientRect(); return [c, r.left + r.width / 2]; });
-    appuiMain = { carte, x: e.clientX, y: e.clientY, id: e.pointerId, bouge: false, prete: false, centres };
+    if (e.button > 0 || (eventail && eventail.doigt) || mainAccueil.classList.contains("enJeu")) return;
+    // (cartes encore en train de revenir : l'animation en cours continue, sans à-coup)
+    if (!eventail) { eventail = creerEventail(); if (!eventail) return; mainAccueil.classList.add("vivante"); eventail.raf = requestAnimationFrame(animerEventail); }
+    eventail.doigt = { id: e.pointerId, x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY, bouge: false };
     // (le doigt est suivi par toute la main : il peut passer d'une carte à l'autre)
     try { mainAccueil.setPointerCapture(e.pointerId); } catch (err) {}
-    tenirCarte(carte, true);
+    viserEventail(eventail);
   });
   // (un clic sans doigt ni souris : lecteur d'écran, commande vocale)
   carte.addEventListener("click", (e) => {
