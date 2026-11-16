@@ -9563,6 +9563,8 @@ html[data-theme="galaxie"] #ecranReglages .menuMEPTitre{ color: rgba(234,243,255
   transition: transform 0.1s ease-out, filter 0.2s ease, box-shadow 0.2s ease;
 }
 #choixMode .cartesAccueil.tient .carteAccueil:not(.tenue){ --leve: 5%; filter: brightness(0.8); }
+/* Carte assez sortie pour être jouée quand on lève le doigt (js/extras.js) : elle s'éclaire un peu plus */
+#choixMode .cartesAccueil .carteAccueil.tenue.prete{ filter: brightness(1.25); }
 /* Carte jouée : elle se redresse, monte et grandit en s'effaçant pendant que sa page arrive ; les autres retombent */
 #choixMode .cartesAccueil .carteAccueil.jouee{
   --angle: 0deg;

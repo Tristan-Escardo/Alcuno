@@ -580,8 +580,11 @@ function ouvrirEthylo(sansSon){
 // Une main de cartes à jouer sous les deux boutons de l'accueil (style_alcuno.css : « Cartes de l'accueil »). Ce ne sont pas
 // des <button> : ceux de l'accueil ont une forme imposée par chaque thème.
 //  - doigt posé : la carte sort à moitié de la main, grossit et s'incline sous le doigt ; les voisines s'écartent ;
-//  - doigt levé sans avoir bougé (un tap), ou carte tirée vers le haut : la carte est jouée (elle monte et grandit en
-//    s'effaçant, les autres retombent), puis sa page s'ouvre ; doigt glissé ailleurs : la carte revient dans la main ;
+//  - doigt glissé de côté, sans lever : on passe d'une carte à l'autre (celle sous le doigt sort à son tour) ;
+//  - doigt avancé vers le haut : la carte suit et sort du lot ; doigt levé quand elle est assez sortie (40 % de sa hauteur) :
+//    elle est jouée (elle monte et grandit en s'effaçant, les autres retombent), puis sa page s'ouvre ;
+//    doigt reculé avant de le lever : la carte revient dans l'éventail et rien n'est joué ;
+//  - simple tap (doigt levé sans avoir bougé) : la carte est jouée ;
 //  - clavier : Entrée ou Espace ;
 //  - en revenant sur l'accueil, la main est redistribuée.
 const DELAI_CARTE_JOUEE = 380;   // ms entre la carte jouée et l'ouverture de sa page
@@ -625,42 +628,83 @@ function jouerCarte(carte, action){
   }, calmeAccueil() ? 0 : DELAI_CARTE_JOUEE);
 }
 
+const SORTIE_VERROU = 0.15;       // sortie de plus de 15 % de sa hauteur : glisser de côté ne change plus de carte
+const actionsCartes = new Map(); // carte => ce qu'elle ouvre
+let appuiMain = null;            // doigt posé sur la main : { carte, x, y, id, bouge, prete, centres }
+let ignorerClicCarte = 0;
+
+// Carte la plus proche du doigt (centres mesurés au moment où le doigt s'est posé, éventail au repos)
+function carteSousDoigt(x){
+  let meilleure = null, d = Infinity;
+  appuiMain.centres.forEach(([c, cx]) => { const e = Math.abs(cx - x); if (e < d) { d = e; meilleure = c; } });
+  return meilleure;
+}
+function suivreDoigt(e){
+  const a = appuiMain, carte = a.carte;
+  const dx = e.clientX - a.x, dy = e.clientY - a.y;
+  if (Math.abs(dx) > 10 || Math.abs(dy) > 10) a.bouge = true;
+  const h = carte.offsetHeight, l = carte.offsetWidth;
+  // Changer de carte : seulement tant que la carte tenue n'est pas sortie du lot
+  if (dy > -h * SORTIE_VERROU) {
+    const autre = carteSousDoigt(e.clientX);
+    if (autre && autre !== carte) {
+      tenirCarte(carte, false);
+      a.carte = autre; a.prete = false;
+      tenirCarte(autre, true);
+      try { if (navigator.vibrate) navigator.vibrate(6); } catch (err) {}
+      return suivreDoigt(e);
+    }
+  }
+  // inclinaison : la carte penche vers le doigt (par rapport à son centre)
+  const centre = (a.centres.find(([c]) => c === carte) || [null, a.x])[1];
+  const borne = (v) => Math.max(-1, Math.min(1, v));
+  carte.style.setProperty("--ry", (borne((e.clientX - centre) / l) * INCLINAISON_CARTE).toFixed(1) + "deg");
+  carte.style.setProperty("--rx", (borne(-dy / h) * INCLINAISON_CARTE).toFixed(1) + "deg");
+  carte.style.setProperty("--tire", Math.max(-h * 0.9, Math.min(0, dy)) + "px");
+  // assez sortie : elle sera jouée au lâcher (petite vibration au passage, dans un sens comme dans l'autre)
+  const prete = dy < -h * TIRAGE_CARTE;
+  if (prete !== a.prete) {
+    a.prete = prete;
+    carte.classList.toggle("prete", prete);
+    try { if (prete && navigator.vibrate) navigator.vibrate(12); } catch (err) {}
+  }
+}
+function finAppuiMain(jouer){
+  const a = appuiMain;
+  if (!a) return;
+  appuiMain = null;
+  a.carte.classList.remove("prete");
+  tenirCarte(a.carte, false);
+  ignorerClicCarte = Date.now();
+  if (jouer) jouerCarte(a.carte, actionsCartes.get(a.carte));
+}
+if (mainAccueil) {
+  mainAccueil.addEventListener("pointermove", (e) => { if (appuiMain && e.pointerId === appuiMain.id) suivreDoigt(e); });
+  mainAccueil.addEventListener("pointerup", (e) => {
+    if (!appuiMain || e.pointerId !== appuiMain.id) return;
+    finAppuiMain(!appuiMain.bouge || appuiMain.prete); // (tap, ou carte assez sortie)
+  });
+  mainAccueil.addEventListener("pointercancel", () => finAppuiMain(false));
+  mainAccueil.addEventListener("lostpointercapture", () => finAppuiMain(false));
+}
+
 function activerCarteAccueil(id, action){
   const carte = document.getElementById(id);
   if (!carte || !mainAccueil) return;
-  let appui = null, ignorerClic = 0;
-  const lacher = () => { if (appui) { appui = null; tenirCarte(carte, false); } };
+  actionsCartes.set(carte, action);
   carte.addEventListener("pointerdown", (e) => {
-    if (e.button > 0 || mainAccueil.classList.contains("enJeu")) return;
-    appui = { x: e.clientX, y: e.clientY, id: e.pointerId, bouge: false };
-    try { carte.setPointerCapture(e.pointerId); } catch (err) {}
+    if (e.button > 0 || appuiMain || mainAccueil.classList.contains("enJeu")) return;
+    // (centres mesurés avant que la carte ne sorte : l'éventail au repos)
+    const centres = cartesVisibles().map((c) => { const r = c.getBoundingClientRect(); return [c, r.left + r.width / 2]; });
+    appuiMain = { carte, x: e.clientX, y: e.clientY, id: e.pointerId, bouge: false, prete: false, centres };
+    // (le doigt est suivi par toute la main : il peut passer d'une carte à l'autre)
+    try { mainAccueil.setPointerCapture(e.pointerId); } catch (err) {}
     tenirCarte(carte, true);
   });
-  carte.addEventListener("pointermove", (e) => {
-    if (!appui || e.pointerId !== appui.id) return;
-    const dx = e.clientX - appui.x, dy = e.clientY - appui.y;
-    if (Math.abs(dx) > 10 || Math.abs(dy) > 10) appui.bouge = true;
-    // inclinaison : la carte penche vers le doigt (mesurée sur la carte sans sa rotation)
-    const h = carte.offsetHeight, l = carte.offsetWidth;
-    const borne = (v) => Math.max(-1, Math.min(1, v));
-    carte.style.setProperty("--ry", (borne(dx / l) * INCLINAISON_CARTE).toFixed(1) + "deg");
-    carte.style.setProperty("--rx", (borne(-dy / h) * INCLINAISON_CARTE).toFixed(1) + "deg");
-    carte.style.setProperty("--tire", Math.min(0, dy) + "px");
-    if (dy < -h * TIRAGE_CARTE) { appui = null; ignorerClic = Date.now(); jouerCarte(carte, action); }
-  });
-  carte.addEventListener("pointerup", (e) => {
-    if (!appui || e.pointerId !== appui.id) return;
-    const tap = !appui.bouge;
-    lacher();
-    ignorerClic = Date.now();
-    if (tap) jouerCarte(carte, action);
-  });
-  carte.addEventListener("pointercancel", lacher);
-  carte.addEventListener("lostpointercapture", lacher);
   // (un clic sans doigt ni souris : lecteur d'écran, commande vocale)
   carte.addEventListener("click", (e) => {
     e.stopImmediatePropagation();
-    if (Date.now() - ignorerClic < 800) return;
+    if (Date.now() - ignorerClicCarte < 800) return;
     jouerCarte(carte, action);
   });
   carte.addEventListener("keydown", (e) => {
