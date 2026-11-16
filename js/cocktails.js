@@ -25,6 +25,10 @@ const COCKTAILS = [
     p: "Écrase le citron vert et le sucre dans le verre, remplis de glace pilée, verse la cachaça et mélange." },
   { n: "Dark 'n' Stormy", g: "rhum", v: "Grand verre", i: ["6 cl de rhum brun", "10 cl de ginger beer", "1 quartier de citron vert", "Glaçons"],
     p: "Verse la ginger beer sur les glaçons, puis le rhum par-dessus. Presse le citron vert." },
+  { n: "Tropical Breeze", g: "rhum", v: "Grand verre", i: ["3 cl de rhum", "3 cl de crème de coco", "1,5 cl de crème de banane", "6 cl de jus d'orange", "1 tranche d'ananas", "Glaçons"],
+    p: "Secoue le rhum, la crème de coco, la crème de banane et le jus d'orange au shaker avec des glaçons, puis verse dans le verre. Décore d'une tranche d'ananas." },
+  { n: "Grim Reaper", g: "rhum", v: "Verre large", i: ["3 cl de liqueur de café", "3 cl de rhum très fort (151 proof, environ 75 %)", "1 trait de grenadine", "Glaçons"],
+    p: "Mélange la liqueur de café et le rhum dans le verre, ajoute vite les glaçons, puis verse la grenadine par-dessus pour lui donner sa teinte rouge. Très fort : il compte pour plus de deux verres." },
   // ----- Vodka -----
   { n: "Moscow Mule", g: "vodka", v: "Tasse en cuivre ou grand verre", i: ["4,5 cl de vodka", "12 cl de ginger beer", "1 cl de jus de citron vert", "Glaçons"],
     p: "Verse la vodka et le citron vert sur les glaçons, complète de ginger beer." },
