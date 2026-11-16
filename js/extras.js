@@ -95,30 +95,34 @@ function remplirListeBar(zone){
       d.setAttribute("name", "cocktail");
       d.dataset.cocktail = c.n;
       const titre = elementExtras("summary", "nomRegle faqQuestion", c.n);
-      const etoile = elementExtras("span", "barEtoile", favoris.has(c.id) ? "★" : "");
-      etoile.setAttribute("aria-hidden", "true");
-      titre.prepend(etoile);
+      // Étoile à droite du nom : vide, dorée quand la recette est en favori (sans avoir à déplier la recette)
+      const etoile = elementExtras("span", "barEtoile"); // (pas un <button> : les thèmes Star Wars et BDSM encadrent tous les boutons)
+      etoile.setAttribute("role", "button");
+      etoile.tabIndex = 0;
+      const majFavori = () => {
+        const fav = favoris.has(c.id);
+        etoile.textContent = fav ? "★" : "☆";
+        etoile.classList.toggle("doree", fav);
+        etoile.setAttribute("aria-pressed", String(fav));
+        etoile.setAttribute("aria-label", fav ? tr("Retirer des favoris") : tr("Ajouter aux favoris"));
+      };
+      const basculer = (e) => {
+        e.preventDefault(); e.stopPropagation(); // (ne déplie pas la recette)
+        if (!favoris.delete(c.id)) favoris.add(c.id);
+        ecrireFavorisBar(favoris);
+        tic(10);
+        majFavori();
+      };
+      etoile.addEventListener("click", basculer);
+      etoile.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") basculer(e); });
+      majFavori();
+      titre.appendChild(etoile);
       titre.appendChild(elementExtras("span", "barSous", tr`${c.i.length} ingrédients · ${c.v}`));
       d.appendChild(titre);
       const corps = elementExtras("div", "detailRegle barRecette");
       const ingredients = elementExtras("ul", "lignesRegle");
       c.i.forEach((ligne) => ingredients.appendChild(elementExtras("li", "", ligne)));
-      const bouton = elementExtras("button", "extrasPuce barFavori");
-      bouton.type = "button";
-      const majFavori = () => {
-        const fav = favoris.has(c.id);
-        bouton.textContent = fav ? "★ " + tr("Retirer des favoris") : "☆ " + tr("Ajouter aux favoris");
-        bouton.setAttribute("aria-pressed", String(fav));
-        etoile.textContent = fav ? "★" : "";
-      };
-      bouton.addEventListener("click", () => { // (la recette reste ouverte : on met seulement l'étoile à jour)
-        if (!favoris.delete(c.id)) favoris.add(c.id);
-        ecrireFavorisBar(favoris);
-        tic(10);
-        majFavori();
-      });
-      majFavori();
-      corps.append(ingredients, elementExtras("p", "", c.p), elementExtras("p", "barVerre", "🍸 " + c.v), bouton);
+      corps.append(ingredients, elementExtras("p", "", c.p), elementExtras("p", "barVerre", "🍸 " + c.v));
       d.appendChild(corps);
       bloc.appendChild(d);
     });
