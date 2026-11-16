@@ -10052,7 +10052,9 @@ html[data-theme="noir"] body :is(#btnBarAccueil, #btnEthyloAccueil)::before{ bor
 /* Réglages en Tuiles, dans TOUS les thèmes : plus de cadre (le « carré ») autour de la tuile ouverte.
    Elle s'éclaire, avec une ombre foncée dessous (pour les thèmes clairs) et un halo de la couleur de son texte
    et se soulève légèrement (3 px, sans grossir). (!important : les thèmes y mettaient leur cadre et leur éclairage) */
-#ecranReglages #tuilesReglages .tuileReglage{ transition: transform .2s ease, filter .2s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease; }
+/* (seule la tuile qu'on ouvre s'allume en douceur ; celle qu'on quitte s'éteint d'un coup, sans fondu) */
+html body #ecranReglages #tuilesReglages .tuileReglage:not(.choisie){ transition: none !important; }
+html body #ecranReglages #tuilesReglages .tuileReglage.choisie{ transition: transform .2s ease, filter .2s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease !important; }
 html[data-theme] body #ecranReglages #tuilesReglages .tuileReglage.choisie,
 html body #ecranReglages #tuilesReglages .tuileReglage.choisie{
   outline: none !important;
