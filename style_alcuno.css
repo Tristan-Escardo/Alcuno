@@ -8203,7 +8203,7 @@ html[data-theme="galaxie"] #choixMode{ background-color:#02030a !important; back
     radial-gradient(1.6px 1.6px at 262px 18px, #fff 60%, transparent 61%),
     radial-gradient(circle at 66% 76%, #fff6d0 0 9px, rgba(255,210,120,.55) 10px, transparent 24px),
     radial-gradient(circle at 74% 78.5%, #ffe3a0 0 6px, rgba(255,170,90,.5) 7px, transparent 18px),
-    radial-gradient(circle at 50% 37%, #02030a 0 6%, transparent 24%, transparent 46%, #02030a 78%),
+    radial-gradient(circle at 50% 37%, #02030a 0 6%, transparent 24%, transparent 46%, rgba(2,3,10,.3) 100%),
     repeating-conic-gradient(from 0deg at 50% 37%, transparent 0deg 2.6deg, rgba(190,215,255,.32) 2.6deg 2.8deg, transparent 2.8deg 5.1deg, rgba(255,255,255,.18) 5.1deg 5.2deg),
     radial-gradient(ellipse at 80% 10%, rgba(60,90,200,.35), transparent 50%), linear-gradient(#02030a,#02030a) !important;
   background-size: 370px 250px, 370px 250px, 370px 250px, 370px 250px, 370px 250px, 370px 250px, 370px 250px, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100% !important;
