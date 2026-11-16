@@ -105,6 +105,9 @@
     t.append(el("span", "tuileIcone", g.icone), el("span", "tuileNom", g.nom));
     t.addEventListener("click", () => {
       const ancien = actif;
+      // (la lumière change dès le tap, sans attendre que le contenu de l'ancienne page ait fini de s'effacer)
+      tuiles.querySelectorAll(".tuileReglage").forEach((x) => x.classList.toggle("choisie", ancien !== g.id && x === t));
+      placerHalo();
       const ouvrir = (id) => { actif = id; majVue(); const bl = blocsVisiblesDe(id); entrer(bl); if (bl[0]) setTimeout(() => { try { bl[0].scrollIntoView({ behavior: calme() ? "auto" : "smooth", block: "nearest" }); } catch (e) {} }, 60); };
       if (ancien === g.id) sortir(blocsVisiblesDe(ancien), () => { actif = ""; majVue(); }); // (retap : la page se referme)
       else if (ancien) sortir(blocsVisiblesDe(ancien), () => ouvrir(g.id));
@@ -113,23 +116,25 @@
     tuiles.append(t);
   });
   choix.after(tuiles);
-  // Lumière de la tuile ouverte : deux calques (halo sous les tuiles, éclaircissement par-dessus) qui glissent ensemble
-  // d'une tuile à l'autre (style_alcuno.css, « .haloTuile » et « .lumiereTuile »)
+  // Lumière de la tuile ouverte : deux calques (halo sous les tuiles, éclaircissement par-dessus), éteints d'un coup sur la
+  // tuile qu'on quitte et rallumés sur place sur la nouvelle, sans déplacement (style_alcuno.css, « .haloTuile »)
   const calquesLumiere = [el("div", "haloTuile"), el("div", "lumiereTuile")];
   calquesLumiere.forEach((c) => { c.setAttribute("aria-hidden", "true"); tuiles.append(c); });
+  let tuileEclairee = null;
   function placerHalo(){
     const t = vue === "tuiles" && actif ? tuiles.querySelector(".tuileReglage.choisie") : null;
-    if (!t || !t.offsetWidth) { calquesLumiere.forEach((c) => c.classList.remove("visible")); return; }
-    const premiere = !calquesLumiere[0].classList.contains("visible"); // (rien d'allumé avant : elle apparaît sur place, sans glisser)
+    if (!t || !t.offsetWidth) { tuileEclairee = null; calquesLumiere.forEach((c) => { c.classList.add("sansAnim"); c.classList.remove("visible"); }); return; }
+    const nouvelle = t !== tuileEclairee;
+    tuileEclairee = t;
     const st = getComputedStyle(t);
     calquesLumiere.forEach((c) => {
-      if (premiere) c.classList.add("sansAnim");
+      if (nouvelle) { c.classList.add("sansAnim"); c.classList.remove("visible"); } // (éteinte d'un coup là où elle était)
       c.style.width = t.offsetWidth + "px"; c.style.height = t.offsetHeight + "px";
       c.style.borderRadius = st.borderRadius; c.style.color = st.color;
-      c.style.transform = `translate(${t.offsetLeft}px, ${t.offsetTop - 3}px)`; // (3 px : la tuile ouverte est soulevée)
-      if (premiere) { void c.offsetWidth; c.classList.remove("sansAnim"); }
-      c.classList.add("visible");
+      c.style.setProperty("--x", t.offsetLeft + "px"); c.style.setProperty("--y", (t.offsetTop - 3) + "px"); // (3 px : tuile soulevée)
     });
+    if (nouvelle) void calquesLumiere[0].offsetWidth; // (posée, invisible, sur la nouvelle tuile…)
+    calquesLumiere.forEach((c) => { c.classList.remove("sansAnim"); c.classList.add("visible"); }); // (… puis elle s'y allume)
   }
   window.addEventListener("resize", placerHalo);
 

@@ -10050,9 +10050,9 @@ html[data-theme="noir"] body :is(#btnBarAccueil, #btnEthyloAccueil){ border-colo
 html[data-theme="noir"] body :is(#btnBarAccueil, #btnEthyloAccueil)::before{ border-color: var(--noir-btn-bord) !important; }
 
 /* Réglages en Tuiles, dans TOUS les thèmes : plus de cadre (le « carré ») autour de la tuile ouverte.
-   La lumière de la tuile ouverte est un seul calque (.haloTuile, posé par js/reglages-vue.js) qui GLISSE d'une tuile à
-   l'autre : voile clair sur la tuile, ombre dessous, halo de la couleur du texte. Rien n'est allumé ni éteint tuile par
-   tuile (les filtres et ombres animés saccadaient sur iPhone) : seuls des déplacements et une opacité sont animés.
+   La lumière de la tuile ouverte est faite de deux calques (posés par js/reglages-vue.js) : ils s'éteignent d'un coup sur
+   la tuile qu'on quitte et s'allument sur place sur la nouvelle (apparition rapide : opacité et taille, pas de
+   déplacement). Les filtres et ombres des tuiles elles-mêmes ne sont pas animés (ça saccadait sur iPhone).
    La tuile ouverte se soulève de 3 px. (!important : les thèmes y mettaient leur cadre, leur éclairage, leurs transitions) */
 #ecranReglages #tuilesReglages{ position: relative; isolation: isolate; } /* (isolate : le halo peut passer SOUS les tuiles) */
 html body #ecranReglages #tuilesReglages .tuileReglage{ transition: transform .22s cubic-bezier(.3, .9, .3, 1.2) !important; }
@@ -10063,12 +10063,13 @@ html body #ecranReglages #tuilesReglages .tuileReglage.choisie{
   position: relative; z-index: 1;
   transform: translateY(-3px);
 }
-/* deux calques qui glissent ensemble : le halo et l'ombre SOUS les tuiles, l'éclaircissement PAR-DESSUS (il éclaire ce
+/* deux calques posés ensemble : le halo et l'ombre SOUS les tuiles, l'éclaircissement PAR-DESSUS (il éclaire ce
    qu'il recouvre, comme un filtre sur la tuile, plus un voile blanc très léger pour les tuiles presque noires) */
 #ecranReglages #tuilesReglages :is(.haloTuile, .lumiereTuile){
   position: absolute; top: 0; left: 0; pointer-events: none;
   opacity: 0;
-  transition: transform .32s cubic-bezier(.3, .9, .3, 1.12), opacity .2s ease;
+  transform: translate(var(--x, 0px), var(--y, 0px)) scale(0.94);
+  transition: transform .2s cubic-bezier(.3, .9, .3, 1.3), opacity .16s ease;
   will-change: transform, opacity;
 }
 #ecranReglages #tuilesReglages .haloTuile{
@@ -10077,7 +10078,7 @@ html body #ecranReglages #tuilesReglages .tuileReglage.choisie{
 }
 #ecranReglages #tuilesReglages .lumiereTuile{ z-index: 2; background: rgba(255,255,255,0.07);
   -webkit-backdrop-filter: brightness(1.28) saturate(1.1); backdrop-filter: brightness(1.28) saturate(1.1); }
-#ecranReglages #tuilesReglages :is(.haloTuile, .lumiereTuile).visible{ opacity: 1; }
+#ecranReglages #tuilesReglages :is(.haloTuile, .lumiereTuile).visible{ opacity: 1; transform: translate(var(--x, 0px), var(--y, 0px)); }
 #ecranReglages #tuilesReglages :is(.haloTuile, .lumiereTuile).sansAnim{ transition: none; }
 /* Star Wars et BDSM : toutes les tuiles ont déjà un néon ; la lumière y a en plus un contour blanc */
 html[data-theme="galaxie"] #ecranReglages #tuilesReglages .haloTuile,
