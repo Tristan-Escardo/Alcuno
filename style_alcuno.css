@@ -9556,17 +9556,17 @@ html[data-theme="galaxie"] #ecranReglages .menuMEPTitre{ color: rgba(234,243,255
 #choixMode .cartesAccueil.distribution .carteEthylo{ animation-delay: 0.4s; }
 /* Carte tenue sous le doigt : elle sort à moitié de la main, grossit, suit le doigt et s'incline ; les autres s'écartent */
 #choixMode .cartesAccueil .carteAccueil.tenue{
-  --leve: -8%;
-  --zoom: 1.04;
+  --leve: -4%;
+  --zoom: 1.03;
   z-index: 4;
-  filter: brightness(1.08);
-  transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.3, 1), filter 0.25s ease, box-shadow 0.25s ease;
+  /* (court : la carte suit le doigt sans traîner ; pas de filtre animé, trop lourd sur iPhone) */
+  transition: transform 0.12s ease-out;
 }
-/* (doigt qui glisse sur l'éventail : les cartes rentrent et sortent en douceur, sans rebond) */
-#choixMode .cartesAccueil.tient .carteAccueil:not(.tenue){ --leve: 5%; filter: brightness(0.8);
-  transition: transform 0.28s cubic-bezier(0.25, 0.8, 0.3, 1), filter 0.25s ease, box-shadow 0.25s ease; }
+/* (doigt qui glisse sur l'éventail : les autres cartes rentrent en douceur, sans rebond) */
+#choixMode .cartesAccueil.tient .carteAccueil:not(.tenue){ --leve: 4%; transition: transform 0.22s ease-out; }
 /* Carte assez sortie pour être jouée quand on lève le doigt (js/extras.js) : elle s'éclaire un peu plus */
 #choixMode .cartesAccueil .carteAccueil.tenue.prete{ filter: brightness(1.25); }
+#choixMode .cartesAccueil .carteAccueil{ will-change: transform; } /* (chaque carte sur son propre calque : animations plus fluides) */
 /* Carte jouée : elle se redresse, monte et grandit en s'effaçant pendant que sa page arrive ; les autres retombent */
 #choixMode .cartesAccueil .carteAccueil.jouee{
   --angle: 0deg;

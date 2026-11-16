@@ -611,7 +611,7 @@ function tenirCarte(carte, oui){
   const cartes = cartesVisibles(), k = cartes.indexOf(carte);
   mainAccueil.classList.toggle("tient", oui);
   carte.classList.toggle("tenue", oui);
-  cartes.forEach((c, j) => { if (c !== carte) c.style.setProperty("--ecart", oui ? (j < k ? -4 : 4) + "deg" : "0deg"); });
+  cartes.forEach((c, j) => { if (c !== carte) c.style.setProperty("--ecart", oui ? (j < k ? -2 : 2) + "deg" : "0deg"); });
   if (!oui) ["--tire", "--rx", "--ry"].forEach((v) => carte.style.removeProperty(v));
 }
 function jouerCarte(carte, action){
@@ -628,6 +628,7 @@ function jouerCarte(carte, action){
   }, calmeAccueil() ? 0 : DELAI_CARTE_JOUEE);
 }
 
+const ZONE_MORTE_TIRE = 14;      // px : le doigt doit monter de plus que ça avant que la carte le suive
 const SORTIE_VERROU = 0.15;       // sortie de plus de 15 % de sa hauteur : glisser de côté ne change plus de carte
 const actionsCartes = new Map(); // carte => ce qu'elle ouvre
 let appuiMain = null;            // doigt posé sur la main : { carte, x, y, id, bouge, prete, centres }
@@ -661,7 +662,8 @@ function suivreDoigt(e){
   const borne = (v) => Math.max(-1, Math.min(1, v));
   carte.style.setProperty("--ry", (borne((e.clientX - centre) / l) * INCLINAISON_CARTE).toFixed(1) + "deg");
   carte.style.setProperty("--rx", (borne(-dy / h) * INCLINAISON_CARTE).toFixed(1) + "deg");
-  carte.style.setProperty("--tire", Math.max(-h * 0.9, Math.min(0, dy)) + "px");
+  // (la carte ne monte qu'une fois le doigt nettement avancé : glisser de côté en déviant un peu ne la fait pas sortir)
+  carte.style.setProperty("--tire", Math.max(-h * 0.9, Math.min(0, dy + ZONE_MORTE_TIRE)) + "px");
   // assez sortie : elle sera jouée au lâcher (petite vibration au passage, dans un sens comme dans l'autre)
   const prete = dy < -h * TIRAGE_CARTE;
   if (prete !== a.prete) {
