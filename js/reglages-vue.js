@@ -113,6 +113,25 @@
     tuiles.append(t);
   });
   choix.after(tuiles);
+  // Lumière de la tuile ouverte : deux calques (halo sous les tuiles, éclaircissement par-dessus) qui glissent ensemble
+  // d'une tuile à l'autre (style_alcuno.css, « .haloTuile » et « .lumiereTuile »)
+  const calquesLumiere = [el("div", "haloTuile"), el("div", "lumiereTuile")];
+  calquesLumiere.forEach((c) => { c.setAttribute("aria-hidden", "true"); tuiles.append(c); });
+  function placerHalo(){
+    const t = vue === "tuiles" && actif ? tuiles.querySelector(".tuileReglage.choisie") : null;
+    if (!t || !t.offsetWidth) { calquesLumiere.forEach((c) => c.classList.remove("visible")); return; }
+    const premiere = !calquesLumiere[0].classList.contains("visible"); // (rien d'allumé avant : elle apparaît sur place, sans glisser)
+    const st = getComputedStyle(t);
+    calquesLumiere.forEach((c) => {
+      if (premiere) c.classList.add("sansAnim");
+      c.style.width = t.offsetWidth + "px"; c.style.height = t.offsetHeight + "px";
+      c.style.borderRadius = st.borderRadius; c.style.color = st.color;
+      c.style.transform = `translate(${t.offsetLeft}px, ${t.offsetTop - 3}px)`; // (3 px : la tuile ouverte est soulevée)
+      if (premiere) { void c.offsetWidth; c.classList.remove("sansAnim"); }
+      c.classList.add("visible");
+    });
+  }
+  window.addEventListener("resize", placerHalo);
 
   // En-têtes de groupe (sections : titre à ouvrir / fermer ; tuiles : bouton « ← Groupe » au-dessus de la page ouverte)
   const entetes = GROUPES.map((g, i) => {
@@ -134,6 +153,7 @@
     itemsMEP.forEach((b) => { const sel = b.dataset.vue === vue; b.classList.toggle("actif", sel); b.setAttribute("aria-checked", sel ? "true" : "false"); });
     btnMEP.querySelector(".mepIcone").innerHTML = ICONES_VUE[vue];
     tuiles.querySelectorAll(".tuileReglage").forEach((t) => t.classList.toggle("choisie", vue === "tuiles" && t.dataset.groupe === actif));
+    placerHalo();
     sauverEtat();
     // Ordre d'affichage (CSS « order ») : un groupe après l'autre ; chaque bloc garde son rang d'origine dans son groupe
     GROUPES.forEach((g, i) => {
