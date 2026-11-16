@@ -8203,12 +8203,11 @@ html[data-theme="galaxie"] #choixMode{ background-color:#02030a !important; back
     radial-gradient(1.6px 1.6px at 262px 18px, #fff 60%, transparent 61%),
     radial-gradient(circle at 66% 76%, #fff6d0 0 9px, rgba(255,210,120,.55) 10px, transparent 24px),
     radial-gradient(circle at 74% 78.5%, #ffe3a0 0 6px, rgba(255,170,90,.5) 7px, transparent 18px),
-    radial-gradient(circle at 88% 94%, #c9b28a 0, #8c6b3e 10%, #3b2a17 17%, transparent 17.5%),
     radial-gradient(circle at 50% 37%, #02030a 0 6%, transparent 24%, transparent 46%, #02030a 78%),
     repeating-conic-gradient(from 0deg at 50% 37%, transparent 0deg 2.6deg, rgba(190,215,255,.32) 2.6deg 2.8deg, transparent 2.8deg 5.1deg, rgba(255,255,255,.18) 5.1deg 5.2deg),
     radial-gradient(ellipse at 80% 10%, rgba(60,90,200,.35), transparent 50%), linear-gradient(#02030a,#02030a) !important;
-  background-size: 370px 250px, 370px 250px, 370px 250px, 370px 250px, 370px 250px, 370px 250px, 370px 250px, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100% !important;
-  background-repeat: repeat, repeat, repeat, repeat, repeat, repeat, repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat !important; }
+  background-size: 370px 250px, 370px 250px, 370px 250px, 370px 250px, 370px 250px, 370px 250px, 370px 250px, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100% !important;
+  background-repeat: repeat, repeat, repeat, repeat, repeat, repeat, repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat !important; }
 html[data-theme="galaxie"] :is(#titreAccueil, header h1){
   font-family: "Arial Black", Impact, Arial, sans-serif !important; color: #000 !important;
   -webkit-text-stroke: 2.4px #FFE81F; paint-order: stroke fill; letter-spacing: .06em !important;
@@ -8245,7 +8244,6 @@ html[data-theme="galaxie"] :is(.btnLivre, #btnReglages, .btnAccueilTexte) svg{ f
 
 html[data-theme="galaxie"] #choixMode #titreAccueil{ font-size: min(15.5vw, 20vh) !important; }
 html[data-theme="galaxie"] header::after{ height: 3px !important; }
-/* Deux soleils sur la planète de l'accueil */
 /* Fenêtres du jeu (annonces, choix) */
 html[data-theme="galaxie"] [id^="overlay"]{ background: radial-gradient(ellipse at 50% 40%, rgba(30,70,170,.45), rgba(2,3,10,.97) 70%), #02030a !important; } /* (fond plein : rien ne doit se voir derrière, ni le plateau ni une autre fenêtre) */
 html[data-theme="galaxie"] :is(.overlay-regle-texte, .titre-pigeon, #overlayAnnulation > div){ color:#FFE81F !important; text-shadow: 0 0 12px rgba(255,232,31,.35) !important; }
