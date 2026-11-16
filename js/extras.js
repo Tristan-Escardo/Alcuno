@@ -634,9 +634,10 @@ let appuiMain = null;            // doigt posé sur la main : { carte, x, y, id,
 let ignorerClicCarte = 0;
 
 // Carte la plus proche du doigt (centres mesurés au moment où le doigt s'est posé, éventail au repos)
+// (la carte tenue garde un peu d'avance : on ne change qu'une fois nettement passé sur la voisine, sans va-et-vient au milieu)
 function carteSousDoigt(x){
   let meilleure = null, d = Infinity;
-  appuiMain.centres.forEach(([c, cx]) => { const e = Math.abs(cx - x); if (e < d) { d = e; meilleure = c; } });
+  appuiMain.centres.forEach(([c, cx]) => { const e = Math.abs(cx - x) - (c === appuiMain.carte ? 10 : 0); if (e < d) { d = e; meilleure = c; } });
   return meilleure;
 }
 function suivreDoigt(e){
