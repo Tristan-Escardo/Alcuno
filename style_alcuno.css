@@ -10115,3 +10115,7 @@ html.android[data-theme="givre"] :is(#btnRemonter, #btnRemonterRegles){ backgrou
       bande entière du plateau s'affichait en bouillie autour d'elle) ; seules les lignes de balayage bleues clignotent encore. */
 html.android[data-theme="galaxie"] .Carte.dos_dore:not(.retournee){ animation: none !important; }
 html.android[data-theme="galaxie"] .Carte.retournee.carte_doree{ animation: none !important; }
+/* 5. Android : texte non sélectionnable (sauf les champs) : un tap sur un mot ouvrait en bas de l'écran la recherche Google de
+      Chrome (« Toucher pour rechercher ») avec ce mot (ex. « annulation »). */
+html.android body, html.android body *{ -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+html.android :is(input, textarea, [contenteditable], [contenteditable] *){ -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
