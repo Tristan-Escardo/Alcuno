@@ -1588,8 +1588,15 @@ function majStickyJoueurActif(){
   const n = Number(annulations[nom] || 0);
   const estPigeon = idx === indexPigeon;
 
-  nomEl.innerText = estPigeon ? tr`PIGEON (${avecCouronne(nom)})` : avecCouronne(nom);
-  ajouterBadgeDeconnecte(nomEl, !!texteDeconnecte(nom));
+  const libelleNom = estPigeon ? tr`PIGEON (${avecCouronne(nom)})` : avecCouronne(nom);
+  if(texteDeconnecte(nom)){ // (le nom dans son propre bloc : c'est lui qui se raccourcit, pas la mention « déconnecté(e) »)
+    nomEl.textContent = "";
+    const texteNom = document.createElement("span");
+    texteNom.className = "sticky-nom-texte";
+    texteNom.innerText = libelleNom;
+    nomEl.appendChild(texteNom);
+    ajouterBadgeDeconnecte(nomEl, true);
+  } else nomEl.innerText = libelleNom;
   bonusEl.innerText = n > 0 ? `+${n}` : "";
   // Un tour = un nombre de cartes restantes dans la manche
   const tour = `${mancheCourante}:${cartesRestantes()}`;

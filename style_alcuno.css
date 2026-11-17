@@ -10130,3 +10130,16 @@ html.android :is(input, textarea, [contenteditable], [contenteditable] *){ -webk
 @media (prefers-reduced-motion: reduce){ :root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn.appuye{ animation: none; filter: brightness(1.3); } }
 /* Barre d'info en bas (même allure que « Mauvais joueur ? », sans bouton) : le texte prend toute la place */
 #annulerChoix.barreInfo .annulerChoix-texte{ text-align: center; }
+
+/* En ligne, « déconnecté(e) » : il prenait la place du nom (nom long ou « PIGEON (…) » écrasé lettre par lettre dans la pastille,
+   mention coupée dans le bandeau du haut). Dans la liste des joueurs, la mention passe sur sa propre ligne, sous le nom (petit
+   texte rouge, sans pastille) ; dans le bandeau du haut, le nom se raccourcit (…) et la mention reste entière à côté. */
+#listeJoueurs .joueur-ligne:has(.joueur-deconnecte){ flex-wrap: wrap; row-gap: 0; }
+#listeJoueurs .joueur-ligne .joueur-deconnecte{
+  order: 99; flex: 0 0 100%; margin: 0; padding: 0 0 2px; background: none; border-radius: 0;
+  font-size: 0.72em; line-height: 1.2; text-align: left;
+}
+html #listeJoueurs .joueur-ligne-actif .joueur-deconnecte{ text-align: center; font-size: 0.5em; }
+#stickyJoueurActif .sticky-nom:has(.joueur-deconnecte){ display: inline-flex; align-items: center; gap: 6px; overflow: visible; }
+#stickyJoueurActif .sticky-nom-texte{ min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#stickyJoueurActif .sticky-nom .joueur-deconnecte{ flex: 0 0 auto; margin-left: 0; font-size: 0.62em; }
