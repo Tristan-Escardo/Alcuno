@@ -10081,3 +10081,29 @@ html[data-theme="donjon"] #ecranReglages #tuilesReglages .haloTuile{
    faisait défiler (ou rebondir) la page derrière. Aucun glissement n'y est utile (les taps marchent toujours, et les cartes
    Bar / Éthylo et le zizi-coptère suivent le doigt par leur propre code). ===== */
 #choixMode{ touch-action: none; overscroll-behavior: none; }
+
+/* ===== Android : moins d'effets graphiques animés (affichage cassé sur certains Android) =====
+   html.android est posé au tout début de index.html. Sur iPhone rien ne change.
+   1. Duel : le halo des cartes à choisir n'anime plus l'ombre de la carte (elle devenait un gros pavé jaune) : l'ombre est
+      dessinée une fois sur un calque (::before) dont on fait seulement varier l'opacité.
+   2. Faces cachées : les cartes recachées du plateau n'ont plus de filtre (gris + sombre) : un filtre sur des dizaines de cartes
+      cassait l'affichage quand on fait défiler le plateau. À la place, un voile sombre posé dessus. */
+html.android #overlayDuel .Carte.duel-a-choisir{
+  animation: none !important; position: relative;
+  box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.75);
+}
+html.android #overlayDuel .Carte.duel-a-choisir::before{
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.95), 0 0 24px rgba(255, 215, 0, 0.6);
+  animation: duelLueurAndroid 1.6s ease-in-out infinite;
+}
+html.android[data-theme="givre"] #overlayDuel .Carte.duel-a-choisir{ box-shadow: 0 0 0 2px rgba(26, 146, 214, 0.75); }
+html.android[data-theme="givre"] #overlayDuel .Carte.duel-a-choisir::before{ box-shadow: 0 0 0 2px rgba(26, 146, 214, 0.95), 0 0 24px rgba(26, 146, 214, 0.6); }
+@keyframes duelLueurAndroid{ 0%, 100%{ opacity: 0.2; } 50%{ opacity: 1; } }
+html.android.faces-fermees[data-theme] #plateau .Carte.retournee.recachee,
+html.android.faces-fermees #plateau .Carte.retournee.recachee{ filter: none !important; position: relative; }
+html.android.faces-fermees #plateau .Carte.retournee.recachee::before{
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; background: rgba(14, 14, 18, 0.62);
+}
+html.android #plateau .Carte.retournee{ transition: transform 0.2s ease-out; }
+@media (prefers-reduced-motion: reduce){ html.android #overlayDuel .Carte.duel-a-choisir::before{ animation: none; } }

@@ -9,7 +9,7 @@
          (Avant : « ?t= » + l'heure, différent à chaque lancement : tout le jeu était retéléchargé à chaque ouverture,
          environ 400 Ko. Maintenant, tant que la version ne change pas, le navigateur se contente de vérifier.) -->
     <script>
-        window.VERSION_FICHIERS = "9.95.38";
+        window.VERSION_FICHIERS = "9.95.39";
         // (ailleurs que sur le vrai site — poste de dev, appli de test — : l'heure en plus, comme avant, pour voir tout de
         // suite un fichier modifié sans changer de version)
         window.ANTI_CACHE = /(^|\.)github\.io$/i.test(location.hostname) ? window.VERSION_FICHIERS : window.VERSION_FICHIERS + "-" + Date.now();
@@ -82,7 +82,7 @@
         });
         // Thème choisi dans les réglages : appliqué tout de suite (pas de flash de bordeaux au chargement)
         // (ancien thème « violet » remplacé par « soleil »)
-        try { var theme = localStorage.getItem("alcuno_theme"); if (theme === "violet") { theme = "soleil"; localStorage.setItem("alcuno_theme", theme); } if (theme) document.documentElement.dataset.theme = theme; } catch (e) {}
+        try { var theme = localStorage.getItem("alcuno_theme"); if (theme === "violet") { theme = "soleil"; localStorage.setItem("alcuno_theme", theme); } if (theme) document.documentElement.dataset.theme = theme; } catch (e) {} if (/android/i.test(navigator.userAgent)) document.documentElement.classList.add("android"); // (style_alcuno.css : effets allégés sur Android)
         // Fêtes qui ne sont pas des thèmes (voir FETES.md), à la date du téléphone : le Nouvel An (le 1er
         // janvier) et la Fête nationale (du 13 au 15 juillet). Les deux posent les mêmes feux d'artifice ;
         // seul le Nouvel An ajoute en plus un chapeau de fête sur le O du titre. Hors de ces dates, rien :
