@@ -80,7 +80,7 @@ function poissonParcourir(racine){
     }
   }
   const marcheur = document.createTreeWalker(racine, NodeFilter.SHOW_TEXT, {
-    acceptNode: (nd) => /^(SCRIPT|STYLE|TEXTAREA)$/.test(nd.parentNode?.tagName) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT
+    acceptNode: (nd) => /^(SCRIPT|STYLE|TEXTAREA)$/.test(nd.parentNode && nd.parentNode.tagName) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT
   });
   const noeuds = [];
   while (marcheur.nextNode()) noeuds.push(marcheur.currentNode);

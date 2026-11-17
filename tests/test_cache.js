@@ -47,5 +47,14 @@ verifier(manquantes.length === 0, `images absentes de A_PRECHARGER dans sw.js ${
   verifier(!!vJeu && vFichiers === vJeu, `VERSION_FICHIERS dans index.html (${vFichiers}) = VERSION_AFFICHEE dans script.js (${vJeu})`);
 }
 
+// Pas de syntaxe trop récente dans les fichiers du jeu (« ?. », « ?? », « ||= » : Chrome 80 / 85) : les navigateurs
+// des télés de quelques années (Samsung, LG…) ne la comprennent pas, et tout le fichier ne se charge plus
+// (la page télé ne s'ouvrait plus). Écrire « a && a.b » ou « (x != null ? x : y) » à la place.
+const SANS_COMMENTAIRES = (s) => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:"'\\])\/\/.*$/gm, "$1");
+const tropRecent = /[\w)\]]\?\.[A-Za-z_$(\[]|[\w)\]] ?\?\? ?[\w("'\[!-]|(\|\||&&|\?\?)=/;
+const fichiersJeu = JSON.parse(fs.readFileSync(path.join(RACINE, "index.html"), "utf8").match(/FICHIERS_JEU = (\[[^\]]+\])/)[1]).concat(["js/langue.js", "js/en.js", "sw.js"]);
+const syntaxeRecente = fichiersJeu.filter((f) => SANS_COMMENTAIRES(fs.readFileSync(path.join(RACINE, f), "utf8")).split("\n").some((l) => tropRecent.test(l.replace(/"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`/g, '""'))));
+verifier(!syntaxeRecente.length, "pas de « ?. », « ?? » ni « ||= » dans les fichiers du jeu (télés plus anciennes)" + (syntaxeRecente.length ? " : " + syntaxeRecente.join(", ") : ""));
+
 console.log(echecs ? `\n${echecs} ÉCHEC(S)` : "\nTOUT EST OK");
 process.exit(echecs ? 1 : 0);

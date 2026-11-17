@@ -1658,7 +1658,7 @@ function appliquerRegle(carteTiree, joueurActuel, carteElement){
     montrerOverlayRegle(entete, carteTiree);
     // pastille « Défi hot spécial Saint-Valentin » au-dessus du titre de l'annonce (même style que la fenêtre de choix)
     const titreAnnonce = document.querySelector("#overlayRegleUnique .regle-titre");
-    if(titreAnnonce && !titreAnnonce.previousElementSibling?.classList.contains("foudre-badge")){
+    if(titreAnnonce && !(titreAnnonce.previousElementSibling && titreAnnonce.previousElementSibling.classList.contains("foudre-badge"))){
       const badge = document.createElement("div");
       badge.className = "foudre-badge";
       badge.innerHTML = (partieHard ? SVG_18_BARRE + tr(" Défi hard") : tr("🔥 Défi hot")) + tr(' spécial <span class="foudre-nowrap">Saint-Valentin</span> 💘');
