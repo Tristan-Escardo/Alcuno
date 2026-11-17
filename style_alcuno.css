@@ -10460,3 +10460,34 @@ html[data-theme="givre"] #ecranTele .tele-joueur-actif{
 /* « Ta partie », en ligne : une seule phrase sur l'hôte, en haut (au lieu d'une sous chaque mode) */
 #ecranReglages .optionsPartieEnLigne{ display: none; margin: 0 4px 12px; font-size: 14px; font-weight: 700; line-height: 1.4; text-align: center; opacity: 0.9; }
 #ecranReglages.options-en-ligne .optionsPartieEnLigne{ display: block; }
+
+/* ===== Éthylotest dans tous les thèmes : le taux (rouge / orange) et les textes du résultat se lisaient mal sur les thèmes vifs ou clairs ===== */
+/* Thèmes vifs : la carte du résultat prend la couleur du thème assombrie (le rouge et le jaune du taux ressortent) */
+html[data-theme="soleil"] #ecranRegles .blocRegles.ethyloResultat,
+html[data-theme="prestige"] #ecranRegles .blocRegles.ethyloResultat,
+html[data-theme="noel"] #ecranRegles .blocRegles.ethyloResultat,
+html[data-theme="chandeleur"] #ecranRegles .blocRegles.ethyloResultat,
+html[data-theme="valentin"] #ecranRegles .blocRegles.ethyloResultat,
+html[data-theme="patrick"] #ecranRegles .blocRegles.ethyloResultat,
+html[data-theme="justrose"] #ecranRegles .blocRegles.ethyloResultat,
+html[data-theme="musique"] #ecranRegles .blocRegles.ethyloResultat{
+  background: linear-gradient(rgba(10, 2, 8, 0.62), rgba(10, 2, 8, 0.62)), var(--couleur-barre, #2b001d) !important;
+}
+html[data-theme="prestige"] #ecranRegles .ethyloResultat :is(.ethyloVerdict, .ethyloLigne, .ethyloUnite){ color: #fff4d6; text-shadow: none; }
+/* Thèmes clairs (Givre, Kawaii) : taux en rouge / orange foncé */
+html[data-theme="givre"] #ecranRegles .ethyloResultat[data-etat="rouge"] .ethyloChiffre,
+html[data-theme="kawaii"] #ecranRegles .ethyloResultat[data-etat="rouge"] .ethyloChiffre{ color: #c4122f; }
+html[data-theme="givre"] #ecranRegles .ethyloResultat[data-etat="orange"] .ethyloChiffre,
+html[data-theme="kawaii"] #ecranRegles .ethyloResultat[data-etat="orange"] .ethyloChiffre{ color: #a85d00; }
+/* Titre sur le fond orange de la Chandeleur : blanc à ombre caramel (le jaune se perdait) */
+html[data-theme="chandeleur"] #ecranRegles.ethylo h2{ color: #fff; text-shadow: 0 2px 0 #7a3008, 0 4px 12px rgba(70, 25, 0, 0.45); }
+/* Petites graduations des curseurs : un peu plus marquées partout */
+#ecranRegles .ethyloTraitTexte{ opacity: 0.88; }
+/* Boutons à choisir (Homme / Femme…) non choisis : un peu moins pâles (4.0 de contraste sur Soleil couchant et Prestige) */
+#ecranRegles .extrasPuce{ opacity: 0.86; }
+#ecranRegles .extrasPuce[aria-pressed="true"]{ opacity: 1; }
+html[data-theme="soleil"] #ecranRegles .ethyloBloc .detailRegle{ color: rgba(255, 255, 255, 0.92); }
+html[data-theme="prestige"] #ecranRegles .ethyloBloc h3{ color: #fff2b0; }
+/* Soleil couchant et Prestige : blocs de l'éthylotest un peu plus sombres (le dégradé du thème passait au travers) */
+html[data-theme="soleil"] #ecranRegles.ethylo .blocRegles:not(.ethyloResultat),
+html[data-theme="prestige"] #ecranRegles.ethylo .blocRegles:not(.ethyloResultat){ box-shadow: inset 0 0 0 100vmax rgba(10, 2, 8, 0.3); }
