@@ -10551,3 +10551,19 @@ html[data-theme]:not([data-theme="galaxie"]):not([data-theme="halloween"]):not([
 #ecranRegles.ethylo h2{ font-size: clamp(32px, 8.4vw, 42px); }
 #ecranRegles.ethylo .ethyloBloc h3{ font-size: 23px; margin-bottom: 8px; }
 #ecranRegles.ethylo .ethyloSousTitre{ font-size: 16px; }
+
+/* ===== Bar et Éthylotest : boutons enfoncés (choisis) dans le même design que la tuile ouverte des Réglages : plus de cadre / anneau, le bouton se soulève
+   de 3 px, ombre dessous, halo de la couleur du texte autour et éclaircissement par-dessus (calque ::after, comme « lumiereTuile ») ===== */
+html[data-theme] #ecranRegles:is(.ethylo, .bar) .extrasPuce[aria-pressed="true"]{
+  outline: none !important; transform: translateY(-3px) !important; position: relative; z-index: 1; opacity: 1;
+  box-shadow: var(--ey-ombre, none), 0 10px 16px -6px rgba(0, 0, 0, 0.5), 0 0 14px 2px color-mix(in srgb, var(--ey-texte, #fff) 32%, transparent) !important;
+}
+html[data-theme] #ecranRegles:is(.ethylo, .bar) .extrasPuce[aria-pressed="true"]::after{
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: rgba(255, 255, 255, 0.05); -webkit-backdrop-filter: brightness(1.14); backdrop-filter: brightness(1.14); /* (moins fort que la tuile : sur un bouton jaune, 1,28 virait au citron) */
+}
+/* Android : pas de flou d'arrière-plan (affichage cassé sur certains Android) : éclaircissement direct */
+html.android[data-theme] #ecranRegles:is(.ethylo, .bar) .extrasPuce[aria-pressed="true"]{ filter: brightness(1.12); }
+html.android[data-theme] #ecranRegles:is(.ethylo, .bar) .extrasPuce[aria-pressed="true"]::after{ display: none; }
+html[data-theme] #ecranRegles:is(.ethylo, .bar) .extrasPuce{ transition: transform .22s cubic-bezier(.3, .9, .3, 1.2), opacity .18s ease; }
+@media (prefers-reduced-motion: reduce){ html[data-theme] #ecranRegles:is(.ethylo, .bar) .extrasPuce{ transition: none; } }
