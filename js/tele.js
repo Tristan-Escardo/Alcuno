@@ -290,6 +290,8 @@ function ecranPourTele(){
     texte: texteSansBoutons(o),
     // (cartes des annonces : leur face sans la classe « retournee » ; cartes du duel encore à choisir : sans face, donc de dos)
     cartes: cartes.slice(0, 4).map(c => faceCarte(c) || (c.classList.contains("dos_dore") ? "d" : "")),
+    // Duel : carte déjà choisie (assombrie), puis carte du perdant (en rouge) et du gagnant (estompée), comme sur le téléphone
+    duel: o.id === "overlayDuel" ? cartes.slice(0, 4).map(c => ["duel-selected", "duel-perdant", "duel-gagnant"].find(k => c.classList.contains(k)) || "") : undefined,
     choix
   };
 }
@@ -1116,7 +1118,12 @@ function dessinerTele(ecran, etat){
   } else if (e) {
     const zoneCartes = surEcran.querySelector(".tele-ecran-cartes");
     zoneCartes.innerHTML = "";
-    (e.cartes || []).forEach(valeur => zoneCartes.appendChild(creerCarteTele(valeur)));
+    (e.cartes || []).forEach((valeur, i) => {
+      const carte = creerCarteTele(valeur);
+      const etatDuel = e.duel && e.duel[i];
+      if (/^duel-(selected|perdant|gagnant)$/.test(etatDuel || "")) carte.classList.add(etatDuel); // (style_alcuno.css, aussi sous #ecranTele)
+      zoneCartes.appendChild(carte);
+    });
     const zoneTexte = surEcran.querySelector(".tele-ecran-texte");
     zoneTexte.innerHTML = "";
     String(e.texte || "").split("\n").filter(Boolean).forEach((t, i) => {
