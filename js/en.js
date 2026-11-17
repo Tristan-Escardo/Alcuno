@@ -1172,5 +1172,7 @@ window.TEXTES_EN = {
 "{0} le fait": "{0} does it",
 "{0} le font": "{0} do it",
 "{0} boivent {1}": "{0} drink {1}",
+"Tu quittes la partie en ligne.": "You are leaving the online game.",
+"Tu quittes la partie.": "You are leaving the game.",
 "🥃 {0} préfère {1} !": "🥃 {0} would rather {1}!"
 };

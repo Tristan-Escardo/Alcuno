@@ -2174,15 +2174,22 @@ function allerAccueil(){
   document.getElementById("choixMode").style.display = "";
 }
 
-document.getElementById("btnAccueil").addEventListener("click", allerAccueil);
-// ⌂ du bandeau (mode classique) : pendant une partie, on demande confirmation
+// ⌂ du bandeau (classique et en ligne, même place) et ⌂ de l'écran « Nouvelle partie » : on demande confirmation
+// (en ligne : toujours, on quitterait la partie ; en classique : pendant une partie, et depuis « Nouvelle partie »)
 const ecranConfirmerAccueil = document.getElementById("ecranConfirmerAccueil");
+function demanderConfirmationAccueil(depuisNouvellePartie = false){
+  const texte = ecranConfirmerAccueil.querySelector(".texteConfirmation");
+  if(texte) texte.innerText = enLigneActif ? tr("Tu quittes la partie en ligne.")
+    : depuisNouvellePartie ? tr("Tu quittes la partie.") : tr("La partie en cours sera perdue.");
+  ecranConfirmerAccueil.style.display = "";
+}
+document.getElementById("btnAccueil").addEventListener("click", () => demanderConfirmationAccueil(true));
 btnAccueilClassique.addEventListener("click", () => {
-  if(!partieLancee){
+  if(!partieLancee && !enLigneActif){
     allerAccueil();
     return;
   }
-  ecranConfirmerAccueil.style.display = "";
+  demanderConfirmationAccueil();
 });
 document.getElementById("btnConfirmerAccueilOui").addEventListener("click", () => {
   ecranConfirmerAccueil.style.display = "none";

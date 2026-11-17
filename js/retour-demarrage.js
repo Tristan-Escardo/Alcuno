@@ -87,7 +87,7 @@ function actionRetour(){
   // Plateau (classique ou en ligne) : même chose que ⌂, avec confirmation si une partie est en cours
   if(estVisible(menu) || estVisible(document.getElementById("jeu"))){
     return () => {
-      if(partieLancee) ecranConfirmerAccueil.style.display = "";
+      if(partieLancee || enLigneActif) demanderConfirmationAccueil();
       else allerAccueil();
     };
   }
