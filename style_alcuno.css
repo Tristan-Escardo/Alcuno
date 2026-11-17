@@ -10317,3 +10317,44 @@ html.android.poisson-uno[data-theme="galaxie"] #ecranRegles .ligneRegle .Carte.r
 :root:root:root:root #ecranTele#ecranTele .bloc-hot-texte{ font-size: 4.4vh; margin: 0.6vh 0 2.4vh; }
 :root:root:root:root #ecranTele#ecranTele .bloc-hot-boutons{ gap: 2vh; }
 :root:root:root:root #ecranTele#ecranTele .bloc-hot-btn{ display: block; padding: 1.8vh 1vh !important; border-radius: 2.4vh !important; font-size: 3.4vh !important; cursor: default; }
+
+/* ===== Télé : pari sur la dernière carte (js/tele.js, dessinerPariTele) : les joueurs avec leur carte en grand ===== */
+#ecranTele .tele-ecran-pari{ gap: 0; padding: 3vh 4vw; }
+#ecranTele .tele-ecran-pari .tele-ecran-texte{ width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: space-evenly; }
+#ecranTele .tele-pari-haut .tele-ecran-titre{ font-size: 6.4vh; }
+#ecranTele .tele-pari-regle{ font-size: 3vh; margin-top: 0.6vh; }
+#ecranTele .tele-pari-tour{ display: inline-block; margin-top: 1.6vh; padding: 0.8vh 2.6vh; border-radius: 99px; font-size: 3.2vh; font-weight: 900;
+  color: #2b001d; background: #FFD700; box-shadow: 0 0 2.4vh rgba(255, 215, 0, 0.45); }
+#ecranTele .tele-pari-joueurs{ display: flex; justify-content: center; align-items: flex-start; gap: 3vh; flex-wrap: nowrap; max-width: 92vw; }
+#ecranTele .tele-pari-joueur{ display: flex; flex-direction: column; align-items: center; gap: 1vh; width: 21vh; padding: 1.6vh 1.2vh; border-radius: 2.2vh;
+  background: rgba(255, 255, 255, 0.06); border: 0.3vh solid rgba(255, 255, 255, 0.12); transition: transform 0.25s ease, opacity 0.25s ease; }
+#ecranTele .tele-pari-joueur .Carte, #ecranTele .tele-pari-vide{ width: 15.5vh; aspect-ratio: 50 / 78; }
+#ecranTele .tele-pari-vide{ display: flex; align-items: center; justify-content: center; border-radius: 1.2vh; border: 0.4vh dashed rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.55); font-size: 6vh; font-weight: 900; box-sizing: border-box; }
+#ecranTele .tele-pari-nom{ font-size: 3.6vh; font-weight: 900; color: #fff; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#ecranTele .tele-pari-type{ min-height: 3vh; font-size: 3vh; font-weight: 800; color: #ffe680; }
+#ecranTele .tele-pari-en-cours{ border-color: #FFD700; background: rgba(255, 215, 0, 0.14); box-shadow: 0 0 3vh rgba(255, 215, 0, 0.5); transform: translateY(-1vh); }
+#ecranTele .tele-pari-en-cours .tele-pari-vide{ border-color: #FFD700; color: #FFD700; animation: telePulse 1.2s ease-in-out infinite; }
+#ecranTele .tele-pari-gagnant{ border-color: #3dff8b; background: rgba(61, 255, 139, 0.16); box-shadow: 0 0 3.4vh rgba(61, 255, 139, 0.6); transform: translateY(-1vh) scale(1.06); }
+#ecranTele .tele-pari-gagnant .tele-pari-nom{ color: #3dff8b; }
+#ecranTele .tele-pari-perdu{ opacity: 0.45; filter: saturate(0.6); }
+#ecranTele .tele-pari-nombreux{ gap: 1.6vh; }
+#ecranTele .tele-pari-nombreux .tele-pari-joueur{ width: 14vh; }
+#ecranTele .tele-pari-nombreux .tele-pari-joueur .Carte, #ecranTele .tele-pari-nombreux .tele-pari-vide{ width: 10vh; }
+#ecranTele .tele-pari-nombreux .tele-pari-nom{ font-size: 2.8vh; }
+#ecranTele .tele-pari-types{ display: flex; justify-content: center; gap: 1.6vh; }
+#ecranTele .tele-pari-type-carte{ position: relative; opacity: 0.55; }
+#ecranTele .tele-pari-type-carte .Carte{ width: 8.6vh; }
+#ecranTele .tele-pari-type-pris{ opacity: 1; }
+#ecranTele .tele-pari-compte{ position: absolute; top: -1.2vh; right: -1.2vh; min-width: 3.4vh; height: 3.4vh; padding: 0 0.6vh; box-sizing: border-box; border-radius: 99px;
+  display: flex; align-items: center; justify-content: center; background: #FFD700; color: #2b001d; font-size: 2.2vh; font-weight: 900; box-shadow: 0 0.3vh 0.8vh rgba(0,0,0,.5); }
+#ecranTele .tele-pari-resultat{ display: flex; align-items: center; justify-content: center; gap: 4vh; max-width: 86vw; }
+#ecranTele .tele-pari-resultat .Carte{ width: 20vh; flex: none; box-shadow: 0 0 4vh rgba(255, 215, 0, 0.55); animation: fadeIn 0.4s ease; }
+#ecranTele .tele-pari-resultat-texte{ font-size: 6.4vh; font-weight: 900; color: #FFD700; text-align: left; line-height: 1.25; white-space: pre-line; max-width: 60vw; }
+#ecranTele .tele-pari-doree .tele-pari-resultat-texte{ font-size: 4.8vh; }
+html[data-theme="soleil"] #ecranTele .tele-pari-nom{ color: #2a1a44; }
+html[data-theme="soleil"] #ecranTele .tele-pari-type, html[data-theme="soleil"] #ecranTele .tele-pari-resultat-texte{ color: #8a1f4a; }
+#ecranTele .tele-pari-apres .tele-pari-joueur{ width: 17vh; padding: 1.2vh 1vh; }
+#ecranTele .tele-pari-apres .tele-pari-joueur .Carte, #ecranTele .tele-pari-apres .tele-pari-vide{ width: 11vh; }
+#ecranTele .tele-pari-apres.tele-pari-nombreux .tele-pari-joueur{ width: 13vh; }
+#ecranTele .tele-pari-apres.tele-pari-nombreux .tele-pari-joueur .Carte, #ecranTele .tele-pari-apres.tele-pari-nombreux .tele-pari-vide{ width: 8.5vh; }

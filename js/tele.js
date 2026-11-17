@@ -247,6 +247,34 @@ function hotPourTele(bloc){
   };
 }
 
+// Pari sur la dernière carte (js/plateau.js, lancerOverlayPrediction) : envoyé en morceaux, la télé en fait son propre écran
+// (chaque joueur avec la carte qu'il a choisie en grand, les types de cartes avec le nombre de paris, puis la révélation)
+function pariPourTele(o){
+  const texte = (sel) => { const el = o.querySelector(sel); return el && estAffiche(el) ? el.innerText.replace(/\s+/g, " ").trim() : ""; };
+  const face = (el) => (el ? faceCarte(el) : "") || "";
+  const reveal = o.querySelector(".fin-choix-reveal");
+  return {
+    t: texte(".prediction-title"),
+    s: texte(".prediction-subtitle"),
+    tour: texte(".fin-choix-turn"),
+    j: Array.from(o.querySelectorAll(".fin-choix-recap .ligne")).slice(0, 12).map((l) => {
+      const mini = l.querySelector(".Carte");
+      return {
+        n: ((l.querySelector("strong") || {}).innerText || "").replace(/\s*←\s*$/, "").trim(),
+        r: face(mini),
+        l: mini ? (l.querySelector(".choix") || {}).innerText.trim() : "",
+        c: l.classList.contains("en-cours") ? 1 : 0
+      };
+    }),
+    g: reveal ? [] : Array.from(o.querySelectorAll(".fin-choix-grid .fin-choix-card")).map((c) => ({
+      r: face(c.querySelector(".Carte")),
+      nb: Number((c.querySelector(".fin-choix-numeros b") || {}).textContent) || 0
+    })),
+    rv: reveal ? { r: face(reveal.querySelector(".Carte")), d: reveal.classList.contains("reveal-doree") ? 1 : 0,
+                   x: ((reveal.querySelector(".fin-choix-resultat") || {}).innerText || "").trim() } : null
+  };
+}
+
 function ecranPourTele(){
   const reglesOuvertes = reglesPourTele() || faqPourTele();
   if (reglesOuvertes) return reglesOuvertes;
@@ -286,6 +314,7 @@ function ecranPourTele(){
   const blocHot = o.querySelector(".bloc-hot");
   return {
     id: o.id,
+    pari: o.id === "overlayPredictionFin" ? pariPourTele(o) : null,
     hot: blocHot ? hotPourTele(blocHot) : null,
     texte: texteSansBoutons(o),
     // (cartes des annonces : leur face sans la classe « retournee » ; cartes du duel encore à choisir : sans face, donc de dos)
@@ -1095,6 +1124,8 @@ function dessinerTele(ecran, etat){
   surEcran.hidden = !e;
   document.documentElement.classList.toggle("tele-ecran-ouvert", !!e); // (pas de reflet Prestige dessus)
   surEcran.classList.toggle("tele-ecran-historique", !!e && e.id === "voletHistorique");
+  surEcran.classList.toggle("tele-ecran-pari", !!(e && e.pari));
+  if (!(e && e.pari)) delete surEcran.querySelector(".tele-ecran-texte").dataset.pari;
   surEcran.classList.toggle("tele-ecran-recap", !!(e && e.recap));
   surEcran.classList.toggle("tele-ecran-regles", !!(e && e.id === "ecranRegles" && (e.regles || e.faq)));
   dessinerHotTele(surEcran, e && !e.recap ? e.hot : null);
@@ -1112,6 +1143,10 @@ function dessinerTele(ecran, etat){
     surEcran.querySelector(".tele-ecran-choix").innerHTML = "";
     if (e.faq) dessinerFaqTele(surEcran.querySelector(".tele-ecran-texte"), e.faq);
     else dessinerReglesTele(surEcran.querySelector(".tele-ecran-texte"), e.regles);
+  } else if (e && e.pari) {
+    surEcran.querySelector(".tele-ecran-cartes").innerHTML = "";
+    surEcran.querySelector(".tele-ecran-choix").innerHTML = "";
+    dessinerPariTele(surEcran.querySelector(".tele-ecran-texte"), e.pari);
   } else if (e && e.id === "voletHistorique") {
     surEcran.querySelector(".tele-ecran-cartes").innerHTML = "";
     surEcran.querySelector(".tele-ecran-choix").innerHTML = "";
@@ -1224,6 +1259,59 @@ function disposerPlateauTele(plateau, n){
   Array.from(plateau.children).forEach((carte, i) => {
     carte.style.gridColumnStart = (reste < g.c && i === g.c * (g.r - 1)) ? String(1 + Math.floor((g.c - reste) / 2)) : "";
   });
+}
+
+// Écran du pari sur la télé (voir pariPourTele) : refait seulement quand quelque chose change
+function dessinerPariTele(zone, p){
+  const cle = JSON.stringify(p);
+  if (zone.dataset.pari === cle) return;
+  zone.dataset.pari = cle;
+  zone.innerHTML = "";
+  const div = (classe, texte) => { const el = document.createElement("div"); el.className = classe; if (texte) el.innerText = texte; return el; };
+  const rv = p.rv;
+  const gagnant = (j) => rv && !rv.d && j.r && j.r === rv.r;
+
+  const haut = div("tele-pari-haut");
+  if (rv) haut.appendChild(div("tele-ecran-titre", tr("Révélation de la dernière carte")));
+  else {
+    if (p.t) haut.appendChild(div("tele-ecran-titre", p.t));
+    if (p.s) haut.appendChild(div("tele-ecran-detail tele-pari-regle", p.s));
+  }
+  if (p.tour && !rv) haut.appendChild(div("tele-pari-tour", p.tour));
+  zone.appendChild(haut);
+
+  if (rv) {
+    const resultat = div("tele-pari-resultat" + (rv.d ? " tele-pari-doree" : ""));
+    const carte = creerCarteTele(rv.r || (rv.d ? "carte_doree" : ""));
+    carte.classList.add("tele-pari-revelee");
+    resultat.append(carte, div("tele-pari-resultat-texte", rv.x));
+    zone.appendChild(resultat);
+  }
+
+  // Les joueurs : nom, et en dessous la carte choisie en grand (case « ? » tant qu'il n'a pas choisi)
+  const joueursPari = div("tele-pari-joueurs" + (p.j.length > 6 ? " tele-pari-nombreux" : "") + (rv ? " tele-pari-apres" : ""));
+  p.j.forEach((j) => {
+    const bloc = div("tele-pari-joueur" + (j.c ? " tele-pari-en-cours" : "") + (gagnant(j) ? " tele-pari-gagnant" : "") +
+                     (rv && !gagnant(j) ? " tele-pari-perdu" : ""));
+    bloc.appendChild(div("tele-pari-nom", j.n));
+    if (j.r) bloc.appendChild(creerCarteTele(j.r));
+    else bloc.appendChild(div("tele-pari-vide", j.c ? "…" : "?"));
+    bloc.appendChild(div("tele-pari-type", j.l || ""));
+    joueursPari.appendChild(bloc);
+  });
+  zone.appendChild(joueursPari);
+
+  // Les types de cartes, avec le nombre de joueurs qui ont parié dessus (avant la révélation)
+  if (!rv && p.g.length) {
+    const types = div("tele-pari-types");
+    p.g.forEach((g) => {
+      const t = div("tele-pari-type-carte" + (g.nb ? " tele-pari-type-pris" : ""));
+      t.appendChild(creerCarteTele(g.r));
+      if (g.nb) t.appendChild(div("tele-pari-compte", String(g.nb)));
+      types.appendChild(t);
+    });
+    zone.appendChild(types);
+  }
 }
 
 // Texte avec <b> / <em> (les seules balises des règles) : construit à la main, sans innerHTML
