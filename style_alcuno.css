@@ -10379,7 +10379,7 @@ html:root:root #menu:is(:has(#jouer:not([style*="none"])), :has(#nouvellePartie:
 @media (prefers-reduced-motion: reduce){ html:root:root #menu #btnCaster.caster-actif#btnCaster::after{ animation: none; } }
 
 /* ===== Télé : règle d'une carte (appui long) en demi-écran qui monte du bas, comme le volet du téléphone (js/tele.js, dessinerVoletCarteTele) ===== */
-html #ecranTele .tele-ecran.tele-ecran-volet{ background: rgba(0, 0, 0, 0.55) !important; justify-content: flex-end; padding: 0; gap: 0; } /* (!important : chaque thème donne un fond plein à l'écran de la télé) */
+html[data-theme] #ecranTele .tele-ecran.tele-ecran-volet{ background: rgba(0, 0, 0, 0.55) !important; justify-content: flex-end; padding: 0; gap: 0; } /* (!important : chaque thème donne un fond plein à l'écran de la télé) */
 #ecranTele .tele-ecran-volet .tele-ecran-texte{ width: 100%; }
 #ecranTele .tele-volet-feuille{ box-sizing: border-box; width: 100%; min-height: 44vh; padding: 1.6vh 6vw 6vh; border-radius: 4vh 4vh 0 0; background: var(--fond-theme, #2b001d);
   border-top: 0.3vh solid rgba(255, 215, 0, 0.35); box-shadow: 0 -2vh 6vh rgba(0, 0, 0, 0.5); text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -10388,8 +10388,10 @@ html #ecranTele .tele-ecran.tele-ecran-volet{ background: rgba(0, 0, 0, 0.55) !i
 #ecranTele .tele-volet-contenu{ display: flex; gap: 5vh; align-items: center; text-align: left; max-width: 90vw; }
 #ecranTele .tele-volet-contenu .Carte{ width: 20vh; flex: none; box-shadow: 0 1vh 3vh rgba(0, 0, 0, 0.5); }
 #ecranTele .tele-volet-nom{ font-size: 6vh; font-weight: 900; color: #FFD700; line-height: 1.15; }
-#ecranTele .tele-volet-texte{ margin-top: 1.4vh; font-size: 3.8vh; font-weight: 700; line-height: 1.35; color: #ddd; white-space: pre-line; }
+#ecranTele .tele-volet-texte{ margin-top: 1.4vh; font-size: 3.8vh; font-weight: 700; line-height: 1.35; color: #fff; white-space: pre-line; }
 html[data-theme="galaxie"] #ecranTele .tele-volet-nom{ color: #FFE81F; }
 html[data-theme="givre"] #ecranTele .tele-volet-nom{ color: var(--givre-accent); }
+html[data-theme="kawaii"] #ecranTele .tele-volet-nom{ color: var(--kawaii-rose-fonce, #c2185b); }
+html[data-theme="kawaii"] #ecranTele .tele-volet-texte{ color: var(--kawaii-prune, #500b50); }
 html[data-theme="givre"] #ecranTele .tele-volet-texte{ color: #0d3550; }
 @keyframes teleVoletMonte{ from{ transform: translateY(100%); } to{ transform: none; } }
