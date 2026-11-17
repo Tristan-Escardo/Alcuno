@@ -928,6 +928,14 @@ body.no-scroll{
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
 }
 
+/* Règle du pari sous le titre : lisible (avant : 14 px en maigre, comme les autres sous-titres ; #overlayPredictionFin : passe devant .overlay-subtitle) */
+#overlayPredictionFin .prediction-subtitle{
+  font-size: clamp(17px, 4.6vw, 24px);
+  font-weight: 800;
+  line-height: 1.35;
+  opacity: 1;
+}
+
 .overlay-panel.prediction-reveal-mode{
   gap: 16px;
 }
