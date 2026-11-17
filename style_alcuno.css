@@ -10411,3 +10411,32 @@ html[data-theme] #listeJoueurs .joueur-ligne-actif .btnPauseJoueur{
   opacity: 1 !important; box-shadow: none !important;
 }
 html[data-theme] #listeJoueurs .joueur-ligne-actif .btnPauseJoueur svg{ width: 13px; height: 13px; }
+/* ===== Givre : pastilles des joueurs (avant et pendant la partie) : verre glacé ; joueur actif bleu glace brillant, sans contour ===== */
+html[data-theme="givre"] #listeJoueurs .joueur-ligne:not(.joueur-ligne-actif){
+  background: linear-gradient(180deg, #ffffff 0%, #cdeefb 100%); border: 1.5px solid rgba(39, 174, 232, 0.6); color: #08537f; font-weight: 900;
+  min-height: 38px; padding: 5px 18px; font-size: 1.08em; letter-spacing: .2px;
+  box-shadow: inset 0 2px 0 #fff, inset 0 -3px 0 rgba(39, 174, 232, 0.22), 0 4px 10px rgba(26, 146, 214, 0.28);
+}
+html[data-theme="givre"] #listeJoueurs .joueur-ligne:not(.joueur-ligne-actif) .btnPauseJoueur{
+  color: #1a8fd0; border: 1.5px solid rgba(26, 146, 214, 0.45); background: rgba(39, 174, 232, 0.1);
+}
+html[data-theme="givre"] #listeJoueurs .joueur-ligne-actif{
+  background:
+    radial-gradient(ellipse 38% 90% at 14% 28%, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0) 70%),
+    radial-gradient(ellipse 30% 80% at 86% 70%, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0) 70%),
+    linear-gradient(180deg, #f4fdff 0%, #b9f0ff 30%, #58d0ff 62%, #21a8f5 100%) !important;
+  color: #04304c !important; border: 0 !important;
+  box-shadow: inset 0 2px 0 #fff, inset 0 -4px 8px rgba(0, 120, 200, 0.3), inset 0 0 14px rgba(255, 255, 255, 0.55),
+    0 0 22px rgba(120, 225, 255, 0.85), 0 8px 18px rgba(26, 146, 214, 0.35) !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8), 0 0 8px rgba(255, 255, 255, 0.7) !important; position: relative; overflow: hidden;
+}
+/* reflet de verre sur le haut + éclat qui traverse la pastille (arrêté si les animations sont réduites) */
+html[data-theme="givre"] #listeJoueurs .joueur-ligne-actif::before{
+  content: ""; position: absolute; left: 5%; right: 5%; top: 3px; height: 44%; border-radius: 99px; pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.05)); }
+html[data-theme="givre"] #listeJoueurs .joueur-ligne-actif::after{
+  content: ""; position: absolute; top: -20%; bottom: -20%; width: 22%; left: -30%; pointer-events: none; transform: skewX(-22deg);
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0)); animation: givreEclat 4.5s ease-in-out infinite; }
+@keyframes givreEclat{ 0%, 55% { left: -30%; } 100% { left: 130%; } }
+@media (prefers-reduced-motion: reduce){ html[data-theme="givre"] #listeJoueurs .joueur-ligne-actif::after{ animation: none; opacity: 0; } }
+html[data-theme="givre"] #listeJoueurs .joueur-ligne-actif .btnPauseJoueur{ color: #05324f !important; border-color: #05324f !important; background: rgba(255, 255, 255, 0.45) !important; position: absolute; z-index: 1; }
