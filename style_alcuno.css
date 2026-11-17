@@ -10111,3 +10111,7 @@ html.android #plateau .Carte.retournee{ transition: transform 0.2s ease-out; }
       (flou recalculé à chaque image du défilement, au-dessus de dizaines de cartes) ; fond plus opaque à la place. */
 html.android :is(#btnRemonter, #btnRemonterRegles){ -webkit-backdrop-filter: none !important; backdrop-filter: none !important; background: rgba(0, 0, 0, 0.62); }
 html.android[data-theme="givre"] :is(#btnRemonter, #btnRemonterRegles){ background: rgba(255, 255, 255, 0.88); }
+/* 4. Star Wars : dos de la carte dorée qui « grésille » : sur Android, plus de filtre ni de décalage animés sur la carte (une
+      bande entière du plateau s'affichait en bouillie autour d'elle) ; seules les lignes de balayage bleues clignotent encore. */
+html.android[data-theme="galaxie"] .Carte.dos_dore:not(.retournee){ animation: none !important; }
+html.android[data-theme="galaxie"] .Carte.retournee.carte_doree{ animation: none !important; }
