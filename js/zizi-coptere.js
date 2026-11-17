@@ -107,10 +107,28 @@ function placerZiziPresDuTitre(){ // (sur le A du titre)
     plage.setStart(texte, 0); plage.setEnd(texte, 1); // la lettre A
     const rA = plage.getBoundingClientRect();
     // (la boîte du A comprend l'espacement des lettres, à droite : on le retire pour viser le milieu de la lettre)
-    const espace = parseFloat(getComputedStyle(titre).letterSpacing) || 0;
+    const style = getComputedStyle(titre);
+    const espace = parseFloat(style.letterSpacing) || 0;
     if (rA.width) r = { left: rA.left, top: rA.top, width: Math.max(1, rA.width - espace), height: rA.height };
+    // Mieux : l'encre réelle du A (sa « case » peut avoir plus de marge d'un côté que de l'autre, selon la police :
+    // sur iPhone il partait vers la droite du A). Mesurée sur un canvas avec la police du titre.
+    try {
+      const ctx = (placerZiziPresDuTitre.canvas || (placerZiziPresDuTitre.canvas = document.createElement("canvas"))).getContext("2d");
+      ctx.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+      const m = ctx.measureText("A");
+      if (rA.width && isFinite(m.actualBoundingBoxLeft) && isFinite(m.actualBoundingBoxRight) && m.actualBoundingBoxRight > 0)
+        r = { left: rA.left - m.actualBoundingBoxLeft, top: rA.top, width: m.actualBoundingBoxLeft + m.actualBoundingBoxRight, height: rA.height };
+    } catch (e) {}
   }
   if (!r.width) return; // (accueil caché)
+  // Le bloc du titre arrive en glissant (animation « pageEntree », 32 px) : on vise sa place d'arrivée, pas celle du moment
+  // (placé pendant le glissement, il restait décalé à droite du A ; il est aussi replacé à la fin de l'animation)
+  let dx = 0, dy = 0;
+  for (let e = titre; e && e !== document.body; e = e.parentElement) {
+    const t = getComputedStyle(e).transform;
+    if (t && t !== "none") { try { const m = new DOMMatrixReadOnly(t); dx += m.m41; dy += m.m42; } catch (err) {} }
+  }
+  r = { left: r.left - dx, top: r.top - dy, width: r.width, height: r.height };
   const taille = tailleZizi();
   ziziAngle = 90;
   // devant la lettre : centré sur le A (par-dessus). Pas de butée sur les bords : sa boîte est carrée mais le dessin, tourné
@@ -320,6 +338,7 @@ window.addEventListener("resize", () => {
 // (retour à l'accueil, polices chargées : le titre change de taille ou réapparaît ; lancé en l'air : il reprend sa chute)
 try { new ResizeObserver(() => { placerZiziPresDuTitre(); if (!ziziPose) demarrerBoucleZizi(); }).observe(document.getElementById("titreAccueil")); } catch (e) {}
 window.addEventListener("load", () => setTimeout(majZiziCoptere, 200));
+document.getElementById("choixMode").addEventListener("animationend", (e) => { if (e.animationName === "pageEntree") placerZiziPresDuTitre(); });
 majZiziCoptere();
 // ----- Bulle « Tapote-moi » : tant que le son du jeu est encore bloqué (aucun tap court depuis l'ouverture, voir
 // plus haut : sur iPhone un appui long ne débloque pas le son), au-dessus du zizi. Disparaît dès que le son marche.
