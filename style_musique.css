@@ -266,7 +266,6 @@
 }
 :where(html[data-theme="musique"]) #overlayDuel .duel-boutons button:disabled{ background: #d9c0fc !important; }
 :where(html[data-theme="musique"]) #menu #btnCaster{ box-shadow: 0 0 0 1px rgba(255,255,255,0.45) inset; }
-:where(html[data-theme="musique"]) #menu #btnCaster.caster-actif{ box-shadow: 0 0 0 2px #ffffff inset, 0 0 14px rgba(255,255,255,0.35); }
 :where(html[data-theme="musique"]) #ecranCaster .adresseTele{ color: #ffffff; }
 :where(html[data-theme="musique"]) #ecranCaster .casterCode input{ border: 1px solid rgba(255,255,255,0.35); }
 :where(html[data-theme="musique"]) #ecranCaster #btnCasterArreter{ box-shadow: 0 0 0 1px rgba(255,255,255,0.45) inset; }

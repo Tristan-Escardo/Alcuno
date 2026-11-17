@@ -268,7 +268,6 @@
 }
 :where(html[data-theme="justrose"]) #overlayDuel .duel-boutons button:disabled{ background: #fcc0de !important; }
 :where(html[data-theme="justrose"]) #menu #btnCaster{ box-shadow: 0 0 0 1px rgba(255,255,255,0.45) inset; }
-:where(html[data-theme="justrose"]) #menu #btnCaster.caster-actif{ box-shadow: 0 0 0 2px #ffffff inset, 0 0 14px rgba(255,255,255,0.35); }
 :where(html[data-theme="justrose"]) #ecranCaster .adresseTele{ color: #ffffff; }
 :where(html[data-theme="justrose"]) #ecranCaster .casterCode input{ border: 1px solid rgba(255,255,255,0.35); }
 :where(html[data-theme="justrose"]) #ecranCaster #btnCasterArreter{ box-shadow: 0 0 0 1px rgba(255,255,255,0.45) inset; }

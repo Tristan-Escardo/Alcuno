@@ -18,7 +18,6 @@
 html[data-theme="kawaii"] .fin-choix-numeros b{ background: #a60f5b; color: #ffffff; }
 @media (max-width: 520px), (orientation: landscape) and (max-height: 520px){
 html[data-theme="kawaii"] #menu #btnCaster{ background-image: linear-gradient(180deg, #e82788, #b81466) !important; text-shadow: 0 1px 2px rgba(100, 8, 100, 0.55); }
-html[data-theme="kawaii"] #menu #btnCaster.caster-actif{ outline-color: #500b50; }
 }
 @media (max-width: 520px), (orientation: landscape) and (max-height: 520px){
 html[data-theme="kawaii"] #listeJoueurs .joueur-ligne{ background: #ffffff; border-color: rgba(184, 20, 102, 0.35); }

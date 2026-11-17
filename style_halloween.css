@@ -274,7 +274,6 @@
 }
 :where(html[data-theme="halloween"]) #overlayDuel .duel-boutons button:disabled{ background: #fcd9c0 !important; }
 :where(html[data-theme="halloween"]) #menu #btnCaster{ box-shadow: 0 0 0 1px rgba(255,154,60,0.45) inset; }
-:where(html[data-theme="halloween"]) #menu #btnCaster.caster-actif{ box-shadow: 0 0 0 2px #ff9a3c inset, 0 0 14px rgba(255,154,60,0.35); }
 :where(html[data-theme="halloween"]) #ecranCaster .adresseTele{ color: #ff9a3c; }
 :where(html[data-theme="halloween"]) #ecranCaster .casterCode input{ border: 1px solid rgba(255,154,60,0.35); }
 :where(html[data-theme="halloween"]) #ecranCaster #btnCasterArreter{ box-shadow: 0 0 0 1px rgba(255,154,60,0.45) inset; }
