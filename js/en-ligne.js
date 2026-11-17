@@ -332,7 +332,7 @@ document.getElementById("btnCreerPartie").addEventListener("click", () => ouvrir
   document.getElementById("enLigneChoix").style.display = "none";
   document.getElementById("enLigneCreer").style.display = "";
   ouvrirClavier(document.getElementById("pseudoCreateur"));
-}));
+}, true));
 
 document.getElementById("btnRejoindrePartie").addEventListener("click", () => {
   document.getElementById("enLigneRejoindre").classList.remove("regarder");

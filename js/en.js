@@ -416,6 +416,8 @@ window.TEXTES_EN = {
 "En ligne : c'est le réglage de celui qui lance la partie qui compte.": "Online: the setting of whoever starts the game is the one that counts.",
 "En ligne : c'est le réglage de l'hôte qui compte, quand il crée la partie.": "Online: the host's setting is the one that counts, when they create the game.",
 "En ligne et télé": "Online and TV",
+"En ligne, ce sont les choix de l'hôte qui comptent, car c'est lui qui crée et lance la partie.": "Online, the host's choices are the ones that count, since they create and start the game.",
+"À 2 joueurs seulement.": "2 players only.",
 "En pause clope, aux toilettes…<br>Son tour sera sauté jusqu'à ce qu'il revienne.": "Smoke break, bathroom…<br>Their turn will be skipped until they come back.",
 "Enlève 4 vêtements, au choix de {nom}.": "Take off 4 pieces of clothing, of {nom}'s choosing.",
 "Enlève un vêtement de {nom}, avec les dents.": "Take off a piece of {nom}'s clothing, with your teeth.",

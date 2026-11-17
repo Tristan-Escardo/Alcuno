@@ -10431,3 +10431,28 @@ html[data-theme="givre"] #listeJoueurs .joueur-ligne-actif{
     0 0 18px rgba(90, 210, 255, 0.75), 0 8px 14px rgba(10, 90, 160, 0.4) !important;
 }
 html[data-theme="givre"] #listeJoueurs .joueur-ligne-actif .btnPauseJoueur{ color: #05324f !important; border-color: #05324f !important; background: rgba(255, 255, 255, 0.45) !important; position: absolute; z-index: 1; }
+/* Givre, joueur actif (téléphone et télé) : reflet de lumière qui traverse le bloc de glace toutes les 4 s (coupé par la pastille ;
+   arrêté si le téléphone demande moins d'animations) */
+html[data-theme="givre"] #listeJoueurs .joueur-ligne-actif{ overflow: hidden; }
+html[data-theme="givre"] :is(#listeJoueurs .joueur-ligne-actif, #ecranTele .tele-joueur-actif)::after{
+  content: ""; position: absolute; top: 0; bottom: 0; left: -40%; width: 28%; pointer-events: none; transform: skewX(-24deg);
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.9) 50%, rgba(255, 255, 255, 0));
+  animation: givreReflet 4s ease-in-out infinite;
+}
+@keyframes givreReflet{ 0%, 60% { left: -40%; } 100% { left: 140%; } }
+@media (prefers-reduced-motion: reduce){ html[data-theme="givre"] :is(#listeJoueurs .joueur-ligne-actif, #ecranTele .tele-joueur-actif)::after{ animation: none; display: none; } }
+/* Télé : même bloc de glace taillé et bombé que sur le téléphone */
+html[data-theme="givre"] #ecranTele .tele-joueur-actif{
+  position: relative; overflow: hidden; border: 0.35vh solid #fff;
+  background:
+    radial-gradient(ellipse 70% 60% at 30% 15%, rgba(255,255,255,0.9), rgba(255,255,255,0) 70%),
+    linear-gradient(180deg, rgba(255,255,255,0) 50%, rgba(0,70,140,0.32) 100%),
+    linear-gradient(115deg, #f4fdff 0%, #c4f1ff 20%, #92e2ff 24%, #dcf8ff 44%, #a9e9ff 49%, #62d0ff 70%, #a8ebff 75%, #6fd5ff 100%);
+  color: #03385b; text-shadow: 0 0.1vh 0 rgba(255,255,255,0.85);
+  box-shadow: inset 0 0.4vh 0.3vh rgba(255,255,255,1), inset 0 -0.7vh 1.1vh rgba(0,80,150,0.4), 0 0 0 0.15vh rgba(110,210,255,0.8),
+    0 0 2.4vh rgba(90, 210, 255, 0.75), 0 1.1vh 1.9vh rgba(10, 90, 160, 0.4);
+}
+
+/* « Ta partie », en ligne : une seule phrase sur l'hôte, en haut (au lieu d'une sous chaque mode) */
+#ecranReglages .optionsPartieEnLigne{ display: none; margin: 0 4px 12px; font-size: 14px; font-weight: 700; line-height: 1.4; text-align: center; opacity: 0.9; }
+#ecranReglages.options-en-ligne .optionsPartieEnLigne{ display: block; }

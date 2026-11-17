@@ -38,8 +38,9 @@ document.getElementById("btnReglagesJeu").addEventListener("click", ouvrirReglag
 // trois lignes et « Continuer ». Ouverte après « Mode classique » ou « Créer une partie » (js/en-ligne.js) ;
 // « ← Retour » revient à l'écran d'avant (l'accueil reste affiché dessous).
 let suiteOptionsPartie = null; // ce que fait « Continuer » (donné par js/en-ligne.js)
-function ouvrirOptionsPartie(suite){
+function ouvrirOptionsPartie(suite, enLigne = false){
   suiteOptionsPartie = suite;
+  ecranReglages.classList.toggle("options-en-ligne", !!enLigne); // (phrase « En ligne, ce sont les choix de l'hôte… » en haut)
   // Chaque nouvelle partie repart sans option : rien n'est gardé d'une partie à l'autre (la revanche et la reprise
   // d'une partie interrompue gardent, elles, le mode de la partie en cours)
   [caseModeSoft, casePartieExpress, caseModeHot, caseModeHard].forEach((c) => { c.checked = false; });

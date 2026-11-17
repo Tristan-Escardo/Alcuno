@@ -9,7 +9,7 @@
          (Avant : « ?t= » + l'heure, différent à chaque lancement : tout le jeu était retéléchargé à chaque ouverture,
          environ 400 Ko. Maintenant, tant que la version ne change pas, le navigateur se contente de vérifier.) -->
     <script>
-        window.VERSION_FICHIERS = "9.95.78";
+        window.VERSION_FICHIERS = "9.95.79";
         // (ailleurs que sur le vrai site — poste de dev, appli de test — : l'heure en plus, comme avant, pour voir tout de
         // suite un fichier modifié sans changer de version)
         window.ANTI_CACHE = /(^|\.)github\.io$/i.test(location.hostname) ? window.VERSION_FICHIERS : window.VERSION_FICHIERS + "-" + Date.now();
@@ -432,10 +432,12 @@
                 <!-- « Ta partie » : mêmes lignes que les Réglages, mais ouvertes seulement après « Mode classique » ou
                      « Créer une partie » (classe vue-options sur l'écran, voir js/reglages.js) -->
                 <div class="optionsPartie">
+                <!-- En ligne seulement (« Créer une partie ») : une seule phrase pour tous les modes, au lieu d'une sous chacun -->
+                <p class="optionsPartieEnLigne">En ligne, ce sont les choix de l'hôte qui comptent, car c'est lui qui crée et lance la partie.</p>
                 <div class="optionReglage">
                     <span class="optionTexte">
                         <span class="optionTitre">Mode PJ</span>
-                        <span class="optionNote">Tu prends 2x moins cher que dans la version normale.<br><br>En ligne : c'est le réglage de l'hôte qui compte, quand il crée la partie.</span>
+                        <span class="optionNote">Tu prends 2x moins cher que dans la version normale.</span>
                     </span>
                     <input type="checkbox" id="optionModeSoft" aria-label="Mode PJ">
                     <label class="interrupteur" for="optionModeSoft" aria-hidden="true"></label>
@@ -444,7 +446,7 @@
                 <div class="optionReglage">
                     <span class="optionTexte">
                         <span class="optionTitre">Partie express</span>
-                        <span class="optionNote">Environ 2x moins de cartes (28 au lieu de 52) : une partie plus courte.<br><br>En ligne : c'est le réglage de celui qui lance la partie qui compte.</span>
+                        <span class="optionNote">Environ 2x moins de cartes (28 au lieu de 52) : une partie plus courte.</span>
                     </span>
                     <input type="checkbox" id="optionPartieExpress" aria-label="Partie express">
                     <label class="interrupteur" for="optionPartieExpress" aria-hidden="true"></label>
@@ -453,7 +455,7 @@
                 <div class="optionReglage">
                     <span class="optionTexte">
                         <span class="optionTitre">Mode hot 🔥</span>
-                        <span class="optionNote">Des défis osés pendant la partie.<br><br>En ligne : c'est le réglage de celui qui lance la partie qui compte.</span>
+                        <span class="optionNote">Des défis osés pendant la partie.</span>
                     </span>
                     <input type="checkbox" id="optionModeHot" aria-label="Mode hot">
                     <label class="interrupteur" for="optionModeHot" aria-hidden="true"></label>
@@ -464,7 +466,7 @@
                 <div class="optionReglage" id="ligneModeHard" hidden>
                     <span class="optionTexte">
                         <span class="optionTitre">Mode <span class="badgeOrangeHard">hard</span></span>
-                        <span class="optionNote">On est pas là pour se titiller la bite avec des gants de boxe.<br><br>À 2 joueurs seulement. En ligne : c'est le réglage de celui qui lance la partie qui compte.</span>
+                        <span class="optionNote">On est pas là pour se titiller la bite avec des gants de boxe.<br><br>À 2 joueurs seulement.</span>
                     </span>
                     <input type="checkbox" id="optionModeHard" aria-label="Mode hard">
                     <label class="interrupteur" for="optionModeHard" aria-hidden="true"></label>
