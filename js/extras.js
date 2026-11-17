@@ -390,9 +390,31 @@ function heureIlYa(minutes){
 }
 
 // sansSon : écran redessiné (« Tout remettre à zéro »), sans rejouer le son d'ouverture
+// Les boutons de l'éthylotest prennent le style des vrais boutons du thème : on lit celui d'un bouton « normal » du jeu
+// (« Oui » de l'écran « Reprendre la partie ? », habillé dans chaque thème) et on le passe au CSS (--ey-*). Relu si le thème change.
+function styleBoutonsEthylo(){
+  const sonde = document.getElementById("btnRepriseOui"), page = document.getElementById("ecranRegles");
+  if (!sonde || !page) return;
+  const cs = getComputedStyle(sonde);
+  const poser = (k, v) => page.style.setProperty(k, v);
+  poser("--ey-image", cs.backgroundImage || "none");
+  poser("--ey-couleur", cs.backgroundColor || "transparent");
+  poser("--ey-texte", cs.color);
+  poser("--ey-texte-ombre", cs.textShadow || "none");
+  poser("--ey-ombre", cs.boxShadow || "none");
+  poser("--ey-bord-l", cs.borderTopWidth || "0px");
+  poser("--ey-bord-s", cs.borderTopStyle === "none" ? "solid" : cs.borderTopStyle);
+  poser("--ey-bord-c", cs.borderTopColor || "transparent");
+}
+let veilleThemeEthylo = null;
 function ouvrirEthylo(sansSon){
   if (sansSon !== true) jouerSon("cartes");
   ouvrirPageExtras("ethylo", tr("Éthylotest"));
+  styleBoutonsEthylo();
+  if (!veilleThemeEthylo && window.MutationObserver) {
+    veilleThemeEthylo = new MutationObserver(() => { if (document.getElementById("ecranRegles").classList.contains("ethylo")) styleBoutonsEthylo(); });
+    veilleThemeEthylo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  }
   const liste = document.getElementById("listeRegles");
   const resultat = elementExtras("div", "blocRegles ethyloResultat");
   resultat.setAttribute("role", "status");
