@@ -739,6 +739,7 @@ function afficherOverlayCouleur(joueurActuel){
     const carre = document.createElement("div");
     carre.className = "carre-couleur " + c.classe;
     surAction(carre, "couleur:" + c.nom, { owner: choisisseur, once: true }, ()=>{
+      sonClicTheme(); // (sabre, son BDSM, saxophone : js/reglages.js)
       couleurChoisie = c.nom;
       majAffichageCouleur();
       noterHistorique(tr`Choisit le ${tr(c.nom)}`);
@@ -1176,6 +1177,7 @@ function afficherOverlayTirageDuel(overlay, j1, j2, carteDuel = ""){
   function onChoose(which){
     // Phase 1 : J1 choisit
     if(phase === 1){
+      sonClicTheme(); // (sabre, son BDSM, saxophone : js/reglages.js)
       choixJ1 = which;
       phase = 2;
 
@@ -1198,6 +1200,7 @@ function afficherOverlayTirageDuel(overlay, j1, j2, carteDuel = ""){
     if(phase === 2){
       // sécurité : si J2 clique la même que J1 (normalement impossible)
       if(which === choixJ1) return;
+      sonClicTheme();
 
       phase = 3; // terminé
       c1.style.pointerEvents = "none";

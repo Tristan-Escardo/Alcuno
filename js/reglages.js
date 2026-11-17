@@ -1842,6 +1842,12 @@ function morceauClicTheme(){
   return dispo.length ? dispo[Math.floor(Math.random() * dispo.length)] : "bouton";
 }
 
+// Cartes du duel et carrés de la carte Couleur (pas des boutons, donc pas de clic) : dans les thèmes Star Wars, BDSM et Fête de la
+// musique, le même son que leurs boutons (sabre, son BDSM, saxophone), aussi joué par la télé ; ailleurs, rien (comme avant)
+function sonClicTheme(){
+  if (SONS_CLIC_THEME[document.documentElement.dataset.theme]) jouerSon("bouton");
+}
+
 // clicNormal : le son « bouton » d'origine, jamais remplacé par un sabre ou un son du thème BDSM
 function jouerSon(nom, clicNormal = false){
   if (nom === "bouton" && !clicNormal) nom = morceauClicTheme();
