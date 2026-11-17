@@ -1376,10 +1376,17 @@ function quitterPartie(){
   }
 
   // En pleine partie à plus de 2 : on se retire seulement, la partie continue sans nous
-  // (à 2, il ne resterait qu'un joueur : tout le monde repasse en salle d'attente)
   if (enLigneActif && partieLancee && joueurs.length > 2 && joueurs.includes(pseudo)) {
     ecrireAction(idRetrait(pseudo)).catch(() => {});
     quitterPartieEnLigne();
+    return;
+  }
+
+  // En pleine partie à 2 : la partie est supprimée pour tout le monde (personne ne peut plus y revenir, même avec le code) ;
+  // l'autre téléphone le voit tout de suite (« La partie est terminée : elle a été fermée. », voir partieFermee)
+  if (enLigneActif && partieLancee && joueurs.length <= 2 && joueurs.includes(pseudo) && code) {
+    quitterPartieEnLigne();
+    window.fbRemove(window.fbRef(window.firebaseDB, `parties/${code}`)).catch(erreurFirebase);
     return;
   }
 

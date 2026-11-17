@@ -1174,5 +1174,6 @@ window.TEXTES_EN = {
 "{0} boivent {1}": "{0} drink {1}",
 "Tu quittes la partie en ligne.": "You are leaving the online game.",
 "Tu quittes la partie.": "You are leaving the game.",
+"Vous n'êtes que 2 : la partie sera supprimée, personne ne pourra y revenir.": "There are only 2 of you: the game will be deleted and nobody can come back to it.",
 "🥃 {0} préfère {1} !": "🥃 {0} would rather {1}!"
 };

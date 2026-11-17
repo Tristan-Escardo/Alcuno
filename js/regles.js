@@ -2179,7 +2179,8 @@ function allerAccueil(){
 const ecranConfirmerAccueil = document.getElementById("ecranConfirmerAccueil");
 function demanderConfirmationAccueil(depuisNouvellePartie = false){
   const texte = ecranConfirmerAccueil.querySelector(".texteConfirmation");
-  if(texte) texte.innerText = enLigneActif ? tr("Tu quittes la partie en ligne.")
+  if(texte) texte.innerText = enLigneActif && partieLancee && joueurs.length <= 2 ? tr("Vous n'êtes que 2 : la partie sera supprimée, personne ne pourra y revenir.")
+    : enLigneActif ? tr("Tu quittes la partie en ligne.")
     : depuisNouvellePartie ? tr("Tu quittes la partie.") : tr("La partie en cours sera perdue.");
   ecranConfirmerAccueil.style.display = "";
 }
