@@ -750,7 +750,10 @@ function viserEventail(m){
 function animerEventail(t){
   const m = eventail;
   if (!m) return;
-  const dt = Math.min(0.034, m.t ? (t - m.t) / 1000 : 0.016);
+  // Temps écoulé, découpé en petits pas (8 ms au plus) : avec un seul grand pas, les ressorts raides s'emballaient dès que
+  // l'écran tombait vers 30 images/s (fréquent sur Android quand on reste appuyé) : la carte tournait et s'envolait.
+  const ecoule = Math.min(0.05, m.t ? Math.max(0, t - m.t) / 1000 : 0.016);
+  const pas = Math.max(1, Math.ceil(ecoule / 0.008)), dt = ecoule / pas;
   m.t = t;
   viserEventail(m);
   const calme = calmeAccueil();
@@ -761,10 +764,11 @@ function animerEventail(t){
       const raide = m.doigt && (k === "tire" || k === "rx" || k === "ry");
       const K = raide ? 900 : 300, D = raide ? 54 : 26;
       if (calme) { c.v[k] = c.cible[k]; c.vit[k] = 0; }
-      else {
+      else for (let i = 0; i < pas; i++) {
         c.vit[k] += ((c.cible[k] - c.v[k]) * K - c.vit[k] * D) * dt;
         c.v[k] += c.vit[k] * dt;
       }
+      if (!isFinite(c.v[k]) || !isFinite(c.vit[k])) { c.v[k] = c.cible[k]; c.vit[k] = 0; } // (sécurité : jamais de carte perdue)
       if (Math.abs(c.cible[k] - c.v[k]) > SEUIL_REPOS[k] || Math.abs(c.vit[k]) > SEUIL_REPOS[k] * 20) auRepos = false;
     }
     const v = c.v, h = m.h;
