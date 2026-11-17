@@ -858,6 +858,9 @@ function barreIphoneARafraichir(){
 
 function rafraichirBarreIphone(){
   if (!barreIphoneARafraichir()) return;
+  // Pendant une partie (classique ou en ligne) : pas de rechargement. Il pouvait charger une nouvelle version du jeu en
+  // pleine partie (et en ligne, couper la partie). La barre du haut garde l'ancienne couleur jusqu'au prochain lancement.
+  if (partieLancee || enLigneActif) return;
   // tout petit délai (avant : 0,4 s, la barre gardait l'ancienne couleur trop longtemps) : le nouveau
   // thème s'affiche, et deux taps très rapprochés ne font qu'un rechargement
   // Le rechargement coupe le son : on laisse d'abord le clic se jouer (0,25 s après son départ). Juste
@@ -1037,7 +1040,7 @@ document.querySelectorAll(".pastilleTheme").forEach((pastille) => {
       ecrireReglage(CLE_MUSIQUE, false);
       majLigneMusique();
     }
-    appliquerTheme(pastille.dataset.theme, barreIphoneARafraichir());
+    appliquerTheme(pastille.dataset.theme, barreIphoneARafraichir() && !partieLancee && !enLigneActif);
     try { localStorage.setItem(CLE_THEME, pastille.dataset.theme); } catch (e) {}
     try { setTimeout(majNoteMusiqueHorsLigne, 300); } catch (e) {} // (la ligne « Hors connexion » sous le volume de la musique)
     try { noterAppareilStats(); } catch (e) {} // statistiques : thème choisi

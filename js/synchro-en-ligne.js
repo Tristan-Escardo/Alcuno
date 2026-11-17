@@ -745,9 +745,16 @@ const DUREE_PARTIE_CLASSIQUE = 12 * 60 * 60 * 1000;
 let sauvegardeClassique = null; // { v, date, seed, sansDoree, soft, express, hot, hard, joueurs, actions }
 let repriseClassiqueEnCours = false;
 
+// Faces des cartes retournées, place par place ("" : de dos) : gardées avec la partie pour vérifier qu'une reprise
+// redonne bien le même plateau (voir reprendrePartieClassique)
+function facesPlateauClassique(){
+  return Array.from(plateau.children).map(c => (c.classList.contains("retournee") && faceDeCarte(c)) || "");
+}
+
 function enregistrerPartieClassique(){
   if(!sauvegardeClassique) return;
   sauvegardeClassique.date = Date.now();
+  try { sauvegardeClassique.faces = facesPlateauClassique(); } catch (e) {}
   sauvegardeClassique.soft = estModeSoft();
   try { localStorage.setItem(CLE_PARTIE_CLASSIQUE, JSON.stringify(sauvegardeClassique)); } catch (e) {}
 }
@@ -781,7 +788,9 @@ function oublierPartieClassique(){
 function lirePartieClassique(){
   let s = null;
   try { s = JSON.parse(localStorage.getItem(CLE_PARTIE_CLASSIQUE) || "null"); } catch (e) { s = null; }
-  const valide = s && s.v === VERSION_JEU && Array.isArray(s.joueurs) && s.joueurs.length >= 2 &&
+  // Jeu mis à jour depuis (nouvelle version chargée en pleine partie : appli relancée, page rechargée) : la partie reste
+  // reprenable si elle a gardé ses faces (vérifiées après la reprise) ; avant, elle était effacée sans rien dire
+  const valide = s && (s.v === VERSION_JEU || Array.isArray(s.faces)) && Array.isArray(s.joueurs) && s.joueurs.length >= 2 &&
     Array.isArray(s.actions) && s.actions.length > 0 && Date.now() - Number(s.date || 0) < DUREE_PARTIE_CLASSIQUE;
   if(!valide){ oublierPartieClassique(); return null; }
   return s;
@@ -821,8 +830,18 @@ function reprendrePartieClassique(s){
   joueurs = s.joueurs.slice();
   annulations = {};
   afficherJoueurs();
-  rejouerActionsClassiques(s.actions.slice(), tr("Reprise de la partie…"),
-    () => afficherNotificationHaut("", tr("Partie reprise !"), true));
+  const facesAttendues = Array.isArray(s.faces) ? s.faces.slice() : null;
+  rejouerActionsClassiques(s.actions.slice(), tr("Reprise de la partie…"), () => {
+    // Plateau rejoué différent de celui de la partie (jeu mis à jour entre-temps, et le mélange a changé) : on ne la
+    // laisse pas continuer de travers, on le dit et on revient à l'accueil
+    const faces = facesPlateauClassique();
+    if(facesAttendues && facesAttendues.some((f, i) => f && faces[i] !== f)){
+      allerAccueil(); // (js/regles.js : oublie aussi la partie)
+      alert(tr("Le jeu a été mis à jour pendant la partie : elle n'a pas pu être reprise à l'identique.\n\nLance une nouvelle partie."));
+      return;
+    }
+    afficherNotificationHaut("", tr("Partie reprise !"), true);
+  });
 }
 
 // Relance la partie (même graine) et rejoue ces taps en accéléré, derrière un écran d'attente

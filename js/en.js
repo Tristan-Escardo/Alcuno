@@ -215,6 +215,7 @@ window.TEXTES_EN = {
 "Afficher l'écran télé": "Show the TV screen",
 "Aide et questions fréquentes": "Help and frequently asked questions",
 "Aimant à +4": "+4 magnet",
+"Le jeu a été mis à jour pendant la partie : elle n'a pas pu être reprise à l'identique.\n\nLance une nouvelle partie.": "The game was updated during the game: it could not be resumed exactly.\n\nStart a new game.",
 "Coquinou": "Naughty one",
 "Affamé": "Hungry one",
 "{0} défi{1} relevé{2}": "{0} challenge{1} accepted",
