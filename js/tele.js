@@ -1133,6 +1133,7 @@ function dessinerTele(ecran, etat){
   document.documentElement.classList.toggle("tele-ecran-ouvert", !!e); // (pas de reflet Prestige dessus)
   surEcran.classList.toggle("tele-ecran-historique", !!e && e.id === "voletHistorique");
   surEcran.classList.toggle("tele-ecran-pari", !!(e && e.pari));
+  surEcran.classList.toggle("tele-ecran-volet", !!(e && e.id === "voletCarte")); // (règle d'une carte : demi-écran, comme sur le téléphone)
   if (!(e && e.pari)) delete surEcran.querySelector(".tele-ecran-texte").dataset.pari;
   surEcran.classList.toggle("tele-ecran-recap", !!(e && e.recap));
   surEcran.classList.toggle("tele-ecran-regles", !!(e && e.id === "ecranRegles" && (e.regles || e.faq)));
@@ -1151,6 +1152,10 @@ function dessinerTele(ecran, etat){
     surEcran.querySelector(".tele-ecran-choix").innerHTML = "";
     if (e.faq) dessinerFaqTele(surEcran.querySelector(".tele-ecran-texte"), e.faq);
     else dessinerReglesTele(surEcran.querySelector(".tele-ecran-texte"), e.regles);
+  } else if (e && e.id === "voletCarte") {
+    surEcran.querySelector(".tele-ecran-cartes").innerHTML = "";
+    surEcran.querySelector(".tele-ecran-choix").innerHTML = "";
+    dessinerVoletCarteTele(surEcran.querySelector(".tele-ecran-texte"), e);
   } else if (e && e.pari) {
     surEcran.querySelector(".tele-ecran-cartes").innerHTML = "";
     surEcran.querySelector(".tele-ecran-choix").innerHTML = "";
@@ -1267,6 +1272,34 @@ function disposerPlateauTele(plateau, n){
   Array.from(plateau.children).forEach((carte, i) => {
     carte.style.gridColumnStart = (reste < g.c && i === g.c * (g.r - 1)) ? String(1 + Math.floor((g.c - reste) / 2)) : "";
   });
+}
+
+// Règle d'une carte (appui long sur le téléphone) : un demi-écran qui monte du bas, par-dessus le plateau, comme le volet du téléphone
+// (et pas un grand écran plein : on le prenait pour une annonce)
+function dessinerVoletCarteTele(zone, e){
+  const cle = JSON.stringify([e.texte, e.cartes]);
+  if (zone.dataset.volet === cle) return;
+  zone.dataset.volet = cle;
+  zone.innerHTML = "";
+  const lignes = String(e.texte || "").split("\n").filter(Boolean);
+  const feuille = document.createElement("div");
+  feuille.className = "tele-volet-feuille";
+  const poignee = document.createElement("div");
+  poignee.className = "tele-volet-poignee";
+  const contenu = document.createElement("div");
+  contenu.className = "tele-volet-contenu";
+  const texte = document.createElement("div");
+  const nom = document.createElement("div");
+  nom.className = "tele-volet-nom";
+  nom.innerText = lignes.shift() || "";
+  const regle = document.createElement("div");
+  regle.className = "tele-volet-texte";
+  regle.innerText = lignes.join("\n");
+  texte.append(nom, regle);
+  if ((e.cartes || []).length) contenu.appendChild(creerCarteTele(e.cartes[0]));
+  contenu.appendChild(texte);
+  feuille.append(poignee, contenu);
+  zone.appendChild(feuille);
 }
 
 // Écran du pari sur la télé (voir pariPourTele) : refait seulement quand quelque chose change
