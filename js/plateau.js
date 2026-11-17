@@ -1490,8 +1490,11 @@ function programmerRappelTour(tour){
     // écran « Nouvelle partie » ouvert : pas de sifflet, on réessaie dans 50 s (et à sa fermeture, voir regles.js)
     if(ecranNouvellePartieOuvert()) return programmerRappelTour(tour);
     if(enLigneActif){
-      if(`${mancheCourante}:${cartesRestantes()}` !== tour) return; // tour joué entre-temps
-      if(joueurs[indexJoueur % joueurs.length] !== pseudoActuel) return; // plus son tour
+      // En ligne : seulement le téléphone du joueur que le jeu attend VRAIMENT : celui qui doit faire le choix affiché (pigeon,
+      // duel, +4, défi…), sinon celui dont c'est le tour. (Avant : toujours le joueur du tour, même quand on attendait le choix
+      // d'un autre.) Pas moi : on revérifie dans 50 s (chaque action jouée relance aussi le compteur, voir actionAppliquee).
+      const attendus = joueursAttendusEnLigne();
+      if(attendus ? !attendus.has(pseudoActuel) : joueurs[indexJoueur % joueurs.length] !== pseudoActuel) return programmerRappelTour(tour);
     } else if(tour !== null) return; // (rappel d'une partie en ligne)
     // (mode télé : un peu plus tard, en même temps que la télé, voir rappelPourTele dans tele.js)
     setTimeout(() => {
@@ -1500,6 +1503,20 @@ function programmerRappelTour(tour){
     }, rappelPourTele());
     programmerRappelTour(tour); // et encore dans 50 s s'il ne joue toujours pas
   }, DELAI_RAPPEL_TOUR);
+}
+
+// En ligne : joueurs dont le jeu attend un geste (propriétaires des boutons prêts à être touchés ; pendant une fenêtre de choix,
+// seulement ceux de la fenêtre, pas les cartes du plateau dessous). null : rien de propre à un joueur (=> le joueur du tour).
+function joueursAttendusEnLigne(){
+  const attendus = new Set();
+  const fenetre = overlayOuvert();
+  document.querySelectorAll("[data-net-id]").forEach((el) => {
+    if(!el._net || (fenetre && el.closest("main"))) return;
+    try { if(!actionPrete(el)) return; } catch (e) { return; }
+    const qui = proprietaireAction(el);
+    if(qui) attendus.add(qui);
+  });
+  return attendus.size ? attendus : null;
 }
 
 // Classique : le compteur du rappel repart de zéro (action du jeu, nouveau choix proposé, ou tour passé

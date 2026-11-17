@@ -1007,6 +1007,7 @@ function masquerAnnulerChoix(){
 
 // Une autre action jouée après le choix : il est confirmé, plus d'annulation
 function actionAppliquee(position){
+  if(enLigneActif && partieLancee) programmerRappelTour("en-ligne"); // (en ligne : le compteur du sifflet repart à chaque action jouée)
   if(choixAnnulable && position > choixAnnulable.fin) masquerAnnulerChoix();
 }
 
