@@ -10107,3 +10107,7 @@ html.android.faces-fermees #plateau .Carte.retournee.recachee::before{
 }
 html.android #plateau .Carte.retournee{ transition: transform 0.2s ease-out; }
 @media (prefers-reduced-motion: reduce){ html.android #overlayDuel .Carte.duel-a-choisir::before{ animation: none; } }
+/* 3. Bouton flèche « remonter » (il apparaît dès qu'on fait défiler le plateau) : plus de flou de ce qui passe derrière lui
+      (flou recalculé à chaque image du défilement, au-dessus de dizaines de cartes) ; fond plus opaque à la place. */
+html.android :is(#btnRemonter, #btnRemonterRegles){ -webkit-backdrop-filter: none !important; backdrop-filter: none !important; background: rgba(0, 0, 0, 0.62); }
+html.android[data-theme="givre"] :is(#btnRemonter, #btnRemonterRegles){ background: rgba(255, 255, 255, 0.88); }
