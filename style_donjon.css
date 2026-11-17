@@ -422,3 +422,13 @@ html[data-theme="donjon"] #choixMode .titreAccueilBarre{
 html[data-theme="donjon"] :is(#overlayPlus4, #overlayCupidon, #overlayCoupDeFoudre) .plus4-container-joueurs{
   box-sizing: content-box; padding: 22px 24px; margin: -20px auto -22px auto;
 }
+/* Télé : règle d'une carte en demi-écran (js/tele.js, dessinerVoletCarteTele) : rouge sombre verni, comme le défi du mode hot, au lieu du noir */
+html[data-theme="donjon"] #ecranTele .tele-volet-feuille{ background: linear-gradient(160deg, #5a0817, #2a0409 55%, #46050f) !important; border-top: 0.3vh solid rgba(255, 42, 61, 0.7); box-shadow: 0 -2vh 6vh rgba(120, 0, 20, 0.55); }
+html[data-theme="donjon"] #ecranTele .tele-volet-nom{ color: #ff3b4e; text-shadow: 0 0.3vh 0 #000, 0 0 2vh rgba(255, 42, 61, 0.6); }
+html[data-theme="donjon"] #ecranTele .tele-volet-texte{ color: #ffd0d6; }
+html[data-theme="donjon"] #ecranTele .tele-volet-poignee{ background: rgba(255, 120, 135, 0.45); }
+/* Téléphone : même volet de règle d'une carte (appui long) en rouge sombre verni */
+html[data-theme="donjon"] #voletCarte .voletPause-feuille{ background: linear-gradient(160deg, #5a0817, #2a0409 55%, #46050f) !important; border-top: 1px solid rgba(255, 42, 61, 0.7) !important; box-shadow: 0 -10px 30px rgba(120, 0, 20, 0.55) !important; }
+html[data-theme="donjon"] #voletCarte .voletPause-nom{ color: #ff3b4e !important; text-shadow: 0 1px 0 #000, 0 0 12px rgba(255, 42, 61, 0.6); }
+html[data-theme="donjon"] #voletCarte .voletPause-texte{ color: #ffd0d6 !important; }
+html[data-theme="donjon"] #voletCarte .voletPause-poignee{ background: rgba(255, 120, 135, 0.45); }
