@@ -251,8 +251,13 @@ function montrerDefiHot(joueurIndex, nbGorgees, defiPossible = true, defiImpose 
   boutons.className = "bloc-hot-boutons";
   bloc.appendChild(boutons);
 
+  // En ligne, sur les téléphones des AUTRES joueurs : les boutons disent qui choisit (« Léa le fait », « Léa boit 3 »),
+  // et le choix fait s'affiche en bas de l'écran (l'annonce se ferme aussitôt : sinon on ne voyait pas ce qu'il avait choisi)
+  const chezUnAutre = typeof enLigneActif !== "undefined" && enLigneActif && typeof pseudoActuel !== "undefined" && pseudoActuel !== nom;
+  if(chezUnAutre) bloc.classList.add("bloc-hot-autre");
   const choisir = (choix, messageRegle) => {
     etat.choix = choix;
+    if(chezUnAutre) try { afficherToast((choix === "fait" ? "✅ " : "🍺 ") + messageRegle.split("\n")[0], 3500); } catch (e) {}
     try { noterDefiStats(defi.id, choix); } catch (e) {} // (stats : défi relevé ou refusé, js/stats.js)
     bloc.dataset.netFerme = "1";
     afficherRegleBloc(regleZero, messageRegle);
@@ -269,11 +274,11 @@ function montrerDefiHot(joueurIndex, nbGorgees, defiPossible = true, defiImpose 
     surAction(btn, id, { owner: nom, once: true }, action);
     boutons.appendChild(btn);
   };
-  bouton("fait", tr("Je le fais"), "defi:fait", () => {
+  bouton("fait", chezUnAutre ? (partenaire ? tr`${qui} le font` : tr`${qui} le fait`) : tr("Je le fais"), "defi:fait", () => {
     jouerSon("annuler_gorgees");
     choisir("fait", tr`${qui} ${partenaire ? tr("relèvent") : tr("relève")} le défi :\n${defi.texte}`);
   });
-  bouton("bois", tr`Je bois ${nbGorgees}`, "defi:bois", () => {
+  bouton("bois", chezUnAutre ? (partenaire ? tr`${qui} boivent ${nbGorgees}` : tr`${qui} boit ${nbGorgees}`) : tr`Je bois ${nbGorgees}`, "defi:bois", () => {
     choisir("bois", partenaire ? tr`${qui} boivent ${texteGorgees(nbGorgees)}` : tr`${qui} boit ${texteGorgees(nbGorgees)}`);
   });
 

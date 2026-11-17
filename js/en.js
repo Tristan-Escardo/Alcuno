@@ -1169,5 +1169,8 @@ window.TEXTES_EN = {
 "Ta progression sauvegardée en ligne et ton compte Alcuno sont effacés. Ce téléphone garde ce qu'il a déjà.": "Your progress saved online and your Alcuno account are erased. This phone keeps what it already has.",
 "Supprimer": "Delete",
 "Picon bière": "Picon beer",
+"{0} le fait": "{0} does it",
+"{0} le font": "{0} do it",
+"{0} boivent {1}": "{0} drink {1}",
 "🥃 {0} préfère {1} !": "🥃 {0} would rather {1}!"
 };
