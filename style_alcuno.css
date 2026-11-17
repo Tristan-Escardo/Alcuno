@@ -8798,7 +8798,7 @@ html[data-theme="galaxie"] .switch_bleu, html[data-theme="galaxie"] .switch_bleu
 :root{ --actif-haut: #fff27a; --actif-bas: #ffd400; --actif-texte: #3b2a00; --actif-halo: #ffd400; }
 html[data-theme="noir"]{ --actif-haut: #fff3a0; --actif-bas: #ffd400; --actif-texte: #3a2a00; --actif-halo: #ffd700; }
 html[data-theme="vert"]{ --actif-haut: #8dffb4; --actif-bas: #19d964; --actif-texte: #04301a; --actif-halo: #3dff8a; }
-html[data-theme="bleu"]{ --actif-haut: #9fe0ff; --actif-bas: #2f9bff; --actif-texte: #03203f; --actif-halo: #5ab4ff; }
+html[data-theme="bleu"]{ --actif-haut: #3f7fe8; --actif-bas: #12379e; --actif-texte: #ffffff; --actif-halo: #2f6dff; } /* (Nuit : bleu foncé, nom en blanc) */
 html[data-theme="soleil"]{ --actif-haut: #ffd9a8; --actif-bas: #ff8a5c; --actif-texte: #4a1500; --actif-halo: #ff9a6b; }
 html[data-theme="cerisier"]{ --actif-haut: #ffc2de; --actif-bas: #ff5fa8; --actif-texte: #4a0a2a; --actif-halo: #ff7fba; }
 html[data-theme="givre"]{ --actif-haut: #7fe0ff; --actif-bas: #2aa6f0; --actif-texte: #032a45; --actif-halo: #3fb8ff; }
@@ -10422,7 +10422,7 @@ html[data-theme="givre"] #listeJoueurs .joueur-ligne:not(.joueur-ligne-actif) .b
 }
 /* Joueur actif : comme dans les autres thèmes (pastille pleine et lueur), en bleu glace lumineux ; sans contour blanc ni anneau */
 html[data-theme="givre"] #listeJoueurs .joueur-ligne-actif{
-  background: linear-gradient(180deg, #c8f6ff, #3cc8ff) !important; color: #022c47 !important; border-color: transparent !important;
-  box-shadow: 0 0 18px #4fd6ff, 0 0 32px rgba(60, 200, 255, 0.55) !important; text-shadow: none !important;
+  background: linear-gradient(180deg, #f2feff, #9cecff 45%, #45d4ff) !important; color: #022c47 !important; border-color: transparent !important;
+  box-shadow: 0 0 10px #ffffff, 0 0 24px #5fe0ff, 0 0 46px rgba(60, 215, 255, 0.85), 0 0 80px rgba(40, 200, 255, 0.5) !important; text-shadow: none !important;
 }
 html[data-theme="givre"] #listeJoueurs .joueur-ligne-actif .btnPauseJoueur{ color: #05324f !important; border-color: #05324f !important; background: rgba(255, 255, 255, 0.45) !important; position: absolute; z-index: 1; }
