@@ -9691,9 +9691,9 @@ html[data-theme="kawaii"] #choixMode .carteAccueil{
 html[data-theme="kawaii"] #choixMode .carteBar{ --fond: linear-gradient(180deg, #ffe0ef, #ff9fcc); }
 html[data-theme="kawaii"] #choixMode .carteAlbum{ --fond: linear-gradient(180deg, #fffbe0, #ffe27a); }
 html[data-theme="kawaii"] #choixMode .carteEthylo{ --fond: linear-gradient(180deg, #ece6ff, #bba8ff); }
-html[data-theme="givre"] #choixMode .carteBar{ --fond: linear-gradient(180deg, #5cc3f0, #1787cf); }
+html[data-theme="givre"] #choixMode .carteBar{ --fond: var(--givre-bouton); } /* (le même bleu que les boutons, pour le Bar comme pour l'Éthylo) */
 html[data-theme="givre"] #choixMode .carteAlbum{ --fond: linear-gradient(180deg, #ffffff, #cfeaff); --encre: #0f6fb8; }
-html[data-theme="givre"] #choixMode .carteEthylo{ --fond: linear-gradient(180deg, #2a9be0, #0b5fa8); }
+html[data-theme="givre"] #choixMode .carteEthylo{ --fond: var(--givre-bouton); }
 html[data-theme="givre"] #choixMode .carteAccueil{ --ombre: 0 8px 18px rgba(20, 90, 150, 0.35); }
 /* Musique : violet de la scène, un néon par carte (les couleurs de l'égaliseur) */
 html[data-theme="musique"] #choixMode .carteAccueil{
@@ -10572,6 +10572,6 @@ html[data-theme] #ecranRegles:is(.ethylo, .bar) .extrasPuce{ transition: transfo
 html[data-theme] #ecranRegles.ethylo .ethyloNumero::after{
   content: ""; flex: none; width: 24px; height: 24px; font-size: 0;
   background-color: var(--ey-titre, var(--ey-curseur, #ffd400));
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z'/%3E%3C/svg%3E") center / contain no-repeat;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z'/%3E%3C/svg%3E") center / contain no-repeat;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z'/%3E%3C/svg%3E") center / contain no-repeat;
 }
