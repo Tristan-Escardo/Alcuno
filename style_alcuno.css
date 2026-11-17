@@ -10420,20 +10420,9 @@ html[data-theme="givre"] #listeJoueurs .joueur-ligne:not(.joueur-ligne-actif){
 html[data-theme="givre"] #listeJoueurs .joueur-ligne:not(.joueur-ligne-actif) .btnPauseJoueur{
   color: #1a8fd0; border: 1.5px solid rgba(26, 146, 214, 0.45); background: rgba(39, 174, 232, 0.1);
 }
+/* Joueur actif : comme dans les autres thèmes (pastille pleine et lueur), en bleu glace lumineux ; sans contour blanc ni anneau */
 html[data-theme="givre"] #listeJoueurs .joueur-ligne-actif{
-  background:
-    radial-gradient(ellipse 38% 90% at 14% 28%, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0) 70%),
-    radial-gradient(ellipse 30% 80% at 86% 70%, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0) 70%),
-    linear-gradient(180deg, #ffffff 0%, #d8faff 26%, #86ecff 58%, #2fd0ff 100%) !important;
-  color: #022c47 !important; border: 0 !important;
-  /* néon glace : cœur presque blanc, lueur cyan intense autour (pas de trait) */
-  box-shadow: inset 0 2px 0 #fff, inset 0 -3px 10px rgba(0, 170, 235, 0.45), inset 0 0 18px rgba(255, 255, 255, 0.9),
-    0 0 6px rgba(255, 255, 255, 0.95), 0 0 16px rgba(110, 232, 255, 0.95), 0 0 34px rgba(40, 200, 255, 0.75), 0 0 60px rgba(30, 170, 255, 0.45) !important;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.95), 0 1px 0 rgba(255, 255, 255, 0.9) !important; position: relative; overflow: visible;
+  background: linear-gradient(180deg, #c8f6ff, #3cc8ff) !important; color: #022c47 !important; border-color: transparent !important;
+  box-shadow: 0 0 18px #4fd6ff, 0 0 32px rgba(60, 200, 255, 0.55) !important; text-shadow: none !important;
 }
-/* reflet de verre sur le haut */
-html[data-theme="givre"] #listeJoueurs .joueur-ligne-actif::before{
-  content: ""; position: absolute; left: 5%; right: 5%; top: 3px; height: 44%; border-radius: 99px; pointer-events: none;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.05)); }
-/* (lueur néon : pas d'éclat qui traverse, il déborderait de la pastille) */
 html[data-theme="givre"] #listeJoueurs .joueur-ligne-actif .btnPauseJoueur{ color: #05324f !important; border-color: #05324f !important; background: rgba(255, 255, 255, 0.45) !important; position: absolute; z-index: 1; }
