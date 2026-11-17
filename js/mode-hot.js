@@ -262,6 +262,7 @@ function montrerDefiHot(joueurIndex, nbGorgees, defiPossible = true, defiImpose 
     etat.choix = choix;
     const btnChoisi = boutons.querySelector(".bloc-hot-btn." + choix);
     if(btnChoisi){ btnChoisi.classList.remove("appuye"); void btnChoisi.offsetWidth; btnChoisi.classList.add("appuye"); } // (se voit aussi chez les autres)
+    try { if(typeof envoyerEtatTele === "function") setTimeout(envoyerEtatTele, 0); } catch (e) {} // (et sur la télé, sans attendre le prochain envoi)
     if(chezUnAutre) try { afficherBarreInfo((choix === "fait" ? "✅ " : "🍺 ") + messageRegle.split("\n")[0].replace(/\s*:\s*$/, ""), 4500); } catch (e) {}
     try { noterDefiStats(defi.id, choix); } catch (e) {} // (stats : défi relevé ou refusé, js/stats.js)
     bloc.dataset.netFerme = "1";

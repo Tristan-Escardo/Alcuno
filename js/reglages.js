@@ -1844,15 +1844,15 @@ function morceauClicTheme(){
 
 // clicNormal : le son « bouton » d'origine, jamais remplacé par un sabre ou un son du thème BDSM
 function jouerSon(nom, clicNormal = false){
-  sonPourTele(nom);
-  if (nom === "bouton" && !clicNormal) nom = morceauClicTheme(); // le clic des boutons = un son de sabre (ou du thème BDSM, ou de saxophone) au hasard // mode télé : la télé le joue aussi (même si le son de ce téléphone est coupé)
+  if (nom === "bouton" && !clicNormal) nom = morceauClicTheme();
+  sonPourTele(nom); // (après le tirage : la télé joue le même sabre / son BDSM / saxophone que le téléphone) // le clic des boutons = un son de sabre (ou du thème BDSM, ou de saxophone) au hasard // mode télé : la télé le joue aussi (même si le son de ce téléphone est coupé)
   if (!caseSons.checked || volumeSons <= 0) return;
   if (rattrapageEnCours) return; // reconnexion : pas de sons pour les actions déjà passées
   const ctx = contexteAudio();
   if (!ctx) return;
   chargerSons();
   const son = sonsCharges[nom];
-  if (son === undefined) sonsDemandes[nom] = Date.now(); // pas encore chargé : joué dès qu'il arrive
+  if (son === undefined) { sonsDemandes[nom] = Date.now(); chargerSon(ctx, nom); } // pas encore chargé : joué dès qu'il arrive (sabre… : pas dans SONS)
   if (!son) return; // (null : pas de fichier pour ce moment)
   lireSon(nom, son);
 }

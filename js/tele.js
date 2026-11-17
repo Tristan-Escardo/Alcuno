@@ -371,8 +371,17 @@ function numeroTele(){
   dernierNumeroTele = Math.max(dernierNumeroTele + 1, Date.now());
   return dernierNumeroTele;
 }
+// + « regles » (le livre : la télé montre les règles aussi) et, pendant une partie, le clic des boutons des thèmes Star Wars, BDSM
+// et Fête de la musique (sabre, son BDSM, saxophone : celui tiré par le téléphone). Le clic normal des autres thèmes : non.
+SONS_TELE.add("regles");
+function estSonClicTheme(nom){
+  return Object.keys(SONS_CLIC_THEME).some((t) => SONS_CLIC_THEME[t].indexOf(nom) !== -1);
+}
+function estSonTele(nom){
+  return SONS_TELE.has(nom) || estSonClicTheme(nom);
+}
 function sonPourTele(nom){
-  if (!codeTele || enLigneActif || !SONS_TELE.has(nom)) return;
+  if (!codeTele || enLigneActif || !estSonTele(nom) || (estSonClicTheme(nom) && !partieLancee)) return;
   sonsTele = sonsTele.concat({ i: numeroTele(), n: nom }).slice(-4);
   setTimeout(envoyerEtatTele, 60); // tout de suite (avec ce que montre l'écran à ce moment-là)
 }
@@ -481,6 +490,8 @@ const THEME_TELE_ATTENTE = "bordeaux";
 function appliquerThemeTele(nom){
   if (!nom || !THEMES[nom] || document.documentElement.dataset.theme === nom) return;
   document.documentElement.dataset.theme = nom;
+  // (sabres, sons BDSM, saxophone : chargés d'avance, pour que le premier clic du téléphone s'entende tout de suite sur la télé)
+  try { const ctx = contexteAudio(); if (ctx && SONS_CLIC_THEME[nom]) SONS_CLIC_THEME[nom].forEach((n) => chargerSon(ctx, n)); } catch (e) {}
   try { majReglageFeuxArtifice(); } catch (e) {} // (thème de fête : feux d'artifice arrêtés et effacés, js/reglages.js)
 }
 
@@ -813,7 +824,7 @@ function jouerSonsTele(sons){
   sons = Array.isArray(sons) ? sons : [];
   const plusRecent = sons.reduce((max, son) => Math.max(max, Number(son.i) || 0), 0);
   if (dernierSonTele !== null) {
-    sons.filter(son => son.i > dernierSonTele && SONS_TELE.has(son.n)).forEach(son => jouerSon(son.n));
+    sons.filter(son => son.i > dernierSonTele && estSonTele(son.n)).forEach(son => jouerSon(son.n));
   }
   dernierSonTele = Math.max(dernierSonTele || 0, plusRecent);
 }
