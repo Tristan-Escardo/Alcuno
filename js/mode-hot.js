@@ -255,6 +255,9 @@ function montrerDefiHot(joueurIndex, nbGorgees, defiPossible = true, defiImpose 
   // et le choix fait s'affiche en bas de l'écran (l'annonce se ferme aussitôt : sinon on ne voyait pas ce qu'il avait choisi)
   const chezUnAutre = typeof enLigneActif !== "undefined" && enLigneActif && typeof pseudoActuel !== "undefined" && pseudoActuel !== nom;
   if(chezUnAutre) bloc.classList.add("bloc-hot-autre");
+  // (la télé montre ce bloc tel quel, avec les boutons à la 3e personne : js/tele.js, hotPourTele)
+  bloc.dataset.teleFait = partenaire ? tr`${qui} le font` : tr`${qui} le fait`;
+  bloc.dataset.teleBois = partenaire ? tr`${qui} boivent ${nbGorgees}` : tr`${qui} boit ${nbGorgees}`;
   const choisir = (choix, messageRegle) => {
     etat.choix = choix;
     const btnChoisi = boutons.querySelector(".bloc-hot-btn." + choix);

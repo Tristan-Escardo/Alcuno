@@ -320,13 +320,13 @@ html[data-theme="donjon"] .fin-choix-recap{ background: rgba(20, 2, 6, 0.6); bor
 html[data-theme="donjon"] .fin-choix-recap .ligne{ border-bottom-color: rgba(255, 42, 61, 0.2); }
 html[data-theme="donjon"] .fin-choix-recap .ligne.en-cours{ background: rgba(255, 42, 61, 0.2); box-shadow: inset 0 0 0 1px rgba(255, 42, 61, 0.55); }
 /* Défi du mode hot : bandeau rouge et noir verni (au lieu du rose) */
-:root:root:root[data-theme="donjon"] #overlayRegleUnique#overlayRegleUnique .bloc-hot{
+:root:root:root[data-theme="donjon"] #overlayRegleUnique#overlayRegleUnique .bloc-hot, :root:root:root[data-theme="donjon"] #ecranTele#ecranTele .bloc-hot{
   background: linear-gradient(160deg, #4a0612, #0c0608 60%, #3a0410) !important; border-color: #ff2a3d !important; box-shadow: 0 0 22px rgba(255, 42, 61, 0.6) !important;
 }
-:root:root:root[data-theme="donjon"] #overlayRegleUnique#overlayRegleUnique .bloc-hot-puce{ background: linear-gradient(90deg, #c2102a, #ff3b4e) !important; }
-:root:root:root[data-theme="donjon"] #overlayRegleUnique#overlayRegleUnique .bloc-hot-lien{ color: #ff8a96 !important; }
-:root:root:root[data-theme="donjon"] #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn.fait{ background: linear-gradient(#ff4a5c, #c2102a) !important; box-shadow: 0 3px 0 #6a0614, 0 0 14px rgba(255, 42, 61, 0.6) !important; }
-:root:root:root[data-theme="donjon"] #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn.bois{ background: #120408 !important; border-color: rgba(255, 42, 61, 0.6) !important; color: #ffd0d6 !important; }
+:root:root:root[data-theme="donjon"] #overlayRegleUnique#overlayRegleUnique .bloc-hot-puce, :root:root:root[data-theme="donjon"] #ecranTele#ecranTele .bloc-hot-puce{ background: linear-gradient(90deg, #c2102a, #ff3b4e) !important; }
+:root:root:root[data-theme="donjon"] #overlayRegleUnique#overlayRegleUnique .bloc-hot-lien, :root:root:root[data-theme="donjon"] #ecranTele#ecranTele .bloc-hot-lien{ color: #ff8a96 !important; }
+:root:root:root[data-theme="donjon"] #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn.fait, :root:root:root[data-theme="donjon"] #ecranTele#ecranTele .bloc-hot-btn.fait{ background: linear-gradient(#ff4a5c, #c2102a) !important; box-shadow: 0 3px 0 #6a0614, 0 0 14px rgba(255, 42, 61, 0.6) !important; }
+:root:root:root[data-theme="donjon"] #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn.bois, :root:root:root[data-theme="donjon"] #ecranTele#ecranTele .bloc-hot-btn.bois{ background: #120408 !important; border-color: rgba(255, 42, 61, 0.6) !important; color: #ffd0d6 !important; }
 
 /* ===== Écran des crédits : rouge et noir, chaînes et flammes derrière (comme l'accueil) ===== */
 html[data-theme="donjon"] #ecranCredits{

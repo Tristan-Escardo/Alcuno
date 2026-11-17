@@ -9021,7 +9021,7 @@ html[data-theme="soleil"] #ecranTele .tele-regles-ligne em{ color: #a8203f; }
 }
 
 /* ===== Mode hot : bloc du défi dans l'annonce de la règle (sous la carte), rose / rouge quel que soit le thème (:root:root:root : passe devant les couleurs des thèmes) ===== */
-:root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot{
+:root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot, :root:root:root #ecranTele#ecranTele .bloc-hot{
   margin: 18px 0 0;
   padding: 14px 14px 16px;
   width: min(354px, 92vw);
@@ -9033,10 +9033,10 @@ html[data-theme="soleil"] #ecranTele .tele-regles-ligne em{ color: #a8203f; }
   box-shadow: 0 0 22px rgba(255, 61, 113, 0.45) !important;
   cursor: default;
 }
-:root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot *{
+:root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot *, :root:root:root #ecranTele#ecranTele .bloc-hot *{
   text-shadow: none !important;
 }
-:root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot-puce{
+:root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot-puce, :root:root:root #ecranTele#ecranTele .bloc-hot-puce{
   display: inline-block;
   padding: 4px 11px;
   margin-bottom: 8px;
@@ -9047,24 +9047,24 @@ html[data-theme="soleil"] #ecranTele .tele-regles-ligne em{ color: #a8203f; }
   font-weight: 900;
   letter-spacing: 0.6px;
 }
-:root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot-lien{
+:root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot-lien, :root:root:root #ecranTele#ecranTele .bloc-hot-lien{
   margin: 0 0 6px;
   font-size: 14px;
   font-weight: 800;
   color: #ffb3c7 !important;
 }
-:root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot-texte{
+:root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot-texte, :root:root:root #ecranTele#ecranTele .bloc-hot-texte{
   margin: 4px 0 12px;
   font-size: clamp(17px, 4.3vw, 22px);
   font-weight: 800;
   line-height: 1.3;
   color: #fff !important;
 }
-:root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot-boutons{
+:root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot-boutons, :root:root:root #ecranTele#ecranTele .bloc-hot-boutons{
   display: flex;
   gap: 10px;
 }
-:root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn{
+:root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn, :root:root:root #ecranTele#ecranTele .bloc-hot-btn{
   flex: 1;
   width: auto !important;
   min-width: 0;
@@ -9076,30 +9076,30 @@ html[data-theme="soleil"] #ecranTele .tele-regles-ligne em{ color: #a8203f; }
   cursor: pointer;
   transform: none !important;
 }
-:root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn.fait{
+:root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn.fait, :root:root:root #ecranTele#ecranTele .bloc-hot-btn.fait{
   background: linear-gradient(#ff6a90, #ff2d62) !important;
   border: none !important;
   box-shadow: 0 3px 0 #a31238 !important;
 }
-:root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn.bois{
+:root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn.bois, :root:root:root #ecranTele#ecranTele .bloc-hot-btn.bois{
   background: #3a1030 !important;
   border: 2px solid #7a4a6c !important;
   box-shadow: none !important;
 }
 /* Thèmes clairs (Givre ici, Kawaii : outils/kawaii_deco.css) : bannière hot rose clair, boutons rouge / rose (jamais de bleu) */
-:root:root:root[data-theme="givre"] #overlayRegleUnique#overlayRegleUnique .bloc-hot{
+:root:root:root[data-theme="givre"] #overlayRegleUnique#overlayRegleUnique .bloc-hot, :root:root:root[data-theme="givre"] #ecranTele#ecranTele .bloc-hot{
   background: linear-gradient(#ffc4d8, #ff9dbb) !important;
   border: 2px solid #ff3d71 !important;
   box-shadow: 0 0 18px rgba(255, 61, 113, 0.35) !important;
 }
-:root:root:root[data-theme="givre"] #overlayRegleUnique#overlayRegleUnique .bloc-hot-texte{ color: #5a0a26 !important; }
-:root:root:root[data-theme="givre"] #overlayRegleUnique#overlayRegleUnique .bloc-hot-lien{ color: #c2185b !important; }
-:root:root:root[data-theme="givre"] #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn.fait{
+:root:root:root[data-theme="givre"] #overlayRegleUnique#overlayRegleUnique .bloc-hot-texte, :root:root:root[data-theme="givre"] #ecranTele#ecranTele .bloc-hot-texte{ color: #5a0a26 !important; }
+:root:root:root[data-theme="givre"] #overlayRegleUnique#overlayRegleUnique .bloc-hot-lien, :root:root:root[data-theme="givre"] #ecranTele#ecranTele .bloc-hot-lien{ color: #c2185b !important; }
+:root:root:root[data-theme="givre"] #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn.fait, :root:root:root[data-theme="givre"] #ecranTele#ecranTele .bloc-hot-btn.fait{
   background: linear-gradient(#ff6a90, #ff2d62) !important;
   color: #fff !important;
   box-shadow: 0 3px 0 #a31238 !important;
 }
-:root:root:root[data-theme="givre"] #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn.bois{
+:root:root:root[data-theme="givre"] #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn.bois, :root:root:root[data-theme="givre"] #ecranTele#ecranTele .bloc-hot-btn.bois{
   background: #ffffff !important;
   color: #b3123f !important;
   border: 2px solid #ff8fa8 !important;
@@ -9125,8 +9125,8 @@ html[data-theme="soleil"] #overlayFinUnRestants .recap-p{ color: rgba(255, 241, 
 html[data-theme="soleil"] #overlayFinUnRestants .recap-doree{ background: linear-gradient(135deg, rgba(255, 215, 0, .2), rgba(255, 215, 0, .05)), rgba(22, 32, 72, 0.82); border-color: rgba(255, 215, 0, 0.55); }
 html[data-theme="soleil"] #overlayFinUnRestants .recap-doree-q{ color: #fff1df; }
 /* Défi du mode hot : puce et bouton « Je le fais » plus foncés pour porter du texte blanc */
-:root:root:root[data-theme="soleil"] #overlayRegleUnique#overlayRegleUnique .bloc-hot-puce{ background: linear-gradient(90deg, #c4204f, #d9561f) !important; }
-:root:root:root[data-theme="soleil"] #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn.fait{ background: linear-gradient(#cc3260, #9c1c44) !important; box-shadow: 0 3px 0 #6a1030 !important; }
+:root:root:root[data-theme="soleil"] #overlayRegleUnique#overlayRegleUnique .bloc-hot-puce, :root:root:root[data-theme="soleil"] #ecranTele#ecranTele .bloc-hot-puce{ background: linear-gradient(90deg, #c4204f, #d9561f) !important; }
+:root:root:root[data-theme="soleil"] #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn.fait, :root:root:root[data-theme="soleil"] #ecranTele#ecranTele .bloc-hot-btn.fait{ background: linear-gradient(#cc3260, #9c1c44) !important; box-shadow: 0 3px 0 #6a1030 !important; }
 
 /* ===== Télé, Soleil couchant : joueur dont c'est le tour (texte crème sur pastille pêche : illisible) et boutons de choix des fenêtres ===== */
 html[data-theme="soleil"] #ecranTele .tele-joueur-actif{ color: var(--actif-texte); }
@@ -10119,13 +10119,13 @@ html.android :is(input, textarea, [contenteditable], [contenteditable] *){ -webk
 
 /* Mode hot / hard : bouton du défi touché (« Je le fais » / « Je bois N ») : il s'éclaircit, s'enfonce et revient (chez celui qui
    touche dès le doigt posé, et chez tout le monde au moment où le choix est joué) */
-:root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn.appuye{ animation: appuiBoutonHot 0.38s cubic-bezier(0.3, 0.7, 0.3, 1.4); }
+:root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn.appuye, :root:root:root #ecranTele#ecranTele .bloc-hot-btn.appuye{ animation: appuiBoutonHot 0.38s cubic-bezier(0.3, 0.7, 0.3, 1.4); }
 @keyframes appuiBoutonHot{
   0%  { transform: none; filter: none; }
   35% { transform: translateY(3px) scale(0.93); filter: brightness(1.45) saturate(1.1); }
   100%{ transform: none; filter: brightness(1.15); }
 }
-@media (prefers-reduced-motion: reduce){ :root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn.appuye{ animation: none; filter: brightness(1.3); } }
+@media (prefers-reduced-motion: reduce){ :root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn.appuye, :root:root:root #ecranTele#ecranTele .bloc-hot-btn.appuye{ animation: none; filter: brightness(1.3); } }
 /* Barre d'info en bas (même allure que « Mauvais joueur ? », sans bouton) : le texte prend toute la place */
 #annulerChoix.barreInfo .annulerChoix-texte{ text-align: center; }
 
@@ -10143,8 +10143,8 @@ html #listeJoueurs .joueur-ligne-actif .joueur-deconnecte{ text-align: center; f
 #stickyJoueurActif .sticky-nom .joueur-deconnecte{ flex: 0 0 auto; margin-left: 0; font-size: 0.62em; }
 
 /* Bouton du défi choisi : reste éclairé, l'autre s'efface (le temps que l'annonce se ferme : tout le monde voit lequel) */
-:root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn.appuye{ filter: brightness(1.18); }
-:root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot[data-net-ferme] .bloc-hot-btn:not(.appuye){ opacity: 0.4; transition: opacity 0.2s ease; }
+:root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn.appuye, :root:root:root #ecranTele#ecranTele .bloc-hot-btn.appuye{ filter: brightness(1.18); }
+:root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot[data-net-ferme] .bloc-hot-btn:not(.appuye), :root:root:root #ecranTele#ecranTele .bloc-hot[data-net-ferme] .bloc-hot-btn:not(.appuye){ opacity: 0.4; transition: opacity 0.2s ease; }
 
 /* ===== Android, thème Star Wars : dos et faces des cartes en images prêtes (WebP, Cartes/android/, faites à partir des SVG par
    rendu à 3x) au lieu des dessins SVG : chaque SVG a un flou et ~100 traits, et des dizaines à redessiner pendant le défilement
@@ -10291,3 +10291,13 @@ html.android.poisson-uno[data-theme="galaxie"] .tele-plateau .Carte.carte-recach
 html.android.poisson-uno[data-theme="galaxie"] .Carte.dos_dore:not(.retournee):nth-child(3n){ background-image: url("Cartes/android/dos_galaxie_planete_uno.webp") !important; }
 html.android.poisson-uno[data-theme="galaxie"] .Carte.dos_dore:not(.retournee){ background-image: url("Cartes/android/dos_galaxie_argent_uno.webp") !important; }
 html.android.poisson-uno[data-theme="galaxie"] #ecranRegles .ligneRegle .Carte.retournee:not([class*="_"]):not([class*="couleur"]){ background-image: url("Cartes/android/dos_galaxie_argent_uno.webp") !important; }
+
+/* ===== Télé : défi du mode hot / hard dans le même cadre que sur le téléphone (js/tele.js, dessinerHotTele), en grand ===== */
+#ecranTele .tele-ecran-hot:empty{ display: none; }
+:root:root:root:root #ecranTele#ecranTele .bloc-hot{ width: min(64vw, 104vh); margin: 0; padding: 2.4vh 3.2vh 3vh; border-radius: 3vh; }
+:root:root:root:root #ecranTele#ecranTele .bloc-hot-puce{ font-size: 2.6vh; padding: 0.7vh 2vh; margin-bottom: 1.4vh; }
+:root:root:root:root #ecranTele#ecranTele .bloc-hot-puce .svg18{ height: 1.3em; width: 1.3em; vertical-align: -0.3em; }
+:root:root:root:root #ecranTele#ecranTele .bloc-hot-lien{ font-size: 2.8vh; margin-bottom: 1vh; }
+:root:root:root:root #ecranTele#ecranTele .bloc-hot-texte{ font-size: 4.4vh; margin: 0.6vh 0 2.4vh; }
+:root:root:root:root #ecranTele#ecranTele .bloc-hot-boutons{ gap: 2vh; }
+:root:root:root:root #ecranTele#ecranTele .bloc-hot-btn{ display: block; padding: 1.8vh 1vh !important; border-radius: 2.4vh !important; font-size: 3.4vh !important; cursor: default; }

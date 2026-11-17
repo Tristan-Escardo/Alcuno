@@ -167,7 +167,7 @@ function texteSansBoutons(racine){
       if (enfant.tagName === "BUTTON" || enfant.tagName === "SCRIPT" || enfant.classList.contains("Carte") ||
           enfant.classList.contains("fin-choix-grid") || enfant.classList.contains("fin-choix-actions") ||
           enfant.classList.contains("plus4-container-joueurs") || enfant.classList.contains("plus4-actions") ||
-          enfant.classList.contains("duel-boutons") || getComputedStyle(enfant).display === "none") return;
+          enfant.classList.contains("duel-boutons") || enfant.classList.contains("bloc-hot") || getComputedStyle(enfant).display === "none") return;
       if (enfant.tagName === "BR") { finir(); return; }
       if (BALISES_EN_LIGNE.has(enfant.tagName)) {
         // (dans une ligne flex, ex. « nom ... carte choisie » du pari : à l'écran ils sont écartés, en texte ils se collaient)
@@ -232,6 +232,21 @@ function faqPourTele(){
   return { id: "ecranRegles", texte: "", cartes: [], choix: [], faq: { parties } };
 }
 
+// Défi du mode hot / hard dans l'annonce (js/mode-hot.js) : envoyé à part, la télé le dessine dans le même cadre que le téléphone
+// (puce MODE HARD / MODE HOT, défi, deux boutons aux couleurs du thème ; celui qui a été touché s'enfonce, l'autre s'efface)
+function hotPourTele(bloc){
+  const btn = (c) => bloc.querySelector(".bloc-hot-btn." + c);
+  const lien = bloc.querySelector(".bloc-hot-lien");
+  return {
+    m: partieHard ? "hard" : "hot",
+    l: lien ? lien.innerText.trim() : "",
+    t: (bloc.querySelector(".bloc-hot-texte") || {}).innerText || "",
+    f: bloc.dataset.teleFait || "",
+    b: bloc.dataset.teleBois || "",
+    c: btn("fait") && btn("fait").classList.contains("appuye") ? "fait" : btn("bois") && btn("bois").classList.contains("appuye") ? "bois" : ""
+  };
+}
+
 function ecranPourTele(){
   const reglesOuvertes = reglesPourTele() || faqPourTele();
   if (reglesOuvertes) return reglesOuvertes;
@@ -255,7 +270,7 @@ function ecranPourTele(){
   const estPlus4 = o.id === "overlayPlus4";
   let choix = Array.from(o.querySelectorAll("button"))
     .filter(b => estAffiche(b) && !b.classList.contains("cache") && b.innerText.trim() &&
-                 !b.matches(BOUTONS_ACTION_TELE) && b.innerText.trim() !== tr("Terminer"))
+                 !b.matches(BOUTONS_ACTION_TELE) && !b.classList.contains("bloc-hot-btn") && b.innerText.trim() !== tr("Terminer"))
     .slice(0, 12)
     .map(b => {
       const t = b.innerText.replace(/\s+/g, " ").trim().slice(0, 40);
@@ -268,8 +283,10 @@ function ecranPourTele(){
       return { t: nom.toUpperCase(), c: nom };
     }).filter((c) => c.c);
   }
+  const blocHot = o.querySelector(".bloc-hot");
   return {
     id: o.id,
+    hot: blocHot ? hotPourTele(blocHot) : null,
     texte: texteSansBoutons(o),
     // (cartes des annonces : leur face sans la classe « retournee » ; cartes du duel encore à choisir : sans face, donc de dos)
     cartes: cartes.slice(0, 4).map(c => faceCarte(c) || (c.classList.contains("dos_dore") ? "d" : "")),
@@ -880,7 +897,7 @@ let derniereLectureTele = "";
 function lireSurTele(etat){
   if (!etat || !etat.voix || !etat.partie) { derniereLectureTele = ""; return; }
   const e = etat.ecran;
-  const texte = e ? (e.recap ? "" : e.texte || "") : etat.regles || "";
+  const texte = e ? (e.recap ? "" : (e.texte || "") + (e.hot && e.hot.t ? "\n" + e.hot.t : "")) : etat.regles || "";
   if (!texte) { derniereLectureTele = ""; return; }
   const cle = (e ? e.id : "") + "|" + texte;
   if (cle === derniereLectureTele) return;
@@ -1066,6 +1083,7 @@ function dessinerTele(ecran, etat){
   surEcran.classList.toggle("tele-ecran-historique", !!e && e.id === "voletHistorique");
   surEcran.classList.toggle("tele-ecran-recap", !!(e && e.recap));
   surEcran.classList.toggle("tele-ecran-regles", !!(e && e.id === "ecranRegles" && (e.regles || e.faq)));
+  dessinerHotTele(surEcran, e && !e.recap ? e.hot : null);
   if (e && e.recap) {
     surEcran.querySelector(".tele-ecran-cartes").innerHTML = "";
     surEcran.querySelector(".tele-ecran-choix").innerHTML = "";
@@ -1110,6 +1128,49 @@ function dessinerTele(ecran, etat){
       zoneChoix.appendChild(puce);
     });
   }
+}
+
+// Défi du mode hot / hard (voir hotPourTele) : même cadre que sur le téléphone (style_alcuno.css : .bloc-hot, aussi sous #ecranTele).
+// Dans sa propre zone, refaite seulement quand le défi change : l'animation du bouton touché ne repart pas à chaque envoi.
+function dessinerHotTele(surEcran, hot){
+  let zone = surEcran.querySelector(".tele-ecran-hot");
+  if (!zone) {
+    zone = document.createElement("div");
+    zone.className = "tele-ecran-hot";
+    surEcran.insertBefore(zone, surEcran.querySelector(".tele-ecran-choix"));
+  }
+  const cle = hot ? JSON.stringify([hot.m, hot.l, hot.t, hot.f, hot.b]) : "";
+  if (zone.dataset.cle !== cle) {
+    zone.dataset.cle = cle;
+    zone.innerHTML = "";
+    if (!hot) return;
+    const bloc = document.createElement("div");
+    bloc.className = "bloc-hot";
+    const puce = document.createElement("span");
+    puce.className = "bloc-hot-puce";
+    if (hot.m === "hard") puce.innerHTML = tr`${SVG_18_BARRE} MODE HARD`; // (dessin fixe, rien qui vient d'un joueur)
+    else puce.innerText = tr("🔥 MODE HOT");
+    bloc.appendChild(puce);
+    if (hot.l) { const lien = document.createElement("div"); lien.className = "bloc-hot-lien"; lien.innerText = hot.l; bloc.appendChild(lien); }
+    const texte = document.createElement("p");
+    texte.className = "bloc-hot-texte";
+    texte.innerText = hot.t;
+    bloc.appendChild(texte);
+    const boutons = document.createElement("div");
+    boutons.className = "bloc-hot-boutons";
+    [["fait", hot.f], ["bois", hot.b]].forEach(([c, t]) => {
+      const b = document.createElement("span");
+      b.className = "bloc-hot-btn " + c;
+      b.innerText = t;
+      boutons.appendChild(b);
+    });
+    bloc.appendChild(boutons);
+    zone.appendChild(bloc);
+  }
+  if (!hot) return;
+  const bloc = zone.querySelector(".bloc-hot");
+  zone.querySelectorAll(".bloc-hot-btn").forEach((b) => b.classList.toggle("appuye", b.classList.contains(hot.c)));
+  if (hot.c) bloc.dataset.netFerme = "1"; else delete bloc.dataset.netFerme;
 }
 
 // Texte avec <b> / <em> (les seules balises des règles) : construit à la main, sans innerHTML
