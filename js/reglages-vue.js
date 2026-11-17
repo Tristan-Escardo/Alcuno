@@ -108,7 +108,7 @@
       // (la lumière change dès le tap, sans attendre que le contenu de l'ancienne page ait fini de s'effacer)
       tuiles.querySelectorAll(".tuileReglage").forEach((x) => x.classList.toggle("choisie", ancien !== g.id && x === t));
       placerHalo();
-      const ouvrir = (id) => { actif = id; majVue(); const bl = blocsVisiblesDe(id); entrer(bl); if (bl[0]) setTimeout(() => { try { bl[0].scrollIntoView({ behavior: calme() ? "auto" : "smooth", block: "nearest" }); } catch (e) {} }, 60); };
+      const ouvrir = (id) => { actif = id; majVue(); const bl = blocsVisiblesDe(id); entrer(bl); };
       if (ancien === g.id) sortir(blocsVisiblesDe(ancien), () => { actif = ""; majVue(); }); // (retap : la page se referme)
       else if (ancien) sortir(blocsVisiblesDe(ancien), () => ouvrir(g.id));
       else ouvrir(g.id);
