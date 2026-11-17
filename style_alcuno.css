@@ -10404,3 +10404,10 @@ html[data-theme="prestige"] #ecranCaster .texteConfirmation{ text-shadow: 0 1px 
 html[data-theme="prestige"] #ecranCaster #btnCasterArreter{ background: rgba(40, 25, 0, 0.45); box-shadow: 0 0 0 1px rgba(255, 230, 150, 0.6) inset; }
 /* Soleil couchant : titre jaune peu lisible sur le mauve du dégradé : en blanc à ombre prune */
 html[data-theme="soleil"] #ecranCaster h2{ color: #fff; text-shadow: 0 2px 0 #6a2a55, 0 4px 12px rgba(58, 31, 74, 0.5); }
+/* ===== Bouton pause du joueur actif (dans sa pastille) : bien visible dans tous les thèmes. En BDSM il était rose sur la pastille
+   rouge (invisible) ; ailleurs, trait fin et discret. Couleur du nom du joueur, bordure plus épaisse, léger fond clair ===== */
+html[data-theme] #listeJoueurs .joueur-ligne-actif .btnPauseJoueur{
+  color: var(--actif-texte) !important; border: 2px solid var(--actif-texte) !important; background: rgba(255, 255, 255, 0.32) !important;
+  opacity: 1 !important; box-shadow: none !important;
+}
+html[data-theme] #listeJoueurs .joueur-ligne-actif .btnPauseJoueur svg{ width: 13px; height: 13px; }
