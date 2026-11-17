@@ -10145,3 +10145,149 @@ html #listeJoueurs .joueur-ligne-actif .joueur-deconnecte{ text-align: center; f
 /* Bouton du défi choisi : reste éclairé, l'autre s'efface (le temps que l'annonce se ferme : tout le monde voit lequel) */
 :root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn.appuye{ filter: brightness(1.18); }
 :root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot[data-net-ferme] .bloc-hot-btn:not(.appuye){ opacity: 0.4; transition: opacity 0.2s ease; }
+
+/* ===== Android, thème Star Wars : dos et faces des cartes en images prêtes (WebP, Cartes/android/, faites à partir des SVG par
+   rendu à 3x) au lieu des dessins SVG : chaque SVG a un flou et ~100 traits, et des dizaines à redessiner pendant le défilement
+   du plateau cassaient l'affichage sur les petits Android (Samsung A14 : bande d'écran en bouillie). Même rendu. iPhone inchangé.
+   Règles fabriquées depuis celles des SVG : refaire les images et ce bloc si un dessin change. ===== */
+html.android[data-theme="galaxie"] .Carte:not(.retournee):not([class*="_"]):not([class*="couleur"]),
+html.android.faces-fermees[data-theme="galaxie"] #plateau .Carte.retournee.recachee,
+html.android[data-theme="galaxie"] .tele-plateau .Carte.carte-recachee{ background-image: url("Cartes/android/dos_galaxie_argent.webp") !important; }
+html.android[data-theme="galaxie"] .Carte:not(.retournee):not([class*="_"]):not([class*="couleur"]):nth-child(3n+2),
+html.android.faces-fermees[data-theme="galaxie"] #plateau .Carte.retournee.recachee:nth-child(3n+2),
+html.android[data-theme="galaxie"] .tele-plateau .Carte.carte-recachee:nth-child(3n+2),
+html.android[data-theme="galaxie"] .Carte.dos_dore:not(.retournee):nth-child(3n+2){ background-image: url("Cartes/android/dos_galaxie_hyperespace.webp") !important; }
+html.android[data-theme="galaxie"] .Carte:not(.retournee):not([class*="_"]):not([class*="couleur"]):nth-child(3n),
+html.android.faces-fermees[data-theme="galaxie"] #plateau .Carte.retournee.recachee:nth-child(3n),
+html.android[data-theme="galaxie"] .tele-plateau .Carte.carte-recachee:nth-child(3n),
+html.android[data-theme="galaxie"] .Carte.dos_dore:not(.retournee):nth-child(3n){ background-image: url("Cartes/android/dos_galaxie_planete.webp") !important; }
+html.android[data-theme="galaxie"] .Carte.dos_dore:not(.retournee){ background-image: url("Cartes/android/dos_galaxie_argent.webp") !important; }
+html.android[data-theme="galaxie"] .zero_vert{ background-image: url("Cartes/android/galaxie/zero_vert.webp"); }
+html.android[data-theme="galaxie"] .zero_jaune{ background-image: url("Cartes/android/galaxie/zero_jaune.webp"); }
+html.android[data-theme="galaxie"] .zero_rouge{ background-image: url("Cartes/android/galaxie/zero_rouge.webp"); }
+html.android[data-theme="galaxie"] .zero_bleu{ background-image: url("Cartes/android/galaxie/zero_bleu.webp"); }
+html.android[data-theme="galaxie"] .un_vert,
+html.android[data-theme="galaxie"] .un_vert1{ background-image: url("Cartes/android/galaxie/un_vert.webp"); }
+html.android[data-theme="galaxie"] .un_jaune,
+html.android[data-theme="galaxie"] .un_jaune1{ background-image: url("Cartes/android/galaxie/un_jaune.webp"); }
+html.android[data-theme="galaxie"] .un_rouge,
+html.android[data-theme="galaxie"] .un_rouge1{ background-image: url("Cartes/android/galaxie/un_rouge.webp"); }
+html.android[data-theme="galaxie"] .un_bleu,
+html.android[data-theme="galaxie"] .un_bleu1{ background-image: url("Cartes/android/galaxie/un_bleu.webp"); }
+html.android[data-theme="galaxie"] .deux_vert,
+html.android[data-theme="galaxie"] .deux_vert1{ background-image: url("Cartes/android/galaxie/deux_vert.webp"); }
+html.android[data-theme="galaxie"] .deux_jaune,
+html.android[data-theme="galaxie"] .deux_jaune1{ background-image: url("Cartes/android/galaxie/deux_jaune.webp"); }
+html.android[data-theme="galaxie"] .deux_rouge,
+html.android[data-theme="galaxie"] .deux_rouge1{ background-image: url("Cartes/android/galaxie/deux_rouge.webp"); }
+html.android[data-theme="galaxie"] .deux_bleu,
+html.android[data-theme="galaxie"] .deux_bleu1{ background-image: url("Cartes/android/galaxie/deux_bleu.webp"); }
+html.android[data-theme="galaxie"] .trois_vert,
+html.android[data-theme="galaxie"] .trois_vert1{ background-image: url("Cartes/android/galaxie/trois_vert.webp"); }
+html.android[data-theme="galaxie"] .trois_jaune,
+html.android[data-theme="galaxie"] .trois_jaune1{ background-image: url("Cartes/android/galaxie/trois_jaune.webp"); }
+html.android[data-theme="galaxie"] .trois_rouge,
+html.android[data-theme="galaxie"] .trois_rouge1{ background-image: url("Cartes/android/galaxie/trois_rouge.webp"); }
+html.android[data-theme="galaxie"] .trois_bleu,
+html.android[data-theme="galaxie"] .trois_bleu1{ background-image: url("Cartes/android/galaxie/trois_bleu.webp"); }
+html.android[data-theme="galaxie"] .quatre_vert,
+html.android[data-theme="galaxie"] .quatre_vert1{ background-image: url("Cartes/android/galaxie/quatre_vert.webp"); }
+html.android[data-theme="galaxie"] .quatre_jaune,
+html.android[data-theme="galaxie"] .quatre_jaune1{ background-image: url("Cartes/android/galaxie/quatre_jaune.webp"); }
+html.android[data-theme="galaxie"] .quatre_rouge,
+html.android[data-theme="galaxie"] .quatre_rouge1{ background-image: url("Cartes/android/galaxie/quatre_rouge.webp"); }
+html.android[data-theme="galaxie"] .quatre_bleu,
+html.android[data-theme="galaxie"] .quatre_bleu1{ background-image: url("Cartes/android/galaxie/quatre_bleu.webp"); }
+html.android[data-theme="galaxie"] .cinq_vert,
+html.android[data-theme="galaxie"] .cinq_vert1{ background-image: url("Cartes/android/galaxie/cinq_vert.webp"); }
+html.android[data-theme="galaxie"] .cinq_jaune,
+html.android[data-theme="galaxie"] .cinq_jaune1{ background-image: url("Cartes/android/galaxie/cinq_jaune.webp"); }
+html.android[data-theme="galaxie"] .cinq_rouge,
+html.android[data-theme="galaxie"] .cinq_rouge1{ background-image: url("Cartes/android/galaxie/cinq_rouge.webp"); }
+html.android[data-theme="galaxie"] .cinq_bleu,
+html.android[data-theme="galaxie"] .cinq_bleu1{ background-image: url("Cartes/android/galaxie/cinq_bleu.webp"); }
+html.android[data-theme="galaxie"] .six_vert,
+html.android[data-theme="galaxie"] .six_vert1{ background-image: url("Cartes/android/galaxie/six_vert.webp"); }
+html.android[data-theme="galaxie"] .six_jaune,
+html.android[data-theme="galaxie"] .six_jaune1{ background-image: url("Cartes/android/galaxie/six_jaune.webp"); }
+html.android[data-theme="galaxie"] .six_rouge,
+html.android[data-theme="galaxie"] .six_rouge1{ background-image: url("Cartes/android/galaxie/six_rouge.webp"); }
+html.android[data-theme="galaxie"] .six_bleu,
+html.android[data-theme="galaxie"] .six_bleu1{ background-image: url("Cartes/android/galaxie/six_bleu.webp"); }
+html.android[data-theme="galaxie"] .sept_vert,
+html.android[data-theme="galaxie"] .sept_vert1{ background-image: url("Cartes/android/galaxie/sept_vert.webp"); }
+html.android[data-theme="galaxie"] .sept_jaune,
+html.android[data-theme="galaxie"] .sept_jaune1{ background-image: url("Cartes/android/galaxie/sept_jaune.webp"); }
+html.android[data-theme="galaxie"] .sept_rouge,
+html.android[data-theme="galaxie"] .sept_rouge1{ background-image: url("Cartes/android/galaxie/sept_rouge.webp"); }
+html.android[data-theme="galaxie"] .sept_bleu,
+html.android[data-theme="galaxie"] .sept_bleu1{ background-image: url("Cartes/android/galaxie/sept_bleu.webp"); }
+html.android[data-theme="galaxie"] .huit_vert,
+html.android[data-theme="galaxie"] .huit_vert1{ background-image: url("Cartes/android/galaxie/huit_vert.webp"); }
+html.android[data-theme="galaxie"] .huit_jaune,
+html.android[data-theme="galaxie"] .huit_jaune1{ background-image: url("Cartes/android/galaxie/huit_jaune.webp"); }
+html.android[data-theme="galaxie"] .huit_rouge,
+html.android[data-theme="galaxie"] .huit_rouge1{ background-image: url("Cartes/android/galaxie/huit_rouge.webp"); }
+html.android[data-theme="galaxie"] .huit_bleu,
+html.android[data-theme="galaxie"] .huit_bleu1{ background-image: url("Cartes/android/galaxie/huit_bleu.webp"); }
+html.android[data-theme="galaxie"] .neuf_vert,
+html.android[data-theme="galaxie"] .neuf_vert1{ background-image: url("Cartes/android/galaxie/neuf_vert.webp"); }
+html.android[data-theme="galaxie"] .neuf_jaune,
+html.android[data-theme="galaxie"] .neuf_jaune1{ background-image: url("Cartes/android/galaxie/neuf_jaune.webp"); }
+html.android[data-theme="galaxie"] .neuf_rouge,
+html.android[data-theme="galaxie"] .neuf_rouge1{ background-image: url("Cartes/android/galaxie/neuf_rouge.webp"); }
+html.android[data-theme="galaxie"] .neuf_bleu,
+html.android[data-theme="galaxie"] .neuf_bleu1{ background-image: url("Cartes/android/galaxie/neuf_bleu.webp"); }
+html.android[data-theme="galaxie"] .interdit_vert{ background-image: url("Cartes/android/galaxie/interdit_vert.webp"); }
+html.android[data-theme="galaxie"] .interdit_jaune{ background-image: url("Cartes/android/galaxie/interdit_jaune.webp"); }
+html.android[data-theme="galaxie"] .interdit_rouge{ background-image: url("Cartes/android/galaxie/interdit_rouge.webp"); }
+html.android[data-theme="galaxie"] .interdit_bleu{ background-image: url("Cartes/android/galaxie/interdit_bleu.webp"); }
+html.android[data-theme="galaxie"] .couleur,
+html.android[data-theme="galaxie"] .couleur1,
+html.android[data-theme="galaxie"] .couleur2,
+html.android[data-theme="galaxie"] .couleur3{ background-image: url("Cartes/android/galaxie/couleur.webp"); }
+html.android[data-theme="galaxie"] .cupidon_a,
+html.android[data-theme="galaxie"] .cupidon_b,
+html.android[data-theme="galaxie"] .cupidon_c{ background-image: url("Cartes/android/galaxie/cupidon.webp"); }
+html.android[data-theme="galaxie"] .plus_2_vert,
+html.android[data-theme="galaxie"] .plus_2_vert1,
+html.android[data-theme="galaxie"] .plus_2_vert2,
+html.android[data-theme="galaxie"] .plus_2_vert3{ background-image: url("Cartes/android/galaxie/plus_2_vert.webp"); }
+html.android[data-theme="galaxie"] .plus_2_jaune,
+html.android[data-theme="galaxie"] .plus_2_jaune1,
+html.android[data-theme="galaxie"] .plus_2_jaune2,
+html.android[data-theme="galaxie"] .plus_2_jaune3{ background-image: url("Cartes/android/galaxie/plus_2_jaune.webp"); }
+html.android[data-theme="galaxie"] .plus_2_rouge,
+html.android[data-theme="galaxie"] .plus_2_rouge1,
+html.android[data-theme="galaxie"] .plus_2_rouge2,
+html.android[data-theme="galaxie"] .plus_2_rouge3{ background-image: url("Cartes/android/galaxie/plus_2_rouge.webp"); }
+html.android[data-theme="galaxie"] .plus_2_bleu,
+html.android[data-theme="galaxie"] .plus_2_bleu1,
+html.android[data-theme="galaxie"] .plus_2_bleu2,
+html.android[data-theme="galaxie"] .plus_2_bleu3{ background-image: url("Cartes/android/galaxie/plus_2_bleu.webp"); }
+html.android[data-theme="galaxie"] .plus_4,
+html.android[data-theme="galaxie"] .plus_4_1,
+html.android[data-theme="galaxie"] .plus_4_2,
+html.android[data-theme="galaxie"] .plus_4_3{ background-image: url("Cartes/android/galaxie/plus_4.webp"); }
+html.android[data-theme="galaxie"] .switch_vert,
+html.android[data-theme="galaxie"] .switch_vert1{ background-image: url("Cartes/android/galaxie/switch_vert.webp"); }
+html.android[data-theme="galaxie"] .switch_jaune,
+html.android[data-theme="galaxie"] .switch_jaune1{ background-image: url("Cartes/android/galaxie/switch_jaune.webp"); }
+html.android[data-theme="galaxie"] .switch_rouge,
+html.android[data-theme="galaxie"] .switch_rouge1{ background-image: url("Cartes/android/galaxie/switch_rouge.webp"); }
+html.android[data-theme="galaxie"] .switch_bleu,
+html.android[data-theme="galaxie"] .switch_bleu1{ background-image: url("Cartes/android/galaxie/switch_bleu.webp"); }
+html.android[data-theme="galaxie"] #ecranRegles .ligneRegle .Carte.retournee:not([class*="_"]):not([class*="couleur"]){ background-image: url("Cartes/android/dos_galaxie_argent.webp") !important; }
+html.android.poisson-uno[data-theme="galaxie"] .Carte:not(.retournee):not([class*="_"]):not([class*="couleur"]),
+html.android.poisson-uno.faces-fermees[data-theme="galaxie"] #plateau .Carte.retournee.recachee,
+html.android.poisson-uno[data-theme="galaxie"] .tele-plateau .Carte.carte-recachee{ background-image: url("Cartes/android/dos_galaxie_argent_uno.webp") !important; }
+html.android.poisson-uno[data-theme="galaxie"] .Carte:not(.retournee):not([class*="_"]):not([class*="couleur"]):nth-child(3n+2),
+html.android.poisson-uno.faces-fermees[data-theme="galaxie"] #plateau .Carte.retournee.recachee:nth-child(3n+2),
+html.android.poisson-uno[data-theme="galaxie"] .tele-plateau .Carte.carte-recachee:nth-child(3n+2),
+html.android.poisson-uno[data-theme="galaxie"] .Carte.dos_dore:not(.retournee):nth-child(3n+2){ background-image: url("Cartes/android/dos_galaxie_hyperespace_uno.webp") !important; }
+html.android.poisson-uno[data-theme="galaxie"] .Carte:not(.retournee):not([class*="_"]):not([class*="couleur"]):nth-child(3n),
+html.android.poisson-uno.faces-fermees[data-theme="galaxie"] #plateau .Carte.retournee.recachee:nth-child(3n),
+html.android.poisson-uno[data-theme="galaxie"] .tele-plateau .Carte.carte-recachee:nth-child(3n),
+html.android.poisson-uno[data-theme="galaxie"] .Carte.dos_dore:not(.retournee):nth-child(3n){ background-image: url("Cartes/android/dos_galaxie_planete_uno.webp") !important; }
+html.android.poisson-uno[data-theme="galaxie"] .Carte.dos_dore:not(.retournee){ background-image: url("Cartes/android/dos_galaxie_argent_uno.webp") !important; }
+html.android.poisson-uno[data-theme="galaxie"] #ecranRegles .ligneRegle .Carte.retournee:not([class*="_"]):not([class*="couleur"]){ background-image: url("Cartes/android/dos_galaxie_argent_uno.webp") !important; }
