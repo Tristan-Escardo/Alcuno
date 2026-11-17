@@ -8798,7 +8798,7 @@ html[data-theme="galaxie"] .switch_bleu, html[data-theme="galaxie"] .switch_bleu
 :root{ --actif-haut: #fff27a; --actif-bas: #ffd400; --actif-texte: #3b2a00; --actif-halo: #ffd400; }
 html[data-theme="noir"]{ --actif-haut: #fff3a0; --actif-bas: #ffd400; --actif-texte: #3a2a00; --actif-halo: #ffd700; }
 html[data-theme="vert"]{ --actif-haut: #8dffb4; --actif-bas: #19d964; --actif-texte: #04301a; --actif-halo: #3dff8a; }
-html[data-theme="bleu"]{ --actif-haut: #3f7fe8; --actif-bas: #12379e; --actif-texte: #ffffff; --actif-halo: #2f6dff; } /* (Nuit : bleu foncé, nom en blanc) */
+html[data-theme="bleu"]{ --actif-haut: #fff27a; --actif-bas: #ffd400; --actif-texte: #3b2a00; --actif-halo: #ffd400; } /* (Nuit : le jaune normal) */
 html[data-theme="soleil"]{ --actif-haut: #ffd9a8; --actif-bas: #ff8a5c; --actif-texte: #4a1500; --actif-halo: #ff9a6b; }
 html[data-theme="cerisier"]{ --actif-haut: #ffc2de; --actif-bas: #ff5fa8; --actif-texte: #4a0a2a; --actif-halo: #ff7fba; }
 html[data-theme="givre"]{ --actif-haut: #7fe0ff; --actif-bas: #2aa6f0; --actif-texte: #032a45; --actif-halo: #3fb8ff; }
