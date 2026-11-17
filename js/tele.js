@@ -740,6 +740,8 @@ function delaiNotifTele(){
 function avancerNotifsTele(ecran){
   const etat = dernierEtatNotifTele;
   if (!etat || !etat.partie || !(etat.cartes || []).length || document.visibilityState !== "visible") return;
+  const attente = ecran.querySelector(".tele-attente");
+  if (!attente || !attente.hidden) return; // (écran du QR code : jamais de notif)
   if (etat.pause) return; // (pas de notif ni de temps de jeu compté pendant la pause)
   const lenteur = phraseLenteur(etat);
   if (lenteur) { lenteurDite = true; montrerNotifTele(ecran, lenteur); return; }
@@ -775,6 +777,8 @@ function phraseNotifTele(etat){
 }
 
 function montrerNotifTele(ecran, texte){
+  const attente = ecran.querySelector(".tele-attente");
+  if (attente && !attente.hidden) return; // (écran du QR code : jamais de notif)
   const ancienne = ecran.querySelector(".tele-notif");
   if (ancienne) ancienne.remove();
   const notif = document.createElement("div");
@@ -954,6 +958,10 @@ function dessinerTele(ecran, etat){
   if (!etat) {
     attente.hidden = false; jeu.hidden = true; surEcran.hidden = true;
     document.documentElement.classList.remove("tele-ecran-ouvert");
+    // Retour au QR code : plus aucune notif qui chambre (celle à l'écran est retirée, le dernier état de la partie oublié)
+    dernierEtatNotifTele = null;
+    const notifEnCours = ecran.querySelector(".tele-notif");
+    if (notifEnCours) notifEnCours.remove();
     appliquerThemeTele(THEME_TELE_ATTENTE);
     dernierSonTele = null;
     dernierEnvolTele = null;
