@@ -265,6 +265,7 @@ function montrerDefiHot(joueurIndex, nbGorgees, defiPossible = true, defiImpose 
     try { if(typeof envoyerEtatTele === "function") setTimeout(envoyerEtatTele, 0); } catch (e) {} // (et sur la télé, sans attendre le prochain envoi)
     if(chezUnAutre) try { afficherBarreInfo((choix === "fait" ? "✅ " : "🍺 ") + messageRegle.split("\n")[0].replace(/\s*:\s*$/, ""), 4500); } catch (e) {}
     try { noterDefiStats(defi.id, choix); } catch (e) {} // (stats : défi relevé ou refusé, js/stats.js)
+    if(choix === "fait") compterStat("defis", nom); // (récap de fin : « Coquinou » / « Affamé »)
     bloc.dataset.netFerme = "1";
     afficherRegleBloc(regleZero, messageRegle);
     regleZero.style.display = "block";
