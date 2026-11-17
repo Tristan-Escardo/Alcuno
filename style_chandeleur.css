@@ -202,3 +202,6 @@ html[data-theme="chandeleur"] #ecranTele .tele-compteur[hidden]{ display: none; 
 
 /* ----- Plateau : l'intérieur de l'icône Règles (le livre) prend le ton de l'en-tête (les cartes), pas l'orange de l'accueil ----- */
 html[data-theme="chandeleur"] header #btnReglesJeu path.couverture{ fill: var(--carte-chandeleur); }
+/* Écran « Caster sur la télé » : titre blanc à ombre caramel (le jaune par défaut se perdait sur le fond orange) */
+html[data-theme="chandeleur"] #ecranCaster h2{ color: #fff; text-shadow: 0 2px 0 #7a3008, 0 4px 12px rgba(70, 25, 0, 0.45); }
+html[data-theme="chandeleur"] #ecranCaster .texteConfirmation{ text-shadow: 0 1px 2px rgba(70, 25, 0, 0.6); }

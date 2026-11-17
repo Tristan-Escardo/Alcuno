@@ -10395,3 +10395,12 @@ html[data-theme="kawaii"] #ecranTele .tele-volet-nom{ color: var(--kawaii-rose-f
 html[data-theme="kawaii"] #ecranTele .tele-volet-texte{ color: var(--kawaii-prune, #500b50); }
 html[data-theme="givre"] #ecranTele .tele-volet-texte{ color: #0d3550; }
 @keyframes teleVoletMonte{ from{ transform: translateY(100%); } to{ transform: none; } }
+/* ===== Écran « Caster sur la télé », télé connectée : thèmes où ça ne se lisait pas ===== */
+/* Givre : « Arrêter de caster » était en blanc sur le fond clair (invisible) : bouton fantôme bleu, comme « Caster » au repos */
+html[data-theme="givre"] #ecranCaster #btnCasterArreter{ background: rgba(26, 155, 224, 0.1); color: var(--givre-accent); text-shadow: none; box-shadow: 0 0 0 1px var(--givre-bord) inset; }
+/* Prestige : titre doré sur fond doré : en blanc à ombre brune, texte avec une ombre plus marquée, bouton plus sombre */
+html[data-theme="prestige"] #ecranCaster h2{ color: #fff; text-shadow: 0 2px 0 #6b4a00, 0 4px 12px rgba(40, 25, 0, 0.55); }
+html[data-theme="prestige"] #ecranCaster .texteConfirmation{ text-shadow: 0 1px 3px rgba(40, 25, 0, 0.85); }
+html[data-theme="prestige"] #ecranCaster #btnCasterArreter{ background: rgba(40, 25, 0, 0.45); box-shadow: 0 0 0 1px rgba(255, 230, 150, 0.6) inset; }
+/* Soleil couchant : titre jaune peu lisible sur le mauve du dégradé : en blanc à ombre prune */
+html[data-theme="soleil"] #ecranCaster h2{ color: #fff; text-shadow: 0 2px 0 #6a2a55, 0 4px 12px rgba(58, 31, 74, 0.5); }
