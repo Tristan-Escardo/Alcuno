@@ -1281,10 +1281,22 @@ function dessinerPariTele(zone, p){
   zone.appendChild(haut);
 
   if (rv) {
+    // Carte dorée : « ✦ PERSONNE N'A TROUVÉ LA CARTE DORÉE !! ✦ » sur une seule ligne, au-dessus de la carte et de la suite
+    // (à côté de la carte, il passait à la ligne et laissait « !! ✦ » tout seuls) ; rétréci s'il ne tient pas en largeur
+    let texteResultat = rv.x;
+    if (rv.d) {
+      const lignes = String(rv.x).split("\n");
+      const titreDoree = div("tele-pari-doree-titre", lignes.shift());
+      zone.appendChild(titreDoree);
+      let taille = 5.2;
+      titreDoree.style.fontSize = taille + "vh";
+      while (titreDoree.scrollWidth > titreDoree.clientWidth + 1 && taille > 2.4) { taille -= 0.2; titreDoree.style.fontSize = taille + "vh"; }
+      texteResultat = lignes.join("\n").trim();
+    }
     const resultat = div("tele-pari-resultat" + (rv.d ? " tele-pari-doree" : ""));
     const carte = creerCarteTele(rv.r || (rv.d ? "carte_doree" : ""));
     carte.classList.add("tele-pari-revelee");
-    resultat.append(carte, div("tele-pari-resultat-texte", rv.x));
+    resultat.append(carte, div("tele-pari-resultat-texte", texteResultat));
     zone.appendChild(resultat);
   }
 

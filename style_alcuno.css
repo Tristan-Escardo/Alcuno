@@ -10366,3 +10366,5 @@ html[data-theme="soleil"] #ecranTele .tele-pari-type, html[data-theme="soleil"] 
 #ecranTele .tele-pari-apres .tele-pari-joueur .Carte, #ecranTele .tele-pari-apres .tele-pari-vide{ width: 11vh; }
 #ecranTele .tele-pari-apres.tele-pari-nombreux .tele-pari-joueur{ width: 13vh; }
 #ecranTele .tele-pari-apres.tele-pari-nombreux .tele-pari-joueur .Carte, #ecranTele .tele-pari-apres.tele-pari-nombreux .tele-pari-vide{ width: 8.5vh; }
+#ecranTele .tele-pari-doree-titre{ width: 92vw; white-space: nowrap; overflow: hidden; text-align: center; font-weight: 900; color: #FFD700;
+  text-shadow: 0 0 2vh rgba(255, 215, 0, 0.55), 0.3vh 0.3vh 0.8vh #000; }
