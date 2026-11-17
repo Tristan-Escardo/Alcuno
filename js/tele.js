@@ -1000,6 +1000,7 @@ function dessinerTele(ecran, etat){
     nouvelle.dataset.valeur = valeur;
     if (actuelle) actuelle.replaceWith(nouvelle); else plateauTele.appendChild(nouvelle);
   });
+  disposerPlateauTele(plateauTele, cartes.length);
   // Titre « ALCUNO PJ 🔥 », comme le bandeau du téléphone (mode PJ : moitié moins de gorgées ; mode hot)
   const titreJeu = ecran.querySelector(".tele-entete .tele-titre");
   const texteTitre = "ALCUNO" + (etat.pj ? " PJ" : "") + (etat.hot ? " 🔥" : "");
@@ -1189,6 +1190,40 @@ function dessinerHotTele(surEcran, hot){
   const bloc = zone.querySelector(".bloc-hot");
   zone.querySelectorAll(".bloc-hot-btn").forEach((b) => b.classList.toggle("appuye", b.classList.contains(hot.c)));
   if (hot.c) bloc.dataset.netFerme = "1"; else delete bloc.dataset.netFerme;
+}
+
+// Plateau de la télé : rangées équilibrées quel que soit le nombre de cartes (52 : 13 x 4 ; partie express, 28 : avant,
+// 13 + 13 + 2 cartes). Au plus 4 rangées et 13 colonnes ; on prend la grille aux plus grandes cartes, et à taille presque
+// égale celle qui a le moins de trous ; la dernière rangée, si elle est incomplète, est centrée.
+function choisirGrillePlateauTele(n, largeur, hauteur, ecart){
+  let meilleure = null;
+  for (let r = 1; r <= 4; r++) {
+    const c = Math.ceil(n / r);
+    if (c > 13 || (r > 1 && Math.ceil(n / (r - 1)) <= 13 && c * (r - 1) >= n)) continue;
+    const taille = Math.min((largeur - (c - 1) * ecart) / c, ((hauteur - (r - 1) * ecart) / r) * 50 / 78);
+    const trous = c * r - n;
+    if (!meilleure || taille > meilleure.taille * 1.03 || (taille > meilleure.taille * 0.97 && trous < meilleure.trous)) meilleure = { r, c, taille, trous };
+  }
+  return meilleure;
+}
+function disposerPlateauTele(plateau, n){
+  if (!n) return;
+  const vh = window.innerHeight / 100;
+  const parent = plateau.parentElement;
+  const largeur = parent ? parent.clientWidth : window.innerWidth * 0.7;
+  const g = choisirGrillePlateauTele(n, largeur, 66 * vh, 1.1 * vh);
+  if (!g) return;
+  const cle = g.r + "x" + g.c + "/" + n;
+  if (plateau.dataset.grille !== cle) {
+    plateau.dataset.grille = cle;
+    plateau.style.gridTemplateColumns = "repeat(" + g.c + ", 1fr)";
+    plateau.style.maxWidth = "calc(66vh * " + g.c + " / " + g.r + " * 50 / 78)"; // (r rangées qui tiennent dans la hauteur)
+  }
+  // dernière rangée incomplète : centrée (décalée d'autant de colonnes de chaque côté)
+  const reste = n - g.c * (g.r - 1);
+  Array.from(plateau.children).forEach((carte, i) => {
+    carte.style.gridColumnStart = (reste < g.c && i === g.c * (g.r - 1)) ? String(1 + Math.floor((g.c - reste) / 2)) : "";
+  });
 }
 
 // Texte avec <b> / <em> (les seules balises des règles) : construit à la main, sans innerHTML
