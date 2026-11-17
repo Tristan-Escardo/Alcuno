@@ -257,7 +257,9 @@ function montrerDefiHot(joueurIndex, nbGorgees, defiPossible = true, defiImpose 
   if(chezUnAutre) bloc.classList.add("bloc-hot-autre");
   const choisir = (choix, messageRegle) => {
     etat.choix = choix;
-    if(chezUnAutre) try { afficherToast((choix === "fait" ? "✅ " : "🍺 ") + messageRegle.split("\n")[0], 3500); } catch (e) {}
+    const btnChoisi = boutons.querySelector(".bloc-hot-btn." + choix);
+    if(btnChoisi){ btnChoisi.classList.remove("appuye"); void btnChoisi.offsetWidth; btnChoisi.classList.add("appuye"); } // (se voit aussi chez les autres)
+    if(chezUnAutre) try { afficherBarreInfo((choix === "fait" ? "✅ " : "🍺 ") + messageRegle.split("\n")[0].replace(/\s*:\s*$/, ""), 4500); } catch (e) {}
     try { noterDefiStats(defi.id, choix); } catch (e) {} // (stats : défi relevé ou refusé, js/stats.js)
     bloc.dataset.netFerme = "1";
     afficherRegleBloc(regleZero, messageRegle);
@@ -271,6 +273,8 @@ function montrerDefiHot(joueurIndex, nbGorgees, defiPossible = true, defiImpose 
     btn.type = "button";
     btn.className = "bloc-hot-btn " + classe;
     btn.innerText = libelle;
+    // appui visible tout de suite chez celui qui touche (en ligne, le choix n'est joué qu'au retour du serveur)
+    btn.addEventListener("pointerdown", () => { btn.classList.remove("appuye"); void btn.offsetWidth; btn.classList.add("appuye"); });
     surAction(btn, id, { owner: nom, once: true }, action);
     boutons.appendChild(btn);
   };

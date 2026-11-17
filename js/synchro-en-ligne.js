@@ -981,6 +981,25 @@ function rendreAnnulerChoixGlissable(barre){
   barre.addEventListener("pointercancel", lacher);
 }
 
+// Barre d'info en bas de l'écran, même allure que « Mauvais joueur ? » mais sans bouton (ex. en ligne : le choix d'un défi hot
+// fait par un autre joueur). Se jette vers le bas comme elle. Ne remplace jamais une vraie barre « Annuler » en cours.
+function afficherBarreInfo(texte, duree = 4000){
+  if(choixAnnulable){ afficherToast(texte, duree); return; }
+  const ancienne = document.getElementById("annulerChoix");
+  if(ancienne) ancienne.remove();
+  const barre = document.createElement("div");
+  barre.id = "annulerChoix";
+  barre.className = "barreInfo";
+  barre.innerHTML = '<span class="annulerChoix-poignee" aria-hidden="true"></span><span class="annulerChoix-texte"></span>' +
+    '<span class="annulerChoix-temps" aria-hidden="true"></span>';
+  barre.querySelector(".annulerChoix-texte").textContent = texte;
+  barre.querySelector(".annulerChoix-temps").style.animationDuration = `${duree}ms`;
+  barre.setAttribute("role", "status");
+  rendreAnnulerChoixGlissable(barre);
+  document.body.appendChild(barre);
+  setTimeout(() => { if(barre.isConnected) barre.remove(); }, duree);
+}
+
 function masquerAnnulerChoix(){
   if(choixAnnulable) clearTimeout(choixAnnulable.timer);
   choixAnnulable = null;

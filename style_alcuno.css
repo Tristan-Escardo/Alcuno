@@ -10118,3 +10118,15 @@ html.android[data-theme="galaxie"] .Carte.retournee.carte_doree{ animation: none
       Chrome (« Toucher pour rechercher ») avec ce mot (ex. « annulation »). */
 html.android body, html.android body *{ -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 html.android :is(input, textarea, [contenteditable], [contenteditable] *){ -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
+
+/* Mode hot / hard : bouton du défi touché (« Je le fais » / « Je bois N ») : il s'éclaircit, s'enfonce et revient (chez celui qui
+   touche dès le doigt posé, et chez tout le monde au moment où le choix est joué) */
+:root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn.appuye{ animation: appuiBoutonHot 0.38s cubic-bezier(0.3, 0.7, 0.3, 1.4); }
+@keyframes appuiBoutonHot{
+  0%  { transform: none; filter: none; }
+  35% { transform: translateY(3px) scale(0.93); filter: brightness(1.45) saturate(1.1); }
+  100%{ transform: none; filter: brightness(1.15); }
+}
+@media (prefers-reduced-motion: reduce){ :root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn.appuye{ animation: none; filter: brightness(1.3); } }
+/* Barre d'info en bas (même allure que « Mauvais joueur ? », sans bouton) : le texte prend toute la place */
+#annulerChoix.barreInfo .annulerChoix-texte{ text-align: center; }
