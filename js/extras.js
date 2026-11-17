@@ -133,6 +133,7 @@ function remplirListeBar(zone){
 function ouvrirBar(){
   jouerSon("cartes");
   ouvrirPageExtras("bar", tr("Le Bar"));
+  habillerBoutonsExtras(); // (boutons et couleurs du thème, comme l'éthylotest)
   const liste = document.getElementById("listeRegles");
 
   const champ = elementExtras("input", "extrasChamp");
@@ -405,16 +406,26 @@ function styleBoutonsEthylo(){
   poser("--ey-bord-l", cs.borderTopWidth || "0px");
   poser("--ey-bord-s", cs.borderTopStyle === "none" ? "solid" : cs.borderTopStyle);
   poser("--ey-bord-c", cs.borderTopColor || "transparent");
+  // Couleur des curseurs : celle du bouton (son fond ; si le bouton est sombre, son bord ou son texte)
+  const nombres = (v) => (String(v).match(/rgba?\([^)]*\)/g) || []).map((c) => c.match(/[\d.]+/g).map(Number));
+  const lum = (c) => { const v = c.slice(0, 3).map((x) => { x /= 255; return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); }); return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2]; };
+  const candidats = nombres(cs.backgroundImage).concat(nombres(cs.backgroundColor)).filter((c) => c.length < 4 || c[3] > 0.6)
+    .concat(nombres(cs.borderTopColor).filter((c) => c.length < 4 || c[3] > 0.5), nombres(cs.color));
+  const choisi = candidats.find((c) => lum(c) > 0.12) || candidats[0];
+  if (choisi) poser("--ey-curseur", `rgb(${Math.round(choisi[0])}, ${Math.round(choisi[1])}, ${Math.round(choisi[2])})`);
 }
 let veilleThemeEthylo = null;
+function habillerBoutonsExtras(){
+  styleBoutonsEthylo();
+  if (!veilleThemeEthylo && window.MutationObserver) {
+    veilleThemeEthylo = new MutationObserver(() => { const l = document.getElementById("ecranRegles").classList; if (l.contains("ethylo") || l.contains("bar")) styleBoutonsEthylo(); });
+    veilleThemeEthylo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  }
+}
 function ouvrirEthylo(sansSon){
   if (sansSon !== true) jouerSon("cartes");
   ouvrirPageExtras("ethylo", tr("Éthylotest"));
-  styleBoutonsEthylo();
-  if (!veilleThemeEthylo && window.MutationObserver) {
-    veilleThemeEthylo = new MutationObserver(() => { if (document.getElementById("ecranRegles").classList.contains("ethylo")) styleBoutonsEthylo(); });
-    veilleThemeEthylo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
-  }
+  habillerBoutonsExtras();
   const liste = document.getElementById("listeRegles");
   const resultat = elementExtras("div", "blocRegles ethyloResultat");
   resultat.setAttribute("role", "status");

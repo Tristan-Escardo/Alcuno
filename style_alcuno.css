@@ -10494,43 +10494,46 @@ html[data-theme="prestige"] #ecranRegles.ethylo .blocRegles:not(.ethyloResultat)
 
 /* ===== Éthylotest : boutons (Homme / Femme, − et +, bières ajoutées, « Tout remettre à zéro », numéros) dans le style des boutons de chaque thème
    (valeurs lues sur un vrai bouton du thème : styleBoutonsEthylo, js/extras.js). Non choisis : un peu estompés ; choisis : pleins + anneau. ===== */
-html[data-theme] #ecranRegles.ethylo :is(.extrasPuce, .ethyloPas, .ethyloRemise, .ethyloNumeroChiffre){
+html[data-theme] #ecranRegles:is(.ethylo, .bar) :is(.extrasPuce, .ethyloPas, .ethyloRemise, .ethyloNumeroChiffre){
   background: var(--ey-image, none), var(--ey-couleur, #ffcc00) !important; color: var(--ey-texte, #fff) !important;
   border: var(--ey-bord-l, 0px) var(--ey-bord-s, solid) var(--ey-bord-c, transparent) !important;
   box-shadow: var(--ey-ombre, none) !important; text-shadow: var(--ey-texte-ombre, none) !important;
 }
-html[data-theme] #ecranRegles.ethylo .extrasPuce:not([aria-pressed="true"]){ opacity: 0.8; filter: saturate(0.75); }
-html[data-theme] #ecranRegles.ethylo .ethyloBieres .extrasPuce{ opacity: 1; }
-html[data-theme] #ecranRegles.ethylo .extrasPuce[aria-pressed="true"]{ opacity: 1; outline: 2px solid var(--ey-texte, #fff); outline-offset: 2px; }
-html[data-theme] #ecranRegles.ethylo .ethyloRemise{ padding: 12px 22px; font-size: 16px; }
-html[data-theme] #ecranRegles.ethylo .ethyloNumeroChiffre{ border-radius: 12px; }
-html[data-theme] #ecranRegles.ethylo .ethyloLigneChamp input[type="checkbox"]{ accent-color: var(--ey-bord-c, #ffcc00); }
+html[data-theme] #ecranRegles:is(.ethylo, .bar) .extrasPuce:not([aria-pressed="true"]){ opacity: 0.8; filter: saturate(0.75); }
+html[data-theme] #ecranRegles:is(.ethylo, .bar) .ethyloBieres .extrasPuce{ opacity: 1; }
+html[data-theme] #ecranRegles:is(.ethylo, .bar) .extrasPuce[aria-pressed="true"]{ opacity: 1; outline: 2px solid var(--ey-texte, #fff); outline-offset: 2px; }
+html[data-theme] #ecranRegles:is(.ethylo, .bar) .ethyloRemise{ padding: 12px 22px; font-size: 16px; }
+html[data-theme] #ecranRegles:is(.ethylo, .bar) .ethyloNumeroChiffre{ border-radius: 12px; }
+html[data-theme] #ecranRegles:is(.ethylo, .bar) .ethyloLigneChamp input[type="checkbox"]{ accent-color: var(--ey-bord-c, #ffcc00); }
 
 /* ===== Éthylotest : écritures aux couleurs du thème : titres, valeurs et verdict dans la couleur d'accent du thème, textes courants teintés de cette couleur ===== */
-html[data-theme="bordeaux"] #ecranRegles.ethylo{ --ey-accent: #ffd700; }
-html[data-theme="noir"] #ecranRegles.ethylo{ --ey-accent: #ffd700; }
-html[data-theme="vert"] #ecranRegles.ethylo{ --ey-accent: #5dffa0; }
-html[data-theme="bleu"] #ecranRegles.ethylo{ --ey-accent: #ffd400; }
-html[data-theme="cerisier"] #ecranRegles.ethylo{ --ey-accent: #ff8cc4; }
-html[data-theme="soleil"] #ecranRegles.ethylo{ --ey-accent: #ffcf9e; }
-html[data-theme="prestige"] #ecranRegles.ethylo{ --ey-accent: #ffe27a; }
-html[data-theme="galaxie"] #ecranRegles.ethylo{ --ey-accent: #ffe81f; }
-html[data-theme="donjon"] #ecranRegles.ethylo{ --ey-accent: #ff6b7c; }
-html[data-theme="noel"] #ecranRegles.ethylo{ --ey-accent: #ffe27a; }
-html[data-theme="chandeleur"] #ecranRegles.ethylo{ --ey-accent: #ffe9b0; }
-html[data-theme="valentin"] #ecranRegles.ethylo{ --ey-accent: #ffd6e8; }
-html[data-theme="patrick"] #ecranRegles.ethylo{ --ey-accent: #b8ffd2; }
-html[data-theme="justrose"] #ecranRegles.ethylo{ --ey-accent: #ffd0ea; }
-html[data-theme="musique"] #ecranRegles.ethylo{ --ey-accent: #c9b8ff; }
-html[data-theme="halloween"] #ecranRegles.ethylo{ --ey-accent: #ff9a3c; }
-html[data-theme="givre"] #ecranRegles.ethylo{ --ey-accent: #0f6aa6; }
-html[data-theme="kawaii"] #ecranRegles.ethylo{ --ey-accent: #a60f5b; }
-html[data-theme] #ecranRegles.ethylo :is(h2, .ethyloBloc h3, .ethyloGlisseValeur, .ethyloSousTitre, .ethyloVerdict, .ethyloNombre, .ethyloNumeroChiffre){ color: var(--ey-accent, #ffd700) !important; }
-html[data-theme] #ecranRegles.ethylo .ethyloChoisi .ethyloNombre{ color: var(--ey-accent, #ffd700) !important; }
-html[data-theme] #ecranRegles.ethylo :is(.ethyloResultat .ethyloLigne, .ethyloResultat .ethyloUnite, .nomRegle, .detailRegle, .ethyloAide, .ethyloGlissePrecision, .extrasNote){
+html[data-theme="bordeaux"] #ecranRegles:is(.ethylo, .bar){ --ey-accent: #ffd700; }
+html[data-theme="noir"] #ecranRegles:is(.ethylo, .bar){ --ey-accent: #ffd700; }
+html[data-theme="vert"] #ecranRegles:is(.ethylo, .bar){ --ey-accent: #5dffa0; }
+html[data-theme="bleu"] #ecranRegles:is(.ethylo, .bar){ --ey-accent: #ffd400; }
+html[data-theme="cerisier"] #ecranRegles:is(.ethylo, .bar){ --ey-accent: #ff8cc4; }
+html[data-theme="soleil"] #ecranRegles:is(.ethylo, .bar){ --ey-accent: #ffcf9e; }
+html[data-theme="prestige"] #ecranRegles:is(.ethylo, .bar){ --ey-accent: #ffe27a; }
+html[data-theme="galaxie"] #ecranRegles:is(.ethylo, .bar){ --ey-accent: #ffe81f; }
+html[data-theme="donjon"] #ecranRegles:is(.ethylo, .bar){ --ey-accent: #ff6b7c; }
+html[data-theme="noel"] #ecranRegles:is(.ethylo, .bar){ --ey-accent: #ffe27a; }
+html[data-theme="chandeleur"] #ecranRegles:is(.ethylo, .bar){ --ey-accent: #ffe9b0; }
+html[data-theme="valentin"] #ecranRegles:is(.ethylo, .bar){ --ey-accent: #ffd6e8; }
+html[data-theme="patrick"] #ecranRegles:is(.ethylo, .bar){ --ey-accent: #b8ffd2; }
+html[data-theme="justrose"] #ecranRegles:is(.ethylo, .bar){ --ey-accent: #ffd0ea; }
+html[data-theme="musique"] #ecranRegles:is(.ethylo, .bar){ --ey-accent: #c9b8ff; }
+html[data-theme="halloween"] #ecranRegles:is(.ethylo, .bar){ --ey-accent: #ff9a3c; }
+html[data-theme="givre"] #ecranRegles:is(.ethylo, .bar){ --ey-accent: #0f6aa6; }
+html[data-theme="kawaii"] #ecranRegles:is(.ethylo, .bar){ --ey-accent: #a60f5b; }
+html[data-theme] #ecranRegles:is(.ethylo, .bar) :is(h2, .ethyloBloc h3, .ethyloGlisseValeur, .ethyloSousTitre, .ethyloVerdict, .ethyloNombre, .ethyloNumeroChiffre){ color: var(--ey-accent, #ffd700) !important; }
+html[data-theme] #ecranRegles:is(.ethylo, .bar) .ethyloChoisi .ethyloNombre{ color: var(--ey-accent, #ffd700) !important; }
+html[data-theme] #ecranRegles:is(.ethylo, .bar) :is(.ethyloResultat .ethyloLigne, .ethyloResultat .ethyloUnite, .nomRegle, .detailRegle, .ethyloAide, .ethyloGlissePrecision, .extrasNote){
   color: #fff; color: color-mix(in srgb, var(--ey-accent, #fff) 22%, #fff) !important; }
-html[data-theme="givre"] #ecranRegles.ethylo :is(.nomRegle, .detailRegle, .ethyloAide, .ethyloGlissePrecision, .extrasNote, .ethyloResultat .ethyloLigne, .ethyloResultat .ethyloUnite),
-html[data-theme="kawaii"] #ecranRegles.ethylo :is(.nomRegle, .detailRegle, .ethyloAide, .ethyloGlissePrecision, .extrasNote, .ethyloResultat .ethyloLigne, .ethyloResultat .ethyloUnite){
+html[data-theme="givre"] #ecranRegles:is(.ethylo, .bar) :is(.nomRegle, .detailRegle, .ethyloAide, .ethyloGlissePrecision, .extrasNote, .ethyloResultat .ethyloLigne, .ethyloResultat .ethyloUnite),
+html[data-theme="kawaii"] #ecranRegles:is(.ethylo, .bar) :is(.nomRegle, .detailRegle, .ethyloAide, .ethyloGlissePrecision, .extrasNote, .ethyloResultat .ethyloLigne, .ethyloResultat .ethyloUnite){
   color: color-mix(in srgb, var(--ey-accent) 55%, #1a0a24) !important; }
 /* « Je ne conduis pas » etc. : le verdict garde sa couleur d'alerte rouge / orange quand il y en a une */
-html[data-theme] #ecranRegles.ethylo .ethyloResultat[data-etat="rouge"] .ethyloVerdict{ color: var(--ey-accent) !important; }
+html[data-theme] #ecranRegles:is(.ethylo, .bar) .ethyloResultat[data-etat="rouge"] .ethyloVerdict{ color: var(--ey-accent) !important; }
+
+/* Curseurs : couleur du bouton du thème (piste remplie et bord du rond), au lieu de la couleur du texte (blanc, noir…) */
+html[data-theme] #ecranRegles:is(.ethylo, .bar) .extrasGlisse{ color: var(--ey-curseur, currentColor); }
