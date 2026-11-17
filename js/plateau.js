@@ -191,7 +191,7 @@ function calculerRecap(restants = []){
   ajouter("⚔️", tr("Duelliste"), meilleurs(st.duels), v => tr`${v} duel${v > 1 ? "s" : ""} gagné${v > 1 ? "s" : ""}`);
   ajouter("🎯", tr("Aimant à +4"), meilleurs(st.plus4), v => tr`${pluriel(v, tr("gorgée"))} de +4`);
   // Mode hot : « Coquinou » (mode hard : « Affamé »), celui qui a relevé le plus de défis (au moins 1 ; égalité à 2 : les deux)
-  if(partieHot) ajouter(partieHard ? "🍽️" : "😈", partieHard ? tr("Affamé") : tr("Coquinou"), meilleurs(st.defis), v => tr`${v} défi${v > 1 ? "s" : ""} relevé${v > 1 ? "s" : ""}`);
+  if(partieHot) ajouter(partieHard ? "😈" : "🔥", partieHard ? tr("Affamé") : tr("Coquinou"), meilleurs(st.defis), v => tr`${v} défi${v > 1 ? "s" : ""} relevé${v > 1 ? "s" : ""}`);
   // Mode hot : le couple de la soirée (un bisou compte comme un cul sec ; égalité : le premier par ordre alphabétique)
   if(partieHot && !partieHard && st.couples){ // (pas en mode hard : 2 joueurs, toujours le même couple)
     const couples = Object.entries(st.couples).map(([cle, c]) => ({ noms: cle.split("\u0001"), c, score: c.g + c.b * GORGEES_CUL_SEC }))
