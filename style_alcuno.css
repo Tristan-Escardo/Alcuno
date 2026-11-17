@@ -8165,8 +8165,6 @@ html[data-theme="soleil"] #ecranTele .tele-compteur{ color: #3a1f4a; opacity: 0.
 #ecranTele .tele-historique-ligne .Carte{ width: 5.6vh; flex: none; margin: 0; }
 #ecranTele .tele-historique-quoi{ margin-top: 0.4vh; font: 700 2.5vh/1.25 Arial, sans-serif; color: rgba(255, 255, 255, 0.75); }
 #ecranTele .tele-historique-quoi em{ font-style: normal; font-weight: 900; color: #FFD700; }
-/* Faces cachées : pas de dernières cartes (elles redonneraient les cartes déjà sorties) */
-html.faces-fermees #stickyJoueurActif #btnHistorique{ display: none; }
 
 /* ===== Thème secret « Galaxie » (débloqué par un mot de passe en nom de joueur, js/reglages.js) ===== */
 html[data-theme="galaxie"]{ --fond-theme:#02030a; background: #02030a !important; }
