@@ -266,7 +266,11 @@ function montrerDefiHot(joueurIndex, nbGorgees, defiPossible = true, defiImpose 
     regleZero.style.display = "block";
     zeroEnCours = true;
     overlayRegleVerrouille = false;
-    fermerOverlayRegleUnique(); // (la suite : finirBoireHot, quand l'annonce est fermée)
+    // L'annonce reste ~0,7 s avec le bouton choisi enfoncé et éclairé (l'autre s'efface), sur TOUS les téléphones : en ligne, les
+    // autres voient lequel a été touché. Puis elle se ferme (la suite : finirBoireHot, quand l'annonce est fermée).
+    // (fermée seulement si c'est toujours la même annonce : une nouvelle aurait pu prendre sa place entre-temps)
+    const annonce = document.getElementById("overlayRegleUnique");
+    setTimeout(() => { if(document.getElementById("overlayRegleUnique") === annonce) fermerOverlayRegleUnique(); }, 700);
   };
   const bouton = (classe, libelle, id, action) => {
     const btn = document.createElement("button");

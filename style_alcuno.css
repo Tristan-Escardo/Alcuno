@@ -10143,3 +10143,7 @@ html #listeJoueurs .joueur-ligne-actif .joueur-deconnecte{ text-align: center; f
 #stickyJoueurActif .sticky-nom:has(.joueur-deconnecte){ display: inline-flex; align-items: center; gap: 6px; overflow: visible; }
 #stickyJoueurActif .sticky-nom-texte{ min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #stickyJoueurActif .sticky-nom .joueur-deconnecte{ flex: 0 0 auto; margin-left: 0; font-size: 0.62em; }
+
+/* Bouton du défi choisi : reste éclairé, l'autre s'efface (le temps que l'annonce se ferme : tout le monde voit lequel) */
+:root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot-btn.appuye{ filter: brightness(1.18); }
+:root:root:root #overlayRegleUnique#overlayRegleUnique .bloc-hot[data-net-ferme] .bloc-hot-btn:not(.appuye){ opacity: 0.4; transition: opacity 0.2s ease; }

@@ -990,10 +990,8 @@ function afficherBarreInfo(texte, duree = 4000){
   const barre = document.createElement("div");
   barre.id = "annulerChoix";
   barre.className = "barreInfo";
-  barre.innerHTML = '<span class="annulerChoix-poignee" aria-hidden="true"></span><span class="annulerChoix-texte"></span>' +
-    '<span class="annulerChoix-temps" aria-hidden="true"></span>';
+  barre.innerHTML = '<span class="annulerChoix-poignee" aria-hidden="true"></span><span class="annulerChoix-texte"></span>'; // (pas de barre du temps)
   barre.querySelector(".annulerChoix-texte").textContent = texte;
-  barre.querySelector(".annulerChoix-temps").style.animationDuration = `${duree}ms`;
   barre.setAttribute("role", "status");
   rendreAnnulerChoixGlissable(barre);
   document.body.appendChild(barre);
