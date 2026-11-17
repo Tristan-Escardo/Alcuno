@@ -113,8 +113,9 @@ function placerZiziPresDuTitre(){ // (sur le A du titre)
   if (!r.width) return; // (accueil caché)
   const taille = tailleZizi();
   ziziAngle = 90;
-  // devant la lettre : centré sur le A (par-dessus)
-  ziziX = Math.max(0, Math.min(largeurEcranZizi() - taille, r.left + r.width / 2 - taille / 2));
+  // devant la lettre : centré sur le A (par-dessus). Pas de butée sur les bords : sa boîte est carrée mais le dessin, tourné
+  // pointe en bas, est étroit ; sur un écran étroit (Android) le A est près du bord et la butée le décalait à droite du A.
+  ziziX = r.left + r.width / 2 - taille / 2;
   ziziY = Math.max(0, r.top + r.height / 2 - taille / 2);
   dessinerZizi();
 }
