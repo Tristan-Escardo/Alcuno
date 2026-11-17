@@ -10431,15 +10431,19 @@ html[data-theme="givre"] #listeJoueurs .joueur-ligne-actif{
     0 0 18px rgba(90, 210, 255, 0.75), 0 8px 14px rgba(10, 90, 160, 0.4) !important;
 }
 html[data-theme="givre"] #listeJoueurs .joueur-ligne-actif .btnPauseJoueur{ color: #05324f !important; border-color: #05324f !important; background: rgba(255, 255, 255, 0.45) !important; position: absolute; z-index: 1; }
-/* Givre, joueur actif (téléphone et télé) : reflet de lumière qui traverse le bloc de glace toutes les 4 s (coupé par la pastille ;
+/* Givre, joueur actif (téléphone et télé) : 3 reflets de lumière qui traversent le bloc de glace toutes les 2,4 s (coupés par la pastille ;
    arrêté si le téléphone demande moins d'animations) */
 html[data-theme="givre"] #listeJoueurs .joueur-ligne-actif{ overflow: hidden; }
 html[data-theme="givre"] :is(#listeJoueurs .joueur-ligne-actif, #ecranTele .tele-joueur-actif)::after{
-  content: ""; position: absolute; top: 0; bottom: 0; left: -40%; width: 28%; pointer-events: none; transform: skewX(-24deg);
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.9) 50%, rgba(255, 255, 255, 0));
-  animation: givreReflet 4s ease-in-out infinite;
+  content: ""; position: absolute; top: 0; bottom: 0; left: -75%; width: 60%; pointer-events: none; transform: skewX(-24deg);
+  /* 3 reflets qui se suivent */
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0) 0%, rgba(255,255,255,0.9) 10%, rgba(255,255,255,0) 20%,
+    rgba(255,255,255,0) 35%, rgba(255,255,255,0.8) 45%, rgba(255,255,255,0) 55%,
+    rgba(255,255,255,0) 70%, rgba(255,255,255,0.7) 80%, rgba(255,255,255,0) 90%);
+  animation: givreReflet 2.4s ease-in-out infinite;
 }
-@keyframes givreReflet{ 0%, 60% { left: -40%; } 100% { left: 140%; } }
+@keyframes givreReflet{ 0%, 25% { left: -75%; } 100% { left: 125%; } }
 @media (prefers-reduced-motion: reduce){ html[data-theme="givre"] :is(#listeJoueurs .joueur-ligne-actif, #ecranTele .tele-joueur-actif)::after{ animation: none; display: none; } }
 /* Télé : même bloc de glace taillé et bombé que sur le téléphone */
 html[data-theme="givre"] #ecranTele .tele-joueur-actif{
