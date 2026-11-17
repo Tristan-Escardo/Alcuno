@@ -10505,3 +10505,32 @@ html[data-theme] #ecranRegles.ethylo .extrasPuce[aria-pressed="true"]{ opacity: 
 html[data-theme] #ecranRegles.ethylo .ethyloRemise{ padding: 12px 22px; font-size: 16px; }
 html[data-theme] #ecranRegles.ethylo .ethyloNumeroChiffre{ border-radius: 12px; }
 html[data-theme] #ecranRegles.ethylo .ethyloLigneChamp input[type="checkbox"]{ accent-color: var(--ey-bord-c, #ffcc00); }
+
+/* ===== Éthylotest : écritures aux couleurs du thème : titres, valeurs et verdict dans la couleur d'accent du thème, textes courants teintés de cette couleur ===== */
+html[data-theme="bordeaux"] #ecranRegles.ethylo{ --ey-accent: #ffd700; }
+html[data-theme="noir"] #ecranRegles.ethylo{ --ey-accent: #ffd700; }
+html[data-theme="vert"] #ecranRegles.ethylo{ --ey-accent: #5dffa0; }
+html[data-theme="bleu"] #ecranRegles.ethylo{ --ey-accent: #ffd400; }
+html[data-theme="cerisier"] #ecranRegles.ethylo{ --ey-accent: #ff8cc4; }
+html[data-theme="soleil"] #ecranRegles.ethylo{ --ey-accent: #ffcf9e; }
+html[data-theme="prestige"] #ecranRegles.ethylo{ --ey-accent: #ffe27a; }
+html[data-theme="galaxie"] #ecranRegles.ethylo{ --ey-accent: #ffe81f; }
+html[data-theme="donjon"] #ecranRegles.ethylo{ --ey-accent: #ff6b7c; }
+html[data-theme="noel"] #ecranRegles.ethylo{ --ey-accent: #ffe27a; }
+html[data-theme="chandeleur"] #ecranRegles.ethylo{ --ey-accent: #ffe9b0; }
+html[data-theme="valentin"] #ecranRegles.ethylo{ --ey-accent: #ffd6e8; }
+html[data-theme="patrick"] #ecranRegles.ethylo{ --ey-accent: #b8ffd2; }
+html[data-theme="justrose"] #ecranRegles.ethylo{ --ey-accent: #ffd0ea; }
+html[data-theme="musique"] #ecranRegles.ethylo{ --ey-accent: #c9b8ff; }
+html[data-theme="halloween"] #ecranRegles.ethylo{ --ey-accent: #ff9a3c; }
+html[data-theme="givre"] #ecranRegles.ethylo{ --ey-accent: #0f6aa6; }
+html[data-theme="kawaii"] #ecranRegles.ethylo{ --ey-accent: #a60f5b; }
+html[data-theme] #ecranRegles.ethylo :is(h2, .ethyloBloc h3, .ethyloGlisseValeur, .ethyloSousTitre, .ethyloVerdict, .ethyloNombre, .ethyloNumeroChiffre){ color: var(--ey-accent, #ffd700) !important; }
+html[data-theme] #ecranRegles.ethylo .ethyloChoisi .ethyloNombre{ color: var(--ey-accent, #ffd700) !important; }
+html[data-theme] #ecranRegles.ethylo :is(.ethyloResultat .ethyloLigne, .ethyloResultat .ethyloUnite, .nomRegle, .detailRegle, .ethyloAide, .ethyloGlissePrecision, .extrasNote){
+  color: #fff; color: color-mix(in srgb, var(--ey-accent, #fff) 22%, #fff) !important; }
+html[data-theme="givre"] #ecranRegles.ethylo :is(.nomRegle, .detailRegle, .ethyloAide, .ethyloGlissePrecision, .extrasNote, .ethyloResultat .ethyloLigne, .ethyloResultat .ethyloUnite),
+html[data-theme="kawaii"] #ecranRegles.ethylo :is(.nomRegle, .detailRegle, .ethyloAide, .ethyloGlissePrecision, .extrasNote, .ethyloResultat .ethyloLigne, .ethyloResultat .ethyloUnite){
+  color: color-mix(in srgb, var(--ey-accent) 55%, #1a0a24) !important; }
+/* « Je ne conduis pas » etc. : le verdict garde sa couleur d'alerte rouge / orange quand il y en a une */
+html[data-theme] #ecranRegles.ethylo .ethyloResultat[data-etat="rouge"] .ethyloVerdict{ color: var(--ey-accent) !important; }
