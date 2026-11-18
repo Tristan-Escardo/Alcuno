@@ -904,7 +904,7 @@ window.TEXTES_EN = {
 "Textes et boutons plus gros.": "Bigger text and buttons.",
 "Mode Préhistoire 🐢": "Prehistoric mode 🐢",
 "Politique de confidentialité": "Privacy policy",
-"Supprime les animations et les effets gourmands (décors qui bougent, flous, passages à l'accueil) pour que le jeu tourne mieux sur un téléphone ancien.": "Removes animations and heavy effects (moving decorations, blurs, things flying across the home screen) so the game runs better on an old phone.",
+"Pour les vieux téléphones : supprime les animations et les effets gourmands (décors qui bougent, flous, passages à l'accueil) pour que le jeu tourne mieux.": "For old phones: removes animations and heavy effects (moving decorations, blurs, things flying across the home screen) so the game runs better.",
 "Thème": "Theme",
 "Thème BDSM": "BDSM theme",
 "Thème BDSM débloqué": "BDSM theme unlocked",

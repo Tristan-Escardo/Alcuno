@@ -9,7 +9,7 @@
          (Avant : « ?t= » + l'heure, différent à chaque lancement : tout le jeu était retéléchargé à chaque ouverture,
          environ 400 Ko. Maintenant, tant que la version ne change pas, le navigateur se contente de vérifier.) -->
     <script>
-        window.VERSION_FICHIERS = "9.95.98";
+        window.VERSION_FICHIERS = "9.95.99";
         // (ailleurs que sur le vrai site — poste de dev, appli de test — : l'heure en plus, comme avant, pour voir tout de
         // suite un fichier modifié sans changer de version)
         window.ANTI_CACHE = /(^|\.)github\.io$/i.test(location.hostname) ? window.VERSION_FICHIERS : window.VERSION_FICHIERS + "-" + Date.now();
@@ -431,15 +431,6 @@
                     <label class="interrupteur" for="optionAccessibilite" aria-hidden="true"></label>
                 </div>
 
-                <div class="optionReglage" data-cle="economie">
-                    <span class="optionTexte">
-                        <span class="optionTitre">Mode Préhistoire 🐢</span>
-                        <span class="optionNote">Supprime les animations et les effets gourmands (décors qui bougent, flous, passages à l'accueil) pour que le jeu tourne mieux sur un téléphone ancien.</span>
-                    </span>
-                    <input type="checkbox" id="optionEconomie" aria-label="Mode Préhistoire 🐢">
-                    <label class="interrupteur" for="optionEconomie" aria-hidden="true"></label>
-                </div>
-
                 <!-- « Ta partie » : mêmes lignes que les Réglages, mais ouvertes seulement après « Mode classique » ou
                      « Créer une partie » (classe vue-options sur l'écran, voir js/reglages.js) -->
                 <div class="optionsPartie">
@@ -531,6 +522,15 @@
                         </button>
                         <p class="profilSupprimer" id="ligneProfilSupprimer" hidden><button type="button" id="btnProfilSupprimer">Supprimer mon profil</button></p>
                     </div>
+                </div>
+
+                <div class="optionReglage" data-cle="economie">
+                    <span class="optionTexte">
+                        <span class="optionTitre">Mode Préhistoire 🐢</span>
+                        <span class="optionNote">Pour les vieux téléphones : supprime les animations et les effets gourmands (décors qui bougent, flous, passages à l'accueil) pour que le jeu tourne mieux.</span>
+                    </span>
+                    <input type="checkbox" id="optionEconomie" aria-label="Mode Préhistoire 🐢">
+                    <label class="interrupteur" for="optionEconomie" aria-hidden="true"></label>
                 </div>
 
                 <!-- Dit si le jeu peut se lancer sans réseau (mode avion) : fichiers du jeu + musiques gardés par le service worker -->
