@@ -902,7 +902,7 @@ window.TEXTES_EN = {
 "Terminer la modification": "Finish editing",
 "Terminé": "Done",
 "Textes et boutons plus gros.": "Bigger text and buttons.",
-"Mode économie (vieux téléphone) 🐢": "Battery saver mode (old phone) 🐢",
+"Mode Préhistoire 🐢": "Prehistoric mode 🐢",
 "Supprime les animations et les effets gourmands (décors qui bougent, flous, passages à l'accueil) pour que le jeu tourne mieux sur un téléphone ancien.": "Removes animations and heavy effects (moving decorations, blurs, things flying across the home screen) so the game runs better on an old phone.",
 "Thème": "Theme",
 "Thème BDSM": "BDSM theme",

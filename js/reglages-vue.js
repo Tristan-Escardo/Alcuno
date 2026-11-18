@@ -9,10 +9,10 @@
   if (!contenu) return;
   const CLE_VUE = "alcuno_reglages_vue";
   const GROUPES = [
-    { id: "affichage", nom: tr("Affichage"), icone: "🎨", cles: ["themes", "feux-artifice", "accessibilite", "economie"] },
+    { id: "affichage", nom: tr("Affichage"), icone: "🎨", cles: ["themes", "feux-artifice", "accessibilite"] },
     { id: "son", nom: tr("Son"), icone: "🔊", cles: ["sons", "musique", "vibrations", "voix"] },
     { id: "jeu", nom: tr("Jeu"), icone: "🎮", cles: ["faces-cachees", "gaucher", "eau", "ecran-allume", "partie-memoire"] },
-    { id: "appareil", nom: tr("Appareil"), icone: "📱", cles: ["compte", "hors-ligne", "ecran-tele"] },
+    { id: "appareil", nom: tr("Appareil"), icone: "📱", cles: ["compte", "hors-ligne", "ecran-tele", "economie"] },
     { id: "langue", nom: tr("Langue"), icone: "🌐", cles: ["langue"] },
     { id: "apropos", nom: tr("À propos"), icone: "ℹ️", cles: [] } // (Partager le jeu + À propos : sans data-cle, repérés par leur classe)
   ];
