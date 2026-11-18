@@ -9,7 +9,7 @@
          (Avant : « ?t= » + l'heure, différent à chaque lancement : tout le jeu était retéléchargé à chaque ouverture,
          environ 400 Ko. Maintenant, tant que la version ne change pas, le navigateur se contente de vérifier.) -->
     <script>
-        window.VERSION_FICHIERS = "9.95.95";
+        window.VERSION_FICHIERS = "9.95.96";
         // (ailleurs que sur le vrai site — poste de dev, appli de test — : l'heure en plus, comme avant, pour voir tout de
         // suite un fichier modifié sans changer de version)
         window.ANTI_CACHE = /(^|\.)github\.io$/i.test(location.hostname) ? window.VERSION_FICHIERS : window.VERSION_FICHIERS + "-" + Date.now();
@@ -83,6 +83,8 @@
         // Thème choisi dans les réglages : appliqué tout de suite (pas de flash de bordeaux au chargement)
         // (ancien thème « violet » remplacé par « soleil »)
         try { var theme = localStorage.getItem("alcuno_theme"); if (theme === "violet") { theme = "soleil"; localStorage.setItem("alcuno_theme", theme); } if (theme) document.documentElement.dataset.theme = theme; } catch (e) {} if (/android/i.test(navigator.userAgent)) document.documentElement.classList.add("android"); // (style_alcuno.css : effets allégés sur Android)
+        // Mode économie (Réglages) : animations et effets coupés pour les vieux téléphones (style_alcuno.css, « Mode économie »)
+        try { if (localStorage.getItem("alcuno_economie") === "1") document.documentElement.classList.add("economie"); } catch (e) {}
         // Fêtes qui ne sont pas des thèmes (voir FETES.md), à la date du téléphone : le Nouvel An (le 1er
         // janvier) et la Fête nationale (du 13 au 15 juillet). Les deux posent les mêmes feux d'artifice ;
         // seul le Nouvel An ajoute en plus un chapeau de fête sur le O du titre. Hors de ces dates, rien :
@@ -427,6 +429,15 @@
                     </span>
                     <input type="checkbox" id="optionAccessibilite" aria-label="Accessibilité pour les gens bourrés 🍻">
                     <label class="interrupteur" for="optionAccessibilite" aria-hidden="true"></label>
+                </div>
+
+                <div class="optionReglage" data-cle="economie">
+                    <span class="optionTexte">
+                        <span class="optionTitre">Mode économie (vieux téléphone) 🐢</span>
+                        <span class="optionNote">Supprime les animations et les effets gourmands (décors qui bougent, flous, passages à l'accueil) pour que le jeu tourne mieux sur un téléphone ancien.</span>
+                    </span>
+                    <input type="checkbox" id="optionEconomie" aria-label="Mode économie (vieux téléphone) 🐢">
+                    <label class="interrupteur" for="optionEconomie" aria-hidden="true"></label>
                 </div>
 
                 <!-- « Ta partie » : mêmes lignes que les Réglages, mais ouvertes seulement après « Mode classique » ou

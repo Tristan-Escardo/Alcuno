@@ -10575,3 +10575,16 @@ html[data-theme] #ecranRegles.ethylo .ethyloNumero::after{
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z'/%3E%3C/svg%3E") center / contain no-repeat;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z'/%3E%3C/svg%3E") center / contain no-repeat;
 }
+
+/* ===== Mode économie (Réglages « Mode économie (vieux téléphone) ») : html.economie, posé par le <head> de index.html et js/reglages.js =====
+   Pour les vieux téléphones qui rament avec les animations. Pas « animation: none » : le jeu attend parfois la fin d'une animation
+   (animationend / transitionend : fermeture des pages, annonces, zizi-coptère…) ; avec une durée quasi nulle, l'événement part quand
+   même et l'élément arrive tout de suite dans son état final. !important : passe devant tous les thèmes et les durées posées en JS. */
+html.economie *, html.economie *::before, html.economie *::after{
+  animation-duration: 0.001s !important; animation-delay: 0s !important; animation-iteration-count: 1 !important;
+  transition-duration: 0.001s !important; transition-delay: 0s !important;
+  scroll-behavior: auto !important;
+  -webkit-backdrop-filter: none !important; backdrop-filter: none !important; /* (le flou d'arrière-plan est le plus gourmand) */
+}
+/* Décors animés de l'accueil (pétales, neige, cœurs, étincelles, personnages, objets) et feux d'artifice : plus du tout dessinés */
+html.economie :is(#petalesCerisier, #etincellesPrestige, #kawaiiFlotteurs, #donjonFlotteurs, #neigeNoel, #coeursValentin, #feuxArtifice, .etincelles-doree){ display: none !important; }

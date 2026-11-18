@@ -91,6 +91,22 @@ caseAccessibilite.addEventListener("change", () => {
   if (caseAccessibilite.checked) jouerSon("accessibilite_on");
 });
 
+// Mode économie (vieux téléphones) : la classe html.economie coupe les animations et les effets gourmands (style_alcuno.css, « Mode
+// économie »), et les effets décidés par le JS (feux d'artifice, passages du Nyan Cat et du traîneau) ne se lancent plus.
+// La classe est déjà posée par le <head> de index.html (pas de flash d'animations au lancement). Réglage de CE téléphone : il n'est pas
+// repris par le profil joueur (un vieux téléphone n'est pas celui du joueur).
+const CLE_ECONOMIE = "alcuno_economie";
+const caseEconomie = document.getElementById("optionEconomie");
+const modeEconomie = () => document.documentElement.classList.contains("economie");
+caseEconomie.checked = lireReglage(CLE_ECONOMIE, false);
+document.documentElement.classList.toggle("economie", caseEconomie.checked);
+caseEconomie.addEventListener("change", () => {
+  ecrireReglage(CLE_ECONOMIE, caseEconomie.checked);
+  document.documentElement.classList.toggle("economie", caseEconomie.checked);
+  if (caseEconomie.checked) { const zone = document.getElementById("feuxArtifice"); if (zone) zone.innerHTML = ""; }
+  if (caseEconomie.checked) jouerSon("sons_on");
+});
+
 // ===== Thème : couleur du fond du jeu (réglage de ce téléphone, purement visuel) =====
 // (le thème est déjà posé au tout début du chargement par index.html : pas de flash de couleur)
 const CLE_THEME = "alcuno_theme";
@@ -459,6 +475,7 @@ const NYAN_L = 985, NYAN_H = 140;        // une image de la feuille
 let dernierBordNyan = null; // bord par lequel le dernier passage est reparti
 function passageNyanCat(){
   setTimeout(passageNyanCat, 25000 + Math.random() * 20000);
+  if (modeEconomie()) return;
   const accueil = document.getElementById("choixMode");
   if (document.documentElement.dataset.theme !== "galaxie" || document.visibilityState !== "visible" ||
       document.documentElement.classList.contains("mode-tele") || // (pas sur la page de la télé)
@@ -517,6 +534,7 @@ function accueilDevant(){
 }
 function passageTraineau(){
   setTimeout(passageTraineau, 18000 + Math.random() * 14000);
+  if (modeEconomie()) return;
   // grelots du traîneau : seulement dans ce thème, chargés d'avance (sinon le son arriverait après le passage)
   if (document.documentElement.dataset.theme === "noel" && caseSons.checked && volumeSons > 0) { const ctx = contexteAudio(); if (ctx) chargerSon(ctx, "traineau_noel"); }
   const accueil = document.getElementById("choixMode");
@@ -1988,7 +2006,7 @@ function feuArtifice(){
 }
 function prochainFeuArtifice(){
   setTimeout(() => {
-    if (document.documentElement.classList.contains("feux-actifs") &&
+    if (document.documentElement.classList.contains("feux-actifs") && !modeEconomie() &&
         document.visibilityState === "visible" &&
         !matchMedia("(prefers-reduced-motion: reduce)").matches) feuArtifice();
     prochainFeuArtifice();
