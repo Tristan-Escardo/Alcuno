@@ -903,6 +903,7 @@ window.TEXTES_EN = {
 "Terminé": "Done",
 "Textes et boutons plus gros.": "Bigger text and buttons.",
 "Mode Préhistoire 🐢": "Prehistoric mode 🐢",
+"Politique de confidentialité": "Privacy policy",
 "Supprime les animations et les effets gourmands (décors qui bougent, flous, passages à l'accueil) pour que le jeu tourne mieux sur un téléphone ancien.": "Removes animations and heavy effects (moving decorations, blurs, things flying across the home screen) so the game runs better on an old phone.",
 "Thème": "Theme",
 "Thème BDSM": "BDSM theme",

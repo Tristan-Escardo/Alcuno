@@ -2129,6 +2129,8 @@ function texteDiagnostic(){
   ].join("\n");
 }
 
+document.getElementById("btnConfidentialite").addEventListener("click", () => { location.href = "confidentialite.html"; }); // (page à part : texte en français)
+
 document.getElementById("btnDiagnostic").addEventListener("click", () => {
   const texte = texteDiagnostic();
   const copie = (navigator.clipboard && navigator.clipboard.writeText)

@@ -9,7 +9,7 @@
          (Avant : « ?t= » + l'heure, différent à chaque lancement : tout le jeu était retéléchargé à chaque ouverture,
          environ 400 Ko. Maintenant, tant que la version ne change pas, le navigateur se contente de vérifier.) -->
     <script>
-        window.VERSION_FICHIERS = "9.95.97";
+        window.VERSION_FICHIERS = "9.95.98";
         // (ailleurs que sur le vrai site — poste de dev, appli de test — : l'heure en plus, comme avant, pour voir tout de
         // suite un fichier modifié sans changer de version)
         window.ANTI_CACHE = /(^|\.)github\.io$/i.test(location.hostname) ? window.VERSION_FICHIERS : window.VERSION_FICHIERS + "-" + Date.now();
@@ -576,6 +576,7 @@
                     <div class="aProposTitre">À propos</div>
                     <p id="versionJeu" class="versionJeu"></p>
                     <button type="button" id="btnDiagnostic" class="btnDiagnostic">Copier le diagnostic</button>
+                    <button type="button" id="btnConfidentialite" class="btnDiagnostic">Politique de confidentialité</button>
                 </div>
             </div>
         </section>
