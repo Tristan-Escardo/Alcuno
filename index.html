@@ -9,7 +9,7 @@
          (Avant : « ?t= » + l'heure, différent à chaque lancement : tout le jeu était retéléchargé à chaque ouverture,
          environ 400 Ko. Maintenant, tant que la version ne change pas, le navigateur se contente de vérifier.) -->
     <script>
-        window.VERSION_FICHIERS = "9.96.0";
+        window.VERSION_FICHIERS = "9.96.1";
         // (ailleurs que sur le vrai site — poste de dev, appli de test — : l'heure en plus, comme avant, pour voir tout de
         // suite un fichier modifié sans changer de version)
         window.ANTI_CACHE = /(^|\.)github\.io$/i.test(location.hostname) ? window.VERSION_FICHIERS : window.VERSION_FICHIERS + "-" + Date.now();
@@ -23,11 +23,16 @@
         // Fichiers du jeu, dans l'ordre (aussi dans sw.js, pour le hors connexion). Téléchargés tout de suite
         // et en parallèle : en bas de la page, ils s'exécutent d'affilée, sans attente entre deux fichiers
         // (aucun bouton ni minuteur ne peut se déclencher avant que tout le jeu soit là).
-        window.FICHIERS_JEU = ["script.js", "js/qrcode.js", "js/config-lib.js", "js/reglages.js", "js/en-ligne.js", "js/plateau.js", "js/regles.js", "js/mode-hot.js", "js/zizi-coptere.js", "js/reglages-vue.js",
+        window.FICHIERS_JEU = ["script.js", "js/qrcode.js", "js/config-lib.js", "js/reglages.js", "js/defis-personnels.js", "js/en-ligne.js", "js/plateau.js", "js/regles.js", "js/mode-hot.js", "js/zizi-coptere.js", "js/reglages-vue.js",
                                "js/synchro-en-ligne.js", "js/retour-demarrage.js", "js/tele.js", "js/stats.js", "js/config-distante.js", "js/stickers.js", "js/faq.js", "js/mouchard.js", "js/poisson.js", "js/piano-accueil.js", "js/cocktails.js", "js/extras.js", "js/profil.js"];
-        // Langue (js/langue.js) : en tout premier ; les textes anglais (js/en.js) seulement si le jeu est en anglais
+        // Langue (js/langue.js) : en tout premier ; dictionnaire chargé avant quand la langue est choisie
         window.FICHIERS_JEU.unshift("js/langue.js");
-        try { if (localStorage.getItem("alcuno_langue") === "en") window.FICHIERS_JEU.unshift("js/en.js"); } catch (e) {}
+        try {
+            var langueChoisie = localStorage.getItem("alcuno_langue");
+            if (langueChoisie === "en") window.FICHIERS_JEU.unshift("js/en.js");
+            else if (langueChoisie === "es") window.FICHIERS_JEU.unshift("js/es.js");
+            else if (langueChoisie === "it") window.FICHIERS_JEU.unshift("js/it.js");
+        } catch (e) {}
         window.FICHIERS_JEU.forEach(function (f) {
             document.write('<link rel="preload" as="script" href="' + f + '?v=' + window.ANTI_CACHE + '">');
         });
@@ -62,13 +67,26 @@
                 try { new Function("async function f(){ await 1; }"); } catch (e) { ancien = true; }
                 if (!(window.Promise && Promise.prototype.finally && Object.entries && window.fetch && window.CSS && CSS.supports && CSS.supports("display", "grid"))) ancien = true;
                 var nav = (navigator.userAgent.match(/(SamsungBrowser|Chrome|CriOS|Firefox|FxiOS|Version)\/[\d.]+/) || [""])[0].replace("/", " ");
+                var langueErreur = "";
+                try { langueErreur = localStorage.getItem("alcuno_langue") || ""; } catch (e) {}
+                var ancienTexte = langueErreur === "es"
+                    ? 'Es probable que tu teléfono o navegador sea demasiado antiguo para cargar el juego.<br><span style="font-size:15px;font-weight:700;opacity:.8">Actualiza tu navegador o sistema, o juega desde otro teléfono.'
+                    : langueErreur === "it"
+                        ? 'Il tuo telefono o browser potrebbe essere troppo vecchio per caricare il gioco.<br><span style="font-size:15px;font-weight:700;opacity:.8">Aggiorna il browser o il sistema, oppure gioca da un altro telefono.'
+                        : langueErreur === "en"
+                            ? 'Your phone or browser may be too old to load the game.<br><span style="font-size:15px;font-weight:700;opacity:.8">Update your browser or system, or play on another phone.'
+                            : 'Ton téléphone ou ton navigateur est probablement trop ancien pour charger le jeu.<br><span style="font-size:15px;font-weight:700;opacity:.8">Mets à jour ton navigateur ou ton système, ou joue depuis un autre téléphone.';
                 var texte = ancien
-                    ? 'Ton téléphone ou ton navigateur est probablement trop ancien pour charger le jeu.<br><span style="font-size:15px;font-weight:700;opacity:.8">Mets à jour ton navigateur ou ton système, ou joue depuis un autre téléphone.' + (nav ? '<br>(' + nav + ')' : '') + '</span>'
-                    : 'Le jeu n’a pas pu se charger.<br>Vérifie ta connexion internet.';
+                    ? ancienTexte + (nav ? '<br>(' + nav + ')' : '') + '</span>'
+                    : langueErreur === "es" ? 'No se pudo cargar el juego.<br>Comprueba tu conexión a internet.'
+                        : langueErreur === "it" ? 'Impossibile caricare il gioco.<br>Controlla la connessione a internet.'
+                            : langueErreur === "en" ? 'The game could not be loaded.<br>Check your internet connection.'
+                                : 'Le jeu n’a pas pu se charger.<br>Vérifie ta connexion internet.';
+                var reessayer = langueErreur === "es" ? "Reintentar" : langueErreur === "it" ? "Riprova" : langueErreur === "en" ? "Try again" : "Réessayer";
                 m.innerHTML = '<div style="font-size:42px">' + (ancien ? '📱' : '📶') + '</div>' +
                     '<div>' + texte + '</div>' +
                     '<button type="button" style="padding:16px 34px;border:none;border-radius:14px;background:#ffcc00;' +
-                    'color:#fff;font:900 20px Arial,sans-serif;text-shadow:0 1px 2px rgba(0,0,0,.45);cursor:pointer">Réessayer</button>';
+                    'color:#fff;font:900 20px Arial,sans-serif;text-shadow:0 1px 2px rgba(0,0,0,.45);cursor:pointer">' + reessayer + '</button>';
                 m.querySelector("button").addEventListener("click", function () { location.reload(); });
                 document.body.appendChild(m);
             };
@@ -454,6 +472,15 @@
                     <label class="interrupteur" for="optionPartieExpress" aria-hidden="true"></label>
                 </div>
 
+                <div class="optionReglage" id="ligneDefisPersonnelsPartie">
+                    <span class="optionTexte">
+                        <span class="optionTitre">Défis personnalisés</span>
+                        <span class="optionNote" id="noteDefisPersonnelsPartie">Ajoute tes propres défis hot ou hard.</span>
+                    </span>
+                    <input type="checkbox" id="optionDefisPersonnels" aria-label="Défis personnalisés">
+                    <label class="interrupteur" for="optionDefisPersonnels"></label>
+                </div>
+
                 <div class="optionReglage">
                     <span class="optionTexte">
                         <span class="optionTitre">Mode hot 🔥</span>
@@ -462,7 +489,6 @@
                     <input type="checkbox" id="optionModeHot" aria-label="Mode hot">
                     <label class="interrupteur" for="optionModeHot" aria-hidden="true"></label>
                 </div>
-
                 <!-- Mode hard (js/reglages.js, MODE_HARD.md) : caché tant qu'il n'est pas débloqué (« Jojo » comme nom de joueur).
                      Même cadre noir et « hard » noir sur orange dans tous les thèmes (style_alcuno.css : #ligneModeHard) -->
                 <div class="optionReglage" id="ligneModeHard" hidden>
@@ -509,6 +535,14 @@
                     <button type="button" id="btnOublierPartie">Oublier</button>
                 </div>
 
+                <button type="button" class="optionReglage optionLien" id="btnMesDefis" data-cle="defis-personnels">
+                    <span class="optionTexte">
+                        <span class="optionTitre">Mes défis</span>
+                        <span class="optionNote" id="noteDefisPersonnels">Ajoute tes propres défis pour les modes hot et hard.</span>
+                    </span>
+                    <svg class="optionChevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+                </button>
+
                 <!-- Profil joueur : connexion Google facultative, pour retrouver sa progression sur un autre téléphone (js/profil.js) -->
                 <div class="blocReglage" data-cle="compte">
                     <div class="optionReglage optionAction">
@@ -551,13 +585,15 @@
                     <svg class="optionChevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
                 </button>
 
-                <!-- Langue du jeu : français ou anglais (js/langue.js ; la page se recharge au changement) -->
+                <!-- Langue du jeu (js/langue.js ; la page se recharge au changement) -->
                 <div class="blocReglage" data-cle="langue">
                     <div class="optionReglage">
-                        <span class="optionTexte"><span class="optionTitre">Langue</span></span>
+                        <span class="optionTexte"><span class="optionTitre">Langues</span></span>
                         <span class="choixLangue">
                             <button type="button" class="chipLangue actif" data-langue="fr" aria-pressed="true">Français</button>
                             <button type="button" class="chipLangue" data-langue="en" aria-pressed="false">English</button>
+                            <button type="button" class="chipLangue" data-langue="es" aria-pressed="false">Español</button>
+                            <button type="button" class="chipLangue" data-langue="it" aria-pressed="false">Italiano</button>
                         </span>
                     </div>
                 </div>
@@ -576,7 +612,46 @@
                     <div class="aProposTitre">À propos</div>
                     <p id="versionJeu" class="versionJeu"></p>
                     <button type="button" id="btnDiagnostic" class="btnDiagnostic">Copier le diagnostic</button>
+                    <button type="button" id="btnConfidentialite" class="btnDiagnostic">Politique de confidentialité</button>
                 </div>
+            </div>
+        </section>
+
+        <section class="ecranDefisPersonnels" id="ecranDefisPersonnels" style="display:none;">
+            <button type="button" id="btnRetourDefisPersonnels" class="btnRetour">← Retour</button>
+            <div class="defisPersonnelsContenu">
+                <h2>Mes défis</h2>
+                <p class="defisPersonnelsIntro">Ils sont gardés sur cet appareil et synchronisés avec Google si tu es connecté.</p>
+
+                <div class="defisFormulaire">
+                    <label class="defisEtiquette" for="niveauDefiPersonnel">Niveau</label>
+                    <select id="niveauDefiPersonnel">
+                        <option value="A">Léger — moins de 5 gorgées</option>
+                        <option value="B">Moyen — 5 à 10 gorgées</option>
+                        <option value="C">Osé — plus de 10 gorgées</option>
+                        <option value="HA">Hard HA — préliminaires</option>
+                        <option value="HB">Hard HB — actes sexuels</option>
+                    </select>
+
+                    <label class="defisEtiquette" for="texteDefiPersonnel">Ton défi</label>
+                    <textarea id="texteDefiPersonnel" maxlength="160" rows="3" placeholder="Exemple : Fais un compliment sincère à {nom}."></textarea>
+                    <div class="defisPiedChamp">
+                        <div class="defisPersonnelsInsertion">
+                            <button type="button" data-inserer="{nom}">{nom}</button>
+                            <button type="button" data-inserer="{nom1}">{nom1}</button>
+                            <button type="button" data-inserer="{nom2}">{nom2}</button>
+                        </div>
+                        <span class="defisCompteur" id="compteurDefiPersonnel" aria-hidden="true">0/160</span>
+                    </div>
+
+                    <p class="defiPersonnelErreur" id="erreurDefiPersonnel" aria-live="polite"></p>
+                    <p class="defiPersonnelApercu" id="apercuDefiPersonnel">Aperçu : …</p>
+                    <input type="hidden" id="idDefiPersonnel">
+                    <button type="button" id="btnAjouterDefiPersonnel">Ajouter le défi</button>
+                </div>
+
+                <h3 class="defisTitreListe">Mes défis enregistrés</h3>
+                <div class="listeDefisPersonnels" id="listeDefisPersonnels"></div>
             </div>
         </section>
 

@@ -93,6 +93,9 @@ const ECRANS = [
   ...["enLigneChoix", "enLigneCreer", "enLigneRejoindre", "enLigneRevenir", "salleAttente"].map((id) => [`en ligne : ${id}`, null, MONTRER + `(['enLigne', '${id}']); ${ENLIGNE}`, 700]),
   ...["ecranNouvellePartie", "ecranChoixPseudo", "ecranConfirmerAccueil", "ecranConfirmerHote", "ecranConfirmerRetrait", "ecranReprise", "ecranPause"].map((id) =>
     [id, null, MONTRER + `(['${id}']); document.querySelectorAll('#${id} .texteConfirmation, #${id} h2').forEach(e => { if (!e.innerText.trim()) e.innerText = 'Texte de test'; })`, 700]),
+  // « Mes défis » : l'écran avec trois défis enregistrés (un par niveau de base), un début de défi dans le champ
+  ["Mes défis (avec des défis enregistrés)", null, "DefisPersonnels.enregistrer('A', 'Fais un compliment sincère à {nom}.'); DefisPersonnels.enregistrer('B', '{nom1} fait un massage de 30 secondes à {nom2}.'); DefisPersonnels.enregistrer('C', '{nom} raconte son pire date en 20 secondes, sinon il boit 3 gorgées.'); document.getElementById('btnMesDefis').click(); document.getElementById('texteDefiPersonnel').value = 'Fais un compliment à {nom}'; document.getElementById('texteDefiPersonnel').dispatchEvent(new Event('input'))", 900],
+  ["Mes défis (liste vide)", null, "DefisPersonnels.remplacer({}); document.getElementById('btnMesDefis').click()", 900],
   ["ajout des joueurs", ["__avantJouer"], "", 300],
   ["plateau (début de partie)", [], "", 300],
   ["plateau (en cours)", [], "document.querySelectorAll('#plateau .Carte').forEach((c, i) => { if (i < 5) c.classList.add('retournee', classes[i * 7 % classes.length]); }); indexPigeon = 1; afficherJoueurs(); afficherJoueurActif()", 500],

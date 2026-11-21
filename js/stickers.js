@@ -139,9 +139,11 @@ function ouvrirAlbum(){
   titre.textContent = kawaiiDebloque() ? tr("Thème Kawaii débloqué ✓") : tr`Thème Kawaii : ${Math.min(a.gagnes.length, STICKERS_POUR_KAWAII)} / ${STICKERS_POUR_KAWAII}`;
   const texte = document.createElement("p");
   texte.className = "albumTexte";
-  texte.textContent = kawaiiDebloque()
-    ? tr("Il est dans Réglages › Thèmes. Bravo, album complet !")
-    : tr`Gagne les ${STICKERS.length} stickers pour débloquer le thème Kawaii.`;
+  if (kawaiiDebloque()) {
+    texte.append(tr("Il est dans Réglages › Thèmes."), document.createElement("br"), tr("Bravo, album complet !"));
+  } else {
+    texte.textContent = tr`Gagne les ${STICKERS.length} stickers pour débloquer le thème Kawaii.`;
+  }
   const barre = document.createElement("div");
   barre.className = "albumBarre";
   const rempli = document.createElement("span");

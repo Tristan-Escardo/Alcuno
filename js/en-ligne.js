@@ -984,6 +984,12 @@ function lancerMancheEnLigne(listeJoueurs, depuisSalle, avecDefis = true){
     const valentin = depuisSalle ? saintValentinEnCours() : graineValentin(e.seed || 0);
     const source = !hot || !avecDefis ? {} : depuisSalle ? (configDistante || {}) : e;
     const defis = source.defisHot, masques = source.defisMasques;
+    const personnelsActifs = depuisSalle
+      ? (typeof window.defisPersonnelsActifs === "function" ? window.defisPersonnelsActifs() : caseDefisPersonnels.checked)
+      : !!e.defisPersonnelsActifs;
+    const defisPersonnels = depuisSalle
+      ? (personnelsActifs && typeof DefisPersonnels === "object" ? DefisPersonnels.pourPartie() : null)
+      : (e.defisPersonnels || null);
     return Object.assign({
       demarree: true,
       manche: (e.manche || 0) + 1,
@@ -992,7 +998,9 @@ function lancerMancheEnLigne(listeJoueurs, depuisSalle, avecDefis = true){
       seed: Math.floor(Math.random() * 4294967296) + (premierePartieJouee() ? 0 : GRAINE_SANS_CARTE_DOREE) + (express ? GRAINE_EXPRESS : 0) + (hot ? GRAINE_HOT : 0) + (hard ? GRAINE_HARD : 0) + (valentin ? GRAINE_VALENTIN : 0),
       joueurs: listeJoueurs,
       hote: e.hote || pseudoActuel
-    }, defis && Object.keys(defis).length ? { defisHot: defis } : {}, masques && Object.keys(masques).length ? { defisMasques: masques } : {});
+    }, defis && Object.keys(defis).length ? { defisHot: defis } : {}, masques && Object.keys(masques).length ? { defisMasques: masques } : {},
+       personnelsActifs ? { defisPersonnelsActifs: true } : {},
+       defisPersonnels && Object.keys(defisPersonnels).length ? { defisPersonnels } : {});
   }).then((resultat) => {
     if (hardRefuse) { alert(tr("Le mode hard se joue à 2 joueurs seulement.")); return; }
     if (resultat && resultat.committed) { // statistiques : une fois par manche (celui qui lance)

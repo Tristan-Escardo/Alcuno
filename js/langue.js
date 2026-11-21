@@ -1,18 +1,21 @@
 // =============================================================================================
-// ALCUNO : langue du jeu (français ou anglais). Chargé en tout premier (index.html, FICHIERS_JEU).
-// Le français est écrit dans le code ; l'anglais est dans js/en.js (texte français -> texte anglais), chargé
-// seulement quand le jeu est en anglais. tr("texte") ou tr`texte ${variable}` rend le texte dans la langue
-// du jeu ; un texte absent de js/en.js reste en français. La langue se choisit dans Réglages > Langue : la
+// ALCUNO : langue du jeu (français, anglais, espagnol ou italien). Chargé en tout premier (index.html, FICHIERS_JEU).
+// Le français est écrit dans le code ; les autres langues sont dans js/en.js, js/es.js et js/it.js (texte français -> traduction), chargées
+// seulement quand elle est choisie. tr("texte") ou tr`texte ${variable}` rend le texte dans la langue
+// du jeu ; un texte absent du dictionnaire reste en français. La langue se choisit dans Réglages > Langue : la
 // page se recharge (les textes sont posés un peu partout au chargement).
-// Ajouter un texte : l'écrire en français dans tr(...), puis ajouter sa traduction dans js/en.js
+// Ajouter un texte : l'écrire en français dans tr(...), puis ajouter sa traduction dans les dictionnaires anglais, espagnol et italien
 // (clé : le texte français, avec {0}, {1}… à la place des ${...}).
 // =============================================================================================
 const CLE_LANGUE = "alcuno_langue";
 const LANGUE = (() => {
-  try { return localStorage.getItem(CLE_LANGUE) === "en" ? "en" : "fr"; } catch (e) { return "fr"; }
+  try { const l = localStorage.getItem(CLE_LANGUE); return l === "en" || l === "es" || l === "it" ? l : "fr"; } catch (e) { return "fr"; }
 })();
-const TEXTES_LANGUE = (LANGUE === "en" && window.TEXTES_EN) || null;
-const estAnglais = !!TEXTES_LANGUE;
+const TEXTES_LANGUE = (LANGUE === "en" && window.TEXTES_EN) || (LANGUE === "es" && window.TEXTES_ES) || (LANGUE === "it" && window.TEXTES_IT) || null;
+const estAnglais = LANGUE === "en";
+const estEspanol = LANGUE === "es";
+const estItalien = LANGUE === "it";
+const LOCALE_LANGUE = estAnglais ? "en-US" : estEspanol ? "es-ES" : estItalien ? "it-IT" : "fr-FR";
 
 // tr("Retour") -> "Back" ; tr`Tour de ${nom}` -> cherche « Tour de {0} »
 function tr(a, ...valeurs){
@@ -25,19 +28,45 @@ function tr(a, ...valeurs){
     let cle = "";
     for (let i = 0; i < a.length; i++) cle += a[i] + (i < a.length - 1 ? "{" + i + "}" : "");
     const t = TEXTES_LANGUE[cle.replace(/\n[ \t]*/g, "\n")];
-    if (t !== undefined) return t.replace(/\{(\d+)\}/g, (m, i) => (i < valeurs.length ? String(valeurs[i]) : m));
+    if (t !== undefined) {
+      let resultat = "";
+      let positionPrecedente = 0;
+      t.replace(/\{(\d+)\}/g, (m, i, position) => {
+        let segment = t.slice(positionPrecedente, position);
+        if(i >= valeurs.length){
+          resultat += segment + m;
+        }else{
+          const valeur = String(valeurs[i]);
+          const finalesItaliennes = { a: "e", o: "i", e: "i" };
+          const finale = segment.slice(-1).toLowerCase();
+          if(estItalien && valeur === "s" && finalesItaliennes[finale]){
+            segment = segment.slice(0, -1) + finalesItaliennes[finale];
+            resultat += segment;
+          }else{
+            resultat += segment + valeur;
+          }
+        }
+        positionPrecedente = position + m.length;
+        return m;
+      });
+      return resultat + t.slice(positionPrecedente);
+    }
   }
   let texte = "";
   for (let i = 0; i < a.length; i++) texte += a[i] + (i < valeurs.length ? String(valeurs[i]) : "");
   return texte;
 }
 
-// « 3 gorgées », « 2 annulées » : le pluriel français ajoute un s ; en anglais le mot traduit décide
-// (« cancelled » ne change pas)
+// « 3 gorgées », « 2 annulées » : accord au pluriel en français et espagnol, formes anglaises irrégulières à part
 const MOTS_INVARIABLES_EN = ["cancelled"];
+const PLURIELS_ES = { "anulación": "anulaciones", "vez": "veces", "luz": "luces", "voz": "voces" };
+const PLURIELS_IT = { "sorso": "sorsi", "ricetta": "ricette" };
 function trPluriel(n, mot){
   const m = tr(mot);
-  return `${n} ${m}${n > 1 && !(estAnglais && MOTS_INVARIABLES_EN.includes(m)) ? (estAnglais && /s$/.test(m) ? "es" : "s") : ""}`;
+  if(n === 1 || (estAnglais && MOTS_INVARIABLES_EN.includes(m))) return `${n} ${m}`;
+  if(estEspanol) return `${n} ${PLURIELS_ES[m] || m + (/[aeiouáéíóú]$/i.test(m) ? "s" : "es")}`;
+  if(estItalien) return `${n} ${PLURIELS_IT[m] || m.replace(/o$/i, "i").replace(/a$/i, "e").replace(/e$/i, "i")}`;
+  return `${n} ${m}${estAnglais && /s$/.test(m) ? "es" : "s"}`;
 }
 
 // Nombre à virgule : « 0,5 » en français, « 0.5 » en anglais
@@ -67,18 +96,18 @@ function traduireElement(racine){
     if (t !== undefined) e.setAttribute(attr, t);
   }));
 }
-if (estAnglais) {
-  document.documentElement.lang = "en";
+if (TEXTES_LANGUE) {
+  document.documentElement.lang = LANGUE;
   traduireElement(document.body);
   // Titre du réglage « Mode hard » : en anglais l'adjectif passe devant (« Hard mode », « hard » dans son badge orange)
   const titreHard = document.querySelector("#ligneModeHard .optionTitre");
   const badgeHard = titreHard && titreHard.querySelector(".badgeOrangeHard");
-  if (badgeHard) { badgeHard.textContent = "Hard"; titreHard.textContent = " mode"; titreHard.prepend(badgeHard); }
+  if (estAnglais && badgeHard) { badgeHard.textContent = "Hard"; titreHard.textContent = " mode"; titreHard.prepend(badgeHard); }
 }
 
 // Réglages > Langue : on retient le choix et on recharge la page
 function choisirLangue(langue){
-  const nouvelle = langue === "en" ? "en" : "fr";
+  const nouvelle = langue === "en" || langue === "es" || langue === "it" ? langue : "fr";
   if (nouvelle === LANGUE) return;
   try { localStorage.setItem(CLE_LANGUE, nouvelle); } catch (e) { return; }
   // Même chemin que le changement de thème (js/reglages.js) : rechargerPage() (js/retour-demarrage.js) revient d'abord à la
@@ -88,11 +117,24 @@ function choisirLangue(langue){
     const ouverts = typeof ecranReglages !== "undefined" && ecranReglages.style.display !== "none" && !ecranReglages.classList.contains("page-sortie");
     if (ouverts && typeof CLE_ROUVRIR_REGLAGES !== "undefined") sessionStorage.setItem(CLE_ROUVRIR_REGLAGES, String(ecranReglages.scrollTop));
   } catch (e) {}
-  if (typeof rechargerPage === "function") rechargerPage(); else location.reload();
+  // Rechargement après le clic : 250 ms pour le petit clic normal ; dans les thèmes Star Wars, BDSM et Fête de la musique, le son
+  // du bouton (sabre, son BDSM, saxophone : 0,4 à 1 s) était coupé net par le rechargement => on attend qu'il ait fini (1,2 s au plus)
+  const resteClic = typeof finDernierClicA === "number" ? finDernierClicA - Date.now() : 0;
+  setTimeout(() => {
+    if (typeof rechargerPage === "function") rechargerPage(); else location.reload();
+  }, Math.max(250, Math.min(1200, resteClic + 50)));
 }
+let sonLangueJoueA = 0;
 document.querySelectorAll(".chipLangue").forEach((chip) => {
   const active = chip.dataset.langue === LANGUE;
   chip.classList.toggle("actif", active);
   chip.setAttribute("aria-pressed", active ? "true" : "false");
-  chip.addEventListener("click", () => choisirLangue(chip.dataset.langue));
+  chip.addEventListener("pointerdown", () => {
+    if (typeof jouerSon === "function") jouerSon("bouton");
+    sonLangueJoueA = Date.now();
+  });
+  chip.addEventListener("click", () => {
+    if (Date.now() - sonLangueJoueA >= 300 && typeof jouerSon === "function") jouerSon("bouton");
+    choisirLangue(chip.dataset.langue);
+  });
 });

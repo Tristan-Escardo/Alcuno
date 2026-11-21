@@ -28,7 +28,11 @@ const messageTexte = document.getElementById("messageTexte");
 // des joueurs sont tapés par les joueurs. innerText redonne le texte ligne par ligne (télé, tests).
 // Ligne de texte avec les gorgées (et le cul sec) en <em> doré, construite en DOM
 function remplirAvecGorgees(parent, ligne){
-  ligne.split(estAnglais ? /(\d+ sips?|a CHUG)/ : /(\d+ gorgées?|un CUL SEC)/).forEach((morceau, i) => {
+  const motifGorgees = estAnglais ? /(\d+ sips?|a CHUG)/ : new RegExp(
+    "(\\d+\\s+(?:" + [trPluriel(2, "gorgée").replace(/^2\s+/, ""), tr("gorgée")]
+      .map((mot) => mot.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|") + ")|" +
+      tr("un CUL SEC").replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")", "i");
+  ligne.split(motifGorgees).forEach((morceau, i) => {
     if(!morceau) return;
     if(i % 2){
       const em = document.createElement("em");
@@ -1685,7 +1689,7 @@ function afficherJoueurs(){
     const lien = partenaireHot(j) ? tr` <span class="badge-lien" title="Lié par Cupidon">💘</span>` : ""; // (mode hot)
     const classePause = estEnPause(j) ? " joueur-en-pause" : "";
     if(i === indexPigeon){
-      return `<div class="joueur-ligne joueur-ligne-pigeon${classePause}"><span class="joueur-nom${classeNomLong(nomPigeonOriginal)}"><strong>PIGEON</strong> (${echapperHtml(avecCouronne(nomPigeonOriginal))})</span>${lien}${bonus}${pause}${badgeDeconnecte(j)}</div>`;
+      return `<div class="joueur-ligne joueur-ligne-pigeon${classePause}"><span class="joueur-nom${classeNomLong(nomPigeonOriginal)}"><strong>${echapperHtml(tr("PIGEON"))}</strong> (${echapperHtml(avecCouronne(nomPigeonOriginal))})</span>${lien}${bonus}${pause}${badgeDeconnecte(j)}</div>`;
     }
 
     return `<div class="joueur-ligne${classePause}"><span class="joueur-nom${classeNomLong(j)}">${echapperHtml(avecCouronne(j))}</span>${lien}${bonus}${pause}${badgeDeconnecte(j)}</div>`;

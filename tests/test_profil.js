@@ -38,7 +38,13 @@ const verifier = (ok, message) => { console.log((ok ? "OK    " : "ECHEC ") + mes
   verifier(f.reglagesChanges && f.local.reglages.sons === undefined, "fusion : un réglage remis par défaut ailleurs l'est aussi ici");
   // données étranges dans la base : seul le connu et le bien formé est gardé
   const g = L.normaliser({ debloque: { prestige: true, pirate: true, hard: "oui" }, stickers: { gagnes: { chat: true, faux: true }, parties: -4, fins: { 0: 5, 1: "x" } }, reglages: { maj: 7, valeurs: { theme: "noir", inconnu: "x", sons: 3, voix: "x".repeat(601) } } });
-  verifier(JSON.stringify(g) === JSON.stringify({ debloque: { prestige: true }, stickers: { gagnes: ["chat"], parties: 0, fins: [5] }, reglages: { maj: 7, valeurs: { theme: "noir" } } }), "fusion : valeurs étranges ignorées " + JSON.stringify(g));
+  verifier(JSON.stringify(g) === JSON.stringify({ debloque: { prestige: true }, stickers: { gagnes: ["chat"], parties: 0, fins: [5] }, reglages: { maj: 7, valeurs: { theme: "noir" } }, defis: {} }), "fusion : valeurs étranges ignorées " + JSON.stringify(g));
+  const defisTel = { pabc123: { t: "Danse avec {nom}.", n: "B", maj: 100 } };
+  const defisDistant = { pxyz789: { t: "Tiens la main de {nom1} et regarde {nom2}.", n: "C", maj: 200 } };
+  const h = L.fusionner({ debloque: {}, stickers: { gagnes: [], parties: 0, fins: [] }, reglages: {}, defis: defisTel }, { defis: defisDistant }, null, 7000);
+  verifier(h.local.defis.pabc123 && h.local.defis.pxyz789 && h.profil.defis.pabc123 && h.profil.defis.pxyz789, "fusion : défis personnels locaux et distants réunis");
+  const i = L.fusionner({ debloque: {}, stickers: { gagnes: [], parties: 0, fins: [] }, reglages: {}, defis: {} }, h.profil, { defis: defisTel }, 8000);
+  verifier(!i.local.defis.pabc123 && i.local.defis.pxyz789, "fusion : défi supprimé localement ne revient pas à la synchronisation");
   verifier(JSON.stringify(L.fusionner(null, "n'importe quoi", null, 1).profil.debloque) === "{}", "fusion : profil et téléphone vides");
 }
 
@@ -50,6 +56,7 @@ const verifier = (ok, message) => { console.log((ok ? "OK    " : "ECHEC ") + mes
   verifier(liste(regles.debloque.$id[".validate"]) === Object.keys(L.DEBLOCAGES).sort().join(), "règles Firebase : mêmes déblocages que js/profil.js");
   verifier(liste(regles.reglages.valeurs.$cle[".validate"]) === L.REGLAGES.slice().sort().join() && regles.reglages.valeurs.$cle[".validate"].includes("<= " + L.VALEUR_MAX), "règles Firebase : mêmes réglages que js/profil.js");
   verifier(liste(regles.stickers.gagnes.$id[".validate"]) === L.STICKERS_CONNUS.slice().sort().join(), "règles Firebase : mêmes stickers que js/profil.js");
+  verifier(regles.defis && regles.defis.$id[".validate"].includes("p") && regles.defis.$id.t[".validate"].includes("<= 160"), "règles Firebase : défis personnels synchronisés");
   const stickers = fs.readFileSync(path.join(RACINE, "js", "stickers.js"), "utf8").match(/const STICKERS = \[[\s\S]*?\n\];/)[0];
   verifier((stickers.match(/id: "([a-z]+)"/g) || []).map((m) => m.slice(5, -1)).join() === L.STICKERS_CONNUS.join(), "les stickers de js/profil.js sont ceux de js/stickers.js");
   // Chaque clé du stockage local citée existe bien dans le code du jeu

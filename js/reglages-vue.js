@@ -11,12 +11,12 @@
   const GROUPES = [
     { id: "affichage", nom: tr("Affichage"), icone: "🎨", cles: ["themes", "feux-artifice", "accessibilite"] },
     { id: "son", nom: tr("Son"), icone: "🔊", cles: ["sons", "musique", "vibrations", "voix"] },
-    { id: "jeu", nom: tr("Jeu"), icone: "🎮", cles: ["faces-cachees", "gaucher", "eau", "ecran-allume", "partie-memoire"] },
+    { id: "jeu", nom: tr("Jeu"), icone: "🎮", cles: ["defis-personnels", "faces-cachees", "eau", "ecran-allume", "partie-memoire", "gaucher"] },
     { id: "appareil", nom: tr("Appareil"), icone: "📱", cles: ["compte", "economie", "hors-ligne", "ecran-tele"] },
     { id: "langue", nom: tr("Langue"), icone: "🌐", cles: ["langue"] },
     { id: "apropos", nom: tr("À propos"), icone: "ℹ️", cles: [] } // (Partager le jeu + À propos : sans data-cle, repérés par leur classe)
   ];
-  const groupeDe = (cle) => (GROUPES.find((g) => g.cles.includes(cle)) || GROUPES[2]).id; // (réglage ajouté plus tard : rangé dans « Jeu »)
+  const groupeDe = (cle) => (GROUPES.find((g) => g.cles.includes(cle)) || GROUPES[0]).id; // (réglage ajouté plus tard : rangé dans « Jeu »)
   Array.from(contenu.children).forEach((el) => {
     if (el.dataset.cle) el.dataset.groupe = groupeDe(el.dataset.cle);
     else if (el.classList.contains("blocPartage") || el.classList.contains("aPropos")) el.dataset.groupe = "apropos";
@@ -170,7 +170,8 @@
           e.style.order = String(i * 100);
         } else {
           e.classList.toggle("groupe-ouvert", ouvert);
-          e.style.order = vue === "liste" ? "" : String(i * 100 + 10);
+          const rang = g.cles.indexOf(e.dataset.cle);
+          e.style.order = String(i * 100 + 10 + (rang < 0 ? g.cles.length : rang));
         }
       });
     });

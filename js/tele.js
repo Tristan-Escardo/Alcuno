@@ -308,7 +308,7 @@ function ecranPourTele(){
   if (o.id === "overlayCouleur") {
     choix = Array.from(o.querySelectorAll(".carre-couleur")).map((c) => {
       const nom = (c.className.match(/carre-(vert|jaune|rouge|bleu)/) || [])[1] || "";
-      return { t: nom.toUpperCase(), c: nom };
+      return { t: tr(nom).toUpperCase(), c: nom }; // (tr : « green », « verde »… sur la télé aussi)
     }).filter((c) => c.c);
   }
   const blocHot = o.querySelector(".bloc-hot");
@@ -977,7 +977,7 @@ function dessinerTele(ecran, etat){
   // Langue du téléphone qui caste : la télé la prend (sinon : règles en anglais venues du téléphone, libellés de la télé en
   // français). La langue se choisit au chargement, donc on recharge ; le code de la télé est gardé (sessionStorage), le
   // téléphone reste relié. Une seule tentative par minute, au cas où le réglage ne s'enregistrerait pas.
-  if ((etat.langue === "en" || etat.langue === "fr") && etat.langue !== LANGUE) {
+  if (["en", "es", "it", "fr"].includes(etat.langue) && etat.langue !== LANGUE) {
     let dernier = 0;
     try { dernier = Number(sessionStorage.getItem("alcuno_tele_langue_a")) || 0; } catch (e) {}
     if (Date.now() - dernier > 60000) {

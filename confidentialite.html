@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2b001d">
+<meta name="color-scheme" content="dark">
+<title>Alcuno – Politique de confidentialité</title>
+<style>
+  :root{ --fond:#2b001d; --carte:#3d0a2b; --carte2:#4a1034; --texte:#f7e9f0; --discret:#d9b9c9; --accent:#ffd166; --trait:rgba(255,255,255,.14); }
+  *{ box-sizing:border-box; }
+  html{ background:var(--fond); scroll-behavior:smooth; scroll-padding-top:16px; -webkit-text-size-adjust:100%; }
+  body{ margin:0; background:var(--fond); color:var(--texte); font:16px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+        padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(40px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left)); }
+  main{ max-width:760px; margin:0 auto; }
+  a{ color:var(--accent); overflow-wrap:anywhere; }
+  .retour{ display:inline-block; margin:4px 0 8px; padding:8px 16px; border:1px solid var(--trait); border-radius:999px; text-decoration:none; background:var(--carte); font-weight:600; }
+  header.entete{ margin:8px 0 22px; padding-bottom:18px; border-bottom:1px solid var(--trait); }
+  h1{ font-size:clamp(1.6rem,6vw,2.1rem); line-height:1.2; margin:.3em 0 .25em; letter-spacing:-.01em; }
+  .maj{ color:var(--discret); margin:0; font-size:.95rem; }
+  nav.sommaire{ background:var(--carte); border:1px solid var(--trait); border-radius:14px; padding:14px 18px; margin:0 0 26px; }
+  nav.sommaire h2{ font-size:.85rem; text-transform:uppercase; letter-spacing:.08em; color:var(--discret); margin:0 0 6px; }
+  nav.sommaire ol{ margin:0; padding-left:1.4em; columns:2 240px; column-gap:28px; }
+  nav.sommaire li{ margin:.2em 0; break-inside:avoid; }
+  nav.sommaire a{ text-decoration:none; }
+  nav.sommaire a:hover, nav.sommaire a:focus{ text-decoration:underline; }
+  main{ counter-reset:rubrique; }
+  section.rubrique{ margin:0 0 28px; }
+  section.rubrique > h2{ counter-increment:rubrique; font-size:1.3rem; line-height:1.3; margin:0 0 .6em; color:var(--accent); display:flex; gap:.55em; align-items:baseline; }
+  section.rubrique > h2::before{ content:counter(rubrique) "."; min-width:1.4em; color:var(--discret); font-weight:600; }
+  p{ margin:.55em 0; }
+  ul{ margin:.45em 0; padding-left:1.25em; }
+  li{ margin:.3em 0; }
+  .fiche{ background:var(--carte); border:1px solid var(--trait); border-radius:14px; padding:6px 18px 10px; margin:16px 0; }
+  .fiche h3{ font-size:1.08rem; margin:12px 0 8px; padding-bottom:8px; border-bottom:1px solid var(--trait); }
+  .ligne{ display:grid; grid-template-columns:150px 1fr; gap:4px 18px; padding:10px 0; border-top:1px solid var(--trait); }
+  .fiche h3 + .ligne{ border-top:0; }
+  .etiquette{ font-size:.8rem; text-transform:uppercase; letter-spacing:.06em; color:var(--discret); font-weight:700; padding-top:.2em; }
+  .valeur > :first-child{ margin-top:0; }
+  .valeur > :last-child{ margin-bottom:0; }
+  .fiche > p:first-of-type, .fiche > ul:first-of-type{ margin-top:.2em; }
+  p.note{ color:var(--discret); font-size:.9rem; border-top:1px solid var(--trait); padding-top:16px; margin-top:34px; }
+  @media (max-width:560px){ .ligne{ grid-template-columns:1fr; } .etiquette{ padding-top:0; } }
+  @media print{ html,body{ background:#fff; color:#000; } a{ color:#000; } .retour{ display:none; } .fiche,nav.sommaire{ background:#fff; border-color:#999; } section.rubrique > h2, .etiquette, .maj{ color:#000; } }
+</style>
+</head>
+<body>
+<main>
+  <a class="retour" href="./">← Retour au jeu</a>
+  <header class="entete">
+    <h1>Politique de confidentialité</h1>
+    <p class="maj">Dernière mise à jour : 21 novembre 2026</p>
+  </header>
+  <nav class="sommaire" aria-label="Sommaire">
+    <h2>Sommaire</h2>
+    <ol>
+      <li><a href="#introduction">Introduction</a></li>
+      <li><a href="#editeur">Éditeur et contact</a></li>
+      <li><a href="#donnees">Données traitées par fonctionnalité</a></li>
+      <li><a href="#destinataires">Destinataires et prestataires</a></li>
+      <li><a href="#transferts">Transferts hors de l'Union européenne</a></li>
+      <li><a href="#securite">Sécurité des données</a></li>
+      <li><a href="#cookies">Cookies et stockage local</a></li>
+      <li><a href="#droits">Vos droits</a></li>
+      <li><a href="#modifications">Modifications de cette politique</a></li>
+    </ol>
+  </nav>
+
+  <section class="rubrique" id="introduction">
+    <h2>Introduction</h2>
+    <p>Cette politique de confidentialité explique quelles données personnelles sont traitées lorsque vous utilisez Alcuno, un jeu de cartes à boire qui se joue sur un seul téléphone, en ligne entre plusieurs téléphones, ou avec un affichage sur téléviseur.</p>
+    <p>Pour chaque fonctionnalité, elle précise les données concernées, la finalité, la base juridique, la durée de conservation et les destinataires, ainsi que vos droits.</p>
+  </section>
+
+  <section class="rubrique" id="editeur">
+    <h2>Éditeur et contact</h2>
+    <p>Alcuno est un jeu gratuit, édité à titre individuel par son créateur.</p>
+    <p>L'éditeur est responsable du traitement des données décrites ci-dessous, sauf lorsqu'un service tiers les traite pour son propre compte.</p>
+    <p>Pour toute question relative à cette politique ou à vos données, utilisez le bouton « Signaler un bug » des Réglages, ou ouvrez une demande sur la page GitHub du projet :</p>
+    <p><a href="https://github.com/Tristan-Escardo/Alcuno" rel="noopener">github.com/Tristan-Escardo/Alcuno</a></p>
+  </section>
+
+  <section class="rubrique" id="donnees">
+    <h2>Données traitées par fonctionnalité</h2>
+    <p>Pour chaque fonctionnalité, voici ce qui est traité, pourquoi, sur quelle base juridique et pour combien de temps.</p>
+    <article class="fiche" id="local">
+      <h3>Stockage sur votre appareil</h3>
+      <div class="ligne">
+        <div class="etiquette">Données concernées</div>
+        <div class="valeur">
+          <ul>
+            <li>vos préférences : thème, effets sonores, musique, annonces vocales, langue, accessibilité, mode Préhistoire et organisation des Réglages ;</li>
+            <li>vos déblocages : thèmes secrets, mode Hard et album de stickers ;</li>
+            <li>vos défis personnalisés ;</li>
+            <li>la partie en ligne en mémoire, pour pouvoir y revenir (code de la partie et pseudonyme) ;</li>
+            <li>un identifiant aléatoire utilisé pour les statistiques ;</li>
+            <li>une copie du jeu, qui permet de jouer sans connexion.</li>
+          </ul>
+          <p>Les données saisies dans l'éthylotest (poids et sexe) et le journal de diagnostic (« mouchard », désactivé par défaut) restent exclusivement sur votre appareil, sauf si vous envoyez un rapport de bug alors que le mouchard est activé.</p>
+        </div>
+      </div>
+      <div class="ligne">
+        <div class="etiquette">Finalité</div>
+        <div class="valeur">
+          <p>Faire fonctionner le jeu, mémoriser vos choix et permettre de jouer sans connexion.</p>
+        </div>
+      </div>
+      <div class="ligne">
+        <div class="etiquette">Base juridique</div>
+        <div class="valeur">
+          <p>Fonctionnement du service que vous utilisez : ces données sont nécessaires au jeu.</p>
+        </div>
+      </div>
+      <div class="ligne">
+        <div class="etiquette">Conservation</div>
+        <div class="valeur">
+          <p>Jusqu'à ce que vous effaciez les données du site dans les paramètres de votre navigateur.</p>
+        </div>
+      </div>
+      <div class="ligne">
+        <div class="etiquette">Destinataires</div>
+        <div class="valeur">
+          <p>Aucun : ces données restent sur votre appareil, hormis celles évoquées dans les rubriques suivantes.</p>
+        </div>
+      </div>
+    </article>
+    <article class="fiche" id="stats">
+      <h3>Statistiques d'utilisation</h3>
+      <div class="ligne">
+        <div class="etiquette">Données concernées</div>
+        <div class="valeur">
+          <ul>
+            <li>un identifiant aléatoire de 12 caractères propre à l'appareil, qui ne correspond ni à votre nom ni à un identifiant publicitaire ;</li>
+            <li>le type d'appareil (iPhone, Android ou ordinateur), le thème, la version du jeu, la date de la dernière visite, l'état d'installation et l'indication qu'une partie a déjà été lancée ;</li>
+            <li>des compteurs : visites, parties lancées (par mode et par heure), parties terminées (durée et nombre de joueurs), cartes dorées, et choix effectués pour chaque défi du mode Hot ;</li>
+            <li>l'état courant de l'appareil (menu, partie classique, en ligne ou télé), effacé à la déconnexion ;</li>
+            <li>des informations techniques du navigateur : navigateur, version du système, dimensions de l'écran, langue et fuseau horaire ;</li>
+            <li>une localisation approximative (pays, région, ville) et le fournisseur d'accès à Internet, déduits de votre adresse IP par un service tiers (ipwho.is ou, à défaut, get.geojs.io). Ces services voient votre adresse IP ; Alcuno ne l'enregistre pas et ne demande jamais votre position GPS.</li>
+          </ul>
+          <p>Ces statistiques ne contiennent ni nom, ni pseudonyme, ni adresse e-mail. Seul l'éditeur peut les consulter.</p>
+        </div>
+      </div>
+      <div class="ligne">
+        <div class="etiquette">Finalité</div>
+        <div class="valeur">
+          <p>Mesurer la fréquentation et l'usage du jeu afin de l'améliorer.</p>
+        </div>
+      </div>
+      <div class="ligne">
+        <div class="etiquette">Base juridique</div>
+        <div class="valeur">
+          <p>Intérêt légitime de l'éditeur à connaître l'usage de son jeu.</p>
+        </div>
+      </div>
+      <div class="ligne">
+        <div class="etiquette">Conservation</div>
+        <div class="valeur">
+          <p>Il n'existe pas, à ce jour, de suppression automatique de ces données.</p>
+        </div>
+      </div>
+      <div class="ligne">
+        <div class="etiquette">Destinataires</div>
+        <div class="valeur">
+          <p>Google Firebase (hébergement de la base de données) ; ipwho.is et get.geojs.io (localisation approximative).</p>
+        </div>
+      </div>
+    </article>
+    <article class="fiche" id="erreurs">
+      <h3>Rapports d'erreur</h3>
+      <div class="ligne">
+        <div class="etiquette">Données concernées</div>
+        <div class="valeur">
+          <ul>
+            <li>un message technique expurgé (le texte entre guillemets est supprimé, afin qu'aucun pseudonyme ni code de partie ne soit transmis), le nom du fichier et la ligne concernés, la version du jeu et le type d'appareil.</li>
+          </ul>
+          <p>Au plus cinq types d'erreurs sont envoyés par ouverture du jeu, chacun une seule fois.</p>
+        </div>
+      </div>
+      <div class="ligne">
+        <div class="etiquette">Finalité</div>
+        <div class="valeur">
+          <p>Détecter et corriger les plantages.</p>
+        </div>
+      </div>
+      <div class="ligne">
+        <div class="etiquette">Base juridique</div>
+        <div class="valeur">
+          <p>Intérêt légitime de l'éditeur à garantir le bon fonctionnement du jeu.</p>
+        </div>
+      </div>
+      <div class="ligne">
+        <div class="etiquette">Conservation</div>
+        <div class="valeur">
+          <p>Il n'existe pas, à ce jour, de suppression automatique de ces données.</p>
+        </div>
+      </div>
+      <div class="ligne">
+        <div class="etiquette">Destinataires</div>
+        <div class="valeur">
+          <p>Google Firebase (hébergement de la base de données).</p>
+        </div>
+      </div>
+    </article>
+    <article class="fiche" id="enligne">
+      <h3>Parties en ligne et affichage sur téléviseur</h3>
+      <div class="ligne">
+        <div class="etiquette">Données concernées</div>
+        <div class="valeur">
+          <ul>
+            <li>le code de la partie ;</li>
+            <li>les pseudonymes des joueurs et le rôle d'hôte ;</li>
+            <li>l'état de la partie et les actions effectuées par les participants ;</li>
+            <li>pour l'affichage sur téléviseur : l'état de l'affichage associé au code de la partie.</li>
+          </ul>
+          <p>Toute personne qui connaît le code d'une partie peut en consulter le contenu. Choisissez un pseudonyme qui ne révèle pas votre identité.</p>
+        </div>
+      </div>
+      <div class="ligne">
+        <div class="etiquette">Finalité</div>
+        <div class="valeur">
+          <p>Faire fonctionner le jeu en ligne et l'affichage sur téléviseur.</p>
+        </div>
+      </div>
+      <div class="ligne">
+        <div class="etiquette">Base juridique</div>
+        <div class="valeur">
+          <p>Exécution du service que vous demandez.</p>
+        </div>
+      </div>
+      <div class="ligne">
+        <div class="etiquette">Conservation</div>
+        <div class="valeur">
+          <p>Une partie est supprimée automatiquement après 3 heures sans activité, ou au plus tard 10 heures après sa création (nettoyage toutes les heures).</p>
+        </div>
+      </div>
+      <div class="ligne">
+        <div class="etiquette">Destinataires</div>
+        <div class="valeur">
+          <p>Google Firebase (hébergement de la base de données).</p>
+        </div>
+      </div>
+    </article>
+    <article class="fiche" id="google">
+      <h3>Compte Google et profil (facultatif)</h3>
+      <div class="ligne">
+        <div class="etiquette">Données concernées</div>
+        <div class="valeur">
+          <p>Firebase Authentication gère votre compte Google : votre nom et votre adresse e-mail restent chez Google/Firebase et ne sont pas copiés dans la base de données du jeu.</p>
+          <p>Le profil enregistré par le jeu contient :</p>
+          <ul>
+            <li>vos déblocages ;</li>
+            <li>votre album de stickers ;</li>
+            <li>vos réglages (thème, langue, sons, voix…) ;</li>
+            <li>vos défis personnalisés.</li>
+          </ul>
+          <p>Ce profil n'est lisible et modifiable que par vous.</p>
+        </div>
+      </div>
+      <div class="ligne">
+        <div class="etiquette">Finalité</div>
+        <div class="valeur">
+          <p>Retrouver votre progression sur un autre téléphone ou après avoir vidé le navigateur.</p>
+        </div>
+      </div>
+      <div class="ligne">
+        <div class="etiquette">Base juridique</div>
+        <div class="valeur">
+          <p>Exécution du service que vous demandez : la connexion est facultative.</p>
+        </div>
+      </div>
+      <div class="ligne">
+        <div class="etiquette">Conservation</div>
+        <div class="valeur">
+          <p>Jusqu'à la suppression de votre profil : Réglages, rubrique Appareil, « Supprimer mon profil ». Cette action supprime le compte et la progression sauvegardée en ligne ; les données déjà présentes sur votre appareil ne sont pas effacées.</p>
+        </div>
+      </div>
+      <div class="ligne">
+        <div class="etiquette">Destinataires</div>
+        <div class="valeur">
+          <p>Google (page de connexion et Firebase Authentication) ; Google Firebase (base de données).</p>
+        </div>
+      </div>
+    </article>
+    <article class="fiche" id="defis">
+      <h3>Défis personnalisés</h3>
+      <div class="ligne">
+        <div class="etiquette">Données concernées</div>
+        <div class="valeur">
+          <ul>
+            <li>le texte de chaque défi (160 caractères au plus), son niveau et sa date de modification.</li>
+          </ul>
+          <p>Ces défis sont d'abord enregistrés sur votre appareil. Si vous êtes connecté avec Google, ils sont aussi synchronisés avec votre profil, visible par vous seul.</p>
+          <p>Lorsque vous lancez une partie en ligne avec l'option « Défis personnalisés », vos défis sont copiés dans l'état de la partie : toute personne qui connaît le code de la partie peut les lire, jusqu'à la suppression automatique de la partie.</p>
+          <p>Le texte est libre : n'y mettez ni nom réel, ni coordonnées, ni information sensible concernant une personne identifiable.</p>
+        </div>
+      </div>
+      <div class="ligne">
+        <div class="etiquette">Finalité</div>
+        <div class="valeur">
+          <p>Personnaliser les modes Hot et Hard.</p>
+        </div>
+      </div>
+      <div class="ligne">
+        <div class="etiquette">Base juridique</div>
+        <div class="valeur">
+          <p>Exécution du service que vous demandez.</p>
+        </div>
+      </div>
+      <div class="ligne">
+        <div class="etiquette">Conservation</div>
+        <div class="valeur">
+          <p>Sur votre appareil : jusqu'à leur suppression par vos soins ou l'effacement des données du site. Dans votre profil : jusqu'à leur suppression ou celle du profil. En ligne : voir la rubrique « Parties en ligne et affichage sur téléviseur ».</p>
+        </div>
+      </div>
+      <div class="ligne">
+        <div class="etiquette">Destinataires</div>
+        <div class="valeur">
+          <p>Google Firebase si vous êtes connecté ou jouez en ligne ; les autres joueurs d'une partie en ligne.</p>
+        </div>
+      </div>
+    </article>
+    <article class="fiche" id="bug">
+      <h3>Signalement d'un problème</h3>
+      <div class="ligne">
+        <div class="etiquette">Données concernées</div>
+        <div class="valeur">
+          <p>Le signalement n'est envoyé qu'à votre initiative. Il comprend :</p>
+          <ul>
+            <li>le texte que vous saisissez ;</li>
+            <li>un diagnostic technique : version du jeu, identification du navigateur et de l'appareil, état du réseau, dimensions de l'écran, code de la partie et pseudonyme si vous êtes en partie, journal des actions et erreurs récentes ;</li>
+            <li>le journal du mouchard, s'il est activé ;</li>
+            <li>les photos ou vidéos que vous joignez.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="ligne">
+        <div class="etiquette">Finalité</div>
+        <div class="valeur">
+          <p>Comprendre et corriger le problème que vous signalez.</p>
+        </div>
+      </div>
+      <div class="ligne">
+        <div class="etiquette">Base juridique</div>
+        <div class="valeur">
+          <p>Votre demande : vous envoyez ce signalement volontairement.</p>
+        </div>
+      </div>
+      <div class="ligne">
+        <div class="etiquette">Conservation</div>
+        <div class="valeur">
+          <p>Selon les règles du service ntfy.sh, que l'éditeur ne contrôle pas.</p>
+        </div>
+      </div>
+      <div class="ligne">
+        <div class="etiquette">Destinataires</div>
+        <div class="valeur">
+          <p>ntfy.sh, service tiers qui ne demande pas de compte. N'y mettez pas d'informations sensibles (mot de passe, coordonnées, photo d'une autre personne…).</p>
+        </div>
+      </div>
+    </article>
+    <article class="fiche" id="autres">
+      <h3>Caméra, synthèse vocale et partage</h3>
+      <ul>
+        <li><strong>Caméra :</strong> l'accès n'est demandé que pour scanner le code QR d'une partie. L'image est analysée sur votre appareil ; elle n'est ni enregistrée ni transmise.</li>
+        <li><strong>Synthèse vocale :</strong> les annonces vocales utilisent le moteur de synthèse vocale de votre appareil.</li>
+        <li><strong>Partage et presse-papiers :</strong> ces fonctions ne sont utilisées que lorsque vous appuyez sur « Partager » ou « Copier ».</li>
+      </ul>
+    </article>
+  </section>
+
+  <section class="rubrique" id="destinataires">
+    <h2>Destinataires et prestataires</h2>
+    <ul>
+      <li><strong>Google Firebase :</strong> base de données hébergée en Europe, authentification et bibliothèques chargées depuis gstatic.com.</li>
+      <li><strong>GitHub Pages :</strong> hébergement du jeu. Comme tout hébergeur, il reçoit l'adresse IP des personnes qui accèdent au site.</li>
+      <li><strong>ipwho.is et get.geojs.io :</strong> localisation approximative déduite de l'adresse IP.</li>
+      <li><strong>ntfy.sh :</strong> transmission des signalements de problème.</li>
+      <li><strong>Google :</strong> page de connexion, uniquement si vous choisissez de vous connecter.</li>
+    </ul>
+    <p>L'éditeur ne vend pas vos données. Alcuno ne diffuse aucune publicité et n'intègre aucun outil de suivi publicitaire.</p>
+  </section>
+
+  <section class="rubrique" id="transferts">
+    <h2>Transferts hors de l'Union européenne</h2>
+    <p>La base de données du jeu est hébergée en Europe. Certains prestataires (Google, GitHub, ipwho.is, get.geojs.io, ntfy.sh) peuvent toutefois traiter des données en dehors de l'Espace économique européen, selon leurs propres conditions et garanties. L'éditeur ne maîtrise pas l'emplacement de leurs serveurs.</p>
+  </section>
+
+  <section class="rubrique" id="securite">
+    <h2>Sécurité des données</h2>
+    <p>Les échanges avec les services du jeu passent par des connexions chiffrées (HTTPS). Les statistiques et les rapports d'erreur ne sont lisibles que par l'éditeur, après authentification ; votre profil n'est lisible que par vous. Aucune mesure ne garantit toutefois une sécurité absolue.</p>
+  </section>
+
+  <section class="rubrique" id="cookies">
+    <h2>Cookies et stockage local</h2>
+    <p>Alcuno n'utilise pas de cookies publicitaires et n'intègre pas d'outil tiers de mesure d'audience. Il utilise le stockage local de votre navigateur et son cache (voir la rubrique « Stockage sur votre appareil »), ainsi que le stockage propre à Firebase Authentication si vous vous connectez avec Google. Vous pouvez les effacer à tout moment dans les paramètres de votre navigateur.</p>
+  </section>
+
+  <section class="rubrique" id="droits">
+    <h2>Vos droits</h2>
+    <p>Conformément à la réglementation applicable (notamment le RGPD), vous disposez d'un droit d'accès, de rectification, d'effacement, de limitation et de portabilité de vos données, ainsi que d'un droit d'opposition aux traitements fondés sur l'intérêt légitime (statistiques et rapports d'erreur).</p>
+    <p>Pour exercer ces droits, contactez l'éditeur (voir la rubrique « Éditeur et contact »). Les statistiques ne sont rattachées qu'à un identifiant aléatoire stocké sur votre appareil, et non à votre identité : l'éditeur ne peut donc pas, en général, les relier à une personne précise.</p>
+    <p>Vous pouvez à tout moment supprimer votre profil depuis les Réglages et effacer les données locales depuis votre navigateur.</p>
+    <p>Si vous estimez que vos droits ne sont pas respectés, vous pouvez introduire une réclamation auprès de l'autorité de protection des données de votre pays (en France : la CNIL, www.cnil.fr).</p>
+  </section>
+
+  <section class="rubrique" id="modifications">
+    <h2>Modifications de cette politique</h2>
+    <p>Cette politique peut évoluer avec le jeu. La date de dernière mise à jour figure en haut de cette page.</p>
+  </section>
+
+  <p class="note">Le contenu de cette page suit la langue sélectionnée dans l'application.</p>
+</main>
+<script>
+(function(){
+  let langue;
+  try { langue = localStorage.getItem("alcuno_langue"); } catch (e) { return; }
+  if(langue !== "en" && langue !== "es" && langue !== "it") return;
+  const charger = (fichier, termine) => {
+    const script = document.createElement("script");
+    script.src = "js/" + fichier + ".js";
+    script.onload = termine;
+    script.onerror = () => console.error("Impossible de charger le dictionnaire " + fichier);
+    document.head.appendChild(script);
+  };
+  charger(langue, () => charger("langue", () => {
+    document.title = "Alcuno – " + tr("Politique de confidentialité");
+  }));
+})();
+</script>
+</body>
+</html>

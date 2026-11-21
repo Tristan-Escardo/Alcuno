@@ -1862,10 +1862,15 @@ function lancerPartie(){
   const hot = hotSeul || hard;
   partieHot = hot;
   partieHard = hard;
-  if(enLigneActif){ choisirModeHotEnLigne(hotSeul); choisirModeHardEnLigne(hard); }
+  if(enLigneActif){
+    choisirModeHotEnLigne(hotSeul);
+    choisirModeHardEnLigne(hard);
+    choisirDefisPersonnelsEnLigne(!!dernierEtatManche && !!dernierEtatManche.defisPersonnelsActifs);
+  }
   else { // (partie reprise : même mode que pendant la partie)
     if(caseModeHot.checked !== hotSeul) caseModeHot.checked = hotSeul;
     if(caseModeHard.checked !== hard) caseModeHard.checked = hard;
+    if(sauvegardeClassique && typeof sauvegardeClassique.defisPersonnels === "boolean") caseDefisPersonnels.checked = sauvegardeClassique.defisPersonnels;
   }
   initialiserModeHot(); // (js/mode-hot.js : défis vus, liens Cupidon, hasard des défis)
   // Période Saint-Valentin : carte Coup de foudre dans le paquet hot (en ligne : celle de la graine ; reprise : celle de la partie)

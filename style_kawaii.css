@@ -459,8 +459,8 @@ html[data-theme="kawaii"] #choixMode #btnRegles svg,
 html[data-theme="kawaii"] header #btnReglesJeu svg{
   filter: drop-shadow(0 2px 0 #8c0b8c) drop-shadow(0 3px 6px rgba(80, 13, 80, 0.2));
 }
-html[data-theme="kawaii"] #ecranRegles{ color: var(--givre-texte); }
-html[data-theme="kawaii"] #ecranRegles h2,
+html[data-theme="kawaii"] #ecranRegles,html[data-theme="kawaii"] #ecranDefisPersonnels{ color: var(--givre-texte); }
+html[data-theme="kawaii"] #ecranRegles h2,html[data-theme="kawaii"] #ecranDefisPersonnels h2,
 html[data-theme="kawaii"] #ecranRegles .blocRegles h3{
   color: var(--givre-accent);
   text-shadow: 0 2px 8px rgba(255, 255, 255, 0.9);
@@ -473,7 +473,7 @@ html[data-theme="kawaii"] #ecranRegles .nomRegle{ color: var(--givre-texte); }
 html[data-theme="kawaii"] #ecranRegles .detailRegle{ color: var(--givre-texte); opacity: 0.85; }
 html[data-theme="kawaii"] #ecranRegles .ligneRegle + .ligneRegle{ border-top-color: var(--givre-bord); }
 html[data-theme="kawaii"] #ecranRegles .reglesNotePJ{ color: #127a3e; }
-html[data-theme="kawaii"] #ecranRegles .btnRetour{
+html[data-theme="kawaii"] #ecranRegles .btnRetour,html[data-theme="kawaii"] #ecranDefisPersonnels .btnRetour{
   background: var(--givre-bouton);
   color: #ffffff;
   text-shadow: 0 1px 2px rgba(100, 8, 100, 0.55);
@@ -504,7 +504,7 @@ html[data-theme="kawaii"] body :is(#btnModeEnLigne, #btnModeClassique, #btnConti
   #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
   #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
   #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
-  #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+  #btnConfirmerRetraitNon, #ajouterJoueur, #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
   #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayDuel button,
   #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
   #overlayAnnulation button):hover:not(:disabled),
@@ -512,7 +512,7 @@ html[data-theme="kawaii"] body :is(#btnModeEnLigne, #btnModeClassique, #btnConti
   #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
   #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
   #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
-  #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+  #btnConfirmerRetraitNon, #ajouterJoueur, #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
   #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCoupDeFoudre .bouton-pigeon, #overlayDuel button,
   #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
   #overlayAnnulation button):hover:not(:disabled){
@@ -756,7 +756,7 @@ html[data-theme="kawaii"] #listeJoueurs .joueur-ligne-pigeon::before{ background
 html[data-theme="kawaii"] #listeJoueurs .joueur-ligne-actif{ background: linear-gradient(180deg, #fff0a0, #ffd04a) !important; color: #6b3300 !important; border-color: #fff !important; box-shadow: 0 4px 0 #c48a0a !important; }
 
 /* Boutons en gélatine */
-html[data-theme="kawaii"] :is(#btnModeEnLigne, #btnModeClassique, #jouer, #nouvellePartie, #ajouterJoueur, #supprimerJoueur, #menu #btnCaster, .voletPause-ok, .voletPause-annuler, .bouton-pigeon, .btnRetour, #btnReprendrePause, #btnRepriseOui, #btnRepriseNon){
+html[data-theme="kawaii"] :is(#btnModeEnLigne, #btnModeClassique, #jouer, #nouvellePartie, #ajouterJoueur, #btnAjouterDefiPersonnel, #supprimerJoueur, #menu #btnCaster, .voletPause-ok, .voletPause-annuler, .bouton-pigeon, .btnRetour, #btnReprendrePause, #btnRepriseOui, #btnRepriseNon){
   border: 3px solid #fff !important; border-radius: 999px !important; color: #6b1450 !important; font-weight: 900;
   background: linear-gradient(180deg, #f9a6cb, #ee70a9) !important; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) !important;
   box-shadow: 0 6px 0 var(--kawaii-rose-bouton), 0 10px 14px rgba(150, 30, 90, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.55) !important;

@@ -237,8 +237,8 @@
     var(--fond-theme); }
 :where(html[data-theme="patrick"]) #choixMode #btnRegles svg, :where(html[data-theme="patrick"]) header #btnReglesJeu svg{ filter: drop-shadow(0 2px 0 rgba(6,70,40,0.95)) drop-shadow(0 3px 6px rgba(0,0,0,0.45)); }
 :where(html[data-theme="patrick"]) #choixMode #btnRegles path, :where(html[data-theme="patrick"]) header #btnReglesJeu path{ stroke: #d9ffe5; }
-:where(html[data-theme="patrick"]) #ecranRegles .btnRetour{ background-color: #7dff9f; }
-:where(html[data-theme="patrick"]) #ecranRegles h2{ color: #d9ffe5; }
+:where(html[data-theme="patrick"]) #ecranRegles .btnRetour,:where(html[data-theme="patrick"]) #ecranDefisPersonnels .btnRetour{ background-color: #7dff9f; }
+:where(html[data-theme="patrick"]) #ecranRegles h2,:where(html[data-theme="patrick"]) #ecranDefisPersonnels h2{ color: #d9ffe5; }
 :where(html[data-theme="patrick"]) #ecranRegles .blocRegles{ border: 1px solid rgba(200,255,220,0.18); }
 :where(html[data-theme="patrick"]) #ecranRegles .blocRegles h3{ color: #d9ffe5; }
 :where(html[data-theme="patrick"]) #ecranRegles .btnFaqLien{ border: 1px solid rgba(200,255,220,0.45); background: rgba(200,255,220,0.10); color: #d9ffe5; }
@@ -253,14 +253,14 @@
     #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
     #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
     #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
-    #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+    #btnConfirmerRetraitNon, #ajouterJoueur, #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
     #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayDuel button,
     #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
     #overlayAnnulation button):hover:not(:disabled), :where(html[data-theme="patrick"]) body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie,
     #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
     #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
     #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
-    #btnConfirmerRetraitNon, #ajouterJoueur, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+    #btnConfirmerRetraitNon, #ajouterJoueur, #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
     #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCoupDeFoudre .bouton-pigeon, #overlayDuel button,
     #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
     #overlayAnnulation button):hover:not(:disabled){ box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9), 0 6px 20px rgba(200,255,220,0.55) !important; }
@@ -437,7 +437,7 @@ html[data-theme="patrick"] #ecranTele .tele-pied{ color: rgba(230,255,240,.8); }
 
 /* ----- Boutons : or avec un anneau blanc (comme une étiquette de cadeau) et texte brun foncé, sur tous les écrans -----
    (mêmes boutons que les autres thèmes habillés, Soleil couchant par exemple : tous les boutons du jeu doivent être aux couleurs du thème) */
-html[data-theme="patrick"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #ajouterJoueur, #jouer, #supprimerJoueur,
+html[data-theme="patrick"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #ajouterJoueur, #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur,
   #nouvellePartie, #btnRejouerMemes, #btnModifierJoueurs, #btnReprendrePause,
   #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR,
   #lancerPartieEnLigne, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui, #btnConfirmerAccueilNon,
@@ -445,7 +445,7 @@ html[data-theme="patrick"][data-theme] body :is(#btnModeEnLigne, #btnModeClassiq
   #btnInstallationInstaller, #ecranRegles .btnFaqLien, #choixMode .btnInstaller, #menu #btnCaster, #ecranCaster button:not(.btnRetour), #btnFermerScanner, #ecranReprise button,
   #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayFinUnRestants .bouton-pigeon,
   #overlayAnnulation button, #overlayRegleUnique .bouton-annulation, #overlayDuel button:not(:disabled), #overlayPredictionFin .bouton-pigeon),
-html[data-theme="patrick"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #ajouterJoueur, #jouer, #supprimerJoueur,
+html[data-theme="patrick"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #ajouterJoueur, #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur,
   #nouvellePartie, #btnRejouerMemes, #btnModifierJoueurs, #btnReprendrePause,
   #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR,
   #lancerPartieEnLigne, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui, #btnConfirmerAccueilNon,
@@ -545,7 +545,7 @@ html[data-theme="patrick"] :is(#choixMode #btnReglages svg, #choixMode #btnRegle
   filter: drop-shadow(0 2px 0 #06402a) drop-shadow(0 3px 6px rgba(0, 40, 20, 0.45));
 }
 html[data-theme="patrick"] :is(#btnAccueilClassique, #enLigne #btnAccueilEnLigne, #ecranNouvellePartie #btnAccueil){ color: #fff; -webkit-text-stroke-color: #fff; text-shadow: 0 2px 0 #06402a, 0 3px 8px rgba(0, 40, 20, 0.45); }
-html[data-theme="patrick"] :is(#ecranReglages, #ecranRegles, #ecranCaster, #ecranBug, #ecranInstallation, #ecranCredits, #ecranConfirmerAccueil, #ecranConfirmerHote, #ecranConfirmerRetrait, #ecranReprise, #ecranPause, #suppression) :is(h2, .credits-titre){
+html[data-theme="patrick"] :is(#ecranReglages, #ecranRegles, #ecranDefisPersonnels, #ecranCaster, #ecranBug, #ecranInstallation, #ecranCredits, #ecranConfirmerAccueil, #ecranConfirmerHote, #ecranConfirmerRetrait, #ecranReprise, #ecranPause, #suppression) :is(h2, .credits-titre){
   color: #fff;
   text-shadow: 0 2px 0 #06402a, 0 4px 12px rgba(0, 40, 20, 0.4);
 }

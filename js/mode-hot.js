@@ -143,6 +143,19 @@ function initialiserModeHot(){
     const d = ajoutes[id];
     if (defisAjoutesHot[d.n]) defisAjoutesHot[d.n].push({ id: "P" + id, t: d.t, deux: /\{nom1\}/.test(d.t) });
   });
+  // Défis personnels : activés depuis « Ta partie ». En ligne, seule la liste de l'hôte est transportée dans la manche.
+  let personnels = {};
+  if (typeof defisPersonnelsActifs === "function" && defisPersonnelsActifs()) {
+    if (enLigneActif && dernierEtatManche && dernierEtatManche.defisPersonnelsActifs && dernierEtatManche.defisPersonnels) {
+      personnels = dernierEtatManche.defisPersonnels;
+    } else if (!enLigneActif && typeof DefisPersonnels === "object") {
+      personnels = DefisPersonnels.pourPartie();
+    }
+  }
+  Object.keys(personnels).sort().forEach((id) => {
+    const d = personnels[id];
+    if (d && defisAjoutesHot[d.n]) defisAjoutesHot[d.n].push({ id: "U" + id, t: d.t, deux: /\{nom1\}/.test(d.t) });
+  });
   liensHot = [];
   const graine = enLigneActif
     ? (dernierEtatManche ? dernierEtatManche.seed : 0)

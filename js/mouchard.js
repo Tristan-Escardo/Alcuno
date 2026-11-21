@@ -28,7 +28,7 @@ function sauverMouchard(){
 function noter(texte){
   if (!mouchardActif) return;
   const d = new Date();
-  const heure = d.toLocaleTimeString("fr-FR") + "." + String(d.getMilliseconds()).padStart(3, "0");
+  const heure = d.toLocaleTimeString(LOCALE_LANGUE) + "." + String(d.getMilliseconds()).padStart(3, "0");
   lignesMouchard.push(`${heure} ${texte}`);
   if (lignesMouchard.length > MAX_LIGNES_MOUCHARD) lignesMouchard.splice(0, lignesMouchard.length - MAX_LIGNES_MOUCHARD);
   if (!sauvegardeMouchardPrevue) sauvegardeMouchardPrevue = setTimeout(sauverMouchard, 2000);
@@ -55,7 +55,7 @@ const rond = (n) => Math.round(n);
 // ===== Activation : 5 taps sur la version =====
 const ligneVersion = document.getElementById("versionJeu");
 function majLigneVersionMouchard(){
-  ligneVersion.innerText = "Alcuno — version " + VERSION_AFFICHEE + (MODE_TEST ? " · TEST" : "") + (mouchardActif ? " · mouchard actif" : "");
+  ligneVersion.innerText = "Alcuno — " + tr("version") + " " + VERSION_AFFICHEE + (MODE_TEST ? " · TEST" : "") + (mouchardActif ? " · " + tr("mouchard actif") : "");
 }
 let tapsVersion = [];
 // (doigt levé et pas « click » : des taps rapides sur un texte ne donnent pas tous un click)
@@ -70,9 +70,9 @@ ligneVersion.addEventListener("pointerup", () => {
     lignesMouchard = [];
     noter(`=== mouchard activé · ${VERSION_AFFICHEE} · ${navigator.userAgent}`);
     noter(`écran ${innerWidth}x${innerHeight} · appli installée : ${estEnAppli}`);
-    afficherToast("Mouchard activé : reproduis le bug, puis « Copier le diagnostic »", 4000);
+    afficherToast(tr("Mouchard activé : reproduis le bug, puis « Copier le diagnostic »"), 4000);
   } else {
-    afficherToast("Mouchard coupé", 2000);
+    afficherToast(tr("Mouchard coupé"), 2000);
   }
   sauverMouchard();
   majLigneVersionMouchard();

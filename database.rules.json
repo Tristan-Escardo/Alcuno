@@ -144,6 +144,15 @@
           },
           "$autre": { ".validate": false }
         },
+        "defis": {
+          "$id": {
+            ".validate": "$id.matches(/^p[a-z0-9]{1,29}$/) && newData.hasChildren(['t', 'n', 'maj'])",
+            "t": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 160" },
+            "n": { ".validate": "newData.isString() && newData.val().matches(/^(A|B|C|HA|HB)$/)" },
+            "maj": { ".validate": "newData.isNumber()" },
+            "$autre": { ".validate": false }
+          }
+        },
         "reglages": {
           "maj": { ".validate": "newData.isNumber()" },
           "valeurs": {
@@ -251,6 +260,15 @@
           "defisHot": {
             "$id": {
               ".validate": "$id.matches(/^[a-z0-9]{1,30}$/) && newData.hasChildren(['t', 'n'])",
+              "t": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 160" },
+              "n": { ".validate": "newData.isString() && newData.val().matches(/^(A|B|C|HA|HB)$/)" },
+              "$autre": { ".validate": false }
+            }
+          },
+          "defisPersonnelsActifs": { ".validate": "newData.val() === true" },
+          "defisPersonnels": {
+            "$id": {
+              ".validate": "$id.matches(/^p[a-z0-9]{1,29}$/) && newData.hasChildren(['t', 'n'])",
               "t": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 160" },
               "n": { ".validate": "newData.isString() && newData.val().matches(/^(A|B|C|HA|HB)$/)" },
               "$autre": { ".validate": false }

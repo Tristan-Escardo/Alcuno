@@ -7,9 +7,9 @@
 // Chaque réglage est retenu sur le téléphone (stockage local du navigateur)
 const ecranReglages = document.getElementById("ecranReglages");
 
-// Réglages ouverts pendant une partie : ceux qui pourraient la casser (faces cachées,
+// Réglages ouverts pendant une partie : ceux qui pourraient la casser (langue, faces cachées,
 // écran télé, partie en mémoire) sont grisés et bloqués ; tout le reste (thème, sons, voix, gaucher…) marche
-const REGLAGES_BLOQUES_EN_PARTIE = ["faces-cachees", "ecran-tele", "partie-memoire"];
+const REGLAGES_BLOQUES_EN_PARTIE = ["langue", "faces-cachees", "ecran-tele", "partie-memoire"];
 function majReglagesEnPartie(){
   const enPartie = partieLancee;
   document.documentElement.classList.toggle("reglages-en-partie", enPartie);
@@ -20,6 +20,10 @@ function majReglagesEnPartie(){
     [ligne, ...ligne.querySelectorAll("input, button")].forEach((el) => {
       if (el.matches("input, button")) el.disabled = enPartie;
     });
+  });
+  ecranReglages.querySelectorAll('.enteteGroupe[data-groupe="langue"], .tuileReglage[data-groupe="langue"]').forEach((el) => {
+    el.setAttribute("aria-disabled", enPartie ? "true" : "false");
+    el.disabled = enPartie;
   });
 }
 
@@ -43,7 +47,7 @@ function ouvrirOptionsPartie(suite, enLigne = false){
   ecranReglages.classList.toggle("options-en-ligne", !!enLigne); // (phrase « En ligne, ce sont les choix de l'hôte… » en haut)
   // Chaque nouvelle partie repart sans option : rien n'est gardé d'une partie à l'autre (la revanche et la reprise
   // d'une partie interrompue gardent, elles, le mode de la partie en cours)
-  [caseModeSoft, casePartieExpress, caseModeHot, caseModeHard].forEach((c) => { c.checked = false; });
+  [caseModeSoft, casePartieExpress, caseModeHot, caseModeHard, caseDefisPersonnels].forEach((c) => { c.checked = false; });
   majOptionHard(); // (ligne « Mode hard » : seulement une fois débloqué)
   majTitrePJ();
   ecranReglages.classList.add("vue-options");
@@ -1106,6 +1110,18 @@ function estModeHot(){
   return codePartieActuel ? hotPartieEnLigne : caseModeHot.checked;
 }
 
+// Défis personnels : activés seulement pour la partie choisie sur l'écran « Ta partie ».
+// En ligne, seul l'hôte transporte sa liste dans l'état de la manche.
+const caseDefisPersonnels = document.getElementById("optionDefisPersonnels");
+caseDefisPersonnels.checked = false;
+let defisPersonnelsActifsEnLigne = false;
+function defisPersonnelsActifs(){
+  return codePartieActuel ? defisPersonnelsActifsEnLigne : caseDefisPersonnels.checked;
+}
+function choisirDefisPersonnelsEnLigne(actifs){
+  defisPersonnelsActifsEnLigne = !!actifs;
+}
+
 // ===== Mode hard : la mécanique du mode hot, avec des défis sexuels, à 2 joueurs (voir MODE_HARD.md) =====
 // Caché tant qu'il n'est pas débloqué sur ce téléphone : en entrant « Jojo » comme nom de joueur (ou comme pseudo
 // en ligne). Jamais avec le mode hot : cocher l'un décoche l'autre. En ligne : réglage de celui qui lance la partie
@@ -1118,6 +1134,7 @@ function hardDebloque(){
 }
 function majOptionHard(){
   document.getElementById("ligneModeHard").hidden = !hardDebloque();
+  if (window.DefisPersonnels) DefisPersonnels.majTextes(); // (js/defis-personnels.js : on ne parle du mode hard qu'une fois débloqué)
 }
 // « Jojo » (majuscules et accents ignorés) : le nom reste un joueur normal
 function estCodeHard(nom){
@@ -1843,7 +1860,7 @@ function chargerSons(){
 // (annuler des gorgées, distribuer au +4, choisir le pigeon ou la victime de la carte dorée), et sauf
 // « Signaler un bug » et « Copier le diagnostic » (silencieux), et sauf les touches du petit piano de l'accueil (elles jouent leur note)
 const BOUTONS_AVEC_LEUR_SON = ".bouton-annulation, .plus4-joueur-btn, #overlayPigeon .bouton-pigeon, .bouton-doree, " +
-  "#btnSignalerBug, #btnDiagnostic, #btnRegles, #btnReglesJeu, #btnFaq, #btnFaqDepuisRegles, #bandeauMiseAJour .maj, .fenetreGalaxie-ok, .etoileFilante, .pianoTouche";
+  "#btnSignalerBug, #btnDiagnostic, #btnRegles, #btnReglesJeu, #btnFaq, #btnFaqDepuisRegles, #bandeauMiseAJour .maj, .fenetreGalaxie-ok, .etoileFilante, .pianoTouche, .chipLangue";
 document.addEventListener("click", (e) => {
   if (!e.isTrusted || document.documentElement.classList.contains("mode-tele")) return;
   if (Date.now() - sonBoutonJoueLe < 500) return; // déjà joué au doigt levé (activerMemePendantElan)
@@ -1900,6 +1917,7 @@ function arreterSonTraineau(){
   } catch (e) {}
 }
 
+let finDernierClicA = 0; // moment où le dernier clic (bouton, sabre, son BDSM, saxophone) finit de sonner (voir choisirLangue, js/langue.js)
 let dernierClicJoueA = 0; // moment où le dernier clic (bouton ou sabre) a vraiment commencé (voir rafraichirBarreIphone)
 function lireSon(nom, son){
   const ctx = contexteAudio();
@@ -1919,7 +1937,10 @@ function lireSon(nom, son){
     lectureTraineau = { ctx, lecture, sortie };
     lecture.onended = () => { if (lectureTraineau && lectureTraineau.lecture === lecture) lectureTraineau = null; };
   }
-  if (nom === "bouton" || nom.startsWith("sabre/") || nom.startsWith("bdsm_buttons/") || nom.startsWith("saxo/")) dernierClicJoueA = Date.now();
+  if (nom === "bouton" || nom.startsWith("sabre/") || nom.startsWith("bdsm_buttons/") || nom.startsWith("saxo/")) {
+    dernierClicJoueA = Date.now();
+    finDernierClicA = Date.now() + Math.min(son.duration, DUREE_MAX_SONS[nom] || son.duration) * 1000;
+  }
 
   const dureeMax = DUREE_MAX_SONS[nom];
   if (SONS_QUI_BAISSENT_LA_MUSIQUE.includes(nom)) attenuerMusique(Math.min(son.duration, dureeMax || son.duration));
@@ -2114,7 +2135,7 @@ function texteDiagnostic(){
   delete etat.journal;
   return [
     "=== Diagnostic Alcuno ===",
-    `Version ${VERSION_AFFICHEE} | ${new Date().toLocaleString("fr-FR")}`,
+    `Version ${VERSION_AFFICHEE} | ${new Date().toLocaleString(LOCALE_LANGUE)}`,
     `Téléphone : ${navigator.userAgent}`,
     `Réseau : ${navigator.onLine ? "en ligne" : "hors connexion"} | Firebase chargé : ${!!window.firebaseDB}`,
     infosEcranDiagnostic(),
@@ -2128,6 +2149,12 @@ function texteDiagnostic(){
     ...(typeof journalMouchard === "function" ? journalMouchard() : []) // (js/mouchard.js)
   ].join("\n");
 }
+
+// (page à part, langue de l'application) : on change de page quand le son du bouton a fini (sabre, son BDSM, saxophone : 0,4 à
+// 1 s dans les thèmes Star Wars, BDSM et Fête de la musique ; le changement de page le coupait net), 1,2 s au plus
+document.getElementById("btnConfidentialite").addEventListener("click", () => {
+  setTimeout(() => { location.href = "confidentialite.html"; }, Math.max(0, Math.min(1200, finDernierClicA - Date.now() + 50)));
+});
 
 document.getElementById("btnDiagnostic").addEventListener("click", () => {
   const texte = texteDiagnostic();
@@ -2595,9 +2622,9 @@ function textePourVoix(brut){
   return String(brut || "")
     .replace(regexEmojisVoix, " ")
     .replace(/\b(Il|Elle|il|elle)\/(il|elle)\b/g, "$1 ou $2")
-    .replace(/\b(\d+) cl\b/g, estAnglais ? "$1 centilitres" : "$1 cl")
+    .replace(/\b(\d+) cl\b/g, (m, n) => estAnglais ? n + " centilitres" : estEspanol ? n + " centilitros" : estItalien ? n + (n === "1" ? " centilitro" : " centilitri") : n + " cl")
     .replace(/\+(\d+)/g, "plus $1")
-    .replace(/(\d+)\s*\/\s*(\d+)/g, estAnglais ? "$1 out of $2" : "$1 sur $2")
+    .replace(/(\d+)\s*\/\s*(\d+)/g, estAnglais ? "$1 out of $2" : estEspanol ? "$1 de $2" : estItalien ? "$1 su $2" : "$1 sur $2")
     .replace(/\s+/g, " ").replace(/\s+([.,!?])/g, "$1").replace(/([!?])\./g, "$1").trim();
 }
 
@@ -2608,7 +2635,10 @@ function noteVoix(v){
   const nom = `${v.name || ""} ${v.voiceURI || ""}`;
   let n = 0;
   if (/premium|enhanced|am[ée]lior[ée]e?|neural|natural|naturelle/i.test(nom)) n += 100;
-  if ((estAnglais ? /^en[-_](US|GB)$/i : /^fr[-_]FR$/i).test(v.lang)) n += 20; else if ((estAnglais ? /^en$/i : /^fr$/i).test(v.lang)) n += 10;
+  const langueVoix = LANGUE;
+  const regionVoix = estAnglais ? "US" : estEspanol ? "ES" : estItalien ? "IT" : "FR";
+  if ((new RegExp("^" + langueVoix + "[-_]" + regionVoix + "$", "i")).test(v.lang)) n += 20;
+  else if ((new RegExp("^" + langueVoix + "$", "i")).test(v.lang)) n += 10;
   if (v.localService) n += 5;
   if (/google/i.test(nom)) n += 3;
   if (v.default) n += 1;
@@ -2617,7 +2647,8 @@ function noteVoix(v){
 function meilleureVoixFr(){
   ecouterChangementDeVoix();
   if (voixFrCherchee && voixFrChoisie) return voixFrChoisie;
-  const voix = (window.speechSynthesis.getVoices() || []).filter((v) => (estAnglais ? /^en/i : /^fr/i).test(v.lang)); // (voix de la langue du jeu)
+  const langueVoix = estAnglais ? /^en/i : estEspanol ? /^es/i : estItalien ? /^it/i : /^fr/i;
+  const voix = (window.speechSynthesis.getVoices() || []).filter((v) => langueVoix.test(v.lang)); // (voix de la langue du jeu)
   voixFrCherchee = voix.length > 0; // (liste encore vide : on redemande à la prochaine lecture)
   voixFrChoisie = voix.length ? voix.slice().sort((a, b) => noteVoix(b) - noteVoix(a))[0] : null;
   return voixFrChoisie;
@@ -2640,7 +2671,7 @@ function dire(brut, force = false, vitesse = null){
   try {
     window.speechSynthesis.cancel();
     const lecture = new SpeechSynthesisUtterance(texte);
-    lecture.lang = estAnglais ? "en-US" : "fr-FR";
+    lecture.lang = LOCALE_LANGUE;
     lecture.rate = Math.min(1.6, Math.max(0.6, Number(vitesse) || vitesseVoix));
     const voixFr = meilleureVoixFr();
     if (voixFr) lecture.voice = voixFr;

@@ -767,7 +767,7 @@ function demarrerSauvegardeClassique(){
   }
   const seed = Math.floor(Math.random() * 4294967296);
   sauvegardeClassique = {
-    v: VERSION_JEU, date: Date.now(), seed, sansDoree: !premierePartieJouee(), soft: estModeSoft(), express: estPartieExpress(), hot: estModeHot(), hard: estModeHard(), valentin: saintValentinEnCours(),
+    v: VERSION_JEU, date: Date.now(), seed, sansDoree: !premierePartieJouee(), soft: estModeSoft(), express: estPartieExpress(), hot: estModeHot(), hard: estModeHard(), defisPersonnels: defisPersonnelsActifs(), valentin: saintValentinEnCours(),
     joueurs: joueurs.slice(), actions: []
   };
   aleatoire = generateurAleatoire(seed);
@@ -823,6 +823,7 @@ function reprendrePartieClassique(s){
   if(caseModeSoft.checked !== !!s.soft) caseModeSoft.checked = !!s.soft; // (même mode que pendant la partie)
   if(caseModeHot.checked !== !!s.hot) caseModeHot.checked = !!s.hot;
   if(caseModeHard.checked !== !!s.hard) caseModeHard.checked = !!s.hard;
+  if(caseDefisPersonnels.checked !== !!s.defisPersonnels) caseDefisPersonnels.checked = !!s.defisPersonnels;
   casePartieExpress.checked = !!s.express; // (rien n'est gardé sur le téléphone : la revanche refera une partie du même type)
   majTitrePJ();
   ouvrirModeClassique(); // (js/en-ligne.js) sans passer par l'écran « Ta partie »

@@ -55,7 +55,14 @@
       REGLAGES.forEach((cle) => { const v = objet(p.reglages.valeurs)[cle]; if (typeof v === "string" && v.length <= VALEUR_MAX) valeurs[cle] = v; });
       reglages = { maj: Number(p.reglages.maj), valeurs };
     }
-    return { debloque, stickers: { gagnes, parties: Math.max(0, Math.floor(Number(s.parties) || 0)), fins }, reglages };
+    const defis = {};
+    Object.keys(objet(p.defis)).sort().slice(0, 300).forEach((id) => {
+      if (!/^p[a-z0-9]{1,29}$/.test(id)) return;
+      const d = objet(p.defis[id]);
+      if (!/^(A|B|C|HA|HB)$/.test(d.n) || typeof d.t !== "string" || d.t.trim().length < 1 || d.t.length > 160) return;
+      defis[id] = { t: d.t.trim(), n: d.n, maj: Number(d.maj) > 0 ? Number(d.maj) : 1 };
+    });
+    return { debloque, stickers: { gagnes, parties: Math.max(0, Math.floor(Number(s.parties) || 0)), fins }, reglages, defis };
   }
   // Forme écrite dans Firebase (les stickers gagnés en { id: true } : pas de tableau à trous)
   function enForme(n){
@@ -63,6 +70,7 @@
     n.stickers.gagnes.forEach((id) => { gagnes[id] = true; });
     const p = { v: 1, debloque: n.debloque, stickers: { gagnes, parties: n.stickers.parties, fins: n.stickers.fins } };
     if (n.reglages) p.reglages = { maj: n.reglages.maj, valeurs: n.reglages.valeurs };
+    if (Object.keys(n.defis).length) p.defis = n.defis;
     return p;
   }
   // Texte identique pour deux objets de même contenu, quel que soit l'ordre de leurs clés
@@ -78,7 +86,7 @@
   // Rend { profil (à écrire dans Firebase), ecrire (faut-il l'écrire), local (à poser sur le téléphone), reglagesChanges,
   //        nouveauxDeblocages, nouveauxStickers (ce que le téléphone n'avait pas) }
   function fusionner(local, distant, vu, maintenant){
-    const l = normaliser({ debloque: objet(local).debloque, stickers: objet(local).stickers, reglages: { maj: 1, valeurs: objet(local).reglages } });
+    const l = normaliser({ debloque: objet(local).debloque, stickers: objet(local).stickers, reglages: { maj: 1, valeurs: objet(local).reglages }, defis: objet(local).defis });
     const d = normaliser(distant);
     const debloque = Object.assign({}, d.debloque, l.debloque);
     const gagnes = STICKERS_CONNUS.filter((id) => l.stickers.gagnes.includes(id) || d.stickers.gagnes.includes(id));
@@ -94,11 +102,21 @@
     else reglages = d.reglages;                                                                  // sinon ceux du profil (modifiés ailleurs, ou identiques)
     const reglagesChanges = stable(reglages.valeurs) !== stable(reglagesLocaux); // (le téléphone doit reprendre ceux du profil)
 
-    const fusion = { debloque, stickers, reglages };
+    const defis = {};
+    const vus = objet(objet(vu).defis);
+    const ids = Array.from(new Set(Object.keys(l.defis).concat(Object.keys(d.defis)).concat(Object.keys(vus))));
+    ids.forEach((id) => {
+      const localDefi = l.defis[id], distantDefi = d.defis[id], vuDefi = vus[id];
+      if (!localDefi && vuDefi && distantDefi) return; // supprimé depuis la dernière synchronisation
+      if (localDefi && !distantDefi) defis[id] = localDefi;
+      else if (!localDefi && distantDefi) defis[id] = distantDefi;
+      else if (localDefi && distantDefi) defis[id] = (localDefi.maj >= distantDefi.maj ? localDefi : distantDefi);
+    });
+    const fusion = { debloque, stickers, reglages, defis };
     return {
       profil: enForme(fusion),
       ecrire: stable(enForme(fusion)) !== stable(enForme(d)),
-      local: { debloque, stickers, reglages: reglages.valeurs },
+      local: { debloque, stickers, reglages: reglages.valeurs, defis },
       reglagesChanges,
       nouveauxDeblocages: Object.keys(debloque).filter((id) => !l.debloque[id]),
       nouveauxStickers: gagnes.filter((id) => !l.stickers.gagnes.includes(id))
@@ -153,7 +171,8 @@ if (typeof document !== "undefined" && !document.documentElement.classList.conta
     const album = typeof lireAlbum === "function" ? lireAlbum() : { gagnes: [], parties: 0, fins: [] };
     const reglages = {};
     L.REGLAGES.forEach((cle) => { const v = lire("alcuno_" + cle); if (v !== null && v.length <= L.VALEUR_MAX) reglages[cle] = v; });
-    return { debloque, stickers: { gagnes: album.gagnes, parties: album.parties, fins: album.fins }, reglages };
+    const defis = typeof DefisPersonnels === "object" ? DefisPersonnels.lire() : {};
+    return { debloque, stickers: { gagnes: album.gagnes, parties: album.parties, fins: album.fins }, reglages, defis };
   }
   const instantane = () => L.stable(profilLocal());
 
@@ -169,6 +188,7 @@ if (typeof document !== "undefined" && !document.documentElement.classList.conta
     });
     const album = typeof lireAlbum === "function" ? lireAlbum() : null;
     if (album && typeof ecrireAlbum === "function" && L.stable(album) !== L.stable(r.local.stickers)) ecrireAlbum(r.local.stickers);
+    if (typeof DefisPersonnels === "object" && L.stable(DefisPersonnels.lire()) !== L.stable(r.local.defis)) DefisPersonnels.remplacer(r.local.defis);
     // Album complet reconstitué à partir de deux téléphones : le thème Kawaii va avec (envoyé au profil à la synchronisation suivante)
     if (r.local.stickers.gagnes.length >= L.STICKERS_CONNUS.length && lire(L.DEBLOCAGES.kawaii) !== "1") {
       try { localStorage.setItem(L.DEBLOCAGES.kawaii, "1"); } catch (e) {}
@@ -275,11 +295,11 @@ if (typeof document !== "undefined" && !document.documentElement.classList.conta
       .then((photo) => {
         if (utilisateur !== moi) return null;
         const etat = lireEtat();
-        const vu = etat && etat.uid === moi.uid && etat.maj ? { maj: etat.maj, reglages: etat.reglages } : null;
+        const vu = etat && etat.uid === moi.uid && etat.maj ? { maj: etat.maj, reglages: etat.reglages, defis: etat.defis } : null;
         const r = L.fusionner(profilLocal(), photo.val(), vu, Date.now());
         poserLocal(r);
         const fin = () => {
-          ecrireEtat({ uid: moi.uid, nom: moi.displayName || "", maj: r.profil.reglages.maj, reglages: r.local.reglages });
+          ecrireEtat({ uid: moi.uid, nom: moi.displayName || "", maj: r.profil.reglages.maj, reglages: r.local.reglages, defis: r.local.defis });
           dernierInstantane = instantane();
           return r;
         };

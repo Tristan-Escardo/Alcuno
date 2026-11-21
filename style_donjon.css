@@ -129,7 +129,7 @@ html[data-theme="donjon"] .pastilleTheme[data-theme="donjon"] .rond{ box-shadow:
 @media (prefers-reduced-motion: reduce){ #fenetreBdsm, .fenetreDeblocage, .fenetreBdsm-carte{ animation: none; } }
 
 /* ===== Écrans annexes (Réglages, « Ta partie », Règles, FAQ, signalement) : rouge et noir, comme le reste ===== */
-html[data-theme="donjon"] :is(#ecranReglages, #ecranRegles, #ecranBug){
+html[data-theme="donjon"] :is(#ecranReglages, #ecranRegles, #ecranDefisPersonnels, #ecranBug){
   background: radial-gradient(ellipse 120% 40% at 50% 100%, rgba(110, 6, 20, 0.55), transparent 70%), linear-gradient(var(--fond-theme), var(--fond-theme)) var(--couleur-barre) !important;
 }
 html[data-theme="donjon"] :is(#ecranReglages .optionReglage, #ecranReglages .blocReglage, #ecranRegles .blocRegles, #ecranBug .blocBug){
@@ -138,7 +138,7 @@ html[data-theme="donjon"] :is(#ecranReglages .optionReglage, #ecranReglages .blo
   box-shadow: 0 0 12px rgba(255, 42, 61, 0.35), inset 0 0 14px rgba(255, 42, 61, 0.12) !important;
 }
 html[data-theme="donjon"] #ecranReglages .blocReglage .optionReglage{ background: transparent !important; border: none !important; box-shadow: none !important; }
-html[data-theme="donjon"] :is(#ecranReglages h2, #ecranRegles h2, #ecranBug h2){
+html[data-theme="donjon"] :is(#ecranReglages h2, #ecranRegles h2, #ecranDefisPersonnels h2, #ecranBug h2){
   color: #ff4458 !important; text-shadow: 0 0 14px rgba(255, 42, 61, 0.85), 0 2px 0 #000 !important;
 }
 html[data-theme="donjon"] :is(#ecranReglages .optionTitre, #ecranRegles .blocRegles h3, #ecranRegles .nomRegle, #ecranReglages .aProposTitre, #ecranReglages .titrePartage){
