@@ -180,6 +180,26 @@
         .santeLigne button, .santeActions button{ font: 700 12px "Rajdhani", Arial, sans-serif; padding: 6px 14px; border-radius: 14px; cursor: pointer; border: 1px solid var(--cyan); background: transparent; color: var(--cyan-clair); }
         .santeLigne button:active, .santeActions button:active{ background: rgba(0, 229, 255, .4); transform: scale(.96); }
         .santeActions{ margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+        #lecteurTexte{ width: 100%; box-sizing: border-box; margin: 4px 0 0; padding: 10px; border-radius: 8px; border: 1px solid rgba(0, 229, 255, .4); background: rgba(0, 229, 255, .05); color: var(--cyan-clair); font: 12px/1.4 ui-monospace, Menlo, Consolas, monospace; resize: vertical; }
+        #lecteurResultat{ margin-top: 12px; }
+        .lecInfos{ display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; font-size: 14px; line-height: 1.35; }
+        .lecInfos dt{ color: var(--cyan-doux); }
+        .lecInfos dd{ margin: 0; color: var(--cyan-clair); overflow-wrap: anywhere; }
+        .lecInfos .att{ color: #ffd479; } .lecInfos .grave{ color: #ff8fab; } .lecInfos .ok{ color: #7dffb0; }
+        .lecSousTitre{ margin: 16px 0 6px; font: 700 12px "Orbitron", Arial, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--cyan-titre); }
+        .lecProbleme{ margin: 0 0 10px; padding: 10px 12px; border-radius: 10px; border-left: 4px solid var(--cyan); background: rgba(0, 229, 255, .06); font-size: 14px; line-height: 1.45; color: var(--cyan-clair); }
+        .lecProbleme.grave{ border-left-color: #ff4d6d; background: rgba(255, 77, 109, .08); }
+        .lecProbleme.att{ border-left-color: #ffc14d; background: rgba(255, 193, 77, .07); }
+        .lecProbleme b.t{ display: block; margin-bottom: 4px; font-size: 15px; }
+        .lecProbleme ul{ margin: 4px 0 0; padding-left: 18px; }
+        .lecProbleme .ex, .lecLigne code, .lecErreur code{ font: 12px/1.35 ui-monospace, Menlo, Consolas, monospace; color: var(--cyan-doux); overflow-wrap: anywhere; }
+        .lecLigne{ display: grid; grid-template-columns: 62px 1fr; gap: 6px; padding: 3px 0; border-top: 1px solid rgba(0, 229, 255, .1); font-size: 13px; }
+        .lecLigne span{ color: var(--cyan-doux); font-variant-numeric: tabular-nums; }
+        .lecLigne.err code{ color: #ff8fab; }
+        .lecErreur{ margin: 0 0 8px; font-size: 14px; color: var(--cyan-clair); }
+        .lecNote{ margin: 10px 0 0; padding: 8px 10px; border-radius: 10px; background: rgba(0, 229, 255, .06); font-size: 14px; line-height: 1.45; color: var(--cyan-doux); }
+        .lecNote.erreur{ color: #ffc2d4; background: rgba(255, 77, 109, .1); }
+        .lecMessage{ margin: 0 0 10px; padding: 8px 10px; border-radius: 10px; background: rgba(255, 79, 216, .08); font-size: 14px; color: var(--cyan-clair); white-space: pre-wrap; overflow-wrap: anywhere; }
         #vueSante details{ margin-top: 12px; font-size: 14px; color: var(--cyan-doux); }
         #vueSante summary{ cursor: pointer; color: var(--cyan-titre); }
         .vue{ display: none; }
@@ -479,6 +499,13 @@
                 <details id="santeIgnores" hidden><summary id="santeIgnoresTitre">Ignorés</summary><div id="santeIgnoresListe"></div></details>
                 <p class="pilNote" id="santeNote" style="margin-top:10px"></p>
                 <div class="santeActions"><button type="button" id="santeEffacer">Effacer le journal</button></div>
+            </section>
+            <section class="bloc" id="blocLecteur">
+                <div class="titre">Lire un diagnostic</div>
+                <p class="pilNote">Colle ici le texte de <b>« Copier le diagnostic »</b> (Réglages › À propos du jeu) ou le message reçu par <b>« Signaler un bug »</b>. Avec le mouchard (5 taps sur la version), la page explique le bug, propose des solutions et ce qu'il faut vérifier ; sans mouchard, elle résume les infos principales. Tout est lu ici, rien n'est envoyé.</p>
+                <textarea id="lecteurTexte" rows="6" spellcheck="false" autocapitalize="off" autocorrect="off" placeholder="=== Diagnostic Alcuno ===&#10;Version …"></textarea>
+                <div class="santeActions"><button type="button" id="lecteurAnalyser">Analyser</button><button type="button" id="lecteurColler">Coller</button><button type="button" id="lecteurVider">Vider</button></div>
+                <div id="lecteurResultat" aria-live="polite"></div>
             </section>
             <p class="note">Erreurs du jeu, anonymes : message nettoyé, fichier, version, type d'appareil · rien de personnel<br>Alcuno Stats <span id="versionStats3"></span></p>
         </div>
@@ -825,6 +852,7 @@
     </main>
 
     <script src="js/config-lib.js"></script>
+    <script src="js/lecteur-diagnostic.js"></script><!-- (onglet Santé : « Lire un diagnostic ») -->
     <script>function tr(a, ...v){ return typeof a === "string" ? a : String.raw({ raw: a }, ...v); } // (cette page reste en français : js/langue.js n'est pas chargé)</script>
     <script src="js/mode-hot.js"></script><!-- (seulement pour les textes des défis : DEFIS_HOT) -->
     <script src="js/cocktails.js"></script><!-- (recettes du Bar : Pilotage → Bar) -->
@@ -846,7 +874,7 @@
         });
         const authPorte = getAuth(app);
         // Version de la page de stats (à part de celle du jeu : +0.0.1 à chaque modification de cette page)
-        const VERSION_STATS = "1.24.4";
+        const VERSION_STATS = "1.25.0";
         document.getElementById("versionStats").textContent = VERSION_STATS;
         document.getElementById("versionStats2").textContent = VERSION_STATS;
         document.getElementById("versionStats3").textContent = VERSION_STATS;
@@ -2194,5 +2222,60 @@ Données (stats ; « jours » = les 45 derniers jours, « visiteurs » du jour =
         <iframe id="apercuJeuCadre" title="Aperçu du défi dans le jeu"></iframe>
         <button type="button" class="pilBtn" id="apercuJeuFermer">Fermer l'aperçu</button>
     </div>
+    <script>
+        // ===== Santé › Lire un diagnostic (js/lecteur-diagnostic.js) : indépendant de Firebase et du compte, rien n'est envoyé =====
+        (function(){
+            const $l = (id) => document.getElementById(id);
+            const esc = (t) => String(t == null ? "" : t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+            // Dernière version du jeu : lue dans index.html (même site), pour dire si le diagnostic vient d'une ancienne version
+            let versionJeu = "";
+            const lireVersion = fetch("index.html", { cache: "no-store" }).then((r) => r.text())
+                .then((t) => { const m = t.match(/VERSION_FICHIERS\s*=\s*"([\d.]+)"/); versionJeu = m ? m[1] : ""; }).catch(() => {});
+            const liste = (titre, l) => l && l.length ? `<div><b>${titre}</b><ul>${l.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>` : "";
+            const ligneJournal = (l) => `<div class="lecLigne${/^ERREUR /.test(l.texte) ? " err" : ""}"><span>${esc((l.heure || "").replace(/\.\d+$/, ""))}</span><code>${esc(l.texte)}</code></div>`;
+            function afficher(r){
+                const zone = $l("lecteurResultat");
+                if (!r.valide) { zone.innerHTML = `<div class="lecNote erreur">${esc(r.message)}</div>`; return; }
+                let h = "";
+                if (r.messageJoueur) h += `<div class="lecSousTitre">Message du joueur</div><div class="lecMessage">${esc(r.messageJoueur.slice(0, 1500))}</div>`;
+                h += `<div class="lecSousTitre">Infos principales</div><dl class="lecInfos">${r.infos.map((i) => `<dt>${esc(i.nom)}</dt><dd class="${i.niveau}">${esc(i.valeur)}</dd>`).join("")}</dl>`;
+                if (r.erreurs.length) {
+                    h += `<div class="lecSousTitre">Erreurs récentes</div>` + r.erreurs.map((e) =>
+                        `<div class="lecErreur"><code>${esc(e.heure)} ${esc(e.message)}</code>${e.explication ? `<br>→ ${esc(e.explication.titre)}` : ""}</div>`).join("");
+                }
+                if (r.mouchard) {
+                    const m = r.mouchard;
+                    h += `<div class="lecSousTitre">Ce qui ne va pas${r.problemes.length ? " (" + r.problemes.length + ")" : ""}</div>`;
+                    h += r.problemes.map((p) => `<div class="lecProbleme ${p.gravite}"><b class="t">${p.gravite === "grave" ? "✕" : p.gravite === "att" ? "!" : "i"} ${esc(p.titre)}${p.n > 1 ? " · ×" + p.n : ""}</b>${esc(p.explication)}` +
+                        (p.exemples && p.exemples.length ? `<div class="ex">${p.exemples.map(esc).join("<br>")}</div>` : "") +
+                        liste("Pour régler :", p.solutions) + liste("À vérifier :", p.verifier) + `</div>`).join("") || `<div class="lecNote">Aucun problème connu trouvé.</div>`;
+                    h += `<div class="lecSousTitre">Mouchard</div><dl class="lecInfos">` +
+                        `<dt>Journal</dt><dd>${m.nombre} lignes${m.debut ? ` · ${esc(m.debut.replace(/\.\d+$/, ""))} → ${esc(m.finHeure.replace(/\.\d+$/, ""))}` : ""} · ${m.actif ? "actif" : "coupé"}</dd>` +
+                        `<dt>Gestes</dt><dd>${m.compte.taps} taps · ${m.compte.clics} clics · ${m.compte.defilements} défilements</dd>` +
+                        `<dt>Écrans / sons</dt><dd>${m.compte.ecrans} écrans ouverts · ${m.compte.sons} sons</dd>` +
+                        (m.dernierEcran ? `<dt>Dernier écran</dt><dd>${esc(m.dernierEcran)}</dd>` : "") +
+                        (m.dernierGeste ? `<dt>Dernier clic</dt><dd>${esc(m.dernierGeste)}</dd>` : "") + `</dl>`;
+                    if (m.parcours.length) h += `<details><summary>Parcours (écrans, messages, cartes…)</summary>${m.parcours.map(ligneJournal).join("")}</details>`;
+                    if (m.dernieres.length) h += `<details open><summary>Dernières lignes avant la copie</summary>${m.dernieres.map(ligneJournal).join("")}</details>`;
+                }
+                h += r.fin.map((t) => `<div class="lecNote">${esc(t)}</div>`).join("");
+                zone.innerHTML = h;
+            }
+            async function analyser(){
+                const texte = $l("lecteurTexte").value;
+                if (!texte.trim()) { afficher({ valide: false, message: "Rien à lire : colle d'abord un diagnostic." }); return; }
+                await Promise.race([lireVersion, new Promise((ok) => setTimeout(ok, 1500))]);
+                afficher(window.LecteurDiagnostic.analyserDiagnostic(texte, versionJeu));
+            }
+            $l("lecteurAnalyser").addEventListener("click", analyser);
+            $l("lecteurVider").addEventListener("click", () => { $l("lecteurTexte").value = ""; $l("lecteurResultat").innerHTML = ""; });
+            $l("lecteurColler").addEventListener("click", async () => {
+                try { $l("lecteurTexte").value = await navigator.clipboard.readText(); analyser(); }
+                catch (e) { afficher({ valide: false, message: "Le navigateur refuse de lire le presse-papiers : colle le texte à la main dans le cadre (appui long › Coller)." }); }
+            });
+            // collé à la main : analysé tout de suite
+            $l("lecteurTexte").addEventListener("paste", () => setTimeout(analyser, 0));
+        })();
+    </script>
 </body>
 </html>
