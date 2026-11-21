@@ -141,7 +141,8 @@ assert.equal(vm.runInContext('trPluriel(1, "gorgée")', contexteItalien), "1 sor
 assert.equal(vm.runInContext('trPluriel(2, "gorgée")', contexteItalien), "2 sorsi");
 
 const sourceLangue = fs.readFileSync(path.join(racine, "js", "langue.js"), "utf8");
-assert.ok(sourceLangue.includes('jouerSon("bouton")'), "changement de langue : un son doit être joué");
+assert.ok(sourceLangue.includes('jouerSon("bouton", true)'), "changement de langue : le son « bouton » d'origine, dans tous les thèmes");
+assert.ok(!/jouerSon\("bouton"\)/.test(sourceLangue), "changement de langue : jamais de son spécial du thème (sabre, BDSM, saxophone)");
 assert.ok(sourceLangue.includes('pointerdown'), "changement de langue : le son doit partir à l'appui");
 assert.ok(sourceLangue.includes('setTimeout(() =>'), "changement de langue : le rechargement doit laisser passer le son");
 

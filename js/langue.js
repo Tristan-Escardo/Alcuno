@@ -117,8 +117,8 @@ function choisirLangue(langue){
     const ouverts = typeof ecranReglages !== "undefined" && ecranReglages.style.display !== "none" && !ecranReglages.classList.contains("page-sortie");
     if (ouverts && typeof CLE_ROUVRIR_REGLAGES !== "undefined") sessionStorage.setItem(CLE_ROUVRIR_REGLAGES, String(ecranReglages.scrollTop));
   } catch (e) {}
-  // Rechargement après le clic : 250 ms pour le petit clic normal ; dans les thèmes Star Wars, BDSM et Fête de la musique, le son
-  // du bouton (sabre, son BDSM, saxophone : 0,4 à 1 s) était coupé net par le rechargement => on attend qu'il ait fini (1,2 s au plus)
+  // Rechargement après le clic : on attend que le son du clic ait fini (250 ms au moins, 1,2 s au plus ; c'est toujours le son
+  // « bouton » d'origine, même dans les thèmes Star Wars, BDSM et Fête de la musique)
   const resteClic = typeof finDernierClicA === "number" ? finDernierClicA - Date.now() : 0;
   setTimeout(() => {
     if (typeof rechargerPage === "function") rechargerPage(); else location.reload();
@@ -130,11 +130,12 @@ document.querySelectorAll(".chipLangue").forEach((chip) => {
   chip.classList.toggle("actif", active);
   chip.setAttribute("aria-pressed", active ? "true" : "false");
   chip.addEventListener("pointerdown", () => {
-    if (typeof jouerSon === "function") jouerSon("bouton");
+    // (son « bouton » d'origine dans tous les thèmes : pas de sabre, de son BDSM ni de saxophone pour les langues)
+    if (typeof jouerSon === "function") jouerSon("bouton", true);
     sonLangueJoueA = Date.now();
   });
   chip.addEventListener("click", () => {
-    if (Date.now() - sonLangueJoueA >= 300 && typeof jouerSon === "function") jouerSon("bouton");
+    if (Date.now() - sonLangueJoueA >= 300 && typeof jouerSon === "function") jouerSon("bouton", true);
     choisirLangue(chip.dataset.langue);
   });
 });
