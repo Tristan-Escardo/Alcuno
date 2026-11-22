@@ -95,6 +95,28 @@ caseAccessibilite.addEventListener("change", () => {
   if (caseAccessibilite.checked) jouerSon("accessibilite_on");
 });
 
+// Mode daltonien : la couleur de chaque carte écrite dans un rond en haut à droite de sa face (classe html.daltonien, style_alcuno.css
+// « Mode daltonien »), et son nom dans les carrés du choix de couleur. Les lettres suivent la langue (en espagnol, « amarillo » et
+// « azul » commencent par la même lettre : AM / AZ). Réglage de CE téléphone ; la télé prend celui du téléphone qui caste (js/tele.js).
+const CLE_DALTONIEN = "alcuno_daltonien";
+const LETTRES_DALTONIEN = {
+  fr: { vert: "V", jaune: "J", rouge: "R", bleu: "B" },
+  en: { vert: "G", jaune: "Y", rouge: "R", bleu: "B" },
+  es: { vert: "V", jaune: "AM", rouge: "R", bleu: "AZ" },
+  it: { vert: "V", jaune: "G", rouge: "R", bleu: "B" }
+};
+(function(){
+  const lettres = LETTRES_DALTONIEN[typeof LANGUE === "string" ? LANGUE : "fr"] || LETTRES_DALTONIEN.fr;
+  Object.entries(lettres).forEach(([couleur, l]) => document.documentElement.style.setProperty("--daltonien-" + couleur, JSON.stringify(l)));
+})();
+const caseDaltonien = document.getElementById("optionDaltonien");
+caseDaltonien.checked = lireReglage(CLE_DALTONIEN, false);
+document.documentElement.classList.toggle("daltonien", caseDaltonien.checked);
+caseDaltonien.addEventListener("change", () => {
+  ecrireReglage(CLE_DALTONIEN, caseDaltonien.checked);
+  document.documentElement.classList.toggle("daltonien", caseDaltonien.checked);
+});
+
 // Mode économie (vieux téléphones) : la classe html.economie coupe les animations et les effets gourmands (style_alcuno.css, « Mode
 // économie »), et les effets décidés par le JS (feux d'artifice, passages du Nyan Cat et du traîneau) ne se lancent plus.
 // La classe est déjà posée par le <head> de index.html (pas de flash d'animations au lancement). Réglage de CE téléphone : il n'est pas

@@ -738,6 +738,12 @@ function afficherOverlayCouleur(joueurActuel){
   couleurs.forEach(c=>{
     const carre = document.createElement("div");
     carre.className = "carre-couleur " + c.classe;
+    // (mode daltonien : le nom de la couleur dans le carré, style_alcuno.css)
+    const nomCarre = document.createElement("span");
+    nomCarre.className = "carre-couleur-nom";
+    nomCarre.textContent = tr(c.nom).toUpperCase();
+    carre.appendChild(nomCarre);
+    carre.setAttribute("aria-label", tr(c.nom));
     surAction(carre, "couleur:" + c.nom, { owner: choisisseur, once: true }, ()=>{
       sonClicTheme(); // (sabre, son BDSM, saxophone : js/reglages.js)
       couleurChoisie = c.nom;

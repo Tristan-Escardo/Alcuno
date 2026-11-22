@@ -9,7 +9,7 @@
          (Avant : « ?t= » + l'heure, différent à chaque lancement : tout le jeu était retéléchargé à chaque ouverture,
          environ 400 Ko. Maintenant, tant que la version ne change pas, le navigateur se contente de vérifier.) -->
     <script>
-        window.VERSION_FICHIERS = "9.96.2";
+        window.VERSION_FICHIERS = "9.96.3";
         // (ailleurs que sur le vrai site — poste de dev, appli de test — : l'heure en plus, comme avant, pour voir tout de
         // suite un fichier modifié sans changer de version)
         window.ANTI_CACHE = /(^|\.)github\.io$/i.test(location.hostname) ? window.VERSION_FICHIERS : window.VERSION_FICHIERS + "-" + Date.now();
@@ -447,6 +447,15 @@
                     </span>
                     <input type="checkbox" id="optionAccessibilite" aria-label="Accessibilité pour les gens bourrés 🍻">
                     <label class="interrupteur" for="optionAccessibilite" aria-hidden="true"></label>
+                </div>
+
+                <div class="optionReglage" data-cle="daltonien">
+                    <span class="optionTexte">
+                        <span class="optionTitre">Accessibilité pour les daltoniens 👁️</span>
+                        <span class="optionNote">La couleur écrite sur les cartes et dans le choix de couleur.</span>
+                    </span>
+                    <input type="checkbox" id="optionDaltonien" aria-label="Accessibilité pour les daltoniens 👁️">
+                    <label class="interrupteur" for="optionDaltonien" aria-hidden="true"></label>
                 </div>
 
                 <!-- « Ta partie » : mêmes lignes que les Réglages, mais ouvertes seulement après « Mode classique » ou

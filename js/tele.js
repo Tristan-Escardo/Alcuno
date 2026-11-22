@@ -354,6 +354,7 @@ function etatPourTele(){
     regles,
     theme: document.documentElement.dataset.theme || "bordeaux",
     langue: LANGUE, // (la télé passe dans la langue du téléphone qui caste, js/langue.js)
+    daltonien: document.documentElement.classList.contains("daltonien") ? 1 : 0, // (mode daltonien du téléphone qui caste)
     voix: voixActive ? 1 : 0, // (réglage « Annonces à voix haute » : la télé lit alors les annonces, js/reglages.js)
     vitesseVoix, // (et à la vitesse choisie sur le téléphone)
     pause: !!pauseEnCours,
@@ -992,6 +993,7 @@ function dessinerTele(ecran, etat){
   }
   attente.hidden = true;
   jeu.hidden = false;
+  document.documentElement.classList.toggle("daltonien", !!etat.daltonien);
   appliquerThemeTele(etat.theme);
   lireSurTele(etat);
   musiqueTele = Number(etat.musique) > 0 ? { volume: Number(etat.musique), theme: etat.theme, enPartie: !!etat.partie } : null;

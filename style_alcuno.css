@@ -10775,3 +10775,29 @@ html.economie *, html.economie *::before, html.economie *::after{
 }
 /* Décors animés de l'accueil (pétales, neige, cœurs, étincelles, personnages, objets) et feux d'artifice : plus du tout dessinés */
 html.economie :is(#petalesCerisier, #etincellesPrestige, #kawaiiFlotteurs, #donjonFlotteurs, #neigeNoel, #coeursValentin, #feuxArtifice, .etincelles-doree){ display: none !important; }
+
+/* ===== Mode daltonien (Réglages › Affichage, js/reglages.js) =====
+   Face d'une carte de couleur : la lettre de sa couleur dans un rond blanc en haut à droite (coin vide des faces), lettres de la
+   langue dans --daltonien-vert… Seulement sur une face visible : pas sur une carte recachée (Faces cachées) ni sur un dos.
+   Choix de couleur : le nom écrit dans chaque carré. */
+html.daltonien .Carte:is([class*="_vert"], [class*="_jaune"], [class*="_rouge"], [class*="_bleu"]):not(.carte-envol):not(.tele-envol){ position: relative; }
+html.daltonien .Carte:is([class*="_vert"], [class*="_jaune"], [class*="_rouge"], [class*="_bleu"]):not(.dos_dore){ container-type: inline-size; }
+html.daltonien .Carte:is([class*="_vert"], [class*="_jaune"], [class*="_rouge"], [class*="_bleu"]):not(.dos_dore)::after{
+  position: absolute; top: 4%; right: 7%; z-index: 2;
+  min-width: 30%; height: 0; padding: 15% 3% 15%; box-sizing: border-box;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 999px; background: #fff; color: #111; border: 1.5px solid #111;
+  font: 900 11px/1 Arial, sans-serif; font-size: 20cqw; letter-spacing: -0.02em;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .45); pointer-events: none;
+}
+html.daltonien .Carte[class*="_vert"]:not(.dos_dore)::after{ content: var(--daltonien-vert, "V"); }
+html.daltonien .Carte[class*="_jaune"]:not(.dos_dore)::after{ content: var(--daltonien-jaune, "J"); }
+html.daltonien .Carte[class*="_rouge"]:not(.dos_dore)::after{ content: var(--daltonien-rouge, "R"); }
+html.daltonien .Carte[class*="_bleu"]:not(.dos_dore)::after{ content: var(--daltonien-bleu, "B"); }
+html.daltonien.faces-fermees #plateau .Carte.retournee.recachee::after{ content: none !important; }
+.carre-couleur-nom{ display: none; }
+html.daltonien #overlayCouleur .carre-couleur{ display: flex; align-items: center; justify-content: center; }
+html.daltonien .carre-couleur-nom{
+  display: block; padding: 4px 8px; border-radius: 8px; background: rgba(255, 255, 255, .92); color: #111;
+  font: 900 clamp(13px, 3.6vw, 18px)/1.1 Arial, sans-serif; letter-spacing: .04em; pointer-events: none;
+}

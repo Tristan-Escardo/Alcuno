@@ -207,6 +207,8 @@ window.TEXTES_IT = {
 "<strong>L'eau aussi, ça se boit 😉</strong></span>": "<strong>Anche l'acqua si può bere 😉</strong></span>",
 "ALBUM": "ALBUM",
 "Accessibilité pour les gens bourrés 🍻": "Accessibilità per chi ha bevuto 🍻",
+"Accessibilité pour les daltoniens 👁️": "Accessibilità per daltonici 👁️",
+"La couleur écrite sur les cartes et dans le choix de couleur.": "Il colore scritto sulle carte e nella scelta del colore.",
 "Accident, personne en danger": "Incidente, persona in pericolo",
 "Accueil": "Home",
 "Accueil du jeu : le bouton Mode classique est entouré": "Pagina iniziale del gioco: il pulsante della modalità classica è cerchiato",
