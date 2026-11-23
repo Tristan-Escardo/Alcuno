@@ -443,9 +443,8 @@ if (typeof document !== "undefined" && !document.documentElement.classList.conta
     // (le téléphone garde tout ce qu'il a ; le profil en ligne reste tel qu'il était à la dernière sauvegarde)
     fb.signOut(auth).catch(() => {}).then(() => { occupe = false; etatTexte = ""; ecrireEtat(null); majBloc(); });
   }
-  // Confirmation à l'écran, aux couleurs du thème (pas de confirm() du navigateur) : on emprunte l'écran « Retirer un joueur ? »
-  // du jeu (#ecranConfirmerRetrait, déjà habillé par chaque thème), passé au-dessus des Réglages le temps de la question.
-  // Ses boutons sont écoutés AVANT ceux du jeu (capture) : le retrait d'un joueur n'est jamais déclenché d'ici.
+  // Confirmation à l'écran, aux couleurs du thème (pas de confirm() du navigateur) : #ecranConfirmerRetrait (l'ancien écran
+  // « Retirer un joueur ? », déjà habillé par chaque thème), passé au-dessus des Réglages le temps de la question.
   function confirmerAEcran(titre, texte, libelleOui, libelleNon){
     return new Promise((fin) => {
       const ecran = document.getElementById("ecranConfirmerRetrait"), h = document.getElementById("titreConfirmerRetrait"),

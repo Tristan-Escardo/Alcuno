@@ -45,20 +45,11 @@
 :where(html[data-theme="valentin"]) .messages::before{ background: linear-gradient(90deg, #ff5b5b 0%, #ff9ec2 25%, #6eff72 50%, #58d4ff 75%, #8b7dff 100%); }
 :where(html[data-theme="valentin"]) .bonus-annulation{ color: #ffe3ee; }
 :where(html[data-theme="valentin"]) .regleZero, :where(html[data-theme="valentin"]) .reglePigeon, :where(html[data-theme="valentin"]) .rappelTour{ color: #ffe3ee; }
-:where(html[data-theme="valentin"]) .menu button, :where(html[data-theme="valentin"]) .suppression button{ background-color: #ff9ec2; }
+:where(html[data-theme="valentin"]) .menu button{ background-color: #ff9ec2; }
 @media (hover: hover){
-  :where(html[data-theme="valentin"]) .menu button:hover, :where(html[data-theme="valentin"]) .suppression button:hover{ background-color: #ffe0ec; }
+  :where(html[data-theme="valentin"]) .menu button:hover{ background-color: #ffe0ec; }
 }
-:where(html[data-theme="valentin"]) #suppression h2{ color: #ffe3ee; }
-:where(html[data-theme="valentin"]) #listeSuppression{ box-shadow: 0 0 0 1px rgba(255,200,222,0.18) inset; }
-@media (hover: hover){
-  :where(html[data-theme="valentin"]) #listeSuppression .supp-item:hover{ background: rgba(255,200,222,0.10); box-shadow: 0 0 0 1px rgba(255,200,222,0.22) inset; }
-}
-:where(html[data-theme="valentin"]) #listeSuppression .supp-check{ accent-color: #ffe3ee; }
-:where(html[data-theme="valentin"]) #termineSuppression{ background-color: #ffe3ee; }
-@media (hover: hover){
-  :where(html[data-theme="valentin"]) #termineSuppression:hover{ background-color: #ffe0ec; }
-}
+
 :where(html[data-theme="valentin"]) #overlayCouleur div.titre-couleur{ color: #ffe3ee; }
 :where(html[data-theme="valentin"]) #overlayPlus4 .titre-pigeon, :where(html[data-theme="valentin"]) #overlayCupidon .titre-pigeon, :where(html[data-theme="valentin"]) #overlayCoupDeFoudre .titre-pigeon{ color: #ffe3ee; }
 :where(html[data-theme="valentin"]) #overlayPlus4 .bouton-pigeon, :where(html[data-theme="valentin"]) #overlayCupidon .bouton-pigeon, :where(html[data-theme="valentin"]) #overlayCoupDeFoudre .bouton-pigeon{ background-color: #ffe3ee; }
@@ -155,7 +146,7 @@
 :where(html[data-theme="valentin"]) #btnAccueilClassique, :where(html[data-theme="valentin"]) #enLigne #btnAccueilEnLigne, :where(html[data-theme="valentin"]) #ecranNouvellePartie #btnAccueil{ -webkit-text-stroke: 1.2px #ffe3ee; color: #ffe3ee; text-shadow:
     0 2px 0 rgba(138,18,68,0.95),
     0 3px 8px rgba(0,0,0,0.45); }
-:where(html[data-theme="valentin"]) #toastEnLigne{ color: #ffe3ee; box-shadow: 0 0 0 1px rgba(255,200,222,0.45) inset, 0 8px 24px rgba(0,0,0,0.45); }
+:where(html[data-theme="valentin"]) :is(#toastEnLigne, #toastRetrait){ color: #ffe3ee; box-shadow: 0 0 0 1px rgba(255,200,222,0.45) inset, 0 8px 24px rgba(0,0,0,0.45); }
 :where(html[data-theme="valentin"]) #ecranCredits{ background:
     radial-gradient(ellipse 85% 28% at 50% 30%, rgba(255,200,222,0.16), transparent 100%),
     radial-gradient(ellipse 45% 22% at 15% 72%, rgba(255,77,77,0.10), transparent 100%),
@@ -252,14 +243,14 @@
     #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
     #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, :is(#btnConfirmerAccueilOui, #btnConfirmerBotOui),
     :is(#btnConfirmerAccueilNon, #btnConfirmerBotNon), #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
-    #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+    #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #nouvellePartie,
     #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayDuel button,
     #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
     #overlayAnnulation button):hover:not(:disabled), :where(html[data-theme="valentin"]) body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie,
     #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
     #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, :is(#btnConfirmerAccueilOui, #btnConfirmerBotOui),
     :is(#btnConfirmerAccueilNon, #btnConfirmerBotNon), #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
-    #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+    #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #nouvellePartie,
     #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCoupDeFoudre .bouton-pigeon, #overlayDuel button,
     #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
     #overlayAnnulation button):hover:not(:disabled){ box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9), 0 6px 20px rgba(255,200,222,0.55) !important; }
@@ -429,7 +420,7 @@ html[data-theme="valentin"] #ecranTele .tele-ecran-recap{ background: radial-gra
    règles / FAQ / album, créateurs, étapes d'installation, salle d'attente, retrait d'un joueur. Quasi opaque pour que le motif
    du fond ne passe jamais derrière un texte ; les noms de thèmes (chacun de sa couleur) restent lisibles. */
 html[data-theme="valentin"] :is(#ecranReglages .blocReglage, #ecranReglages .reglages-contenu > .optionReglage, #ecranReglages > .optionReglage, .optionsPartie > .optionReglage:not(.optionsSuite),
-  .blocRegles, #ecranCredits .credits-nom, #ecranInstallation .etapeInstallation, #listeJoueursEnLigne div, #listeSuppression){
+  .blocRegles, #ecranCredits .credits-nom, #ecranInstallation .etapeInstallation, #listeJoueursEnLigne div){
   background: var(--carte-valentin); border: 1px solid rgba(255, 255, 255, 0.22);
 }
 html[data-theme="valentin"] #ecranCredits .cadrePhoto.sansPhoto{ background: var(--carte-valentin); }
@@ -446,19 +437,19 @@ html[data-theme="valentin"] #ecranTele .tele-pied{ color: rgba(255,240,246,.8); 
 
 /* ----- Boutons : or avec un anneau blanc (comme une étiquette de cadeau) et texte framboise foncé, sur tous les écrans -----
    (mêmes boutons que les autres thèmes habillés, Soleil couchant par exemple : tous les boutons du jeu doivent être aux couleurs du thème) */
-html[data-theme="valentin"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur,
+html[data-theme="valentin"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer,
   #nouvellePartie, #btnRejouerMemes, #btnModifierJoueurs, #btnReprendrePause,
   #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR,
   #lancerPartieEnLigne, #btnChoixPseudoAnnuler, #listeChoixPseudo button, :is(#btnConfirmerAccueilOui, #btnConfirmerBotOui), :is(#btnConfirmerAccueilNon, #btnConfirmerBotNon),
-  #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #termineSuppression,
+  #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon,
   #btnInstallationInstaller, #ecranRegles .btnFaqLien, #choixMode .btnInstaller, #menu #btnCaster, #ecranCaster button:not(.btnRetour), #btnFermerScanner, #ecranReprise button,
   #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayFinUnRestants .bouton-pigeon,
   #overlayAnnulation button, #overlayRegleUnique .bouton-annulation, #overlayDuel button:not(:disabled), #overlayPredictionFin .bouton-pigeon),
-html[data-theme="valentin"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur,
+html[data-theme="valentin"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer,
   #nouvellePartie, #btnRejouerMemes, #btnModifierJoueurs, #btnReprendrePause,
   #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR,
   #lancerPartieEnLigne, #btnChoixPseudoAnnuler, #listeChoixPseudo button, :is(#btnConfirmerAccueilOui, #btnConfirmerBotOui), :is(#btnConfirmerAccueilNon, #btnConfirmerBotNon),
-  #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #termineSuppression,
+  #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon,
   #btnInstallationInstaller, #ecranRegles .btnFaqLien, #choixMode .btnInstaller, #menu #btnCaster, #ecranCaster button:not(.btnRetour), #btnFermerScanner, #ecranReprise button,
   #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCoupDeFoudre .bouton-pigeon, #overlayFinUnRestants .bouton-pigeon,
   #overlayAnnulation button, #overlayRegleUnique .bouton-annulation, #overlayDuel button:not(:disabled), #overlayPredictionFin .bouton-pigeon){
@@ -573,7 +564,7 @@ html[data-theme="valentin"] :is(#choixMode #btnReglages svg, #choixMode #btnRegl
 html[data-theme="valentin"] :is(#btnAccueilClassique, #enLigne #btnAccueilEnLigne, #ecranNouvellePartie #btnAccueil){ color: #fff; -webkit-text-stroke-color: #fff; text-shadow: 0 2px 0 #8a1244, 0 3px 8px rgba(60, 0, 30, 0.45); } /* le ⌂ des écrans : blanc, contour compris */
 
 /* ----- Titres des écrans (Réglages, Ta partie, Règles du jeu, FAQ, Album, Caster, Signaler un bug, Installer, créateurs…) : blancs aussi ----- */
-html[data-theme="valentin"] :is(#ecranReglages, #ecranRegles, #ecranDefisPersonnels, #ecranCaster, #ecranBug, #ecranInstallation, #ecranCredits, :is(#ecranConfirmerAccueil, #ecranConfirmerBot), #ecranConfirmerHote, #ecranConfirmerRetrait, #ecranReprise, #ecranPause, #suppression) :is(h2, .credits-titre){
+html[data-theme="valentin"] :is(#ecranReglages, #ecranRegles, #ecranDefisPersonnels, #ecranCaster, #ecranBug, #ecranInstallation, #ecranCredits, :is(#ecranConfirmerAccueil, #ecranConfirmerBot), #ecranConfirmerHote, #ecranConfirmerRetrait, #ecranReprise, #ecranPause) :is(h2, .credits-titre){
   color: #fff;
   text-shadow: 0 2px 0 #8a1244, 0 4px 12px rgba(60, 0, 30, 0.4);
 }

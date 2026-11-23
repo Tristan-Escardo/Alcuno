@@ -1850,6 +1850,9 @@ function lancerPartie(){
     alert(tr("Pas de bot en mode hard : il faut 2 vrais joueurs."));
     return;
   }
+  // Joueurs remplacés par un bot pendant la partie d'avant : de nouveau eux-mêmes (après un plantage, le rejeu les remplace
+  // au même moment qu'avant) (js/bots.js)
+  if(typeof rendreLesRemplaces === "function") rendreLesRemplaces();
   couleurDuelEnAttente = null;
 
   plateau.innerHTML = "";
@@ -2036,10 +2039,6 @@ function retourMenu(){
   majMusique(); // retour aux menus : la musique remonte
   finUnOverlayAffiche = false;
 
-  // Écrans du retrait en cours de partie (nouvelle manche, départ, partie fermée...)
-  retraitEnAttente = null;
-  ecranConfirmerRetrait.style.display = "none";
-  suppression.style.display = "none";
 
 
   // ✅ reset des annulations (compteurs "un") pour une nouvelle partie
@@ -2084,7 +2083,6 @@ function retourMenu(){
   if(overlayDuel) overlayDuel.remove();
 
   btnNouvellePartie.style.display = "none";
-  btnSupprimer.style.display = "inline-block";
   btnJouer.style.display = joueurs.length >= 2 ? "inline-block" : "none";
   menu.style.display = ""; // (la disposition vient du CSS : flex, ou grille sur téléphone)
 
@@ -2244,9 +2242,5 @@ function reinitialiserEcransJeu(){
   document.getElementById("jeu").style.display = "none";
 }
 
-// on force l'UI du menu (au cas où)
-suppression.style.display = "none";
-
-btnSupprimer.style.display = "inline-block";
 
 // #endregion

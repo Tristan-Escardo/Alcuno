@@ -22,8 +22,6 @@ bleu | enLigneRejoindre | #enLigneRejoindre > #validerRejoindre « Rejoindre »	
 bleu | enLigneRevenir | #enLigneRevenir > #btnRetourRevenir « ← Retour »	1.43
 bleu | enLigneRevenir | #enLigneRevenir > #validerRevenir « Revenir »	1.43
 bleu | plateau | #menu > #nouvellePartie « Nouvelle partie »	1.43
-bleu | plateau | #menu > #supprimerJoueur « Supprimer un joueur »	1.43
-bleu | retirer un joueur | #suppression > #termineSuppression « Annuler »	1.43
 bleu | réglages | #ecranReglages > #btnFermerReglages « ← Retour »	1.43
 bleu | réglages | div.blocPartage > #btnPartagerJeu « 📤 Partager le lien »	1.43
 bleu | salleAttente | #salleAttente > #btnQuitterSalle « ← Retour »	1.43
@@ -72,8 +70,6 @@ bordeaux | overlay plus4 | div.plus4-container-joueurs > button.bouton-pigeon.pl
 bordeaux | overlay plus4 | div.plus4-container-joueurs > button.bouton-pigeon.plus4-joueur-btn « Tristan »	1.43
 bordeaux | overlay plus4 | div.plus4-container-joueurs > button.bouton-pigeon.plus4-joueur-btn « Ylana »	1.43
 bordeaux | plateau | #menu > #nouvellePartie « Nouvelle partie »	1.43
-bordeaux | plateau | #menu > #supprimerJoueur « Supprimer un joueur »	1.43
-bordeaux | retirer un joueur | #suppression > #termineSuppression « Annuler »	1.43
 bordeaux | réglages | #ecranReglages > #btnFermerReglages « ← Retour »	1.43
 bordeaux | réglages | div.blocPartage > #btnPartagerJeu « 📤 Partager le lien »	1.43
 bordeaux | salleAttente | #salleAttente > #btnQuitterSalle « ← Retour »	1.43
@@ -102,8 +98,6 @@ cerisier | enLigneRejoindre | #enLigneRejoindre > #validerRejoindre « Rejoindre
 cerisier | enLigneRevenir | #enLigneRevenir > #btnRetourRevenir « ← Retour »	1.43
 cerisier | enLigneRevenir | #enLigneRevenir > #validerRevenir « Revenir »	1.43
 cerisier | plateau | #menu > #nouvellePartie « Nouvelle partie »	1.43
-cerisier | plateau | #menu > #supprimerJoueur « Supprimer un joueur »	1.43
-cerisier | retirer un joueur | #suppression > #termineSuppression « Annuler »	1.43
 cerisier | réglages | #ecranReglages > #btnFermerReglages « ← Retour »	1.43
 cerisier | réglages | div.blocPartage > #btnPartagerJeu « 📤 Partager le lien »	1.43
 cerisier | salleAttente | #salleAttente > #btnQuitterSalle « ← Retour »	1.43
@@ -164,8 +158,6 @@ givre | overlay plus4 | div.plus4-container-joueurs > button.bouton-pigeon.plus4
 givre | overlay plus4 | div.plus4-container-joueurs > button.bouton-pigeon.plus4-joueur-btn « Ylana »	2.53
 givre | overlay tiens | div.overlay-regle-texte > div.doree-titre « TIENS DANS TA GUEULE 1. »	2.76
 givre | plateau | #menu > #nouvellePartie « Nouvelle partie »	2.53
-givre | plateau | #menu > #supprimerJoueur « Supprimer un joueur »	2.53
-givre | retirer un joueur | #suppression > #termineSuppression « Annuler »	2.53
 givre | réglages | #ecranReglages > #btnFermerReglages « ← Retour »	2.53
 givre | réglages | #lignePartieMemoire > #btnOublierPartie « Oublier »	2.53
 givre | réglages | div.blocPartage > #btnPartagerJeu « 📤 Partager le lien »	2.53
@@ -196,8 +188,6 @@ noir | enLigneRejoindre | #enLigneRejoindre > #validerRejoindre « Rejoindre »	
 noir | enLigneRevenir | #enLigneRevenir > #btnRetourRevenir « ← Retour »	1.43
 noir | enLigneRevenir | #enLigneRevenir > #validerRevenir « Revenir »	1.43
 noir | plateau | #menu > #nouvellePartie « Nouvelle partie »	1.43
-noir | plateau | #menu > #supprimerJoueur « Supprimer un joueur »	1.43
-noir | retirer un joueur | #suppression > #termineSuppression « Annuler »	1.43
 noir | réglages | #ecranReglages > #btnFermerReglages « ← Retour »	1.43
 noir | réglages | div.blocPartage > #btnPartagerJeu « 📤 Partager le lien »	1.43
 noir | salleAttente | #salleAttente > #btnQuitterSalle « ← Retour »	1.43
@@ -226,8 +216,6 @@ prestige | enLigneRejoindre | #enLigneRejoindre > #validerRejoindre « Rejoindre
 prestige | enLigneRevenir | #enLigneRevenir > #btnRetourRevenir « ← Retour »	1.43
 prestige | enLigneRevenir | #enLigneRevenir > #validerRevenir « Revenir »	1.43
 prestige | plateau | #menu > #nouvellePartie « Nouvelle partie »	1.43
-prestige | plateau | #menu > #supprimerJoueur « Supprimer un joueur »	1.43
-prestige | retirer un joueur | #suppression > #termineSuppression « Annuler »	1.43
 prestige | réglages | #ecranReglages > #btnFermerReglages « ← Retour »	1.43
 prestige | réglages | div.blocPartage > #btnPartagerJeu « 📤 Partager le lien »	1.43
 prestige | salleAttente | #salleAttente > #btnQuitterSalle « ← Retour »	1.43
@@ -256,8 +244,6 @@ soleil | enLigneRejoindre | #enLigneRejoindre > #validerRejoindre « Rejoindre �
 soleil | enLigneRevenir | #enLigneRevenir > #btnRetourRevenir « ← Retour »	1.77
 soleil | enLigneRevenir | #enLigneRevenir > #validerRevenir « Revenir »	1.77
 soleil | plateau | #menu > #nouvellePartie « Nouvelle partie »	1.77
-soleil | plateau | #menu > #supprimerJoueur « Supprimer un joueur »	1.77
-soleil | retirer un joueur | #suppression > #termineSuppression « Annuler »	1.77
 soleil | réglages | #ecranReglages > #btnFermerReglages « ← Retour »	1.77
 soleil | réglages | div.aPropos > #btnDiagnostic « Copier le diagnostic »	2.54
 soleil | réglages | div.aPropos > #versionJeu « Alcuno — version 9.7.2 »	1.19
@@ -293,8 +279,6 @@ vert | enLigneRejoindre | #enLigneRejoindre > #validerRejoindre « Rejoindre »	
 vert | enLigneRevenir | #enLigneRevenir > #btnRetourRevenir « ← Retour »	1.43
 vert | enLigneRevenir | #enLigneRevenir > #validerRevenir « Revenir »	1.43
 vert | plateau | #menu > #nouvellePartie « Nouvelle partie »	1.43
-vert | plateau | #menu > #supprimerJoueur « Supprimer un joueur »	1.43
-vert | retirer un joueur | #suppression > #termineSuppression « Annuler »	1.43
 vert | réglages | #ecranReglages > #btnFermerReglages « ← Retour »	1.43
 vert | réglages | div.blocPartage > #btnPartagerJeu « 📤 Partager le lien »	1.43
 vert | salleAttente | #salleAttente > #btnQuitterSalle « ← Retour »	1.43

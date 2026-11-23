@@ -42,7 +42,6 @@ const ECRANS_RETOUR = [
   ["ecranPause", "btnReprendrePause"],
   ["ecranChoixPseudo", "btnChoixPseudoAnnuler"],
   ["ecranNouvellePartie", "btnRetourNouvellePartie"],
-  ["suppression", "termineSuppression"],
   ["enLigneRevenir", "btnRetourRevenir"],
   ["enLigneCreer", "btnRetourCreer"],
   ["enLigneRejoindre", "btnRetourRejoindre"],

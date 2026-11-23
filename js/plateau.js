@@ -11,15 +11,11 @@ const reglePigeon = document.getElementById("reglePigeon");
 const messagesBar = document.getElementById("messages");
 
 const menu = document.getElementById("menu");
-const suppression = document.getElementById("suppression");
-const listeSuppression = document.getElementById("listeSuppression");
 
 const nomJoueurInput = document.getElementById("nomJoueur");
 const btnAjouter = document.getElementById("ajouterJoueur");
 const btnJouer = document.getElementById("jouer");
-const btnSupprimer = document.getElementById("supprimerJoueur");
 const btnNouvellePartie = document.getElementById("nouvellePartie");
-const btnTermine = document.getElementById("termineSuppression");
 const btnAccueilClassique = document.getElementById("btnAccueilClassique");
 const messageTexte = document.getElementById("messageTexte");
 
@@ -849,11 +845,15 @@ function rendreVoletGlissable(volet){
   }, true);
 }
 
-// Volet « Léa » (au tap sur ⏸ / ▶) : confirmation, puis l'action de jeu (évènement « alcuno-pause »)
+// Volet « Léa » (au tap sur son nom ou sur ⏸ / ▶) : pause ou retour (évènement « alcuno-pause »), et en classique
+// « 🤖 Remplacer par un bot » (même nom, joué par le téléphone, js/bots.js) ou « reprend la main » s'il avait été remplacé
 function ouvrirVoletPause(nom, bouton){
   fermerVoletPause();
   const enPause = estEnPause(nom);
-  if(!enPause && indexJoueursActifs().length <= 2){
+  const pausePossible = enPause || indexJoueursActifs().length > 2;
+  const bot = typeof peutRemplacerParBot === "function" && peutRemplacerParBot(nom);
+  const reprendre = typeof peutReprendreLaMain === "function" && peutReprendreLaMain(nom);
+  if(!pausePossible && !bot && !reprendre){
     afficherNotificationHaut("", tr("Il faut au moins 2 joueurs qui ne sont pas en pause"), true);
     return;
   }
@@ -864,20 +864,38 @@ function ouvrirVoletPause(nom, bouton){
       <div class="voletPause-nom"></div>
       <div class="voletPause-texte"></div>
       <button type="button" class="voletPause-ok"></button>
-      <button type="button" class="voletPause-annuler">Annuler</button>
+      <button type="button" class="voletPause-annuler voletPause-bot"></button>
+      <button type="button" class="voletPause-annuler voletPause-fermer">Annuler</button>
     </div>`; traduireElement(volet);
   volet.querySelector(".voletPause-nom").textContent = avecCouronne(nom);
   volet.querySelector(".voletPause-texte").innerHTML = enPause
     ? tr("De retour parmi nous ?")
-    : tr("En pause clope, aux toilettes…<br>Son tour sera sauté jusqu'à ce qu'il revienne.");
-  volet.querySelector(".voletPause-ok").textContent = enPause ? tr`${nom} est de retour` : tr`Mettre ${nom} en pause`;
+    : pausePossible
+      ? tr("En pause clope, aux toilettes…<br>Son tour sera sauté jusqu'à ce qu'il revienne.")
+      : tr("Le téléphone peut jouer à sa place.");
+  const ok = volet.querySelector(".voletPause-ok");
+  if(pausePossible){
+    ok.textContent = enPause ? tr`${nom} est de retour` : tr`Mettre ${nom} en pause`;
+    ok.addEventListener("click", () => {
+      fermerVoletPause();
+      if(bouton.isConnected) bouton.dispatchEvent(new Event("alcuno-pause"));
+    });
+  } else {
+    ok.remove();
+  }
+  const btnBot = volet.querySelector(".voletPause-bot");
+  if(bot || reprendre){
+    btnBot.textContent = reprendre ? tr`🙋 ${nom} reprend la main` : tr("🤖 Remplacer par un bot");
+    btnBot.addEventListener("click", () => {
+      fermerVoletPause();
+      if(reprendre) reprendreLaMain(nom); else remplacerParBot(nom);
+    });
+  } else {
+    btnBot.remove();
+  }
   rendreVoletGlissable(volet);
   volet.addEventListener("click", (e) => { if(e.target === volet) fermerVoletPause(); });
-  volet.querySelector(".voletPause-annuler").addEventListener("click", fermerVoletPause);
-  volet.querySelector(".voletPause-ok").addEventListener("click", () => {
-    fermerVoletPause();
-    if(bouton.isConnected) bouton.dispatchEvent(new Event("alcuno-pause"));
-  });
+  volet.querySelector(".voletPause-fermer").addEventListener("click", fermerVoletPause);
   document.body.appendChild(volet);
 }
 function fermerVoletPause(){
@@ -1711,9 +1729,27 @@ function afficherJoueurs(){
         pret: () => partieLancee && !predictionEnCours,
         valide: () => joueurs.includes(nom) && (estEnPause(nom) || indexJoueursActifs().length > 2)
       }, () => basculerPauseJoueur(nom));
-      bouton.addEventListener("click", () => ouvrirVoletPause(nom, bouton));
+      ligne.appendChild(bouton);
+      // tout le cadre du prénom ouvre le volet (le ⏸ / ▶ aussi : son clic remonte jusqu'ici), joueur actif compris
+      ligne.classList.add("joueur-touchable");
+      ligne.addEventListener("click", () => ouvrirVoletPause(nom, bouton));
+    });
+  }
+
+  // Avant la partie (classique) : ✕ sur chaque nom pour le retirer (pas en partie : là, c'est « Retirer un joueur »)
+  if(!partieLancee && !enLigneActif){
+    listeJoueurs.querySelectorAll(".joueur-ligne").forEach((ligne, i) => {
+      const nom = joueurs[i];
+      const bouton = document.createElement("button");
+      bouton.type = "button";
+      bouton.className = "btnPauseJoueur btnRetirerJoueur";
+      bouton.setAttribute("aria-label", tr`Retirer ${nom}`);
+      bouton.innerHTML = ICONE_RETIRER_JOUEUR;
+      bouton.addEventListener("click", () => retirerAvantPartie(nom));
       ligne.appendChild(bouton);
     });
+  } else {
+    cacherToastRetrait();
   }
 
   if(!partieLancee){
@@ -1724,11 +1760,9 @@ function afficherJoueurs(){
   majStickyJoueurActif();
 }
 
-// Supprimer : avant la partie (classique) dès qu'il y a un joueur, pendant la partie s'il en reste plus de 2.
+// Retirer un joueur : seulement avant la partie, avec le ✕ sur chaque nom (jamais en partie).
 // Ajouter : seulement avant la partie (en ligne, les joueurs viennent de la salle d'attente).
 function majBoutonsJoueurs(){
-  const supprimer = partieLancee ? joueurs.length > 2 : (!enLigneActif && joueurs.length > 0);
-  btnSupprimer.style.display = supprimer ? "inline-block" : "none";
   nomJoueurInput.style.display = partieLancee ? "none" : "";
   btnAjouter.style.display = partieLancee ? "none" : "";
   if(typeof majBoutonBot === "function") majBoutonBot(); // (« Ajouter un bot », js/bots.js)
@@ -1866,159 +1900,78 @@ btnAjouter.addEventListener("pointerdown", (e) => {
 });
 nomJoueurInput.addEventListener("keydown", e=>{ if(e.key==="Enter") ajouterJoueur(); });
 
-const titreSuppression = suppression.querySelector("h2");
+/* ===== RETIRER UN JOUEUR AVANT LA PARTIE : ✕ sur son nom, « Annuler » pendant 5 s ===== */
+const ICONE_RETIRER_JOUEUR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" fill="none"/></svg>';
+const DUREE_ANNULER_RETRAIT = 5000;
+let dernierRetrait = null; // { nom, index, annulations, pigeon } : le dernier joueur retiré, tant qu'on peut l'annuler
 
-// "click" (et pas pointerdown) : sinon le doigt relevé coche/choisit tout de suite le joueur placé dessous
-btnSupprimer.addEventListener("click", ()=>{
-  if(partieLancee){
-    ouvrirRetraitEnJeu();
-    return;
-  }
-  titreSuppression.innerText = tr("Supprimer un ou plusieurs joueurs");
-  btnTermine.innerText = tr("Terminé");
-  menu.style.display="none";
-  suppression.style.display="flex";
-  lockScroll();
-  listeSuppression.innerHTML="";
-  joueurs.forEach((j,i)=>{
-    const ligne = document.createElement("div");
+function pigeonSelonNom(){
+  const i = nomPigeonOriginal ? joueurs.indexOf(nomPigeonOriginal) : -1;
+  indexPigeon = i >= 0 ? i : null;
+}
 
-    ligne.innerHTML = `
-        <label class="supp-item">
-          <input class="supp-check" type="checkbox" value="${i}">
-          <span class="supp-name">${echapperHtml(avecCouronne(j))}</span>
-        </label>
-      `;
-
-    listeSuppression.appendChild(ligne);
-  });
-});
-
-btnTermine.addEventListener("click", ()=>{
-  const toDelete=[...listeSuppression.querySelectorAll("input:checked")]
-    .map(cb=>parseInt(cb.value,10)).sort((a,b)=>b-a);
-  toDelete.forEach(i=>{
-    const name = joueurs[i];
-    joueurs.splice(i,1);
-    // si pigeon supprimé ou liste vide
-    if (joueurs.length === 0) {
-      indexPigeon = null;
-    } else if (indexPigeon != null) {
-      // si on a supprimé quelqu’un avant l’index pigeon, il faut le décaler
-      // (le plus safe : retrouver par nom si tu gardes nomPigeonOriginal)
-      const newIdx = joueurs.indexOf(nomPigeonOriginal);
-      indexPigeon = newIdx >= 0 ? newIdx : null;
-    }
-    // sécurise indexJoueur
-    if (joueurs.length > 0) indexJoueur = ((indexJoueur % joueurs.length) + joueurs.length) % joueurs.length;
-
-    if(name != null) delete annulations[name];
-  });
-  suppression.style.display="none";
-  menu.style.display = ""; // (la disposition vient du CSS : flex, ou grille sur téléphone)
-  unlockScroll();
+function retirerAvantPartie(nom){
+  const index = joueurs.indexOf(nom);
+  if(partieLancee || enLigneActif || index < 0) return;
+  dernierRetrait = { nom, index, annulations: annulations[nom], pigeon: indexPigeon !== null };
+  joueurs.splice(index, 1);
+  delete annulations[nom];
+  if(indexPigeon !== null) pigeonSelonNom();
+  if(joueurs.length > 0) indexJoueur = ((indexJoueur % joueurs.length) + joueurs.length) % joueurs.length;
   afficherJoueurs();
-});
+  montrerToastRetrait(nom);
+}
 
-/* ===== RETIRER UN JOUEUR PENDANT LA PARTIE ===== */
+function annulerRetrait(){
+  const r = dernierRetrait;
+  cacherToastRetrait();
+  // (plus possible si la partie est lancée, si on a quitté la préparation, ou si le nom a été repris entre-temps)
+  if(!r || partieLancee || enLigneActif || menu.style.display === "none" || joueurs.includes(r.nom)) return;
+  joueurs.splice(Math.min(r.index, joueurs.length), 0, r.nom);
+  if(r.annulations !== undefined) annulations[r.nom] = r.annulations;
+  if(r.pigeon) pigeonSelonNom();
+  afficherJoueurs();
+  const ligne = listeJoueurs.querySelectorAll(".joueur-ligne")[joueurs.indexOf(r.nom)];
+  if(ligne) ligne.classList.add("joueur-revient");
+}
+
+function montrerToastRetrait(nom){
+  let toast = document.getElementById("toastRetrait");
+  if(!toast){
+    toast = document.createElement("div");
+    toast.id = "toastRetrait";
+    toast.setAttribute("role", "status");
+    toast.innerHTML = '<span class="toastRetrait-texte"></span><button type="button" class="toastRetrait-annuler"></button><span class="toastRetrait-barre"></span>';
+    toast.querySelector(".toastRetrait-annuler").addEventListener("click", annulerRetrait);
+    document.body.appendChild(toast);
+  }
+  toast.querySelector(".toastRetrait-texte").textContent = tr`${nom} a été retiré`;
+  toast.querySelector(".toastRetrait-annuler").textContent = tr("Annuler");
+  // la barre repart de plein à chaque retrait
+  const barre = toast.querySelector(".toastRetrait-barre");
+  barre.style.animation = "none"; void barre.offsetWidth; barre.style.animation = "";
+  barre.style.animationDuration = DUREE_ANNULER_RETRAIT + "ms";
+  toast.classList.add("visible");
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => { dernierRetrait = null; toast.classList.remove("visible"); }, DUREE_ANNULER_RETRAIT);
+}
+
+function cacherToastRetrait(){
+  dernierRetrait = null;
+  const toast = document.getElementById("toastRetrait");
+  if(!toast) return;
+  clearTimeout(toast._timer);
+  toast.classList.remove("visible");
+}
+
+/* ===== UN JOUEUR QUI PART EN PLEINE PARTIE (en ligne : il quitte la partie ; ou ancienne partie gardée en mémoire) =====
+   Personne ne peut retirer quelqu'un d'autre en partie. */
 // Seulement plateau au repos : aucun overlay, aucun choix en cours, pas pendant le pari de fin
 // (il reste alors 1 carte). En ligne, c'est vérifié à nouveau sur chaque téléphone au moment du retrait.
 function plateauLibre(){
   return partieLancee && !choixPigeonEnCours && !duelEnCours && !predictionEnCours &&
     cartesRestantes() !== 1 && !document.querySelector('[id^="overlay"]');
 }
-
-function ouvrirRetraitEnJeu(){
-  if(joueurs.length <= 2){
-    afficherToast(tr("Il faut au moins 3 joueurs pour en retirer un"));
-    return;
-  }
-  if(!plateauLibre()){
-    afficherToast(tr("Attends la fin de l'action en cours"));
-    return;
-  }
-
-  titreSuppression.innerText = tr("Retirer un joueur de la partie");
-  btnTermine.innerText = tr("Annuler");
-  listeSuppression.innerHTML = "";
-  joueurs.forEach((nom) => {
-    const bouton = document.createElement("button");
-    bouton.type = "button";
-    bouton.className = "supp-item supp-retrait";
-    bouton.innerHTML = `<span class="supp-name">${echapperHtml(avecCouronne(nom))}</span>${badgeDeconnecte(nom)}`;
-    bouton.addEventListener("click", () => demanderConfirmationRetrait(nom));
-    listeSuppression.appendChild(bouton);
-  });
-
-  menu.style.display = "none";
-  suppression.style.display = "flex";
-  lockScroll();
-}
-
-const ecranConfirmerRetrait = document.getElementById("ecranConfirmerRetrait");
-let retraitEnAttente = null;
-
-function demanderConfirmationRetrait(nom){
-  if(estSpectateur) return; // (un spectateur ne retire personne)
-  retraitEnAttente = nom;
-  document.getElementById("titreConfirmerRetrait").innerText = tr`Retirer ${nom} de la partie ?`;
-
-  let texte = tr("La partie continue sans lui/elle.");
-  if(enLigneActif && nom === pseudoActuel){
-    texte = tr("Tu vas quitter la partie. Elle continuera sans toi.");
-  } else if(enLigneActif && nom === hotePartie){
-    const i = joueurs.indexOf(nom);
-    texte = tr`C'est l'hôte : le rôle d'hôte passera à ${joueurs[(i + 1) % joueurs.length]}.\nLa partie continue sans lui/elle.`;
-  }
-  document.getElementById("texteConfirmerRetrait").innerText = texte;
-  ecranConfirmerRetrait.style.display = "";
-}
-
-function fermerRetraitEnJeu(){
-  retraitEnAttente = null;
-  ecranConfirmerRetrait.style.display = "none";
-  if(suppression.style.display !== "none"){
-    suppression.style.display = "none";
-    menu.style.display = ""; // (la disposition vient du CSS : flex, ou grille sur téléphone)
-    unlockScroll();
-  }
-}
-
-document.getElementById("btnConfirmerRetraitNon").addEventListener("click", () => {
-  retraitEnAttente = null;
-  ecranConfirmerRetrait.style.display = "none";
-});
-
-document.getElementById("btnConfirmerRetraitOui").addEventListener("click", () => {
-  const nom = retraitEnAttente;
-  fermerRetraitEnJeu();
-  if(!nom || !joueurs.includes(nom)) return;
-  if(joueurs.length <= 2){
-    afficherToast(tr("Il faut au moins 3 joueurs pour en retirer un"));
-    return;
-  }
-  if(!plateauLibre()){
-    afficherToast(tr("Une action vient de commencer : réessaie juste après"));
-    return;
-  }
-
-  if(!enLigneActif){
-    retirerJoueurEnJeu(nom);
-    noterActionClassique(`retrait-classique:${nom}`);
-    afficherToast(tr`${nom} a été retiré de la partie`);
-    return;
-  }
-
-  const moiMeme = nom === pseudoActuel;
-  ecrireAction(idRetrait(nom))
-    .then(() => {
-      // Retrait de soi-même : on part tout de suite (si le retrait n'a pas déjà été appliqué ici)
-      if(!moiMeme || !codePartieActuel) return;
-      quitterPartieEnLigne();
-      allerAccueil();
-    })
-    .catch(() => afficherToast(tr("Connexion perdue, réessaie")));
-});
 
 // Applique le retrait (identique sur tous les téléphones en ligne). Le tour, le pigeon, ses « 1 » et
 // l'hôte sont mis à jour ; les overlays sont fermés à ce moment-là, rien d'autre ne dépend de lui.

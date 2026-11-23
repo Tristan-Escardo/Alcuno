@@ -99,8 +99,7 @@ html[data-theme="kawaii"] #ecranChoixPseudo h2,
 html[data-theme="kawaii"] #ecranCaster h2,
 html[data-theme="kawaii"] #enLigne h2,
 html[data-theme="kawaii"] #enLigne h3,
-html[data-theme="kawaii"] #ecranReglages h2,
-html[data-theme="kawaii"] #suppression h2{
+html[data-theme="kawaii"] #ecranReglages h2{
   color: var(--givre-accent);
   text-shadow: 0 2px 8px rgba(255, 255, 255, 0.9);
 }
@@ -125,8 +124,6 @@ html[data-theme="kawaii"] #ecranCaster button,
 html[data-theme="kawaii"] #ecranScanner button,
 html[data-theme="kawaii"] #enLigne button:not(.btnAccueilTexte):not(.btnExclure),
 html[data-theme="kawaii"] .menu button,
-html[data-theme="kawaii"] .suppression button,
-html[data-theme="kawaii"] #termineSuppression,
 html[data-theme="kawaii"] #ecranReglages .btnRetour,
 html[data-theme="kawaii"] #ecranCredits .btnRetour,
 html[data-theme="kawaii"] #ecranReglages #btnPartagerJeu,
@@ -138,12 +135,7 @@ html[data-theme="kawaii"] #ecranReglages .optionAction button{
     inset 0 -2px 0 rgba(100, 8, 100, 0.25),
     0 6px 14px rgba(214, 26, 120, 0.28);
 }
-html[data-theme="kawaii"] #listeSuppression .supp-retrait{
-  background: #ffffff;
-  color: var(--givre-texte);
-  text-shadow: none;
-  box-shadow: 0 0 0 1px var(--givre-bord) inset;
-}
+
 @media (hover: hover){
 html[data-theme="kawaii"] .btnRetour:hover,
 html[data-theme="kawaii"] .btnAccueil:hover{
@@ -219,20 +211,12 @@ html[data-theme="kawaii"] #enLigne .btnExclure{
 html[data-theme="kawaii"] #codePartieAffiche{
   color: var(--givre-accent);
 }
-html[data-theme="kawaii"] #toastEnLigne{
+html[data-theme="kawaii"] :is(#toastEnLigne, #toastRetrait){
   background: #ffffff;
   color: var(--givre-accent);
   box-shadow: 0 0 0 1px var(--givre-bord) inset, 0 8px 24px rgba(80, 13, 80, 0.2);
 }
-html[data-theme="kawaii"] #listeSuppression{
-  background: rgba(255, 255, 255, 0.5);
-  box-shadow: 0 0 0 1px var(--givre-bord) inset;
-}
-html[data-theme="kawaii"] #listeSuppression .supp-item{
-  background: #ffffff;
-  color: var(--givre-texte);
-  box-shadow: 0 0 0 1px var(--givre-bord) inset;
-}
+
 html[data-theme="kawaii"] #ecranReglages{
   color: var(--givre-texte);
 }
@@ -504,7 +488,7 @@ html[data-theme="kawaii"] body :is(#btnModeEnLigne, #btnModeClassique, #btnConti
   #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
   #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, :is(#btnConfirmerAccueilOui, #btnConfirmerBotOui),
   :is(#btnConfirmerAccueilNon, #btnConfirmerBotNon), #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
-  #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+  #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #nouvellePartie,
   #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayDuel button,
   #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
   #overlayAnnulation button):hover:not(:disabled),
@@ -512,7 +496,7 @@ html[data-theme="kawaii"] body :is(#btnModeEnLigne, #btnModeClassique, #btnConti
   #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
   #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, :is(#btnConfirmerAccueilOui, #btnConfirmerBotOui),
   :is(#btnConfirmerAccueilNon, #btnConfirmerBotNon), #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
-  #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+  #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #nouvellePartie,
   #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCoupDeFoudre .bouton-pigeon, #overlayDuel button,
   #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
   #overlayAnnulation button):hover:not(:disabled){
@@ -756,7 +740,7 @@ html[data-theme="kawaii"] #listeJoueurs .joueur-ligne-pigeon::before{ background
 html[data-theme="kawaii"] #listeJoueurs .joueur-ligne-actif{ background: linear-gradient(180deg, #fff0a0, #ffd04a) !important; color: #6b3300 !important; border-color: #fff !important; box-shadow: 0 4px 0 #c48a0a !important; }
 
 /* Boutons en gélatine */
-html[data-theme="kawaii"] :is(#btnModeEnLigne, #btnModeClassique, #jouer, #nouvellePartie, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #supprimerJoueur, #menu #btnCaster, .voletPause-ok, .voletPause-annuler, .bouton-pigeon, .btnRetour, #btnReprendrePause, #btnRepriseOui, #btnRepriseNon){
+html[data-theme="kawaii"] :is(#btnModeEnLigne, #btnModeClassique, #jouer, #nouvellePartie, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #menu #btnCaster, .voletPause-ok, .voletPause-annuler, .bouton-pigeon, .btnRetour, #btnReprendrePause, #btnRepriseOui, #btnRepriseNon){
   border: 3px solid #fff !important; border-radius: 999px !important; color: #6b1450 !important; font-weight: 900;
   background: linear-gradient(180deg, #f9a6cb, #ee70a9) !important; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) !important;
   box-shadow: 0 6px 0 var(--kawaii-rose-bouton), 0 10px 14px rgba(150, 30, 90, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.55) !important;
@@ -824,7 +808,7 @@ html[data-theme="kawaii"].overlay-ouvert, html[data-theme="kawaii"].overlay-ouve
 html.accessibilite[data-theme="kawaii"] :is(#overlayRegleUnique, #overlayCarteDoree, #overlayPredictionFin) .doree-titre{ white-space: normal; }
 
 /* Boutons des fenêtres et des écrans plein écran : aussi en gélatine rose (avant : rouge foncé hérité de Givre) */
-html[data-theme="kawaii"] :is(#ecranNouvellePartie, :is(#ecranConfirmerAccueil, #ecranConfirmerBot), #ecranConfirmerHote, #ecranConfirmerRetrait, #ecranReprise, #ecranCaster, #ecranPause, #ecranChoixPseudo, #enLigne, #salleAttente, #suppression, #ecranBug) button:not(.bugFermer):not(.btnPauseJoueur):not(#btnBugEnvoyer):not(.btnAccueilTexte){
+html[data-theme="kawaii"] :is(#ecranNouvellePartie, :is(#ecranConfirmerAccueil, #ecranConfirmerBot), #ecranConfirmerHote, #ecranConfirmerRetrait, #ecranReprise, #ecranCaster, #ecranPause, #ecranChoixPseudo, #enLigne, #salleAttente, #ecranBug) button:not(.bugFermer):not(.btnPauseJoueur):not(#btnBugEnvoyer):not(.btnAccueilTexte){
   border: 3px solid #fff !important; border-radius: 999px !important; color: #6b1450 !important; font-weight: 900;
   background: linear-gradient(180deg, #f9a6cb, #ee70a9) !important; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) !important;
   box-shadow: 0 6px 0 var(--kawaii-rose-bouton), 0 10px 14px rgba(150, 30, 90, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.55) !important;

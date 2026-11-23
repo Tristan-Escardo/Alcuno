@@ -58,15 +58,11 @@ header {
     margin-bottom: 20px;
 }
 
-.menu, .suppression {
+.menu {
     display: flex;
     gap: 10px;
     align-items: center;
     margin-bottom: 20px;
-}
-
-.suppression {
-    flex-direction: column;
 }
 
 .menu input {
@@ -176,8 +172,6 @@ button,
 .Carte,
 .fin-choix-card,
 #overlayCouleur .carre-couleur,
-#listeSuppression .supp-item,
-#listeSuppression .supp-check,
 #overlayPlus4 .plus4-joueur-btn,
 #overlayCupidon .plus4-joueur-btn,
 #overlayCoupDeFoudre .plus4-joueur-btn,
@@ -197,8 +191,7 @@ button,
 button,
 .Carte,
 .fin-choix-card,
-#overlayCouleur .carre-couleur,
-#listeSuppression .supp-item {
+#overlayCouleur .carre-couleur {
   -webkit-user-select: none;
   user-select: none;
 }
@@ -301,8 +294,7 @@ button,
 }
 
 /* ===== MENU – STYLE COHÉRENT AVEC LES OVERLAYS ===== */
-.menu button,
-.suppression button{
+.menu button{
   background-color: #ffcc00;
   color: #ffffff;
   border: none;
@@ -318,140 +310,19 @@ button,
 
 /* Hover */
 @media (hover: hover){ /* survol : seulement avec une souris (sur téléphone il reste collé après un tap) */
-  .menu button:hover,
-  .suppression button:hover{
+  .menu button:hover{
     background-color: #ffea70;
     transform: scale(1.05);
   }
 }
 
 /* Click */
-.menu button:active,
-.suppression button:active{
+.menu button:active{
   transform: scale(0.98);
 }
 
-.menu button,
-.suppression button{
+.menu button{
   text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
-}
-/* ===== Overlay suppression joueurs (même style que les overlays) ===== */
-#suppression{
-  position: fixed;
-  inset: 0;
-  margin: 0; /* sinon le margin-bottom de .suppression le raccourcit : le plateau se voyait en bas */
-  z-index: 9999;
-  background:
-    var(--deco-theme, none),
-    linear-gradient(var(--fond-theme), var(--fond-theme)) var(--couleur-barre);
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  padding: 20px;
-  box-sizing: border-box;
-  gap: 14px;
-
-  animation: fadeIn 0.25s ease forwards;
-}
-
-#suppression h2{
-  margin: 0;
-  color: #FFD700;
-  text-align: center;
-  font-size: clamp(20px, 4.5vw, 34px);
-  font-weight: 900;
-  text-shadow: 2px 2px 5px #000;
-}
-
-/* Conteneur liste : scroll SI besoin */
-#listeSuppression{
-  width: min(620px, 92vw);
-  flex: 1;
-  min-height: 0;              /* important pour overflow dans flex */
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-
-  padding: 12px;
-  border-radius: 14px;
-  background: rgba(255,255,255,0.06);
-  box-shadow: 0 0 0 1px rgba(255,215,0,0.18) inset;
-}
-
-/* Une ligne joueur (toute la ligne cliquable) */
-#listeSuppression .supp-item{
-  display: flex;
-  align-items: center;
-  gap: 12px;
-
-  padding: 12px 14px;
-  border-radius: 12px;
-  background: rgba(0,0,0,0.35);
-  box-shadow: 0 0 0 1px rgba(255,255,255,0.08) inset;
-
-  cursor: pointer;
-  user-select: none;
-}
-
-@media (hover: hover){ /* survol : seulement avec une souris (sur téléphone il reste collé après un tap) */
-  #listeSuppression .supp-item:hover{
-    background: rgba(255,215,0,0.10);
-    box-shadow: 0 0 0 1px rgba(255,215,0,0.22) inset;
-  }
-}
-
-/* Checkbox simple mais clean (support moderne) */
-#listeSuppression .supp-check{
-  width: 20px;
-  height: 20px;
-  accent-color: #FFD700;
-  flex: 0 0 auto;
-}
-
-/* Pendant une partie : un bouton par joueur (pas de case à cocher) */
-#listeSuppression .supp-retrait{
-  width: 100%;
-  border: none;
-  color: #ffffff;
-  font: inherit;
-  text-align: left;
-}
-
-#listeSuppression .supp-name{
-  font-size: clamp(16px, 4vw, 22px);
-  font-weight: 800;
-}
-
-/* Bouton "Terminé" en bas, sticky */
-#termineSuppression{
-  width: min(420px, 92vw);
-  padding: clamp(12px, 3.2vw, 18px);
-  font-size: clamp(16px, 4vw, 22px);
-  font-weight: 900;
-  border-radius: 12px;
-  border: none;
-  cursor: pointer;
-  background-color: #FFD700;
-  color: #ffffff;
-  transition: transform 0.15s ease, background-color 0.15s ease;
-}
-
-@media (hover: hover){ /* survol : seulement avec une souris (sur téléphone il reste collé après un tap) */
-  #termineSuppression:hover{
-    background-color: #ffea70;
-    transform: scale(1.05);
-  }
-}
-
-#termineSuppression:active{
-  transform: scale(0.98);
 }
 
 #overlayRegleUnique{
@@ -1222,14 +1093,12 @@ html[data-theme="galaxie"] .fin-choix-numeros b{ background: #8fd0ff; color: #02
     #menu > button, #menu > input{ margin-top: 8px; width: auto; max-width: none; min-height: 42px; box-sizing: border-box; }
     #menu #nomJoueur{ order: 1; flex: 1 1 100px; margin-top: 0; padding-top: 0; padding-bottom: 0; }
     #menu :is(#ajouterJoueur, #ajouterBot){ order: 2; flex: 0 0 48px; margin-top: 0; padding: 0; }
-    #menu #supprimerJoueur{ order: 3; flex: 0 0 48px; margin-top: 0; padding: 0; }
     #menu::after{ content: ""; order: 4; flex: 0 0 100%; height: 0; margin: 0; }
     #menu #jouer{ order: 5; flex: 1 1 0; height: 42px; padding-top: 0; padding-bottom: 0; font-size: 17px; }
     #menu #nouvellePartie{ order: 5; flex: 1 1 0; height: 42px; padding-top: 0; padding-bottom: 0; font-size: 16px; }
     #menu #jouer, #menu #nouvellePartie{ min-width: 0; overflow: hidden; text-overflow: ellipsis; }
     html.accessibilite #menu :is(#jouer, #nouvellePartie){ font-size: clamp(13px, 4vw, 19px); } /* (texte agrandi, mais sans pousser « Caster » à la ligne) */
     #menu:has(#nouvellePartie:not([style*="none"])) :is(#nouvellePartie, #btnCaster){ margin-top: 0; } /* (première ligne en partie) */
-    #menu:has(#nouvellePartie:not([style*="none"])) #supprimerJoueur{ order: 6; } /* (en partie : « Nouvelle partie », puis « − », puis « Caster » sur la même ligne) */
     html #menu #btnCaster{ order: 7 !important; flex: 1 1 100%; height: 42px; padding-top: 0; padding-bottom: 0; font-size: 16px; }
     /* Quand « Jouer » ou « Nouvelle partie » est affiché : « Caster » n'est plus que son icône, carrée, à côté (plus de place pour le gros bouton) */
     html #menu:is(:has(#jouer:not([style*="none"])), :has(#nouvellePartie:not([style*="none"]))) #btnCaster{ flex: 0 0 48px; min-height: 42px; padding-left: 0; padding-right: 0; }
@@ -1246,7 +1115,7 @@ html[data-theme="galaxie"] .fin-choix-numeros b{ background: #8fd0ff; color: #02
     /* télé connectée : badge « LIVE » rouge (voir la fin de ce fichier) */
     html #menu #btnCaster .casterIcone svg{ width: 26px; height: 26px; }
     #menu .libelleLong{ display: none; }
-    #menu :is(:is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #supprimerJoueur) .libelleCourt{ display: flex; align-items: center; justify-content: center; }
+    #menu :is(:is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel) .libelleCourt{ display: flex; align-items: center; justify-content: center; }
     #menu .libelleCourt svg{ width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     /* (en partie, « Supprimer un joueur » n'est pas affiché ; sinon ses deux versions de texte) */
 }
@@ -2375,7 +2244,7 @@ body.mode-en-ligne #jouer{
 }
 
 /* Petit message « En attente de X » quand on tape hors de son tour */
-#toastEnLigne{
+:is(#toastEnLigne, #toastRetrait){
   position: fixed;
   left: 50%;
   bottom: calc(24px + env(safe-area-inset-bottom, 0px));
@@ -2394,7 +2263,7 @@ body.mode-en-ligne #jouer{
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
-#toastEnLigne.visible{
+:is(#toastEnLigne, #toastRetrait).visible{
   opacity: 1;
   transform: translate(-50%, 0);
   pointer-events: auto; /* on peut le jeter vers le bas (js/synchro-en-ligne.js) */
@@ -3494,7 +3363,7 @@ html.accessibilite .bouton-doree,
 html.accessibilite .bouton-annulation,
 html.accessibilite .titreBloc,
 html.accessibilite #ecranReglages .interrupteur,
-html.accessibilite #toastEnLigne{
+html.accessibilite :is(#toastEnLigne, #toastRetrait){
   zoom: 1.2;
 }
 
@@ -3594,15 +3463,9 @@ html.accessibilite #enLigne .btnExclure{
   font-size: 19px;
 }
 
-/* En partie : « Supprimer un joueur », « Nouvelle partie », liste et « Terminé » du retrait */
-html.accessibilite #menu button,
-html.accessibilite .suppression button{
+/* En partie : « Nouvelle partie » */
+html.accessibilite #menu button{
   font-size: clamp(19px, 4.2vw, 24px);
-}
-
-html.accessibilite #listeSuppression .supp-name,
-html.accessibilite #termineSuppression{
-  font-size: clamp(19px, 4.8vw, 26px);
 }
 
 /* +4 : boutons des joueurs (grille de 2) plus gros, sans zoom (sinon ils se chevauchent) */
@@ -4697,8 +4560,7 @@ html[data-theme="givre"] #ecranChoixPseudo h2,
 html[data-theme="givre"] #ecranCaster h2,
 html[data-theme="givre"] #enLigne h2,
 html[data-theme="givre"] #enLigne h3,
-html[data-theme="givre"] #ecranReglages h2,
-html[data-theme="givre"] #suppression h2{
+html[data-theme="givre"] #ecranReglages h2{
   color: var(--givre-accent);
   text-shadow: 0 2px 8px rgba(255, 255, 255, 0.9);
 }
@@ -4725,8 +4587,6 @@ html[data-theme="givre"] #ecranCaster button,
 html[data-theme="givre"] #ecranScanner button,
 html[data-theme="givre"] #enLigne button:not(.btnAccueilTexte):not(.btnExclure),
 html[data-theme="givre"] .menu button,
-html[data-theme="givre"] .suppression button,
-html[data-theme="givre"] #termineSuppression,
 html[data-theme="givre"] #ecranReglages .btnRetour,
 html[data-theme="givre"] #ecranCredits .btnRetour,
 html[data-theme="givre"] #ecranReglages #btnPartagerJeu,
@@ -4738,12 +4598,7 @@ html[data-theme="givre"] #ecranReglages .optionAction button{
     inset 0 -2px 0 rgba(8, 60, 100, 0.25),
     0 6px 14px rgba(26, 146, 214, 0.28);
 }
-html[data-theme="givre"] #listeSuppression .supp-retrait{
-  background: #fff;
-  color: var(--givre-texte);
-  text-shadow: none;
-  box-shadow: 0 0 0 1px var(--givre-bord) inset;
-}
+
 @media (hover: hover){ /* survol : seulement avec une souris (sur téléphone il reste collé après un tap : « Modifier » restait clair) */
   html[data-theme="givre"] .btnRetour:hover,
   html[data-theme="givre"] .btnAccueil:hover{
@@ -4827,21 +4682,10 @@ html[data-theme="givre"] #enLigne .btnExclure{
 html[data-theme="givre"] #codePartieAffiche{
   color: var(--givre-accent);
 }
-html[data-theme="givre"] #toastEnLigne{
+html[data-theme="givre"] :is(#toastEnLigne, #toastRetrait){
   background: #fff;
   color: var(--givre-accent);
   box-shadow: 0 0 0 1px var(--givre-bord) inset, 0 8px 24px rgba(13, 53, 80, 0.2);
-}
-
-/* Retirer un joueur */
-html[data-theme="givre"] #listeSuppression{
-  background: rgba(255, 255, 255, 0.5);
-  box-shadow: 0 0 0 1px var(--givre-bord) inset;
-}
-html[data-theme="givre"] #listeSuppression .supp-item{
-  background: #fff;
-  color: var(--givre-texte);
-  box-shadow: 0 0 0 1px var(--givre-bord) inset;
 }
 
 /* Réglages */
@@ -5950,8 +5794,7 @@ html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#btnModeEn
   #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR,
   #lancerPartieEnLigne, #btnRejouerMemes, #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button,
   :is(#btnConfirmerAccueilOui, #btnConfirmerBotOui), :is(#btnConfirmerAccueilNon, #btnConfirmerBotNon), #btnConfirmerHoteOui, #btnConfirmerHoteNon,
-  #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur, #nouvellePartie,
-  #termineSuppression, #btnInstallationInstaller){
+  #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #nouvellePartie, #btnInstallationInstaller){
   background-image: linear-gradient(180deg, #ffd426, #f6b800);
   color: #fff;
   text-shadow: 0 1px 0 rgba(122, 74, 0, 0.85), 0 2px 4px rgba(0, 0, 0, 0.4);
@@ -6138,7 +5981,7 @@ html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#overlayPi
   #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
   #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, :is(#btnConfirmerAccueilOui, #btnConfirmerBotOui),
   :is(#btnConfirmerAccueilNon, #btnConfirmerBotNon), #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
-  #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+  #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #nouvellePartie,
   #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayDuel button,
   #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
   #overlayAnnulation button),
@@ -6146,7 +5989,7 @@ html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#overlayPi
   #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
   #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, :is(#btnConfirmerAccueilOui, #btnConfirmerBotOui),
   :is(#btnConfirmerAccueilNon, #btnConfirmerBotNon), #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
-  #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+  #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #nouvellePartie,
   #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCoupDeFoudre .bouton-pigeon, #overlayDuel button,
   #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
   #overlayAnnulation button){
@@ -6157,7 +6000,7 @@ html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#overlayPi
     #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
     #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, :is(#btnConfirmerAccueilOui, #btnConfirmerBotOui),
     :is(#btnConfirmerAccueilNon, #btnConfirmerBotNon), #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
-    #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+    #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #nouvellePartie,
     #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayDuel button,
     #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
     #overlayAnnulation button):hover:not(:disabled),
@@ -6165,7 +6008,7 @@ html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#overlayPi
     #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
     #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, :is(#btnConfirmerAccueilOui, #btnConfirmerBotOui),
     :is(#btnConfirmerAccueilNon, #btnConfirmerBotNon), #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
-    #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+    #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #nouvellePartie,
     #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCoupDeFoudre .bouton-pigeon, #overlayDuel button,
     #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
     #overlayAnnulation button):hover:not(:disabled){
@@ -6181,7 +6024,7 @@ html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#overlayPi
   #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
   #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, :is(#btnConfirmerAccueilOui, #btnConfirmerBotOui),
   :is(#btnConfirmerAccueilNon, #btnConfirmerBotNon), #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
-  #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+  #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #nouvellePartie,
   #btnInstallationInstaller):hover:not(:disabled){
     filter: none;
     box-shadow: 0 0 0 1px var(--noir-btn-bord-survol), 0 8px 20px rgba(0, 0, 0, 0.7) !important;
@@ -6194,7 +6037,7 @@ html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#overlayPi
   #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
   #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, :is(#btnConfirmerAccueilOui, #btnConfirmerBotOui),
   :is(#btnConfirmerAccueilNon, #btnConfirmerBotNon), #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
-  #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+  #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #nouvellePartie,
   #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayDuel button,
   #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
   #overlayAnnulation button):hover:not(:disabled),
@@ -6202,7 +6045,7 @@ html:not([data-theme="givre"]):where(:not([data-theme="kawaii"])) :is(#overlayPi
   #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
   #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, :is(#btnConfirmerAccueilOui, #btnConfirmerBotOui),
   :is(#btnConfirmerAccueilNon, #btnConfirmerBotNon), #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
-  #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+  #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #nouvellePartie,
   #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCoupDeFoudre .bouton-pigeon, #overlayDuel button,
   #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
   #overlayAnnulation button):hover:not(:disabled){
@@ -7286,11 +7129,11 @@ html[data-theme="soleil"] header::after{
   box-shadow: 0 0 14px rgba(255,150,110,0.45) !important;
 }
 /* Boutons : dégradé soleil, texte blanc */
-html[data-theme="soleil"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur,
+html[data-theme="soleil"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer,
   #nouvellePartie, #btnRejouerMemes, #btnModifierJoueurs, #btnReprendrePause,
   #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR,
   #lancerPartieEnLigne, #btnChoixPseudoAnnuler, #listeChoixPseudo button, :is(#btnConfirmerAccueilOui, #btnConfirmerBotOui), :is(#btnConfirmerAccueilNon, #btnConfirmerBotNon),
-  #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #termineSuppression,
+  #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon,
   #btnInstallationInstaller){
   background: linear-gradient(180deg, #ffb35c, #f2775c) !important;
   color: #fff !important;
@@ -7625,8 +7468,7 @@ html[data-theme="noir"] :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOpt
   #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR,
   #lancerPartieEnLigne, #btnRejouerMemes, #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button,
   :is(#btnConfirmerAccueilOui, #btnConfirmerBotOui), :is(#btnConfirmerAccueilNon, #btnConfirmerBotNon), #btnConfirmerHoteOui, #btnConfirmerHoteNon,
-  #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur, #nouvellePartie,
-  #termineSuppression, #btnInstallationInstaller){
+  #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #nouvellePartie, #btnInstallationInstaller){
   background-image: var(--noir-btn-fond);
   color: var(--noir-btn-texte);
   border: 1px solid var(--noir-btn-bord);
@@ -10804,3 +10646,65 @@ html.daltonien .carre-couleur-nom{
 
 /* ===== Bots (js/bots.js) : pastille 🤖 à côté du nom ===== */
 .badge-bot{ display: inline-block; margin-left: 4px; font-size: .9em; line-height: 1; vertical-align: middle; }
+
+/* ===== Retirer un joueur avant la partie : ✕ sur son nom, bandeau « Annuler » 5 s (js/plateau.js) ===== */
+html #listeJoueurs .btnPauseJoueur.btnRetirerJoueur{ color: #ff6b81; border-color: rgba(255, 107, 129, 0.55); opacity: 1; }
+html #listeJoueurs .btnPauseJoueur.btnRetirerJoueur svg{ width: 11px; height: 11px; }
+html[data-theme="givre"] #listeJoueurs .btnPauseJoueur.btnRetirerJoueur,
+html[data-theme="kawaii"] #listeJoueurs .btnPauseJoueur.btnRetirerJoueur{ color: #d0213f; border-color: rgba(208, 33, 63, 0.5); }
+html #listeJoueurs .joueur-ligne.joueur-revient{ animation: joueurRevient 0.6s ease; }
+@keyframes joueurRevient{
+  0%{ transform: scale(0.6); opacity: 0; }
+  40%{ transform: scale(1.06); opacity: 1; box-shadow: 0 0 0 2px #FFD700; }
+  100%{ transform: none; box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+}
+#toastRetrait{
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  padding: 8px 8px 12px 18px;
+  overflow: hidden;
+  text-align: left;
+  color: #fff;
+}
+#toastRetrait .toastRetrait-texte{ flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+html #toastRetrait .toastRetrait-annuler{
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 8px 12px;
+  min-width: 0;
+  width: auto;
+  height: auto;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(255, 215, 0, 0.16);
+  box-shadow: none;
+  color: #FFD700;
+  font: 900 14px Arial, sans-serif;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-shadow: none;
+  cursor: pointer;
+}
+#toastRetrait .toastRetrait-barre{
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  background: #FFD700;
+  transform-origin: left;
+}
+#toastRetrait.visible .toastRetrait-barre{ animation: toastRetraitBarre 5s linear forwards; }
+@keyframes toastRetraitBarre{ from{ transform: scaleX(1); } to{ transform: scaleX(0); } }
+html[data-theme="givre"] #toastRetrait{ color: #0d3550; }
+html[data-theme="givre"] #toastRetrait .toastRetrait-annuler{ background: rgba(26, 146, 214, 0.14); color: var(--givre-accent); }
+html[data-theme="givre"] #toastRetrait .toastRetrait-barre{ background: var(--givre-accent); }
+html[data-theme="kawaii"] #toastRetrait .toastRetrait-annuler{ background: rgba(255, 92, 160, 0.14); color: var(--givre-accent); }
+html[data-theme="kawaii"] #toastRetrait .toastRetrait-barre{ background: var(--givre-accent); }
+
+/* En partie : tout le cadre du prénom ouvre le volet (pause, remplacer par un bot) */
+#listeJoueurs .joueur-ligne.joueur-touchable{ cursor: pointer; -webkit-tap-highlight-color: transparent; }
+#listeJoueurs .joueur-ligne.joueur-touchable:active{ filter: brightness(1.25); }

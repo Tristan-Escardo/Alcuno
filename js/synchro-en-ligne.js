@@ -895,6 +895,12 @@ function rejouerActionClassique(id){
     retirerJoueurEnJeu(nom);
     return "ok";
   }
+  // (js/bots.js : joueur remplacé par un bot, ou qui reprend la main)
+  if(id.startsWith("bot-classique:") || id.startsWith("humain-classique:")){
+    const nom = id.slice(id.indexOf(":") + 1);
+    if(id.startsWith("bot-classique:")) return remplacerParBot(nom) ? "ok" : "ignorer";
+    return reprendreLaMain(nom) ? "ok" : "ignorer";
+  }
   const candidats = Array.from(document.querySelectorAll("[data-net-id]")).filter(el => el.dataset.netId === id);
   const el = candidats.find(actionPrete);
   if(!el){

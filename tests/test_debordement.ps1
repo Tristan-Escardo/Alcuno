@@ -141,10 +141,6 @@ try {
     Recharger $O
     LancerPartie $O
     Verifier $O $th "plateau"
-    Eval $O "document.getElementById('supprimerJoueur').dispatchEvent(new PointerEvent('pointerdown',{bubbles:true})); document.getElementById('supprimerJoueur').click(); 'ok'" | Out-Null
-    Start-Sleep -Milliseconds 700
-    Verifier $O $th "retirer un joueur"
-    Recharger $O
     Eval $O "ouvrirPage(document.getElementById('ecranCredits')); 'ok'" | Out-Null; Start-Sleep -Milliseconds 700
     Verifier $O $th "créateurs"
     # Overlays : les mêmes (noirs) dans tous les thèmes sombres, différents en Givre

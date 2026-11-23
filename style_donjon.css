@@ -200,7 +200,7 @@ html[data-theme="donjon"] #choixMode .btnInstaller{
 }
 html[data-theme="donjon"] #ecranRegles .albumBarre{ background: rgba(255, 42, 61, 0.15) !important; }
 html[data-theme="donjon"] #ecranRegles .albumBarre span{ background: linear-gradient(90deg, #c2102a, #ff3b4e) !important; }
-html[data-theme="donjon"] #toastEnLigne{
+html[data-theme="donjon"] :is(#toastEnLigne, #toastRetrait){
   background: linear-gradient(160deg, #3a0612, #0a0a0c) !important; color: #ffd0d6 !important;
   box-shadow: 0 0 0 2px #ff2a3d inset, 0 0 16px rgba(255, 42, 61, 0.6), 0 8px 24px rgba(0, 0, 0, 0.5) !important;
 }

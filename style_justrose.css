@@ -47,20 +47,11 @@
 :where(html[data-theme="justrose"]) .messages::before{ background: linear-gradient(90deg, #ff5b5b 0%, #ffc2de 25%, #6eff72 50%, #58d4ff 75%, #8b7dff 100%); }
 :where(html[data-theme="justrose"]) .bonus-annulation{ color: #ffffff; }
 :where(html[data-theme="justrose"]) .regleZero, :where(html[data-theme="justrose"]) .reglePigeon, :where(html[data-theme="justrose"]) .rappelTour{ color: #ffffff; }
-:where(html[data-theme="justrose"]) .menu button, :where(html[data-theme="justrose"]) .suppression button{ background-color: #ffc2de; }
+:where(html[data-theme="justrose"]) .menu button{ background-color: #ffc2de; }
 @media (hover: hover){
-  :where(html[data-theme="justrose"]) .menu button:hover, :where(html[data-theme="justrose"]) .suppression button:hover{ background-color: #ffffff; }
+  :where(html[data-theme="justrose"]) .menu button:hover{ background-color: #ffffff; }
 }
-:where(html[data-theme="justrose"]) #suppression h2{ color: #ffffff; }
-:where(html[data-theme="justrose"]) #listeSuppression{ box-shadow: 0 0 0 1px rgba(255,255,255,0.18) inset; }
-@media (hover: hover){
-  :where(html[data-theme="justrose"]) #listeSuppression .supp-item:hover{ background: rgba(255,255,255,0.10); box-shadow: 0 0 0 1px rgba(255,255,255,0.22) inset; }
-}
-:where(html[data-theme="justrose"]) #listeSuppression .supp-check{ accent-color: #ffffff; }
-:where(html[data-theme="justrose"]) #termineSuppression{ background-color: #ffffff; }
-@media (hover: hover){
-  :where(html[data-theme="justrose"]) #termineSuppression:hover{ background-color: #ffffff; }
-}
+
 :where(html[data-theme="justrose"]) #overlayCouleur div.titre-couleur{ color: #ffffff; }
 :where(html[data-theme="justrose"]) #overlayPlus4 .titre-pigeon, :where(html[data-theme="justrose"]) #overlayCupidon .titre-pigeon, :where(html[data-theme="justrose"]) #overlayCoupDeFoudre .titre-pigeon{ color: #ffffff; }
 :where(html[data-theme="justrose"]) #overlayPlus4 .bouton-pigeon, :where(html[data-theme="justrose"]) #overlayCupidon .bouton-pigeon, :where(html[data-theme="justrose"]) #overlayCoupDeFoudre .bouton-pigeon{ background-color: #ffffff; }
@@ -157,7 +148,7 @@
 :where(html[data-theme="justrose"]) #btnAccueilClassique, :where(html[data-theme="justrose"]) #enLigne #btnAccueilEnLigne, :where(html[data-theme="justrose"]) #ecranNouvellePartie #btnAccueil{ -webkit-text-stroke: 1.2px #ffffff; color: #ffffff; text-shadow:
     0 2px 0 rgba(106,30,67,0.95),
     0 3px 8px rgba(0,0,0,0.45); }
-:where(html[data-theme="justrose"]) #toastEnLigne{ color: #ffffff; box-shadow: 0 0 0 1px rgba(255,255,255,0.45) inset, 0 8px 24px rgba(0,0,0,0.45); }
+:where(html[data-theme="justrose"]) :is(#toastEnLigne, #toastRetrait){ color: #ffffff; box-shadow: 0 0 0 1px rgba(255,255,255,0.45) inset, 0 8px 24px rgba(0,0,0,0.45); }
 :where(html[data-theme="justrose"]) #ecranCredits{ background:
     radial-gradient(ellipse 85% 28% at 50% 30%, rgba(255,255,255,0.16), transparent 100%),
     radial-gradient(ellipse 45% 22% at 15% 72%, rgba(255,77,77,0.10), transparent 100%),
@@ -254,14 +245,14 @@
     #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
     #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, :is(#btnConfirmerAccueilOui, #btnConfirmerBotOui),
     :is(#btnConfirmerAccueilNon, #btnConfirmerBotNon), #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
-    #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+    #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #nouvellePartie,
     #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayDuel button,
     #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
     #overlayAnnulation button):hover:not(:disabled), :where(html[data-theme="justrose"]) body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie,
     #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
     #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, :is(#btnConfirmerAccueilOui, #btnConfirmerBotOui),
     :is(#btnConfirmerAccueilNon, #btnConfirmerBotNon), #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
-    #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+    #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #nouvellePartie,
     #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCoupDeFoudre .bouton-pigeon, #overlayDuel button,
     #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
     #overlayAnnulation button):hover:not(:disabled){ box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9), 0 6px 20px rgba(255,235,244,0.55) !important; }
@@ -426,7 +417,7 @@ html[data-theme="justrose"] #ecranTele .tele-ecran-recap{ background: radial-gra
    règles / FAQ / album, créateurs, étapes d'installation, salle d'attente, retrait d'un joueur. Quasi opaque pour que le motif
    du fond ne passe jamais derrière un texte ; les noms de thèmes (chacun de sa couleur) restent lisibles. */
 html[data-theme="justrose"] :is(#ecranReglages .blocReglage, #ecranReglages .reglages-contenu > .optionReglage, #ecranReglages > .optionReglage, .optionsPartie > .optionReglage:not(.optionsSuite),
-  .blocRegles, #ecranCredits .credits-nom, #ecranInstallation .etapeInstallation, #listeJoueursEnLigne div, #listeSuppression){
+  .blocRegles, #ecranCredits .credits-nom, #ecranInstallation .etapeInstallation, #listeJoueursEnLigne div){
   background: var(--carte-justrose); border: 1px solid rgba(255, 255, 255, 0.22);
 }
 html[data-theme="justrose"] #ecranCredits .cadrePhoto.sansPhoto{ background: var(--carte-justrose); }
@@ -443,19 +434,19 @@ html[data-theme="justrose"] #ecranTele .tele-pied{ color: rgba(255,255,255,.85);
 
 /* ----- Boutons : or avec un anneau blanc (comme une étiquette de cadeau) et texte brun foncé, sur tous les écrans -----
    (mêmes boutons que les autres thèmes habillés, Soleil couchant par exemple : tous les boutons du jeu doivent être aux couleurs du thème) */
-html[data-theme="justrose"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur,
+html[data-theme="justrose"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer,
   #nouvellePartie, #btnRejouerMemes, #btnModifierJoueurs, #btnReprendrePause,
   #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR,
   #lancerPartieEnLigne, #btnChoixPseudoAnnuler, #listeChoixPseudo button, :is(#btnConfirmerAccueilOui, #btnConfirmerBotOui), :is(#btnConfirmerAccueilNon, #btnConfirmerBotNon),
-  #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #termineSuppression,
+  #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon,
   #btnInstallationInstaller, #ecranRegles .btnFaqLien, #choixMode .btnInstaller, #menu #btnCaster, #ecranCaster button:not(.btnRetour), #btnFermerScanner, #ecranReprise button,
   #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayFinUnRestants .bouton-pigeon,
   #overlayAnnulation button, #overlayRegleUnique .bouton-annulation, #overlayDuel button:not(:disabled), #overlayPredictionFin .bouton-pigeon),
-html[data-theme="justrose"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur,
+html[data-theme="justrose"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer,
   #nouvellePartie, #btnRejouerMemes, #btnModifierJoueurs, #btnReprendrePause,
   #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR,
   #lancerPartieEnLigne, #btnChoixPseudoAnnuler, #listeChoixPseudo button, :is(#btnConfirmerAccueilOui, #btnConfirmerBotOui), :is(#btnConfirmerAccueilNon, #btnConfirmerBotNon),
-  #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #termineSuppression,
+  #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon,
   #btnInstallationInstaller, #ecranRegles .btnFaqLien, #choixMode .btnInstaller, #menu #btnCaster, #ecranCaster button:not(.btnRetour), #btnFermerScanner, #ecranReprise button,
   #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCoupDeFoudre .bouton-pigeon, #overlayFinUnRestants .bouton-pigeon,
   #overlayAnnulation button, #overlayRegleUnique .bouton-annulation, #overlayDuel button:not(:disabled), #overlayPredictionFin .bouton-pigeon){
@@ -536,7 +527,7 @@ html[data-theme="justrose"] :is(#choixMode #btnReglages svg, #choixMode #btnRegl
   filter: drop-shadow(0 2px 0 #6a1e43) drop-shadow(0 3px 6px rgba(60, 0, 35, 0.45));
 }
 html[data-theme="justrose"] :is(#btnAccueilClassique, #enLigne #btnAccueilEnLigne, #ecranNouvellePartie #btnAccueil){ color: #fff; -webkit-text-stroke-color: #fff; text-shadow: 0 2px 0 #6a1e43, 0 3px 8px rgba(60, 0, 35, 0.45); }
-html[data-theme="justrose"] :is(#ecranReglages, #ecranRegles, #ecranDefisPersonnels, #ecranCaster, #ecranBug, #ecranInstallation, #ecranCredits, :is(#ecranConfirmerAccueil, #ecranConfirmerBot), #ecranConfirmerHote, #ecranConfirmerRetrait, #ecranReprise, #ecranPause, #suppression) :is(h2, .credits-titre){
+html[data-theme="justrose"] :is(#ecranReglages, #ecranRegles, #ecranDefisPersonnels, #ecranCaster, #ecranBug, #ecranInstallation, #ecranCredits, :is(#ecranConfirmerAccueil, #ecranConfirmerBot), #ecranConfirmerHote, #ecranConfirmerRetrait, #ecranReprise, #ecranPause) :is(h2, .credits-titre){
   color: #fff;
   text-shadow: 0 2px 0 #6a1e43, 0 4px 12px rgba(60, 0, 35, 0.4);
 }

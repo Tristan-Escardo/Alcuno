@@ -103,7 +103,6 @@ const ECRANS = [
   ["volet dernières cartes", [], "ouvrirVoletHistorique()", 600],
   ["volet d'une carte", [], "ouvrirVoletCarte(classes.find(c => c.startsWith('plus')) || classes[0])", 600],
   ["volet pause d'un joueur", [], "ouvrirVoletPause(joueurs[1], document.querySelectorAll('.btnPauseJoueur')[1])", 600],
-  ["retirer un joueur (en jeu)", [], "ouvrirRetraitEnJeu()", 700],
   ["rappel de boire de l'eau", [], "afficherRappelEau()", 700],
   ["message en bas (toast)", [], "afficherToast('Connexion perdue, on réessaie…', 5000)", 400],
   ["annonce d'une règle", [], "montrerOverlayRegle('Tris boit 3 gorgées\\nEt un détail en dessous', 'trois_rouge'); reglerDureeOverlayRegle('', null)", 900],

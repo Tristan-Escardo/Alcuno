@@ -77,7 +77,8 @@ function Comparer($titre, $onglets) {
   if (-not $identiques) { $etats | ForEach-Object { Write-Output "   $_" } }
 }
 function Retirer($onglet, [string]$nom) {
-  return Eval $onglet "document.getElementById('supprimerJoueur').click(); const b = Array.from(document.querySelectorAll('#listeSuppression button')).find(x => x.innerText.startsWith('$nom')); if (b) { b.click(); document.getElementById('btnConfirmerRetraitOui').click(); 'retrait demandé' } else ('pas de bouton, toast: ' + (document.getElementById('toastEnLigne')||{}).innerText)"
+  # (plus de bouton pour retirer un joueur en partie : on écrit directement l'action de départ, comme un joueur qui quitte)
+  return Eval $onglet "ecrireAction(idRetrait('$nom')).then(() => {}); 'retrait demandé'"
 }
 
 $fb = "https://alcuno-default-rtdb.europe-west1.firebasedatabase.app/parties"

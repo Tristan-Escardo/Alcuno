@@ -34,6 +34,50 @@ function botsPresents(){
 function retirerBot(nom){
   if (botsPartie.delete(nom)) sauverBots();
 }
+// ----- Remplacer un joueur par un bot, en partie (volet de la pause : toucher son nom) -----
+// Même nom, pastille 🤖 : le téléphone joue à sa place jusqu'à ce qu'il reprenne la main (même volet).
+// Gardé comme action de la partie (« bot-classique: » / « humain-classique: ») : rejoué au même moment après un plantage.
+const CLE_REMPLACES = "alcuno_bots_remplaces";
+const remplacesParBot = new Set();
+try { (JSON.parse(localStorage.getItem(CLE_REMPLACES) || "[]") || []).forEach((n) => { if (typeof n === "string") remplacesParBot.add(n); }); } catch (e) {}
+function sauverRemplaces(){
+  try { localStorage.setItem(CLE_REMPLACES, JSON.stringify([...remplacesParBot].filter((n) => botsPartie.has(n) && joueurs.includes(n)))); } catch (e) {}
+}
+// (il faut qu'il reste au moins un vrai joueur, et pas en mode hard)
+function peutRemplacerParBot(nom){
+  return partieLancee && !enLigneActif && !estModeHard() && joueurs.includes(nom) && !estBot(nom) &&
+    joueurs.some((n) => n !== nom && !estBot(n));
+}
+function peutReprendreLaMain(nom){
+  return partieLancee && !enLigneActif && remplacesParBot.has(nom) && estBot(nom);
+}
+function rendreLesRemplaces(){
+  remplacesParBot.forEach((n) => botsPartie.delete(n));
+  remplacesParBot.clear();
+  sauverBots(); sauverRemplaces();
+}
+function remplacerParBot(nom){
+  if (!peutRemplacerParBot(nom)) return false;
+  if (estEnPause(nom)) {
+    joueursEnPause.delete(nom);
+    if (tourSautePourPause && tourSautePourPause.nom === nom) tourSautePourPause = null;
+  }
+  botsPartie.add(nom); remplacesParBot.add(nom);
+  sauverBots(); sauverRemplaces();
+  noterActionClassique(`bot-classique:${nom}`);
+  if (!rattrapageEnCours) afficherNotificationHaut("🤖", tr`${nom} est remplacé par un bot`, true);
+  afficherJoueurs(); afficherJoueurActif();
+  return true;
+}
+function reprendreLaMain(nom){
+  if (!peutReprendreLaMain(nom)) return false;
+  botsPartie.delete(nom); remplacesParBot.delete(nom);
+  sauverBots(); sauverRemplaces();
+  noterActionClassique(`humain-classique:${nom}`);
+  if (!rattrapageEnCours) afficherNotificationHaut("🙋", tr`${nom} reprend la main`, true);
+  afficherJoueurs(); afficherJoueurActif();
+  return true;
+}
 // Vrais joueurs disponibles (pas en pause), en indices
 function indicesHumains(sauf = -1){
   return joueurs.map((_, i) => i).filter((i) => i !== sauf && !estBot(joueurs[i]) && !estEnPause(joueurs[i]));
