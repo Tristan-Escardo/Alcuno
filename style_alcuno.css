@@ -9766,7 +9766,7 @@ html[data-theme="soleil"] #choixMode .carteAlbum{ --fond: linear-gradient(180deg
 html[data-theme="soleil"] #choixMode .carteEthylo{ --fond: linear-gradient(180deg, #8f74d6, #4b3f9e); }
 
 /* ----- Écrans Bar et Éthylotest : dans l'écran des Règles (ses blocs prennent les couleurs de chaque thème) ----- */
-#ecranRegles.bar #btnFaqDepuisRegles, #ecranRegles.ethylo #btnFaqDepuisRegles{ display: none; }
+#ecranRegles:is(.bar, .ethylo) :is(#btnFaqDepuisRegles, .reglesLiens){ display: none; }
 /* Les blocs arrivent l'un après l'autre */
 @keyframes extrasEntree{
   from{ opacity: 0; transform: translateY(16px) scale(0.98); }
@@ -10036,7 +10036,7 @@ body.mode-spectateur #nouvellePartie{ display: none !important; }
    passe en gris neutre très fin (variables --noir-* plus haut). Le doré ne reste que là où il veut dire quelque chose :
    le titre, les textes importants, les interrupteurs allumés et le joueur dont c'est le tour (sans halo). ===== */
 html[data-theme="noir"] .messages::before{ background: rgba(255, 255, 255, 0.1) !important; }
-html[data-theme="noir"] body :is(#btnModifierReglages, #btnMiseEnPage, #btnFaqDepuisRegles, #listeJoueurs .joueur-ligne:not(.joueur-ligne-actif) .btnPauseJoueur){
+html[data-theme="noir"] body :is(#btnModifierReglages, #btnMiseEnPage, #btnFaqDepuisRegles, #btnTutoDepuisRegles, #listeJoueurs .joueur-ligne:not(.joueur-ligne-actif) .btnPauseJoueur){
   border-color: var(--noir-btn-bord) !important;
 }
 html[data-theme="noir"] body #ecranReglages :is(.optionReglage, .optionReglage.groupe-ouvert, .blocPartage),
@@ -10060,7 +10060,7 @@ html[data-theme="noir"] #listeJoueurs .joueur-ligne-actif{ border-color: transpa
 html[data-theme="noir"] #choixMode #titreAccueil::before{ color: #4a4a55; }
 /* Petits boutons en pastille (Album de stickers, Inviter à rejoindre, Questions fréquentes, crayon et « Mise en page »
    des Réglages) : même graphite que les grands boutons, au lieu du voile et du liseré dorés */
-html[data-theme="noir"] body :is(#btnAlbumAccueil, #btnInviterPartie, #btnFaqDepuisRegles, .btnModifierReglages, #btnMiseEnPage){
+html[data-theme="noir"] body :is(#btnAlbumAccueil, #btnInviterPartie, #btnFaqDepuisRegles, #btnTutoDepuisRegles, .btnModifierReglages, #btnMiseEnPage){
   background: var(--noir-btn-fond) !important;
   color: var(--noir-btn-texte) !important;
   border: 1px solid var(--noir-btn-bord) !important;
@@ -10708,3 +10708,117 @@ html[data-theme="kawaii"] #toastRetrait .toastRetrait-barre{ background: var(--g
 /* En partie : tout le cadre du prénom ouvre le volet (pause, remplacer par un bot) */
 #listeJoueurs .joueur-ligne.joueur-touchable{ cursor: pointer; -webkit-tap-highlight-color: transparent; }
 #listeJoueurs .joueur-ligne.joueur-touchable:active{ filter: brightness(1.25); }
+
+/* ===== Tutoriel du premier lancement (js/tutoriel.js) : mini-partie pour de faux, par-dessus l'accueil ===== */
+/* (sous les volets du jeu : le vrai volet de la règle d'une carte s'ouvre par-dessus) */
+#tutoriel{
+  position: fixed;
+  inset: 0;
+  z-index: 2147483300;
+  display: flex;
+  flex-direction: column;
+  font-family: Arial, sans-serif;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+/* (fondu sur chaque morceau et pas sur #tutoriel : un parent en fondu empêche le flou du voile) */
+#tutoriel > *{ animation: aideAccueilEntree 0.35s ease both; }
+#tutoriel.tuto-sortie > *{ animation: aideAccueilEntree 0.3s ease reverse both; }
+#tutoriel .tuto-voile{
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 0, 13, 0.82);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+html[data-theme="noir"] #tutoriel .tuto-voile{ background: rgba(0, 0, 0, 0.86); }
+#tutoriel .tuto-passer{
+  position: absolute;
+  top: calc(12px + env(safe-area-inset-top));
+  right: 14px;
+  z-index: 2;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(0, 0, 0, 0.25);
+  color: #fff;
+  font: 800 15px Arial, sans-serif;
+  cursor: pointer;
+}
+#tutoriel .tuto-passer[hidden]{ display: none; }
+#tutoriel .tuto-scene{
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  padding: calc(56px + env(safe-area-inset-top)) 16px 18px;
+  min-height: 0;
+}
+#tutoriel .tuto-joueurs{ display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+#tutoriel .tuto-joueur{
+  padding: 7px 16px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font: 800 16px Arial, sans-serif;
+  cursor: pointer;
+  transition: border-color 0.25s, color 0.25s, box-shadow 0.25s, opacity 0.25s;
+}
+#tutoriel .tuto-joueur.actif{ border-color: #FFD700; color: #FFD700; box-shadow: 0 0 14px rgba(255, 215, 0, 0.45); }
+#tutoriel .tuto-joueur.tuto-en-pause{ opacity: 0.45; }
+#tutoriel .tuto-joueur.tuto-en-pause::before{ content: "⏸ "; }
+#tutoriel .tuto-plateau{
+  display: grid;
+  grid-template-columns: repeat(4, 64px);
+  gap: 12px;
+  perspective: 600px;
+}
+#tutoriel .tuto-plateau .Carte{ width: 64px; margin: 0; transition: opacity 0.4s ease, transform 0.25s ease, box-shadow 0.25s ease; }
+#tutoriel .tuto-plateau .Carte.tuto-partie{ opacity: 0; pointer-events: none; }
+#tutoriel .tuto-plateau .Carte.carte-appuyee{ transform: scale(1.08); box-shadow: 0 0 0 3px #FFD700, 0 0 22px rgba(255, 215, 0, 0.7); }
+#tutoriel .tuto-indice{ animation: tutoIndice 1.3s ease-in-out infinite; }
+@keyframes tutoIndice{
+  0%, 100%{ box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+  50%{ box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.95), 0 0 18px rgba(255, 215, 0, 0.6); }
+}
+#tutoriel .tuto-doigt{
+  position: absolute;
+  z-index: 1;
+  font-size: 34px;
+  line-height: 1;
+  pointer-events: none;
+  transform: translateX(-30%);
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.6));
+  animation: tutoDoigt 1.3s ease-in-out infinite;
+}
+#tutoriel .tuto-doigt[hidden]{ display: none; }
+/* Faces des cartes qu'on va retourner, chargées d'avance (sinon la carte reste vide le temps que l'image arrive) */
+#tutoriel .tuto-precharge{ position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; }
+#tutoriel .tuto-precharge .Carte{ width: 1px; }
+@keyframes tutoDoigt{ 0%, 100%{ translate: 0 0; } 50%{ translate: 0 -10px; } }
+#tutoriel .tuto-feuille{ position: relative; animation: voletPauseMonte 0.35s cubic-bezier(0.2, 0.9, 0.3, 1) both; min-height: 210px; }
+#tutoriel .tuto-feuille.tuto-change .voletPause-nom,
+#tutoriel .tuto-feuille.tuto-change .voletPause-texte{ animation: aideAccueilEntree 0.3s ease both; }
+#tutoriel .voletPause-texte em{ font-style: normal; color: #FFD700; }
+#tutoriel .voletPause-texte b{ color: #fff; }
+#tutoriel .tuto-points{ display: flex; justify-content: center; gap: 6px; margin: 2px 0 14px; }
+#tutoriel .tuto-points span{ width: 7px; height: 7px; border-radius: 50%; background: rgba(255, 255, 255, 0.25); transition: width 0.25s, background 0.25s; }
+#tutoriel .tuto-points span.actif{ width: 20px; border-radius: 4px; background: #FFD700; }
+#tutoriel .tuto-boutons:empty{ display: none; }
+html:is([data-theme="givre"], [data-theme="kawaii"]) #tutoriel .voletPause-texte em{ color: var(--givre-accent); }
+html:is([data-theme="givre"], [data-theme="kawaii"]) #tutoriel .voletPause-texte b{ color: inherit; }
+html:is([data-theme="givre"], [data-theme="kawaii"]) #tutoriel .tuto-points span{ background: rgba(0, 0, 0, 0.18); }
+html:is([data-theme="givre"], [data-theme="kawaii"]) #tutoriel .tuto-points span.actif{ background: var(--givre-accent); }
+@media (prefers-reduced-motion: reduce){
+  #tutoriel *, #tutoriel > *{ animation-duration: 0.01s !important; animation-iteration-count: 1 !important; }
+}
+
+/* Écran des Règles : « 🎓 Tutoriel » et « ❓ Questions fréquentes » côte à côte */
+#ecranRegles .reglesLiens{ display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 0 auto 14px; }
+#ecranRegles .reglesLiens .btnFaqLien{ margin: 0; }
+#ecranRegles:is(.album, .faq) .reglesLiens{ display: none; }

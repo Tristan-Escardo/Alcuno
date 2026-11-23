@@ -3118,7 +3118,7 @@ function afficherAideAccueil(){
 function nouveauQuiVientDInstaller(){
   try {
     if (localStorage.getItem("alcuno_install_comptee")) return false;
-    const clesNeuves = ["alcuno_id_stats", "alcuno_code_invitation", CLE_AIDE_VUE];
+    const clesNeuves = ["alcuno_id_stats", "alcuno_code_invitation", CLE_AIDE_VUE, "alcuno_tutoriel"];
     return !Object.keys(localStorage).some((cle) => cle.startsWith("alcuno_") && !clesNeuves.includes(cle));
   } catch (e) { return false; }
 }
@@ -3132,6 +3132,8 @@ if (estEnAppli && !aideDejaVue() && !nouveauQuiVientDInstaller()) {
 if (!document.documentElement.classList.contains("mode-tele") && estEnAppli && !aideDejaVue()) { // (pas sur la télé)
   const verifierAideAccueil = () => {
     if (aideDejaVue()) { clearInterval(surveillance); return; }
+    // (le tutoriel d'abord : les flèches viennent à sa fin ; on attend aussi que js/tutoriel.js, chargé en dernier, soit là)
+    if (typeof tutorielEnAttente !== "function" || tutorielEnAttente()) return;
     const accueilLibre = !partieLancee &&
       document.getElementById("choixMode").style.display !== "none" &&
       [ecranInstallation, ecranReglages, ecranRegles, ecranCredits].every((page) => page.style.display === "none") &&

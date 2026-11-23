@@ -9,7 +9,7 @@
          (Avant : « ?t= » + l'heure, différent à chaque lancement : tout le jeu était retéléchargé à chaque ouverture,
          environ 400 Ko. Maintenant, tant que la version ne change pas, le navigateur se contente de vérifier.) -->
     <script>
-        window.VERSION_FICHIERS = "9.96.7";
+        window.VERSION_FICHIERS = "9.96.8";
         // (ailleurs que sur le vrai site — poste de dev, appli de test — : l'heure en plus, comme avant, pour voir tout de
         // suite un fichier modifié sans changer de version)
         window.ANTI_CACHE = /(^|\.)github\.io$/i.test(location.hostname) ? window.VERSION_FICHIERS : window.VERSION_FICHIERS + "-" + Date.now();
@@ -24,7 +24,7 @@
         // et en parallèle : en bas de la page, ils s'exécutent d'affilée, sans attente entre deux fichiers
         // (aucun bouton ni minuteur ne peut se déclencher avant que tout le jeu soit là).
         window.FICHIERS_JEU = ["script.js", "js/qrcode.js", "js/config-lib.js", "js/reglages.js", "js/defis-personnels.js", "js/en-ligne.js", "js/plateau.js", "js/regles.js", "js/mode-hot.js", "js/bots.js", "js/zizi-coptere.js", "js/reglages-vue.js",
-                               "js/synchro-en-ligne.js", "js/retour-demarrage.js", "js/tele.js", "js/stats.js", "js/config-distante.js", "js/stickers.js", "js/faq.js", "js/mouchard.js", "js/poisson.js", "js/piano-accueil.js", "js/cocktails.js", "js/extras.js", "js/profil.js"];
+                               "js/synchro-en-ligne.js", "js/retour-demarrage.js", "js/tele.js", "js/stats.js", "js/config-distante.js", "js/stickers.js", "js/faq.js", "js/mouchard.js", "js/poisson.js", "js/piano-accueil.js", "js/cocktails.js", "js/extras.js", "js/profil.js", "js/tutoriel.js"];
         // Langue (js/langue.js) : en tout premier ; dictionnaire chargé avant quand la langue est choisie
         window.FICHIERS_JEU.unshift("js/langue.js");
         try {
@@ -852,7 +852,10 @@
             <button type="button" id="btnFermerRegles" class="btnRetour">← Retour</button>
             <div class="regles-contenu">
                 <h2>Règles du jeu</h2>
-                <button type="button" id="btnFaqDepuisRegles" class="btnFaqLien">❓ Questions fréquentes</button>
+                <div class="reglesLiens">
+                    <button type="button" id="btnTutoDepuisRegles" class="btnFaqLien">🎓 Tutoriel</button>
+                    <button type="button" id="btnFaqDepuisRegles" class="btnFaqLien">❓ Questions fréquentes</button>
+                </div>
                 <div id="listeRegles"></div>
             </div>
         </section>

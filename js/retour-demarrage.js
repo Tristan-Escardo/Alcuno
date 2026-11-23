@@ -61,6 +61,7 @@ function actionRetour(){
   if(document.getElementById("voletCarte")) return fermerVoletCarte;
   if(document.getElementById("voletPause")) return fermerVoletPause;
   if(document.getElementById("voletHistorique")) return fermerVoletHistorique;
+  if(document.getElementById("tutoriel")) return () => fermerTutoriel(false);
   if(estOuverte(ecranInstallation)) return () => activer("btnInstallationPlusTard");
   if(estOuverte(ecranRegles)) return () => activer("btnFermerRegles");
   if(estOuverte(ecranBug)) return () => activer("btnBugRetour"); // (par-dessus les Réglages)
