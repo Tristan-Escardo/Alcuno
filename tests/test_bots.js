@@ -96,7 +96,7 @@ const URL = process.env.URL_JEU || "http://localhost:8765/index.html";
     if ($("#btnContinuerOptions")) $("#btnContinuerOptions").click();
     for (const n of ["Léa", "Tom", "Max"]) { $("#nomJoueur").value = n; pd($("#ajouterJoueur")); }
     const hasard = Math.random;
-    Math.random = () => 0.1; // (tirage : le relou est proposé)
+    Math.random = () => 0.05; // (tirage : le relou est proposé, 1 fois sur 10)
     document.documentElement.dataset.theme = "bordeaux";
     $("#ajouterBot").click();
     res.pasEnBordeaux = !$("#titreConfirmerBot").innerText.includes("Oh non pas lui");

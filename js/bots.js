@@ -40,11 +40,11 @@ function indicesHumains(sauf = -1){
 }
 const auHasard = (liste) => liste[Math.floor(Math.random() * liste.length)];
 
-// ----- Le relou : « Oh non pas lui... », proposé seulement en thème Sombre (une fois sur CHANCE_RELOU, un seul par partie).
+// ----- Le relou : « Oh non pas lui... », proposé seulement en thème Sombre (une fois sur 10 : CHANCE_RELOU, un seul par partie).
 // Au lancement, il choisit une victime au hasard parmi les vrais joueurs, et s'acharne sur elle : nouveau pigeon, duel,
 // carte dorée, tout le +4, Cupidon, Coup de foudre… et ses gorgées, il les lui refile souvent (CHANCE_REFILE_RELOU).
 const NOM_RELOU_FR = "Oh non pas lui...";
-const CHANCE_RELOU = 1 / 3, CHANCE_REFILE_RELOU = 0.5;
+const CHANCE_RELOU = 1 / 10, CHANCE_REFILE_RELOU = 0.5; // (1 sur 3 avant : il tombait trop souvent)
 const nomRelou = () => tr(NOM_RELOU_FR);
 const estRelou = (nom) => nom === nomRelou() && estBot(nom);
 let victimeDuRelou = null;
