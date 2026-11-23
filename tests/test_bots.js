@@ -129,7 +129,7 @@ const URL = process.env.URL_JEU || "http://localhost:8765/index.html";
   });
   assert.ok(rr.pasEnBordeaux, "le relou n'est pas proposé hors du thème Sombre");
   assert.match(rr.titre, /Oh non pas lui\.\.\./, "proposé en thème Sombre");
-  assert.match(rr.texte, /s'acharner/, "texte de confirmation du relou");
+  assert.equal(rr.texte, "Tiens c'est qui lui\u00a0? Qui l'a invité\u00a0??", "texte de confirmation du relou");
   assert.equal(rr.relou, "Oh non pas lui...");
   assert.ok(["Léa", "Tom", "Max"].includes(rr.victime), "une victime choisie au lancement");
   assert.ok(rr.refile.includes(`à ${rr.victime}. Encore ${rr.victime}. Évidemment.`), "ses gorgées refilées à sa victime : " + rr.refile);

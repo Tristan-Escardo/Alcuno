@@ -74,7 +74,7 @@ function proposerBot(){
   if (botsPresents().length >= MAX_BOTS) { afficherToast(tr`${MAX_BOTS} bots au plus`, 2500); return; }
   const relou = document.documentElement.dataset.theme === "noir" && !joueurs.includes(nomRelou()) && Math.random() < CHANCE_RELOU;
   botPropose = relou ? nomRelou() : nomBotLibre();
-  document.getElementById("texteConfirmerBot").innerText = relou ? tr("Il va s'acharner sur l'un de vous. Bon courage 😈") : tr("Il joue tout seul et ne boit pas… enfin, presque 🤖");
+  document.getElementById("texteConfirmerBot").innerText = (relou ? tr("Tiens c'est qui lui ? Qui l'a invité ??") : tr("Il joue tout seul et ne boit pas… enfin, presque 🤖")).replace(/ ([?!])/g, "\u00a0$1");
   document.getElementById("titreConfirmerBot").innerText = tr`Ajouter le bot ${botPropose} à la partie ?`.replace(/ ([?!])/g, "\u00a0$1"); // (le « ? » ne passe jamais seul à la ligne)
   ecranConfirmerBot.style.display = "";
 }

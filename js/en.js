@@ -210,7 +210,7 @@ window.TEXTES_EN = {
 "Accessibilité pour les daltoniens 👁️": "Accessibility for colorblind people 👁️",
 "Ajouter un bot": "Add a bot",
 "Oh non pas lui...": "Oh no, not him...",
-"Il va s'acharner sur l'un de vous. Bon courage 😈": "He's going to pick on one of you. Good luck 😈",
+"Tiens c'est qui lui ? Qui l'a invité ??": "Wait, who's that? Who invited him??",
 "{0} a choisi sa victime : {1}": "{0} has chosen a victim: {1}",
 "{0} refile {1} à {2}. Encore {3}. Évidemment.": "{0} passes {1} to {2}. {3} again. Obviously.",
 "Ajouter un bot ?": "Add a bot?",
