@@ -531,6 +531,7 @@
                     <button type="button" data-pan="themes"><i aria-hidden="true">🎨</i>Thèmes</button>
                     <button type="button" data-pan="defis"><i aria-hidden="true">🔥</i>Défis hot</button>
                     <button type="button" data-pan="bar"><i aria-hidden="true">🍹</i>Bar</button>
+                    <button type="button" data-pan="bots"><i aria-hidden="true">🤖</i>Bots</button>
                     <button type="button" data-pan="compte"><i aria-hidden="true">🔑</i>Compte</button>
                 </nav>
 
@@ -692,6 +693,20 @@
                 </div>
                 <input type="search" id="barCherche" placeholder="Chercher un cocktail" autocomplete="off">
                 <div id="barListe"></div>
+                </div>
+
+                <!-- Bots : prénoms tirés au hasard par « Ajouter un bot » (js/bots.js) ; « config/bots » (js/config-lib.js : nomsBots) -->
+                <div class="pan" data-groupe="pilotage" data-pan="bots">
+                <div class="pilSous">Prénoms des bots</div>
+                <p class="pilNote">« Ajouter un bot » (partie classique) tire un de ces prénoms au hasard, parmi ceux qu'aucun joueur ne porte déjà. Les joueurs voient la nouvelle liste à leur prochaine ouverture du jeu (avec internet).</p>
+                <input type="text" id="pilBotNom" maxlength="20" autocomplete="off" autocapitalize="words" placeholder="Ex : Roméo">
+                <button type="button" class="pilBtn" id="pilAjouterBot">Ajouter le prénom</button>
+                <p class="pilNote" id="pilBotsCompte" style="margin-top:12px"></p>
+                <div id="pilBots"></div>
+                <details id="pilBotsRetires" hidden>
+                    <summary id="pilBotsRetiresTitre">Prénoms du jeu retirés</summary>
+                    <div id="pilBotsRetiresListe"></div>
+                </details>
                 </div>
 
                 <div class="pan" data-groupe="pilotage" data-pan="compte">
@@ -874,7 +889,7 @@
         });
         const authPorte = getAuth(app);
         // Version de la page de stats (à part de celle du jeu : +0.0.1 à chaque modification de cette page)
-        const VERSION_STATS = "1.25.0";
+        const VERSION_STATS = "1.26.0";
         document.getElementById("versionStats").textContent = VERSION_STATS;
         document.getElementById("versionStats2").textContent = VERSION_STATS;
         document.getElementById("versionStats3").textContent = VERSION_STATS;
@@ -1313,6 +1328,20 @@
                 $("pilMajEtat").innerHTML = config.majMin ? `En ce moment : <b>${ecape(config.majMin)}</b> demandée.` : "En ce moment : rien de demandé.";
                 if (document.activeElement !== $("pilMajMin")) $("pilMajMin").value = config.majMin || "";
                 dessinerDefis();
+                dessinerBots();
+            }
+
+            // Bots : la liste que le jeu utilise (ceux du jeu pas retirés + ceux ajoutés), chacun avec « Retirer » ;
+            // les prénoms du jeu retirés, avec « Remettre »
+            function dessinerBots(){
+                const liste = ConfigLib.nomsBots(config);
+                const duJeu = (n) => ConfigLib.NOMS_BOTS.includes(n);
+                $("pilBotsCompte").innerHTML = `<b>${liste.length} prénom${liste.length > 1 ? "s" : ""}</b>`;
+                $("pilBots").innerHTML = liste.map((n) => `<div class="pilLigne"><span>🤖 ${ecape(n)}${duJeu(n) ? "" : " <small>(ajouté)</small>"}</span><button type="button" class="coupe" data-bot-retirer="${ecape(n)}">Retirer</button></div>`).join("");
+                const retires = ConfigLib.NOMS_BOTS.filter((n) => !liste.includes(n));
+                $("pilBotsRetires").hidden = !retires.length;
+                $("pilBotsRetiresTitre").textContent = `Prénoms du jeu retirés (${retires.length})`;
+                $("pilBotsRetiresListe").innerHTML = retires.map((n) => `<div class="pilLigne masque"><span>${ecape(n)}</span><button type="button" data-bot-remettre="${ecape(n)}">Remettre</button></div>`).join("");
             }
 
             // Défis hot ajoutés : liste par niveau, chacun avec « Retirer »
@@ -1499,6 +1528,16 @@
                 const pos = Math.min(avant.length + ajout.length, z.value.length); z.setSelectionRange(pos, pos);
                 apercuDefi();
             });
+            // Bots : ajouter / retirer / remettre un prénom
+            const ajouterPrenomBot = async () => { if (await lancer([{ op: "bot_ajout", nom: $("pilBotNom").value }])) $("pilBotNom").value = ""; };
+            $("pilAjouterBot").addEventListener("click", ajouterPrenomBot);
+            $("pilBotNom").addEventListener("keydown", (e) => { if (e.key === "Enter") ajouterPrenomBot(); });
+            document.querySelector('.pan[data-pan="bots"]').addEventListener("click", (e) => {
+                const r = e.target.closest("button[data-bot-retirer]"), m = e.target.closest("button[data-bot-remettre]");
+                if (r) lancer([{ op: "bot_suppr", nom: r.dataset.botRetirer }]);
+                if (m) lancer([{ op: "bot_ajout", nom: m.dataset.botRemettre }]);
+            });
+
             $("pilAjouterDefi").addEventListener("click", async () => {
                 // (refuse aussi un défi identique à un défi du jeu : DEFIS_HOT, que config-lib ne connaît pas)
                 const cleDefi = (x) => String(x).toLowerCase().replace(/\s+/g, " ").trim();

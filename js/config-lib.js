@@ -23,6 +23,34 @@
 (function (global) {
   "use strict";
 
+  // Prénoms des bots (js/bots.js) : ceux du jeu, et dans « config/bots » ceux ajoutés (id => prénom) ou retirés (id => false)
+  // depuis le pilotage (stats.html → Bots). L'id : le prénom sans accent ni majuscule (« jean-mi »).
+  const NOMS_BOTS = ["Robert", "Bernard", "Michel", "Jean-Mi", "Roger", "Simone", "Gégé", "Jacky", "Lucienne", "Dédé", "Momo", "Titouan",
+    "Léo", "Francis", "Jeremiah", "Pinocchio", "Philippe", "Julie", "Carla", "Sid"];
+  const BOT_NOM_MAX = 20, BOTS_MAX = 100;
+  const motifIdBot = /^[a-z0-9-]{1,30}$/;
+  const motifNomBot = /^[\p{L}][\p{L} '’.-]*$/u;
+  function idBot(nom) {
+    return String(nom).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 30);
+  }
+  function erreurNomBot(nom) {
+    const n = String(nom || "").replace(/\s+/g, " ").trim();
+    if (!n) return "Il manque le prénom.";
+    if (n.length > BOT_NOM_MAX) return `Prénom trop long (${BOT_NOM_MAX} caractères max).`;
+    if (!motifNomBot.test(n) || !idBot(n)) return "Seulement des lettres (et espace, tiret, apostrophe, point).";
+    return null;
+  }
+  // Liste finale : ceux du jeu pas retirés, puis ceux ajoutés (sans doublon)
+  function nomsBots(config) {
+    const b = (config && config.bots) || {};
+    const liste = NOMS_BOTS.filter((n) => b[idBot(n)] !== false);
+    Object.keys(b).sort().forEach((id) => {
+      const n = b[id];
+      if (typeof n === "string" && !liste.some((x) => idBot(x) === idBot(n))) liste.push(n);
+    });
+    return liste;
+  }
+
   const THEMES_CONNUS = ["bordeaux", "noir", "vert", "bleu", "soleil", "cerisier", "givre", "prestige", "galaxie", "kawaii", "donjon", "noel", "chandeleur", "valentin", "patrick", "justrose", "musique", "halloween"];
   const NOMS_THEMES = {
     bordeaux: "Bordeaux", noir: "Sombre", vert: "Casino", bleu: "Nuit", soleil: "Soleil couchant",
@@ -163,6 +191,14 @@
         if (!o) return;
         if (r.x === true) o.x = true;
         if (Object.keys(o).length) (c.bar = c.bar || {})[id] = o;
+      });
+    }
+    if (estObjet(brut.bots)) {
+      Object.keys(brut.bots).sort().slice(0, BOTS_MAX).forEach((id) => {
+        const n = brut.bots[id];
+        if (!motifIdBot.test(id)) return;
+        if (n === false && NOMS_BOTS.some((x) => idBot(x) === id)) (c.bots = c.bots || {})[id] = false;
+        else if (typeof n === "string" && !erreurNomBot(n) && idBot(n) === id) (c.bots = c.bots || {})[id] = n.replace(/\s+/g, " ").trim();
       });
     }
     if (typeof brut.v === "number" && isFinite(brut.v)) c.v = brut.v;
@@ -345,11 +381,35 @@
         if (!Object.keys(c.bar).length) delete c.bar;
         return { config: c, resume: (cmd.jeu ? "Recette du Bar remise d'origine" : "Recette retirée du Bar") + ` : ${nom}` };
       }
+      case "bot_ajout": {
+        const err = erreurNomBot(cmd.nom);
+        if (err) return { erreur: err };
+        const nom = String(cmd.nom).replace(/\s+/g, " ").trim(), id = idBot(nom);
+        if (nomsBots(c).some((x) => idBot(x) === id)) return { erreur: `« ${nom} » est déjà dans la liste.` };
+        c.bots = c.bots || {};
+        const duJeu = NOMS_BOTS.find((x) => idBot(x) === id);
+        if (duJeu) delete c.bots[id]; // (un prénom du jeu retiré qui revient, écrit comme dans le jeu)
+        else c.bots[id] = nom;
+        if (!Object.keys(c.bots).length) delete c.bots;
+        return { config: c, resume: `Bot ajouté : ${duJeu || nom}` };
+      }
+      case "bot_suppr": {
+        const id = idBot(cmd.nom || "");
+        const nom = nomsBots(c).find((x) => idBot(x) === id);
+        if (!nom) return { erreur: "Ce bot n'est pas dans la liste." };
+        if (nomsBots(c).length <= 1) return { erreur: "Il faut garder au moins un prénom de bot." };
+        c.bots = c.bots || {};
+        if (NOMS_BOTS.some((x) => idBot(x) === id)) c.bots[id] = false;
+        else delete c.bots[id];
+        if (!Object.keys(c.bots).length) delete c.bots;
+        return { config: c, resume: `Bot retiré : ${nom}` };
+      }
       case "tout_remettre": { // (les défis ajoutés ou masqués et les recettes du Bar ne sont pas des réglages : ils restent)
         const garde = {};
         if (c.defisHot) garde.defisHot = c.defisHot;
         if (c.defisMasques) garde.defisMasques = c.defisMasques;
         if (c.bar) garde.bar = c.bar;
+        if (c.bots) garde.bots = c.bots;
         return { config: garde, resume: "Tout remettre par défaut (aucun réglage à distance)" + (Object.keys(garde).length ? ", en gardant les défis hot et les recettes du Bar" : "") };
       }
       default:
@@ -667,7 +727,8 @@
   global.ConfigLib = {
     THEMES_CONNUS, NOMS_THEMES, PERIODES_FETES, periodeTheme, COUPURES_CONNUES, NOMS_COUPURES, TEXTE_MAX, DEFI_MAX, DEFIS_MAX, NIVEAUX_DEFIS, erreurDefi,
     valider, versionPlusVieille, themeDisponible, coupee, annonceVisible, appliquer, interpreter, decrire, dansPeriode, dateEnTexte,
-    SCENARIOS, MODELES_ANNONCES, repondreQuestion, FAMILLES_BAR, erreurCocktail, BAR_NOM_MAX, BAR_VERRE_MAX, BAR_TEXTE_MAX
+    SCENARIOS, MODELES_ANNONCES, repondreQuestion, FAMILLES_BAR, erreurCocktail, BAR_NOM_MAX, BAR_VERRE_MAX, BAR_TEXTE_MAX,
+    NOMS_BOTS, BOT_NOM_MAX, idBot, erreurNomBot, nomsBots
   };
   if (typeof module !== "undefined" && module.exports) module.exports = global.ConfigLib;
 })(typeof window !== "undefined" ? window : globalThis);

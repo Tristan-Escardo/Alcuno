@@ -232,6 +232,7 @@ function montrerDefiHot(joueurIndex, nbGorgees, defiPossible = true, defiImpose 
   const overlay = document.getElementById("overlayRegleUnique");
   if(!overlay) return null;
   const nom = joueurs[joueurIndex];
+  if(typeof estBot === "function" && estBot(nom)) return null; // (pas de défi pour un bot, js/bots.js)
   const partenaire = partenaireHot(nom);
   const defi = defiImpose || tirerDefiHot(nom, nbGorgees, partenaire);
   if(!defi) return null;

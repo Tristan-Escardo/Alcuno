@@ -496,6 +496,9 @@ function afficherOverlayAnnulation(joueurIndex, nbGorgees, onDone = null, afterC
 function annoncerBoireAvecAnnulation(joueurIndex, nbGorgees, classeCarte = "", prefixMsg = null, onFinish = null){
   const nom = joueurs[joueurIndex];
   const msg = prefixMsg ? prefixMsg : tr`${nom} boit ${texteGorgees(nbGorgees)}`;
+  // Un bot ne boit pas : gorgées perdues, ou refilées à un vrai joueur (js/bots.js)
+  if(typeof gorgeesDuBot === "function" && gorgeesDuBot(joueurIndex, nbGorgees, classeCarte, msg, onFinish,
+    (h, texte) => annoncerBoireAvecAnnulation(h, nbGorgees, classeCarte, texte, onFinish))) return;
 
   if (nbGorgees > 15) {
     // (bloc Règles rempli aussi : avant, il restait vide pour ces grosses gorgées)
@@ -1456,6 +1459,9 @@ function demanderAnnulationPlus4(joueurIndex, nbGorgees, classeCartePlus4, onFin
   compterStat("plus4", joueurs[joueurIndex], nbGorgees); // (récap de fin : gorgées reçues par des +4)
   const nom = joueurs[joueurIndex];
   const msg = tr`${nom} boit ${texteGorgees(nbGorgees)} (+4)`;
+  // Un bot ne boit pas : gorgées perdues, ou refilées à un vrai joueur (js/bots.js)
+  if(typeof gorgeesDuBot === "function" && gorgeesDuBot(joueurIndex, nbGorgees, classeCartePlus4, msg, onFinish,
+    (h, texte) => annoncerBoireAvecAnnulation(h, nbGorgees, classeCartePlus4, texte, onFinish))) return;
 
   montrerOverlayRegle(msg, classeCartePlus4);
   const defiHot = montrerDefiHot(joueurIndex, nbGorgees, seul); // (mode hot : bloc défi sous la carte, js/mode-hot.js)
@@ -1496,6 +1502,7 @@ function demanderAnnulationSimple(joueurIndex, nbGorgees, onFinish){
 function demarrerAnnulationsMulti(victimes, classeCarte, messageEntete, onComplete = null){
   montrerOverlayRegle(messageEntete, classeCarte);
 
+  if(typeof estBot === "function") victimes = victimes.filter(idx => !estBot(joueurs[idx])); // (un bot ne boit pas, js/bots.js)
   const file = victimes.filter(idx => Number(annulations[joueurs[idx]] || 0) > 0);
   victimes.filter(idx => !file.includes(idx)).forEach(idx => noterGorgees(joueurs[idx], 1)); // (rien à annuler)
 
@@ -1836,6 +1843,11 @@ function lancerPartie(){
   // Mode hard : seulement à 2 (en ligne : vérifié au lancement de la manche, js/en-ligne.js)
   if(!enLigneActif && !repriseClassiqueEnCours && estModeHard() && joueurs.length !== 2){
     alert(tr("Le mode hard se joue à 2 joueurs seulement."));
+    return;
+  }
+  // Pas de bot en mode hard : il faut 2 vrais joueurs (js/bots.js)
+  if(!enLigneActif && !repriseClassiqueEnCours && estModeHard() && typeof botsPresents === "function" && botsPresents().length){
+    alert(tr("Pas de bot en mode hard : il faut 2 vrais joueurs."));
     return;
   }
   couleurDuelEnAttente = null;

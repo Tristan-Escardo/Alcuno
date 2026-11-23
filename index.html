@@ -9,7 +9,7 @@
          (Avant : « ?t= » + l'heure, différent à chaque lancement : tout le jeu était retéléchargé à chaque ouverture,
          environ 400 Ko. Maintenant, tant que la version ne change pas, le navigateur se contente de vérifier.) -->
     <script>
-        window.VERSION_FICHIERS = "9.96.3";
+        window.VERSION_FICHIERS = "9.96.4";
         // (ailleurs que sur le vrai site — poste de dev, appli de test — : l'heure en plus, comme avant, pour voir tout de
         // suite un fichier modifié sans changer de version)
         window.ANTI_CACHE = /(^|\.)github\.io$/i.test(location.hostname) ? window.VERSION_FICHIERS : window.VERSION_FICHIERS + "-" + Date.now();
@@ -23,7 +23,7 @@
         // Fichiers du jeu, dans l'ordre (aussi dans sw.js, pour le hors connexion). Téléchargés tout de suite
         // et en parallèle : en bas de la page, ils s'exécutent d'affilée, sans attente entre deux fichiers
         // (aucun bouton ni minuteur ne peut se déclencher avant que tout le jeu soit là).
-        window.FICHIERS_JEU = ["script.js", "js/qrcode.js", "js/config-lib.js", "js/reglages.js", "js/defis-personnels.js", "js/en-ligne.js", "js/plateau.js", "js/regles.js", "js/mode-hot.js", "js/zizi-coptere.js", "js/reglages-vue.js",
+        window.FICHIERS_JEU = ["script.js", "js/qrcode.js", "js/config-lib.js", "js/reglages.js", "js/defis-personnels.js", "js/en-ligne.js", "js/plateau.js", "js/regles.js", "js/mode-hot.js", "js/bots.js", "js/zizi-coptere.js", "js/reglages-vue.js",
                                "js/synchro-en-ligne.js", "js/retour-demarrage.js", "js/tele.js", "js/stats.js", "js/config-distante.js", "js/stickers.js", "js/faq.js", "js/mouchard.js", "js/poisson.js", "js/piano-accueil.js", "js/cocktails.js", "js/extras.js", "js/profil.js"];
         // Langue (js/langue.js) : en tout premier ; dictionnaire chargé avant quand la langue est choisie
         window.FICHIERS_JEU.unshift("js/langue.js");
@@ -773,6 +773,14 @@
             <button type="button" id="btnConfirmerAccueilNon">Non</button>
         </section>
 
+        <!-- « Ajouter un bot » : confirmation avec le prénom tiré au hasard (js/bots.js) ; même habillage que « Retourner à l'accueil ? » -->
+        <section class="ecranConfirmerAccueil" id="ecranConfirmerBot" style="display:none;">
+            <h2 id="titreConfirmerBot">Ajouter un bot ?</h2>
+            <p class="texteConfirmation" id="texteConfirmerBot">Il joue tout seul et ne boit pas… enfin, presque 🤖</p>
+            <button type="button" id="btnConfirmerBotOui">Oui</button>
+            <button type="button" id="btnConfirmerBotNon">Non</button>
+        </section>
+
         <!-- Mode classique : partie interrompue (appli fermée en pleine partie), voir js/synchro-en-ligne.js -->
         <section class="ecranReprise" id="ecranReprise" style="display:none;">
             <h2>Partie en cours</h2>
@@ -793,6 +801,7 @@
         <section class="menu" id="menu" style="display:none;">
             <input type="text" id="nomJoueur" placeholder="Nom de joueur" autocomplete="off" enterkeyhint="done" />
             <button type="button" id="ajouterJoueur" aria-label="Ajouter un joueur"><span class="libelleLong">Ajouter un joueur</span><span class="libelleCourt"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.6"/><path d="M2.5 20.5c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M19 7v6M16 10h6"/></svg></span></button>
+            <button type="button" id="ajouterBot" aria-label="Ajouter un bot" title="Ajouter un bot"><span class="libelleLong">🤖 Ajouter un bot</span><span class="libelleCourt"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="8" width="15" height="11" rx="3"/><path d="M12 8V4.5"/><circle cx="12" cy="3.6" r="1"/><circle cx="9.2" cy="13" r="1.2"/><circle cx="14.8" cy="13" r="1.2"/><path d="M9.5 16.4h5M2.5 12.5v2.5M21.5 12.5v2.5"/></svg></span></button>
             <button type="button" id="jouer" style="display:none;">Jouer</button>
             <button type="button" id="btnCaster" aria-label="Caster sur la télé" title="Caster sur la télé"><span class="casterIcone" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 8V6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"/><path d="M3 12a8 8 0 0 1 8 8"/><path d="M3 16a4 4 0 0 1 4 4"/><circle cx="3.5" cy="19.5" r="0.6"/></svg></span><span class="casterTexte">Caster sur la télé</span></button>
             <button type="button" id="supprimerJoueur" aria-label="Supprimer un joueur"><span class="libelleLong">Supprimer un joueur</span><span class="libelleCourt"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.6"/><path d="M2.5 20.5c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 10h6"/></svg></span></button>

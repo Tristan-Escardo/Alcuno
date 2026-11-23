@@ -318,6 +318,7 @@ function reinitialiserGorgees(){
 function noterGorgees(nom, n){
   n = Number(n) || 0;
   if(!nom || n <= 0) return;
+  if(typeof estBot === "function" && estBot(nom)) return; // (un bot ne boit pas : ses gorgées sont perdues, js/bots.js)
   gorgeesBues[nom] = (gorgeesBues[nom] || 0) + n;
   derniereGorgeeA[nom] = cartesRestantes();
   if(statsPartie && n > (statsPartie.plusGros[nom] || 0)) statsPartie.plusGros[nom] = n;
@@ -1688,11 +1689,12 @@ function afficherJoueurs(){
     const pause = estEnPause(j) ? tr` <span class="badge-pause">EN PAUSE</span>` : "";
     const lien = partenaireHot(j) ? tr` <span class="badge-lien" title="Lié par Cupidon">💘</span>` : ""; // (mode hot)
     const classePause = estEnPause(j) ? " joueur-en-pause" : "";
+    const bot = (typeof estBot === "function" && estBot(j)) ? ' <span class="badge-bot" title="Bot" aria-label="bot">🤖</span>' : ""; // (js/bots.js)
     if(i === indexPigeon){
-      return `<div class="joueur-ligne joueur-ligne-pigeon${classePause}"><span class="joueur-nom${classeNomLong(nomPigeonOriginal)}"><strong>${echapperHtml(tr("PIGEON"))}</strong> (${echapperHtml(avecCouronne(nomPigeonOriginal))})</span>${lien}${bonus}${pause}${badgeDeconnecte(j)}</div>`;
+      return `<div class="joueur-ligne joueur-ligne-pigeon${classePause}"><span class="joueur-nom${classeNomLong(nomPigeonOriginal)}"><strong>${echapperHtml(tr("PIGEON"))}</strong> (${echapperHtml(avecCouronne(nomPigeonOriginal))})</span>${bot}${lien}${bonus}${pause}${badgeDeconnecte(j)}</div>`;
     }
 
-    return `<div class="joueur-ligne${classePause}"><span class="joueur-nom${classeNomLong(j)}">${echapperHtml(avecCouronne(j))}</span>${lien}${bonus}${pause}${badgeDeconnecte(j)}</div>`;
+    return `<div class="joueur-ligne${classePause}"><span class="joueur-nom${classeNomLong(j)}">${echapperHtml(avecCouronne(j))}</span>${bot}${lien}${bonus}${pause}${badgeDeconnecte(j)}</div>`;
   }).join("");
 
   // En partie : bouton ⏸ (ou ▶ s'il est en pause) à droite de chaque nom (pas pour un spectateur : il ne touche à rien)
@@ -1729,6 +1731,8 @@ function majBoutonsJoueurs(){
   btnSupprimer.style.display = supprimer ? "inline-block" : "none";
   nomJoueurInput.style.display = partieLancee ? "none" : "";
   btnAjouter.style.display = partieLancee ? "none" : "";
+  if(typeof majBoutonBot === "function") majBoutonBot(); // (« Ajouter un bot », js/bots.js)
+  if(typeof sauverBots === "function") sauverBots();
 }
 
 
@@ -1848,6 +1852,7 @@ function ajouterJoueur(){
   }
 
   if(estCodeHard(nom)) debloquerHard(); // « Jojo » : débloque le mode hard (js/reglages.js), et reste un joueur
+  if(typeof retirerBot === "function") retirerBot(nom); // (un vrai joueur qui prend le nom d'un ancien bot n'est pas un bot)
   joueurs.push(nom);
   nomJoueurInput.value = "";
   afficherJoueurs();

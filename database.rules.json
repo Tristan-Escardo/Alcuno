@@ -124,6 +124,9 @@
           "$autre": { ".validate": false }
         }
       },
+      "bots": {
+        "$id": { ".validate": "$id.matches(/^[a-z0-9-]{1,30}$/) && (newData.val() === false || (newData.isString() && newData.val().length > 0 && newData.val().length <= 20))" }
+      },
       "$autre": { ".validate": false }
     },
     "profils": {

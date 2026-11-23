@@ -94,7 +94,7 @@ html[data-theme="kawaii"] #ecranNouvellePartie h2,
 html[data-theme="kawaii"] #ecranConfirmerHote h2,
 html[data-theme="kawaii"] #ecranConfirmerRetrait h2,
 html[data-theme="kawaii"] #ecranReprise h2,
-html[data-theme="kawaii"] #ecranConfirmerAccueil h2,
+html[data-theme="kawaii"] :is(#ecranConfirmerAccueil, #ecranConfirmerBot) h2,
 html[data-theme="kawaii"] #ecranChoixPseudo h2,
 html[data-theme="kawaii"] #ecranCaster h2,
 html[data-theme="kawaii"] #enLigne h2,
@@ -107,7 +107,7 @@ html[data-theme="kawaii"] #suppression h2{
 html[data-theme="kawaii"] #ecranConfirmerHote .texteConfirmation,
 html[data-theme="kawaii"] #ecranConfirmerRetrait .texteConfirmation,
 html[data-theme="kawaii"] #ecranReprise .texteConfirmation,
-html[data-theme="kawaii"] #ecranConfirmerAccueil .texteConfirmation,
+html[data-theme="kawaii"] :is(#ecranConfirmerAccueil, #ecranConfirmerBot) .texteConfirmation,
 html[data-theme="kawaii"] #ecranChoixPseudo .texteConfirmation,
 html[data-theme="kawaii"] #ecranCaster .texteConfirmation{
   color: var(--givre-texte);
@@ -119,7 +119,7 @@ html[data-theme="kawaii"] #btnContinuerOptions:not(.btnAccueilTexte),
 html[data-theme="kawaii"] #ecranConfirmerHote button,
 html[data-theme="kawaii"] #ecranConfirmerRetrait button,
 html[data-theme="kawaii"] #ecranReprise button,
-html[data-theme="kawaii"] #ecranConfirmerAccueil button,
+html[data-theme="kawaii"] :is(#ecranConfirmerAccueil, #ecranConfirmerBot) button,
 html[data-theme="kawaii"] #ecranChoixPseudo button,
 html[data-theme="kawaii"] #ecranCaster button,
 html[data-theme="kawaii"] #ecranScanner button,
@@ -502,17 +502,17 @@ html[data-theme="kawaii"] #ecranInstallation #btnInstallationPlusTard{ color: va
 @media (hover: hover){
 html[data-theme="kawaii"] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie,
   #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
-  #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
-  #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
-  #btnConfirmerRetraitNon, #ajouterJoueur, #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+  #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, :is(#btnConfirmerAccueilOui, #btnConfirmerBotOui),
+  :is(#btnConfirmerAccueilNon, #btnConfirmerBotNon), #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
+  #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
   #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayDuel button,
   #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
   #overlayAnnulation button):hover:not(:disabled),
 html[data-theme="kawaii"] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie,
   #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
-  #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
-  #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
-  #btnConfirmerRetraitNon, #ajouterJoueur, #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+  #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, :is(#btnConfirmerAccueilOui, #btnConfirmerBotOui),
+  :is(#btnConfirmerAccueilNon, #btnConfirmerBotNon), #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
+  #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
   #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCoupDeFoudre .bouton-pigeon, #overlayDuel button,
   #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
   #overlayAnnulation button):hover:not(:disabled){
@@ -756,7 +756,7 @@ html[data-theme="kawaii"] #listeJoueurs .joueur-ligne-pigeon::before{ background
 html[data-theme="kawaii"] #listeJoueurs .joueur-ligne-actif{ background: linear-gradient(180deg, #fff0a0, #ffd04a) !important; color: #6b3300 !important; border-color: #fff !important; box-shadow: 0 4px 0 #c48a0a !important; }
 
 /* Boutons en gélatine */
-html[data-theme="kawaii"] :is(#btnModeEnLigne, #btnModeClassique, #jouer, #nouvellePartie, #ajouterJoueur, #btnAjouterDefiPersonnel, #supprimerJoueur, #menu #btnCaster, .voletPause-ok, .voletPause-annuler, .bouton-pigeon, .btnRetour, #btnReprendrePause, #btnRepriseOui, #btnRepriseNon){
+html[data-theme="kawaii"] :is(#btnModeEnLigne, #btnModeClassique, #jouer, #nouvellePartie, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #supprimerJoueur, #menu #btnCaster, .voletPause-ok, .voletPause-annuler, .bouton-pigeon, .btnRetour, #btnReprendrePause, #btnRepriseOui, #btnRepriseNon){
   border: 3px solid #fff !important; border-radius: 999px !important; color: #6b1450 !important; font-weight: 900;
   background: linear-gradient(180deg, #f9a6cb, #ee70a9) !important; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) !important;
   box-shadow: 0 6px 0 var(--kawaii-rose-bouton), 0 10px 14px rgba(150, 30, 90, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.55) !important;
@@ -824,7 +824,7 @@ html[data-theme="kawaii"].overlay-ouvert, html[data-theme="kawaii"].overlay-ouve
 html.accessibilite[data-theme="kawaii"] :is(#overlayRegleUnique, #overlayCarteDoree, #overlayPredictionFin) .doree-titre{ white-space: normal; }
 
 /* Boutons des fenêtres et des écrans plein écran : aussi en gélatine rose (avant : rouge foncé hérité de Givre) */
-html[data-theme="kawaii"] :is(#ecranNouvellePartie, #ecranConfirmerAccueil, #ecranConfirmerHote, #ecranConfirmerRetrait, #ecranReprise, #ecranCaster, #ecranPause, #ecranChoixPseudo, #enLigne, #salleAttente, #suppression, #ecranBug) button:not(.bugFermer):not(.btnPauseJoueur):not(#btnBugEnvoyer):not(.btnAccueilTexte){
+html[data-theme="kawaii"] :is(#ecranNouvellePartie, :is(#ecranConfirmerAccueil, #ecranConfirmerBot), #ecranConfirmerHote, #ecranConfirmerRetrait, #ecranReprise, #ecranCaster, #ecranPause, #ecranChoixPseudo, #enLigne, #salleAttente, #suppression, #ecranBug) button:not(.bugFermer):not(.btnPauseJoueur):not(#btnBugEnvoyer):not(.btnAccueilTexte){
   border: 3px solid #fff !important; border-radius: 999px !important; color: #6b1450 !important; font-weight: 900;
   background: linear-gradient(180deg, #f9a6cb, #ee70a9) !important; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) !important;
   box-shadow: 0 6px 0 var(--kawaii-rose-bouton), 0 10px 14px rgba(150, 30, 90, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.55) !important;

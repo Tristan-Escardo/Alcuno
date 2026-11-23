@@ -144,10 +144,10 @@
     inset 0 0 0 1px rgba(255,255,255,0.06),
     inset 0 0 0 2px rgba(255,154,60,0.08); }
 :where(html[data-theme="halloween"]) #menu input{ border: 1px solid rgba(255,154,60,0.18); }
-:where(html[data-theme="halloween"]) #choixMode h2, :where(html[data-theme="halloween"]) #ecranNouvellePartie h2, :where(html[data-theme="halloween"]) #ecranConfirmerHote h2, :where(html[data-theme="halloween"]) #ecranConfirmerRetrait h2, :where(html[data-theme="halloween"]) #ecranReprise h2, :where(html[data-theme="halloween"]) #ecranConfirmerAccueil h2, :where(html[data-theme="halloween"]) #ecranChoixPseudo h2, :where(html[data-theme="halloween"]) #ecranCaster h2, :where(html[data-theme="halloween"]) #enLigne h2, :where(html[data-theme="halloween"]) #enLigne h3{ color: #ff9a3c; }
-:where(html[data-theme="halloween"]) #choixMode button, :where(html[data-theme="halloween"]) #ecranNouvellePartie button, :where(html[data-theme="halloween"]) #btnContinuerOptions, :where(html[data-theme="halloween"]) #ecranConfirmerHote button, :where(html[data-theme="halloween"]) #ecranConfirmerRetrait button, :where(html[data-theme="halloween"]) #ecranReprise button, :where(html[data-theme="halloween"]) #ecranConfirmerAccueil button, :where(html[data-theme="halloween"]) #ecranChoixPseudo button, :where(html[data-theme="halloween"]) #ecranCaster button, :where(html[data-theme="halloween"]) #enLigne button{ background-color: #ff7a18; }
+:where(html[data-theme="halloween"]) #choixMode h2, :where(html[data-theme="halloween"]) #ecranNouvellePartie h2, :where(html[data-theme="halloween"]) #ecranConfirmerHote h2, :where(html[data-theme="halloween"]) #ecranConfirmerRetrait h2, :where(html[data-theme="halloween"]) #ecranReprise h2, :where(html[data-theme="halloween"]) :is(#ecranConfirmerAccueil, #ecranConfirmerBot) h2, :where(html[data-theme="halloween"]) #ecranChoixPseudo h2, :where(html[data-theme="halloween"]) #ecranCaster h2, :where(html[data-theme="halloween"]) #enLigne h2, :where(html[data-theme="halloween"]) #enLigne h3{ color: #ff9a3c; }
+:where(html[data-theme="halloween"]) #choixMode button, :where(html[data-theme="halloween"]) #ecranNouvellePartie button, :where(html[data-theme="halloween"]) #btnContinuerOptions, :where(html[data-theme="halloween"]) #ecranConfirmerHote button, :where(html[data-theme="halloween"]) #ecranConfirmerRetrait button, :where(html[data-theme="halloween"]) #ecranReprise button, :where(html[data-theme="halloween"]) :is(#ecranConfirmerAccueil, #ecranConfirmerBot) button, :where(html[data-theme="halloween"]) #ecranChoixPseudo button, :where(html[data-theme="halloween"]) #ecranCaster button, :where(html[data-theme="halloween"]) #enLigne button{ background-color: #ff7a18; }
 @media (hover: hover){
-  :where(html[data-theme="halloween"]) #choixMode button:hover, :where(html[data-theme="halloween"]) #ecranNouvellePartie button:hover, :where(html[data-theme="halloween"]) #btnContinuerOptions:hover, :where(html[data-theme="halloween"]) #ecranConfirmerHote button:hover, :where(html[data-theme="halloween"]) #ecranConfirmerRetrait button:hover, :where(html[data-theme="halloween"]) #ecranReprise button:hover, :where(html[data-theme="halloween"]) #ecranConfirmerAccueil button:hover, :where(html[data-theme="halloween"]) #ecranChoixPseudo button:hover, :where(html[data-theme="halloween"]) #ecranCaster button:hover, :where(html[data-theme="halloween"]) #enLigne button:hover{ background-color: #ffc07a; }
+  :where(html[data-theme="halloween"]) #choixMode button:hover, :where(html[data-theme="halloween"]) #ecranNouvellePartie button:hover, :where(html[data-theme="halloween"]) #btnContinuerOptions:hover, :where(html[data-theme="halloween"]) #ecranConfirmerHote button:hover, :where(html[data-theme="halloween"]) #ecranConfirmerRetrait button:hover, :where(html[data-theme="halloween"]) #ecranReprise button:hover, :where(html[data-theme="halloween"]) :is(#ecranConfirmerAccueil, #ecranConfirmerBot) button:hover, :where(html[data-theme="halloween"]) #ecranChoixPseudo button:hover, :where(html[data-theme="halloween"]) #ecranCaster button:hover, :where(html[data-theme="halloween"]) #enLigne button:hover{ background-color: #ffc07a; }
 }
 :where(html[data-theme="halloween"]) #enLigne input{ border: 1px solid rgba(255,154,60,0.25); }
 :where(html[data-theme="halloween"]) #enLigne .separateurOu::before, :where(html[data-theme="halloween"]) #enLigne .separateurOu::after{ background: rgba(255,154,60,0.35); }
@@ -258,16 +258,16 @@
 @media (hover: hover){
   :where(html[data-theme="halloween"]) body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie,
     #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
-    #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
-    #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
-    #btnConfirmerRetraitNon, #ajouterJoueur, #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+    #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, :is(#btnConfirmerAccueilOui, #btnConfirmerBotOui),
+    :is(#btnConfirmerAccueilNon, #btnConfirmerBotNon), #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
+    #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
     #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayDuel button,
     #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
     #overlayAnnulation button):hover:not(:disabled), :where(html[data-theme="halloween"]) body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie,
     #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR, #lancerPartieEnLigne, #btnRejouerMemes,
-    #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui,
-    #btnConfirmerAccueilNon, #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
-    #btnConfirmerRetraitNon, #ajouterJoueur, #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
+    #btnModifierJoueurs, #btnChoixPseudoAnnuler, #listeChoixPseudo button, :is(#btnConfirmerAccueilOui, #btnConfirmerBotOui),
+    :is(#btnConfirmerAccueilNon, #btnConfirmerBotNon), #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui,
+    #btnConfirmerRetraitNon, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur, #nouvellePartie, #termineSuppression,
     #btnInstallationInstaller, #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCoupDeFoudre .bouton-pigeon, #overlayDuel button,
     #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
     #overlayAnnulation button):hover:not(:disabled){ box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9), 0 6px 20px rgba(255,180,100,0.55) !important; }
@@ -465,18 +465,18 @@ html[data-theme="halloween"] #ecranTele .tele-pied{ color: rgba(255,255,255,.85)
 
 /* ----- Boutons : presque noirs, texte blanc, sur tous les écrans -----
    (mêmes boutons que les autres thèmes habillés, Soleil couchant par exemple : tous les boutons du jeu doivent être aux couleurs du thème) */
-html[data-theme="halloween"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #ajouterJoueur, #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur,
+html[data-theme="halloween"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur,
   #nouvellePartie, #btnRejouerMemes, #btnModifierJoueurs, #btnReprendrePause,
   #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR,
-  #lancerPartieEnLigne, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui, #btnConfirmerAccueilNon,
+  #lancerPartieEnLigne, #btnChoixPseudoAnnuler, #listeChoixPseudo button, :is(#btnConfirmerAccueilOui, #btnConfirmerBotOui), :is(#btnConfirmerAccueilNon, #btnConfirmerBotNon),
   #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #termineSuppression,
   #btnInstallationInstaller, #ecranRegles .btnFaqLien, #choixMode .btnInstaller, #menu #btnCaster, #ecranCaster button:not(.btnRetour), #btnFermerScanner, #ecranReprise button,
   #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCupidon .bouton-pigeon, #overlayFinUnRestants .bouton-pigeon,
   #overlayAnnulation button, #overlayRegleUnique .bouton-annulation, #overlayDuel button:not(:disabled), #overlayPredictionFin .bouton-pigeon),
-html[data-theme="halloween"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, #ajouterJoueur, #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur,
+html[data-theme="halloween"][data-theme] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, .btnRetour, #btnPartagerJeu, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur,
   #nouvellePartie, #btnRejouerMemes, #btnModifierJoueurs, #btnReprendrePause,
   #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder, #btnScannerQR,
-  #lancerPartieEnLigne, #btnChoixPseudoAnnuler, #listeChoixPseudo button, #btnConfirmerAccueilOui, #btnConfirmerAccueilNon,
+  #lancerPartieEnLigne, #btnChoixPseudoAnnuler, #listeChoixPseudo button, :is(#btnConfirmerAccueilOui, #btnConfirmerBotOui), :is(#btnConfirmerAccueilNon, #btnConfirmerBotNon),
   #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #termineSuppression,
   #btnInstallationInstaller, #ecranRegles .btnFaqLien, #choixMode .btnInstaller, #menu #btnCaster, #ecranCaster button:not(.btnRetour), #btnFermerScanner, #ecranReprise button,
   #overlayPigeon .bouton-pigeon, #overlayPlus4 .bouton-pigeon, #overlayCoupDeFoudre .bouton-pigeon, #overlayFinUnRestants .bouton-pigeon,
@@ -560,7 +560,7 @@ html[data-theme="halloween"] :is(#choixMode #btnReglages svg, #choixMode #btnReg
   filter: drop-shadow(0 2px 0 #1a0204) drop-shadow(0 3px 6px rgba(0, 0, 0, 0.7));
 }
 html[data-theme="halloween"] :is(#btnAccueilClassique, #enLigne #btnAccueilEnLigne, #ecranNouvellePartie #btnAccueil){ color: var(--hw-texte); -webkit-text-stroke-color: #fff; text-shadow: 0 2px 0 #1a0204, 0 3px 8px rgba(0, 0, 0, 0.7); }
-html[data-theme="halloween"] :is(#ecranReglages, #ecranRegles, #ecranDefisPersonnels, #ecranCaster, #ecranBug, #ecranInstallation, #ecranCredits, #ecranConfirmerAccueil, #ecranConfirmerHote, #ecranConfirmerRetrait, #ecranReprise, #ecranPause, #suppression) :is(h2, .credits-titre){
+html[data-theme="halloween"] :is(#ecranReglages, #ecranRegles, #ecranDefisPersonnels, #ecranCaster, #ecranBug, #ecranInstallation, #ecranCredits, :is(#ecranConfirmerAccueil, #ecranConfirmerBot), #ecranConfirmerHote, #ecranConfirmerRetrait, #ecranReprise, #ecranPause, #suppression) :is(h2, .credits-titre){
   color: var(--hw-titre);
   text-shadow: 0 2px 0 #1a0204, 0 4px 12px rgba(0, 0, 0, 0.65);
 }
@@ -655,9 +655,9 @@ html[data-theme="halloween"] :is(h2, #titreReglages, .titreBloc, .aProposTitre, 
 }
 /* Texte courant et boutons */
 html[data-theme="halloween"] body :is(#btnModeEnLigne, #btnModeClassique, #btnContinuerOptions, #nouvellePartie,
-  #btnPartagerJeu, #btnRejouerMemes, #btnModifierJoueurs, #btnReprendrePause, #ajouterJoueur, #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur,
+  #btnPartagerJeu, #btnRejouerMemes, #btnModifierJoueurs, #btnReprendrePause, :is(#ajouterJoueur, #ajouterBot), #btnAjouterDefiPersonnel, #jouer, #supprimerJoueur,
   #btnCreerPartie, #btnRejoindrePartie, #btnRegarderPartie, #btnRevenirPartie, #validerRevenir, #validerCreation, #validerRejoindre, #validerRegarder,
-  #btnScannerQR, #lancerPartieEnLigne, #btnChoixPseudoAnnuler, #btnConfirmerAccueilOui, #btnConfirmerAccueilNon,
+  #btnScannerQR, #lancerPartieEnLigne, #btnChoixPseudoAnnuler, :is(#btnConfirmerAccueilOui, #btnConfirmerBotOui), :is(#btnConfirmerAccueilNon, #btnConfirmerBotNon),
   #btnConfirmerHoteOui, #btnConfirmerHoteNon, #btnConfirmerRetraitOui, #btnConfirmerRetraitNon, #termineSuppression,
   #btnInstallationInstaller, #btnFermerScanner, .btnRetour, .btnAccueilTexte, .btnInstaller, .btnDiagnostic,
   .btnFaqLien, .voletPause-ok, .bouton-pigeon, .bouton-annulation, #listeChoixPseudo button, #ecranReprise button,
