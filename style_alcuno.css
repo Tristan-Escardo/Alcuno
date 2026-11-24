@@ -10380,6 +10380,21 @@ html.android.poisson-uno[data-theme="galaxie"] #ecranRegles .ligneRegle .Carte.r
 #ecranTele .tele-pari-doree .tele-pari-resultat-texte{ font-size: 4.8vh; }
 html[data-theme="soleil"] #ecranTele .tele-pari-nom{ color: #2a1a44; }
 html[data-theme="soleil"] #ecranTele .tele-pari-type, html[data-theme="soleil"] #ecranTele .tele-pari-resultat-texte{ color: #8a1f4a; }
+/* Thèmes clairs (Givre, Kawaii, Soleil) : résultat du pari, noms et types lisibles (jaune et vert pâle disparaissaient sur le fond clair),
+   rayons et onde de la victoire plus soutenus */
+html:is([data-theme="givre"], [data-theme="kawaii"], [data-theme="soleil"]) #ecranTele :is(.tele-pari-resultat-texte, .tele-pari-doree-titre){ color: #6b4a00; text-shadow: 0 0.2vh 0 rgba(255, 255, 255, 0.7); }
+html[data-theme="givre"] #ecranTele :is(.tele-pari-resultat-texte, .tele-pari-doree-titre){ color: #0d3550; }
+html[data-theme="kawaii"] #ecranTele :is(.tele-pari-resultat-texte, .tele-pari-doree-titre){ color: #7a1f6e; }
+html[data-theme="soleil"] #ecranTele .tele-pari-resultat-texte{ color: #8a1f4a; }
+html:is([data-theme="givre"], [data-theme="kawaii"], [data-theme="soleil"]) #ecranTele .tele-pari-type{ color: #5a4300; }
+html:is([data-theme="givre"], [data-theme="kawaii"], [data-theme="soleil"]) #ecranTele .tele-pari-gagnant .tele-pari-nom{ color: #0a7a3a; }
+html:is([data-theme="givre"], [data-theme="kawaii"], [data-theme="soleil"]) #ecranTele .tele-pari-gagnant{ border-color: #1a9c55; background: rgba(26, 156, 85, 0.14); }
+html:is([data-theme="givre"], [data-theme="kawaii"], [data-theme="soleil"]) #ecranTele .tele-victoire-rayons{
+  background: repeating-conic-gradient(rgba(255, 160, 0, 0.55) 0deg 9deg, transparent 9deg 22.5deg); }
+html:is([data-theme="givre"], [data-theme="kawaii"], [data-theme="soleil"]) #ecranTele .tele-victoire-onde{ border-color: #f0a000; box-shadow: 0 0 4vh #f0a000, inset 0 0 4vh #f0a000; }
+html:is([data-theme="givre"], [data-theme="kawaii"]) #ecranTele .tele-pari-nom{ color: #1b2a3a; }
+html:is([data-theme="givre"], [data-theme="kawaii"], [data-theme="soleil"]) #ecranTele .tele-pari-vide{ color: #5a4300; border-color: rgba(60, 40, 0, 0.45); }
+html:is([data-theme="givre"], [data-theme="kawaii"], [data-theme="soleil"]) #ecranTele .tele-pari-en-cours .tele-pari-vide{ color: #8a5a00; border-color: #c98a00; }
 #ecranTele .tele-pari-apres .tele-pari-joueur{ width: 17vh; padding: 1.2vh 1vh; }
 #ecranTele .tele-pari-apres .tele-pari-joueur .Carte, #ecranTele .tele-pari-apres .tele-pari-vide{ width: 11vh; }
 #ecranTele .tele-pari-apres.tele-pari-nombreux .tele-pari-joueur{ width: 13vh; }

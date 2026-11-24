@@ -1440,7 +1440,10 @@ function jouerVictoirePariTele(zone, face){
   const couche = document.createElement("div");
   couche.className = "tele-confettis";
   ecran.appendChild(couche);
-  const couleurs = ["#e53935", "#fdd835", "#43a047", "#1e88e5", "#ffffff", "#ffb300"];
+  // (fond clair : le blanc et le jaune pâle disparaîtraient)
+  const fondClair = ["givre", "kawaii", "soleil"].indexOf(document.documentElement.dataset.theme) >= 0;
+  const couleurs = fondClair ? ["#e53935", "#f9a825", "#2e7d32", "#1565c0", "#8e24aa", "#ef6c00"]
+                             : ["#e53935", "#fdd835", "#43a047", "#1e88e5", "#ffffff", "#ffb300"];
   const l = window.innerWidth, h = window.innerHeight;
   const r = carte ? carte.getBoundingClientRect() : { left: l / 2, top: h / 3, width: 0, height: 0 };
   const sources = [
