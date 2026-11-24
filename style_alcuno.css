@@ -4887,21 +4887,16 @@ html[data-theme="givre"] .fin-choix-recap .ligne{
   border-bottom-color: var(--givre-bord);
 }
 
-/* Lueurs dorées des cartes (carte dorée, cartes du duel) : bleues */
+/* Lueurs dorées des cartes (carte dorée, cartes du duel) : aucune lueur en Givre (un halo bleu se voyait derrière le
+   givre des cartes et cassait tout) ; seulement l'ombre douce sous la carte dorée */
 html[data-theme="givre"] :is(#overlayCarteDoree .doree-carte-vedette, #overlayRegleUnique.overlay-doree .Carte,
   #overlayPredictionFin .reveal-doree .Carte){
-  animation-name: lueurGivre;
-}
-@keyframes lueurGivre{
-  0%, 100% { box-shadow: 0 0 0 1px rgba(26, 146, 214, 0.5), 0 10px 26px rgba(13, 53, 80, 0.25), 0 0 18px rgba(26, 155, 224, 0.3); }
-  50%      { box-shadow: 0 0 0 1px rgba(26, 146, 214, 0.9), 0 10px 26px rgba(13, 53, 80, 0.25), 0 0 38px rgba(26, 155, 224, 0.6); }
+  animation: none;
+  box-shadow: 0 10px 26px rgba(13, 53, 80, 0.25);
 }
 html[data-theme="givre"] #overlayDuel .Carte.duel-a-choisir{
-  animation-name: duelPulseGivre;
-}
-@keyframes duelPulseGivre{
-  0%, 100% { box-shadow: 0 0 0 2px rgba(26, 146, 214, 0.55), 0 0 10px rgba(26, 146, 214, 0.25); }
-  50%      { box-shadow: 0 0 0 2px rgba(26, 146, 214, 0.95), 0 0 28px rgba(26, 146, 214, 0.6); }
+  animation: none;
+  box-shadow: none;
 }
 
 /* Annonce « Nouvelle partie » */
@@ -10141,8 +10136,8 @@ html.android #overlayDuel .Carte.duel-a-choisir::before{
   box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.95), 0 0 24px rgba(255, 215, 0, 0.6);
   animation: duelLueurAndroid 1.6s ease-in-out infinite;
 }
-html.android[data-theme="givre"] #overlayDuel .Carte.duel-a-choisir{ box-shadow: 0 0 0 2px rgba(26, 146, 214, 0.75); }
-html.android[data-theme="givre"] #overlayDuel .Carte.duel-a-choisir::before{ box-shadow: 0 0 0 2px rgba(26, 146, 214, 0.95), 0 0 24px rgba(26, 146, 214, 0.6); }
+html.android[data-theme="givre"] #overlayDuel .Carte.duel-a-choisir{ box-shadow: none; } /* (Givre : pas de halo ; le ::before est le givre) */
+html.android[data-theme="givre"] #overlayDuel .Carte.duel-a-choisir::before{ box-shadow: none; animation: none; }
 @keyframes duelLueurAndroid{ 0%, 100%{ opacity: 0.2; } 50%{ opacity: 1; } }
 html.android.faces-fermees[data-theme] #plateau .Carte.retournee.recachee,
 html.android.faces-fermees #plateau .Carte.retournee.recachee{ filter: none !important; position: relative; }
@@ -10724,7 +10719,12 @@ html[data-theme="kawaii"] #toastRetrait .toastRetrait-barre{ background: var(--g
 }
 /* (fondu sur chaque morceau et pas sur #tutoriel : un parent en fondu empêche le flou du voile) */
 #tutoriel > *{ animation: aideAccueilEntree 0.35s ease both; }
-#tutoriel.tuto-sortie > *{ animation: aideAccueilEntree 0.3s ease reverse both; }
+/* Sortie : sa propre animation (rejouer celle de l'entrée à l'envers ne la relance pas : tout disparaissait d'un coup) */
+#tutoriel.tuto-sortie{ pointer-events: none; }
+#tutoriel.tuto-sortie > *{ animation: tutoSortie 0.45s ease both; }
+#tutoriel.tuto-sortie .tuto-feuille{ animation: tutoFeuilleDescend 0.4s cubic-bezier(0.5, 0, 0.75, 0) both; }
+@keyframes tutoSortie{ from{ opacity: 1; } to{ opacity: 0; } }
+@keyframes tutoFeuilleDescend{ from{ transform: none; } to{ transform: translateY(100%); } }
 #tutoriel .tuto-voile{
   position: absolute;
   inset: 0;
@@ -10780,6 +10780,28 @@ html[data-theme="noir"] #tutoriel .tuto-voile{ background: rgba(0, 0, 0, 0.86); 
 }
 #tutoriel .tuto-plateau .Carte{ width: 64px; margin: 0; transition: opacity 0.4s ease, transform 0.25s ease, box-shadow 0.25s ease; }
 #tutoriel .tuto-plateau .Carte.tuto-partie{ opacity: 0; pointer-events: none; }
+/* Étape « La dernière carte » : la carte restante mise en avant (lueur fixe et « ? » dans le coin : on parie dessus, on ne la touche pas) */
+#tutoriel .tuto-plateau .Carte.tuto-derniere{
+  position: relative;
+  cursor: default;
+  transform: scale(1.08);
+  box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.9), 0 0 22px rgba(255, 215, 0, 0.45);
+}
+#tutoriel .tuto-plateau .Carte.tuto-derniere::after{
+  content: "?";
+  position: absolute;
+  right: -12px;
+  top: -12px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #FFD700;
+  color: #3a2300;
+  font: 900 20px/30px Arial, sans-serif;
+  text-align: center;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45);
+  animation: aideAccueilEntree 0.35s ease both;
+}
 #tutoriel .tuto-plateau .Carte.carte-appuyee{ transform: scale(1.08); box-shadow: 0 0 0 3px #FFD700, 0 0 22px rgba(255, 215, 0, 0.7); }
 #tutoriel .tuto-indice{ animation: tutoIndice 1.3s ease-in-out infinite; }
 @keyframes tutoIndice{
@@ -10804,6 +10826,13 @@ html[data-theme="noir"] #tutoriel .tuto-voile{ background: rgba(0, 0, 0, 0.86); 
 #tutoriel .tuto-feuille{ position: relative; animation: voletPauseMonte 0.35s cubic-bezier(0.2, 0.9, 0.3, 1) both; min-height: 210px; }
 #tutoriel .tuto-feuille.tuto-change .voletPause-nom,
 #tutoriel .tuto-feuille.tuto-change .voletPause-texte{ animation: aideAccueilEntree 0.3s ease both; }
+/* Glisser la fiche vers la droite : étape d'avant (js/tutoriel.js). Le texte et les boutons suivent le doigt. */
+#tutoriel .tuto-feuille{ touch-action: pan-y; }
+#tutoriel .tuto-feuille > :not(.tuto-points){ transform: translateX(var(--glisse, 0px)); }
+#tutoriel .tuto-feuille.tuto-relache > :not(.tuto-points){ transition: transform 0.2s ease; }
+#tutoriel .tuto-feuille.tuto-change-retour .voletPause-nom,
+#tutoriel .tuto-feuille.tuto-change-retour .voletPause-texte{ animation: tutoRetour 0.3s ease both; }
+@keyframes tutoRetour{ from{ opacity: 0; translate: -28px 0; } to{ opacity: 1; translate: 0 0; } }
 #tutoriel .voletPause-texte em{ font-style: normal; color: #FFD700; }
 #tutoriel .voletPause-texte b{ color: #fff; }
 #tutoriel .tuto-points{ display: flex; justify-content: center; gap: 6px; margin: 2px 0 14px; }
@@ -10822,3 +10851,93 @@ html:is([data-theme="givre"], [data-theme="kawaii"]) #tutoriel .tuto-points span
 #ecranRegles .reglesLiens{ display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 0 auto 14px; }
 #ecranRegles .reglesLiens .btnFaqLien{ margin: 0; }
 #ecranRegles:is(.album, .faq) .reglesLiens{ display: none; }
+
+/* ===== Givre : les cartes commencent à givrer =====
+   Le givre part du fond blanc et mord sur la carte depuis les bords, par plaques irrégulières ; un dessin différent
+   selon la place de la carte (6 images, plus des miroirs). Images prêtes (Cartes/givre/*.webp) et pas de filtres
+   SVG : redessinés à chaque image du défilement, ils cassaient l'affichage sur Android (cf. Star Wars).
+   Sur TOUTES les cartes du thème, en partie et en dehors (plateau, dos et faces, fenêtres de règle, +4, duel, carte
+   dorée, pari de fin, appui long, dernières cartes, écran des Règles, télé), sauf : le tutoriel, les cartes
+   recachées en faces fermées (la classe « recachee » est posée sur toutes les cartes tirées, même en faces
+   ouvertes : seul html.faces-fermees compte) et celles de la télé. */
+html[data-theme="givre"] .Carte:not(#tutoriel .Carte):not(html.faces-fermees #plateau .recachee):not(.carte-recachee):not(.carte-envol):not(.tele-envol){ position: relative; } /* (la carte qui s'envole est déjà en position fixe) */
+html[data-theme="givre"] .Carte:not(#tutoriel .Carte):not(html.faces-fermees #plateau .recachee):not(.carte-recachee)::before{
+  content: "";
+  position: absolute;
+  inset: -5.13% -8%; /* (déborde un peu sur le fond : la carte est prise dans le blanc) */
+  pointer-events: none;
+  background: url("Cartes/givre/givre_1.webp") center / 100% 100% no-repeat;
+}
+html[data-theme="givre"] .Carte:not(#tutoriel .Carte):not(html.faces-fermees #plateau .recachee):not(.carte-recachee):nth-child(6n+2)::before{ background-image: url("Cartes/givre/givre_2.webp"); }
+html[data-theme="givre"] .Carte:not(#tutoriel .Carte):not(html.faces-fermees #plateau .recachee):not(.carte-recachee):nth-child(6n+3)::before{ background-image: url("Cartes/givre/givre_3.webp"); }
+html[data-theme="givre"] .Carte:not(#tutoriel .Carte):not(html.faces-fermees #plateau .recachee):not(.carte-recachee):nth-child(6n+4)::before{ background-image: url("Cartes/givre/givre_4.webp"); }
+html[data-theme="givre"] .Carte:not(#tutoriel .Carte):not(html.faces-fermees #plateau .recachee):not(.carte-recachee):nth-child(6n+5)::before{ background-image: url("Cartes/givre/givre_5.webp"); }
+html[data-theme="givre"] .Carte:not(#tutoriel .Carte):not(html.faces-fermees #plateau .recachee):not(.carte-recachee):nth-child(6n)::before{ background-image: url("Cartes/givre/givre_6.webp"); }
+html[data-theme="givre"] .Carte:not(#tutoriel .Carte):not(html.faces-fermees #plateau .recachee):not(.carte-recachee):nth-child(5n)::before{ transform: scaleX(-1); }
+html[data-theme="givre"] .Carte:not(#tutoriel .Carte):not(html.faces-fermees #plateau .recachee):not(.carte-recachee):nth-child(7n)::before{ transform: rotate(180deg); }
+/* Tutoriel : cartes sans givre */
+html[data-theme="givre"] #tutoriel .Carte::before{ content: none !important; }
+/* Givre, duel : la carte choisie n'est plus assombrie (le filtre noircissait aussi le givre autour : un pavé gris). Elle
+   « gèle » à la place : un voile de glace posé dessus, toujours un peu surélevée. */
+html[data-theme="givre"] :is(#overlayDuel, #ecranTele .tele-ecran-cartes) .Carte.duel-selected{ filter: none; }
+html[data-theme="givre"] :is(#overlayDuel, #ecranTele .tele-ecran-cartes) .Carte.duel-selected::after{
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.78), rgba(205, 234, 249, 0.62));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.9), inset 0 0 14px rgba(255, 255, 255, 0.6);
+  animation: givreVoile 0.25s ease-out both;
+}
+@keyframes givreVoile{ from{ opacity: 0; } to{ opacity: 1; } }
+/* Givre, duel : la carte du perdant gigote => son givre éclate en morceaux qui tombent (briserGivre, js/regles.js) et
+   la carte finit dégivrée. Sur la carte, le givre disparaît aussitôt (les morceaux prennent le relais) ; sans les
+   morceaux (télé, animations réduites), il s'efface en fondu. */
+html[data-theme="givre"] :is(#overlayDuel, #ecranTele .tele-ecran-cartes) .Carte.duel-perdant::before{
+  animation: givreFond 0.6s ease-in 0.1s both;
+}
+html[data-theme="givre"] :is(#overlayDuel, #ecranTele .tele-ecran-cartes) .Carte.duel-perdant.givre-brise::before{ animation: none; opacity: 0; }
+@keyframes givreFond{ to{ opacity: 0; } }
+.givre-morceau{
+  position: fixed; z-index: 2147483600; pointer-events: none; will-change: translate, rotate, opacity;
+  filter: drop-shadow(0 0 0.8px rgba(20, 110, 180, 0.9)) drop-shadow(0 1px 2px rgba(20, 110, 180, 0.35)); /* (éclats de glace : bord bleuté, lisibles sur le fond clair) */
+}
+/* Givre : la carte dorée (face et dos) n'est jamais givrée */
+html[data-theme="givre"] .Carte:is(.carte_doree, .dos_dore)::before{ content: none !important; }
+/* Givre : la carte dorée reste DORÉE — titre « CARTE DORÉE », ✦ et étincelles en or (or foncé : lisible sur le fond blanc) */
+html[data-theme="givre"][data-theme][data-theme] :is(#overlayRegleUnique, #overlayCarteDoree, #overlayPredictionFin) .doree-titre{
+  color: #a87800 !important; /* (or foncé : contraste 3,5 sur le fond clair ; l'éclat doré autour le garde « or ») */
+  text-shadow: 0 1px 0 #5c4100, 0 0 16px rgba(255, 200, 0, 0.7) !important;
+}
+html[data-theme="givre"][data-theme][data-theme] :is(#overlayRegleUnique, #overlayCarteDoree, #overlayPredictionFin) .doree-etincelle{
+  color: #f0b400 !important;
+  text-shadow: 0 1px 0 #8a6200, 0 0 10px rgba(255, 215, 0, 0.7) !important;
+}
+html[data-theme="givre"] .etincelle.e0{ --c: #f0b400; } html[data-theme="givre"] .etincelle.e1{ --c: #ffd23f; }
+html[data-theme="givre"] .etincelle.e2{ --c: #c99200; } html[data-theme="givre"] .etincelle.e3{ --c: #ffe680; }
+/* Givre : aucune ombre ni contour autour des cartes (elle se voyait en gris derrière le givre ; le contour rouge de la
+   carte du perdant au duel est retiré aussi) — sauf le tutoriel, sans givre */
+html[data-theme="givre"] .Carte:not(#tutoriel .Carte){ box-shadow: none !important; }
+/* Givre : la carte qui s'envole vers le prénom (le 1) n'a pas de givre */
+html[data-theme="givre"] .Carte:is(.carte-envol, .tele-envol)::before{ content: none !important; }
+/* Givre : les 4 couleurs à choisir (carte Couleur) givrent comme les cartes, sans ombre */
+html[data-theme="givre"] #overlayCouleur .carre-couleur{ position: relative; isolation: isolate; box-shadow: none !important; }
+html[data-theme="givre"] #overlayCouleur .carre-couleur::before{ /* (z-index -1 : sous le nom de la couleur du mode daltonien) */
+  content: ""; position: absolute; inset: -7%; pointer-events: none; z-index: -1;
+  background: url("Cartes/givre/givre_1.webp") center / 100% 100% no-repeat;
+}
+html[data-theme="givre"] #overlayCouleur .carre-couleur:nth-child(2)::before{ background-image: url("Cartes/givre/givre_3.webp"); transform: scaleX(-1); }
+html[data-theme="givre"] #overlayCouleur .carre-couleur:nth-child(3)::before{ background-image: url("Cartes/givre/givre_4.webp"); transform: rotate(180deg); }
+html[data-theme="givre"] #overlayCouleur .carre-couleur:nth-child(4)::before{ background-image: url("Cartes/givre/givre_6.webp"); }
+/* Givre, télé : comme sur le téléphone — les 4 couleurs à choisir givrées (sans ombre), le carré de la couleur choisie
+   sans halo, et le titre de la carte dorée en or */
+html[data-theme="givre"] #ecranTele .tele-puce.tele-puce-couleur.tele-puce-couleur{ position: relative; isolation: isolate; box-shadow: none; }
+html[data-theme="givre"] #ecranTele .tele-puce.tele-puce-couleur::before{ /* (z-index -1 : sous le nom de la couleur, qui reste lisible) */
+  content: ""; position: absolute; inset: -14% -6%; pointer-events: none; z-index: -1;
+  background: url("Cartes/givre/givre_1.webp") center / 100% 100% no-repeat;
+}
+html[data-theme="givre"] #ecranTele .tele-puce.tele-puce-couleur:nth-child(2)::before{ background-image: url("Cartes/givre/givre_3.webp"); transform: scaleX(-1); }
+html[data-theme="givre"] #ecranTele .tele-puce.tele-puce-couleur:nth-child(3)::before{ background-image: url("Cartes/givre/givre_4.webp"); transform: rotate(180deg); }
+html[data-theme="givre"] #ecranTele .tele-puce.tele-puce-couleur:nth-child(4)::before{ background-image: url("Cartes/givre/givre_6.webp"); }
+html[data-theme="givre"] #ecranTele .tele-couleur-carre{ box-shadow: none; }
+html[data-theme="givre"][data-theme] #ecranTele .tele-ecran-doree .tele-ecran-titre{
+  color: #a87800 !important;
+  text-shadow: 0 0.15vh 0 #5c4100, 0 0 2vh rgba(255, 200, 0, 0.7) !important;
+}

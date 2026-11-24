@@ -579,7 +579,9 @@ function remplirTexteRegle(boxTexte, message){
     el.className = i === 0 ? "regle-titre" : "regle-detail";
     if (estNote(texte)) el.classList.add("regle-note");
     else if (avecNotes && i > 0) el.classList.add("regle-boit");
-    el.innerText = texte;
+    // Espace insécable devant « : ; ! ? » et après « (typographie française) : sinon le « : » de « Pour s'en
+    // débarrasser : tirer un 3 » pouvait partir seul à la ligne
+    el.innerText = texte.replace(/ ([:;!?»])/g, "\u00A0$1").replace(/« /g, "«\u00A0");
     boxTexte.appendChild(el);
   });
 }
@@ -1027,6 +1029,65 @@ function lancerOverlayChoixDuel(joueurActuel, carteDuel = ""){
   }
 }
 
+// Thème Givre, duel : le givre de la carte du perdant (son ::before, voir style_alcuno.css) éclate en morceaux qui
+// tombent chacun de son côté en tournant, pendant que la carte gigote. Les morceaux sont des copies du même dessin de
+// givre, découpées (clip-path) dans une grille aux coins décalés au hasard ; le givre de la carte, lui, s'efface aussitôt.
+function briserGivre(carte){
+  if(document.documentElement.dataset.theme !== "givre" || !carte || !carte.animate) return;
+  if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return; // (simple fondu en CSS)
+  const avant = getComputedStyle(carte, "::before");
+  if(!avant.backgroundImage || avant.backgroundImage === "none" || avant.content === "none") return;
+  const r = carte.getBoundingClientRect();
+  if(!r.width) return;
+  // Boîte du givre : celle du ::before (inset: -5.13% -8%)
+  const boite = { x: r.left - r.width * 0.08, y: r.top - r.height * 0.0513, l: r.width * 1.16, h: r.height * 1.1026 };
+  const COLS = 4, LIGNES = 5;
+  const coin = [];
+  for(let i = 0; i <= LIGNES; i++){
+    coin.push([]);
+    for(let j = 0; j <= COLS; j++){
+      const bord = i === 0 || j === 0 || i === LIGNES || j === COLS;
+      coin[i].push([j / COLS * 100 + (bord ? 0 : (Math.random() - 0.5) * 14), i / LIGNES * 100 + (bord ? 0 : (Math.random() - 0.5) * 12)]);
+    }
+  }
+  const fragment = document.createDocumentFragment();
+  for(let i = 0; i < LIGNES; i++){
+    for(let j = 0; j < COLS; j++){
+      // Le centre de la carte n'a presque pas de givre : ces morceaux-là seraient vides
+      if(i > 0 && i < LIGNES - 1 && j > 0 && j < COLS - 1 && Math.random() < 0.7) continue;
+      // (le morceau dans un cadre : le liseré glacé du cadre suit le bord découpé du morceau)
+      const m = document.createElement("div");
+      m.className = "givre-morceau";
+      Object.assign(m.style, { left: boite.x + "px", top: boite.y + "px", width: boite.l + "px", height: boite.h + "px" });
+      const glace = document.createElement("div");
+      m.appendChild(glace);
+      const pts = [coin[i][j], coin[i][j + 1], coin[i + 1][j + 1], coin[i + 1][j]];
+      Object.assign(glace.style, {
+        position: "absolute", inset: "0", background: "center / 100% 100% no-repeat",
+        backgroundImage: avant.backgroundImage,
+        transform: avant.transform === "none" ? "" : avant.transform, // (miroir / demi-tour du dessin)
+        clipPath: "polygon(" + pts.map(([x, y]) => x.toFixed(1) + "% " + y.toFixed(1) + "%").join(", ") + ")"
+      });
+      // Il part du côté où il est (gauche à gauche, droite à droite), tombe en accélérant et tourne
+      const cote = (j + 0.5) / COLS - 0.5;
+      const dx = cote * 120 + (Math.random() - 0.5) * 50;
+      const dy = 160 + Math.random() * 180 + i * 12;
+      const tour = (Math.random() - 0.5) * 140;
+      const duree = 750 + Math.random() * 450;
+      m.animate([
+        { translate: "0 0", rotate: "0deg", opacity: 1 },
+        { translate: (dx * 0.15).toFixed(1) + "px -6px", rotate: (tour * 0.1).toFixed(1) + "deg", opacity: 1, offset: 0.15 },
+        { translate: dx.toFixed(1) + "px " + dy.toFixed(1) + "px", rotate: tour.toFixed(1) + "deg", opacity: 0 }
+      ], { duration: duree, delay: Math.random() * 140, easing: "cubic-bezier(0.45, 0, 0.85, 0.5)", fill: "both" })
+        .finished.then(() => m.remove(), () => m.remove());
+      fragment.appendChild(m);
+    }
+  }
+  // (sur la télé, tout ce qui n'est pas son écran est caché : les morceaux y vont)
+  (carte.closest("#ecranTele") || document.body).appendChild(fragment);
+  carte.classList.add("givre-brise");
+}
+
 function afficherOverlayTirageDuel(overlay, j1, j2, carteDuel = ""){
   const content = document.createElement("div");
   content.className = "duel-content duel-tirage-content";
@@ -1148,6 +1209,7 @@ function afficherOverlayTirageDuel(overlay, j1, j2, carteDuel = ""){
     c1.style.opacity = ""; // (opacité posée par preparerDuel : sinon la carte du gagnant ne s'estompe pas)
     c2.style.opacity = "";
     (perdant === j1 ? carteDeJ1 : carteDeJ2).classList.add("duel-perdant");
+    briserGivre(perdant === j1 ? carteDeJ1 : carteDeJ2); // (thème Givre : son givre éclate et tombe en morceaux)
     (perdant === j1 ? carteDeJ2 : carteDeJ1).classList.add("duel-gagnant");
     info.innerText = joueurs[perdant] + tr(" perd le duel !");
 

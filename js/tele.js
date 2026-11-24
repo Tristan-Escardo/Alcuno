@@ -137,6 +137,8 @@ function arreterTele(){
 // Classe de la face d'une carte parmi ses autres classes : « trois_rouge1 », « plus_4_3 », « couleur2 »,
 // « carte_doree »… (les doubles d'une même carte ont un numéro à la fin, voir « classes » dans plateau.js)
 const FACE_CARTE = /^((zero|un|deux|trois|quatre|cinq|six|sept|huit|neuf|plus_2|interdit|switch)_(vert|jaune|rouge|bleu)\d*|plus_4(_\d+)?|couleur\d*|cupidon_[abc]|coup_de_foudre|carte_doree)$/;
+let givreBriseTele = ""; // (duel dont le givre du perdant a déjà éclaté sur la télé)
+
 function faceCarte(el){
   return Array.from(el.classList).find(c => FACE_CARTE.test(c)) || "";
 }
@@ -1169,12 +1171,23 @@ function dessinerTele(ecran, etat){
   } else if (e) {
     const zoneCartes = surEcran.querySelector(".tele-ecran-cartes");
     zoneCartes.innerHTML = "";
+    // Givre : titre en or quand la carte dorée est à l'écran (comme sur le téléphone)
+    surEcran.classList.toggle("tele-ecran-doree", (e.cartes || []).includes("carte_doree"));
+    const aBriser = [];
     (e.cartes || []).forEach((valeur, i) => {
       const carte = creerCarteTele(valeur);
       const etatDuel = e.duel && e.duel[i];
       if (/^duel-(selected|perdant|gagnant)$/.test(etatDuel || "")) carte.classList.add(etatDuel); // (style_alcuno.css, aussi sous #ecranTele)
+      // Givre, duel : le givre de la carte du perdant éclate (briserGivre, js/regles.js) une seule fois ; l'écran est
+      // redessiné à chaque état reçu : ensuite, la carte reste dégivrée
+      if (etatDuel === "duel-perdant") {
+        const cle = (e.cartes || []).join(",") + "/" + e.duel.join(",");
+        if (givreBriseTele === cle) carte.classList.add("givre-brise");
+        else { givreBriseTele = cle; aBriser.push(carte); }
+      }
       zoneCartes.appendChild(carte);
     });
+    if (typeof briserGivre === "function") aBriser.forEach((c) => briserGivre(c));
     const zoneTexte = surEcran.querySelector(".tele-ecran-texte");
     zoneTexte.innerHTML = "";
     String(e.texte || "").split("\n").filter(Boolean).forEach((t, i) => {

@@ -100,12 +100,14 @@ const ETAPES_TUTO = [
   () => {
     const cachees = [...tuto.racine.querySelectorAll(".tuto-plateau .Carte:not(.retournee)")];
     cachees.slice(1).forEach((carte) => carte.classList.add("tuto-partie"));
-    tutoIndice(cachees.slice(0, 1));
+    // (mise en avant fixe, sans doigt ni clignotement : on ne la touche pas, on parie dessus)
+    cachees[0].classList.add("tuto-derniere");
     tutoTexte(tr("La dernière carte"), tr`Quand il ne reste qu'<b>une carte</b>, chacun parie sur son type. Ceux qui trouvent distribuent <em>${texteCulSec()}</em> !`);
     tutoBoutons([[tr("Suivant"), () => tutoEtape(6)]]);
   },
   // 6 : fin
   () => {
+    tuto.racine.querySelectorAll(".tuto-derniere").forEach((carte) => carte.classList.remove("tuto-derniere"));
     tutoIndice([]);
     tutoTexte(tr("À toi de jouer !"), tr("<b>Mode classique</b> : un seul téléphone, qu'on se passe à tour de rôle.<br><b>Mode en ligne</b> : chacun joue sur son téléphone."));
     tutoBoutons([[tr("C'est parti !"), () => fermerTutoriel(true)]]);
@@ -136,8 +138,9 @@ function afficherTutoriel(depuisRegles = false){
   racine.querySelector(".tuto-passer").textContent = tr("Passer");
   racine.querySelector(".tuto-passer").addEventListener("click", () => fermerTutoriel(false));
   racine.querySelectorAll(".tuto-joueur").forEach((pastille, i) => { pastille.textContent = NOMS_TUTO()[i]; });
-  tuto = { racine, etape: -1, depuisRegles, joueur: 0, appui: null, surveillance: null, attenteCarte: null };
+  tuto = { racine, etape: -1, depuisRegles, joueur: 0, appui: null, surveillance: null, attenteCarte: null, photos: [], sens: "avant" };
   brancherPlateauTuto(racine.querySelector(".tuto-plateau"));
+  brancherGlissementTuto(racine.querySelector(".tuto-feuille"));
   window.addEventListener("resize", replacerDoigtTuto);
   document.body.appendChild(racine);
   tutoEtape(0);
@@ -153,31 +156,86 @@ function fermerTutoriel(fini){
   window.removeEventListener("resize", replacerDoigtTuto);
   fermerVoletCarte();
   racine.classList.add("tuto-sortie");
-  setTimeout(() => racine.remove(), 300);
+  setTimeout(() => racine.remove(), 480);
   if (depuisRegles) return;
   // Fini : les flèches vers les Règles et les Réglages (une fois). Passé : plus rien ne s'ouvre.
-  if (fini) { if (!aideDejaVue()) setTimeout(afficherAideAccueil, 320); }
+  if (fini) { if (!aideDejaVue()) afficherAideAccueil(); } // (les flèches arrivent par-dessus pendant que le tutoriel s'efface : fondu enchaîné)
   else { try { localStorage.setItem(CLE_AIDE_VUE, "1"); } catch (e) {} }
 }
 
-function tutoEtape(n){
+// retour : on revient à l'étape n en glissant vers la droite (le plateau est remis comme à l'arrivée sur cette étape)
+function tutoEtape(n, retour = false){
   if (!tuto) return;
   clearInterval(tuto.surveillance);
   tuto.appui = null;
   tuto.attenteCarte = null;
+  fermerVoletCarte();
+  tuto.racine.querySelectorAll(".tuto-joueur").forEach((pastille) => { pastille.onclick = null; });
+  if (retour && tuto.photos[n]) remettreSceneTuto(tuto.photos[n]);
+  else tuto.photos[n] = photoSceneTuto();
+  tutoIndice([]);
   tuto.etape = n;
   tuto.racine.querySelectorAll(".tuto-points span").forEach((point, i) => point.classList.toggle("actif", i === n));
   tuto.racine.querySelector(".tuto-passer").hidden = n === 0 || n === ETAPES_TUTO.length - 1;
+  tuto.sens = retour ? "retour" : "avant";
   ETAPES_TUTO[n]();
+  tuto.sens = "avant";
+}
+
+// Photo du plateau (cartes et prénoms) à l'arrivée sur une étape, pour y revenir
+function photoSceneTuto(){
+  return {
+    cartes: [...tuto.racine.querySelectorAll(".tuto-plateau .Carte")].map((c) => c.className),
+    joueurs: [...tuto.racine.querySelectorAll(".tuto-joueur")].map((p) => p.className)
+  };
+}
+function remettreSceneTuto(photo){
+  tuto.racine.querySelectorAll(".tuto-plateau .Carte").forEach((c, i) => {
+    if (c.getAnimations) c.getAnimations().forEach((a) => a.cancel()); // (carte encore en train de se retourner)
+    c.className = photo.cartes[i];
+  });
+  tuto.racine.querySelectorAll(".tuto-joueur").forEach((p, i) => { p.className = photo.joueurs[i]; });
+}
+
+// Glisser la fiche du bas vers la droite : étape d'avant (le texte suit le doigt)
+function brancherGlissementTuto(feuille){
+  let depart = null, glisse = false;
+  const remettre = () => {
+    feuille.classList.add("tuto-relache");
+    feuille.style.setProperty("--glisse", "0px");
+    setTimeout(() => feuille.classList.remove("tuto-relache"), 220);
+  };
+  feuille.addEventListener("pointerdown", (e) => { depart = { x: e.clientX, y: e.clientY }; glisse = false; });
+  feuille.addEventListener("pointermove", (e) => {
+    if (!depart || !tuto) return;
+    const dx = e.clientX - depart.x, dy = e.clientY - depart.y;
+    if (!glisse && Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) glisse = true;
+    if (!glisse) return;
+    // (vers la droite seulement, et pas à la première étape ; un peu de résistance sinon)
+    const possible = tuto.etape > 0 && dx > 0;
+    feuille.style.setProperty("--glisse", (possible ? Math.min(dx, 160) * 0.6 : dx * 0.15) + "px");
+  });
+  const lacher = (e) => {
+    if (!depart) return;
+    const dx = e.clientX - depart.x, dy = e.clientY - depart.y;
+    depart = null;
+    if (!glisse) return;
+    remettre();
+    if (tuto && tuto.etape > 0 && dx > 60 && Math.abs(dy) < dx) tutoEtape(tuto.etape - 1, true);
+  };
+  feuille.addEventListener("pointerup", lacher);
+  feuille.addEventListener("pointercancel", (e) => { depart = null; if (glisse) remettre(); });
+  // (un glissement qui finit sur un bouton ne le déclenche pas)
+  feuille.addEventListener("click", (e) => { if (glisse) { e.stopPropagation(); e.preventDefault(); glisse = false; } }, true);
 }
 
 function tutoTexte(titre, html){
   const feuille = tuto.racine.querySelector(".tuto-feuille");
   feuille.querySelector(".voletPause-nom").textContent = titre;
   feuille.querySelector(".voletPause-texte").innerHTML = html; // (textes du jeu, rien qui vient d'un joueur)
-  feuille.classList.remove("tuto-change");
+  feuille.classList.remove("tuto-change", "tuto-change-retour");
   void feuille.offsetWidth;
-  feuille.classList.add("tuto-change");
+  feuille.classList.add(tuto.sens === "retour" ? "tuto-change-retour" : "tuto-change");
 }
 
 // boutons : [texte, action, secondaire ?]
