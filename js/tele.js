@@ -1138,7 +1138,12 @@ function dessinerTele(ecran, etat){
   surEcran.classList.toggle("tele-ecran-historique", !!e && e.id === "voletHistorique");
   surEcran.classList.toggle("tele-ecran-pari", !!(e && e.pari));
   surEcran.classList.toggle("tele-ecran-volet", !!(e && e.id === "voletCarte")); // (règle d'une carte : demi-écran, comme sur le téléphone)
-  if (!(e && e.pari)) delete surEcran.querySelector(".tele-ecran-texte").dataset.pari;
+  if (!(e && e.pari)) {
+    const zonePari = surEcran.querySelector(".tele-ecran-texte");
+    delete zonePari.dataset.pari;
+    zonePari.classList.remove("tele-victoire", "tele-victoire-finie");
+    victoirePariTele = ""; // (prochain pari : l'animation rejoue)
+  }
   surEcran.classList.toggle("tele-ecran-recap", !!(e && e.recap));
   surEcran.classList.toggle("tele-ecran-regles", !!(e && e.id === "ecranRegles" && (e.regles || e.faq)));
   dessinerHotTele(surEcran, e && !e.recap ? e.hot : null);
@@ -1323,6 +1328,7 @@ function dessinerPariTele(zone, p){
   if (zone.dataset.pari === cle) return;
   zone.dataset.pari = cle;
   zone.innerHTML = "";
+  zone.classList.remove("tele-victoire", "tele-victoire-finie");
   const div = (classe, texte) => { const el = document.createElement("div"); el.className = classe; if (texte) el.innerText = texte; return el; };
   const rv = p.rv;
   const gagnant = (j) => rv && !rv.d && j.r && j.r === rv.r;
@@ -1380,6 +1386,94 @@ function dessinerPariTele(zone, p){
     });
     zone.appendChild(types);
   }
+
+  // Quelqu'un a trouvé la dernière carte : animation de victoire, une seule fois par révélation
+  const nomsGagnants = rv ? p.j.filter(gagnant).map((j) => j.n) : [];
+  const cleVictoire = nomsGagnants.length ? rv.r + "/" + nomsGagnants.join(",") : "";
+  if (cleVictoire && cleVictoire !== victoirePariTele) jouerVictoirePariTele(zone, rv.r);
+  else if (cleVictoire) jouerVictoirePariTele(zone, "");
+  victoirePariTele = cleVictoire;
+}
+
+// Victoire au pari sur la télé : la carte se retourne, une onde dorée, des confettis, le texte qui saute,
+// les gagnants qui sautent avec une couronne (les autres s'éteignent doucement)
+let victoirePariTele = "";
+function jouerVictoirePariTele(zone, face){
+  zone.classList.remove("tele-victoire-finie");
+  zone.classList.add("tele-victoire");
+  const carte = zone.querySelector(".tele-pari-revelee");
+  if (carte) {
+    const pivot = document.createElement("div");
+    pivot.className = "tele-victoire-pivot";
+    const rayons = document.createElement("div");
+    rayons.className = "tele-victoire-rayons";
+    const onde = document.createElement("div");
+    onde.className = "tele-victoire-onde";
+    carte.replaceWith(pivot);
+    pivot.append(rayons, onde, carte);
+  }
+  zone.querySelectorAll(".tele-pari-gagnant").forEach((bloc) => { // (au-dessus du bloc : devant le nom, elle le coupait)
+    const couronne = document.createElement("div");
+    couronne.className = "tele-victoire-couronne";
+    couronne.textContent = "👑";
+    bloc.appendChild(couronne);
+  });
+  if (face) jouerSon("victoire"); // (Sons/victoire.mp3 : souffle de la carte, pop des confettis, fanfare, étincelles, calés sur l'animation)
+  // (sans face : écran redessiné après coup, ou mouvements réduits : tout de suite l'état final, sans confettis)
+  if (!face || (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches)) {
+    zone.classList.add("tele-victoire-finie");
+    return;
+  }
+  // La carte arrive de dos et se retourne à mi-chemin
+  if (carte) {
+    carte.className = "Carte tele-pari-revelee";
+    setTimeout(() => { carte.className = "Carte retournee " + face + " tele-pari-revelee"; }, 450);
+    carte.animate([
+      { transform: "perspective(80vh) rotateY(180deg) scale(0.5)", opacity: 0 },
+      { transform: "perspective(80vh) rotateY(90deg) scale(1.1)", opacity: 1, offset: 0.5 },
+      { transform: "perspective(80vh) rotateY(0deg) scale(1.18)", offset: 0.8 },
+      { transform: "perspective(80vh) rotateY(0deg) scale(1)" }
+    ], { duration: 900, easing: "ease-out" });
+  }
+  // Confettis : une gerbe depuis la carte, puis deux canons dans les coins du bas
+  const ecran = zone.closest("#ecranTele") || document.body;
+  const couche = document.createElement("div");
+  couche.className = "tele-confettis";
+  ecran.appendChild(couche);
+  const couleurs = ["#e53935", "#fdd835", "#43a047", "#1e88e5", "#ffffff", "#ffb300"];
+  const l = window.innerWidth, h = window.innerHeight;
+  const r = carte ? carte.getBoundingClientRect() : { left: l / 2, top: h / 3, width: 0, height: 0 };
+  const sources = [
+    { x: r.left + r.width / 2, y: r.top + r.height / 2, n: 60, angle: -90, ecart: 180, vitesse: 0.75, delai: 750 },
+    { x: 0, y: h, n: 45, angle: -60, ecart: 30, vitesse: 1.15, delai: 950 },
+    { x: l, y: h, n: 45, angle: -120, ecart: 30, vitesse: 1.15, delai: 950 }
+  ];
+  let fin = 0;
+  sources.forEach((s) => {
+    for (let i = 0; i < s.n; i++) {
+      const morceau = document.createElement("div");
+      morceau.className = "tele-confetti" + (Math.random() < 0.3 ? " tele-confetti-rond" : "");
+      morceau.style.background = couleurs[i % couleurs.length];
+      morceau.style.left = s.x + "px";
+      morceau.style.top = s.y + "px";
+      couche.appendChild(morceau);
+      const a = (s.angle + (Math.random() - 0.5) * s.ecart) * Math.PI / 180;
+      const v = h * s.vitesse * (0.55 + Math.random() * 0.45);
+      const dx = Math.cos(a) * v, dy = Math.sin(a) * v;
+      const chute = h * (1.1 + Math.random() * 0.4);
+      const tourne = (Math.random() < 0.5 ? -1 : 1) * (360 + Math.random() * 720);
+      const duree = 2600 + Math.random() * 1400;
+      const delai = s.delai + Math.random() * 150;
+      fin = Math.max(fin, duree + delai);
+      morceau.animate([
+        { transform: "translate(0, 0) rotate(0deg) rotateX(0deg)", opacity: 1 },
+        { transform: `translate(${dx * 0.9}px, ${dy * 0.9}px) rotate(${tourne * 0.3}deg) rotateX(360deg)`, opacity: 1, offset: 0.25 },
+        { transform: `translate(${dx * 1.15}px, ${dy + chute * 0.45}px) rotate(${tourne * 0.7}deg) rotateX(900deg)`, opacity: 1, offset: 0.7 },
+        { transform: `translate(${dx * 1.25}px, ${dy + chute}px) rotate(${tourne}deg) rotateX(1440deg)`, opacity: 0 }
+      ], { duration: duree, delay: delai, easing: "cubic-bezier(.2,.7,.4,1)", fill: "both" });
+    }
+  });
+  setTimeout(() => { couche.remove(); zone.classList.add("tele-victoire-finie"); }, fin + 100);
 }
 
 // Texte avec <b> / <em> (les seules balises des règles) : construit à la main, sans innerHTML

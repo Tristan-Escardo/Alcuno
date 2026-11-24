@@ -18,6 +18,8 @@ Un fichier MP3 par moment du jeu, avec exactement ces noms :
   regles.mp3   on ouvre les Règles du jeu
   accessibilite_on.mp3  on active « Accessibilité pour les gens bourrés » dans les réglages
   etoile.mp3   on touche l'étoile filante de l'accueil (découverte de l'album de stickers)
+  victoire.mp3  télé seulement : quelqu'un a trouvé la dernière carte au pari (3,4 s, calé sur l'animation : souffle de la carte qui se retourne,
+    pop des confettis, fanfare, étincelles). Pas un enregistrement : synthétisé.
 
   tiens_gueule.mp3  le cul sec de la carte dorée (« TIENS DANS TA GUEULE »)
   bouton.mp3   petit clic quand on touche un bouton (sauf ceux qui ont déjà leur son ; coupé à 0,3 seconde par le jeu)

@@ -10387,6 +10387,42 @@ html[data-theme="soleil"] #ecranTele .tele-pari-type, html[data-theme="soleil"] 
 #ecranTele .tele-pari-doree-titre{ width: 92vw; white-space: nowrap; overflow: hidden; text-align: center; font-weight: 900; color: #FFD700;
   text-shadow: 0 0 2vh rgba(255, 215, 0, 0.55), 0.3vh 0.3vh 0.8vh #000; }
 
+/* Victoire au pari sur la télé (js/tele.js, jouerVictoirePariTele) : rayons qui tournent et onde dorée derrière la carte,
+   texte qui saute, gagnants qui sautent avec une couronne, perdants qui s'éteignent, confettis par-dessus tout */
+#ecranTele .tele-victoire-pivot{ position: relative; flex: none; display: flex; }
+#ecranTele .tele-victoire-pivot .Carte{ position: relative; z-index: 1; }
+#ecranTele .tele-victoire-rayons{ position: absolute; left: 50%; top: 50%; width: 70vh; height: 70vh; margin: -35vh 0 0 -35vh; border-radius: 50%; pointer-events: none;
+  background: repeating-conic-gradient(rgba(255, 215, 0, 0.32) 0deg 9deg, transparent 9deg 22.5deg);
+  -webkit-mask: radial-gradient(circle, #000 12%, transparent 68%); mask: radial-gradient(circle, #000 12%, transparent 68%);
+  animation: teleVictoireRayonsArrivee 0.8s ease-out 0.5s both, teleVictoireRayons 16s linear infinite; }
+#ecranTele .tele-victoire-onde{ position: absolute; left: 50%; top: 50%; width: 30vh; height: 30vh; margin: -15vh 0 0 -15vh; border-radius: 50%; pointer-events: none;
+  border: 1.2vh solid #FFD700; box-shadow: 0 0 4vh #FFD700, inset 0 0 4vh #FFD700; opacity: 0; animation: teleVictoireOnde 1s ease-out 0.75s; }
+#ecranTele .tele-victoire .tele-pari-resultat-texte{ animation: teleVictoireTexte 0.7s cubic-bezier(.3, 1.6, .5, 1) 0.85s both; transform-origin: left center; }
+#ecranTele .tele-victoire .tele-pari-gagnant{ animation: teleVictoireSaut 0.55s ease-in-out 1.1s 3, teleVictoireLueur 1.6s ease-in-out 2.8s infinite alternate; }
+#ecranTele .tele-victoire .tele-pari-perdu{ animation: teleVictoireEteint 0.8s ease 1s both; }
+#ecranTele .tele-victoire .tele-pari-gagnant{ position: relative; }
+#ecranTele .tele-victoire-couronne{ position: absolute; left: 0; right: 0; top: -4.6vh; text-align: center; font-size: 5vh; line-height: 1; pointer-events: none;
+  filter: drop-shadow(0 0.4vh 0.6vh rgba(0, 0, 0, 0.5)); animation: teleVictoireCouronne 0.6s cubic-bezier(.3, 1.5, .5, 1) 1.1s both; }
+#ecranTele .tele-victoire-finie .tele-victoire-onde{ display: none; }
+#ecranTele .tele-victoire-finie .tele-victoire-rayons{ animation: teleVictoireRayons 16s linear infinite; }
+#ecranTele .tele-victoire-finie :is(.tele-pari-resultat-texte, .tele-pari-perdu, .tele-victoire-couronne){ animation: none; }
+#ecranTele .tele-victoire-finie .tele-pari-gagnant{ animation: teleVictoireLueur 1.6s ease-in-out infinite alternate; }
+.tele-confettis{ position: fixed; inset: 0; z-index: 2147483600; pointer-events: none; overflow: hidden; }
+.tele-confetti{ position: absolute; width: 1.4vh; height: 2.2vh; margin: -1.1vh 0 0 -0.7vh; border-radius: 0.2vh; will-change: transform, opacity; }
+.tele-confetti-rond{ width: 1.3vh; height: 1.3vh; border-radius: 50%; }
+@keyframes teleVictoireRayons{ to{ rotate: 360deg; } }
+@keyframes teleVictoireRayonsArrivee{ from{ opacity: 0; scale: 0.2; } }
+@keyframes teleVictoireOnde{ 0%{ opacity: 1; transform: scale(0.4); } 100%{ opacity: 0; transform: scale(3.2); } }
+@keyframes teleVictoireTexte{ from{ opacity: 0; transform: scale(0.3); } }
+@keyframes teleVictoireSaut{ 0%, 100%{ transform: translateY(-1vh) scale(1.06); } 40%{ transform: translateY(-5vh) scale(1.12); } }
+@keyframes teleVictoireLueur{ from{ box-shadow: 0 0 3.4vh rgba(61, 255, 139, 0.6); } to{ box-shadow: 0 0 7vh rgba(61, 255, 139, 0.95), 0 0 2vh rgba(255, 215, 0, 0.6); } }
+@keyframes teleVictoireEteint{ from{ opacity: 1; filter: none; } }
+@keyframes teleVictoireCouronne{ from{ opacity: 0; transform: translateY(-6vh) rotate(-30deg) scale(1.6); } }
+@media (prefers-reduced-motion: reduce){
+  #ecranTele .tele-victoire-rayons, #ecranTele .tele-victoire :is(.tele-pari-resultat-texte, .tele-pari-gagnant, .tele-pari-perdu, .tele-victoire-couronne){ animation: none; }
+  #ecranTele .tele-victoire-onde{ display: none; }
+}
+
 /* ===== Bouton « Caster » quand la télé est connectée : badge « ● LIVE » rouge qui pulse (à la place de l'ancien anneau), dans tous les thèmes ===== */
 html:root:root #menu #btnCaster.caster-actif#btnCaster{ position: relative; overflow: visible !important; outline: none !important; padding-right: 84px !important; }
 html:root:root #menu #btnCaster.caster-actif#btnCaster::after{
