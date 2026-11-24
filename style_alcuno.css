@@ -3260,7 +3260,7 @@ body.rattrapage [id^="overlay"] *{
   border: none;
   border-radius: 10px;
   background: var(--bandeau-bouton);
-  color: #fff;
+  color: var(--bandeau-bouton-texte); /* (comme « ↶ Annuler » : couleur prévue pour le fond du bouton, par thème ; avant : blanc partout, illisible sur le jaune, le rose, le crème…) */
   font-weight: 900;
   cursor: pointer;
 }
