@@ -1119,6 +1119,9 @@ function dessinerTele(ecran, etat){
   elCouleur.hidden = !hexCouleur;
   elCouleur.textContent = "";
   elCouleur.style.setProperty("--c", hexCouleur || "");
+  // (même couleur assombrie : le nom de la couleur reste lisible sur les thèmes clairs, Givre, Kawaii et Soleil)
+  elCouleur.style.setProperty("--c-texte", /^#[0-9a-f]{6}$/i.test(hexCouleur || "")
+    ? "#" + [1, 3, 5].map((i) => Math.round(parseInt(hexCouleur.substr(i, 2), 16) * 0.5).toString(16).padStart(2, "0")).join("") : "");
   if (hexCouleur) {
     // comme sur le téléphone : la couleur et ce qu'elle fait
     const carre = document.createElement("span");

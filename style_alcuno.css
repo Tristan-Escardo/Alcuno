@@ -10988,6 +10988,10 @@ html[data-theme="givre"] #ecranTele .tele-puce.tele-puce-couleur:nth-child(2)::b
 html[data-theme="givre"] #ecranTele .tele-puce.tele-puce-couleur:nth-child(3)::before{ background-image: url("Cartes/givre/givre_4.webp"); transform: rotate(180deg); }
 html[data-theme="givre"] #ecranTele .tele-puce.tele-puce-couleur:nth-child(4)::before{ background-image: url("Cartes/givre/givre_6.webp"); }
 html[data-theme="givre"] #ecranTele .tele-couleur-carre{ box-shadow: none; }
+/* Thèmes clairs : nom de la couleur (VERT…) assombri, titre « Joueurs » de Givre plus foncé, ✦ ✦ ✦ du récap de la carte dorée en or foncé */
+html:is([data-theme="givre"], [data-theme="kawaii"], [data-theme="soleil"]) #ecranTele .tele-couleur b{ color: var(--c-texte, var(--c)); }
+html[data-theme="givre"] #ecranTele .tele-prepa-titre{ color: #0b6aa3; }
+html:is([data-theme="givre"], [data-theme="kawaii"], [data-theme="soleil"]) .recap-eclats{ color: #a87800; opacity: 1; }
 html[data-theme="givre"][data-theme] #ecranTele .tele-ecran-doree .tele-ecran-titre{
   color: #a87800 !important;
   text-shadow: 0 0.15vh 0 #5c4100, 0 0 2vh rgba(255, 200, 0, 0.7) !important;
