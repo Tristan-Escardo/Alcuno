@@ -40,6 +40,15 @@ function verifier(ok, texte){
   const url = `http://localhost:${serveur.address().port}/index.html`;
   const exe = fs.existsSync("/opt/pw-browsers/chromium") ? { executablePath: "/opt/pw-browsers/chromium" } : {};
   const nav = await chromium.launch(exe);
+  // Test sans internet : le SDK Firebase (gstatic.com) n'est jamais chargé, dans AUCUNE page du test. Sinon, quand le réseau marche (GitHub Actions),
+  // le jeu lit la VRAIE config sur Firebase et efface la copie que le test vient de poser (annonce, coupures, valeurs de départ) : le test 35 échouait
+  // en CI (« #btnAnnonceFermer … element is not visible ») alors qu'il passait sans réseau, et masquait tous les tests suivants.
+  const nouveauContexte = nav.newContext.bind(nav);
+  nav.newContext = async (...args) => {
+    const ctx = await nouveauContexte(...args);
+    await ctx.route(/gstatic\.com\/firebasejs\//, (r) => r.abort());
+    return ctx;
+  };
   const ouvrir = async (options = {}, avant) => {
     const ctx = await nav.newContext({ viewport: { width: 390, height: 780 }, ...options });
     const page = await ctx.newPage();
