@@ -81,6 +81,11 @@ export const signInWithEmailAndPassword = async (auth, email, mdp) => {
   utilisateur = { uid: "UID-TEST-123" }; ecouteurs.forEach((e) => e(utilisateur)); return { user: utilisateur };
 };
 export const signOut = async () => { utilisateur = null; ecouteurs.forEach((e) => e(null)); };
+// Connexion Google (stats.html les importe depuis la 1.24.x) : sans ces exports, le script de la page plantait au chargement
+export class GoogleAuthProvider {}
+export class OAuthProvider { constructor(id) { this.providerId = id; } credential(c) { return c; } }
+export const signInWithCredential = async () => { utilisateur = { uid: "UID-TEST-123" }; ecouteurs.forEach((e) => e(utilisateur)); return { user: utilisateur }; };
+export const signInWithPopup = async () => { utilisateur = { uid: "UID-TEST-123" }; ecouteurs.forEach((e) => e(utilisateur)); return { user: utilisateur }; };
 `;
 
 (async () => {
@@ -444,11 +449,11 @@ export const signOut = async () => { utilisateur = null; ecouteurs.forEach((e) =
     window.__notifier();
   });
   await page.waitForTimeout(300);
-  const direct = await page.evaluate(() => ({ legende: document.getElementById("pubDirectLegende").textContent, lignes: [...document.querySelectorAll("#pubDirectListe .appLigne")].map((l) => l.textContent),
-    images: document.querySelectorAll("#pubDirectListe img").length, injecte: !!window.__injecte, debord: [...document.querySelectorAll("#pubDirectListe .appLigne")].some((e) => e.getBoundingClientRect().right > 391) }));
+  const direct = await page.evaluate(() => ({ legende: document.getElementById("pubDirectLegende").textContent, lignes: [...document.querySelectorAll("#pubDirectListe .liveCarte")].map((l) => l.textContent),
+    images: document.querySelectorAll("#pubDirectListe img").length, injecte: !!window.__injecte, debord: [...document.querySelectorAll("#pubDirectListe .liveCarte")].some((e) => e.getBoundingClientRect().right > 391) }));
   verifier(/3 appareils connectés/.test(direct.legende) && direct.lignes.length === 3 && /Télé castée/.test(direct.lignes[0]) && /Appareil inconnu/.test(direct.lignes[0])
-    && /Partie en ligne · .*Toulouse, Occitanie/.test(direct.lignes[2]) && /Thème : /.test(direct.lignes[2]) && /Orange S\.A\./.test(direct.lignes[2]) && /Téléphone · iOS 17\.5 · Safari 17/.test(direct.lignes[2]) && /il est \d\d:\d\d chez lui/.test(direct.lignes[2])
-    && /Au menu · .*Montréal/.test(direct.lignes[1]) && /<img src=x/.test(direct.lignes[1]) && !direct.lignes.join().includes("aaaaaaaaaa02") && direct.images === 0 && !direct.injecte && !direct.debord,
+    && /Partie en ligne/.test(direct.lignes[2]) && /Toulouse, Occitanie/.test(direct.lignes[2]) && /🎨 /.test(direct.lignes[2]) && /Orange S\.A\./.test(direct.lignes[2]) && /Téléphone/.test(direct.lignes[2]) && /iOS 17\.5/.test(direct.lignes[2]) && /Safari 17/.test(direct.lignes[2]) && /\d\d:\d\d chez lui/.test(direct.lignes[2])
+    && /Montréal/.test(direct.lignes[1]) && /<img src=x/.test(direct.lignes[1]) && !direct.lignes.join().includes("aaaaaaaaaa02") && direct.images === 0 && !direct.injecte && !direct.debord,
     `Public : infos en temps réel, 3 présences récentes (la plus ancienne ignorée), thème et fiche rapprochés, texte piégé inerte (${JSON.stringify(direct)})`);
   await page.evaluate((v) => { window.__arbre.presence = JSON.parse(v); window.__notifier(); }, presAvant);
   await page.click('#pubPeriode button[data-jours="30"]');
@@ -463,9 +468,9 @@ export const signOut = async () => { utilisateur = null; ecouteurs.forEach((e) =
   const themesVisibles = await page.evaluate(() => ({ themes: document.getElementById("pilThemes").offsetParent !== null, annonce: document.getElementById("pilAnnonce").offsetParent !== null, reset: document.getElementById("btnReset").offsetParent !== null, bar: document.getElementById("barListe").offsetParent !== null }));
   await page.click('#pilMenu button[data-pan="bar"]'); const rubBar = await rubriques();
   const barVisible = await page.evaluate(() => ({ bar: document.getElementById("barListe").offsetParent !== null, recettes: document.querySelectorAll("#barListe .pilLigne").length, themes: document.getElementById("pilThemes").offsetParent !== null }));
-  verifier(rubThemes.boutons.join() === "etat,assistant,annonce,jeu,themes,defis,bar,compte" && rubThemes.choisie === "themes" && rubThemes.visibles.join() === "themes" && rubThemes.orphelins === 0 && rubThemes.retenue === "themes" && !rubThemes.debord && rubThemes.largeur <= 390
+  verifier(rubThemes.boutons.join() === "etat,assistant,annonce,jeu,themes,defis,bar,bots,compte" && rubThemes.choisie === "themes" && rubThemes.visibles.join() === "themes" && rubThemes.orphelins === 0 && rubThemes.retenue === "themes" && !rubThemes.debord && rubThemes.largeur <= 390
     && themesVisibles.themes && !themesVisibles.annonce && !themesVisibles.reset && !themesVisibles.bar && rubBar.visibles.join() === "bar" && barVisible.bar && barVisible.recettes > 10 && !barVisible.themes,
-    `pilotage : 8 rubriques, une seule affichée (${rubThemes.visibles} puis ${rubBar.visibles}), retenue (${rubThemes.retenue}), Bar rangé dedans (${barVisible.recettes} recettes)`);
+    `pilotage : 9 rubriques, une seule affichée (${rubThemes.visibles} puis ${rubBar.visibles}), retenue (${rubThemes.retenue}), Bar rangé dedans (${barVisible.recettes} recettes)`);
   // Mise à jour demandée : son propre réglage (avant : seulement par une phrase à l'assistant)
   await page.fill("#pilMajMin", "9.92"); await page.click("#pilMajDemander"); await page.waitForTimeout(200);
   const majRefus = await page.evaluate(() => ({ majMin: window.__arbre.config.majMin || null, message: document.getElementById("pilMessage").textContent }));

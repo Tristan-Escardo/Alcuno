@@ -200,7 +200,7 @@ export const deleteUser = async () => { window.__compteEfface = true; courant = 
   verifier(!a.authCharge && a.lie === null, "sans profil : l'authentification n'est pas téléchargée au lancement");
   await A.page.click("#btnReglages"); await A.page.waitForTimeout(700);
   a = await etat(A.page);
-  const visible = await A.page.evaluate(() => { const b = document.querySelector('#ecranReglages [data-cle="compte"]'); return b.offsetHeight > 0 && b.dataset.groupe === "appareil" && b.nextElementSibling.dataset.cle === "hors-ligne"; });
+  const visible = await A.page.evaluate(() => { const b = document.querySelector('#ecranReglages [data-cle="compte"]'); return b.offsetHeight > 0 && b.dataset.groupe === "appareil" && b.nextElementSibling.dataset.cle === "economie"; }); // (Mode Préhistoire rangé sous le compte Google : c'est lui qui suit, plus « hors-ligne »)
   verifier(visible && a.google && a.bouton === "Se connecter avec Google" && !a.supprimer && a.authCharge && a.appliAuth === "profil" && a.profil === null,
     `Réglages : bloc « Profil joueur » visible, déconnecté, authentification prête dans sa propre appli (${a.appliAuth})`);
 
