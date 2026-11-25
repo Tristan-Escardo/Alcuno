@@ -82,7 +82,13 @@
         tr + tr td{ border-top: 1px solid rgba(0, 229, 255, .14); }
         /* Téléphone : 5 colonnes (Fréquentation : Aujourd'hui, Hier, 7 jours, Total) : le nom de la ligne peut passer sur 2 lignes, titres moins espacés */
         @media (max-width: 460px){ td:first-child, th:first-child{ white-space: normal; } td:first-child{ font-size: 15px; } th{ letter-spacing: .04em; } td, th{ padding: 7px 3px; } }
-        @media (max-width: 380px){ td, th{ padding: 7px 2px; } td:first-child{ font-size: 14px; } td + td{ font-size: 14px; } th{ font-size: 9px; } }
+        /* Fréquentation : « Aujourd'hui » sur un fond teinté et « Hier » séparé d'elle (les deux chiffres collés se confondaient) */
+        #tableau td:nth-child(2), table th:nth-child(2){ background: rgba(0, 229, 255, .09); padding-left: 8px; padding-right: 8px; }
+        table th:nth-child(2){ border-radius: 8px 8px 0 0; }
+        #tableau tr:last-child td:nth-child(2){ border-radius: 0 0 8px 8px; }
+        #tableau td:nth-child(3), table th:nth-child(3){ padding-left: 16px; }
+        #tableau td:nth-child(3){ color: #9fc9dc; }
+        @media (max-width: 380px){ #tableau td:nth-child(2), table th:nth-child(2){ padding-left: 3px; padding-right: 3px; } #tableau td:nth-child(3), table th:nth-child(3){ padding-left: 8px; } td, th{ padding: 7px 2px; } td:first-child{ font-size: 14px; } td + td{ font-size: 14px; } th{ font-size: 9px; } }
         .barre{ display: flex; align-items: center; gap: 8px; font-size: 15px; margin: 8px 0; }
         .nom{ width: 120px; color: var(--cyan-doux); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .piste{ flex: 1; height: 7px; background: rgba(0, 229, 255, .1); border-radius: 4px; overflow: hidden; }
