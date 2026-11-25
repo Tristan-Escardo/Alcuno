@@ -35,6 +35,21 @@ window.verifierContraste = function (seuil) {
       const st = getComputedStyle(e);
       const img = st.backgroundImage;
       if (img && img !== "none" && !img.includes("url(")) {
+        // Dégradé vertical opaque (fond de la télé en Soleil : bleu nuit en haut, pêche en bas, sous un autre dégradé) : la couleur à
+        // la hauteur du texte, et pas la première couleur opaque de l'ensemble (un texte sombre posé sur le pêche passait pour
+        // « sombre sur bleu nuit »)
+        const vert = img.match(/linear-gradient\(\s*(?:(?:180deg|to bottom),\s*)?((?:rgba?\([^)]*\)\s*[\d.]+%,?\s*)+)\)/); // (le navigateur écrit le dégradé vertical sans « 180deg »)
+        const arrets = vert ? [...vert[1].matchAll(/(rgba?\([^)]+\))\s*([\d.]+)%/g)].map((x) => ({ c: parse(x[1]), t: Number(x[2]) / 100 })) : [];
+        if (arrets.length >= 2 && arrets.every((x) => x.c && x.c.a >= 0.99)) {
+          const boite = e === document.body ? { top: 0, height: innerHeight } : e.getBoundingClientRect();
+          const r = el.getBoundingClientRect();
+          const t = Math.min(1, Math.max(0, (r.top + r.height / 2 - boite.top) / (boite.height || 1)));
+          const i = arrets.findIndex((x) => x.t >= t);
+          if (i <= 0) { couches.push(arrets[i < 0 ? arrets.length - 1 : 0].c); break; }
+          const u = arrets[i - 1].c, v = arrets[i].c, k = (t - arrets[i - 1].t) / ((arrets[i].t - arrets[i - 1].t) || 1);
+          couches.push({ r: u.r + (v.r - u.r) * k, g: u.g + (v.g - u.g) * k, b: u.b + (v.b - u.b) * k, a: 1 });
+          break;
+        }
         const m = img.match(/rgba?\([^)]+\)/g);
         const couleurs = m ? m.map(parse) : [];
         const opaque = couleurs.find((c) => c.a >= 0.99);

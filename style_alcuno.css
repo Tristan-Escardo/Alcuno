@@ -6669,7 +6669,7 @@ html[data-theme="givre"] #ecranTele .tele-prepa-joueur{
   color: #0a7f8a;
   box-shadow: 0 0.8vh 2vh rgba(13,53,80,0.1);
 }
-html[data-theme="givre"] #ecranTele .tele-pied{ color: rgba(13,53,80,0.45); }
+html[data-theme="givre"] #ecranTele .tele-pied{ color: rgba(13,53,80,0.75); }
 
 /* ===== Réglages > Signaler un bug : petit lien discret sous « Partager le lien » ===== */
 #ecranReglages .lienBug{
@@ -7412,14 +7412,14 @@ html[data-theme="soleil"] #ecranTele .tele-tour{
 html[data-theme="soleil"] #ecranTele .tele-tour-nom{ color: #ffcf86; text-shadow: 0 0.4vh 0 #b8456a; }
 html[data-theme="soleil"] #ecranTele .tele-joueur{ color: #fff1df; }
 html[data-theme="soleil"] #ecranTele .tele-joueur-actif{ color: #ffcf86; }
-html[data-theme="soleil"] #ecranTele .tele-badge{ background: linear-gradient(180deg, #ffb35c, #f2775c); color: #fff; }
+html[data-theme="soleil"] #ecranTele .tele-badge{ background: linear-gradient(180deg, #ffb35c, #f2775c); color: #3a1230; }
 html[data-theme="soleil"] #ecranTele .tele-regles{ color: #ffe0b0; }
 html[data-theme="soleil"] #ecranTele .tele-prepa-joueur{ background: rgba(22,32,72,0.5); border-color: rgba(255,205,170,0.45); color: #fff1df; }
 html[data-theme="soleil"] #ecranTele :is(.tele-restantes, .tele-pied, .tele-son-coupe, .tele-prepa-info){ color: #3a1f4a; }
 /* Annonces : « heure dorée », comme les overlays du téléphone */
 html[data-theme="soleil"] #ecranTele .tele-ecran{ background: linear-gradient(180deg, #fcc98a 0%, #f7a072 38%, #e9787a 72%, #b8657f 100%); }
 html[data-theme="soleil"] #ecranTele .tele-ecran-titre{ color: #2a1a44; text-shadow: 0 0.3vh 0 rgba(255,240,220,0.6); }
-html[data-theme="soleil"] #ecranTele .tele-ecran-detail{ color: #8a1f4a; }
+html[data-theme="soleil"] #ecranTele .tele-ecran-detail{ color: #6b1838; }
 /* Pause */
 /* Créateurs : ciel du soir sombre (le bas clair du dégradé rendait les noms jaunes illisibles), qui part
    de la couleur de la barre de l'iPhone */
@@ -10389,12 +10389,9 @@ html[data-theme="soleil"] #ecranTele .tele-pari-resultat-texte{ color: #8a1f4a; 
 html:is([data-theme="givre"], [data-theme="kawaii"], [data-theme="soleil"]) #ecranTele .tele-pari-type{ color: #5a4300; }
 html:is([data-theme="givre"], [data-theme="kawaii"], [data-theme="soleil"]) #ecranTele .tele-pari-gagnant .tele-pari-nom{ color: #0a7a3a; }
 html:is([data-theme="givre"], [data-theme="kawaii"], [data-theme="soleil"]) #ecranTele .tele-pari-gagnant{ border-color: #1a9c55; background: rgba(26, 156, 85, 0.14); }
-html:is([data-theme="givre"], [data-theme="kawaii"], [data-theme="soleil"]) #ecranTele .tele-victoire-rayons{
-  background: repeating-conic-gradient(rgba(255, 160, 0, 0.55) 0deg 9deg, transparent 9deg 22.5deg); }
-html:is([data-theme="givre"], [data-theme="kawaii"], [data-theme="soleil"]) #ecranTele .tele-victoire-onde{ border-color: #f0a000; box-shadow: 0 0 4vh #f0a000, inset 0 0 4vh #f0a000; }
 html:is([data-theme="givre"], [data-theme="kawaii"]) #ecranTele .tele-pari-nom{ color: #1b2a3a; }
 html:is([data-theme="givre"], [data-theme="kawaii"], [data-theme="soleil"]) #ecranTele .tele-pari-vide{ color: #5a4300; border-color: rgba(60, 40, 0, 0.45); }
-html:is([data-theme="givre"], [data-theme="kawaii"], [data-theme="soleil"]) #ecranTele .tele-pari-en-cours .tele-pari-vide{ color: #8a5a00; border-color: #c98a00; }
+html:is([data-theme="givre"], [data-theme="kawaii"], [data-theme="soleil"]) #ecranTele .tele-pari-en-cours .tele-pari-vide{ color: #6b4300; border-color: #a86f00; }
 #ecranTele .tele-pari-apres .tele-pari-joueur{ width: 17vh; padding: 1.2vh 1vh; }
 #ecranTele .tele-pari-apres .tele-pari-joueur .Carte, #ecranTele .tele-pari-apres .tele-pari-vide{ width: 11vh; }
 #ecranTele .tele-pari-apres.tele-pari-nombreux .tele-pari-joueur{ width: 13vh; }
@@ -10407,11 +10404,11 @@ html:is([data-theme="givre"], [data-theme="kawaii"], [data-theme="soleil"]) #ecr
 #ecranTele .tele-victoire-pivot{ position: relative; flex: none; display: flex; }
 #ecranTele .tele-victoire-pivot .Carte{ position: relative; z-index: 1; }
 #ecranTele .tele-victoire-rayons{ position: absolute; left: 50%; top: 50%; width: 70vh; height: 70vh; margin: -35vh 0 0 -35vh; border-radius: 50%; pointer-events: none;
-  background: repeating-conic-gradient(rgba(255, 215, 0, 0.32) 0deg 9deg, transparent 9deg 22.5deg);
+  background: repeating-conic-gradient(var(--victoire-rayons, rgba(255, 215, 0, 0.32)) 0deg 9deg, transparent 9deg 22.5deg);
   -webkit-mask: radial-gradient(circle, #000 12%, transparent 68%); mask: radial-gradient(circle, #000 12%, transparent 68%);
   animation: teleVictoireRayonsArrivee 0.8s ease-out 0.5s both, teleVictoireRayons 16s linear infinite; }
 #ecranTele .tele-victoire-onde{ position: absolute; left: 50%; top: 50%; width: 30vh; height: 30vh; margin: -15vh 0 0 -15vh; border-radius: 50%; pointer-events: none;
-  border: 1.2vh solid #FFD700; box-shadow: 0 0 4vh #FFD700, inset 0 0 4vh #FFD700; opacity: 0; animation: teleVictoireOnde 1s ease-out 0.75s; }
+  border: 1.2vh solid var(--victoire-onde, #FFD700); box-shadow: 0 0 4vh var(--victoire-onde, #FFD700), inset 0 0 4vh var(--victoire-onde, #FFD700); opacity: 0; animation: teleVictoireOnde 1s ease-out 0.75s; }
 #ecranTele .tele-victoire .tele-pari-resultat-texte{ animation: teleVictoireTexte 0.7s cubic-bezier(.3, 1.6, .5, 1) 0.85s both; transform-origin: left center; }
 #ecranTele .tele-victoire .tele-pari-gagnant{ animation: teleVictoireSaut 0.55s ease-in-out 1.1s 3, teleVictoireLueur 1.6s ease-in-out 2.8s infinite alternate; }
 #ecranTele .tele-victoire .tele-pari-perdu{ animation: teleVictoireEteint 0.8s ease 1s both; }
@@ -10433,7 +10430,44 @@ html:is([data-theme="givre"], [data-theme="kawaii"], [data-theme="soleil"]) #ecr
 @keyframes teleVictoireLueur{ from{ box-shadow: 0 0 3.4vh rgba(61, 255, 139, 0.6); } to{ box-shadow: 0 0 7vh rgba(61, 255, 139, 0.95), 0 0 2vh rgba(255, 215, 0, 0.6); } }
 @keyframes teleVictoireEteint{ from{ opacity: 1; filter: none; } }
 @keyframes teleVictoireCouronne{ from{ opacity: 0; transform: translateY(-6vh) rotate(-30deg) scale(1.6); } }
+/* Télé allégée (le téléphone qui caste est en Mode Préhistoire) : rayons fixes, pas de lueur qui pulse */
+#ecranTele.tele-allegee .tele-victoire-rayons{ animation: teleVictoireRayonsArrivee 0.8s ease-out 0.5s both; }
+#ecranTele.tele-allegee .tele-victoire .tele-pari-gagnant{ animation: teleVictoireSaut 0.55s ease-in-out 1.1s 3; }
+#ecranTele.tele-allegee .tele-victoire-finie .tele-pari-gagnant{ animation: none; }
+/* Victoire au pari sur le téléphone (js/plateau.js, jouerVictoireTelephone) */
+#overlayPredictionFin .victoire-pivot{ position: relative; display: flex; justify-content: center; }
+#overlayPredictionFin .victoire-pivot .Carte{ position: relative; z-index: 1; }
+#overlayPredictionFin .victoire-rayons{ position: absolute; left: 50%; top: 50%; width: min(120vw, 520px); aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; pointer-events: none;
+  background: repeating-conic-gradient(var(--victoire-rayons, rgba(255, 215, 0, 0.32)) 0deg 9deg, transparent 9deg 22.5deg);
+  -webkit-mask: radial-gradient(circle, #000 12%, transparent 68%); mask: radial-gradient(circle, #000 12%, transparent 68%);
+  animation: victoireRayonsArrivee 0.8s ease-out 0.5s both, victoireRayons 16s linear infinite; }
+#overlayPredictionFin .victoire-onde{ position: absolute; left: 50%; top: 50%; width: 140px; height: 140px; margin: -70px 0 0 -70px; border-radius: 50%; pointer-events: none;
+  border: 6px solid var(--victoire-onde, #FFD700); box-shadow: 0 0 20px var(--victoire-onde, #FFD700), inset 0 0 20px var(--victoire-onde, #FFD700); opacity: 0; animation: victoireOnde 1s ease-out 0.75s; }
+#overlayPredictionFin .victoire-texte{ animation: teleVictoireTexte 0.7s cubic-bezier(.3, 1.6, .5, 1) 0.85s both; }
+@keyframes victoireRayons{ to{ transform: translate(-50%, -50%) rotate(360deg); } }
+@keyframes victoireRayonsArrivee{ from{ opacity: 0; } }
+@keyframes victoireOnde{ 0%{ opacity: 1; transform: scale(0.4); } 100%{ opacity: 0; transform: scale(4); } }
+/* Perdants du pari sur les thèmes clairs : estompés mais lisibles (à 45 % d'opacité, leur nom disparaissait) */
+html:is([data-theme="givre"], [data-theme="kawaii"], [data-theme="soleil"]) #ecranTele .tele-victoire .tele-pari-perdu,
+html:is([data-theme="givre"], [data-theme="kawaii"], [data-theme="soleil"]) #ecranTele .tele-pari-perdu{ opacity: 0.8; filter: saturate(0.6); }
+html:is([data-theme="givre"], [data-theme="kawaii"], [data-theme="soleil"]) #ecranTele .tele-pari-perdu .tele-pari-type{ color: #5a4300; }
+/* Victoire au pari (télé et téléphone) aux couleurs de chaque thème : --victoire-rayons (rayons), --victoire-onde (onde), --victoire-confettis (palette de js/tele.js, lancerConfettis).
+   Sans variable (Bordeaux, Noir, Vert, Bleu, Prestige) : rayons dorés et confettis multicolores. */
+html[data-theme="cerisier"]{ --victoire-rayons: rgba(255,150,190,.38); --victoire-onde: #ff8fb8; --victoire-confettis: #ff8fb8,#ffc1d9,#ffffff,#fdd835,#e91e63,#f06292; }
+html[data-theme="givre"]{ --victoire-rayons: rgba(60,165,235,.40); --victoire-onde: #2a9be0; --victoire-confettis: #1a9be0,#0f6aa6,#4fc3f7,#f0b400,#ef5350,#8e24aa; }
+html[data-theme="galaxie"]{ --victoire-rayons: rgba(73,180,255,.38); --victoire-onde: #49b4ff; --victoire-confettis: #49b4ff,#9fe0ff,#2f9bff,#ffffff,#b388ff,#7ac8ff; }
+html[data-theme="kawaii"]{ --victoire-rayons: rgba(255,105,180,.45); --victoire-onde: #ff69b4; --victoire-confettis: #ff69b4,#7ee0c3,#ffd54f,#b39ddb,#4fc3f7,#f06292; }
+html[data-theme="donjon"]{ --victoire-rayons: rgba(255,60,90,.40); --victoire-onde: #ff3d5a; --victoire-confettis: #ff3d5a,#ff8a96,#b71c1c,#ffffff,#ffd54f,#880e4f; }
+html[data-theme="noel"]{ --victoire-rayons: rgba(255,215,0,.32); --victoire-onde: #FFD700; --victoire-confettis: #e53935,#43a047,#ffffff,#ffd54f,#c62828,#2e7d32; }
+html[data-theme="chandeleur"]{ --victoire-rayons: rgba(255,200,60,.38); --victoire-onde: #ffc83c; --victoire-confettis: #ffd54f,#ffb300,#fff3c4,#ef6c00,#ffffff,#f9a825; }
+html[data-theme="valentin"]{ --victoire-rayons: rgba(255,120,160,.40); --victoire-onde: #ff6f9c; --victoire-confettis: #ff6f9c,#e91e63,#ffffff,#ff9ebb,#c2185b,#ffd54f; }
+html[data-theme="patrick"]{ --victoire-rayons: rgba(120,255,160,.34); --victoire-onde: #6cf29a; --victoire-confettis: #43a047,#a5d6a7,#ffffff,#fdd835,#2e7d32,#ffd54f; }
+html[data-theme="justrose"]{ --victoire-rayons: rgba(255,170,200,.40); --victoire-onde: #ffa6c4; --victoire-confettis: #ff8fb8,#ffc1d9,#ffffff,#f8bbd0,#e91e63,#fdd835; }
+html[data-theme="musique"]{ --victoire-rayons: rgba(200,140,255,.38); --victoire-onde: #c98cff; --victoire-confettis: #c98cff,#ff4fd8,#ffd54f,#ffffff,#7c4dff,#4fc3f7; }
+html[data-theme="halloween"]{ --victoire-rayons: rgba(255,140,40,.38); --victoire-onde: #ff8c28; --victoire-confettis: #ff8c28,#7e3fbf,#6fbf3f,#ffffff,#ffb300,#b71c1c; }
+html[data-theme="soleil"]{ --victoire-rayons: rgba(255,255,255,.50); --victoire-onde: #fff1c0; --victoire-confettis: #e53935,#8e24aa,#1565c0,#f9a825,#ffffff,#ef6c00; }
 @media (prefers-reduced-motion: reduce){
+  #overlayPredictionFin .victoire-rayons, #overlayPredictionFin .victoire-onde, #overlayPredictionFin .victoire-texte{ animation: none; }
   #ecranTele .tele-victoire-rayons, #ecranTele .tele-victoire :is(.tele-pari-resultat-texte, .tele-pari-gagnant, .tele-pari-perdu, .tele-victoire-couronne){ animation: none; }
   #ecranTele .tele-victoire-onde{ display: none; }
 }
@@ -10990,7 +11024,8 @@ html[data-theme="givre"] #ecranTele .tele-puce.tele-puce-couleur:nth-child(3)::b
 html[data-theme="givre"] #ecranTele .tele-puce.tele-puce-couleur:nth-child(4)::before{ background-image: url("Cartes/givre/givre_6.webp"); }
 html[data-theme="givre"] #ecranTele .tele-couleur-carre{ box-shadow: none; }
 /* Thèmes clairs : nom de la couleur (VERT…) assombri, titre « Joueurs » de Givre plus foncé, ✦ ✦ ✦ du récap de la carte dorée en or foncé */
-html:is([data-theme="givre"], [data-theme="kawaii"], [data-theme="soleil"]) #ecranTele .tele-couleur b{ color: var(--c-texte, var(--c)); }
+html:is([data-theme="givre"], [data-theme="kawaii"]) #ecranTele .tele-couleur b{ color: var(--c-texte, var(--c)); }
+html[data-theme="soleil"] #ecranTele .tele-couleur b{ color: var(--c-clair, var(--c)); }
 html[data-theme="givre"] #ecranTele .tele-prepa-titre{ color: #0b6aa3; }
 html:is([data-theme="givre"], [data-theme="kawaii"], [data-theme="soleil"]) .recap-eclats{ color: #a87800; opacity: 1; }
 html[data-theme="givre"][data-theme] #ecranTele .tele-ecran-doree .tele-ecran-titre{

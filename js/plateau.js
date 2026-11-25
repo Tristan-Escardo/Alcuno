@@ -1310,6 +1310,7 @@ function lancerOverlayPrediction(startIndex){
         txt.innerText = tr`${gagnants.join(', ')} ont trouvé ! Chacun distribue ${texteCulSec()} !`;
       }
       reveal.appendChild(txt);
+      if(!derniereEstDoree && gagnants.length > 0) jouerVictoireTelephone(overlay, reveal, prev, txt);
 
       const btn = document.createElement('button');
       btn.className = 'bouton-pigeon';
@@ -2111,3 +2112,29 @@ window.addEventListener("touchstart", (e) => {
 }, { capture: true, passive: true });
 
 // #endregion
+
+// Victoire au pari sur le téléphone, comme sur la télé (voir jouerVictoirePariTele, js/tele.js) : la carte se retourne, onde et rayons
+// dorés derrière elle, confettis, texte qui saute, et le son (sauf quand la télé est reliée : c'est elle qui le joue).
+// Rien en Mode Préhistoire (les animations y sont coupées) ni avec « mouvements réduits ».
+function jouerVictoireTelephone(overlay, reveal, carte, texte){
+  overlay.classList.add("pari-victoire");
+  const reduit = (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) || document.documentElement.classList.contains("economie");
+  if(!codeTele) jouerSon("victoire");
+  if(reduit) return;
+  const pivot = document.createElement("div");
+  pivot.className = "victoire-pivot";
+  const rayons = document.createElement("div");
+  rayons.className = "victoire-rayons";
+  const onde = document.createElement("div");
+  onde.className = "victoire-onde";
+  carte.replaceWith(pivot);
+  pivot.append(rayons, onde, carte);
+  carte.animate([
+    { transform: "perspective(600px) rotateY(180deg) scale(0.5)", opacity: 0 },
+    { transform: "perspective(600px) rotateY(90deg) scale(1.1)", opacity: 1, offset: 0.5 },
+    { transform: "perspective(600px) rotateY(0deg) scale(1.18)", offset: 0.8 },
+    { transform: "perspective(600px) rotateY(0deg) scale(1)" }
+  ], { duration: 900, easing: "ease-out" });
+  texte.classList.add("victoire-texte");
+  lancerConfettis(carte, false); // (js/tele.js)
+}

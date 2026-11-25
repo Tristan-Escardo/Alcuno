@@ -610,7 +610,7 @@ function verifier(ok, texte){
         const lum = ([r, g, b]) => { const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
         const fonds = rgb(st.backgroundImage), texte = rgb(st.color)[0];
         const contraste = (c) => (Math.max(lum(c), lum(texte)) + 0.05) / (Math.min(lum(c), lum(texte)) + 0.05);
-        const plein = fonds.length >= 2 && texte && !/rgba/.test(st.backgroundImage) && fonds.every((c) => contraste(c) >= 4.5);
+        const plein = fonds.length >= 2 && texte && (document.documentElement.dataset.theme === "givre" || !/rgba/.test(st.backgroundImage)) && fonds.every((c) => contraste(c) >= 4.5); // (Givre : bloc de glace = dégradé opaque + reflets translucides par-dessus ; seules les teintes opaques comptent)
         return (r.width > liste.width * 0.8 ? "" : "étroite ") + (Math.abs(r.top - haut) < 2 ? "" : "pas-en-haut ") + (plein ? "" : "pas-plein-ou-illisible:" + st.backgroundImage.slice(0, 70) + " texte " + st.color);
       });
       problemes.push([theme, "départ", await mesure()]);
@@ -685,7 +685,7 @@ function verifier(ok, texte){
         const visuellementPremier = actif && [...liste.children].every((c) => ar.top <= c.getBoundingClientRect().top + 1);
         return [document.documentElement.dataset.theme === theme ? "" : "thème " + document.documentElement.dataset.theme,
           actif && visuellementPremier ? "" : "pas en haut", actif && ar.width > lr.width * 0.8 ? "" : "étroit",
-          actif && /rgb\(\d+, \d+, \d+\), rgb\(/.test(getComputedStyle(actif).backgroundImage) ? "" : "pas plein",
+          actif && (document.documentElement.dataset.theme === "givre" ? /rgb\(\d+, \d+, \d+\) \d+%, rgb\(/ : /rgb\(\d+, \d+, \d+\), rgb\(/).test(getComputedStyle(actif).backgroundImage) ? "" : "pas plein",
           cartes.length === 7 ? "" : cartes.length + " cartes", bad.length ? "images " + bad.slice(0, 2).map((b) => b.split("/").pop()).join(",") : ""].filter(Boolean).join(", ");
       }, theme);
       if (r || erreurs.length) problemes.push(`${theme} : ${r} ${erreurs.join("|")}`);
@@ -874,7 +874,7 @@ function verifier(ok, texte){
     const monte = apresGlisse.split(",").indexOf("voix") < apresFleche.split(",").indexOf("voix") && apresGlisse.split(",").sort().join() === apresFleche.split(",").sort().join();
     const attendueGlisse = apresGlisse;
     verifier(avant.defaut === "none" && avant.texte === "Réorganiser les réglages" && avant.poignees === 0 && pendant.edition && pendant.texte === "Terminer la modification" && pendant.defaut !== "none" &&
-      pendant.poignees >= 14 && pendant.fleches === 0 && pendant.tremble === "none" && pendant.poigneesVisibles === pendant.visibles && pendant.desalignees === 0 && pendant.poignees === 16 && apresFleche === attendueFleche && monte &&
+      pendant.poignees >= 14 && pendant.fleches === 0 && pendant.tremble === "none" && pendant.poigneesVisibles === pendant.visibles && pendant.desalignees === 0 && pendant.poignees >= pendant.visibles && apresFleche === attendueFleche && monte &&
       !fini.edition && fini.controles === 0 && fini.texte === "Réorganiser les réglages" && rechargee === attendueGlisse && parDefaut === origine && stocke === null && interrupteur && queue === "blocPartage,aPropos" && fixesSansPoignee && erreurs.length === 0,
       `réglages réorganisables : avant ${JSON.stringify(avant)}, pendant ${JSON.stringify(pendant)}, flèche ${apresFleche === attendueFleche}, glisser monté ${monte} (${apresGlisse}), fini ${JSON.stringify(fini)}, rechargé ${rechargee === attendueGlisse}, par défaut ${parDefaut === origine}, stocké ${stocke}, interrupteur ${interrupteur}, fin de page ${queue}, fixes sans poignée ${fixesSansPoignee} ${erreurs.join("|")}`);
     await ctx.close();

@@ -571,7 +571,7 @@ html[data-theme="kawaii"] #ecranTele .tele-prepa-joueur{
   color: #8a0a8a;
   box-shadow: 0 0.8vh 2vh rgba(80, 13, 80, 0.1);
 }
-html[data-theme="kawaii"] #ecranTele .tele-pied{ color: rgba(80, 13, 80, 0.45); }
+html[data-theme="kawaii"] #ecranTele .tele-pied{ color: #6b3a68; } /* (était à 45 % d'opacité : trop pâle) */
 html[data-theme="kawaii"] #ecranReglages .lienBug{ color: var(--givre-doux); }
 html[data-theme="kawaii"] #ecranReglages :is(#btnSignalerBug, #btnFaq){ color: var(--givre-accent); }
 html[data-theme="kawaii"] #ecranBug .bugFeuille{

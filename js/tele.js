@@ -357,6 +357,7 @@ function etatPourTele(){
     theme: document.documentElement.dataset.theme || "bordeaux",
     langue: LANGUE, // (la télé passe dans la langue du téléphone qui caste, js/langue.js)
     daltonien: document.documentElement.classList.contains("daltonien") ? 1 : 0, // (mode daltonien du téléphone qui caste)
+    eco: document.documentElement.classList.contains("economie") ? 1 : 0, // (Mode Préhistoire : la télé allège ses animations de victoire)
     voix: voixActive ? 1 : 0, // (réglage « Annonces à voix haute » : la télé lit alors les annonces, js/reglages.js)
     vitesseVoix, // (et à la vitesse choisie sur le téléphone)
     pause: !!pauseEnCours,
@@ -996,6 +997,8 @@ function dessinerTele(ecran, etat){
   attente.hidden = true;
   jeu.hidden = false;
   document.documentElement.classList.toggle("daltonien", !!etat.daltonien);
+  teleAllegee = !!etat.eco;
+  ecran.classList.toggle("tele-allegee", teleAllegee);
   appliquerThemeTele(etat.theme);
   lireSurTele(etat);
   musiqueTele = Number(etat.musique) > 0 ? { volume: Number(etat.musique), theme: etat.theme, enPartie: !!etat.partie } : null;
@@ -1122,6 +1125,8 @@ function dessinerTele(ecran, etat){
   // (même couleur assombrie : le nom de la couleur reste lisible sur les thèmes clairs, Givre, Kawaii et Soleil)
   elCouleur.style.setProperty("--c-texte", /^#[0-9a-f]{6}$/i.test(hexCouleur || "")
     ? "#" + [1, 3, 5].map((i) => Math.round(parseInt(hexCouleur.substr(i, 2), 16) * 0.5).toString(16).padStart(2, "0")).join("") : "");
+  elCouleur.style.setProperty("--c-clair", /^#[0-9a-f]{6}$/i.test(hexCouleur || "") // (éclaircie : lisible sur le panneau sombre de Soleil)
+    ? "#" + [1, 3, 5].map((i) => Math.round(parseInt(hexCouleur.substr(i, 2), 16) * 0.45 + 255 * 0.55).toString(16).padStart(2, "0")).join("") : "");
   if (hexCouleur) {
     // comme sur le téléphone : la couleur et ce qu'elle fait
     const carre = document.createElement("span");
@@ -1401,6 +1406,7 @@ function dessinerPariTele(zone, p){
 // Victoire au pari sur la télé : la carte se retourne, une onde dorée, des confettis, le texte qui saute,
 // les gagnants qui sautent avec une couronne (les autres s'éteignent doucement)
 let victoirePariTele = "";
+let teleAllegee = false; // le téléphone qui caste est en Mode Préhistoire (vieil appareil) : victoire allégée sur la télé aussi
 function jouerVictoirePariTele(zone, face){
   zone.classList.remove("tele-victoire-finie");
   zone.classList.add("tele-victoire");
@@ -1439,20 +1445,26 @@ function jouerVictoirePariTele(zone, face){
     ], { duration: 900, easing: "ease-out" });
   }
   // Confettis : une gerbe depuis la carte, puis deux canons dans les coins du bas
-  const ecran = zone.closest("#ecranTele") || document.body;
+  const fin = lancerConfettis(carte, teleAllegee);
+  setTimeout(() => zone.classList.add("tele-victoire-finie"), fin + 100);
+}
+
+// Confettis (télé ET téléphone : victoire au pari) : une gerbe depuis la carte, puis deux canons dans les coins du bas. Renvoie la durée totale (ms).
+// allege : vieux appareil (Mode Préhistoire du téléphone) : 3 fois moins de confettis et pas de rotation en 3D (gourmande)
+function lancerConfettis(carte, allege){
   const couche = document.createElement("div");
   couche.className = "tele-confettis";
-  ecran.appendChild(couche);
-  // (fond clair : le blanc et le jaune pâle disparaîtraient)
-  const fondClair = ["givre", "kawaii", "soleil"].indexOf(document.documentElement.dataset.theme) >= 0;
-  const couleurs = fondClair ? ["#e53935", "#f9a825", "#2e7d32", "#1565c0", "#8e24aa", "#ef6c00"]
-                             : ["#e53935", "#fdd835", "#43a047", "#1e88e5", "#ffffff", "#ffb300"];
+  (document.getElementById("ecranTele") || document.body).appendChild(couche);
+  // Palette du thème (--victoire-confettis, style_alcuno.css) ; sans variable : multicolore
+  const palette = getComputedStyle(document.documentElement).getPropertyValue("--victoire-confettis").split(",").map((c) => c.trim()).filter(Boolean);
+  const couleurs = palette.length >= 2 ? palette : ["#e53935", "#fdd835", "#43a047", "#1e88e5", "#ffffff", "#ffb300"];
   const l = window.innerWidth, h = window.innerHeight;
   const r = carte ? carte.getBoundingClientRect() : { left: l / 2, top: h / 3, width: 0, height: 0 };
+  const parts = allege ? 3 : 1;
   const sources = [
-    { x: r.left + r.width / 2, y: r.top + r.height / 2, n: 60, angle: -90, ecart: 180, vitesse: 0.75, delai: 750 },
-    { x: 0, y: h, n: 45, angle: -60, ecart: 30, vitesse: 1.15, delai: 950 },
-    { x: l, y: h, n: 45, angle: -120, ecart: 30, vitesse: 1.15, delai: 950 }
+    { x: r.left + r.width / 2, y: r.top + r.height / 2, n: Math.round(60 / parts), angle: -90, ecart: 180, vitesse: 0.75, delai: 750 },
+    { x: 0, y: h, n: Math.round(45 / parts), angle: -60, ecart: 30, vitesse: 1.15, delai: 950 },
+    { x: l, y: h, n: Math.round(45 / parts), angle: -120, ecart: 30, vitesse: 1.15, delai: 950 }
   ];
   let fin = 0;
   sources.forEach((s) => {
@@ -1471,15 +1483,17 @@ function jouerVictoirePariTele(zone, face){
       const duree = 2600 + Math.random() * 1400;
       const delai = s.delai + Math.random() * 150;
       fin = Math.max(fin, duree + delai);
+      const x3d = (deg) => (allege ? "" : ` rotateX(${deg}deg)`);
       morceau.animate([
-        { transform: "translate(0, 0) rotate(0deg) rotateX(0deg)", opacity: 1 },
-        { transform: `translate(${dx * 0.9}px, ${dy * 0.9}px) rotate(${tourne * 0.3}deg) rotateX(360deg)`, opacity: 1, offset: 0.25 },
-        { transform: `translate(${dx * 1.15}px, ${dy + chute * 0.45}px) rotate(${tourne * 0.7}deg) rotateX(900deg)`, opacity: 1, offset: 0.7 },
-        { transform: `translate(${dx * 1.25}px, ${dy + chute}px) rotate(${tourne}deg) rotateX(1440deg)`, opacity: 0 }
+        { transform: "translate(0, 0) rotate(0deg)" + x3d(0), opacity: 1 },
+        { transform: `translate(${dx * 0.9}px, ${dy * 0.9}px) rotate(${tourne * 0.3}deg)` + x3d(360), opacity: 1, offset: 0.25 },
+        { transform: `translate(${dx * 1.15}px, ${dy + chute * 0.45}px) rotate(${tourne * 0.7}deg)` + x3d(900), opacity: 1, offset: 0.7 },
+        { transform: `translate(${dx * 1.25}px, ${dy + chute}px) rotate(${tourne}deg)` + x3d(1440), opacity: 0 }
       ], { duration: duree, delay: delai, easing: "cubic-bezier(.2,.7,.4,1)", fill: "both" });
     }
   });
-  setTimeout(() => { couche.remove(); zone.classList.add("tele-victoire-finie"); }, fin + 100);
+  setTimeout(() => couche.remove(), fin + 100);
+  return fin;
 }
 
 // Texte avec <b> / <em> (les seules balises des règles) : construit à la main, sans innerHTML

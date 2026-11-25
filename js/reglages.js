@@ -2481,6 +2481,7 @@ try {
 
 let editionReglages = false;
 let zoneControlesReglages = null;
+let observeurControlesReglages = null; // (suit les changements de hauteur des blocs : les poignées restaient décalées quand un bloc grandissait après leur placement)
 const nomBlocReglage = (bloc) => ((bloc.querySelector(".optionTitre") || {}).textContent || bloc.dataset.cle).replace(/\s+/g, " ").trim();
 
 function placerControlesReglages(){
@@ -2512,6 +2513,11 @@ function construireControlesReglages(){
     zoneControlesReglages.appendChild(groupe);
   });
   contenuReglages.appendChild(zoneControlesReglages);
+  if (typeof ResizeObserver === "function") {
+    observeurControlesReglages = new ResizeObserver(() => requestAnimationFrame(placerControlesReglages));
+    observeurControlesReglages.observe(contenuReglages);
+    blocsReglages().forEach((bloc) => observeurControlesReglages.observe(bloc));
+  }
 }
 function deplacerBlocReglage(bloc, sens){
   const visibles = blocsVisiblesReglages();
@@ -2592,6 +2598,7 @@ function finirEditionReglages(){
   btnParDefautReglages.hidden = true;
   if (zoneControlesReglages) zoneControlesReglages.remove();
   zoneControlesReglages = null;
+  if (observeurControlesReglages) { observeurControlesReglages.disconnect(); observeurControlesReglages = null; }
 }
 btnModifierReglages.addEventListener("click", () => (editionReglages ? finirEditionReglages() : entrerEditionReglages()));
 btnParDefautReglages.addEventListener("click", () => {
