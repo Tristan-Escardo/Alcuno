@@ -80,7 +80,9 @@
         td + td{ font-family: "Inter", Arial, sans-serif; font-variant-numeric: tabular-nums; font-size: 15px; }
         td b{ color: var(--cyan-clair); text-shadow: 0 0 8px var(--cyan); }
         tr + tr td{ border-top: 1px solid rgba(0, 229, 255, .14); }
-        @media (max-width: 380px){ td, th{ padding: 7px 2px; } td:first-child{ font-size: 15px; } }
+        /* Téléphone : 5 colonnes (Fréquentation : Aujourd'hui, Hier, 7 jours, Total) : le nom de la ligne peut passer sur 2 lignes, titres moins espacés */
+        @media (max-width: 460px){ td:first-child, th:first-child{ white-space: normal; } td:first-child{ font-size: 15px; } th{ letter-spacing: .04em; } td, th{ padding: 7px 3px; } }
+        @media (max-width: 380px){ td, th{ padding: 7px 2px; } td:first-child{ font-size: 14px; } td + td{ font-size: 14px; } th{ font-size: 9px; } }
         .barre{ display: flex; align-items: center; gap: 8px; font-size: 15px; margin: 8px 0; }
         .nom{ width: 120px; color: var(--cyan-doux); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .piste{ flex: 1; height: 7px; background: rgba(0, 229, 255, .1); border-radius: 4px; overflow: hidden; }
@@ -355,7 +357,7 @@
         <section class="bloc">
             <div class="titre">Fréquentation</div>
             <table>
-                <thead><tr><th></th><th>Aujourd'hui</th><th>7 jours</th><th>Total</th></tr></thead>
+                <thead><tr><th></th><th>Aujourd'hui</th><th>Hier</th><th>7 jours</th><th>Total</th></tr></thead>
                 <tbody id="tableau"></tbody>
             </table>
         </section>
@@ -2095,7 +2097,7 @@ Données (stats ; « jours » = les 45 derniers jours, « visiteurs » du jour =
                 donnees.jours = jours;
                 const derniers7 = joursPasses(7);
                 const derniers30 = joursPasses(30);
-                const aujourdhui = derniers7[0];
+                const aujourdhui = derniers7[0], hier = derniers7[1];
                 const somme = (nom, liste) => liste.reduce((a, j) => a + Number((jours[j] || {})[nom] || 0), 0);
                 const visiteurs = (liste) => {
                     const ids = new Set();
@@ -2110,9 +2112,9 @@ Données (stats ; « jours » = les 45 derniers jours, « visiteurs » du jour =
                 ];
                 document.getElementById("tableau").innerHTML = lignes.map(([titre, nom]) => {
                     const v = nom
-                        ? [somme(nom, [aujourdhui]), somme(nom, derniers7), somme(nom, tous)]
-                        : [visiteurs([aujourdhui]), visiteurs(derniers7), visiteurs(tous)];
-                    return `<tr><td>${titre}</td><td><b>${nombre(v[0])}</b></td><td>${nombre(v[1])}</td><td>${nombre(v[2])}</td></tr>`;
+                        ? [somme(nom, [aujourdhui]), somme(nom, [hier]), somme(nom, derniers7), somme(nom, tous)]
+                        : [visiteurs([aujourdhui]), visiteurs([hier]), visiteurs(derniers7), visiteurs(tous)];
+                    return `<tr><td>${titre}</td><td><b>${nombre(v[0])}</b></td><td>${nombre(v[1])}</td><td>${nombre(v[2])}</td><td>${nombre(v[3])}</td></tr>`;
                 }).join("");
                 const chrono = derniers30.slice().reverse();
                 courbe(chrono.map((j) => Number((jours[j] || {}).visites || 0)), chrono[0]);
