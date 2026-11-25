@@ -9,9 +9,28 @@
 //   - ERREUR JS     : une erreur JavaScript pendant l'écran
 // Chaque écran est aussi photographié : planche à regarder dans tests/resultats/affichage_<telephone|tele>/<thème>/index.html
 // (un test ne sait pas dire si c'est joli : il dit si c'est cassé, oublié ou illisible).
-const fs = require("fs"); const path = require("path");
+const fs = require("fs"); const path = require("path"); const http = require("http");
 const RACINE = path.join(__dirname, "..");
-const URL_JEU = process.env.URL_JEU || "http://localhost:8765/index.html";
+
+// Serveur web du jeu : le test lance LE SIEN, sur un port libre, avec le dossier du jeu qui contient ce test (plus besoin de
+// « python3 -m http.server 8765 », et plus de risque de tester sans le savoir le jeu d'un AUTRE dossier servi sur ce port).
+// URL_JEU=http://… node tests/… : sert à tester une page déjà en ligne (rien n'est alors lancé). À appeler (await) avant le premier usage de C.URL_JEU.
+const TYPES = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".png": "image/png", ".svg": "image/svg+xml", ".webp": "image/webp",
+  ".gif": "image/gif", ".json": "application/json", ".mp3": "audio/mpeg", ".ico": "image/x-icon", ".txt": "text/plain" };
+let serveur = null;
+async function demarrerServeur() {
+  if (process.env.URL_JEU) { module.exports.URL_JEU = process.env.URL_JEU; console.log("Jeu testé : " + process.env.URL_JEU + " (URL_JEU)"); return; }
+  serveur = http.createServer((req, res) => {
+    const chemin = path.join(RACINE, decodeURIComponent(req.url.split("?")[0]).replace(/^\/$/, "/index.html"));
+    if (!chemin.startsWith(RACINE) || !fs.existsSync(chemin) || fs.statSync(chemin).isDirectory()) { res.writeHead(404); res.end(); return; }
+    res.writeHead(200, { "Content-Type": TYPES[path.extname(chemin)] || "application/octet-stream", "Cache-Control": "no-store" });
+    fs.createReadStream(chemin).pipe(res);
+  });
+  await new Promise((ok) => serveur.listen(0, ok));
+  module.exports.URL_JEU = `http://localhost:${serveur.address().port}/index.html`;
+  console.log("Jeu testé : " + RACINE + " (servi sur " + module.exports.URL_JEU + ")");
+}
+function arreterServeur() { if (serveur) { serveur.close(); serveur = null; } }
 
 // Boutons volontairement restés au style de base (écran "*" = partout) : [écran, morceau du nom du bouton, raison]
 const EXCEPTIONS_BOUTONS = [
@@ -24,6 +43,7 @@ const EXCEPTIONS_BOUTONS = [
 ];
 // Textes que le calcul de contraste lit mal : [morceau de la clé, raison]
 const EXCEPTIONS_CONTRASTE = [
+  ["tele-pari-perdu", "pari sur la télé : les perdants sont estompés exprès (on voit encore qui a perdu, sans que ça attire l'œil)"],
   ["aideAccueil", "aide du début : son voile est assombri par backdrop-filter, que le calcul ne voit pas (lisible à l'œil)"],
 ];
 
@@ -165,4 +185,4 @@ function conclure(titre, dossier, ecrans, avertissements, infos) {
   else console.log("TOUT EST OK");
 }
 
-module.exports = { URL_JEU, RACINE, lireTheme, scriptMesure, verifierEcran, ecrirePlanche, preparerDossier, conclure };
+module.exports = { URL_JEU: null, demarrerServeur, arreterServeur, RACINE, lireTheme, scriptMesure, verifierEcran, ecrirePlanche, preparerDossier, conclure };

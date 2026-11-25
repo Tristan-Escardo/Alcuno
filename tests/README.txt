@@ -52,7 +52,7 @@ Parties complètes du robot (1 à 2 minutes, Linux / macOS / Windows)
 
 Tout l'affichage dans UN thème : téléphone et télé (pour vérifier un nouveau thème, ex. un thème de fête)
 -------------------------------------------------------------------------------------------------------
-  (le jeu doit être servi sur http://localhost:8765 : python3 -m http.server 8765 depuis le dossier du jeu)
+  (le test lance son propre serveur web, sur le dossier du jeu qui contient ce test ; URL_JEU=http://… pour tester une page déjà en ligne)
   node tests/test_affichage_telephone.js kawaii    tous les écrans du téléphone (environ 3 minutes)
   node tests/test_affichage_tele.js kawaii         tous les écrans de la télé (environ 2 minutes)
 

@@ -1,5 +1,5 @@
 // TOUT L'AFFICHAGE DU TÉLÉPHONE DANS UN THÈME : node tests/test_affichage_telephone.js <thème>   (ex. kawaii)
-// (le jeu doit être servi sur http://localhost:8765 : python3 -m http.server 8765 depuis le dossier du jeu)
+// (le test lance son propre serveur web, sur le dossier du jeu qui contient ce test ; URL_JEU=http://… pour tester une page déjà en ligne)
 //
 // Ouvre chaque écran et chaque fenêtre du jeu (accueil, réglages, règles, FAQ, album, mode en ligne, caster, scan,
 // bug, installation, confirmations, plateau, volets, toutes les fenêtres de partie : pigeon, duel, +4, couleur,
@@ -128,6 +128,7 @@ const ECRANS = [
 ];
 
 (async () => {
+  await C.demarrerServeur(); // (son propre serveur : voir affichage_commun.js)
   const dossier = C.preparerDossier("affichage_telephone", theme);
   const b = await chromium.launch();
   const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 });
@@ -214,4 +215,5 @@ const ECRANS = [
   C.ecrirePlanche(dossier, `Affichage du téléphone : thème ${theme}`, ecrans);
   C.conclure(`Affichage du téléphone : thème ${theme}`, dossier, ecrans, avertissements, infos);
   await b.close();
+  C.arreterServeur();
 })();

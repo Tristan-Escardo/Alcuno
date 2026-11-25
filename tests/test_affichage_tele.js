@@ -1,5 +1,5 @@
 // TOUT L'AFFICHAGE DE LA TÉLÉ DANS UN THÈME : node tests/test_affichage_tele.js <thème>   (ex. kawaii)
-// (le jeu doit être servi sur http://localhost:8765 : python3 -m http.server 8765 depuis le dossier du jeu)
+// (le test lance son propre serveur web, sur le dossier du jeu qui contient ce test ; URL_JEU=http://… pour tester une page déjà en ligne)
 //
 // 1) Un téléphone simulé joue une partie complète en mode hot (robot : joueur_auto.js) dans ce thème ; chaque état
 //    différent qu'il enverrait à la télé est gardé (plateau, annonces, pigeon, duel, +4, couleur, Cupidon, défi hot,
@@ -15,6 +15,7 @@ const { theme, avertissements } = C.lireTheme("test_affichage_tele");
 const MAX_PAR_FENETRE = 3; // variantes gardées par type d'écran (sinon une partie donne des centaines d'états)
 
 (async () => {
+  await C.demarrerServeur(); // (son propre serveur : voir affichage_commun.js)
   const dossier = C.preparerDossier("affichage_tele", theme);
   const b = await chromium.launch();
   const infos = [];
@@ -140,4 +141,5 @@ const MAX_PAR_FENETRE = 3; // variantes gardées par type d'écran (sinon une pa
   C.ecrirePlanche(dossier, `Affichage de la télé : thème ${theme}`, ecrans);
   C.conclure(`Affichage de la télé : thème ${theme}`, dossier, ecrans, avertissements, infos);
   await b.close();
+  C.arreterServeur();
 })();
