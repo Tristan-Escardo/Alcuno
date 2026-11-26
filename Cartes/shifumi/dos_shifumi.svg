@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 156">
+  <rect width="100" height="156" rx="9" fill="#fff"/>
+  <rect x="5" y="5" width="90" height="146" rx="6" fill="#000"/>
+  <ellipse cx="50" cy="78" rx="46" ry="27" transform="rotate(-28 50 78)" fill="#e8180c"/>
+  <g transform="rotate(-22 50 78)" font-family="Arial Black, Arial, sans-serif" font-weight="900" text-anchor="middle" fill="#FFE81F" stroke="#000" stroke-width="3" paint-order="stroke" letter-spacing="1">
+    <text x="50" y="72" font-size="25">SHI</text>
+    <text x="50" y="98" font-size="21">FUMI</text>
+  </g>
+</svg>

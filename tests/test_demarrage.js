@@ -153,7 +153,10 @@ function verifier(ok, texte){
     for (const nom of ["Tom", "Lea", "Max"]) { await page.fill("#nomJoueur", nom); await page.click("#ajouterJoueur"); await page.waitForTimeout(250); }
     await page.click("#jouer"); await page.waitForTimeout(1200);
     await page.evaluate(() => { window.__sons = []; const origine = jouerSon; jouerSon = (nom, ...reste) => { window.__sons.push(nom); return origine(nom, ...reste); }; lancerOverlayChoixDuel(0, ""); });
+    // (d'abord le type de duel : Classique)
+    await page.evaluate(() => [...document.querySelectorAll("#overlayDuel .duel-boutons button")].find((b) => /Classique/.test(b.innerText)).dispatchEvent(new PointerEvent("pointerdown", { bubbles: true })));
     await page.waitForTimeout(800);
+    await page.evaluate(() => { window.__sons = []; });
     const avant = await page.evaluate(() => getComputedStyle(document.querySelectorAll("#overlayDuel .duel-boutons button")[0]).backgroundImage);
     await (await page.$$("#overlayDuel .duel-boutons button"))[0].click();
     await page.waitForTimeout(300);
@@ -263,9 +266,12 @@ function verifier(ok, texte){
       for (const nom of noms) { await o.page.fill("#nomJoueur", nom); await o.page.click("#ajouterJoueur"); await o.page.waitForTimeout(250); }
       await o.page.click("#jouer"); await o.page.waitForTimeout(1200);
       await o.page.evaluate(() => lancerOverlayChoixDuel(0, ""));
-      await o.page.waitForTimeout(500);
+      const types = await o.page.evaluate(() => [...document.querySelectorAll("#overlayDuel .duel-boutons button")].map((b) => b.innerText).join(" / "));
+      await o.page.evaluate(() => [...document.querySelectorAll("#overlayDuel .duel-boutons button")].find((b) => /Classique/.test(b.innerText)).dispatchEvent(new PointerEvent("pointerdown", { bubbles: true })));
+      await o.page.waitForTimeout(700);
       const etat = await o.page.evaluate(() => ({ choix: document.querySelectorAll("#overlayDuel .duel-boutons button").length,
         tirage: !!document.querySelector("#overlayDuel .duel-tirage-content") }));
+      etat.types = types;
       return { ...o, etat };
     };
     const a = await ouvrirDuel(["Tom", "Lea"]);

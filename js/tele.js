@@ -166,6 +166,12 @@ function texteSansBoutons(racine){
     noeud.childNodes.forEach((enfant) => {
       if (enfant.nodeType === Node.TEXT_NODE) { ligne += enfant.textContent; return; }
       if (enfant.nodeType !== Node.ELEMENT_NODE) return;
+      // data-tele : ce que la télé montre à la place (vide : rien). Ex. Shifumi : les choix d'un joueur, sur son téléphone,
+      // ne vont jamais sur la télé, et « tu as perdu » y devient « Tris a perdu, Ylana gagne »
+      if (enfant.dataset && enfant.dataset.tele !== undefined) {
+        if (enfant.dataset.tele && getComputedStyle(enfant).display !== "none") { finir(); ligne += enfant.dataset.tele; finir(); }
+        return;
+      }
       if (enfant.tagName === "BUTTON" || enfant.tagName === "SCRIPT" || enfant.classList.contains("Carte") ||
           enfant.classList.contains("fin-choix-grid") || enfant.classList.contains("fin-choix-actions") ||
           enfant.classList.contains("plus4-container-joueurs") || enfant.classList.contains("plus4-actions") ||

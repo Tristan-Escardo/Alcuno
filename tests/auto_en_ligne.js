@@ -5,7 +5,7 @@
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => Array.from(document.querySelectorAll(s));
   const pd = (el) => el.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
-  const cliquable = (el) => el && el.isConnected && !el.disabled &&
+  const cliquable = (el) => el && el.isConnected && !el.disabled && el.getClientRects().length > 0 &&
     getComputedStyle(el).pointerEvents !== "none" && !el.classList.contains("disabled");
   window.__erreurs = window.__erreurs || [];
   window.addEventListener("error", (e) => window.__erreurs.push(String(e.message)));
@@ -13,13 +13,14 @@
   const tick = () => {
     if (!actif) return;
     if ($("#ecranRattrapage")) return setTimeout(tick, 200);
+    if (window.__laisserDuels && $("#overlayDuel")) return setTimeout(tick, 200); // (un test joue les duels lui-même)
     if ($("#overlayPlus4")) {
       const valider = $$("#overlayPlus4 .plus4-action-btn").find(b => b.innerText.includes("Valider"));
       if (cliquable(valider)) pd(valider); else { const b = $$("#overlayPlus4 .plus4-joueur-btn")[(nbPlus4++) % 2]; if (b) pd(b); }
       return setTimeout(tick, 250);
     }
     const choix = ["#overlayCouleur .carre-couleur", "#overlayPigeon .bouton-pigeon", "#overlayDuel .duel-boutons .bouton-pigeon",
-      "#overlayDuel .duel-cartes .Carte", "#overlayAnnulation .bouton-annulation", "#overlayCarteDoree .bouton-doree",
+      "#overlayDuel .duel-cartes .Carte", "#overlayDuel .shifumi-option", "#overlayAnnulation .bouton-annulation", "#overlayCarteDoree .bouton-doree",
       "#overlayPredictionFin .fin-choix-card", "#overlayPredictionFin .bouton-pigeon", "#overlayFinUnRestants .bouton-pigeon"];
     for (const sel of choix) { const el = $$(sel).filter(cliquable)[0]; if (el) { if (sel.includes("#overlayPredictionFin")) el.click(); else pd(el); return setTimeout(tick, 300); } } // (pari : au doigt levé)
     const msg = $("#overlayRegleUnique") || $("#overlayResultatAnnulation");

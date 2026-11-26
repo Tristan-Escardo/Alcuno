@@ -25,6 +25,15 @@ Démarrage rapide (30 secondes, Linux / macOS / Windows)
   ne sortent que dans ce thème. Résultat attendu : « TOUT EST OK ». GitHub le lance aussi à chaque
   push (onglet Actions, « Tests de démarrage »).
 
+Duel Shifumi en mode classique (2 minutes, Linux / macOS / Windows)
+-------------------------------------------------------------------
+  node tests/test_shifumi_classique.js
+     THEME=givre : dans un autre thème ; CAPTURES=dossier : garde des captures
+
+  Un seul téléphone : chacun son tour choisit, une carte Shifumi de dos apparaît à chaque choix, puis elles se
+  retournent. Vérifie aussi le dos de chaque thème, l'égalité ×2, les gorgées, un bot dans le duel, et qu'une partie
+  coupée en plein Shifumi se reprend à l'identique. Résultat attendu : « TOUT EST OK ».
+
 Spectateur en ligne (10 secondes, Linux / macOS / Windows)
 ----------------------------------------------------------
   node tests/test_spectateur.js

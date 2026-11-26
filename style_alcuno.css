@@ -9202,6 +9202,109 @@ html[data-theme="soleil"] #overlayDuel .duel-vs{ color: #2a1a44; }
 html[data-theme="givre"] #overlayDuel .duel-vs{ color: var(--givre-texte); }
 html[data-theme="soleil"] #overlayDuel .duel-info{ color: #8a1f4a; text-shadow: none; } /* (jaune sur pêche : peu lisible) */
 
+/* ===== Duel Shifumi (en ligne, js/regles.js afficherOverlayShifumi) =====
+   (sélecteurs avec .duel-content : plus forts que « #overlayDuel div:nth-child(2) », qui met n'importe quel 2e div en ligne) */
+#overlayDuel [hidden]{ display: none !important; } /* (les choix de l'autre joueur, sur ce téléphone) */
+#overlayDuel .duel-content.shifumi-content{ gap: clamp(10px, 2.4vw, 22px); }
+#overlayDuel .duel-content .Carte.carte-vedette.shifumi-carte{ width: clamp(96px, 30vw, 150px); }
+#overlayDuel .duel-content .shifumi-statuts{ display: flex; flex-direction: column; align-items: center; gap: 4px; }
+#overlayDuel .duel-content .shifumi-statut{ width: auto; max-width: 92vw; opacity: 0.75; }
+#overlayDuel .duel-content .shifumi-statut.fait{ opacity: 1; }
+#overlayDuel .duel-content .shifumi-zone{ display: flex; flex-direction: column; align-items: center; }
+#overlayDuel .duel-content .shifumi-options{ display: flex; justify-content: center; align-items: flex-start; gap: clamp(10px, 3.5vw, 26px) !important; }
+/* (!important : « #overlayDuel div:nth-child(3){ gap: 16px !important } » des petits écrans écartait le 3e choix de son nom) */
+#overlayDuel .duel-content .shifumi-option{
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 6px !important; cursor: pointer;
+  -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent;
+  animation: slideUp 0.5s ease both;
+}
+#overlayDuel .duel-content .shifumi-option:nth-child(2){ animation-delay: 0.08s; }
+#overlayDuel .duel-content .shifumi-option:nth-child(3){ animation-delay: 0.16s; }
+#overlayDuel .duel-content .shifumi-image{
+  display: flex; align-items: center; justify-content: center;
+  width: clamp(78px, 24vw, 120px); aspect-ratio: 1; border-radius: 50%;
+  font-size: clamp(42px, 13vw, 66px); line-height: 1;
+  background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.28), rgba(255,255,255,0.08));
+  border: 3px solid var(--shifumi-bord, #FFD700);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.45);
+  transition: transform 0.15s ease;
+}
+#overlayDuel .duel-content .shifumi-option:active .shifumi-image{ transform: scale(0.92); }
+@media (hover: hover){ #overlayDuel .duel-content .shifumi-option:hover .shifumi-image{ transform: scale(1.08); } }
+#overlayDuel .duel-content .shifumi-nom{
+  color: var(--shifumi-texte, #FFD700); font: 800 clamp(16px, 4.4vw, 22px)/1.1 Arial, sans-serif; text-shadow: 2px 2px 5px #000;
+}
+#overlayDuel .duel-content .shifumi-mon-choix{ width: auto; max-width: 92vw; }
+#overlayDuel .duel-content .shifumi-mon-choix:empty, #overlayDuel .duel-content .shifumi-resultat:empty{ display: none; }
+#overlayDuel .duel-content .shifumi-reveal{ display: flex; flex-direction: row; justify-content: center; align-items: flex-start; gap: clamp(22px, 8vw, 60px) !important; }
+#overlayDuel .duel-content .shifumi-reveal:empty{ display: none; }
+#overlayDuel .duel-content .shifumi-revele-joueur{ display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 6px !important; animation: shifumiRevele 0.45s cubic-bezier(.2,1.4,.4,1) both; }
+#overlayDuel .duel-content .shifumi-revele-joueur:nth-child(2){ animation-delay: 0.06s; }
+#overlayDuel .duel-content .shifumi-revele-nom{ width: auto; max-width: 40vw; overflow-wrap: anywhere; }
+#overlayDuel .duel-content .shifumi-revele-joueur .shifumi-image{ width: clamp(96px, 30vw, 150px); font-size: clamp(54px, 17vw, 84px); }
+#overlayDuel .duel-content .shifumi-gagnant .shifumi-image{ box-shadow: 0 0 0 4px var(--shifumi-bord, #FFD700), 0 0 30px var(--shifumi-bord, #FFD700); }
+#overlayDuel .duel-content .shifumi-perdant .shifumi-image{ border-color: #e53935; box-shadow: 0 0 26px rgba(229,57,53,0.75); }
+#overlayDuel .duel-content .shifumi-perdant{ animation: shifumiRevele 0.45s cubic-bezier(.2,1.4,.4,1) both, shifumiSecoue 0.5s 0.5s ease both; }
+#overlayDuel .duel-content .shifumi-resultat{ white-space: pre-line; }
+@keyframes shifumiRevele{ from{ transform: scale(0.3) rotate(-12deg); opacity: 0; } to{ transform: none; opacity: 1; } }
+@keyframes shifumiSecoue{ 0%,100%{ translate: 0; } 20%{ translate: -8px; } 40%{ translate: 8px; } 60%{ translate: -5px; } 80%{ translate: 5px; } }
+@media (prefers-reduced-motion: reduce){
+  #overlayDuel .duel-content :is(.shifumi-option, .shifumi-revele-joueur, .shifumi-perdant){ animation: none; }
+}
+/* Couleurs des thèmes : celles du texte du duel */
+html[data-theme="halloween"] #overlayDuel{ --shifumi-bord: #ff9a3c; --shifumi-texte: #ff9a3c; }
+html[data-theme="justrose"] #overlayDuel, html[data-theme="musique"] #overlayDuel{ --shifumi-bord: #ffffff; --shifumi-texte: #ffffff; }
+html[data-theme="patrick"] #overlayDuel{ --shifumi-bord: #7dff9f; --shifumi-texte: #d9ffe5; }
+html[data-theme="valentin"] #overlayDuel{ --shifumi-bord: #ff8fb8; --shifumi-texte: #ffe3ee; }
+html[data-theme="soleil"] #overlayDuel{ --shifumi-bord: #c2185b; --shifumi-texte: #8a1f4a; }
+html[data-theme="soleil"] #overlayDuel .duel-content :is(.shifumi-nom, .shifumi-statut, .shifumi-mon-choix, .shifumi-revele-nom){ color: #6b1838; text-shadow: none; }
+html[data-theme="soleil"] #overlayDuel .duel-content .shifumi-resultat{ color: #8a1f4a; text-shadow: none; }
+html[data-theme="givre"] #overlayDuel{ --shifumi-bord: #3fb8ff; --shifumi-texte: var(--givre-texte); }
+html[data-theme="givre"] #overlayDuel .duel-content :is(.shifumi-nom, .shifumi-statut, .shifumi-mon-choix, .shifumi-revele-nom){ color: #0b6aa3; text-shadow: none; }
+
+/* --- Shifumi CARTES (classique) : une carte Shifumi de dos par choix, puis elles se retournent --- */
+#overlayDuel .duel-content .shifumi-table{ display: flex; flex-direction: row; justify-content: center; align-items: flex-start; gap: clamp(18px, 7vw, 48px) !important; min-height: clamp(130px, 38vw, 190px); }
+#overlayDuel .duel-content .shifumi-carte-jeu{ display: flex; flex-direction: column; align-items: center; gap: 6px !important; perspective: 700px; animation: shifumiPose 0.45s cubic-bezier(.2,1.3,.4,1) both; }
+#overlayDuel .duel-content .shifumi-carte-interieur{
+  position: relative; width: clamp(78px, 24vw, 112px); aspect-ratio: 50 / 78;
+  transform-style: preserve-3d; transition: transform 0.7s cubic-bezier(.3,1.4,.5,1);
+}
+#overlayDuel .duel-content .shifumi-carte-jeu.retournee .shifumi-carte-interieur{ transform: rotateY(180deg); }
+#overlayDuel .duel-content :is(.shifumi-carte-dos, .shifumi-carte-face){
+  position: absolute; inset: 0; border-radius: 10px; backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.5);
+}
+/* Dos des cartes Shifumi (outils/generer_dos_shifumi.py) : un seul dos pour tous les thèmes, sauf Star Wars, Kawaii et
+   BDSM qui ont le leur ; Givre : le dos commun, givré comme les cartes du thème */
+#overlayDuel .duel-content .shifumi-carte-dos{ background: url("Cartes/shifumi/dos_shifumi.svg") center / 100% 100% no-repeat; }
+html[data-theme="galaxie"] #overlayDuel .duel-content .shifumi-carte-dos{ background-image: url("Cartes/shifumi/dos_shifumi_galaxie.svg"); }
+html.android[data-theme="galaxie"] #overlayDuel .duel-content .shifumi-carte-dos{ background-image: url("Cartes/shifumi/dos_shifumi_galaxie_android.webp"); } /* (flous SVG : cassés sur Android) */
+html[data-theme="kawaii"] #overlayDuel .duel-content .shifumi-carte-dos{ background-image: url("Cartes/shifumi/dos_shifumi_kawaii.svg"); }
+html[data-theme="donjon"] #overlayDuel .duel-content .shifumi-carte-dos{ background-image: url("Cartes/shifumi/dos_shifumi_donjon.svg"); }
+html[data-theme="givre"] #overlayDuel .duel-content .shifumi-carte-dos::before{
+  content: ""; position: absolute; inset: -5.13% -8%; pointer-events: none;
+  background: url("Cartes/givre/givre_1.webp") center / 100% 100% no-repeat;
+}
+html[data-theme="givre"] #overlayDuel .duel-content .shifumi-carte-jeu:nth-child(2) .shifumi-carte-dos::before{ background-image: url("Cartes/givre/givre_4.webp"); transform: scaleX(-1); }
+/* (chargé dès l'ouverture du duel : sinon la 1re carte de dos pouvait apparaître vide, le temps que l'image arrive) */
+#overlayDuel .duel-content .shifumi-carte-dos.shifumi-precharge{ position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; box-shadow: none; }
+html[data-theme="givre"] #overlayDuel .duel-content .shifumi-carte-dos.shifumi-precharge::before{ content: none; }
+#overlayDuel .duel-content .shifumi-carte-face{ transform: rotateY(180deg); background: linear-gradient(180deg, #fffdf6, #f1e6cf); border: 3px solid var(--shifumi-bord, #FFD700); }
+#overlayDuel .duel-content .shifumi-face-image{ font-size: clamp(40px, 13vw, 62px); line-height: 1; }
+#overlayDuel .duel-content .shifumi-face-nom{ color: #3a1020; font: 900 clamp(13px, 3.8vw, 18px)/1 Arial, sans-serif; }
+#overlayDuel .duel-content .shifumi-carte-joueur{ width: auto; max-width: 36vw; overflow-wrap: anywhere; color: var(--shifumi-texte, #FFD700); }
+#overlayDuel .duel-content .shifumi-carte-jeu.shifumi-gagnant .shifumi-carte-face{ box-shadow: 0 0 0 3px var(--shifumi-bord, #FFD700), 0 0 30px var(--shifumi-bord, #FFD700); }
+#overlayDuel .duel-content .shifumi-carte-jeu.shifumi-perdant .shifumi-carte-face{ border-color: #e53935; box-shadow: 0 0 26px rgba(229,57,53,0.8); }
+#overlayDuel .duel-content .shifumi-carte-jeu.shifumi-perdant{ animation: shifumiPose 0.45s cubic-bezier(.2,1.3,.4,1) both, shifumiSecoue 0.5s 0.75s ease both; }
+@keyframes shifumiPose{ from{ transform: translateY(40px) scale(0.6); opacity: 0; } to{ transform: none; opacity: 1; } }
+
+html[data-theme="soleil"] #overlayDuel .duel-content .shifumi-carte-joueur, html[data-theme="givre"] #overlayDuel .duel-content .shifumi-carte-joueur{ text-shadow: none; }
+@media (prefers-reduced-motion: reduce){
+  #overlayDuel .duel-content .shifumi-carte-jeu{ animation: none; }
+  #overlayDuel .duel-content .shifumi-carte-interieur{ transition: none; }
+}
+
 /* ===== Télé : choix du +4 (ceux qui reçoivent des gorgées) et carte Couleur (les 4 couleurs) ===== */
 html #ecranTele .tele-puce.tele-puce-active.tele-puce-active{
   background: linear-gradient(180deg, var(--actif-haut), var(--actif-bas)); color: var(--actif-texte);
