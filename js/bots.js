@@ -197,7 +197,7 @@ function declencher(el){
 const idDe = (el) => el.dataset.netId || "";
 // Boutons qu'un bot ne touche jamais (revenir en arrière, effacer) : ils n'entrent même pas dans « ce qui lui revient »
 // (sinon le « Retour » du pari, qui appartient à celui qui vient de parier, bloquait le bot suivant)
-const IDS_JAMAIS_BOT = /^(plus4:annuler|plus4:reset|pred:retour|cupidon:retour|foudre:retour|pause:)/;
+const IDS_JAMAIS_BOT = /^(plus4:annuler|plus4:reset|pred:retour|cupidon:retour|foudre:retour|pause:|reflexe:)/; // (Réflexe : le bot tape lui-même, au bon moment, voir js/regles.js)
 const indexDe = (el) => Number(idDe(el).split(":").pop());
 
 // Choix parmi les boutons proposés à ce bot (tous du même écran)

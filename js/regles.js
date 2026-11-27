@@ -222,6 +222,10 @@ function dureeOverlayPourMessage(message){
 
 /* ===== Overlay animé pour toutes les cartes spéciales ===== */
 let overlayRegleTimeout = null;
+// Annonces et boutons d'annulation : les taps juste après leur apparition sont ignorés (taps encore en cours de l'écran
+// d'avant, ex. au duel Réflexe : l'annonce se fermait aussitôt, puis un « Annuler N » était choisi sans le vouloir)
+const DELAI_TAP_ANNONCE = 700;
+const DELAI_TAP_ANNULATION = 800;
 // ===== Annulation de gorgées (carte "un") =====
 let overlayRegleVerrouille = false; // si true => overlayRegleUnique ne s'auto-ferme pas
 
@@ -482,6 +486,9 @@ function afficherOverlayAnnulation(joueurIndex, nbGorgees, onDone = null, afterC
     boutons.appendChild(btn);
   }
 
+  // Boutons « Annuler N » inactifs un court instant (voir DELAI_TAP_ANNULATION ; en ligne, une action reçue entre-temps attend)
+  boutons.style.pointerEvents = "none";
+  setTimeout(() => { boutons.style.pointerEvents = ""; }, delai(DELAI_TAP_ANNULATION));
   document.body.appendChild(overlay);
   getComputedStyle(overlay).opacity; // départ du fondu bien pris en compte (sinon il apparaissait d'un coup)
   requestAnimationFrame(() => {
@@ -605,6 +612,7 @@ function montrerOverlayRegle(message, classeCarte = "", classeCarteSupplementair
       overlay.style.opacity = "1";
       overlay.style.transform = "scale(1)";
     }
+    overlay._affichee = performance.now();
     // Overlay réutilisé : on retire l'habillage doré d'un message carte dorée précédent
     overlay.classList.remove("overlay-doree");
     overlay.querySelectorAll(".etincelles-doree").forEach(z => z.remove());
@@ -641,6 +649,7 @@ function montrerOverlayRegle(message, classeCarte = "", classeCarteSupplementair
 
   overlay = document.createElement("div");
   overlay.id = "overlayRegleUnique";
+  overlay._affichee = performance.now();
   overlay.style.position = "fixed";
   overlay.style.inset = "0";
   overlay.style.width = "100%";
@@ -690,6 +699,8 @@ function montrerOverlayRegle(message, classeCarte = "", classeCarteSupplementair
   overlay.appendChild(boxTexte);
   overlay.style.cursor = "pointer";
   overlay.addEventListener("pointerdown", () => {
+    // (pas dans les 0,7 s après son apparition : un tap encore en cours, ex. au duel Réflexe, la fermait aussitôt)
+    if (performance.now() - (overlay._affichee || 0) < DELAI_TAP_ANNONCE) return;
     if (!overlayRegleVerrouille) {
       fermerOverlayRegleUnique();
     }
@@ -984,14 +995,18 @@ function lancerOverlayChoixDuel(joueurActuel, carteDuel = ""){
   let shifumi = ""; // "" : duel classique ; sinon la façon de jouer le Shifumi (voir plus bas)
   const nbDuellistes = joueurs.filter(nom => !estEnPause(nom)).length; // (2 seulement : le choix est forcé, pas de « Mauvais joueur ? »)
 
-  // Celui qui a tiré le 4 choisit d'abord le duel : classique (les 2 cartes) ou Shifumi (pierre, feuille, ciseaux).
-  // En ligne, le Shifumi se joue en secret sur le téléphone de chacun des 2 joueurs ; en classique (un seul téléphone),
-  // avec des cartes : chacun choisit à son tour, une carte de dos apparaît, puis les deux se retournent.
+  // Celui qui a tiré le 4 choisit d'abord le duel : classique (les 2 cartes), Shifumi (pierre, feuille, ciseaux) ou
+  // Réflexe (le premier qui tape quand « TAPE ! » s'affiche). En ligne, le Shifumi se joue en secret sur le téléphone de
+  // chacun des 2 joueurs ; en classique (un seul téléphone), avec des cartes : chacun choisit à son tour, une carte de dos
+  // apparaît, puis les deux se retournent. Réflexe : voir afficherOverlayReflexe.
   if(shifumiPossible()){
-    titre.innerText = tr("DUEL ! Classique ou Shifumi ?");
-    const types = enLigneActif
-      ? [["classique", tr("⚔️ Classique")], ["telephones", tr("✊ Shifumi")]]
-      : [["classique", tr("⚔️ Classique")], ["cartes", tr("✊ Shifumi")]];
+    // « DUEL ! » sous la carte, puis la question en plus petit
+    titre.innerText = tr("DUEL !");
+    const question = document.createElement("div");
+    question.className = "duel-label duel-question";
+    question.innerText = tr("Classique, Shifumi ou Réflexe ?");
+    content.insertBefore(question, containerBoutons);
+    const types = [["classique", tr("⚔️ Classique")], [enLigneActif ? "telephones" : "cartes", tr("✊ Shifumi")], ["reflexe", tr("⚡ Réflexe")]];
     types.forEach(([type, texte]) => {
       const btn = document.createElement("button");
       btn.className = "bouton-pigeon";
@@ -1003,7 +1018,9 @@ function lancerOverlayChoixDuel(joueurActuel, carteDuel = ""){
           if(!overlay.isConnected) return;
           containerBoutons.innerHTML = "";
           containerBoutons.style.pointerEvents = "";
-          titre.innerText = shifumi ? tr("SHIFUMI ! Choisis 2 joueurs") : tr("DUEL ! Choisis 2 joueurs");
+          question.remove();
+          titre.innerText = shifumi === "reflexe" ? tr("RÉFLEXE ! Choisis 2 joueurs")
+            : shifumi ? tr("SHIFUMI ! Choisis 2 joueurs") : tr("DUEL ! Choisis 2 joueurs");
           choisirLesJoueurs();
         }, delai(200));
       });
@@ -1061,7 +1078,8 @@ function lancerOverlayChoixDuel(joueurActuel, carteDuel = ""){
 
   function lancerLeDuel(j1, j2){
     overlay.innerHTML = "";
-    if(shifumi === "cartes") afficherOverlayShifumiCartes(overlay, j1, j2);
+    if(shifumi === "reflexe") afficherOverlayReflexe(overlay, j1, j2);
+    else if(shifumi === "cartes") afficherOverlayShifumiCartes(overlay, j1, j2);
     else if(shifumi) afficherOverlayShifumi(overlay, j1, j2);
     else afficherOverlayTirageDuel(overlay, j1, j2, carteDuel);
   }
@@ -1161,7 +1179,9 @@ function terminerDuel(overlay, perdant, gorg, cartePerdant, msg, generation, att
     }, delai(1800));
   };
   setTimeout(suite, delai(attente));
-  overlay.addEventListener("pointerdown", suite);
+  // (au tour suivant seulement : sinon le tap qui vient de décider du duel, encore en train de remonter jusqu'à l'écran
+  // du duel, le sautait aussitôt ; au Réflexe classique, le résultat ne s'affichait pas du tout)
+  setTimeout(() => { if(!suiteFaite) overlay.addEventListener("pointerdown", suite); }, 0);
 }
 
 // ===== DUEL SHIFUMI (en ligne) =====
@@ -1506,6 +1526,264 @@ function afficherOverlayShifumiCartes(overlay, j1, j2){
     resultat.innerText = tr`${joueurs[perdant]} a perdu, ${joueurs[gagnant]} gagne`;
     const gorg = gorgeesDuel(valeurCarteDuel(carteEnJeu), duelMultiplicateur);
     terminerDuel(overlay, perdant, gorg, carteEnJeu, tr`${joueurs[perdant]} boit ${texteGorgees(gorg)}`, generation, 3200);
+  }
+
+  nouvelleManche();
+}
+
+// ===== DUEL RÉFLEXE =====
+// Une carte du paquet des duels est l'enjeu, au milieu de l'écran. « Prêts ? », « Attention… », puis au bout d'un temps au
+// hasard (1,5 à 4,5 s) « TAPE ! » en gros, en vert : le premier qui tape gagne. Taper avant : faux départ, perdu.
+// - En ligne : chacun des 2 joueurs tape n'importe où sur SON téléphone. Le temps de réaction est mesuré sur ce téléphone,
+//   entre l'affichage de SON « TAPE ! » et son toucher, puis envoyé avec l'action (« reflexe:<manche>:<joueur>:<ms> »,
+//   « tot » pour un faux départ, « lent » au bout de 5 s sans tap) : le retard du réseau ne compte donc pas, et chaque
+//   téléphone tire son propre moment (regarder l'écran du voisin n'aide pas). Le plus rapide gagne ; même temps : égalité.
+// - En classique (un seul téléphone posé entre les deux) : l'écran est coupé en deux, une moitié par joueur (celle du
+//   haut à l'envers, pour celui d'en face). Le premier tap après « TAPE ! » gagne.
+// Égalité : gorgées ×2 et on rejoue (même carte). Personne n'a tapé (en ligne) : on rejoue sans doubler.
+// Le perdant boit les gorgées de la carte en jeu.
+const DUREE_REFLEXE_LENT = 5000;
+const DUREE_RESULTAT_REFLEXE = 3600; // (le résultat ne se saute pas au tap : les joueurs tapent encore, voir conclure)
+function afficherOverlayReflexe(overlay, j1, j2){
+  const generation = generationPartie;
+  overlay.classList.add("duel-shifumi", "duel-reflexe", enLigneActif ? "reflexe-en-ligne" : "reflexe-classique");
+  resetPaquetDuelSiBesoin();
+  const carteEnJeu = paquetDuel.shift();
+  const moi = (idx) => enLigneActif && !estSpectateur && joueurs[idx] === pseudoActuel;
+  const jeJoue = moi(j1) || moi(j2);
+  const adversaire = (idx) => idx === j1 ? j2 : j1;
+  const bot = (idx) => !enLigneActif && typeof estBot === "function" && estBot(joueurs[idx]);
+
+  const content = document.createElement("div");
+  content.className = "duel-content shifumi-content reflexe-content";
+  overlay.appendChild(content);
+
+  // Zone de tap d'un joueur. Classique : une moitié d'écran, avec son nom. En ligne : tout l'écran (calque transparent),
+  // seulement sur son téléphone (ailleurs elle existe pour rejouer son action, mais cachée)
+  const zones = {};
+  const creerZone = (idx) => {
+    const zone = document.createElement("div");
+    zone.className = "reflexe-zone";
+    zone.setAttribute("role", "button");
+    zone.dataset.tele = "";
+    zone.innerHTML = `<span class="duel-label reflexe-zone-nom">${echapperHtml(joueurs[idx])}</span>` +
+      `<span class="reflexe-zone-texte"></span>`;
+    zones[idx] = zone;
+    return zone;
+  };
+  if(!enLigneActif){
+    const haut = creerZone(j2);
+    haut.classList.add("reflexe-zone-haut");
+    content.appendChild(haut);
+  }
+
+  const milieu = document.createElement("div");
+  milieu.className = "reflexe-milieu";
+  content.appendChild(milieu);
+  const titre = document.createElement("div");
+  titre.className = "titre-pigeon duel-main-title";
+  titre.innerText = tr("RÉFLEXE");
+  milieu.appendChild(titre);
+  const vs = document.createElement("div");
+  vs.className = "duel-vs";
+  const nomVs = (idx) => { const n = document.createElement("span"); n.className = "duel-vs-nom"; n.textContent = joueurs[idx]; return n; };
+  const motVs = document.createElement("b");
+  motVs.className = "duel-vs-mot";
+  motVs.textContent = "VS";
+  vs.append(nomVs(j1), " ", motVs, " ", nomVs(j2));
+  milieu.appendChild(vs);
+  ajouterCarteVedette(milieu, carteEnJeu, "shifumi-carte reflexe-enjeu");
+
+  // « Prêts ? », « Attention… », puis « TAPE ! » en gros (vert)
+  const signal = document.createElement("div");
+  signal.className = "reflexe-signal";
+  milieu.appendChild(signal);
+  const consigne = document.createElement("div");
+  consigne.className = "duel-label reflexe-consigne";
+  consigne.dataset.tele = "";
+  milieu.appendChild(consigne);
+  const temps = document.createElement("div");
+  temps.className = "reflexe-temps";
+  milieu.appendChild(temps);
+  const resultat = document.createElement("div");
+  resultat.className = "duel-info shifumi-resultat";
+  milieu.appendChild(resultat);
+
+  if(enLigneActif){
+    [j1, j2].forEach((idx) => {
+      const zone = creerZone(idx);
+      zone.classList.add("reflexe-zone-ecran");
+      if(!moi(idx)) zone.hidden = true;
+      overlay.appendChild(zone);
+    });
+  } else {
+    const bas = creerZone(j1);
+    bas.classList.add("reflexe-zone-bas");
+    content.appendChild(bas);
+  }
+
+  let manche = 0;
+  let res = {};        // idx -> nombre (ms) | "tot" | "lent"
+  let go = false;      // « TAPE ! » affiché
+  let tGo = 0;         // moment où « TAPE ! » est à l'écran, sur CE téléphone
+  let fini = false;
+  let forcerLent = false;
+  const minuteurs = [];
+  const plusTard = (f, ms) => minuteurs.push(setTimeout(() => {
+    if(generation !== generationPartie || !overlay.isConnected) return;
+    f();
+  }, ms));
+  const arreterMinuteurs = () => { minuteurs.forEach(clearTimeout); minuteurs.length = 0; };
+
+  // Le résultat s'affiche alors que les joueurs tapent encore : ces taps ne doivent ni le sauter (terminerDuel : un tap
+  // sur l'écran du duel l'abrège), ni fermer l'annonce « X boit… » ou choisir une annulation juste après
+  overlay.addEventListener("pointerdown", (e) => { if(fini) e.stopPropagation(); }, true);
+
+  const texteTemps = (v) => v === "tot" ? tr("faux départ !") : v === "lent" ? tr("trop lent !") : `${v} ms`;
+  const afficherSignal = (texte, classe = "") => { signal.innerText = texte; signal.className = "reflexe-signal " + classe; };
+
+  function nouvelleManche(){
+    manche++;
+    res = {};
+    go = false;
+    fini = false;
+    arreterMinuteurs();
+    overlay.classList.remove("shifumi-revele", "reflexe-go");
+    temps.innerHTML = "";
+    resultat.innerText = "";
+    delete resultat.dataset.tele;
+    afficherSignal(enLigneActif && !jeJoue ? tr("Duel Réflexe en cours...") : tr("Prêts ?"), enLigneActif && !jeJoue ? "reflexe-signal-petit" : "");
+    signal.dataset.tele = tr("Duel Réflexe en cours...");
+    consigne.innerText = jeJoue ? tr("Tape l'écran dès que « TAPE ! » s'affiche") : "";
+    [j1, j2].forEach((idx) => {
+      // Zone neuve à chaque manche (surAction ajoute son écouteur : l'ancien enverrait l'action de la manche d'avant)
+      const ancienne = zones[idx];
+      const zone = ancienne.cloneNode(false);
+      while(ancienne.firstChild) zone.appendChild(ancienne.firstChild);
+      ancienne.replaceWith(zone);
+      zones[idx] = zone;
+      zone.classList.remove("faite", "gagnante", "perdante");
+      delete zone.dataset.netUtilise;
+      delete zone.dataset.netEnvoye;
+      zone.querySelector(".reflexe-zone-texte").innerText = enLigneActif ? "" : tr("Tape ici dès que « TAPE ! » s'affiche");
+      surAction(zone, `reflexe:${manche}:${idx}:`, {
+        owner: joueurs[idx], once: true, valide: () => !fini && res[idx] === undefined,
+        charge: (e) => {
+          if(forcerLent){ forcerLent = false; return "lent"; }
+          if(!go) return "tot";
+          // heure du toucher lui-même (pas celle où ce code tourne, parfois un peu après)
+          const t = e && e.timeStamp > 0 ? e.timeStamp : performance.now();
+          return Math.max(1, Math.round(t - tGo));
+        }
+      }, (e, valeur) => taper(idx, valeur));
+    });
+    // La barre « Mauvais joueur ? Annuler » (quelques secondes après le choix des joueurs) cache le bas de l'écran, donc la
+    // zone du joueur du bas : le compte ne commence qu'une fois la barre partie
+    const m = manche;
+    const lancerCompte = () => {
+      if(m !== manche || fini) return;
+      if(document.getElementById("annulerChoix")) return plusTard(lancerCompte, 150);
+      if(jeJoue || !enLigneActif) plusTard(() => { if(!go && m === manche) afficherSignal(tr("Attention…"), "reflexe-signal-attention"); }, 900);
+      // Moment du « TAPE ! » : tiré sur CE téléphone (pas le hasard commun de la partie : rien à garder pareil partout)
+      plusTard(signalGo, 1500 + Math.floor(Math.random() * 3000));
+    };
+    lancerCompte();
+  }
+
+  function signalGo(){
+    if(fini) return;
+    go = true;
+    overlay.classList.add("reflexe-go");
+    if(jeJoue || !enLigneActif) afficherSignal(tr("TAPE !"), "reflexe-signal-go");
+    tGo = performance.now();
+    requestAnimationFrame((t) => { if(go && !fini) tGo = t; }); // (recalé sur l'image où « TAPE ! » apparaît)
+    vibrer(60);
+    const m = manche;
+    [j1, j2].forEach((idx) => {
+      // En ligne : pas de tap au bout de 5 s => « trop lent », envoyé par SON téléphone (lui seul sait)
+      if(moi(idx)) plusTard(() => {
+        if(m !== manche || fini || res[idx] !== undefined) return;
+        forcerLent = true;
+        zones[idx].dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
+        forcerLent = false;
+      }, DUREE_REFLEXE_LENT);
+      // Bot (classique) : il tape entre 0,25 et 0,55 s après
+      if(bot(idx)) plusTard(() => {
+        if(m !== manche || fini) return;
+        zones[idx].dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
+      }, 250 + Math.floor(Math.random() * 300));
+    });
+  }
+
+  function taper(idx, valeur){
+    if(fini || generation !== generationPartie) return;
+    const v = valeur === "tot" || valeur === "lent" ? valeur : Number(valeur) || 1;
+    res[idx] = v;
+    const zone = zones[idx];
+    zone.classList.add("faite");
+    if(moi(idx) || !enLigneActif){
+      sonClicTheme();
+      if(!enLigneActif) zone.querySelector(".reflexe-zone-texte").innerText = texteTemps(v);
+    }
+    if(moi(idx) && v !== "tot"){
+      consigne.innerText = `${texteTemps(v)} — ` + tr`En attente de ${joueurs[adversaire(idx)]}…`;
+    }
+    // Faux départ : perdu tout de suite
+    if(v === "tot") return conclure(adversaire(idx));
+    // Classique : le premier tap après « TAPE ! » gagne (l'autre n'a pas encore tapé)
+    if(!enLigneActif) return conclure(idx);
+    const a = res[j1], b = res[j2];
+    if(a === undefined || b === undefined) return;
+    if(a === "lent" && b === "lent") return conclure(null, true);
+    if(a === "lent") return conclure(j2);
+    if(b === "lent") return conclure(j1);
+    conclure(a === b ? null : a < b ? j1 : j2);
+  }
+
+  // personne : aucun des deux n'a tapé (en ligne) => on recommence, sans multiplier les gorgées
+  function conclure(gagnant, personne = false){
+    fini = true;
+    arreterMinuteurs();
+    overlay.classList.add("shifumi-revele");
+    overlay.classList.remove("reflexe-go");
+    consigne.innerText = "";
+    delete signal.dataset.tele;
+    // Les temps de chacun (en ligne : ceux reçus ; en classique, seul le tap du premier compte)
+    const lignes = [j1, j2].filter((idx) => res[idx] !== undefined)
+      .map((idx) => `<span class="reflexe-ligne"><b>${echapperHtml(joueurs[idx])}</b> : ${echapperHtml(texteTemps(res[idx]))}</span>`);
+    temps.innerHTML = lignes.join("");
+
+    if(gagnant === null){
+      if(personne){
+        afficherSignal(tr("Personne n'a tapé !"), "reflexe-signal-petit");
+        resultat.innerText = tr("On recommence.");
+      } else {
+        duelMultiplicateur *= 2;
+        titre.innerText = tr("RÉFLEXE ×") + duelMultiplicateur;
+        afficherSignal(tr("Égalité !"), "reflexe-signal-petit");
+        resultat.innerText = tr("Égalité ! Les gorgées sont multipliées : ×") + duelMultiplicateur;
+      }
+      jouerSon("cartes");
+      setTimeout(() => {
+        if(generation !== generationPartie || !overlay.isConnected) return;
+        nouvelleManche();
+      }, delai(2800));
+      return;
+    }
+    const perdant = adversaire(gagnant);
+    const fauxDepart = res[perdant] === "tot";
+    afficherSignal(fauxDepart ? tr`Faux départ de ${joueurs[perdant]} !` : tr("RÉFLEXE !"), "reflexe-signal-petit");
+    zones[gagnant].classList.add("gagnante");
+    zones[perdant].classList.add("perdante");
+    jouerSon("cartes");
+    compterStat("duels", joueurs[gagnant]);
+    const neutre = tr`${joueurs[perdant]} a perdu, ${joueurs[gagnant]} gagne`;
+    resultat.dataset.tele = neutre;
+    resultat.innerText = moi(perdant) ? tr`${joueurs[perdant]}, tu as perdu !\n${joueurs[gagnant]} gagne`
+      : moi(gagnant) ? tr`${joueurs[gagnant]}, tu as gagné !\n${joueurs[perdant]} perd`
+      : neutre;
+    const gorg = gorgeesDuel(valeurCarteDuel(carteEnJeu), duelMultiplicateur);
+    terminerDuel(overlay, perdant, gorg, carteEnJeu, tr`${joueurs[perdant]} boit ${texteGorgees(gorg)}`, generation, DUREE_RESULTAT_REFLEXE);
   }
 
   nouvelleManche();

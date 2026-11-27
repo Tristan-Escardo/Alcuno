@@ -263,7 +263,11 @@
     #overlayFinUnRestants .bouton-pigeon, #overlayPredictionFin .bouton-pigeon, #overlayRegleUnique .bouton-annulation,
     #overlayAnnulation button):hover:not(:disabled){ box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9), 0 6px 20px rgba(255,180,100,0.55) !important; }
 }
-:where(html[data-theme="halloween"]) #overlayDuel .duel-boutons button:disabled{ background: #fcd9c0 !important; }
+/* (joueur déjà choisi au duel : rouge sang plein, texte blanc ; avant, texte rouge sur pêche, presque illisible) */
+html[data-theme="halloween"][data-theme] body #overlayDuel .duel-boutons button:disabled:not(#_):not(#__){ /* (les :not(#…) : plus fort que la règle « textes rouges » qui a deux id) */
+  background: linear-gradient(180deg, #c81e25, #7d0b10) !important; color: #fff !important; border: 1px solid #ff6b6b !important;
+  text-shadow: 0 1px 2px #000 !important; box-shadow: 0 0 16px rgba(232, 37, 44, 0.6) !important;
+}
 :where(html[data-theme="halloween"]) #menu #btnCaster{ box-shadow: 0 0 0 1px rgba(255,154,60,0.45) inset; }
 :where(html[data-theme="halloween"]) #ecranCaster .adresseTele{ color: #ff9a3c; }
 :where(html[data-theme="halloween"]) #ecranCaster .casterCode input{ border: 1px solid rgba(255,154,60,0.35); }
@@ -488,13 +492,17 @@ html[data-theme="halloween"] .voletPause-ok{
   border: 1px solid rgba(163, 21, 26, 0.9);
   text-shadow: 0 1px 3px #000; box-shadow: 0 0 16px rgba(163,21,26,.45);
 }
+/* (aux couleurs du thème, comme les autres boutons : texte rouge, bouton presque noir au liseré de sang ; avant, texte blanc
+   et bouton sans bord, qu'on ne distinguait pas du fond) */
 html[data-theme="halloween"] :is(#annulerChoix, #bandeauMiseAJour){
-  --bandeau-fond: #140205; --bandeau-bord: rgba(255, 255, 255, 0.5); --bandeau-texte: #fff;
-  --bandeau-bouton: linear-gradient(180deg, #2a0609, #120203); --bandeau-bouton-texte: #ffffff;
+  --bandeau-fond: #140205; --bandeau-bord: rgba(163, 21, 26, 0.9); --bandeau-texte: var(--hw-texte);
+  --bandeau-bouton: linear-gradient(180deg, #2a0609, #120203); --bandeau-bouton-texte: var(--hw-texte);
 }
 html[data-theme="halloween"] :is(#annulerChoix .annulerChoix-bouton, #bandeauMiseAJour .maj){
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.8); box-shadow: none;
+  border: 1px solid rgba(163, 21, 26, 0.9); text-shadow: 0 1px 3px #000;
+  box-shadow: inset 0 0 14px rgba(0,0,0,.75), 0 0 12px rgba(163,21,26,.55);
 }
+html[data-theme="halloween"] #annulerChoix .annulerChoix-temps{ background: #e8252c; }
 
 /* ----- Pari de fin et choix de fin : cadres rouge sombre avec un liseré blanc (au lieu du brun-doré de base) ----- */
 html[data-theme="halloween"] :is(.prediction-header, .fin-choix-recap, .fin-choix-card){
@@ -550,7 +558,8 @@ html[data-theme="halloween"] :is(#choixMode #btnReglages circle, #choixMode #btn
 html[data-theme="halloween"] :is(#choixMode #btnReglages svg, #choixMode #btnRegles svg, header #btnReglesJeu svg){
   filter: drop-shadow(0 2px 0 #1a0204) drop-shadow(0 3px 6px rgba(0, 0, 0, 0.7));
 }
-html[data-theme="halloween"] :is(#btnAccueilClassique, #enLigne #btnAccueilEnLigne, #ecranNouvellePartie #btnAccueil){ color: var(--hw-texte); -webkit-text-stroke-color: #fff; text-shadow: 0 2px 0 #1a0204, 0 3px 8px rgba(0, 0, 0, 0.7); }
+/* ⌂ Accueil : rouge sang comme le livre des règles à côté (avant : contour blanc, il paraissait blanc) */
+html[data-theme="halloween"] :is(#btnAccueilClassique, #enLigne #btnAccueilEnLigne, #ecranNouvellePartie #btnAccueil){ color: var(--hw-titre); -webkit-text-stroke-color: var(--hw-titre); text-shadow: 0 2px 0 #1a0204, 0 3px 8px rgba(0, 0, 0, 0.7); }
 html[data-theme="halloween"] :is(#ecranReglages, #ecranRegles, #ecranDefisPersonnels, #ecranCaster, #ecranBug, #ecranInstallation, #ecranCredits, :is(#ecranConfirmerAccueil, #ecranConfirmerBot), #ecranConfirmerHote, #ecranConfirmerRetrait, #ecranReprise, #ecranPause) :is(h2, .credits-titre){
   color: var(--hw-titre);
   text-shadow: 0 2px 0 #1a0204, 0 4px 12px rgba(0, 0, 0, 0.65);
@@ -672,9 +681,8 @@ html[data-theme="halloween"] #stickyJoueurActif:not(.has-couleur):not(.is-pigeon
 }
 html[data-theme="halloween"] #stickyJoueurActif.is-pigeon .sticky-nom{ color: var(--hw-texte) !important; }
 
-/* ----- Noms des thèmes dans les Réglages : en orange citrouille, et plus en bleu / vert / violet -----
-   (chaque thème montrait son nom de SA couleur ; le rond coloré à gauche suffit à les reconnaître) */
-html[data-theme="halloween"] .pastilleTheme .nomTheme{ color: #ff9a3c !important; }
+/* ----- Noms des thèmes dans les Réglages : chacun garde la couleur de SON thème, comme dans tous les autres thèmes
+   (ils étaient tous en orange citrouille ici) ----- */
 
 /* Une exception au « tout en rouge » : la pastille « hors connexion » des Réglages est une pastille d'état
    (fond gris, vert ou ROUGE). Son ✓ / ✗ doit rester blanc, sinon il disparaît sur le fond rouge. */

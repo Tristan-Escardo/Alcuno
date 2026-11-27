@@ -3,6 +3,9 @@
 // Renvoie [{ ratio, cle }] pour les textes sous le seuil.
 window.verifierContraste = function (seuil) {
   const parse = (s) => {
+    // (couleur issue d'un color-mix() : le navigateur l'écrit « color(srgb 0.1 0.2 0.3 / 0.5) », composantes de 0 à 1)
+    const srgb = String(s).match(/color\(srgb\s+([^)]+)\)/);
+    if (srgb) { const q = srgb[1].split(/[ \/]+/).filter(Boolean).map(Number); return { r: q[0] * 255, g: q[1] * 255, b: q[2] * 255, a: q.length > 3 ? q[3] : 1 }; }
     const m = String(s).match(/rgba?\(([^)]+)\)/);
     if (!m) return null;
     const p = m[1].split(/[ ,\/]+/).filter(Boolean).map(Number);

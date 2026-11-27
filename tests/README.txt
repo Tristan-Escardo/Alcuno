@@ -34,6 +34,25 @@ Duel Shifumi en mode classique (2 minutes, Linux / macOS / Windows)
   retournent. Vérifie aussi le dos de chaque thème, l'égalité ×2, les gorgées, un bot dans le duel, et qu'une partie
   coupée en plein Shifumi se reprend à l'identique. Résultat attendu : « TOUT EST OK ».
 
+Duel Shifumi en mode hot et hard (1 minute, Linux / macOS / Windows)
+--------------------------------------------------------------------
+  node tests/test_shifumi_hot.js
+
+  Le défi proposé au perdant suit les gorgées finales, égalités comprises (×2, ×4…) : hot A jusqu'à 4, B de 5 à 10,
+  C au-dessus ; hard HA jusqu'à 4, HB au-dessus ; aussi en mode PJ (moitié des gorgées, 10 au plus).
+  Résultat attendu : « TOUT EST OK ».
+
+Duel Réflexe en mode classique (3 minutes, Linux / macOS / Windows)
+--------------------------------------------------------------------
+  node tests/test_reflexe_classique.js
+     CAPTURES=dossier : garde des captures
+
+  Un seul téléphone posé entre les deux : écran coupé en deux (la moitié du haut à l'envers), la carte en jeu au
+  milieu, puis « TAPE ! » en gros au bout d'un temps au hasard ; le premier qui tape ensuite gagne. Vérifie : les 3 duels
+  proposés, le faux départ, que « TAPE ! » attend la fin de la barre « Mauvais joueur ? » (qui cache la zone du bas), que
+  les taps qui continuent ne sautent ni le résultat, ni l'annonce « X boit… », ni ne choisissent un « Annuler N », un
+  bot qui tape tout seul, et la reprise d'une partie coupée (temps gardés dans les actions). Résultat attendu : « TOUT EST OK ».
+
 Spectateur en ligne (10 secondes, Linux / macOS / Windows)
 ----------------------------------------------------------
   node tests/test_spectateur.js

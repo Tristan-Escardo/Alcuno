@@ -40,6 +40,7 @@ const EXCEPTIONS_BOUTONS = [
   ["*", "bouton-doree", "la carte dorée garde ses boutons or métallique dans tous les thèmes"],
   ["*", "bloc-hot-btn fait", "« Je le fais » du défi hot : rose vif voulu dans tous les thèmes (Givre et Soleil couchant le foncent)"],
   ["*", "fenetre", "fenêtres « Thème … débloqué » : leur propre style, le même dans tous les thèmes"],
+  ["*", "#btnProfilConnexion", "« Se connecter avec Google » : aspect imposé par Google (blanc, ou sombre dans les thèmes sombres)"],
 ];
 // Textes que le calcul de contraste lit mal : [morceau de la clé, raison]
 const EXCEPTIONS_CONTRASTE = [

@@ -9,7 +9,7 @@
          (Avant : « ?t= » + l'heure, différent à chaque lancement : tout le jeu était retéléchargé à chaque ouverture,
          environ 400 Ko. Maintenant, tant que la version ne change pas, le navigateur se contente de vérifier.) -->
     <script>
-        window.VERSION_FICHIERS = "9.96.16";
+        window.VERSION_FICHIERS = "9.96.17";
         // (ailleurs que sur le vrai site — poste de dev, appli de test — : l'heure en plus, comme avant, pour voir tout de
         // suite un fichier modifié sans changer de version)
         window.ANTI_CACHE = /(^|\.)github\.io$/i.test(location.hostname) ? window.VERSION_FICHIERS : window.VERSION_FICHIERS + "-" + Date.now();
@@ -337,7 +337,7 @@
                         <button type="button" class="pastilleTheme" data-theme="kawaii" style="--c:#ff8fc2;--c-givre:#c2276f" id="pastilleKawaii" hidden><span class="rond" style="background:linear-gradient(135deg,#ffb3d9 20%,#d9b8ff 55%,#b3e5ff)"></span><span class="nomTheme">Kawaii</span></button>
                         <!-- Thème secret : débloqué en lançant une partie en mode hot (js/reglages.js) -->
                         <button type="button" class="pastilleTheme" data-theme="donjon" style="--c:#ff2a3d;--c-givre:#a3101f" id="pastilleDonjon" hidden><span class="rond rondDonjon"></span><span class="nomTheme">BDSM</span></button>
-                        <button type="button" class="pastilleTheme" data-theme="galaxie" style="--c:#FFE81F;--c-givre:#1a3f8a" id="pastilleGalaxie" hidden><span class="rond rondGalaxie"></span><span class="nomTheme">Star Wars</span></button>
+                        <button type="button" class="pastilleTheme" data-theme="galaxie" style="--c:#FFE81F;--c-givre:#7d6a00" id="pastilleGalaxie" hidden><span class="rond rondGalaxie"></span><span class="nomTheme">Star Wars</span></button>
                         <!-- Thèmes de fête : TOUJOURS EN DERNIER, après Star Wars (et après les autres thèmes de fête déjà là). Choisi à la main pour l'instant (calendrier automatique plus tard, voir FETES.md) -->
                         <button type="button" class="pastilleTheme" data-theme="noel" style="--c:#ffb0b0;--c-givre:#b3121f"><span class="rond rondNoel"></span><span class="nomTheme">Noël</span></button>
                         <button type="button" class="pastilleTheme" data-theme="chandeleur" style="--c:#ffc58a;--c-givre:#bd4f10"><span class="rond rondChandeleur"></span><span class="nomTheme">Chandeleur</span></button>
@@ -345,7 +345,7 @@
                         <button type="button" class="pastilleTheme" data-theme="patrick" style="--c:#8cf0b4;--c-givre:#0f6a44"><span class="rond rondPatrick"></span><span class="nomTheme">Saint-Patrick</span></button>
                         <button type="button" class="pastilleTheme" data-theme="justrose" style="--c:#ffc2de;--c-givre:#cc3381"><span class="rond rondJustrose"></span><span class="nomTheme">Just Rosé</span></button>
                         <button type="button" class="pastilleTheme" data-theme="musique" style="--c:#cbbcff;--c-givre:#5b2bd1"><span class="rond rondMusique"></span><span class="nomTheme">Musique</span></button>
-                        <button type="button" class="pastilleTheme" data-theme="halloween" style="--c:#ff8a3c;--c-givre:#8f0b10"><span class="rond rondHalloween"></span><span class="nomTheme">Halloween</span></button>
+                        <button type="button" class="pastilleTheme" data-theme="halloween" style="--c:#ff8a3c;--c-givre:#b04a00"><span class="rond rondHalloween"></span><span class="nomTheme">Halloween</span></button>
                     </div>
                 </div>
 

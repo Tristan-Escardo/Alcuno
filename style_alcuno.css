@@ -4502,7 +4502,7 @@ html[data-theme="givre"]{
   --givre-texte: #0d3550;
   --givre-doux: #3f6680;
   --givre-accent: #0f6aa6;
-  --givre-bouton: linear-gradient(180deg, #27aee8, #1474b8);
+  --givre-bouton: linear-gradient(180deg, #1c8fd0, #0f63a8); /* (avant #27aee8 → #1474b8 : texte blanc trop pâle en haut) */
   --givre-panneau: rgba(255, 255, 255, 0.78);
   --givre-bord: rgba(20, 121, 184, 0.28);
   --deco-theme: linear-gradient(transparent, transparent);
@@ -4516,7 +4516,7 @@ html[data-theme="givre"] body{
 html[data-theme="givre"] #choixMode #titreAccueil,
 html[data-theme="givre"] header h1,
 html[data-theme="givre"] #ecranCredits .credits-titre{
-  color: #1a9be0;
+  color: #1585c8; /* (#1a9be0 avant : un peu pâle sur le fond clair) */
   text-shadow:
     0 3px 0 #0b5a8c,
     0 6px 14px rgba(13, 53, 80, 0.25),
@@ -4541,6 +4541,12 @@ html[data-theme="givre"] #ecranNouvellePartie #btnAccueil{
   color: #1a9be0;
   -webkit-text-stroke-color: #1a9be0;
   text-shadow: 0 2px 0 #0b5a8c, 0 3px 8px rgba(13, 53, 80, 0.2);
+}
+/* (hors du bandeau, sur le fond clair des écrans « Revenir », salle d'attente et « Nouvelle partie » : plus foncé, sinon trop pâle) */
+html[data-theme="givre"] #enLigne #btnAccueilEnLigne,
+html[data-theme="givre"] #ecranNouvellePartie #btnAccueil{
+  color: #0b6aa3;
+  -webkit-text-stroke-color: #0b6aa3;
 }
 html[data-theme="givre"] #choixMode #btnReglages path,
 html[data-theme="givre"] #choixMode #btnReglages circle{
@@ -4852,7 +4858,7 @@ html[data-theme="givre"][data-theme] :is(#overlayRegleUnique .regle-detail, #ove
 /* Grands titres en relief, comme ALCUNO (même astuce) */
 html[data-theme="givre"][data-theme] :is(#overlayRegleUnique .doree-titre, #overlayCarteDoree .doree-titre, #overlayPredictionFin .doree-titre,
   #overlayRegleUnique .celien-signature, .prediction-title){
-  color: #1a9be0 !important;
+  color: #1585c8 !important; /* (même bleu que le titre ALCUNO ; #1a9be0 avant, un peu pâle) */
   text-shadow: 0 2px 0 #0b5a8c, 0 0 22px rgba(255, 255, 255, 0.9) !important;
 }
 html[data-theme="givre"] #overlayRegleUnique .celien-bloc{
@@ -7104,7 +7110,7 @@ html[data-theme="givre"] #ecranPause #btnReprendrePause{ background: var(--givre
 :root[data-theme="soleil"]{
   --fond-theme: #2c3d6b;
   --deco-theme: radial-gradient(ellipse 110% 30% at 50% 100%, rgba(255,230,170,0.5) 0%, rgba(255,230,170,0) 70%) no-repeat, linear-gradient(180deg, #1f3566 0%, #4a4f86 20%, #a0618a 42%, #e9787a 62%, #f7a072 80%, #fcc98a 100%);
-  --soleil-panneau: rgba(22, 32, 72, 0.42);
+  --soleil-panneau: rgba(22, 32, 72, 0.72); /* (0,42 avant : sur le bas pêche du dégradé, les textes clairs des panneaux ne se lisaient plus) */
   --soleil-bord: rgba(255, 205, 170, 0.38);
   --soleil-creme: #fff1df;
   --soleil-peche: #ffcf9e;
@@ -7140,7 +7146,7 @@ html[data-theme="soleil"] #btnCaster{
 }
 /* Icônes du haut */
 html[data-theme="soleil"] :is(#btnRegles, header #btnReglesJeu) path{ stroke: var(--soleil-creme) !important; }
-html[data-theme="soleil"] #btnReglages svg *, html[data-theme="soleil"] #btnAccueilClassique{ color: var(--soleil-creme) !important; -webkit-text-stroke-color: var(--soleil-creme) !important; stroke: var(--soleil-creme); }
+html[data-theme="soleil"] #btnReglages svg *, html[data-theme="soleil"] :is(#btnAccueilClassique, #enLigne #btnAccueilEnLigne, #ecranNouvellePartie #btnAccueil){ color: var(--soleil-creme) !important; -webkit-text-stroke-color: var(--soleil-creme) !important; stroke: var(--soleil-creme); }
 /* Bouton Réglages de l'accueil : crème avec la même ombre que le livre des règles (la règle générale
    #choixMode #btnReglages, plus précise que celle du dessus, le laissait en jaune doré) */
 html[data-theme="soleil"] #choixMode #btnReglages :is(path, circle){ stroke: var(--soleil-creme); }
@@ -9299,6 +9305,63 @@ html[data-theme="givre"] #overlayDuel .duel-content .shifumi-carte-dos.shifumi-p
 #overlayDuel .duel-content .shifumi-carte-jeu.shifumi-perdant{ animation: shifumiPose 0.45s cubic-bezier(.2,1.3,.4,1) both, shifumiSecoue 0.5s 0.75s ease both; }
 @keyframes shifumiPose{ from{ transform: translateY(40px) scale(0.6); opacity: 0; } to{ transform: none; opacity: 1; } }
 
+/* --- Duel RÉFLEXE (js/regles.js afficherOverlayReflexe) : la carte en jeu au milieu, puis « TAPE ! » en gros, en vert ;
+   le premier qui tape gagne (tout en display explicite et !important sur les écarts : « #overlayDuel div:nth-child(2/3) »
+   touche n'importe quel div) */
+#overlayDuel .duel-content.reflexe-content{ display: flex !important; flex-direction: column; align-items: stretch; justify-content: space-between; gap: 10px !important; }
+#overlayDuel.reflexe-en-ligne .duel-content.reflexe-content{ justify-content: center; }
+#overlayDuel .duel-content .reflexe-milieu{ display: flex !important; flex-direction: column; align-items: center; justify-content: center; gap: clamp(8px, 2vw, 14px) !important; flex: 1 1 auto; }
+#overlayDuel .duel-content .Carte.carte-vedette.reflexe-enjeu{ width: clamp(96px, 30vw, 150px); }
+#overlayDuel.reflexe-classique .duel-content .Carte.carte-vedette.reflexe-enjeu{ width: clamp(70px, 20vw, 110px); }
+/* « Prêts ? » / « Attention… » / « TAPE ! » */
+#overlayDuel .duel-content .reflexe-signal{
+  color: var(--shifumi-texte, #FFD700); font: 900 clamp(30px, 9vw, 52px)/1.05 Arial Black, Arial, sans-serif; text-align: center;
+  text-shadow: 2px 2px 6px #000; min-height: 1.1em; max-width: 92vw; overflow-wrap: anywhere;
+}
+#overlayDuel .duel-content .reflexe-signal.reflexe-signal-petit{ font-size: clamp(20px, 5.6vw, 30px); }
+#overlayDuel .duel-content .reflexe-signal.reflexe-signal-attention{ animation: reflexeAttention 0.9s ease-in-out infinite alternate; }
+#overlayDuel .duel-content .reflexe-signal.reflexe-signal-go{
+  color: #2fe36a; font-size: clamp(64px, 21vw, 120px); text-shadow: 0 0 22px rgba(47,227,106,0.75), 3px 3px 0 #000;
+  animation: reflexeGo 0.16s cubic-bezier(.2,1.6,.4,1) both;
+}
+@keyframes reflexeAttention{ from{ opacity: 0.55; } to{ opacity: 1; } }
+@keyframes reflexeGo{ from{ transform: scale(0.4); } to{ transform: none; } }
+#overlayDuel .duel-content .reflexe-consigne{ width: auto; max-width: 92vw; opacity: 0.85; }
+#overlayDuel .duel-content .reflexe-consigne:empty{ display: none !important; }
+/* Zone de tap d'un joueur */
+#overlayDuel .duel-content .reflexe-zone{
+  display: flex !important; flex-direction: column; align-items: center; justify-content: center; gap: 8px !important;
+  border: 3px dashed var(--shifumi-bord, #FFD700); border-radius: 18px; padding: 14px 10px; min-height: clamp(110px, 19vh, 190px);
+  background: rgba(255,255,255,0.06); cursor: pointer; user-select: none; -webkit-user-select: none; touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent; transition: background-color 0.1s, border-color 0.1s, transform 0.1s;
+}
+#overlayDuel .reflexe-zone[hidden]{ display: none !important; } /* (en ligne : la zone de l'autre joueur, cachée) */
+#overlayDuel .duel-content .reflexe-zone:active{ transform: scale(0.98); }
+#overlayDuel .duel-content .reflexe-zone-haut{ transform: rotate(180deg); }
+#overlayDuel .duel-content .reflexe-zone-haut:active{ transform: rotate(180deg) scale(0.98); }
+#overlayDuel .duel-content .reflexe-zone-nom{ width: auto; max-width: 80vw; overflow-wrap: anywhere; }
+#overlayDuel .duel-content .reflexe-zone-texte{ color: var(--shifumi-texte, #FFD700); font: 800 clamp(15px, 4.2vw, 20px)/1.2 Arial, sans-serif; text-align: center; text-shadow: 2px 2px 5px #000; }
+#overlayDuel .duel-content .reflexe-zone-texte:empty{ display: none; }
+#overlayDuel.reflexe-go .duel-content .reflexe-zone:not(.faite){ border-style: solid; border-color: #2fe36a; background: rgba(47,227,106,0.18); }
+#overlayDuel .duel-content .reflexe-zone.faite{ border-style: solid; }
+#overlayDuel .duel-content .reflexe-zone.gagnante{ border-color: var(--shifumi-bord, #FFD700); box-shadow: 0 0 26px var(--shifumi-bord, #FFD700); }
+#overlayDuel .duel-content .reflexe-zone.perdante{ border-color: #e53935; background: rgba(229,57,53,0.16); box-shadow: 0 0 22px rgba(229,57,53,0.7); }
+#overlayDuel .duel-content .reflexe-zone.perdante .reflexe-zone-texte{ animation: shifumiSecoue 0.5s ease both; }
+/* En ligne : tout l'écran est la zone (calque transparent par-dessus, sur le téléphone du joueur) */
+#overlayDuel .reflexe-zone.reflexe-zone-ecran{
+  position: absolute; inset: 0; z-index: 2; display: block; cursor: pointer; background: transparent;
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none;
+}
+#overlayDuel .reflexe-zone.reflexe-zone-ecran > *{ display: none; }
+#overlayDuel.reflexe-go .reflexe-zone.reflexe-zone-ecran:not(.faite){ box-shadow: inset 0 0 0 6px #2fe36a, inset 0 0 60px rgba(47,227,106,0.35); }
+#overlayDuel .duel-content .reflexe-temps{ display: flex !important; flex-direction: column; align-items: center; gap: 4px !important; color: #fff; font: 700 clamp(15px, 4.2vw, 20px)/1.2 Arial, sans-serif; text-shadow: 2px 2px 5px #000; }
+#overlayDuel .duel-content .reflexe-temps:empty{ display: none !important; }
+html[data-theme="soleil"] #overlayDuel .duel-content :is(.reflexe-zone-texte, .reflexe-temps, .reflexe-signal:not(.reflexe-signal-go)){ color: #6b1838; text-shadow: none; }
+html[data-theme="givre"] #overlayDuel .duel-content :is(.reflexe-zone-texte, .reflexe-temps, .reflexe-signal:not(.reflexe-signal-go)){ color: #0b6aa3; text-shadow: none; }
+@media (prefers-reduced-motion: reduce){
+  #overlayDuel .duel-content .reflexe-signal{ animation: none !important; }
+}
+
 html[data-theme="soleil"] #overlayDuel .duel-content .shifumi-carte-joueur, html[data-theme="givre"] #overlayDuel .duel-content .shifumi-carte-joueur{ text-shadow: none; }
 @media (prefers-reduced-motion: reduce){
   #overlayDuel .duel-content .shifumi-carte-jeu{ animation: none; }
@@ -9516,7 +9579,7 @@ html[data-theme="cerisier"] body #ecranReglages :is(.enteteGroupe, .tuileReglage
 html[data-theme="cerisier"] body #ecranReglages :is(.btnMiseEnPage, #btnModifierReglages, #btnParDefautReglages, .chipLangue){ border-radius: 999px !important; }
 html[data-theme="cerisier"] body #ecranReglages.reglages-edition #btnModifierReglages{ outline: 3px solid rgb(255, 255, 255); outline-offset: -4px; }
 html[data-theme="givre"] body #ecranReglages :is(.btnMiseEnPage, .enteteGroupe, .tuileReglage, #btnModifierReglages, #btnParDefautReglages, .chipLangue.actif){
-  background: linear-gradient(rgb(39, 174, 232), rgb(20, 116, 184)) !important; border: 0 !important; color: rgb(255, 255, 255) !important; box-shadow: rgba(8, 60, 100, 0.25) 0px -2px 0px 0px inset, rgba(26, 146, 214, 0.28) 0px 6px 14px 0px !important; text-shadow: rgba(8, 60, 100, 0.55) 0px 1px 2px !important; opacity: 1;
+  background: linear-gradient(rgb(28, 143, 208), rgb(15, 99, 168)) !important; border: 0 !important; color: rgb(255, 255, 255) !important; box-shadow: rgba(8, 60, 100, 0.25) 0px -2px 0px 0px inset, rgba(26, 146, 214, 0.28) 0px 6px 14px 0px !important; text-shadow: rgba(8, 60, 100, 0.55) 0px 1px 2px !important; opacity: 1;
 }
 html[data-theme="givre"] body #ecranReglages :is(.enteteGroupe, .tuileReglage){ border-radius: 14px !important; }
 html[data-theme="givre"] body #ecranReglages :is(.btnMiseEnPage, #btnModifierReglages, #btnParDefautReglages, .chipLangue){ border-radius: 999px !important; }
@@ -11096,7 +11159,7 @@ html[data-theme="givre"][data-theme][data-theme] :is(#overlayRegleUnique, #overl
   text-shadow: 0 1px 0 #5c4100, 0 0 16px rgba(255, 200, 0, 0.7) !important;
 }
 html[data-theme="givre"][data-theme][data-theme] :is(#overlayRegleUnique, #overlayCarteDoree, #overlayPredictionFin) .doree-etincelle{
-  color: #f0b400 !important;
+  color: #b08300 !important; /* (#f0b400 avant : presque invisible sur le fond clair) */
   text-shadow: 0 1px 0 #8a6200, 0 0 10px rgba(255, 215, 0, 0.7) !important;
 }
 html[data-theme="givre"] .etincelle.e0{ --c: #f0b400; } html[data-theme="givre"] .etincelle.e1{ --c: #ffd23f; }
@@ -11135,3 +11198,35 @@ html[data-theme="givre"][data-theme] #ecranTele .tele-ecran-doree .tele-ecran-ti
   color: #a87800 !important;
   text-shadow: 0 0.15vh 0 #5c4100, 0 0 2vh rgba(255, 200, 0, 0.7) !important;
 }
+
+/* Choix du duel : « DUEL ! » sous la carte, puis la question en plus petit (js/regles.js lancerOverlayChoixDuel) */
+#overlayDuel .duel-content .duel-question{ width: auto; max-width: 92vw; align-self: center; text-align: center; font-size: clamp(17px, 4.8vw, 24px); margin-top: -6px; }
+/* Thèmes clairs : la question du choix du duel et les noms des zones du Réflexe (jaunes par défaut, illisibles sur fond clair) */
+html[data-theme="soleil"] #overlayDuel .duel-content :is(.duel-question, .reflexe-zone-nom, .reflexe-consigne){ color: #6b1838; text-shadow: none; }
+html[data-theme="givre"] #overlayDuel .duel-content :is(.duel-question, .reflexe-zone-nom, .reflexe-consigne){ color: #0b6aa3; text-shadow: none; }
+
+/* ===== Lisibilité Soleil couchant (fond clair en bas du dégradé) ===== */
+/* Boutons orange des Réglages et « Arrêter de caster » : texte foncé (blanc sur orange clair : peu lisible) */
+html[data-theme="soleil"] body #ecranReglages :is(.btnMiseEnPage, #btnModifierReglages, #btnParDefautReglages, .chipLangue.actif),
+html[data-theme="soleil"] body #ecranReglages :is(.btnMiseEnPage, .chipLangue.actif) *{ color: #3d0d1f !important; text-shadow: none !important; }
+html[data-theme="soleil"][data-theme] body #ecranCaster #btnCasterArreter{ color: #3d0d1f !important; text-shadow: none !important; }
+/* Accueil : « BAR » sur sa carte orange */
+html[data-theme="soleil"] #choixMode #btnBarAccueil span{ color: #4a1010; text-shadow: none; }
+/* En ligne, salle d'attente */
+html[data-theme="soleil"] #listeJoueursEnLigne div{ background: var(--soleil-panneau); box-shadow: 0 0 0 1px var(--soleil-bord) inset; color: var(--soleil-creme); }
+html[data-theme="soleil"] #enLigne .btnExclure{ color: var(--soleil-creme); background-color: rgba(255, 241, 223, 0.12); text-shadow: none; }
+html[data-theme="soleil"] #codePartieAffiche{ color: #4a1338; text-shadow: none; }
+html[data-theme="soleil"] #enLigne .infoModeSoft{ color: #0d4a20; text-shadow: none; }
+/* Annonces (fond pêche) : détails et titres foncés */
+html[data-theme="soleil"][data-theme] body #overlayRegleUnique :is(.regle-titre, .regle-detail):not(#_){ color: #4a1338 !important; text-shadow: none !important; }
+html[data-theme="soleil"] #overlayCoupDeFoudre .foudre-consigne{ color: #4a1338; text-shadow: none; }
+/* Duel : joueur déjà choisi, aux couleurs du thème */
+html[data-theme="soleil"] #overlayDuel .duel-boutons button:disabled{ background: linear-gradient(rgb(255, 179, 92), rgb(242, 119, 92)) !important; color: #3d0d1f !important; }
+/* Récap de fin : étincelles sur le panneau sombre */
+html[data-theme="soleil"] .recap-eclats{ color: #ffd27a; }
+
+/* ===== Lisibilité Givre ===== */
+html[data-theme="givre"] #ecranCaster #codeCaster{ background: #fff; color: var(--givre-texte); border-color: var(--givre-bord, #9fd2ee); }
+html[data-theme="givre"] #ecranCaster #codeCaster::placeholder{ color: #4f7d99; }
+/* Annonce Célien (plus de 15 gorgées) : son fond est sombre (bleu nuit, violet) : titre crème */
+html[data-theme="soleil"][data-theme] body #overlayRegleUnique:has(.celien-bloc) .regle-titre:not(#_):not(#__){ color: var(--soleil-creme) !important; text-shadow: 0 2px 6px rgba(20, 10, 40, 0.6) !important; }

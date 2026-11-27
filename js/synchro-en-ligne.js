@@ -12,7 +12,9 @@
 //           pret() (l'élément peut recevoir l'action maintenant),
 //           valide() (false => action sans objet, ignorée),
 //           once (un seul usage), unique (une seule fois par manche : un 2e envoi est ignoré),
-//           evenement ("pointerdown" par défaut)
+//           evenement ("pointerdown" par défaut),
+//           charge(e) : valeur mesurée au tap sur CE téléphone (ex. temps de réaction du duel Réflexe), ajoutée à la fin
+//           de l'id envoyé (id = préfixe, ex. « reflexe:1:0: ») ; le handler la reçoit en 2e argument, partout pareil
 function surAction(el, id, options, handler){
   el.dataset.netId = id;
   el._net = Object.assign({ owner: null, pret: null, valide: null, once: false, unique: false }, options, { handler });
@@ -35,15 +37,25 @@ function surAction(el, id, options, handler){
       // (avant, un double tap rapide sur « Annuler 1 » s'appliquait deux fois). Les taps appliqués
       // sont gardés en mémoire, pour reprendre la partie après un plantage.
       if(!actionPrete(el) || (el._net.valide && !el._net.valide())) return;
+      const charge = el._net.charge ? String(el._net.charge(e)) : "";
       if(el._net.once) el.dataset.netUtilise = "1";
-      handler(e);
-      noterActionClassique(id);
+      handler(e, charge);
+      noterActionClassique(id + charge);
       actionAppliquee(sauvegardeClassique ? sauvegardeClassique.actions.length - 1 : -1);
       relancerRappelClassique(); // le joueur a joué : le compteur du rappel « À toi » repart de zéro
       return;
     }
-    envoyerAction(el);
+    envoyerAction(el, e);
   });
+}
+
+// Élément visé par une action reçue : même id, ou (option charge) id qui commence par le sien ; avec la valeur ajoutée
+function elementsAction(id){
+  return Array.from(document.querySelectorAll("[data-net-id]"))
+    .filter(el => el.dataset.netId === id || (el._net && el._net.charge && id.startsWith(el.dataset.netId)));
+}
+function chargeAction(el, id){
+  return el._net && el._net.charge ? id.slice(el.dataset.netId.length) : undefined;
 }
 
 function actionPrete(el){
@@ -59,7 +71,7 @@ function proprietaireAction(el){
   return typeof owner === "function" ? owner() : owner;
 }
 
-function envoyerAction(el){
+function envoyerAction(el, e){
   if(estSpectateur){ afficherToast(tr("Tu regardes la partie sans y jouer")); return; }
   const net = el._net;
   if(net.valide && !net.valide()) return;
@@ -76,7 +88,8 @@ function envoyerAction(el){
     el.dataset.netEnvoye = "1";
   }
 
-  ecrireAction(el.dataset.netId).catch(() => {
+  const charge = net.charge ? String(net.charge(e)) : "";
+  ecrireAction(el.dataset.netId + charge).catch(() => {
     delete el.dataset.netEnvoye;
     afficherToast(tr("Connexion perdue, réessaie"));
   });
@@ -332,8 +345,7 @@ function tenterAction(action){
   // ont appuyé en même temps, le 2e appui est ignoré au lieu d'attendre un bouton disparu
   if(idsUniquesUtilises.has(action.id)) return "ignorer";
 
-  const candidats = Array.from(document.querySelectorAll("[data-net-id]"))
-    .filter(el => el.dataset.netId === action.id);
+  const candidats = elementsAction(action.id);
 
   const el = candidats.find(actionPrete);
   if(!el){
@@ -343,7 +355,9 @@ function tenterAction(action){
     // Avant, il attendait un bouton disparu : 30 s de blocage sur un écran allumé, pour toujours sur
     // un écran éteint (partie bloquée). Un écran pas encore affiché ici (action en avance) attend
     // toujours : l'expéditeur, lui, avait vu l'action qui l'a ouvert, donc après la fermeture.
-    const fermeA = idsFermes.get(action.id);
+    let fermeA = idsFermes.get(action.id);
+    // (action avec une valeur ajoutée, voir surAction : l'écran est noté sous l'id sans la valeur)
+    if(fermeA === undefined) for(const [cle, seq] of idsFermes) if(cle.endsWith(":") && action.id.startsWith(cle)){ fermeA = seq; break; }
     if(fermeA !== undefined && typeof action.vu === "number" && action.vu < fermeA) return "ignorer";
     return "attendre";
   }
@@ -360,7 +374,7 @@ function tenterAction(action){
   // Boutons de l'écran de choix où l'action a lieu : notés comme « dépassés » à ce numéro d'action
   const ecranChoix = el.closest('[id^="overlay"]');
   if(ecranChoix) ecranChoix.querySelectorAll("[data-net-id]").forEach(b => idsFermes.set(b.dataset.netId, seqEnCours));
-  el._net.handler();
+  el._net.handler(undefined, chargeAction(el, action.id));
   return "ok";
 }
 
@@ -901,7 +915,7 @@ function rejouerActionClassique(id){
     if(id.startsWith("bot-classique:")) return remplacerParBot(nom) ? "ok" : "ignorer";
     return reprendreLaMain(nom) ? "ok" : "ignorer";
   }
-  const candidats = Array.from(document.querySelectorAll("[data-net-id]")).filter(el => el.dataset.netId === id);
+  const candidats = elementsAction(id);
   const el = candidats.find(actionPrete);
   if(!el){
     if(candidats.some(c => c._net && c._net.valide && !c._net.valide())) return "ignorer";
@@ -911,7 +925,7 @@ function rejouerActionClassique(id){
   // Comme au doigt : le plateau ne se touche pas à travers une annonce (voir surAction)
   if(el.closest("main") && (overlayOuvert() || voileOverlays.classList.contains("visible"))) return "attendre";
   if(el._net.once) el.dataset.netUtilise = "1";
-  el._net.handler();
+  el._net.handler(undefined, chargeAction(el, id));
   return "ok";
 }
 // #endregion

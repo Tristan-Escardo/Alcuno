@@ -39,4 +39,5 @@ donjon = (cadre + '<g transform="translate(50 66) scale(.62) translate(-50 -83)"
   + '<text x="50" y="118" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="15" text-anchor="middle" letter-spacing="1" fill="#d8102a" stroke="#000" stroke-width="2" paint-order="stroke">SHIFUMI</text>'
   + "</svg>\n")
 open("Cartes/shifumi/dos_shifumi_donjon.svg", "w").write(donjon)
+
 print("Dos Shifumi écrits dans Cartes/shifumi/")

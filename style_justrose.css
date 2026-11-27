@@ -594,7 +594,7 @@ html[data-theme="justrose"] #ecranTele .tele-joueur.pigeon-flash{ animation-name
 }
 
 /* ----- Nom du thème BDSM dans les Réglages : son rouge vif se lisait mal sur le panneau prune (contraste 2,9) : rouge plus clair ----- */
-html[data-theme="justrose"] #pastilleDonjon .nomTheme{ color: #ff9aa6; }
+html[data-theme="justrose"] #pastilleDonjon .nomTheme{ color: #ff4f5f; } /* (rouge un peu plus clair, mais rouge : #ff9aa6 avant, il devenait rose) */
 /* Télé : le joueur dont c'est le tour est sur fond blanc : son nom reste foncé (la règle blanche ci-dessus le rendait invisible) */
 html[data-theme="justrose"] #ecranTele .tele-joueur.tele-joueur-actif, html[data-theme="justrose"] #ecranTele .tele-joueur.tele-joueur-actif > span{ color: var(--actif-texte); }
 

@@ -94,7 +94,7 @@ const CAPTURES = process.env.CAPTURES || "";
 
   // ===== 1) CARTES =====
   const types = await lancerDuel("Shifumi", "Tris", "Ylana");
-  verifier(types.length === 2 && /Classique/.test(types[0]) && /Shifumi/.test(types[1]), `choix du duel en classique : ${types.join(" / ")}`);
+  verifier(types.length === 3 && /Classique/.test(types[0]) && /Shifumi/.test(types[1]) && /Réflexe/.test(types[2]), `choix du duel en classique : ${types.join(" / ")}`);
   let [A, B] = await ordre();
   let e = await lire();
   verifier(e.options === 3 && e.cartes === 0 && e.info.includes(`${A} : fais ton choix`), `cartes : ${A} choisit en premier, 3 choix, aucune carte (${e.info})`);
