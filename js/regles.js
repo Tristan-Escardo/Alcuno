@@ -1159,6 +1159,9 @@ function briserGivre(carte){
 
 // Fin d'un duel (classique ou Shifumi) : on enlève l'écran du duel après le temps de lire le résultat (attente, en ms),
 // ou dès qu'on tape sur l'écran, puis « X boit N gorgées » (avec ses « UN » pour annuler)
+// Temps de lecture du résultat avant « X boit… » (un tap l'abrège, sauf au Réflexe) : 1 s de plus qu'avant partout
+const DUREE_RESULTAT_DUEL = 3200;    // duel classique (2,2 s avant)
+const DUREE_RESULTAT_SHIFUMI = 4200; // Shifumi, en ligne et en classique (3,2 s avant)
 function terminerDuel(overlay, perdant, gorg, cartePerdant, msg, generation, attente){
   let suiteFaite = false;
   const suite = () => {
@@ -1371,7 +1374,7 @@ function afficherOverlayShifumi(overlay, j1, j2){
       : moi(gagnant) ? tr`${joueurs[gagnant]}, tu as gagné !\n${joueurs[perdant]} perd`
       : neutre;
     const gorg = gorgeesDuel(valeurCarteDuel(carteEnJeu), duelMultiplicateur);
-    terminerDuel(overlay, perdant, gorg, carteEnJeu, tr`${joueurs[perdant]} boit ${texteGorgees(gorg)}`, generation, 3200);
+    terminerDuel(overlay, perdant, gorg, carteEnJeu, tr`${joueurs[perdant]} boit ${texteGorgees(gorg)}`, generation, DUREE_RESULTAT_SHIFUMI);
   }
 
   nouvelleManche();
@@ -1533,7 +1536,7 @@ function afficherOverlayShifumiCartes(overlay, j1, j2){
     compterStat("duels", joueurs[gagnant]);
     resultat.innerText = tr`${joueurs[perdant]} a perdu, ${joueurs[gagnant]} gagne`;
     const gorg = gorgeesDuel(valeurCarteDuel(carteEnJeu), duelMultiplicateur);
-    terminerDuel(overlay, perdant, gorg, carteEnJeu, tr`${joueurs[perdant]} boit ${texteGorgees(gorg)}`, generation, 3200);
+    terminerDuel(overlay, perdant, gorg, carteEnJeu, tr`${joueurs[perdant]} boit ${texteGorgees(gorg)}`, generation, DUREE_RESULTAT_SHIFUMI);
   }
 
   nouvelleManche();
@@ -1551,7 +1554,7 @@ function afficherOverlayShifumiCartes(overlay, j1, j2){
 // Égalité : gorgées ×2 et on rejoue (même carte). Personne n'a tapé (en ligne) : on rejoue sans doubler.
 // Le perdant boit les gorgées de la carte en jeu.
 const DUREE_REFLEXE_LENT = 5000;
-const DUREE_RESULTAT_REFLEXE = 3600; // (le résultat ne se saute pas au tap : les joueurs tapent encore, voir conclure)
+const DUREE_RESULTAT_REFLEXE = 4600; // (le résultat ne se saute pas au tap : les joueurs tapent encore, voir conclure)
 function afficherOverlayReflexe(overlay, j1, j2){
   const generation = generationPartie;
   overlay.classList.add("duel-shifumi", "duel-reflexe", enLigneActif ? "reflexe-en-ligne" : "reflexe-classique");
@@ -1703,6 +1706,9 @@ function afficherOverlayReflexe(overlay, j1, j2){
     go = true;
     overlay.classList.add("reflexe-go");
     if(jeJoue || !enLigneActif) afficherSignal(tr("TAPE !"), "reflexe-signal-go");
+    // Télé : « TAPE ! » aussi en classique (elle montre le seul téléphone). En ligne, elle reste neutre : chaque téléphone
+    // tire son propre moment, un « TAPE ! » sur la télé pousserait au faux départ
+    if(!enLigneActif) signal.dataset.tele = tr("TAPE !");
     tGo = performance.now();
     requestAnimationFrame((t) => { if(go && !fini) tGo = t; }); // (recalé sur l'image où « TAPE ! » apparaît)
     vibrer(60);
@@ -1921,7 +1927,7 @@ function afficherOverlayTirageDuel(overlay, j1, j2, carteDuel = ""){
     briserGivre(perdant === j1 ? carteDeJ1 : carteDeJ2); // (thème Givre : son givre éclate et tombe en morceaux)
     (perdant === j1 ? carteDeJ2 : carteDeJ1).classList.add("duel-gagnant");
     info.innerText = joueurs[perdant] + tr(" perd le duel !");
-    terminerDuel(overlay, perdant, gorg, cartePerdant, msg, generation, 2200);
+    terminerDuel(overlay, perdant, gorg, cartePerdant, msg, generation, DUREE_RESULTAT_DUEL);
   }
 
   function onChoose(which){
