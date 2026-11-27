@@ -1430,4 +1430,5 @@ window.TEXTES_ES = {
 "Classique, Shifumi ou Réflexe ?": "¿Clásico, Piedra, papel o tijera o Reflejos?",
 "Tape l'écran dès que « TAPE ! » s'affiche": "Toca la pantalla en cuanto aparezca «¡TOCA!»",
 "Tape ici dès que « TAPE ! » s'affiche": "Toca aquí en cuanto aparezca «¡TOCA!»",
+"Je veux garder mon permis": "Quiero conservar mi carné",
 };

@@ -1430,4 +1430,5 @@ window.TEXTES_EN = {
 "Classique, Shifumi ou Réflexe ?": "Classic, Rock Paper Scissors or Reflex?",
 "Tape l'écran dès que « TAPE ! » s'affiche": "Tap the screen as soon as “TAP!” appears",
 "Tape ici dès que « TAPE ! » s'affiche": "Tap here as soon as “TAP!” appears",
+"Je veux garder mon permis": "I want to keep my licence",
 };

@@ -1430,4 +1430,5 @@ window.TEXTES_IT = {
 "Classique, Shifumi ou Réflexe ?": "Classico, Morra cinese o Riflessi?",
 "Tape l'écran dès que « TAPE ! » s'affiche": "Tocca lo schermo appena compare «TOCCA!»",
 "Tape ici dès que « TAPE ! » s'affiche": "Tocca qui appena compare «TOCCA!»",
+"Je veux garder mon permis": "Voglio tenermi la patente",
 };

@@ -71,8 +71,16 @@ function afficherOverlayFinUnRestants(){
     document.getElementById("btnRejouerMemes").click();
   }, { once: true });
 
+  // « Je veux garder mon permis » : ouvre l'éthylotest par-dessus l'écran de fin, sur CE téléphone seulement (« Retour »
+  // y ramène ; la partie n'est pas terminée pour autant, ni pour les autres en ligne)
+  const btnEthylo = document.createElement("button");
+  btnEthylo.className = "bouton-pigeon fin-ethylo";
+  btnEthylo.innerText = tr("Je veux garder mon permis");
+  btnEthylo.addEventListener("click", () => ouvrirEthylo());
+
   overlay.appendChild(btnRevanche);
   overlay.appendChild(btnTerminer);
+  overlay.appendChild(btnEthylo);
   document.body.appendChild(overlay);
 }
 
