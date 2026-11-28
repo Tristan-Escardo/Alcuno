@@ -281,16 +281,16 @@ setInterval(() => {
 }, 300);
 
 // ----- Partie bloquée en ligne -----
-// Un choix attend un joueur (son tour, son défi, son duel…) et rien ne bouge : 12 s s'il est déconnecté, 60 s sinon. Les
-// autres voient alors en bas « On attend Tris (son défi)… », avec :
-// - « Choisir à sa place » : ce téléphone fait UN choix pour lui (celui d'un bot : il boit plutôt que de faire le défi…) ;
-// - « Remplacer par un bot » : un bot joue pour lui jusqu'à ce qu'il reprenne la main. C'est le téléphone qui l'a demandé
-//   qui le fait jouer (son « pilote ») ; s'il part à son tour, la barre revient chez les autres (« Faire jouer le bot ici »).
-// Pas de bot en mode hard (comme en classique : il faut de vrais joueurs) : seulement « Choisir à sa place ».
-// Le joueur remplacé, revenu, voit « Un bot joue à ta place » avec « Reprendre la main ».
-// Tout passe par des actions de la partie (« botenligne:<nom> », « humainenligne:<nom> », et les choix eux-mêmes envoyés AU
+// Un choix attend un joueur (son tour, son défi, son duel…) et rien ne bouge depuis 80 s : les autres voient en bas
+// « On attend Tris (son tour)… » avec « Remplacer par un bot » : un bot joue pour lui jusqu'à ce qu'il reprenne la main.
+// C'est le téléphone qui l'a demandé qui le fait jouer (son « pilote ») ; s'il part à son tour, la barre revient chez les
+// autres (« Faire jouer le bot ici »). Rien en mode hard (comme en classique, pas de bot : il faut de vrais joueurs) : la
+// partie attend qu'il revienne, ou qu'on le retire. Le joueur remplacé, revenu, voit « Un bot joue à ta place » avec
+// « Reprendre la main ».
+// Tout passe par des actions de la partie (« botenligne:<nom> », « humainenligne:<nom> », et les choix du bot envoyés AU
 // NOM du joueur absent : ecrireAction(id, nom)) : même résultat sur tous les téléphones, rejoué au retour d'un joueur.
-const ATTENTE_BLOCAGE_ABSENT = 12000, ATTENTE_BLOCAGE = 60000;
+const ATTENTE_BLOCAGE = () => (typeof window.__attenteBlocage === "number" ? window.__attenteBlocage : 80000); // (les tests la raccourcissent)
+const ATTENTE_BOT_SANS_PILOTE = 12000; // (un bot dont le téléphone pilote est parti : personne n'attend un humain)
 let botsEnLigne = new Set();
 const pilotesBots = new Map(); // nom du bot -> pseudo du téléphone qui le fait jouer
 let debutAttenteBlocage = Date.now(); // (début de la manche : le compteur part de là s'il n'y a pas encore eu d'action)
@@ -313,19 +313,19 @@ function quoiEnAttente(el){
     [/^plus4:/, tr("le +4")], [/^doree:/, tr("la carte dorée")], [/^pred:/, tr("le pari")]].find(([m]) => m.test(id));
   return quoi ? quoi[1] : tr("son choix");
 }
-// Le choix à faire pour lui : celui d'un bot (choisirPourBot). Réflexe : un temps de réaction de bot, ou « trop lent »
-function idChoixPour(nom, enBot){
+// Le choix du bot (choisirPourBot). Réflexe : un temps de réaction de bot
+function idChoixPour(nom){
   const choix = choixEnAttentePour(nom);
   if (!choix.length) return null;
   const horsPlateau = choix.filter((el) => !el.closest("#plateau"));
   const el = horsPlateau.length ? choisirPourBot(nom, horsPlateau) : auHasard(choix);
   if (!el) return null;
-  if (el._net.charge) return idDe(el) + (enBot ? String(250 + Math.floor(Math.random() * 300)) : "lent");
+  if (el._net.charge) return idDe(el) + String(250 + Math.floor(Math.random() * 300));
   return idDe(el);
 }
 const envoisPour = new Map(); // id envoyé -> moment (pas deux fois le même pendant l'aller-retour du serveur)
-function choisirPour(nom, enBot){
-  const id = idChoixPour(nom, enBot);
+function choisirPour(nom){
+  const id = idChoixPour(nom);
   if (!id) return false;
   const deja = envoisPour.get(nom + "|" + id);
   if (deja && Date.now() - deja < 5000) return false;
@@ -370,8 +370,9 @@ function joueurQuiBloque(){
     // (un bot dont le pilote est là joue tout seul ; sinon, il bloque comme un absent)
     const depuis = Date.now() - Math.max(derniere, absentDepuis.get(nom) || 0);
     const pilote = pilotesBots.get(nom);
-    if (estBot(nom) && pilote && !absents.has(pilote) && joueurs.includes(pilote) && depuis < ATTENTE_BLOCAGE_ABSENT) continue;
-    if (depuis >= (absents.has(nom) || estBot(nom) ? ATTENTE_BLOCAGE_ABSENT : ATTENTE_BLOCAGE)) return { nom, quoi: quoiEnAttente(choixEnAttentePour(nom)[0]) };
+    if (estBot(nom) && pilote && !absents.has(pilote) && joueurs.includes(pilote) && depuis < ATTENTE_BOT_SANS_PILOTE) continue;
+    if (!peutMettreUnBot(nom)) continue; // (mode hard : rien à proposer, on attend)
+    if (depuis >= (estBot(nom) ? ATTENTE_BOT_SANS_PILOTE : ATTENTE_BLOCAGE())) return { nom, quoi: quoiEnAttente(choixEnAttentePour(nom)[0]) };
   }
   return null;
 }
@@ -383,7 +384,7 @@ function majBarreBlocage(){
   const moiBot = enLigneActif && partieLancee && !estSpectateur && estBot(pseudoActuel);
   const bloque = moiBot ? null : joueurQuiBloque();
   if (!moiBot && !bloque) { if (barre) barre.remove(); return; }
-  const cle = moiBot ? "moi" : `${bloque.nom}|${bloque.quoi}|${estBot(bloque.nom)}|${peutMettreUnBot(bloque.nom)}`;
+  const cle = moiBot ? "moi" : `${bloque.nom}|${bloque.quoi}|${estBot(bloque.nom)}`;
   if (barre && barre.dataset.cle === cle) return;
   if (barre) barre.remove();
   barre = document.createElement("div");
@@ -406,8 +407,7 @@ function majBarreBlocage(){
   } else {
     const { nom, quoi } = bloque;
     texte.textContent = tr`On attend ${nom} (${quoi})…`;
-    bouton(tr("Choisir à sa place"), () => choisirPour(nom, false));
-    if (peutMettreUnBot(nom)) bouton(estBot(nom) ? tr("Faire jouer le bot ici") : tr("Remplacer par un bot"),
+    bouton(estBot(nom) ? tr("Faire jouer le bot ici") : tr("Remplacer par un bot"),
       () => ecrireAction(`botenligne:${nom}`).catch(() => afficherToast(tr("Connexion perdue, réessaie"))));
   }
   barre.append(texte, boutons);
@@ -423,7 +423,7 @@ setInterval(() => {
   if (!bot) return;
   tourBotEnLignePrevu = setTimeout(() => {
     tourBotEnLignePrevu = null;
-    if (enLigneActif && botsEnLigne.has(bot) && pilotesBots.get(bot) === pseudoActuel) choisirPour(bot, true);
+    if (enLigneActif && botsEnLigne.has(bot) && pilotesBots.get(bot) === pseudoActuel) choisirPour(bot);
   }, DELAI_BOT());
 }, 1000);
 // #endregion

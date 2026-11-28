@@ -1444,7 +1444,6 @@ window.TEXTES_EN = {
 "Un bot joue à ta place": "A bot is playing for you",
 "Reprendre la main": "Take back control",
 "On attend {0} ({1})…": "Waiting for {0} ({1})…",
-"Choisir à sa place": "Choose for them",
 "Faire jouer le bot ici": "Run the bot here",
 "Remplacer par un bot": "Replace with a bot",
 };
