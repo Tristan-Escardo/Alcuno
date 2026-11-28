@@ -32,7 +32,8 @@
   window.__auto = { start(){ if (!actif){ actif = true; tick(); } }, stop(){ actif = false; } };
   // Empreinte de l'état du jeu, pour comparer deux téléphones
   window.__etat = () => JSON.stringify({
-    cartes: $$("#plateau .Carte").map(c => c.className.replace(/\s*(duel-a-choisir|dos_dore)\s*/g, " ").trim()).join("|"),
+    // (classes triées : un téléphone revenu en cours de partie les pose dans un autre ordre, même état)
+    cartes: $$("#plateau .Carte").map(c => c.className.replace(/\s*(duel-a-choisir|dos_dore)\s*/g, " ").trim().split(/\s+/).sort().join(" ")).join("|"),
     joueurs: ($("#listeJoueurs") || {}).innerText,
     tour: ($("#stickyJoueurActif .sticky-nom") || {}).innerText,
     regles: ($("#messageTexte") || {}).innerText

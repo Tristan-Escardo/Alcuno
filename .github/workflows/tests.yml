@@ -1,4 +1,4 @@
-# Test rapide de démarrage (tests/test_demarrage.js) à chaque push et chaque pull request.
+# Tests à chaque push et chaque pull request : démarrage (et autres tests rapides), partie complète du robot, duels.
 name: Tests de démarrage
 
 on:
@@ -49,3 +49,23 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Lancer les parties du robot
         run: node tests/test_partie_robot.js
+
+  duels:
+    # Les duels Shifumi et Réflexe en mode classique (un seul téléphone, sans Firebase) : choix du duel, égalités,
+    # faux départ, gorgées, défis hot / hard selon les gorgées finales, bot, reprise d'une partie coupée
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Installer Playwright et Chromium
+        run: |
+          npm i --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Duel Shifumi (classique)
+        run: node tests/test_shifumi_classique.js
+      - name: Duel Shifumi en mode hot, hard et PJ
+        run: node tests/test_shifumi_hot.js
+      - name: Duel Réflexe (classique)
+        run: node tests/test_reflexe_classique.js

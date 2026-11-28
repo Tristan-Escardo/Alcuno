@@ -7273,7 +7273,7 @@ html[data-theme="noir"] :is(#overlayCarteDoree, #overlayRegleUnique.overlay-dore
 /* ===== « Mauvais joueur ? ↶ Annuler » : quelques secondes après un choix de joueur (pigeon, carte
    dorée, duel, +4), en bas de l'écran, par-dessus les annonces. La barre du bas = temps restant.
    Se jette vers le bas (js : rendreAnnulerChoixGlissable). Couleurs : variables --bandeau-*, par thème (aussi pour le bandeau « Nouvelle version »). ===== */
-:is(#annulerChoix, #bandeauMiseAJour){
+:is(#annulerChoix, #bandeauMiseAJour, #barreBlocage){
   --bandeau-fond: #1d0613;
   --bandeau-bord: rgba(255, 215, 0, 0.45);
   --bandeau-texte: #fff;
@@ -7353,31 +7353,31 @@ html[data-theme="noir"] :is(#overlayCarteDoree, #overlayRegleUnique.overlay-dore
 @keyframes annulerChoixArrive{ from{ transform: translateY(140%); opacity: 0; } to{ transform: none; opacity: 1; } }
 @keyframes annulerChoixTemps{ from{ transform: scaleX(1); } to{ transform: scaleX(0); } }
 /* Couleurs par thème (Bordeaux : celles du dessus) */
-html[data-theme="noir"] :is(#annulerChoix, #bandeauMiseAJour){ --bandeau-fond: #141414; --bandeau-bord: rgba(255, 255, 255, 0.22); --bandeau-bouton-texte: #111; }
-html[data-theme="vert"] :is(#annulerChoix, #bandeauMiseAJour){ --bandeau-fond: #04200f; --bandeau-bouton-texte: #08301e; }
-html[data-theme="bleu"] :is(#annulerChoix, #bandeauMiseAJour){ --bandeau-fond: #070f28; --bandeau-bouton-texte: #0a1634; }
-html[data-theme="soleil"] :is(#annulerChoix, #bandeauMiseAJour){
+html[data-theme="noir"] :is(#annulerChoix, #bandeauMiseAJour, #barreBlocage){ --bandeau-fond: #141414; --bandeau-bord: rgba(255, 255, 255, 0.22); --bandeau-bouton-texte: #111; }
+html[data-theme="vert"] :is(#annulerChoix, #bandeauMiseAJour, #barreBlocage){ --bandeau-fond: #04200f; --bandeau-bouton-texte: #08301e; }
+html[data-theme="bleu"] :is(#annulerChoix, #bandeauMiseAJour, #barreBlocage){ --bandeau-fond: #070f28; --bandeau-bouton-texte: #0a1634; }
+html[data-theme="soleil"] :is(#annulerChoix, #bandeauMiseAJour, #barreBlocage){
   --bandeau-fond: #1f3566; --bandeau-bord: rgba(255, 205, 170, 0.5); --bandeau-texte: #fff1df;
   --bandeau-bouton: linear-gradient(180deg, #ffb35c, #f2775c); --bandeau-bouton-texte: #fff;
 }
-html[data-theme="soleil"] :is(#annulerChoix .annulerChoix-bouton, #bandeauMiseAJour .maj){ text-shadow: 0 1px 0 rgba(150, 50, 40, 0.8); }
-html[data-theme="cerisier"] :is(#annulerChoix, #bandeauMiseAJour){
+html[data-theme="soleil"] :is(#annulerChoix .annulerChoix-bouton, #bandeauMiseAJour .maj, #barreBlocage .barreBlocage-bouton){ text-shadow: 0 1px 0 rgba(150, 50, 40, 0.8); }
+html[data-theme="cerisier"] :is(#annulerChoix, #bandeauMiseAJour, #barreBlocage){
   --bandeau-fond: #3c0a2a; --bandeau-bord: rgba(255, 156, 197, 0.55);
   --bandeau-bouton: #ff9cc5; --bandeau-bouton-texte: #3c0a2a;
 }
-html[data-theme="givre"] :is(#annulerChoix, #bandeauMiseAJour){
+html[data-theme="givre"] :is(#annulerChoix, #bandeauMiseAJour, #barreBlocage){
   --bandeau-fond: #ffffff; --bandeau-bord: rgba(20, 121, 184, 0.35); --bandeau-texte: #0d3550;
   --bandeau-bouton: linear-gradient(180deg, #27aee8, #1474b8); --bandeau-bouton-texte: #fff;
   box-shadow: 0 10px 30px rgba(13, 53, 80, 0.25);
 }
 /* Star Wars : écran de vaisseau bleu nuit, barre de temps bleue (lame), plus de jaune ni de bordeaux */
-html[data-theme="galaxie"] :is(#annulerChoix, #bandeauMiseAJour){
+html[data-theme="galaxie"] :is(#annulerChoix, #bandeauMiseAJour, #barreBlocage){
   --bandeau-fond: #050a1a; --bandeau-bord: rgba(143, 208, 255, 0.55); --bandeau-texte: #eaf3ff;
   --bandeau-bouton: linear-gradient(180deg, #8fd0ff, #3d8fe0); --bandeau-bouton-texte: #02030a;
   box-shadow: 0 0 14px rgba(40, 140, 255, 0.45), 0 10px 30px rgba(0, 0, 0, 0.6);
 }
 html[data-theme="galaxie"] #annulerChoix .annulerChoix-temps{ background: #8fd0ff; opacity: 1; box-shadow: 0 0 8px #39a0ff, 0 0 16px rgba(40, 140, 255, 0.6); }
-html[data-theme="prestige"] :is(#annulerChoix, #bandeauMiseAJour){ --bandeau-fond: #2a1d03; --bandeau-bord: rgba(255, 223, 90, 0.6); --bandeau-bouton-texte: #3a2806; }
+html[data-theme="prestige"] :is(#annulerChoix, #bandeauMiseAJour, #barreBlocage){ --bandeau-fond: #2a1d03; --bandeau-bord: rgba(255, 223, 90, 0.6); --bandeau-bouton-texte: #3a2806; }
 
 /* Soleil couchant : bas des réglages (partager, signaler un bug, à propos) posé sur la fin claire du
    dégradé : textes en prune foncé, lien en framboise souligné */
@@ -11238,3 +11238,22 @@ html[data-theme="cerisier"] #ecranReglages #pastilleDonjon .nomTheme{ color: #ff
 /* Casino : ligne de celui qui choisit au pari de fin, fond vert sombre (jaune sur vert clair : peu lisible) */
 html[data-theme="vert"] #overlayPredictionFin .fin-choix-recap .ligne.en-cours{ background: rgba(0, 35, 14, 0.5); box-shadow: inset 0 0 0 1px rgba(255, 215, 0, 0.45); }
 html[data-theme="chandeleur"] #overlayDuel .duel-content .reflexe-zone-nom{ color: #fff3e0; }
+
+/* ===== Partie bloquée en ligne (js/bots.js, majBarreBlocage) : « On attend Tris (son défi)… » avec « Choisir à sa place »
+   et « Remplacer par un bot » ; chez le joueur remplacé : « Un bot joue à ta place ». Couleurs : les --bandeau-* du thème,
+   comme « Mauvais joueur ? » ===== */
+#barreBlocage{
+  position: fixed; left: 12px; right: 12px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 2147483000;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; max-width: 520px; margin: 0 auto;
+  padding: 12px 14px; border-radius: 16px; background: var(--bandeau-fond); border: 1px solid var(--bandeau-bord);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); color: var(--bandeau-texte); font: 800 15px Arial, sans-serif; text-align: center;
+  animation: annulerChoixArrive 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+#barreBlocage .barreBlocage-texte{ flex: 1 1 100%; }
+#barreBlocage .barreBlocage-boutons{ display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+#barreBlocage .barreBlocage-bouton{
+  padding: 9px 14px; border: none; border-radius: 999px; background: var(--bandeau-bouton); color: var(--bandeau-bouton-texte);
+  font: 900 14px Arial, sans-serif; cursor: pointer;
+}
+#barreBlocage .barreBlocage-bouton:disabled{ opacity: 0.55; cursor: default; }
+@media (prefers-reduced-motion: reduce){ #barreBlocage{ animation: none; } }

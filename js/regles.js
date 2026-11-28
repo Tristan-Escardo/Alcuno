@@ -336,7 +336,9 @@ function afficherOverlayResultatAnnulation(message, afterClose = null){
   };
 
   overlay.style.cursor = "pointer";
-  overlay.addEventListener("pointerdown", fermer);
+  // (pas dans les 0,7 s après son apparition : un tap encore en cours juste après le choix « Annuler N » la fermait aussitôt)
+  const affichee = performance.now();
+  overlay.addEventListener("pointerdown", () => { if(performance.now() - affichee >= DELAI_TAP_ANNONCE) fermer(); });
 
   document.body.appendChild(overlay);
   getComputedStyle(overlay).opacity; // départ du fondu bien pris en compte (sinon il apparaissait d'un coup)
@@ -2678,6 +2680,7 @@ function lancerPartie(){
   if(avecCarteDoree) noterDoreeStats("doreesEnJeu"); // statistiques (js/stats.js)
   reinitialiserGorgees();
   joueursEnPause = new Set(); // (personne en pause au début d'une partie)
+  if(typeof reinitialiserBotsEnLigne === "function") reinitialiserBotsEnLigne(); // (en ligne : plus de joueur remplacé par un bot, js/bots.js)
   tourSautePourPause = null;
   pauseEnCours = false;
   ecranPause.style.display = "none";

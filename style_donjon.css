@@ -309,7 +309,7 @@ html[data-theme="donjon"] #overlayPredictionFin .prediction-header :is(h2, h1, .
 html[data-theme="donjon"] #stickyJoueurActif .sticky-nom{ color: #ff6b7c; }
 html[data-theme="donjon"] .rappelTour{ color: #ff6b7c !important; }
 html[data-theme="donjon"] .btnPauseJoueur{ border-color: rgba(255, 42, 61, 0.6) !important; color: #ff6b7c !important; }
-html[data-theme="donjon"] :is(#annulerChoix, #bandeauMiseAJour){
+html[data-theme="donjon"] :is(#annulerChoix, #bandeauMiseAJour, #barreBlocage){
   --bandeau-fond: #14040a; --bandeau-bord: rgba(255, 42, 61, 0.7); --bandeau-bouton: #ff2a3d; --bandeau-bouton-texte: #fff;
 }
 html[data-theme="donjon"] .fin-choix-numeros b{ background: #ff2a3d; color: #fff; box-shadow: 0 0 8px rgba(255, 42, 61, 0.7); }

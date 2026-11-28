@@ -114,12 +114,13 @@ function prochainePlaceAction(){
   return max + 1;
 }
 
-function ecrireAction(id){
+// par : le joueur au nom de qui l'action est jouée (soi-même ; un joueur absent, quand on choisit à sa place ou que ce
+// téléphone fait jouer son bot : voir js/bots.js, « Partie bloquée en ligne »)
+function ecrireAction(id, par = pseudoActuel){
   if(estSpectateur) return Promise.reject(new Error("spectateur")); // (un spectateur n'écrit jamais dans la partie)
   const db = window.firebaseDB;
   const code = codePartieActuel;
   const manche = mancheCourante;
-  const par = pseudoActuel;
   const vu = prochainSeq - 1;
   // « @vu » : dernière action que ce téléphone avait jouée au moment du tap (voir estUnDoublon)
   const action = { id: `${id}@${vu}`, par };
@@ -340,6 +341,7 @@ function tenterAction(action){
   if(action.id.startsWith("retrait:")) return appliquerRetraitEnLigne(action);
   if(action.id.startsWith("retour:")) return appliquerRetourEnLigne(action);
   if(action.id.startsWith("defaire:")) return appliquerDefaireEnLigne(action);
+  if(action.id.startsWith("botenligne:") || action.id.startsWith("humainenligne:")) return appliquerBotEnLigne(action); // (js/bots.js)
 
   // Bouton à usage unique dans la manche (ex. « Terminer ») déjà appliqué : si deux joueurs
   // ont appuyé en même temps, le 2e appui est ignoré au lieu d'attendre un bouton disparu
@@ -475,7 +477,7 @@ function apresActionTraitee(){
 // Exceptions : les boutons qu'on tape exprès plusieurs fois de suite (+1 et Retour du +4).
 let actionsAppliquees = new Map(); // "joueur|action" -> numéro de la dernière fois appliquée
 let idsFermes = new Map(); // bouton d'un écran de choix -> dernière action appliquée sur cet écran (voir tenterAction)
-const ACTIONS_REPETABLES = ["plus4:joueur:", "plus4:annuler", "plus4:reset", "pause:"];
+const ACTIONS_REPETABLES = ["plus4:joueur:", "plus4:annuler", "plus4:reset", "pause:", "botenligne:", "humainenligne:"];
 
 function estUnDoublon(action){
   if(typeof action.vu !== "number") return false;
@@ -1046,7 +1048,9 @@ function masquerAnnulerChoix(){
 }
 
 // Une autre action jouée après le choix : il est confirmé, plus d'annulation
+let derniereActionEnLigneA = Date.now(); // (partie bloquée en ligne : depuis quand rien n'a bougé, voir js/bots.js)
 function actionAppliquee(position){
+  derniereActionEnLigneA = Date.now();
   if(enLigneActif && partieLancee) programmerRappelTour("en-ligne"); // (en ligne : le compteur du sifflet repart à chaque action jouée)
   if(choixAnnulable && position > choixAnnulable.fin) masquerAnnulerChoix();
 }

@@ -23,10 +23,14 @@ function sauverBots(){
   try { localStorage.setItem(CLE_BOTS, JSON.stringify([...botsPartie].filter((n) => joueurs.includes(n)))); } catch (e) {}
 }
 
-// Un bot : seulement en classique, et seulement s'il est encore dans la liste des joueurs
+// Un bot : en classique, un bot ajouté ou un joueur remplacé ; en ligne, un joueur absent remplacé par un bot (voir
+// « Partie bloquée en ligne » plus bas). Seulement s'il est encore dans la liste des joueurs.
 function estBot(nom){
-  return !enLigneActif && botsPartie.has(nom) && joueurs.includes(nom);
+  return (enLigneActif ? botsEnLigne.has(nom) : botsPartie.has(nom)) && joueurs.includes(nom);
 }
+// Hasard des décisions d'un bot qui changent la partie (refiler ses gorgées) : en ligne, le hasard commun de la partie
+// (même décision sur tous les téléphones) ; en classique, celui du téléphone
+const hasardBot = () => (enLigneActif ? aleatoire() : Math.random());
 function botsPresents(){
   return joueurs.filter((n) => estBot(n));
 }
@@ -149,7 +153,7 @@ function gorgeesDuBot(joueurIndex, nbGorgees, classeCarte, msg, onFinish, refile
   const humains = indicesHumains();
   // le relou : souvent, et toujours à sa victime
   const victime = estRelou(bot) ? victimeRelou() : null;
-  if (victime && Math.random() < CHANCE_REFILE_RELOU) {
+  if (victime && hasardBot() < CHANCE_REFILE_RELOU) {
     const h = joueurs.indexOf(victime);
     const quoi = nbGorgees === 1 ? tr("sa gorgée") : tr`ses ${texteGorgees(nbGorgees)}`;
     const texte = `${msg}\n${tr`${bot} refile ${quoi} à ${victime}. Encore ${victime}. Évidemment.`}\n${tr`Donc ${victime}, tu bois ${texteGorgees(nbGorgees)}.`}`;
@@ -157,8 +161,8 @@ function gorgeesDuBot(joueurIndex, nbGorgees, classeCarte, msg, onFinish, refile
     refiler(h, texte);
     return true;
   }
-  if (!victime && humains.length && Math.random() < CHANCE_REFILE_BOT) {
-    const h = auHasard(humains), nom = joueurs[h];
+  if (!victime && humains.length && hasardBot() < CHANCE_REFILE_BOT) {
+    const h = humains[Math.floor(hasardBot() * humains.length)], nom = joueurs[h];
     const quoi = nbGorgees === 1 ? tr("sa gorgée") : tr`ses ${texteGorgees(nbGorgees)}`;
     const texte = `${msg}\n${tr`${bot} a décidé de refiler ${quoi} à ${nom}. Normalement on n'a pas le droit, mais ${bot} s'en bat les couilles.`}\n${tr`Donc ${nom}, tu bois ${texteGorgees(nbGorgees)}.`}`;
     noterHistorique(tr`${bot} refile ${texteGorgees(nbGorgees)} à ${nom}`);
@@ -275,4 +279,151 @@ setInterval(() => {
     declencher(cible);
   }, DELAI_BOT());
 }, 300);
+
+// ----- Partie bloquée en ligne -----
+// Un choix attend un joueur (son tour, son défi, son duel…) et rien ne bouge : 12 s s'il est déconnecté, 60 s sinon. Les
+// autres voient alors en bas « On attend Tris (son défi)… », avec :
+// - « Choisir à sa place » : ce téléphone fait UN choix pour lui (celui d'un bot : il boit plutôt que de faire le défi…) ;
+// - « Remplacer par un bot » : un bot joue pour lui jusqu'à ce qu'il reprenne la main. C'est le téléphone qui l'a demandé
+//   qui le fait jouer (son « pilote ») ; s'il part à son tour, la barre revient chez les autres (« Faire jouer le bot ici »).
+// Pas de bot en mode hard (comme en classique : il faut de vrais joueurs) : seulement « Choisir à sa place ».
+// Le joueur remplacé, revenu, voit « Un bot joue à ta place » avec « Reprendre la main ».
+// Tout passe par des actions de la partie (« botenligne:<nom> », « humainenligne:<nom> », et les choix eux-mêmes envoyés AU
+// NOM du joueur absent : ecrireAction(id, nom)) : même résultat sur tous les téléphones, rejoué au retour d'un joueur.
+const ATTENTE_BLOCAGE_ABSENT = 12000, ATTENTE_BLOCAGE = 60000;
+let botsEnLigne = new Set();
+const pilotesBots = new Map(); // nom du bot -> pseudo du téléphone qui le fait jouer
+let debutAttenteBlocage = Date.now(); // (début de la manche : le compteur part de là s'il n'y a pas encore eu d'action)
+const absentDepuis = new Map();      // joueur déconnecté -> depuis quand (le compteur repart à son départ)
+function reinitialiserBotsEnLigne(){ botsEnLigne = new Set(); pilotesBots.clear(); debutAttenteBlocage = Date.now(); absentDepuis.clear(); }
+
+// (même découpage que le choix d'un bot classique, sans « jamais » pour le Réflexe : il faut bien répondre pour lui)
+const IDS_JAMAIS_POUR_AUTRE = /^(plus4:annuler|plus4:reset|pred:retour|cupidon:retour|foudre:retour|pause:)/;
+// Choix qui attendent ce joueur en ce moment (boutons cachés compris : ceux d'un autre joueur au Shifumi, au Réflexe…)
+function choixEnAttentePour(nom){
+  if (typeof actionPrete !== "function") return [];
+  return [...document.querySelectorAll("[data-net-id]")].filter((el) => el._net && proprietaire(el) === nom &&
+    !IDS_JAMAIS_POUR_AUTRE.test(idDe(el)) && actionPrete(el) && !(el._net.valide && !el._net.valide()));
+}
+// Ce que la barre dit qu'on attend
+function quoiEnAttente(el){
+  const id = idDe(el);
+  const quoi = [[/^carte:/, tr("son tour")], [/^defi:/, tr("son défi")], [/^(duel|shifumi|reflexe):/, tr("le duel")],
+    [/^couleur:/, tr("la couleur")], [/^pigeon:/, tr("le nouveau pigeon")], [/^annul:/, tr("ses annulations")],
+    [/^plus4:/, tr("le +4")], [/^doree:/, tr("la carte dorée")], [/^pred:/, tr("le pari")]].find(([m]) => m.test(id));
+  return quoi ? quoi[1] : tr("son choix");
+}
+// Le choix à faire pour lui : celui d'un bot (choisirPourBot). Réflexe : un temps de réaction de bot, ou « trop lent »
+function idChoixPour(nom, enBot){
+  const choix = choixEnAttentePour(nom);
+  if (!choix.length) return null;
+  const horsPlateau = choix.filter((el) => !el.closest("#plateau"));
+  const el = horsPlateau.length ? choisirPourBot(nom, horsPlateau) : auHasard(choix);
+  if (!el) return null;
+  if (el._net.charge) return idDe(el) + (enBot ? String(250 + Math.floor(Math.random() * 300)) : "lent");
+  return idDe(el);
+}
+const envoisPour = new Map(); // id envoyé -> moment (pas deux fois le même pendant l'aller-retour du serveur)
+function choisirPour(nom, enBot){
+  const id = idChoixPour(nom, enBot);
+  if (!id) return false;
+  const deja = envoisPour.get(nom + "|" + id);
+  if (deja && Date.now() - deja < 5000) return false;
+  envoisPour.set(nom + "|" + id, Date.now());
+  ecrireAction(id, nom).catch(() => afficherToast(tr("Connexion perdue, réessaie")));
+  return true;
+}
+const peutMettreUnBot = (nom) => !estModeHard() && joueurs.includes(nom) && joueurs.some((n) => n !== nom && !estBot(n));
+
+// « botenligne:<nom> » (remplacé, ou nouveau pilote) / « humainenligne:<nom> » (il reprend la main)
+function appliquerBotEnLigne(action){
+  const nom = action.id.slice(action.id.indexOf(":") + 1);
+  if (!joueurs.includes(nom)) return "ignorer";
+  if (action.id.startsWith("humainenligne:")) {
+    if (!botsEnLigne.has(nom)) return "ignorer";
+    botsEnLigne.delete(nom); pilotesBots.delete(nom);
+    if (!rattrapageEnCours) afficherNotificationHaut("🙋", tr`${nom} reprend la main`, true);
+  } else {
+    if (estModeHard()) return "ignorer";
+    const nouveau = !botsEnLigne.has(nom);
+    botsEnLigne.add(nom); pilotesBots.set(nom, action.par);
+    if (!rattrapageEnCours && nouveau) afficherNotificationHaut("🤖", tr`${nom} est remplacé par un bot`, true);
+  }
+  majBarreBlocage();
+  afficherJoueurs(); afficherJoueurActif();
+  return "ok";
+}
+
+// Le joueur dont la partie attend un choix, s'il bloque (ou null)
+function joueurQuiBloque(){
+  if (!enLigneActif || !partieLancee || estSpectateur || rattrapageEnCours) return null;
+  const absents = typeof deconnectes !== "undefined" ? deconnectes : new Set();
+  absents.forEach((n) => { if (!absentDepuis.has(n)) absentDepuis.set(n, Date.now()); });
+  [...absentDepuis.keys()].forEach((n) => { if (!absents.has(n)) absentDepuis.delete(n); });
+  const derniere = Math.max(typeof derniereActionEnLigneA === "number" ? derniereActionEnLigneA : 0, debutAttenteBlocage);
+  const vus = new Set();
+  for (const el of document.querySelectorAll("[data-net-id]")) {
+    const nom = el._net ? proprietaire(el) : null;
+    if (!nom || nom === pseudoActuel || vus.has(nom) || !joueurs.includes(nom)) continue;
+    vus.add(nom);
+    if (!choixEnAttentePour(nom).length) continue;
+    // (un bot dont le pilote est là joue tout seul ; sinon, il bloque comme un absent)
+    const depuis = Date.now() - Math.max(derniere, absentDepuis.get(nom) || 0);
+    const pilote = pilotesBots.get(nom);
+    if (estBot(nom) && pilote && !absents.has(pilote) && joueurs.includes(pilote) && depuis < ATTENTE_BLOCAGE_ABSENT) continue;
+    if (depuis >= (absents.has(nom) || estBot(nom) ? ATTENTE_BLOCAGE_ABSENT : ATTENTE_BLOCAGE)) return { nom, quoi: quoiEnAttente(choixEnAttentePour(nom)[0]) };
+  }
+  return null;
+}
+
+// Barre en bas de l'écran (même allure que « Mauvais joueur ? ») : chez les autres, « On attend… » ; chez le joueur remplacé,
+// « Un bot joue à ta place »
+function majBarreBlocage(){
+  let barre = document.getElementById("barreBlocage");
+  const moiBot = enLigneActif && partieLancee && !estSpectateur && estBot(pseudoActuel);
+  const bloque = moiBot ? null : joueurQuiBloque();
+  if (!moiBot && !bloque) { if (barre) barre.remove(); return; }
+  const cle = moiBot ? "moi" : `${bloque.nom}|${bloque.quoi}|${estBot(bloque.nom)}|${peutMettreUnBot(bloque.nom)}`;
+  if (barre && barre.dataset.cle === cle) return;
+  if (barre) barre.remove();
+  barre = document.createElement("div");
+  barre.id = "barreBlocage";
+  barre.dataset.cle = cle;
+  barre.setAttribute("role", "status");
+  const texte = document.createElement("span");
+  texte.className = "barreBlocage-texte";
+  const boutons = document.createElement("span");
+  boutons.className = "barreBlocage-boutons";
+  const bouton = (libelle, action) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "barreBlocage-bouton"; b.textContent = libelle;
+    b.addEventListener("click", () => { b.disabled = true; action(); setTimeout(() => { if (b.isConnected) b.disabled = false; }, 4000); });
+    boutons.appendChild(b);
+  };
+  if (moiBot) {
+    texte.textContent = tr("Un bot joue à ta place");
+    bouton(tr("Reprendre la main"), () => ecrireAction(`humainenligne:${pseudoActuel}`).catch(() => afficherToast(tr("Connexion perdue, réessaie"))));
+  } else {
+    const { nom, quoi } = bloque;
+    texte.textContent = tr`On attend ${nom} (${quoi})…`;
+    bouton(tr("Choisir à sa place"), () => choisirPour(nom, false));
+    if (peutMettreUnBot(nom)) bouton(estBot(nom) ? tr("Faire jouer le bot ici") : tr("Remplacer par un bot"),
+      () => ecrireAction(`botenligne:${nom}`).catch(() => afficherToast(tr("Connexion perdue, réessaie"))));
+  }
+  barre.append(texte, boutons);
+  document.body.appendChild(barre);
+}
+
+// Ce téléphone fait jouer les bots dont il est le pilote (même rythme qu'un bot classique)
+let tourBotEnLignePrevu = null;
+setInterval(() => {
+  try { majBarreBlocage(); } catch (e) {}
+  if (tourBotEnLignePrevu || !enLigneActif || !partieLancee || estSpectateur || rattrapageEnCours) return;
+  const bot = [...botsEnLigne].find((n) => pilotesBots.get(n) === pseudoActuel && joueurs.includes(n) && choixEnAttentePour(n).length);
+  if (!bot) return;
+  tourBotEnLignePrevu = setTimeout(() => {
+    tourBotEnLignePrevu = null;
+    if (enLigneActif && botsEnLigne.has(bot) && pilotesBots.get(bot) === pseudoActuel) choisirPour(bot, true);
+  }, DELAI_BOT());
+}, 1000);
 // #endregion

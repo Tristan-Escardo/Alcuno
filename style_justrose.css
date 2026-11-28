@@ -307,7 +307,7 @@
 :where(html[data-theme="justrose"]) #ecranPause #btnReprendrePause{ background: linear-gradient(180deg, #f5449d, #f31885); }
 :where(html[data-theme="justrose"]) #ecranTele .tele-pause svg{ fill: #ffffff; }
 :where(html[data-theme="justrose"]) #ecranTele .tele-pause-titre{ color: #ffffff; text-shadow: 0 1vh 0 rgba(106,30,67,0.9); }
-:where(html[data-theme="justrose"]) :is(#annulerChoix, #bandeauMiseAJour){ --bandeau-bord: rgba(255,255,255,0.45); --bandeau-bouton: #ffffff; }
+:where(html[data-theme="justrose"]) :is(#annulerChoix, #bandeauMiseAJour, #barreBlocage){ --bandeau-bord: rgba(255,255,255,0.45); --bandeau-bouton: #ffffff; }
 :where(html[data-theme="justrose"]) #overlayCouleur .explication-couleur b{ color: #ffffff; }
 :where(html[data-theme="justrose"]) #btnCaster .casterIcone{ background: linear-gradient(180deg, #f5449d, #f31885); }
 :where(html[data-theme="justrose"]) .btnPauseJoueur{ border: 1px solid rgba(255,255,255,0.45); color: #ffffff; }
@@ -464,11 +464,11 @@ html[data-theme="justrose"] .voletPause-ok{
   background: linear-gradient(180deg, #d4408a, #9a1052); color: #ffffff;
   text-shadow: 0 1px 0 rgba(90, 10, 50, 0.6); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.95);
 }
-html[data-theme="justrose"] :is(#annulerChoix, #bandeauMiseAJour){
+html[data-theme="justrose"] :is(#annulerChoix, #bandeauMiseAJour, #barreBlocage){
   --bandeau-fond: #5e0f37; --bandeau-bord: rgba(255, 255, 255, 0.5); --bandeau-texte: #fff;
   --bandeau-bouton: linear-gradient(180deg, #d4408a, #9a1052); --bandeau-bouton-texte: #ffffff;
 }
-html[data-theme="justrose"] :is(#annulerChoix .annulerChoix-bouton, #bandeauMiseAJour .maj){
+html[data-theme="justrose"] :is(#annulerChoix .annulerChoix-bouton, #bandeauMiseAJour .maj, #barreBlocage .barreBlocage-bouton){
   text-shadow: 0 1px 0 rgba(90, 10, 50, 0.6); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.95);
 }
 

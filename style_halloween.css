@@ -317,7 +317,7 @@ html[data-theme="halloween"][data-theme] body #overlayDuel .duel-boutons button:
 :where(html[data-theme="halloween"]) #ecranPause #btnReprendrePause{ background: linear-gradient(180deg, #f58e44, #f37318); }
 :where(html[data-theme="halloween"]) #ecranTele .tele-pause svg{ fill: #ff9a3c; }
 :where(html[data-theme="halloween"]) #ecranTele .tele-pause-titre{ color: #ff9a3c; text-shadow: 0 1vh 0 rgba(90,30,4,0.9); }
-:where(html[data-theme="halloween"]) :is(#annulerChoix, #bandeauMiseAJour){ --bandeau-bord: rgba(255,154,60,0.45); --bandeau-bouton: #ff9a3c; }
+:where(html[data-theme="halloween"]) :is(#annulerChoix, #bandeauMiseAJour, #barreBlocage){ --bandeau-bord: rgba(255,154,60,0.45); --bandeau-bouton: #ff9a3c; }
 :where(html[data-theme="halloween"]) #overlayCouleur .explication-couleur b{ color: #ff9a3c; }
 :where(html[data-theme="halloween"]) #btnCaster .casterIcone{ background: linear-gradient(180deg, #f58e44, #f37318); }
 :where(html[data-theme="halloween"]) .btnPauseJoueur{ border: 1px solid rgba(255,154,60,0.45); color: #ff9a3c; }
@@ -494,11 +494,11 @@ html[data-theme="halloween"] .voletPause-ok{
 }
 /* (aux couleurs du thème, comme les autres boutons : texte rouge, bouton presque noir au liseré de sang ; avant, texte blanc
    et bouton sans bord, qu'on ne distinguait pas du fond) */
-html[data-theme="halloween"] :is(#annulerChoix, #bandeauMiseAJour){
+html[data-theme="halloween"] :is(#annulerChoix, #bandeauMiseAJour, #barreBlocage){
   --bandeau-fond: #140205; --bandeau-bord: rgba(163, 21, 26, 0.9); --bandeau-texte: var(--hw-texte);
   --bandeau-bouton: linear-gradient(180deg, #2a0609, #120203); --bandeau-bouton-texte: var(--hw-texte);
 }
-html[data-theme="halloween"] :is(#annulerChoix .annulerChoix-bouton, #bandeauMiseAJour .maj){
+html[data-theme="halloween"] :is(#annulerChoix .annulerChoix-bouton, #bandeauMiseAJour .maj, #barreBlocage .barreBlocage-bouton){
   border: 1px solid rgba(163, 21, 26, 0.9); text-shadow: 0 1px 3px #000;
   box-shadow: inset 0 0 14px rgba(0,0,0,.75), 0 0 12px rgba(163,21,26,.55);
 }
