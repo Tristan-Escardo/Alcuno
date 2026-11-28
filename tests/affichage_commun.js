@@ -40,10 +40,18 @@ const EXCEPTIONS_BOUTONS = [
   ["*", "bouton-doree", "la carte dorée garde ses boutons or métallique dans tous les thèmes"],
   ["*", "bloc-hot-btn fait", "« Je le fais » du défi hot : rose vif voulu dans tous les thèmes (Givre et Soleil couchant le foncent)"],
   ["*", "fenetre", "fenêtres « Thème … débloqué » : leur propre style, le même dans tous les thèmes"],
+  ["*", "bouton-pigeon (désactivé)", "joueur déjà choisi au duel : jaune pâle à texte foncé, style commun voulu (Givre, Galaxie, Halloween et Soleil couchant ont le leur)"],
   ["*", "#btnProfilConnexion", "« Se connecter avec Google » : aspect imposé par Google (blanc, ou sombre dans les thèmes sombres)"],
 ];
-// Textes que le calcul de contraste lit mal : [morceau de la clé, raison]
+// Textes que le calcul de contraste lit mal : [morceau de la clé, raison, thèmes concernés (tous si absent)]
 const EXCEPTIONS_CONTRASTE = [
+  ["chipLangue.actif", "langue active : même style que les boutons jaunes du jeu (texte blanc ombré, comme « Jouer »)"],
+  ["mepTexte", "« Mise en page » : même style que les boutons jaunes du jeu (texte blanc ombré, comme « Jouer »)"],
+  ["ALCUN", "titre ALCUNO : rouge lumineux (lueur que le calcul ne voit pas), lisible à l'œil", ["donjon"]],
+  ["« O »", "lettre O du titre ALCUNO : idem", ["donjon"]],
+  ["ALCUNO", "titre ALCUNO : contour jaune sur fond transparent (le calcul ne voit que le remplissage vide), lisible à l'œil", ["donjon", "galaxie"]],
+  ["credits-", "écran Créateurs : textes clairs sur le fond étoilé (le calcul prend le fond de la page, pas celui de l'écran)", ["galaxie"]],
+  ["recap-titre", "« Fin de partie » : contour jaune, remplissage vide (comme le titre ALCUNO)", ["galaxie"]],
   ["tele-pari-perdu", "pari sur la télé : les perdants sont estompés exprès (on voit encore qui a perdu, sans que ça attire l'œil)"],
   ["aideAccueil", "aide du début : son voile est assombri par backdrop-filter, que le calcul ne voit pas (lisible à l'œil)"],
 ];
@@ -86,7 +94,7 @@ window.__mesurerAffichage = function (mode) {
     for (let p = el.parentElement; p && p !== document.body; p = p.parentElement) { const c = getComputedStyle(p); if (c.display === "none" || c.visibility === "hidden" || Number(c.opacity) === 0) return false; }
     return true;
   }).map((el) => { const c = getComputedStyle(el);
-    return { cle: (el.id ? "#" + el.id + " " : "") + (typeof el.className === "string" ? el.className.trim() : "") + " « " + (el.innerText || "").trim().replace(/\\s+/g, " ").slice(0, 30) + " »",
+    return { cle: (el.id ? "#" + el.id + " " : "") + (typeof el.className === "string" ? el.className.trim() : "") + (el.disabled ? " (désactivé)" : "") + " « " + (el.innerText || "").trim().replace(/\\s+/g, " ").slice(0, 30) + " »",
       look: [c.backgroundColor, c.backgroundImage.slice(0, 80), c.color, c.borderTopColor, c.borderTopWidth].join("|") }; });
   let debord = [];
   if (mode === "telephone") {
@@ -122,7 +130,7 @@ async function verifierEcran(page, theme, mode, controlerBoutons = true) {
   const problemes = [];
   const base = new Map(sans.contraste.map((x) => [x.cle, x.ratio]));
   for (const x of avec.contraste) {
-    if (EXCEPTIONS_CONTRASTE.some(([morceau]) => x.cle.includes(morceau))) continue;
+    if (EXCEPTIONS_CONTRASTE.some(([morceau, , themes]) => x.cle.includes(morceau) && (!themes || themes.includes(theme)))) continue;
     const b = base.get(x.cle);
     if (b === undefined) problemes.push(`MOINS LISIBLE  ${x.cle} : contraste ${x.ratio} (lisible sans le thème)`);
     else if (x.ratio < b - 0.3) problemes.push(`MOINS LISIBLE  ${x.cle} : contraste ${x.ratio} (${b} sans le thème)`);
@@ -146,7 +154,11 @@ async function verifierEcran(page, theme, mode, controlerBoutons = true) {
   }
   for (const d of avec.debord) problemes.push(`DÉBORDE        ${d}`);
   return { problemes, selection: avec.selection,
-    boutonsHabilles: avec.boutons.filter((x) => lookBase.has(x.cle) && lookBase.get(x.cle) !== x.look).length };
+    // (habillé = fond ou couleur du texte changés : une simple bordure différente, comme en Prestige, ne compte pas,
+    // sinon tous les autres boutons, dorés comme ceux de l'accueil, passaient pour « oubliés »)
+    // (seulement les boutons principaux de l'accueil, « Mode en ligne » et « Mode classique », comme test_themes.js : Prestige
+    // garde exprès les boutons dorés de base, et un autre détail de l'accueil changé ne veut pas dire « boutons habillés »)
+    boutonsHabilles: avec.boutons.filter((x) => /#btnMode(EnLigne|Classique)\b/.test(x.cle) && lookBase.has(x.cle) && lookBase.get(x.cle).split("|").slice(0, 3).join("|") !== x.look.split("|").slice(0, 3).join("|")).length };
 }
 
 // Planche des captures (à ouvrir dans un navigateur) + rapport texte

@@ -287,9 +287,14 @@ function montrerDefiHot(joueurIndex, nbGorgees, defiPossible = true, defiImpose 
     overlayRegleVerrouille = false;
     // L'annonce reste ~0,7 s avec le bouton choisi enfoncé et éclairé (l'autre s'efface), sur TOUS les téléphones : en ligne, les
     // autres voient lequel a été touché. Puis elle se ferme (la suite : finirBoireHot, quand l'annonce est fermée).
-    // (fermée seulement si c'est toujours la même annonce : une nouvelle aurait pu prendre sa place entre-temps)
+    // (fermée seulement si c'est toujours CE défi qui est affiché. L'écran de l'annonce est réutilisé d'une annonce à l'autre :
+    // vérifier seulement que c'est le même écran ne suffisait pas. Une nouvelle annonce avec un nouveau défi arrivée dans
+    // ces 0,7 s (surtout en revenant dans une partie en ligne, quand les actions sont rejouées en accéléré) était fermée
+    // sans réponse : ce téléphone faisait boire le joueur, les autres attendaient son choix, la partie restait bloquée)
     const annonce = document.getElementById("overlayRegleUnique");
-    setTimeout(() => { if(document.getElementById("overlayRegleUnique") === annonce) fermerOverlayRegleUnique(); }, 700);
+    setTimeout(() => {
+      if(bloc.isConnected && document.getElementById("overlayRegleUnique") === annonce && annonce.contains(bloc)) fermerOverlayRegleUnique();
+    }, delai(700));
   };
   const bouton = (classe, libelle, id, action) => {
     const btn = document.createElement("button");

@@ -624,6 +624,9 @@ function montrerOverlayRegle(message, classeCarte = "", classeCarteSupplementair
     // Overlay réutilisé : on retire l'habillage doré d'un message carte dorée précédent
     overlay.classList.remove("overlay-doree");
     overlay.querySelectorAll(".etincelles-doree").forEach(z => z.remove());
+    // … et le bloc du défi hot de l'annonce d'avant (déjà répondu) : la nouvelle annonce n'en a pas forcément un
+    // (montrerDefiHot en remet un si besoin)
+    overlay.querySelectorAll(".bloc-hot").forEach(b => b.remove());
     const cartes = overlay.querySelector(".overlay-regle-cartes");
     const boxTexte = overlay.querySelector(".overlay-regle-texte");
 
