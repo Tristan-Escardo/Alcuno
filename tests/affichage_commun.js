@@ -45,6 +45,7 @@ const EXCEPTIONS_BOUTONS = [
 ];
 // Textes que le calcul de contraste lit mal : [morceau de la clé, raison, thèmes concernés (tous si absent)]
 const EXCEPTIONS_CONTRASTE = [
+  ["tele-shifumi-emoji", "emoji du Shifumi sur la télé : un dessin en couleur, la couleur du texte n'y change rien"],
   ["chipLangue.actif", "langue active : même style que les boutons jaunes du jeu (texte blanc ombré, comme « Jouer »)"],
   ["mepTexte", "« Mise en page » : même style que les boutons jaunes du jeu (texte blanc ombré, comme « Jouer »)"],
   ["ALCUN", "titre ALCUNO : rouge lumineux (lueur que le calcul ne voit pas), lisible à l'œil", ["donjon"]],

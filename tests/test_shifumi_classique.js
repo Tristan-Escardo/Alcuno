@@ -114,7 +114,7 @@ const CAPTURES = process.env.CAPTURES || "";
   verifier(e.cartes === 2 && e.retournees === 0 && e.options === 0, "2e choix : deuxième carte de dos, plus de boutons, suspense");
   e = await attendreQue((x) => /Égalité/.test(x.resultat));
   verifier(e.retournees === 2 && e.faces === "✊✊" && /×2/.test(e.titre), `les 2 cartes se retournent : égalité, ×2 (${e.faces} ${e.titre})`);
-  verifier(/Pierre/.test(JSON.parse(e.tele).texte), "après la révélation, la télé montre les choix");
+  verifier((JSON.parse(e.tele).shifumi || []).every((j) => j.e === "✊") && (JSON.parse(e.tele).shifumi || []).length === 2, "après la révélation, la télé reçoit les deux choix (emojis)");
   e = await attendreQue((x) => x.options === 3 && x.cartes === 0);
   verifier(e.options === 3 && e.cartes === 0, "on rejoue : table vide, 3 choix");
   await tap("#overlayDuel .shifumi-option", "Ciseaux"); await attendre(250);

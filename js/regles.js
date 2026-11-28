@@ -1264,6 +1264,7 @@ function afficherOverlayShifumi(overlay, j1, j2){
   // Révélation : le choix de chacun, côte à côte
   const reveal = document.createElement("div");
   reveal.className = "shifumi-reveal";
+  reveal.dataset.tele = ""; // (télé : les choix révélés lui sont envoyés à part, en grand : js/tele.js, shifumiPourTele)
   content.appendChild(reveal);
 
   const resultat = document.createElement("div");
@@ -1349,8 +1350,10 @@ function afficherOverlayShifumi(overlay, j1, j2){
     [[j1, c1], [j2, c2]].forEach(([idx, c]) => {
       const bloc = document.createElement("div");
       bloc.className = "shifumi-revele-joueur";
-      bloc.innerHTML = `<span class="duel-label shifumi-revele-nom">${echapperHtml(joueurs[idx])}</span>` +
-        `<span class="shifumi-image">${IMAGE_SHIFUMI[c]}</span><span class="duel-label shifumi-nom">${echapperHtml(nomChoixShifumi(c))}</span>`;
+      // (l'emoji en grand, le nom du joueur dessous ; sans le mot « Pierre », « Feuille »…)
+      bloc.dataset.choix = c;
+      bloc.innerHTML = `<span class="shifumi-image" role="img" aria-label="${echapperHtml(nomChoixShifumi(c))}">${IMAGE_SHIFUMI[c]}</span>` +
+        `<span class="duel-label shifumi-revele-nom">${echapperHtml(joueurs[idx])}</span>`;
       reveal.appendChild(bloc);
     });
     overlay.classList.add("shifumi-revele");
@@ -1420,7 +1423,7 @@ function creerCarteShifumi(nom){
   const carte = document.createElement("div");
   carte.className = "shifumi-carte-jeu";
   carte.innerHTML = `<div class="shifumi-carte-interieur"><div class="shifumi-carte-dos"></div>` +
-    `<div class="shifumi-carte-face"><span class="shifumi-face-image"></span><span class="shifumi-face-nom"></span></div></div>` +
+    `<div class="shifumi-carte-face"><span class="shifumi-face-image"></span></div></div>` +
     `<span class="duel-label shifumi-carte-joueur">${echapperHtml(nom)}</span>`;
   return carte;
 }
@@ -1515,11 +1518,13 @@ function afficherOverlayShifumiCartes(overlay, j1, j2){
     const c1 = choix[j1], c2 = choix[j2];
     [[j1, c1], [j2, c2]].forEach(([idx, c]) => {
       const carte = cartes[idx];
-      carte.querySelector(".shifumi-face-image").textContent = IMAGE_SHIFUMI[c];
-      carte.querySelector(".shifumi-face-nom").textContent = nomChoixShifumi(c);
+      const image = carte.querySelector(".shifumi-face-image");
+      image.textContent = IMAGE_SHIFUMI[c];
+      image.setAttribute("role", "img"); image.setAttribute("aria-label", nomChoixShifumi(c));
+      carte.dataset.choix = c;
       carte.classList.add("retournee");
     });
-    table.dataset.tele = `${joueurs[j1]} : ${IMAGE_SHIFUMI[c1]} ${nomChoixShifumi(c1)}   —   ${joueurs[j2]} : ${IMAGE_SHIFUMI[c2]} ${nomChoixShifumi(c2)}`;
+    // (télé : les cartes retournées lui sont envoyées à part, en grand : js/tele.js, shifumiPourTele ; jamais en texte)
     overlay.classList.add("shifumi-revele");
     info.innerText = tr("SHIFUMI !");
     jouerSon("cartes");

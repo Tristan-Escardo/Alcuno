@@ -11257,3 +11257,52 @@ html[data-theme="chandeleur"] #overlayDuel .duel-content .reflexe-zone-nom{ colo
 }
 #barreBlocage .barreBlocage-bouton:disabled{ opacity: 0.55; cursor: default; }
 @media (prefers-reduced-motion: reduce){ #barreBlocage{ animation: none; } }
+/* Télé, Réflexe en classique : « TAPE ! » en gros, en vert, comme sur le téléphone */
+#ecranTele .tele-ecran-go{
+  color: #2fe36a; font: 900 clamp(72px, 12vw, 160px)/1 Arial Black, Arial, sans-serif; margin-top: 0.15em;
+  text-shadow: 0 0 30px rgba(47,227,106,0.75), 4px 4px 0 #000; animation: reflexeGo 0.16s cubic-bezier(.2,1.6,.4,1) both;
+}
+/* Givre, Kawaii et Soleil couchant (fond clair) : vert plus foncé pour « TAPE ! » (le vert vif ne ressortait pas), sur la télé et le téléphone */
+html:is([data-theme="givre"], [data-theme="kawaii"], [data-theme="soleil"]) :is(#ecranTele .tele-ecran-go, #overlayDuel .duel-content .reflexe-signal.reflexe-signal-go){
+  color: #0b7a2e; text-shadow: 0 0 18px rgba(47,227,106,0.45), 2px 2px 0 #fff;
+}
+
+/* Shifumi, résultat sur le téléphone : l'emoji en grand, le nom du joueur dessous, en plus gros (plus le mot « Pierre »…) */
+#overlayDuel .duel-content .shifumi-revele-joueur .shifumi-image{ width: clamp(110px, 34vw, 170px); font-size: clamp(64px, 20vw, 100px); }
+#overlayDuel .duel-content .shifumi-revele-nom{ font-size: clamp(20px, 6vw, 30px); }
+#overlayDuel .duel-content .shifumi-carte-jeu .shifumi-carte-interieur{ width: clamp(90px, 28vw, 130px); }
+#overlayDuel .duel-content .shifumi-face-image{ font-size: clamp(54px, 17vw, 84px); }
+#overlayDuel .duel-content .shifumi-carte-joueur{ font-size: clamp(20px, 6vw, 30px); }
+
+/* Télé, Shifumi révélé (js/tele.js, shifumiPourTele) : les deux emojis en grand, le nom de chaque joueur dessous, puis
+   le résultat en gros. Gagnant éclairé aux couleurs du thème, perdant en rouge. */
+#ecranTele .tele-shifumi{ display: flex; justify-content: center; align-items: flex-start; gap: clamp(40px, 9vw, 140px); margin: 0.15em 0 0.1em; }
+#ecranTele .tele-shifumi-joueur{ display: flex; flex-direction: column; align-items: center; gap: 0.25em; }
+#ecranTele .tele-shifumi-emoji{
+  display: flex; align-items: center; justify-content: center; width: clamp(110px, 12.5vw, 180px); aspect-ratio: 1; border-radius: 50%;
+  font-size: clamp(66px, 8vw, 115px); line-height: 1; background: rgba(255,255,255,0.08); border: 4px solid var(--shifumi-bord, #FFD700);
+}
+#ecranTele .tele-shifumi-nom{ font: 900 clamp(28px, 3.2vw, 48px)/1.1 Arial, sans-serif; color: var(--shifumi-texte, #FFD700); text-shadow: 2px 2px 6px #000; }
+/* (gagnant : plus grand, éclairé, halo ; perdant : plus petit, pâli et à moitié décoloré) */
+#ecranTele .tele-shifumi-joueur{ transition: transform 0.4s ease, opacity 0.4s ease, filter 0.4s ease; }
+#ecranTele .tele-shifumi-gagnant{ transform: scale(1.12); }
+#ecranTele .tele-shifumi-gagnant .tele-shifumi-emoji{
+  background: radial-gradient(circle, rgba(255,255,255,0.55), rgba(255,255,255,0.12) 70%);
+  box-shadow: 0 0 0 6px var(--shifumi-bord, #FFD700), 0 0 60px 10px var(--shifumi-bord, #FFD700), 0 0 120px rgba(255,255,255,0.35);
+  filter: brightness(1.15) saturate(1.2);
+}
+#ecranTele .tele-shifumi-gagnant .tele-shifumi-nom{ filter: brightness(1.25); text-shadow: 0 0 18px var(--shifumi-bord, #FFD700), 2px 2px 6px #000; }
+#ecranTele .tele-shifumi-perdant{ transform: scale(0.88); opacity: 0.45; filter: grayscale(0.65) brightness(0.8); }
+#ecranTele .tele-shifumi-perdant .tele-shifumi-emoji{ border-color: rgba(229,57,53,0.7); box-shadow: none; }
+#ecranTele .tele-ecran-resultat{ font: 900 clamp(26px, 3vw, 44px)/1.15 Arial, sans-serif; color: var(--shifumi-texte, #FFD700); text-shadow: 2px 2px 6px #000; white-space: pre-line; }
+html[data-theme="halloween"] #ecranTele{ --shifumi-bord: #ff9a3c; --shifumi-texte: #ff9a3c; }
+html:is([data-theme="justrose"], [data-theme="musique"]) #ecranTele{ --shifumi-bord: #ffffff; --shifumi-texte: #ffffff; }
+html[data-theme="patrick"] #ecranTele{ --shifumi-bord: #7dff9f; --shifumi-texte: #d9ffe5; }
+html[data-theme="valentin"] #ecranTele{ --shifumi-bord: #ff8fb8; --shifumi-texte: #ffe3ee; }
+html[data-theme="chandeleur"] #ecranTele{ --shifumi-texte: #fff3e0; }
+html[data-theme="soleil"] #ecranTele{ --shifumi-bord: #c2185b; --shifumi-texte: #6b1838; }
+html[data-theme="soleil"] #ecranTele :is(.tele-shifumi-nom, .tele-ecran-resultat){ text-shadow: none; }
+html[data-theme="givre"] #ecranTele{ --shifumi-bord: #3fb8ff; --shifumi-texte: #0b6aa3; }
+html[data-theme="givre"] #ecranTele :is(.tele-shifumi-nom, .tele-ecran-resultat){ text-shadow: none; }
+html[data-theme="kawaii"] #ecranTele{ --shifumi-bord: #e0187a; --shifumi-texte: #a60f5b; }
+html[data-theme="kawaii"] #ecranTele :is(.tele-shifumi-nom, .tele-ecran-resultat){ text-shadow: 0 1px 0 #fff; }

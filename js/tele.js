@@ -242,6 +242,20 @@ function faqPourTele(){
 
 // Défi du mode hot / hard dans l'annonce (js/mode-hot.js) : envoyé à part, la télé le dessine dans le même cadre que le téléphone
 // (puce MODE HARD / MODE HOT, défi, deux boutons aux couleurs du thème ; celui qui a été touché s'enfonce, l'autre s'efface)
+// Shifumi : les choix RÉVÉLÉS (jamais avant : rien n'est lu tant que l'écran n'est pas « shifumi-revele »), pour les montrer
+// en grand sur la télé : l'emoji, le nom du joueur dessous, gagnant / perdant. En ligne : les blocs de la révélation ; en
+// classique : les cartes retournées.
+function shifumiPourTele(o){
+  if (o.id !== "overlayDuel" || !o.classList.contains("shifumi-revele") || o.classList.contains("duel-reflexe")) return null;
+  const blocs = [...o.querySelectorAll(".shifumi-revele-joueur, .shifumi-carte-jeu.retournee")];
+  if (!blocs.length) return null;
+  return blocs.map((b) => ({
+    n: ((b.querySelector(".shifumi-revele-nom, .shifumi-carte-joueur") || {}).textContent || "").trim(),
+    e: ((b.querySelector(".shifumi-image, .shifumi-face-image") || {}).textContent || "").trim(),
+    g: b.classList.contains("shifumi-gagnant") ? "g" : b.classList.contains("shifumi-perdant") ? "p" : ""
+  }));
+}
+
 function hotPourTele(bloc){
   const btn = (c) => bloc.querySelector(".bloc-hot-btn." + c);
   const lien = bloc.querySelector(".bloc-hot-lien");
@@ -325,6 +339,9 @@ function ecranPourTele(){
     pari: o.id === "overlayPredictionFin" ? pariPourTele(o) : null,
     hot: blocHot ? hotPourTele(blocHot) : null,
     texte: texteSansBoutons(o),
+    shifumi: shifumiPourTele(o),
+    // Réflexe en classique : « TAPE ! » en gros (en ligne, la télé reste sur « Duel Réflexe en cours... » : voir regles.js)
+    go: (() => { const sg = o.querySelector(".reflexe-signal-go"); return sg && sg.dataset.tele === tr("TAPE !") ? sg.dataset.tele : null; })(),
     // (cartes des annonces : leur face sans la classe « retournee » ; cartes du duel encore à choisir : sans face, donc de dos)
     cartes: cartes.slice(0, 4).map(c => faceCarte(c) || (c.classList.contains("dos_dore") ? "d" : "")),
     // Duel : carte déjà choisie (assombrie), puis carte du perdant (en rouge) et du gagnant (estompée), comme sur le téléphone
@@ -1209,12 +1226,34 @@ function dessinerTele(ecran, etat){
     if (typeof briserGivre === "function") aBriser.forEach((c) => briserGivre(c));
     const zoneTexte = surEcran.querySelector(".tele-ecran-texte");
     zoneTexte.innerHTML = "";
-    String(e.texte || "").split("\n").filter(Boolean).forEach((t, i) => {
+    const lignesTexte = String(e.texte || "").split("\n").filter(Boolean);
+    // Shifumi révélé avec un gagnant : pas la phrase « Ylana a perdu, Tris gagne » (les emojis éclairés le disent) ; la
+    // ligne d'une égalité (« ×2 ») reste
+    const sansPhrase = !!(e.shifumi && e.shifumi.some((j) => j.g) && lignesTexte.length > 1);
+    if (sansPhrase) lignesTexte.pop();
+    lignesTexte.forEach((t, i) => {
       const l = document.createElement("div");
-      l.className = i === 0 ? "tele-ecran-titre" : "tele-ecran-detail";
+      l.className = i === 0 ? "tele-ecran-titre" : (e.go && t === e.go ? "tele-ecran-go" : "tele-ecran-detail");
+      // Shifumi révélé : la dernière ligne (« Ylana a perdu, Tris gagne », « Égalité ! … ») en plus gros, sous les emojis
+      if (e.shifumi && !sansPhrase && i > 0 && i === lignesTexte.length - 1) l.className = "tele-ecran-resultat";
       l.innerText = t;
       zoneTexte.appendChild(l);
     });
+    // Shifumi révélé : les deux choix en grand (emoji, nom du joueur dessous), avant la ligne du résultat
+    if (e.shifumi && e.shifumi.length) {
+      const bloc = document.createElement("div");
+      bloc.className = "tele-shifumi";
+      e.shifumi.forEach((j) => {
+        const d = document.createElement("div");
+        d.className = "tele-shifumi-joueur" + (j.g === "g" ? " tele-shifumi-gagnant" : j.g === "p" ? " tele-shifumi-perdant" : "");
+        const emoji = document.createElement("span"); emoji.className = "tele-shifumi-emoji"; emoji.textContent = j.e;
+        const nom = document.createElement("span"); nom.className = "tele-shifumi-nom"; nom.textContent = j.n;
+        d.append(emoji, nom);
+        bloc.appendChild(d);
+      });
+      const resultat = zoneTexte.querySelector(".tele-ecran-resultat");
+      zoneTexte.insertBefore(bloc, resultat || null);
+    }
     const zoneChoix = surEcran.querySelector(".tele-ecran-choix");
     zoneChoix.innerHTML = "";
     // +4 : dès que quelqu'un reçoit des gorgées, ceux qui n'en reçoivent pas sont atténués (en Kawaii ou Soleil
